@@ -56,38 +56,38 @@ void pathological_with(Func func) {
     auto view = func(registry);
 
     for(std::uint64_t i = 0; i < 500000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     for(auto i = 0; i < 10; ++i) {
         auto curr = 0;
 
-        for(auto [entity]: registry.storage<entt::entity>().each()) {
+        for(auto [entt]: registry.storage<entt::entity>().each()) {
             if(!(++curr % 7)) {
-                registry.remove<position>(entity);
+                registry.remove<position>(entt);
             }
 
             if(!(++curr % 11)) {
-                registry.remove<velocity>(entity);
+                registry.remove<velocity>(entt);
             }
 
             if(!(++curr % 13)) {
-                registry.remove<comp<0>>(entity);
+                registry.remove<comp<0>>(entt);
             }
 
             if(!(++curr % 17)) {
-                registry.destroy(entity);
+                registry.destroy(entt);
             }
         }
 
         for(std::uint64_t j = 0; j < 50000L; j++) {
-            const auto entity = registry.create();
-            registry.emplace<position>(entity);
-            registry.emplace<velocity>(entity);
-            registry.emplace<comp<0>>(entity);
+            const auto entt = registry.create();
+            registry.emplace<position>(entt);
+            registry.emplace<velocity>(entt);
+            registry.emplace<comp<0>>(entt);
         }
     }
 
@@ -110,70 +110,70 @@ TEST(Benchmark, Create) {
 
 TEST(Benchmark, CreateMany) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Creating 1000000 entities at once" << std::endl;
 
     generic_with([&]() {
-        registry.create(entities.begin(), entities.end());
+        registry.create(entity.begin(), entity.end());
     });
 }
 
 TEST(Benchmark, CreateManyAndEmplaceComponents) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Creating 1000000 entities at once and emplace components" << std::endl;
 
     generic_with([&]() {
-        registry.create(entities.begin(), entities.end());
+        registry.create(entity.begin(), entity.end());
 
-        for(const auto entity: entities) {
-            registry.emplace<position>(entity);
-            registry.emplace<velocity>(entity);
+        for(const auto entt: entity) {
+            registry.emplace<position>(entt);
+            registry.emplace<velocity>(entt);
         }
     });
 }
 
 TEST(Benchmark, CreateManyWithComponents) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Creating 1000000 entities at once with components" << std::endl;
 
     generic_with([&]() {
-        registry.create(entities.begin(), entities.end());
-        registry.insert<position>(entities.begin(), entities.end());
-        registry.insert<velocity>(entities.begin(), entities.end());
+        registry.create(entity.begin(), entity.end());
+        registry.insert<position>(entity.begin(), entity.end());
+        registry.insert<velocity>(entity.begin(), entity.end());
     });
 }
 
 TEST(Benchmark, Erase) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Erasing 1000000 components from their entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: view) {
-            registry.erase<position>(entity);
+        for(auto entt: view) {
+            registry.erase<position>(entt);
         }
     });
 }
 
 TEST(Benchmark, EraseMany) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Erasing 1000000 components from their entities at once" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.erase<position>(view.begin(), view.end());
@@ -182,14 +182,14 @@ TEST(Benchmark, EraseMany) {
 
 TEST(Benchmark, EraseManyMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Erasing 1000000 components per type from their entities at once" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.erase<position, velocity>(view.begin(), view.end());
@@ -198,30 +198,30 @@ TEST(Benchmark, EraseManyMulti) {
 
 TEST(Benchmark, Remove) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Removing 1000000 components from their entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: view) {
-            registry.remove<position>(entity);
+        for(auto entt: view) {
+            registry.remove<position>(entt);
         }
     });
 }
 
 TEST(Benchmark, RemoveMany) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Removing 1000000 components from their entities at once" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.remove<position>(view.begin(), view.end());
@@ -230,14 +230,14 @@ TEST(Benchmark, RemoveMany) {
 
 TEST(Benchmark, RemoveManyMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Removing 1000000 components per type from their entities at once" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.remove<position, velocity>(view.begin(), view.end());
@@ -246,12 +246,12 @@ TEST(Benchmark, RemoveManyMulti) {
 
 TEST(Benchmark, Clear) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Clearing 1000000 components from their entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.clear<position>();
@@ -260,13 +260,13 @@ TEST(Benchmark, Clear) {
 
 TEST(Benchmark, ClearMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Clearing 1000000 components per type from their entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.clear<position, velocity>();
@@ -275,12 +275,12 @@ TEST(Benchmark, ClearMulti) {
 
 TEST(Benchmark, ClearStable) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Clearing 1000000 stable components from their entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<stable_position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<stable_position>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.clear<stable_position>();
@@ -289,60 +289,60 @@ TEST(Benchmark, ClearStable) {
 
 TEST(Benchmark, Recycle) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Recycling 1000000 entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.destroy(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.destroy(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto next = entities.size(); next; --next) {
-            entities[next] = registry.create();
+        for(auto next = entity.size(); next; --next) {
+            entity[next] = registry.create();
         }
     });
 }
 
 TEST(Benchmark, RecycleMany) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
     std::cout << "Recycling 1000000 entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.destroy(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.destroy(entity.begin(), entity.end());
 
     generic_with([&]() {
-        registry.create(entities.begin(), entities.end());
+        registry.create(entity.begin(), entity.end());
     });
 }
 
 TEST(Benchmark, Destroy) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Destroying 1000000 entities" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: view) {
-            registry.destroy(entity);
+        for(auto entt: view) {
+            registry.destroy(entt);
         }
     });
 }
 
 TEST(Benchmark, DestroyMany) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Destroying 1000000 entities at once" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.destroy(view.begin(), view.end());
@@ -351,14 +351,14 @@ TEST(Benchmark, DestroyMany) {
 
 TEST(Benchmark, DestroyManyMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
     std::cout << "Destroying 1000000 entities at once, multiple components" << std::endl;
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
         registry.destroy(view.begin(), view.end());
@@ -367,62 +367,70 @@ TEST(Benchmark, DestroyManyMulti) {
 
 TEST(Benchmark, GetFromRegistry) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    std::cout << "Getting data for 1000000 entities from a registry, one component" << std::endl;
+
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: entities) {
-            registry.get<position>(entity).x = 0u;
+        for(auto entt: entity) {
+            registry.get<position>(entt).x = 0u;
         }
     });
 }
 
 TEST(Benchmark, GetFromRegistryMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    std::cout << "Getting data for 1000000 entities from a registry, multiple components" << std::endl;
+
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: entities) {
-            registry.get<position>(entity).x = 0u;
-            registry.get<velocity>(entity).y = 0u;
+        for(auto entt: entity) {
+            registry.get<position>(entt).x = 0u;
+            registry.get<velocity>(entt).y = 0u;
         }
     });
 }
 
 TEST(Benchmark, GetFromView) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position>();
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
+    std::cout << "Getting data for 1000000 entities from a view, one component" << std::endl;
+
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: entities) {
-            view.get<position>(entity).x = 0u;
+        for(auto entt: entity) {
+            view.get<position>(entt).x = 0u;
         }
     });
 }
 
 TEST(Benchmark, GetFromViewMulti) {
     entt::registry registry;
-    std::vector<entt::entity> entities(1000000);
+    std::vector<entt::entity> entity(1000000);
     auto view = registry.view<position, velocity>();
 
-    registry.create(entities.begin(), entities.end());
-    registry.insert<position>(entities.begin(), entities.end());
-    registry.insert<velocity>(entities.begin(), entities.end());
+    std::cout << "Getting data for 1000000 entities from a view, multiple components" << std::endl;
+
+    registry.create(entity.begin(), entity.end());
+    registry.insert<position>(entity.begin(), entity.end());
+    registry.insert<velocity>(entity.begin(), entity.end());
 
     generic_with([&]() {
-        for(auto entity: entities) {
-            view.get<position>(entity).x = 0u;
-            view.get<velocity>(entity).y = 0u;
+        for(auto entt: entity) {
+            view.get<position>(entt).x = 0u;
+            view.get<velocity>(entt).y = 0u;
         }
     });
 }
@@ -433,8 +441,8 @@ TEST(Benchmark, IterateSingleComponent1M) {
     std::cout << "Iterating over 1000000 entities, one component" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
     }
 
     iterate_with(registry.view<position>(), [](auto &...comp) {
@@ -448,8 +456,8 @@ TEST(Benchmark, IterateSingleStableComponent1M) {
     std::cout << "Iterating over 1000000 entities, one stable component" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<stable_position>(entity);
+        const auto entt = registry.create();
+        registry.emplace<stable_position>(entt);
     }
 
     iterate_with(registry.view<stable_position>(), [](auto &...comp) {
@@ -463,15 +471,15 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     std::cout << "Iterating over 1000000 entities, one component, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
     }
 
     entt::runtime_view view{};
     view.iterate(registry.storage<position>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
     });
 }
 
@@ -481,9 +489,9 @@ TEST(Benchmark, IterateTwoComponents1M) {
     std::cout << "Iterating over 1000000 entities, two components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     iterate_with(registry.view<position, velocity>(), [](auto &...comp) {
@@ -497,9 +505,9 @@ TEST(Benchmark, IterateTwoStableComponents1M) {
     std::cout << "Iterating over 1000000 entities, two stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<stable_position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<stable_position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     iterate_with(registry.view<stable_position, velocity>(), [](auto &...comp) {
@@ -513,11 +521,11 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, two components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -532,11 +540,11 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, two components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -551,9 +559,9 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, two components, non owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     iterate_with(registry.group<>(entt::get<position, velocity>), [](auto &...comp) {
@@ -567,9 +575,9 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, two components, full owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     iterate_with(registry.group<position, velocity>(), [](auto &...comp) {
@@ -583,9 +591,9 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, two components, partial owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     iterate_with(registry.group<position>(entt::get<velocity>), [](auto &...comp) {
@@ -599,18 +607,18 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     std::cout << "Iterating over 1000000 entities, two components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
     }
 
     entt::runtime_view view{};
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
     });
 }
 
@@ -620,11 +628,11 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     std::cout << "Iterating over 1000000 entities, two components, half of the entities have all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -632,9 +640,9 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
     });
 }
 
@@ -644,11 +652,11 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     std::cout << "Iterating over 1000000 entities, two components, only one entity has all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -656,9 +664,9 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     view.iterate(registry.storage<position>())
         .iterate(registry.storage<velocity>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
     });
 }
 
@@ -668,10 +676,10 @@ TEST(Benchmark, IterateThreeComponents1M) {
     std::cout << "Iterating over 1000000 entities, three components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     iterate_with(registry.view<position, velocity, comp<0>>(), [](auto &...comp) {
@@ -685,10 +693,10 @@ TEST(Benchmark, IterateThreeStableComponents1M) {
     std::cout << "Iterating over 1000000 entities, three stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<stable_position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<stable_position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     iterate_with(registry.view<stable_position, velocity, comp<0>>(), [](auto &...comp) {
@@ -702,12 +710,12 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -722,12 +730,12 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -742,10 +750,10 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, three components, non owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     iterate_with(registry.group<>(entt::get<position, velocity, comp<0>>), [](auto &...comp) {
@@ -759,10 +767,10 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, three components, full owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     iterate_with(registry.group<position, velocity, comp<0>>(), [](auto &...comp) {
@@ -776,10 +784,10 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, three components, partial owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     iterate_with(registry.group<position, velocity>(entt::get<comp<0>>), [](auto &...comp) {
@@ -793,10 +801,10 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
     std::cout << "Iterating over 1000000 entities, three components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
     }
 
     entt::runtime_view view{};
@@ -804,10 +812,10 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
     });
 }
 
@@ -817,12 +825,12 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
     std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -831,10 +839,10 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
     });
 }
 
@@ -844,12 +852,12 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
     std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -858,10 +866,10 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         .iterate(registry.storage<velocity>())
         .iterate(registry.storage<comp<0>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
     });
 }
 
@@ -871,12 +879,12 @@ TEST(Benchmark, IterateFiveComponents1M) {
     std::cout << "Iterating over 1000000 entities, five components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.view<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
@@ -890,12 +898,12 @@ TEST(Benchmark, IterateFiveStableComponents1M) {
     std::cout << "Iterating over 1000000 entities, five stable components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<stable_position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<stable_position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.view<stable_position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
@@ -909,14 +917,14 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, five components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -931,14 +939,14 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, five components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -953,12 +961,12 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, five components, non owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>), [](auto &...comp) {
@@ -972,12 +980,12 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, five components, full owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.group<position, velocity, comp<0>, comp<1>, comp<2>>(), [](auto &...comp) {
@@ -991,12 +999,12 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, five components, partial (4 of 5) owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>), [](auto &...comp) {
@@ -1010,12 +1018,12 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
     std::cout << "Iterating over 1000000 entities, five components, partial (3 of 5) owning group" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     iterate_with(registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>), [](auto &...comp) {
@@ -1029,12 +1037,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
     std::cout << "Iterating over 1000000 entities, five components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity);
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt);
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
     }
 
     entt::runtime_view view{};
@@ -1044,12 +1052,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
-        registry.get<comp<1>>(entity).x = {};
-        registry.get<comp<2>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
+        registry.get<comp<1>>(entt).x = {};
+        registry.get<comp<2>>(entt).x = {};
     });
 }
 
@@ -1059,14 +1067,14 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
     std::cout << "Iterating over 1000000 entities, five components, half of the entities have all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
 
         if(i % 2) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -1077,12 +1085,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
-        registry.get<comp<1>>(entity).x = {};
-        registry.get<comp<2>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
+        registry.get<comp<1>>(entt).x = {};
+        registry.get<comp<2>>(entt).x = {};
     });
 }
 
@@ -1092,14 +1100,14 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
     std::cout << "Iterating over 1000000 entities, five components, only one entity has all the components, runtime view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<velocity>(entity);
-        registry.emplace<comp<0>>(entity);
-        registry.emplace<comp<1>>(entity);
-        registry.emplace<comp<2>>(entity);
+        const auto entt = registry.create();
+        registry.emplace<velocity>(entt);
+        registry.emplace<comp<0>>(entt);
+        registry.emplace<comp<1>>(entt);
+        registry.emplace<comp<2>>(entt);
 
         if(i == 500000L) {
-            registry.emplace<position>(entity);
+            registry.emplace<position>(entt);
         }
     }
 
@@ -1110,12 +1118,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         .iterate(registry.storage<comp<1>>())
         .iterate(registry.storage<comp<2>>());
 
-    iterate_with(view, [&](auto entity) {
-        registry.get<position>(entity).x = {};
-        registry.get<velocity>(entity).x = {};
-        registry.get<comp<0>>(entity).x = {};
-        registry.get<comp<1>>(entity).x = {};
-        registry.get<comp<2>>(entity).x = {};
+    iterate_with(view, [&](auto entt) {
+        registry.get<position>(entt).x = {};
+        registry.get<velocity>(entt).x = {};
+        registry.get<comp<0>>(entt).x = {};
+        registry.get<comp<1>>(entt).x = {};
+        registry.get<comp<2>>(entt).x = {};
     });
 }
 
@@ -1145,8 +1153,8 @@ TEST(Benchmark, SortSingle) {
     std::cout << "Sort 150000 entities, one component" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, i, i);
     }
 
     generic_with([&]() {
@@ -1160,9 +1168,9 @@ TEST(Benchmark, SortMulti) {
     std::cout << "Sort 150000 entities, two components" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
-        registry.emplace<velocity>(entity, i, i);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, i, i);
+        registry.emplace<velocity>(entt, i, i);
     }
 
     registry.sort<position>([](const auto &lhs, const auto &rhs) { return lhs.x < rhs.x && lhs.y < rhs.y; });
@@ -1174,23 +1182,23 @@ TEST(Benchmark, SortMulti) {
 
 TEST(Benchmark, AlmostSortedStdSort) {
     entt::registry registry;
-    entt::entity entities[3]{};
+    entt::entity entity[3]{};
 
     std::cout << "Sort 150000 entities, almost sorted, std::sort" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, i, i);
 
         if(!(i % 50000)) {
-            entities[i / 50000] = entity;
+            entity[i / 50000] = entt;
         }
     }
 
     for(std::uint64_t i = 0; i < 3; ++i) {
-        registry.destroy(entities[i]);
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, 50000 * i, 50000 * i);
+        registry.destroy(entity[i]);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, 50000 * i, 50000 * i);
     }
 
     generic_with([&]() {
@@ -1200,23 +1208,23 @@ TEST(Benchmark, AlmostSortedStdSort) {
 
 TEST(Benchmark, AlmostSortedInsertionSort) {
     entt::registry registry;
-    entt::entity entities[3]{};
+    entt::entity entity[3]{};
 
     std::cout << "Sort 150000 entities, almost sorted, insertion sort" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, i, i);
 
         if(!(i % 50000)) {
-            entities[i / 50000] = entity;
+            entity[i / 50000] = entt;
         }
     }
 
     for(std::uint64_t i = 0; i < 3; ++i) {
-        registry.destroy(entities[i]);
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, 50000 * i, 50000 * i);
+        registry.destroy(entity[i]);
+        const auto entt = registry.create();
+        registry.emplace<position>(entt, 50000 * i, 50000 * i);
     }
 
     generic_with([&]() {
