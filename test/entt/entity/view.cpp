@@ -851,6 +851,36 @@ TEST(MultiComponentView, SizeHint) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
+TEST(MultiComponentView, UseAndRefresh) {
+    entt::registry registry;
+    entt::entity entity[3]{registry.create(), registry.create(), registry.create()};
+
+    registry.emplace<int>(entity[0u]);
+    registry.emplace<int>(entity[1u]);
+
+    registry.emplace<char>(entity[1u]);
+    registry.emplace<char>(entity[0u]);
+    registry.emplace<char>(entity[2u]);
+
+    auto view = registry.view<int, char>(entt::exclude<double>);
+
+    view.use<int>();
+
+    ASSERT_EQ(view.handle()->type(), entt::type_id<int>());
+    ASSERT_EQ(view.front(), entity[1u]);
+    ASSERT_EQ(view.back(), entity[0u]);
+
+    view.use<char>();
+
+    ASSERT_EQ(view.handle()->type(), entt::type_id<char>());
+    ASSERT_EQ(view.front(), entity[0u]);
+    ASSERT_EQ(view.back(), entity[1u]);
+
+    view.refresh();
+
+    ASSERT_EQ(view.handle()->type(), entt::type_id<int>());
+}
+
 TEST(MultiComponentView, Each) {
     entt::registry registry;
     entt::entity entity[2]{registry.create(), registry.create()};
