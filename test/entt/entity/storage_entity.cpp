@@ -13,15 +13,15 @@ TEST(StorageEntity, TypeAndPolicy) {
 }
 
 TEST(StorageEntity, Functionalities) {
-    entt::entity entities[2u]{entt::entity{0}, entt::entity{1}};
+    entt::entity entity[2u]{entt::entity{0}, entt::entity{1}};
     entt::storage<entt::entity> pool;
 
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(pool.in_use(), 0u);
 
-    ASSERT_EQ(*pool.push(entt::null), entities[0u]);
-    ASSERT_EQ(*pool.push(entt::tombstone), entities[1u]);
+    ASSERT_EQ(*pool.push(entt::null), entity[0u]);
+    ASSERT_EQ(*pool.push(entt::tombstone), entity[1u]);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
@@ -33,10 +33,10 @@ TEST(StorageEntity, Functionalities) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 1u);
 
-    ASSERT_NO_THROW(pool.get(entities[0u]));
-    ASSERT_EQ(pool.get_as_tuple(entities[0u]), std::tuple<>{});
+    ASSERT_NO_THROW(pool.get(entity[0u]));
+    ASSERT_EQ(pool.get_as_tuple(entity[0u]), std::tuple<>{});
 
-    pool.erase(entities[0u]);
+    pool.erase(entity[0u]);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
@@ -165,13 +165,13 @@ TEST(StorageEntity, Push) {
     ASSERT_EQ(*pool.push(traits_type::construct(4, 42)), traits_type::construct(4, 42));
     ASSERT_EQ(*pool.push(traits_type::construct(4, 43)), entt::entity{6});
 
-    entt::entity entities[2u]{entt::entity{1}, traits_type::construct(5, 3)};
+    entt::entity entity[2u]{entt::entity{1}, traits_type::construct(5, 3)};
 
-    pool.erase(entities, entities + 2u);
+    pool.erase(entity, entity + 2u);
     pool.erase(entt::entity{2});
 
-    ASSERT_EQ(pool.current(entities[0u]), 1);
-    ASSERT_EQ(pool.current(entities[1u]), 4);
+    ASSERT_EQ(pool.current(entity[0u]), 1);
+    ASSERT_EQ(pool.current(entity[1u]), 4);
     ASSERT_EQ(pool.current(entt::entity{2}), 1);
 
     ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());
@@ -191,7 +191,7 @@ TEST(StorageEntity, Emplace) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::storage<entt::entity> pool;
-    entt::entity entities[2u]{};
+    entt::entity entity[2u]{};
 
     ASSERT_EQ(pool.emplace(), entt::entity{0});
     ASSERT_EQ(pool.emplace(entt::null), entt::entity{1});
@@ -216,10 +216,10 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(pool.emplace(), traits_type::construct(2, 1));
 
     pool.erase(traits_type::construct(2, 1));
-    pool.insert(entities, entities + 2u);
+    pool.insert(entity, entity + 2u);
 
-    ASSERT_EQ(entities[0u], traits_type::construct(2, 2));
-    ASSERT_EQ(entities[1u], entt::entity{8});
+    ASSERT_EQ(entity[0u], traits_type::construct(2, 2));
+    ASSERT_EQ(entity[1u], entt::entity{8});
 }
 
 TEST(StorageEntity, Patch) {
@@ -246,27 +246,27 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
 
 TEST(StorageEntity, Insert) {
     entt::storage<entt::entity> pool;
-    entt::entity entities[2u]{};
+    entt::entity entity[2u]{};
 
-    pool.insert(std::begin(entities), std::end(entities));
+    pool.insert(std::begin(entity), std::end(entity));
 
-    ASSERT_TRUE(pool.contains(entities[0u]));
-    ASSERT_TRUE(pool.contains(entities[1u]));
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 2u);
 
-    pool.erase(std::begin(entities), std::end(entities));
+    pool.erase(std::begin(entity), std::end(entity));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 0u);
 
-    pool.insert(entities, entities + 1u);
+    pool.insert(entity, entity + 1u);
 
-    ASSERT_TRUE(pool.contains(entities[0u]));
-    ASSERT_FALSE(pool.contains(entities[1u]));
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[1u]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
@@ -275,12 +275,12 @@ TEST(StorageEntity, Insert) {
 
 TEST(StorageEntity, Pack) {
     entt::storage<entt::entity> pool;
-    entt::entity entities[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}};
+    entt::entity entity[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}};
 
-    pool.push(entities, entities + 3u);
-    std::swap(entities[0u], entities[1u]);
+    pool.push(entity, entity + 3u);
+    std::swap(entity[0u], entity[1u]);
 
-    const auto len = pool.pack(entities + 1u, entities + 3u);
+    const auto len = pool.pack(entity + 1u, entity + 3u);
     auto it = pool.each().cbegin().base();
 
     ASSERT_NE(it, pool.cbegin());
@@ -290,11 +290,11 @@ TEST(StorageEntity, Pack) {
     ASSERT_NE(it + len, pool.cend());
     ASSERT_EQ(it + len + 1u, pool.cend());
 
-    ASSERT_EQ(*it++, entities[1u]);
-    ASSERT_EQ(*it++, entities[2u]);
+    ASSERT_EQ(*it++, entity[1u]);
+    ASSERT_EQ(*it++, entity[2u]);
 
     ASSERT_NE(it, pool.cend());
-    ASSERT_EQ(*it++, entities[0u]);
+    ASSERT_EQ(*it++, entity[0u]);
     ASSERT_EQ(it, pool.cend());
 }
 
