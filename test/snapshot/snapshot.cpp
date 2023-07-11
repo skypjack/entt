@@ -112,12 +112,12 @@ TEST(Snapshot, Continuous) {
     entt::registry source;
     entt::registry destination;
 
-    std::vector<entt::entity> entities;
+    std::vector<entt::entity> entity;
     for(auto i = 0; i < 10; ++i) {
-        entities.push_back(source.create());
+        entity.push_back(source.create());
     }
 
-    for(auto entity: entities) {
+    for(auto entity: entity) {
         source.destroy(entity);
     }
 

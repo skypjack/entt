@@ -59,10 +59,10 @@ TEST(BasicSnapshot, GetEntityType) {
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.in_use());
 
-    entt::entity entities[3u];
+    entt::entity entity[3u];
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.destroy(entities[1u]);
+    registry.create(std::begin(entity), std::end(entity));
+    registry.destroy(entity[1u]);
 
     data.clear();
     snapshot.get<entt::entity>(archive, "ignored"_hs);
@@ -93,12 +93,12 @@ TEST(BasicSnapshot, GetType) {
     entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<int>();
 
-    entt::entity entities[3u];
+    entt::entity entity[3u];
     const int values[3u]{1, 2, 3};
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.insert<int>(std::begin(entities), std::end(entities), std::begin(values));
-    registry.destroy(entities[1u]);
+    registry.create(std::begin(entity), std::end(entity));
+    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(values));
+    registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
     auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
@@ -119,13 +119,13 @@ TEST(BasicSnapshot, GetType) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
     ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), entities[2u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), entity[2u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[4u]), nullptr);
     ASSERT_EQ(entt::any_cast<int>(data[4u]), values[2u]);
@@ -139,11 +139,11 @@ TEST(BasicSnapshot, GetEmptyType) {
     entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<empty>();
 
-    entt::entity entities[3u];
+    entt::entity entity[3u];
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.insert<empty>(std::begin(entities), std::end(entities));
-    registry.destroy(entities[1u]);
+    registry.create(std::begin(entity), std::end(entity));
+    registry.insert<empty>(std::begin(entity), std::end(entity));
+    registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
     auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
@@ -164,10 +164,10 @@ TEST(BasicSnapshot, GetEmptyType) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[2u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), entities[2u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), entity[2u]);
 }
 
 TEST(BasicSnapshot, GetTypeSparse) {
@@ -177,17 +177,17 @@ TEST(BasicSnapshot, GetTypeSparse) {
     entt::registry registry;
     entt::basic_snapshot snapshot{registry};
 
-    entt::entity entities[3u];
+    entt::entity entity[3u];
     const int values[3u]{1, 2, 3};
 
-    registry.create(std::begin(entities), std::end(entities));
-    registry.insert<int>(std::begin(entities), std::end(entities), std::begin(values));
-    registry.destroy(entities[1u]);
+    registry.create(std::begin(entity), std::end(entity));
+    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(values));
+    registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
     auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
-    snapshot.get<int>(archive, std::begin(entities), std::end(entities), "other"_hs);
+    snapshot.get<int>(archive, std::begin(entity), std::end(entity), "other"_hs);
 
     ASSERT_EQ(data.size(), 1u);
 
@@ -195,15 +195,15 @@ TEST(BasicSnapshot, GetTypeSparse) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
-    snapshot.get<int>(archive, std::begin(entities), std::end(entities));
+    snapshot.get<int>(archive, std::begin(entity), std::end(entity));
 
     ASSERT_EQ(data.size(), 6u);
 
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), static_cast<typename traits_type::entity_type>(std::distance(std::begin(entities), std::end(entities))));
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), static_cast<typename traits_type::entity_type>(std::distance(std::begin(entity), std::end(entity))));
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entities[0u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
     ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
@@ -212,7 +212,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), static_cast<entt::entity>(entt::null));
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[4u]), nullptr);
-    ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), entities[2u]);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), entity[2u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[5u]), nullptr);
     ASSERT_EQ(entt::any_cast<int>(data[5u]), values[2u]);
@@ -249,20 +249,20 @@ TEST(BasicSnapshotLoader, GetEntityType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[3u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u), traits_type::construct(1u, 1u)};
+    const entt::entity entity[3u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u), traits_type::construct(1u, 1u)};
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
-    ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
+    ASSERT_FALSE(registry.valid(entity[2u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
 
     loader.get<entt::entity>(archive);
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
-    ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
+    ASSERT_FALSE(registry.valid(entity[2u]));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(storage.in_use(), 0u);
@@ -270,24 +270,24 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
-    data.emplace_back(entities[2u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
+    data.emplace_back(entity[2u]);
 
     loader.get<entt::entity>(archive, "ignored"_hs);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
-    ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_TRUE(registry.valid(entity[1u]));
+    ASSERT_FALSE(registry.valid(entity[2u]));
 
     ASSERT_EQ(storage.size(), 3u);
     ASSERT_EQ(storage.in_use(), 2u);
 
-    ASSERT_EQ(storage[0u], entities[0u]);
-    ASSERT_EQ(storage[1u], entities[1u]);
-    ASSERT_EQ(storage[2u], entities[2u]);
+    ASSERT_EQ(storage[0u], entity[0u]);
+    ASSERT_EQ(storage[1u], entity[1u]);
+    ASSERT_EQ(storage[2u], entity[2u]);
 
-    ASSERT_EQ(registry.create(), entities[2u]);
+    ASSERT_EQ(registry.create(), entity[2u]);
 }
 
 TEST(BasicSnapshotLoader, GetType) {
@@ -300,42 +300,42 @@ TEST(BasicSnapshotLoader, GetType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     loader.get<int>(archive, "other"_hs);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
     data.emplace_back(values[1u]);
 
     loader.get<int>(archive);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_TRUE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(entities[0u]));
-    ASSERT_TRUE(storage.contains(entities[1u]));
-    ASSERT_EQ(storage.get(entities[0u]), values[0u]);
-    ASSERT_EQ(storage.get(entities[1u]), values[1u]);
+    ASSERT_TRUE(storage.contains(entity[0u]));
+    ASSERT_TRUE(storage.contains(entity[1u]));
+    ASSERT_EQ(storage.get(entity[0u]), values[0u]);
+    ASSERT_EQ(storage.get(entity[1u]), values[1u]);
 }
 
 TEST(BasicSnapshotLoader, GetEmptyType) {
@@ -348,35 +348,35 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
 
     loader.get<empty>(archive, "other"_hs);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<empty>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
 
     loader.get<empty>(archive);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_TRUE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(entities[0u]));
-    ASSERT_TRUE(storage.contains(entities[1u]));
+    ASSERT_TRUE(storage.contains(entity[0u]));
+    ASSERT_TRUE(storage.contains(entity[1u]));
 }
 
 TEST(BasicSnapshotLoader, GetTypeSparse) {
@@ -389,45 +389,45 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
     data.emplace_back(static_cast<entt::entity>(entt::null));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     loader.get<int>(archive, "other"_hs);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
 
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     data.emplace_back(static_cast<entt::entity>(entt::null));
 
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
     data.emplace_back(values[1u]);
 
     loader.get<int>(archive);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_TRUE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(entities[0u]));
-    ASSERT_TRUE(storage.contains(entities[1u]));
-    ASSERT_EQ(storage.get(entities[0u]), values[0u]);
-    ASSERT_EQ(storage.get(entities[1u]), values[1u]);
+    ASSERT_TRUE(storage.contains(entity[0u]));
+    ASSERT_TRUE(storage.contains(entity[1u]));
+    ASSERT_EQ(storage.get(entity[0u]), values[0u]);
+    ASSERT_EQ(storage.get(entity[1u]), values[1u]);
 }
 
 TEST(BasicSnapshotLoader, GetTypeWithListener) {
@@ -466,32 +466,32 @@ TEST(BasicSnapshotLoader, Orphans) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int value = 42;
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(value);
 
     loader.get<entt::entity>(archive);
     loader.get<int>(archive);
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_TRUE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_TRUE(registry.valid(entity[1u]));
 
     loader.orphans();
 
-    ASSERT_TRUE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_TRUE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 }
 
 TEST(BasicContinuousLoader, Constructors) {
@@ -518,28 +518,28 @@ TEST(BasicContinuousLoader, GetEntityType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[3u]{traits_type::construct(1u, 0u), traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[3u]{traits_type::construct(1u, 0u), traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
-    ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
+    ASSERT_FALSE(registry.valid(entity[2u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
 
     loader.get<entt::entity>(archive);
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
-    ASSERT_FALSE(registry.valid(entities[2u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
+    ASSERT_FALSE(registry.valid(entity[2u]));
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
-    ASSERT_FALSE(loader.contains(entities[2u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
+    ASSERT_FALSE(loader.contains(entity[2u]));
 
-    ASSERT_EQ(loader.map(entities[0u]), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(loader.map(entities[2u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[0u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[2u]), static_cast<entt::entity>(entt::null));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(storage.in_use(), 0u);
@@ -547,100 +547,100 @@ TEST(BasicContinuousLoader, GetEntityType) {
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
-    data.emplace_back(entities[2u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
+    data.emplace_back(entity[2u]);
 
     loader.get<entt::entity>(archive, "ignored"_hs);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
-    ASSERT_FALSE(loader.contains(entities[2u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
+    ASSERT_FALSE(loader.contains(entity[2u]));
 
-    ASSERT_NE(loader.map(entities[0u]), static_cast<entt::entity>(entt::null));
-    ASSERT_NE(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(loader.map(entities[2u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[0u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[2u]), static_cast<entt::entity>(entt::null));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 2u);
     ASSERT_EQ(storage.in_use(), 2u);
 
-    ASSERT_EQ(storage[0u], loader.map(entities[0u]));
-    ASSERT_EQ(storage[1u], loader.map(entities[1u]));
+    ASSERT_EQ(storage[0u], loader.map(entity[0u]));
+    ASSERT_EQ(storage[1u], loader.map(entity[1u]));
 
-    ASSERT_EQ(registry.create(), entities[2u]);
+    ASSERT_EQ(registry.create(), entity[2u]);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
-    data.emplace_back(entities[2u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
+    data.emplace_back(entity[2u]);
 
     loader.get<entt::entity>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
-    ASSERT_TRUE(loader.contains(entities[2u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
+    ASSERT_TRUE(loader.contains(entity[2u]));
 
-    ASSERT_NE(loader.map(entities[0u]), static_cast<entt::entity>(entt::null));
-    ASSERT_NE(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_NE(loader.map(entities[2u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[0u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[2u]), static_cast<entt::entity>(entt::null));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[2u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[2u])));
 
     ASSERT_EQ(storage.size(), 4u);
     ASSERT_EQ(storage.in_use(), 4u);
 
-    ASSERT_EQ(storage[0u], loader.map(entities[0u]));
-    ASSERT_EQ(storage[1u], loader.map(entities[1u]));
-    ASSERT_EQ(storage[3u], loader.map(entities[2u]));
+    ASSERT_EQ(storage[0u], loader.map(entity[0u]));
+    ASSERT_EQ(storage[1u], loader.map(entity[1u]));
+    ASSERT_EQ(storage[3u], loader.map(entity[2u]));
 
-    registry.destroy(loader.map(entities[1u]));
+    registry.destroy(loader.map(entity[1u]));
 
-    ASSERT_TRUE(loader.contains(entities[1u]));
-    ASSERT_NE(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(loader.contains(entity[1u]));
+    ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
 
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
 
     loader.get<entt::entity>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[1u]));
-    ASSERT_NE(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
-    ASSERT_EQ(storage[3u], loader.map(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
+    ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
+    ASSERT_EQ(storage[3u], loader.map(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
 
-    data.emplace_back(entities[1u]);
-    data.emplace_back(entities[2u]);
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[1u]);
+    data.emplace_back(entity[2u]);
+    data.emplace_back(entity[0u]);
 
     loader.get<entt::entity>(archive, "ignored"_hs);
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
-    ASSERT_FALSE(loader.contains(entities[2u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
+    ASSERT_FALSE(loader.contains(entity[2u]));
 
-    ASSERT_EQ(loader.map(entities[0u]), static_cast<entt::entity>(entt::null));
-    ASSERT_NE(loader.map(entities[1u]), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(loader.map(entities[2u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[0u]), static_cast<entt::entity>(entt::null));
+    ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(loader.map(entity[2u]), static_cast<entt::entity>(entt::null));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 4u);
     ASSERT_EQ(storage.in_use(), 2u);
 
-    ASSERT_EQ(storage[1u], loader.map(entities[1u]));
+    ASSERT_EQ(storage[1u], loader.map(entity[1u]));
 }
 
 TEST(BasicContinuousLoader, GetType) {
@@ -653,51 +653,51 @@ TEST(BasicContinuousLoader, GetType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_FALSE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     loader.get<int>(archive, "other"_hs);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
     data.emplace_back(values[1u]);
 
     loader.get<int>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(loader.map(entities[0u])));
-    ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
-    ASSERT_EQ(storage.get(loader.map(entities[0u])), values[0u]);
-    ASSERT_EQ(storage.get(loader.map(entities[1u])), values[1u]);
+    ASSERT_TRUE(storage.contains(loader.map(entity[0u])));
+    ASSERT_TRUE(storage.contains(loader.map(entity[1u])));
+    ASSERT_EQ(storage.get(loader.map(entity[0u])), values[0u]);
+    ASSERT_EQ(storage.get(loader.map(entity[1u])), values[1u]);
 }
 
 TEST(BasicContinuousLoader, GetTypeExtended) {
@@ -709,8 +709,8 @@ TEST(BasicContinuousLoader, GetTypeExtended) {
     const auto &storage = registry.storage<shadow>();
 
     std::vector<entt::any> data{};
-    const entt::entity entities[2u]{traits_type::construct(0u, 1u), traits_type::construct(1u, 1u)};
-    const shadow value{entities[0u]};
+    const entt::entity entity[2u]{traits_type::construct(0u, 1u), traits_type::construct(1u, 1u)};
+    const shadow value{entity[0u]};
 
     auto archive = [&loader, &data, pos = 0u](auto &elem) mutable {
         elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]);
@@ -720,37 +720,37 @@ TEST(BasicContinuousLoader, GetTypeExtended) {
         }
     };
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_FALSE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
     data.emplace_back(value);
 
     loader.get<entt::entity>(archive);
     loader.get<shadow>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 1u);
-    ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
-    ASSERT_EQ(storage.get(loader.map(entities[1u])).target, loader.map(entities[0u]));
+    ASSERT_TRUE(storage.contains(loader.map(entity[1u])));
+    ASSERT_EQ(storage.get(loader.map(entity[1u])).target, loader.map(entity[0u]));
 }
 
 TEST(BasicContinuousLoader, GetEmptyType) {
@@ -763,44 +763,44 @@ TEST(BasicContinuousLoader, GetEmptyType) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_FALSE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
 
     loader.get<empty>(archive, "other"_hs);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<empty>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
 
     loader.get<empty>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(loader.map(entities[0u])));
-    ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
+    ASSERT_TRUE(storage.contains(loader.map(entity[0u])));
+    ASSERT_TRUE(storage.contains(loader.map(entity[1u])));
 }
 
 TEST(BasicContinuousLoader, GetTypeSparse) {
@@ -813,54 +813,54 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int values[2u]{1, 3};
 
-    ASSERT_FALSE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_FALSE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_FALSE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
     data.emplace_back(static_cast<entt::entity>(entt::null));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     loader.get<int>(archive, "other"_hs);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_FALSE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_FALSE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
 
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(values[0u]);
 
     data.emplace_back(static_cast<entt::entity>(entt::null));
 
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[1u]);
     data.emplace_back(values[1u]);
 
     loader.get<int>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_TRUE(storage.contains(loader.map(entities[0u])));
-    ASSERT_TRUE(storage.contains(loader.map(entities[1u])));
-    ASSERT_EQ(storage.get(loader.map(entities[0u])), values[0u]);
-    ASSERT_EQ(storage.get(loader.map(entities[1u])), values[1u]);
+    ASSERT_TRUE(storage.contains(loader.map(entity[0u])));
+    ASSERT_TRUE(storage.contains(loader.map(entity[1u])));
+    ASSERT_EQ(storage.get(loader.map(entity[0u])), values[0u]);
+    ASSERT_EQ(storage.get(loader.map(entity[1u])), values[1u]);
 }
 
 TEST(BasicContinuousLoader, GetTypeWithListener) {
@@ -899,36 +899,36 @@ TEST(BasicContinuousLoader, Orphans) {
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
-    const entt::entity entities[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
+    const entt::entity entity[2u]{traits_type::construct(0u, 0u), traits_type::construct(2u, 0u)};
     const int value = 42;
 
-    ASSERT_FALSE(registry.valid(entities[0u]));
-    ASSERT_FALSE(registry.valid(entities[1u]));
+    ASSERT_FALSE(registry.valid(entity[0u]));
+    ASSERT_FALSE(registry.valid(entity[1u]));
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
-    data.emplace_back(entities[0u]);
-    data.emplace_back(entities[1u]);
+    data.emplace_back(entity[0u]);
+    data.emplace_back(entity[1u]);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(entities[0u]);
+    data.emplace_back(entity[0u]);
     data.emplace_back(value);
 
     loader.get<entt::entity>(archive);
     loader.get<int>(archive);
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_TRUE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     loader.orphans();
 
-    ASSERT_TRUE(loader.contains(entities[0u]));
-    ASSERT_TRUE(loader.contains(entities[1u]));
+    ASSERT_TRUE(loader.contains(entity[0u]));
+    ASSERT_TRUE(loader.contains(entity[1u]));
 
-    ASSERT_TRUE(registry.valid(loader.map(entities[0u])));
-    ASSERT_FALSE(registry.valid(loader.map(entities[1u])));
+    ASSERT_TRUE(registry.valid(loader.map(entity[0u])));
+    ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 }

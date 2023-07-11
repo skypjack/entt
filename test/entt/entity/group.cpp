@@ -985,30 +985,30 @@ TEST(OwningGroup, SortOrdered) {
     entt::registry registry;
     auto group = registry.group<boxed_int, char>();
 
-    entt::entity entities[5]{};
-    registry.create(std::begin(entities), std::end(entities));
+    entt::entity entity[5]{};
+    registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<boxed_int>(entities[0], 12);
-    registry.emplace<char>(entities[0], 'a');
+    registry.emplace<boxed_int>(entity[0], 12);
+    registry.emplace<char>(entity[0], 'a');
 
-    registry.emplace<boxed_int>(entities[1], 9);
-    registry.emplace<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entity[1], 9);
+    registry.emplace<char>(entity[1], 'b');
 
-    registry.emplace<boxed_int>(entities[2], 6);
-    registry.emplace<char>(entities[2], 'c');
+    registry.emplace<boxed_int>(entity[2], 6);
+    registry.emplace<char>(entity[2], 'c');
 
-    registry.emplace<boxed_int>(entities[3], 1);
-    registry.emplace<boxed_int>(entities[4], 2);
+    registry.emplace<boxed_int>(entity[3], 1);
+    registry.emplace<boxed_int>(entity[4], 2);
 
     group.sort([&group](const entt::entity lhs, const entt::entity rhs) {
         return group.get<boxed_int>(lhs).value < group.get<0>(rhs).value;
     });
 
-    ASSERT_EQ(group.handle().data()[0u], entities[0]);
-    ASSERT_EQ(group.handle().data()[1u], entities[1]);
-    ASSERT_EQ(group.handle().data()[2u], entities[2]);
-    ASSERT_EQ(group.handle().data()[3u], entities[3]);
-    ASSERT_EQ(group.handle().data()[4u], entities[4]);
+    ASSERT_EQ(group.handle().data()[0u], entity[0]);
+    ASSERT_EQ(group.handle().data()[1u], entity[1]);
+    ASSERT_EQ(group.handle().data()[2u], entity[2]);
+    ASSERT_EQ(group.handle().data()[3u], entity[3]);
+    ASSERT_EQ(group.handle().data()[4u], entity[4]);
 
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][0u].value, 12);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][1u].value, 9);
@@ -1020,42 +1020,42 @@ TEST(OwningGroup, SortOrdered) {
     ASSERT_EQ(group.storage<char>()->raw()[0u][1u], 'b');
     ASSERT_EQ(group.storage<char>()->raw()[0u][2u], 'c');
 
-    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{12}, 'a')));
-    ASSERT_EQ((group.get<0, 1>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{6}, 'c')));
+    ASSERT_EQ((group.get<boxed_int, char>(entity[0])), (std::make_tuple(boxed_int{12}, 'a')));
+    ASSERT_EQ((group.get<0, 1>(entity[1])), (std::make_tuple(boxed_int{9}, 'b')));
+    ASSERT_EQ((group.get<boxed_int, char>(entity[2])), (std::make_tuple(boxed_int{6}, 'c')));
 
-    ASSERT_FALSE(group.contains(entities[3]));
-    ASSERT_FALSE(group.contains(entities[4]));
+    ASSERT_FALSE(group.contains(entity[3]));
+    ASSERT_FALSE(group.contains(entity[4]));
 }
 
 TEST(OwningGroup, SortReverse) {
     entt::registry registry;
     auto group = registry.group<boxed_int, char>();
 
-    entt::entity entities[5]{};
-    registry.create(std::begin(entities), std::end(entities));
+    entt::entity entity[5]{};
+    registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<boxed_int>(entities[0], 6);
-    registry.emplace<char>(entities[0], 'a');
+    registry.emplace<boxed_int>(entity[0], 6);
+    registry.emplace<char>(entity[0], 'a');
 
-    registry.emplace<boxed_int>(entities[1], 9);
-    registry.emplace<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entity[1], 9);
+    registry.emplace<char>(entity[1], 'b');
 
-    registry.emplace<boxed_int>(entities[2], 12);
-    registry.emplace<char>(entities[2], 'c');
+    registry.emplace<boxed_int>(entity[2], 12);
+    registry.emplace<char>(entity[2], 'c');
 
-    registry.emplace<boxed_int>(entities[3], 1);
-    registry.emplace<boxed_int>(entities[4], 2);
+    registry.emplace<boxed_int>(entity[3], 1);
+    registry.emplace<boxed_int>(entity[4], 2);
 
     group.sort<boxed_int>([](const auto &lhs, const auto &rhs) {
         return lhs.value < rhs.value;
     });
 
-    ASSERT_EQ(group.handle().data()[0u], entities[2]);
-    ASSERT_EQ(group.handle().data()[1u], entities[1]);
-    ASSERT_EQ(group.handle().data()[2u], entities[0]);
-    ASSERT_EQ(group.handle().data()[3u], entities[3]);
-    ASSERT_EQ(group.handle().data()[4u], entities[4]);
+    ASSERT_EQ(group.handle().data()[0u], entity[2]);
+    ASSERT_EQ(group.handle().data()[1u], entity[1]);
+    ASSERT_EQ(group.handle().data()[2u], entity[0]);
+    ASSERT_EQ(group.handle().data()[3u], entity[3]);
+    ASSERT_EQ(group.handle().data()[4u], entity[4]);
 
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][0u].value, 12);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][1u].value, 9);
@@ -1067,38 +1067,38 @@ TEST(OwningGroup, SortReverse) {
     ASSERT_EQ(group.storage<char>()->raw()[0u][1u], 'b');
     ASSERT_EQ(group.storage<char>()->raw()[0u][2u], 'a');
 
-    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'a')));
-    ASSERT_EQ((group.get<0, 1>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
-    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{12}, 'c')));
+    ASSERT_EQ((group.get<boxed_int, char>(entity[0])), (std::make_tuple(boxed_int{6}, 'a')));
+    ASSERT_EQ((group.get<0, 1>(entity[1])), (std::make_tuple(boxed_int{9}, 'b')));
+    ASSERT_EQ((group.get<boxed_int, char>(entity[2])), (std::make_tuple(boxed_int{12}, 'c')));
 
-    ASSERT_FALSE(group.contains(entities[3]));
-    ASSERT_FALSE(group.contains(entities[4]));
+    ASSERT_FALSE(group.contains(entity[3]));
+    ASSERT_FALSE(group.contains(entity[4]));
 }
 
 TEST(OwningGroup, SortUnordered) {
     entt::registry registry;
     auto group = registry.group<boxed_int>(entt::get<char>);
 
-    entt::entity entities[7]{};
-    registry.create(std::begin(entities), std::end(entities));
+    entt::entity entity[7]{};
+    registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<boxed_int>(entities[0], 6);
-    registry.emplace<char>(entities[0], 'c');
+    registry.emplace<boxed_int>(entity[0], 6);
+    registry.emplace<char>(entity[0], 'c');
 
-    registry.emplace<boxed_int>(entities[1], 3);
-    registry.emplace<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entity[1], 3);
+    registry.emplace<char>(entity[1], 'b');
 
-    registry.emplace<boxed_int>(entities[2], 1);
-    registry.emplace<char>(entities[2], 'a');
+    registry.emplace<boxed_int>(entity[2], 1);
+    registry.emplace<char>(entity[2], 'a');
 
-    registry.emplace<boxed_int>(entities[3], 9);
-    registry.emplace<char>(entities[3], 'd');
+    registry.emplace<boxed_int>(entity[3], 9);
+    registry.emplace<char>(entity[3], 'd');
 
-    registry.emplace<boxed_int>(entities[4], 12);
-    registry.emplace<char>(entities[4], 'e');
+    registry.emplace<boxed_int>(entity[4], 12);
+    registry.emplace<char>(entity[4], 'e');
 
-    registry.emplace<boxed_int>(entities[5], 4);
-    registry.emplace<boxed_int>(entities[6], 5);
+    registry.emplace<boxed_int>(entity[5], 4);
+    registry.emplace<boxed_int>(entity[6], 5);
 
     group.sort<boxed_int, char>([](const auto lhs, const auto rhs) {
         static_assert(std::is_same_v<decltype(std::get<0>(lhs)), boxed_int &>);
@@ -1106,13 +1106,13 @@ TEST(OwningGroup, SortUnordered) {
         return std::get<1>(lhs) < std::get<1>(rhs);
     });
 
-    ASSERT_EQ(group.handle().data()[0u], entities[4]);
-    ASSERT_EQ(group.handle().data()[1u], entities[3]);
-    ASSERT_EQ(group.handle().data()[2u], entities[0]);
-    ASSERT_EQ(group.handle().data()[3u], entities[1]);
-    ASSERT_EQ(group.handle().data()[4u], entities[2]);
-    ASSERT_EQ(group.handle().data()[5u], entities[5]);
-    ASSERT_EQ(group.handle().data()[6u], entities[6]);
+    ASSERT_EQ(group.handle().data()[0u], entity[4]);
+    ASSERT_EQ(group.handle().data()[1u], entity[3]);
+    ASSERT_EQ(group.handle().data()[2u], entity[0]);
+    ASSERT_EQ(group.handle().data()[3u], entity[1]);
+    ASSERT_EQ(group.handle().data()[4u], entity[2]);
+    ASSERT_EQ(group.handle().data()[5u], entity[5]);
+    ASSERT_EQ(group.handle().data()[6u], entity[6]);
 
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][0u].value, 12);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][1u].value, 9);
@@ -1128,45 +1128,45 @@ TEST(OwningGroup, SortUnordered) {
     ASSERT_EQ(group.get<1>(group.handle().data()[3u]), 'b');
     ASSERT_EQ(group.get<char>(group.handle().data()[4u]), 'a');
 
-    ASSERT_FALSE(group.contains(entities[5]));
-    ASSERT_FALSE(group.contains(entities[6]));
+    ASSERT_FALSE(group.contains(entity[5]));
+    ASSERT_FALSE(group.contains(entity[6]));
 }
 
 TEST(OwningGroup, SortWithExclusionList) {
     entt::registry registry;
     auto group = registry.group<boxed_int>(entt::get<>, entt::exclude<char>);
 
-    entt::entity entities[5]{};
-    registry.create(std::begin(entities), std::end(entities));
+    entt::entity entity[5]{};
+    registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<boxed_int>(entities[0], 0);
-    registry.emplace<boxed_int>(entities[1], 1);
-    registry.emplace<boxed_int>(entities[2], 2);
-    registry.emplace<boxed_int>(entities[3], 3);
-    registry.emplace<boxed_int>(entities[4], 4);
+    registry.emplace<boxed_int>(entity[0], 0);
+    registry.emplace<boxed_int>(entity[1], 1);
+    registry.emplace<boxed_int>(entity[2], 2);
+    registry.emplace<boxed_int>(entity[3], 3);
+    registry.emplace<boxed_int>(entity[4], 4);
 
-    registry.emplace<char>(entities[2]);
+    registry.emplace<char>(entity[2]);
 
     group.sort([](const entt::entity lhs, const entt::entity rhs) {
         return lhs < rhs;
     });
 
-    ASSERT_EQ(group.handle().data()[0u], entities[4]);
-    ASSERT_EQ(group.handle().data()[1u], entities[3]);
-    ASSERT_EQ(group.handle().data()[2u], entities[1]);
-    ASSERT_EQ(group.handle().data()[3u], entities[0]);
+    ASSERT_EQ(group.handle().data()[0u], entity[4]);
+    ASSERT_EQ(group.handle().data()[1u], entity[3]);
+    ASSERT_EQ(group.handle().data()[2u], entity[1]);
+    ASSERT_EQ(group.handle().data()[3u], entity[0]);
 
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][0u].value, 4);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][1u].value, 3);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][2u].value, 1);
     ASSERT_EQ(group.storage<boxed_int>()->raw()[0u][3u].value, 0);
 
-    ASSERT_EQ(group.get<boxed_int>(entities[0]).value, 0);
-    ASSERT_EQ(group.get<0>(entities[1]).value, 1);
-    ASSERT_EQ(group.get<boxed_int>(entities[3]).value, 3);
-    ASSERT_EQ(group.get<0>(entities[4]).value, 4);
+    ASSERT_EQ(group.get<boxed_int>(entity[0]).value, 0);
+    ASSERT_EQ(group.get<0>(entity[1]).value, 1);
+    ASSERT_EQ(group.get<boxed_int>(entity[3]).value, 3);
+    ASSERT_EQ(group.get<0>(entity[4]).value, 4);
 
-    ASSERT_FALSE(group.contains(entities[2]));
+    ASSERT_FALSE(group.contains(entity[2]));
 }
 
 TEST(OwningGroup, IndexRebuiltOnDestroy) {
