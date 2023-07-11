@@ -1316,8 +1316,6 @@ TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     entt::registry registry;
     auto view = registry.view<stable_type>(entt::exclude<int>);
 
-    view.use<stable_type>();
-
     const auto entity = registry.create();
     const auto other = registry.create();
 
