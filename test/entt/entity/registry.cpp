@@ -876,7 +876,6 @@ TEST(Registry, View) {
     ASSERT_EQ(fview.size_hint(), 3u);
 
     mview.refresh();
-    fview.refresh();
 
     ASSERT_EQ(mview.size_hint(), 2u);
     ASSERT_EQ(fview.size_hint(), 3u);
