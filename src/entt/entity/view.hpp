@@ -224,7 +224,6 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<typename, typename, typename>
     friend class basic_view;
 
-    static constexpr auto offset = sizeof...(Get);
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;
 
@@ -359,11 +358,7 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        if constexpr(Index < offset) {
-            return std::get<Index>(pools);
-        } else {
-            return std::get<Index - offset>(internal::filter_as_tuple<Exclude...>(filter, std::index_sequence_for<Exclude...>{}));
-        }
+        return std::get<Index>(std::tuple_cat(pools, internal::filter_as_tuple<Exclude...>(filter, std::index_sequence_for<Exclude...>{})));
     }
 
     /**
@@ -384,11 +379,11 @@ public:
      */
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
-        if constexpr(Index < offset) {
+        if constexpr(Index < sizeof...(Get)) {
             std::get<Index>(pools) = &elem;
             refresh();
         } else {
-            std::get<Index - offset>(filter) = &elem;
+            std::get<Index - sizeof...(Get)>(filter) = &elem;
         }
     }
 
