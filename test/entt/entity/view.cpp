@@ -1593,6 +1593,37 @@ TEST(MultiComponentView, StorageEntityWithExcludedComponent) {
     });
 }
 
+TEST(MultiComponentView, StorageEntityExcludeOnly) {
+    entt::registry registry;
+    auto view = registry.view<entt::entity>(entt::exclude<int>);
+
+    const auto entity = registry.create();
+    const auto other = registry.create();
+    const auto excluded = registry.create();
+
+    registry.emplace<int>(excluded);
+
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_EQ(view.size_hint(), 3u);
+    ASSERT_NE(view.begin(), view.end());
+
+    // returns all matching identifiers, both in-use and available ones
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 2);
+    ASSERT_EQ(*view.begin(), entity);
+    ASSERT_EQ(*(++view.begin()), other);
+
+    // skips available identifiers automatically, only returns in-use elements
+    for(auto [entt]: view.each()) {
+        ASSERT_EQ(entt, other);
+    }
+
+    // skips available identifiers automatically, only returns in-use elements
+    view.each([other](auto entt) {
+        ASSERT_EQ(entt, other);
+    });
+}
+
 TEST(View, Pipe) {
     entt::registry registry;
     const auto entity = registry.create();
