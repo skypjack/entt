@@ -908,15 +908,20 @@ TEST(Registry, ExcludeOnlyView) {
     registry.emplace<int>(entity[2u], 0);
     registry.emplace<int>(entity[3u], 0);
 
-    registry.destroy(entity[3u]);
+    registry.destroy(entity[3u], entt::to_version(entity[3u]));
 
     ASSERT_EQ(view.size_hint(), 4u);
     ASSERT_NE(view.begin(), view.end());
 
     // returns all matching identifiers, both in-use and available ones
     ASSERT_EQ(std::distance(view.begin(), view.end()), 2);
-    ASSERT_EQ(entt::to_entity(*view.begin()), entt::to_entity(entity[3u]));
+    ASSERT_EQ(*view.begin(), entity[3u]);
     ASSERT_EQ(*(++view.begin()), entity[1u]);
+
+    // skips available identifiers automatically, only returns in-use elements
+    for(auto [entt]: view.each()) {
+        ASSERT_EQ(entt, entity[1u]);
+    }
 
     // skips available identifiers automatically, only returns in-use elements
     view.each([&entity](auto entt) {
