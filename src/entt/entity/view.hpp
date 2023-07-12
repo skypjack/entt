@@ -489,9 +489,6 @@ public:
 
     /**
      * @brief Returns the components assigned to the given entity.
-     *
-     * @sa get
-     *
      * @tparam Index Indexes of the components to get.
      * @param entt A valid identifier.
      * @return The components assigned to the entity.
