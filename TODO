@@ -14,6 +14,9 @@ TODO (high prio):
 * further optimize exclusion lists in multi type views (no existence check)
 * doc: bump entities
 * deprecate/drop snapshot orphans function, make it a general purpose one
+* view with entity storage: begin/end should return filtered iterators maybe?
+* update view doc: single vs multi type views are no longer a thing actually
+* ===> TEST: review view tests after the last changes
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
