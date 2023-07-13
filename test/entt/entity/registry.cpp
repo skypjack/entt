@@ -641,7 +641,7 @@ ENTT_DEBUG_TEST(RegistryDeathTest, CreateTooManyEntities) {
     std::vector<small_entity> entity(entt::entt_traits<small_entity>::to_entity(entt::null));
     registry.create(entity.begin(), entity.end());
 
-    ASSERT_DEATH([[maybe_unused]] const auto entity = registry.create(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto entt = registry.create(), "");
 }
 
 TEST(Registry, DestroyVersion) {
