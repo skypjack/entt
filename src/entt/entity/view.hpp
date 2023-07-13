@@ -789,7 +789,7 @@ public:
 
     /**
      * @brief Returns the component assigned to the given entity.
-     * @tparam Elem Type or index of the component to get.
+     * @tparam Elem Type of the component to get.
      * @param entt A valid identifier.
      * @return The component assigned to the entity.
      */
@@ -799,13 +799,18 @@ public:
         return get<0>(entt);
     }
 
-    /*! @copydoc get */
-    template<std::size_t... Elem>
+    /**
+     * @brief Returns the component assigned to the given entity.
+     * @tparam Index Index of the component to get.
+     * @param entt A valid identifier.
+     * @return The component assigned to the entity.
+     */
+    template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        if constexpr(sizeof...(Elem) == 0) {
+        if constexpr(sizeof...(Index) == 0) {
             return storage()->get_as_tuple(entt);
         } else {
-            return storage<Elem...>()->get(entt);
+            return storage<Index...>()->get(entt);
         }
     }
 
