@@ -269,12 +269,12 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     }
 
 public:
+    /*! @brief Common type among all storage types. */
+    using common_type = base_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Common type among all storage types. */
-    using common_type = base_type;
     /*! @brief Bidirectional iterator type. */
     using iterator = internal::view_iterator<common_type, sizeof...(Get) - 1u, sizeof...(Exclude)>;
     /*! @brief Iterable view type. */
@@ -287,7 +287,7 @@ public:
           view{} {}
 
     /**
-     * @brief Constructs a multi-type view from a set of storage classes.
+     * @brief Constructs a view from a set of storage classes.
      * @param value The storage for the types to iterate.
      * @param excl The storage for the types used to filter the view.
      */
@@ -299,7 +299,7 @@ public:
     }
 
     /**
-     * @brief Constructs a multi-type view from a set of storage classes.
+     * @brief Constructs a view from a set of storage classes.
      * @param value The storage for the types to iterate.
      * @param excl The storage for the types used to filter the view.
      */
@@ -508,11 +508,8 @@ public:
      * @brief Iterates entities and components and applies the given function
      * object to them.
      *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
      * The signature of the function must be equivalent to one of the following
-     * forms:
+     * (non-empty types only, constness as requested):
      *
      * @code{.cpp}
      * void(const entity_type, Type &...);
@@ -588,12 +585,12 @@ class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<!Get::tra
     friend class basic_view;
 
 public:
+    /*! @brief Common type among all storage types. */
+    using common_type = typename Get::base_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Get::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Common type among all storage types. */
-    using common_type = typename Get::base_type;
     /*! @brief Random access iterator type. */
     using iterator = typename common_type::iterator;
     /*! @brief Reversed iterator type. */
@@ -607,7 +604,7 @@ public:
           filter{} {}
 
     /**
-     * @brief Constructs a single-type view from a storage class.
+     * @brief Constructs a view from a storage class.
      * @param value The storage for the type to iterate.
      */
     basic_view(Get &value) noexcept
@@ -615,7 +612,7 @@ public:
           filter{} {}
 
     /**
-     * @brief Constructs a single-type view from a storage class.
+     * @brief Constructs a view from a storage class.
      * @param value The storage for the type to iterate.
      */
     basic_view(std::tuple<Get &> value, std::tuple<> = {}) noexcept
@@ -818,20 +815,13 @@ public:
      * @brief Iterates entities and components and applies the given function
      * object to them.
      *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a reference to the component if it's a non-empty one.
-     * The _constness_ of the component is as requested.<br/>
      * The signature of the function must be equivalent to one of the following
-     * forms:
+     * (non-empty types only, constness as requested):
      *
      * @code{.cpp}
      * void(const entity_type, Type &);
      * void(typename Type &);
      * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
