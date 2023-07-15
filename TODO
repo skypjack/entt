@@ -16,7 +16,7 @@ TODO (high prio):
 * deprecate/drop snapshot orphans function, make it a general purpose one
 * view with entity storage: begin/end should return filtered iterators maybe?
 * update view doc: single vs multi type views are no longer a thing actually
-* meta seq container ::clear invokes resize(0) which isn't exactly the expected behavior in C++
+* meta container: try to merge all functions in a single fake vtable
 * ===> TEST: review view tests after the last changes
 
 WIP:
