@@ -17,6 +17,8 @@ TODO (high prio):
 * view with entity storage: begin/end should return filtered iterators maybe?
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: try to merge all functions in a single fake vtable
+* meta container: make basic traits publicly available to users
+* meta container: add value type to resize
 * ===> TEST: review view tests after the last changes
 
 WIP:
