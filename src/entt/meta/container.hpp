@@ -27,16 +27,16 @@ namespace entt {
 namespace internal {
 
 template<typename, typename = void>
-struct is_dynamic_sequence_container: std::false_type {};
+struct dynamic_sequence_container: std::false_type {};
 
 template<typename Type>
-struct is_dynamic_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::true_type {};
+struct dynamic_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::true_type {};
 
 template<typename, typename = void>
-struct is_key_only_meta_associative_container: std::true_type {};
+struct key_only_associative_container: std::true_type {};
 
 template<typename Type>
-struct is_key_only_meta_associative_container<Type, std::void_t<typename Type::mapped_type>>: std::false_type {};
+struct key_only_associative_container<Type, std::void_t<typename Type::mapped_type>>: std::false_type {};
 
 template<typename Type>
 struct basic_meta_sequence_container_traits {
@@ -50,7 +50,7 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static bool clear(void *container) {
-        if constexpr(is_dynamic_sequence_container<Type>::value) {
+        if constexpr(dynamic_sequence_container<Type>::value) {
             static_cast<Type *>(container)->clear();
             return true;
         } else {
@@ -59,7 +59,7 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] size_type sz) {
-        if constexpr(is_dynamic_sequence_container<Type>::value) {
+        if constexpr(dynamic_sequence_container<Type>::value) {
             static_cast<Type *>(container)->resize(sz);
             return true;
         } else {
@@ -78,7 +78,7 @@ struct basic_meta_sequence_container_traits {
     }
 
     [[nodiscard]] static iterator insert_or_erase([[maybe_unused]] const meta_ctx &ctx, [[maybe_unused]] void *container, [[maybe_unused]] const any &handle, [[maybe_unused]] meta_any &value) {
-        if constexpr(is_dynamic_sequence_container<Type>::value) {
+        if constexpr(dynamic_sequence_container<Type>::value) {
             typename Type::const_iterator it{};
 
             if(auto *const non_const = any_cast<typename Type::iterator>(&handle); non_const) {
@@ -109,7 +109,7 @@ struct basic_meta_associative_container_traits {
     using iterator = meta_associative_container::iterator;
     using size_type = std::size_t;
 
-    static constexpr auto key_only = is_key_only_meta_associative_container<Type>::value;
+    static constexpr auto key_only = key_only_associative_container<Type>::value;
 
     [[nodiscard]] static size_type size(const void *container) noexcept {
         return static_cast<const Type *>(container)->size();
