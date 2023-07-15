@@ -117,8 +117,8 @@ TEST(Snapshot, Continuous) {
         entity.push_back(source.create());
     }
 
-    for(auto entity: entity) {
-        source.destroy(entity);
+    for(auto entt: entity) {
+        source.destroy(entt);
     }
 
     auto e0 = source.create();
