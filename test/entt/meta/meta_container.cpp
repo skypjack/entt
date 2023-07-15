@@ -152,6 +152,7 @@ TEST(MetaContainer, StdVector) {
     ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
+    ASSERT_TRUE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -193,6 +194,7 @@ TEST(MetaContainer, StdArray) {
     ASSERT_EQ(it->cast<int>(), 2);
 
     ASSERT_FALSE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 3u);
 }
 
@@ -247,6 +249,7 @@ TEST(MetaContainer, StdList) {
     ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -301,6 +304,7 @@ TEST(MetaContainer, StdDeque) {
     ASSERT_EQ(ret->cast<int>(), 2);
 
     ASSERT_TRUE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -344,6 +348,7 @@ TEST(MetaContainer, StdMap) {
 
     ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -386,6 +391,7 @@ TEST(MetaContainer, StdSet) {
 
     ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -433,6 +439,7 @@ TEST(MetaContainer, DenseMap) {
 
     ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
+    ASSERT_TRUE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -479,6 +486,7 @@ TEST(MetaContainer, DenseSet) {
 
     ASSERT_EQ(view.erase(1.), 1u);
     ASSERT_TRUE(view.clear());
+    ASSERT_TRUE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
 }
 
@@ -517,6 +525,7 @@ TEST(MetaContainer, ConstSequenceContainer) {
     ASSERT_EQ(view.size(), 1u);
 
     ASSERT_FALSE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 1u);
 }
 
@@ -559,6 +568,7 @@ TEST(MetaContainer, ConstKeyValueAssociativeContainer) {
     ASSERT_NE(view.find(2), view.end());
 
     ASSERT_FALSE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 1u);
 }
 
@@ -605,6 +615,7 @@ TEST(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     ASSERT_NE(view.find(2), view.end());
 
     ASSERT_FALSE(view.clear());
+    ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 1u);
 }
 
@@ -735,5 +746,6 @@ TEST(MetaContainer, StdVectorBool) {
     ASSERT_EQ(ret->cast<proxy_type>(), false);
 
     ASSERT_TRUE(view.clear());
+    ASSERT_TRUE(view.reserve(42u));
     ASSERT_EQ(cview.size(), 0u);
 }
