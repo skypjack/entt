@@ -54,6 +54,7 @@ public:
         value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_sequence_container_traits<Type>::size;
         clear_fn = &meta_sequence_container_traits<Type>::clear;
+        reserve_fn = &meta_sequence_container_traits<Type>::reserve;
         resize_fn = &meta_sequence_container_traits<Type>::resize;
         iter_fn = &meta_sequence_container_traits<Type>::iter;
         insert_or_erase_fn = &meta_sequence_container_traits<Type>::insert_or_erase;
@@ -64,6 +65,7 @@ public:
     [[nodiscard]] inline size_type size() const noexcept;
     inline bool resize(const size_type);
     inline bool clear();
+    inline bool reserve(const size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline iterator insert(iterator, meta_any);
@@ -76,7 +78,8 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(void *){};
-    bool (*resize_fn)(void *, size_type){};
+    bool (*reserve_fn)(void *, const size_type){};
+    bool (*resize_fn)(void *, const size_type){};
     iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, void *, const any &, meta_any &){};
     any storage{};
@@ -117,6 +120,7 @@ public:
         value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_associative_container_traits<Type>::size;
         clear_fn = &meta_associative_container_traits<Type>::clear;
+        reserve_fn = &meta_associative_container_traits<Type>::reserve;
         iter_fn = &meta_associative_container_traits<Type>::iter;
         insert_or_erase_fn = &meta_associative_container_traits<Type>::insert_or_erase;
         find_fn = &meta_associative_container_traits<Type>::find;
@@ -129,6 +133,7 @@ public:
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
     inline bool clear();
+    inline bool reserve(const size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline bool insert(meta_any);
@@ -145,6 +150,7 @@ private:
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
     bool (*clear_fn)(void *){};
+    bool (*reserve_fn)(void *, const size_type){};
     iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
     size_type (*insert_or_erase_fn)(void *, meta_any &, meta_any &){};
     iterator (*find_fn)(const meta_ctx &, const void *, const bool, meta_any &){};
@@ -1862,6 +1868,15 @@ inline bool meta_sequence_container::clear() {
 }
 
 /**
+ * @brief Reserves storage for at least the given number of elements.
+ * @param sz The new capacity of the container.
+ * @return True in case of success, false otherwise.
+ */
+inline bool meta_sequence_container::reserve(const size_type sz) {
+    return (storage.policy() != any_policy::cref) && reserve_fn(storage.data(), sz);
+}
+
+/**
  * @brief Returns an iterator to the first element of a container.
  * @return An iterator to the first element of the container.
  */
@@ -1953,6 +1968,11 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 /*! @copydoc meta_sequence_container::clear */
 inline bool meta_associative_container::clear() {
     return (storage.policy() != any_policy::cref) && clear_fn(storage.data());
+}
+
+/*! @copydoc meta_sequence_container::reserve */
+inline bool meta_associative_container::reserve(const size_type sz) {
+    return (storage.policy() != any_policy::cref) && reserve_fn(storage.data(), sz);
 }
 
 /*! @copydoc meta_sequence_container::begin */

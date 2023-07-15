@@ -38,6 +38,12 @@ struct key_only_associative_container: std::true_type {};
 template<typename Type>
 struct key_only_associative_container<Type, std::void_t<typename Type::mapped_type>>: std::false_type {};
 
+template<typename, typename = void>
+struct reserve_aware_container: std::false_type {};
+
+template<typename Type>
+struct reserve_aware_container<Type, std::void_t<decltype(&Type::reserve)>>: std::true_type {};
+
 template<typename Type>
 struct basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
@@ -58,7 +64,16 @@ struct basic_meta_sequence_container_traits {
         }
     }
 
-    [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] size_type sz) {
+    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+        if constexpr(reserve_aware_container<Type>::value) {
+            static_cast<Type *>(container)->reserve(sz);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
         if constexpr(dynamic_sequence_container<Type>::value) {
             static_cast<Type *>(container)->resize(sz);
             return true;
@@ -118,6 +133,15 @@ struct basic_meta_associative_container_traits {
     [[nodiscard]] static bool clear(void *container) {
         static_cast<Type *>(container)->clear();
         return true;
+    }
+
+    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+        if constexpr(reserve_aware_container<Type>::value) {
+            static_cast<Type *>(container)->reserve(sz);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     [[nodiscard]] static iterator iter(const meta_ctx &ctx, const void *container, const bool as_const, const bool as_end) {
