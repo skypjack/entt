@@ -53,6 +53,7 @@ public:
         ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
         value_type_node = &internal::resolve<typename Type::value_type>;
         size_fn = &meta_sequence_container_traits<Type>::size;
+        clear_fn = &meta_sequence_container_traits<Type>::clear;
         resize_fn = &meta_sequence_container_traits<Type>::resize;
         iter_fn = &meta_sequence_container_traits<Type>::iter;
         insert_or_erase_fn = &meta_sequence_container_traits<Type>::insert_or_erase;
@@ -74,6 +75,7 @@ private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *) noexcept {};
+    bool (*clear_fn)(void *){};
     bool (*resize_fn)(void *, size_type){};
     iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
     iterator (*insert_or_erase_fn)(const meta_ctx &, void *, const any &, meta_any &){};
@@ -1856,7 +1858,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return resize(0u);
+    return (storage.policy() != any_policy::cref) && clear_fn(storage.data());
 }
 
 /**
