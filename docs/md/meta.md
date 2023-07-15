@@ -385,6 +385,10 @@ to case. In particular:
   true in case of success.<br/>
   For example, it's not possible to clear fixed size containers.
 
+* The `reserve` member function allows to increase the capacity of the wrapped
+  container and returns true in case of success.<br/>
+  For example, it's not possible to increase capacity of fixed size containers.
+
 * The `begin` and `end` member functions return opaque iterators that is used to
   iterate the container directly:
 
@@ -471,6 +475,10 @@ differences in behavior in the case of key-only containers. In particular:
 
 * The `clear` member function allows to clear the wrapped container and returns
   true in case of success.
+
+* The `reserve` member function allows to increase the capacity of the wrapped
+  container and returns true in case of success.<br/>
+  For example, it's not possible to increase capacity of standard maps.
 
 * The `begin` and `end` member functions return opaque iterators that are used
   to iterate the container directly:
