@@ -26,9 +26,37 @@ namespace entt {
 class meta_any;
 class meta_type;
 
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+enum class meta_sequence_container_operation {
+    size,
+    clear,
+    reserve,
+    resize,
+    begin,
+    end,
+    cbegin,
+    cend,
+    insert,
+    erase
+};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
+    using operation = internal::meta_sequence_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -52,12 +80,7 @@ public:
     void rebind(any instance) noexcept {
         ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
         value_type_node = &internal::resolve<typename Type::value_type>;
-        size_fn = &meta_sequence_container_traits<Type>::size;
-        clear_fn = &meta_sequence_container_traits<Type>::clear;
-        reserve_fn = &meta_sequence_container_traits<Type>::reserve;
-        resize_fn = &meta_sequence_container_traits<Type>::resize;
-        iter_fn = &meta_sequence_container_traits<Type>::iter;
-        insert_or_erase_fn = &meta_sequence_container_traits<Type>::insert_or_erase;
+        vtable = &meta_sequence_container_traits<Type>::basic_vtable;
         storage = std::move(instance);
     }
 
@@ -76,12 +99,7 @@ public:
 private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*size_fn)(const void *) noexcept {};
-    bool (*clear_fn)(void *){};
-    bool (*reserve_fn)(void *, const size_type){};
-    bool (*resize_fn)(void *, const size_type){};
-    iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
-    iterator (*insert_or_erase_fn)(const meta_ctx &, void *, const any &, meta_any &){};
+    size_type (*vtable)(const operation, const meta_ctx &, const void *, const void *, iterator *){};
     any storage{};
 };
 
@@ -1675,8 +1693,6 @@ inline bool meta_any::assign(meta_any &&other) {
  */
 
 class meta_sequence_container::meta_iterator final {
-    friend class meta_sequence_container;
-
     using vtable_type = void(const void *, const std::ptrdiff_t, meta_any *);
 
     template<typename It>
@@ -1748,6 +1764,10 @@ public:
 
     [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
         return !(*this == other);
+    }
+
+    [[nodiscard]] const any &base() const noexcept {
+        return handle;
     }
 
 private:
@@ -1847,7 +1867,7 @@ private:
  * @return The size of the container.
  */
 [[nodiscard]] inline meta_sequence_container::size_type meta_sequence_container::size() const noexcept {
-    return size_fn(storage.data());
+    return vtable(operation::size, *ctx, std::as_const(storage).data(), nullptr, nullptr);
 }
 
 /**
@@ -1856,7 +1876,7 @@ private:
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::resize(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && resize_fn(storage.data(), sz);
+    return (storage.policy() != any_policy::cref) && vtable(operation::resize, *ctx, storage.data(), &sz, nullptr);
 }
 
 /**
@@ -1864,7 +1884,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return (storage.policy() != any_policy::cref) && clear_fn(storage.data());
+    return (storage.policy() != any_policy::cref) && vtable(operation::clear, *ctx, storage.data(), nullptr, nullptr);
 }
 
 /**
@@ -1873,7 +1893,7 @@ inline bool meta_sequence_container::clear() {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::reserve(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && reserve_fn(storage.data(), sz);
+    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, *ctx, storage.data(), &sz, nullptr);
 }
 
 /**
@@ -1881,7 +1901,9 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), false);
+    iterator it{};
+    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, *ctx, std::as_const(storage).data(), nullptr, &it);
+    return it;
 }
 
 /**
@@ -1889,7 +1911,9 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), true);
+    iterator it{};
+    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, *ctx, std::as_const(storage).data(), nullptr, &it);
+    return it;
 }
 
 /**
@@ -1899,7 +1923,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return (storage.policy() != any_policy::cref) ? insert_or_erase_fn(*ctx, storage.data(), it.handle, value) : iterator{};
+    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, *ctx, storage.data(), &value, &it)) ? it : iterator{};
 }
 
 /**
@@ -1908,7 +1932,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return insert(it, {});
+    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, *ctx, storage.data(), nullptr, &it)) ? it : iterator{};
 }
 
 /**

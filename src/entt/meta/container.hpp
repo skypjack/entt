@@ -48,72 +48,69 @@ template<typename Type>
 struct basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    using iterator = meta_sequence_container::iterator;
-    using size_type = std::size_t;
+    using operation = internal::meta_sequence_container_operation;
+    using size_type = typename meta_sequence_container::size_type;
+    using iterator = typename meta_sequence_container::iterator;
 
-    [[nodiscard]] static size_type size(const void *container) noexcept {
-        return static_cast<const Type *>(container)->size();
-    }
-
-    [[nodiscard]] static bool clear(void *container) {
-        if constexpr(dynamic_sequence_container<Type>::value) {
-            static_cast<Type *>(container)->clear();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(reserve_aware_container<Type>::value) {
-            static_cast<Type *>(container)->reserve(sz);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(dynamic_sequence_container<Type>::value) {
-            static_cast<Type *>(container)->resize(sz);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    [[nodiscard]] static iterator iter(const meta_ctx &ctx, const void *container, const bool as_const, const bool as_end) {
-        if(as_const) {
-            const auto it = as_end ? static_cast<const Type *>(container)->end() : static_cast<const Type *>(container)->begin();
-            return iterator{ctx, it};
-        } else {
-            const auto it = as_end ? static_cast<Type *>(const_cast<void *>(container))->end() : static_cast<Type *>(const_cast<void *>(container))->begin();
-            return iterator{ctx, it};
-        }
-    }
-
-    [[nodiscard]] static iterator insert_or_erase([[maybe_unused]] const meta_ctx &ctx, [[maybe_unused]] void *container, [[maybe_unused]] const any &handle, [[maybe_unused]] meta_any &value) {
-        if constexpr(dynamic_sequence_container<Type>::value) {
-            typename Type::const_iterator it{};
-
-            if(auto *const non_const = any_cast<typename Type::iterator>(&handle); non_const) {
-                it = *non_const;
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, const void *value, iterator *it) {
+        switch(const Type *cont = static_cast<const Type *>(container); op) {
+        case operation::size:
+            return cont->size();
+        case operation::clear:
+            if constexpr(dynamic_sequence_container<Type>::value) {
+                const_cast<Type *>(cont)->clear();
+                return true;
             } else {
-                it = any_cast<const typename Type::const_iterator &>(handle);
+                break;
             }
+        case operation::reserve:
+            if constexpr(reserve_aware_container<Type>::value) {
+                const_cast<Type *>(cont)->reserve(*static_cast<const size_type *>(value));
+                return true;
+            } else {
+                break;
+            }
+        case operation::resize:
+            if constexpr(dynamic_sequence_container<Type>::value) {
+                const_cast<Type *>(cont)->resize(*static_cast<const size_type *>(value));
+                return true;
+            } else {
+                break;
+            }
+        case operation::begin:
+            *it = iterator{ctx, const_cast<Type *>(cont)->begin()};
+            return true;
+        case operation::end:
+            *it = iterator{ctx, const_cast<Type *>(cont)->end()};
+            return true;
+        case operation::cbegin:
+            *it = iterator{ctx, cont->begin()};
+            return true;
+        case operation::cend:
+            *it = iterator{ctx, cont->end()};
+            return true;
+        case operation::insert:
+        case operation::erase:
+            if constexpr(dynamic_sequence_container<Type>::value) {
+                auto *const non_const = any_cast<typename Type::iterator>(&it->base());
+                typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
 
-            if(auto *const cont = static_cast<Type *>(container); value) {
-                // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                if(value.allow_cast<typename Type::const_reference>() || value.allow_cast<typename Type::value_type>()) {
-                    const auto *element = value.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    return iterator{ctx, cont->insert(it, element ? *element : value.cast<typename Type::value_type>())};
+                if(op == operation::insert) {
+                    // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+                    if(static_cast<meta_any *>(const_cast<void *>(value))->allow_cast<typename Type::const_reference>() || static_cast<meta_any *>(const_cast<void *>(value))->allow_cast<typename Type::value_type>()) {
+                        const auto *element = static_cast<meta_any *>(const_cast<void *>(value))->try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                        *it = iterator{ctx, const_cast<Type *>(cont)->insert(underlying, element ? *element : static_cast<meta_any *>(const_cast<void *>(value))->cast<typename Type::value_type>())};
+                        return true;
+                    }
+                } else {
+                    *it = iterator{ctx, const_cast<Type *>(cont)->erase(underlying)};
+                    return true;
                 }
-            } else {
-                return iterator{ctx, cont->erase(it)};
             }
+            break;
         }
 
-        return iterator{};
+        return false;
     }
 };
 
@@ -121,8 +118,8 @@ template<typename Type>
 struct basic_meta_associative_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    using iterator = meta_associative_container::iterator;
-    using size_type = std::size_t;
+    using size_type = typename meta_associative_container::size_type;
+    using iterator = typename meta_associative_container::iterator;
 
     static constexpr auto key_only = key_only_associative_container<Type>::value;
 
