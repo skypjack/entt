@@ -46,6 +46,20 @@ enum class meta_sequence_container_operation {
     erase
 };
 
+enum class meta_associative_container_operation {
+    size,
+    clear,
+    reserve,
+    begin,
+    end,
+    cbegin,
+    cend,
+    insert,
+    erase,
+    find,
+    cfind
+};
+
 } // namespace internal
 
 /**
@@ -106,6 +120,7 @@ private:
 /*! @brief Proxy object for associative containers. */
 class meta_associative_container {
     class meta_iterator;
+    using operation = internal::meta_associative_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -128,20 +143,15 @@ public:
     template<typename Type>
     void rebind(any instance) noexcept {
         ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
+        key_type_node = &internal::resolve<typename Type::key_type>;
+        value_type_node = &internal::resolve<typename Type::value_type>;
 
         if constexpr(!meta_associative_container_traits<Type>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
 
         key_only_container = meta_associative_container_traits<Type>::key_only;
-        key_type_node = &internal::resolve<typename Type::key_type>;
-        value_type_node = &internal::resolve<typename Type::value_type>;
-        size_fn = &meta_associative_container_traits<Type>::size;
-        clear_fn = &meta_associative_container_traits<Type>::clear;
-        reserve_fn = &meta_associative_container_traits<Type>::reserve;
-        iter_fn = &meta_associative_container_traits<Type>::iter;
-        insert_or_erase_fn = &meta_associative_container_traits<Type>::insert_or_erase;
-        find_fn = &meta_associative_container_traits<Type>::find;
+        vtable = meta_associative_container_traits<Type>::basic_vtable;
         storage = std::move(instance);
     }
 
@@ -166,12 +176,7 @@ private:
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*size_fn)(const void *) noexcept {};
-    bool (*clear_fn)(void *){};
-    bool (*reserve_fn)(void *, const size_type){};
-    iterator (*iter_fn)(const meta_ctx &, const void *, const bool, const bool){};
-    size_type (*insert_or_erase_fn)(void *, meta_any &, meta_any &){};
-    iterator (*find_fn)(const meta_ctx &, const void *, const bool, meta_any &){};
+    size_type (*vtable)(const operation, const meta_ctx &, const void *, meta_any *, const void *, iterator *){};
     any storage{};
 };
 
@@ -1986,27 +1991,31 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 
 /*! @copydoc meta_sequence_container::size */
 [[nodiscard]] inline meta_associative_container::size_type meta_associative_container::size() const noexcept {
-    return size_fn(storage.data());
+    return vtable(operation::size, *ctx, std::as_const(storage).data(), nullptr, nullptr, nullptr);
 }
 
 /*! @copydoc meta_sequence_container::clear */
 inline bool meta_associative_container::clear() {
-    return (storage.policy() != any_policy::cref) && clear_fn(storage.data());
+    return (storage.policy() != any_policy::cref) && vtable(operation::clear, *ctx, storage.data(), nullptr, nullptr, nullptr);
 }
 
 /*! @copydoc meta_sequence_container::reserve */
 inline bool meta_associative_container::reserve(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && reserve_fn(storage.data(), sz);
+    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, *ctx, storage.data(), nullptr, &sz, nullptr);
 }
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), false);
+    iterator it{};
+    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, *ctx, std::as_const(storage).data(), nullptr, nullptr, &it);
+    return it;
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return iter_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), true);
+    iterator it{};
+    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, *ctx, std::as_const(storage).data(), nullptr, nullptr, &it);
+    return it;
 }
 
 /**
@@ -2015,8 +2024,7 @@ inline bool meta_associative_container::reserve(const size_type sz) {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key) {
-    meta_any value{*ctx, std::in_place_type<void>};
-    return (storage.policy() != any_policy::cref) && (insert_or_erase_fn(storage.data(), key, value) != 0u);
+    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, *ctx, storage.data(), &key, nullptr, nullptr));
 }
 
 /**
@@ -2026,7 +2034,7 @@ inline bool meta_associative_container::insert(meta_any key) {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value) {
-    return (storage.policy() != any_policy::cref) && (insert_or_erase_fn(storage.data(), key, value) != 0u);
+    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, *ctx, storage.data(), &key, &value, nullptr));
 }
 
 /**
@@ -2035,7 +2043,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value) {
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
-    return insert(std::move(key), meta_any{meta_ctx_arg, *ctx});
+    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, *ctx, storage.data(), &key, nullptr, nullptr));
 }
 
 /**
@@ -2044,7 +2052,9 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return find_fn(*ctx, std::as_const(storage).data(), (storage.policy() == any_policy::cref), key);
+    iterator it{};
+    vtable(storage.policy() == any_policy::cref ? operation::cfind : operation::find, *ctx, std::as_const(storage).data(), &key, nullptr, &it);
+    return it;
 }
 
 /**
