@@ -164,7 +164,6 @@ public:
     inline bool reserve(const size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
-    inline bool insert(meta_any);
     inline bool insert(meta_any, meta_any);
     inline size_type erase(meta_any);
     [[nodiscard]] inline iterator find(meta_any);
@@ -2019,21 +2018,12 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 }
 
 /**
- * @brief Inserts a key only element into a container.
+ * @brief Inserts a key-only or key/value element into a container.
  * @param key The key of the element to insert.
+ * @param value The value of the element to insert, if needed.
  * @return A bool denoting whether the insertion took place.
  */
-inline bool meta_associative_container::insert(meta_any key) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, *ctx, storage.data(), &key, nullptr, nullptr));
-}
-
-/**
- * @brief Inserts a key/value element into a container.
- * @param key The key of the element to insert.
- * @param value The value of the element to insert.
- * @return A bool denoting whether the insertion took place.
- */
-inline bool meta_associative_container::insert(meta_any key, meta_any value) {
+inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
     return ((storage.policy() != any_policy::cref) && vtable(operation::insert, *ctx, storage.data(), &key, &value, nullptr));
 }
 
