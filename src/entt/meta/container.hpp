@@ -118,62 +118,68 @@ template<typename Type>
 struct basic_meta_associative_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
+    using operation = internal::meta_associative_container_operation;
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
     static constexpr auto key_only = key_only_associative_container<Type>::value;
 
-    [[nodiscard]] static size_type size(const void *container) noexcept {
-        return static_cast<const Type *>(container)->size();
-    }
-
-    [[nodiscard]] static bool clear(void *container) {
-        static_cast<Type *>(container)->clear();
-        return true;
-    }
-
-    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(reserve_aware_container<Type>::value) {
-            static_cast<Type *>(container)->reserve(sz);
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, meta_any *key, const void *value, iterator *it) {
+        switch(const Type *cont = static_cast<const Type *>(container); op) {
+        case operation::size:
+            return cont->size();
+        case operation::clear:
+            const_cast<Type *>(cont)->clear();
             return true;
-        } else {
-            return false;
-        }
-    }
-
-    [[nodiscard]] static iterator iter(const meta_ctx &ctx, const void *container, const bool as_const, const bool as_end) {
-        if(as_const) {
-            const auto it = as_end ? static_cast<const Type *>(container)->end() : static_cast<const Type *>(container)->begin();
-            return iterator{ctx, std::bool_constant<key_only>{}, it};
-        } else {
-            const auto it = as_end ? static_cast<Type *>(const_cast<void *>(container))->end() : static_cast<Type *>(const_cast<void *>(container))->begin();
-            return iterator{ctx, std::bool_constant<key_only>{}, it};
-        }
-    }
-
-    [[nodiscard]] static size_type insert_or_erase(void *container, meta_any &key, meta_any &value) {
-        if(auto *const cont = static_cast<Type *>(container); key.allow_cast<const typename Type::key_type &>()) {
-            if(value) {
-                if constexpr(key_only) {
-                    return cont->insert(key.cast<const typename Type::key_type &>()).second;
-                } else {
-                    return value.allow_cast<const typename Type::mapped_type &>() && cont->emplace(key.cast<const typename Type::key_type &>(), value.cast<const typename Type::mapped_type &>()).second;
-                }
+        case operation::reserve:
+            if constexpr(reserve_aware_container<Type>::value) {
+                const_cast<Type *>(cont)->reserve(*static_cast<const size_type *>(value));
+                return true;
             } else {
-                return cont->erase(key.cast<const typename Type::key_type &>());
+                break;
             }
+        case operation::begin:
+            *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->begin()};
+            return true;
+        case operation::end:
+            *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->end()};
+            return true;
+        case operation::cbegin:
+            *it = iterator{ctx, std::bool_constant<key_only>{}, cont->begin()};
+            return true;
+        case operation::cend:
+            *it = iterator{ctx, std::bool_constant<key_only>{}, cont->end()};
+            return true;
+        case operation::insert:
+            if(key->allow_cast<const typename Type::key_type &>()) {
+                if constexpr(key_only) {
+                    return const_cast<Type *>(cont)->insert(key->cast<const typename Type::key_type &>()).second;
+                } else {
+                    meta_any *val = static_cast<meta_any *>(const_cast<void *>(value));
+                    return val->allow_cast<const typename Type::mapped_type &>() && const_cast<Type *>(cont)->emplace(key->cast<const typename Type::key_type &>(), val->cast<const typename Type::mapped_type &>()).second;
+                }
+            }
+            break;
+        case operation::erase:
+            if(key->allow_cast<const typename Type::key_type &>()) {
+                return const_cast<Type *>(cont)->erase(key->cast<const typename Type::key_type &>());
+            }
+            break;
+        case operation::find:
+            if(key->allow_cast<const typename Type::key_type &>()) {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->find(key->cast<const typename Type::key_type &>())};
+                return true;
+            }
+            break;
+        case operation::cfind:
+            if(key->allow_cast<const typename Type::key_type &>()) {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->find(key->cast<const typename Type::key_type &>())};
+                return true;
+            }
+            break;
         }
 
-        return 0u;
-    }
-
-    [[nodiscard]] static iterator find(const meta_ctx &ctx, const void *container, const bool as_const, meta_any &key) {
-        if(key.allow_cast<const typename Type::key_type &>()) {
-            return as_const ? iterator{ctx, std::bool_constant<key_only>{}, static_cast<const Type *>(container)->find(key.cast<const typename Type::key_type &>())}
-                            : iterator{ctx, std::bool_constant<key_only>{}, static_cast<Type *>(const_cast<void *>(container))->find(key.cast<const typename Type::key_type &>())};
-        }
-
-        return iterator{};
+        return false;
     }
 };
 
