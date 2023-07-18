@@ -14,9 +14,9 @@ TODO (high prio):
 * further optimize exclusion lists in multi type views (no existence check)
 * doc: bump entities
 * deprecate/drop snapshot orphans function, make it a general purpose one
-* view with entity storage: begin/end should return filtered iterators maybe?
+* view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
-* meta container: try to merge all functions in a single fake vtable
+* meta container: merge operations in a single enum, they're already pretty much identical
 * meta container: make basic traits publicly available to users
 * meta container: add value type to resize
 * ===> TEST: review view tests after the last changes
