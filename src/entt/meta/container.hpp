@@ -167,15 +167,15 @@ struct basic_meta_associative_container_traits {
             break;
         case operation::find:
             if(key->allow_cast<const typename Type::key_type &>()) {
+                if(value) {
                 *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->find(key->cast<const typename Type::key_type &>())};
+                } else {
+                    *it = iterator{ctx, std::bool_constant<key_only>{}, cont->find(key->cast<const typename Type::key_type &>())};
+            }
+
                 return true;
             }
-            break;
-        case operation::cfind:
-            if(key->allow_cast<const typename Type::key_type &>()) {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->find(key->cast<const typename Type::key_type &>())};
-                return true;
-            }
+
             break;
         }
 
