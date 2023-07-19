@@ -40,8 +40,6 @@ enum class meta_sequence_container_operation {
     resize,
     begin,
     end,
-    cbegin,
-    cend,
     insert,
     erase
 };
@@ -52,8 +50,6 @@ enum class meta_associative_container_operation {
     reserve,
     begin,
     end,
-    cbegin,
-    cend,
     insert,
     erase,
     find
@@ -1905,7 +1901,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     iterator it{};
-    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, *ctx, std::as_const(storage).data(), nullptr, &it);
+    vtable(operation::begin, *ctx, std::as_const(storage).data(), storage.policy() == any_policy::cref ? nullptr : this, &it);
     return it;
 }
 
@@ -1915,7 +1911,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     iterator it{};
-    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, *ctx, std::as_const(storage).data(), nullptr, &it);
+    vtable(operation::end, *ctx, std::as_const(storage).data(), storage.policy() == any_policy::cref ? nullptr : this, &it);
     return it;
 }
 
@@ -2005,14 +2001,14 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
     iterator it{};
-    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, *ctx, std::as_const(storage).data(), nullptr, nullptr, &it);
+    vtable(operation::begin, *ctx, std::as_const(storage).data(), nullptr, storage.policy() == any_policy::cref ? nullptr : this, &it);
     return it;
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
     iterator it{};
-    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, *ctx, std::as_const(storage).data(), nullptr, nullptr, &it);
+    vtable(operation::end, *ctx, std::as_const(storage).data(), nullptr, storage.policy() == any_policy::cref ? nullptr : this, &it);
     return it;
 }
 

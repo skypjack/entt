@@ -78,16 +78,20 @@ struct basic_meta_sequence_container_traits {
                 break;
             }
         case operation::begin:
-            *it = iterator{ctx, const_cast<Type *>(cont)->begin()};
+            if(value) {
+                *it = iterator{ctx, const_cast<Type *>(cont)->begin()};
+            } else {
+                *it = iterator{ctx, cont->begin()};
+            }
+
             return true;
         case operation::end:
-            *it = iterator{ctx, const_cast<Type *>(cont)->end()};
-            return true;
-        case operation::cbegin:
-            *it = iterator{ctx, cont->begin()};
-            return true;
-        case operation::cend:
-            *it = iterator{ctx, cont->end()};
+            if(value) {
+                *it = iterator{ctx, const_cast<Type *>(cont)->end()};
+            } else {
+                *it = iterator{ctx, cont->end()};
+            }
+
             return true;
         case operation::insert:
         case operation::erase:
@@ -107,6 +111,7 @@ struct basic_meta_sequence_container_traits {
                     return true;
                 }
             }
+
             break;
         }
 
@@ -139,16 +144,20 @@ struct basic_meta_associative_container_traits {
                 break;
             }
         case operation::begin:
-            *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->begin()};
+            if(value) {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->begin()};
+            } else {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->begin()};
+            }
+
             return true;
         case operation::end:
-            *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->end()};
-            return true;
-        case operation::cbegin:
-            *it = iterator{ctx, std::bool_constant<key_only>{}, cont->begin()};
-            return true;
-        case operation::cend:
-            *it = iterator{ctx, std::bool_constant<key_only>{}, cont->end()};
+            if(value) {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->end()};
+            } else {
+                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->end()};
+            }
+
             return true;
         case operation::insert:
             if(key->allow_cast<const typename Type::key_type &>()) {
@@ -159,19 +168,21 @@ struct basic_meta_associative_container_traits {
                     return val->allow_cast<const typename Type::mapped_type &>() && const_cast<Type *>(cont)->emplace(key->cast<const typename Type::key_type &>(), val->cast<const typename Type::mapped_type &>()).second;
                 }
             }
+
             break;
         case operation::erase:
             if(key->allow_cast<const typename Type::key_type &>()) {
                 return const_cast<Type *>(cont)->erase(key->cast<const typename Type::key_type &>());
             }
+
             break;
         case operation::find:
             if(key->allow_cast<const typename Type::key_type &>()) {
                 if(value) {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->find(key->cast<const typename Type::key_type &>())};
+                    *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->find(key->cast<const typename Type::key_type &>())};
                 } else {
                     *it = iterator{ctx, std::bool_constant<key_only>{}, cont->find(key->cast<const typename Type::key_type &>())};
-            }
+                }
 
                 return true;
             }
