@@ -56,8 +56,7 @@ enum class meta_associative_container_operation {
     cend,
     insert,
     erase,
-    find,
-    cfind
+    find
 };
 
 } // namespace internal
@@ -2043,7 +2042,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
     iterator it{};
-    vtable(storage.policy() == any_policy::cref ? operation::cfind : operation::find, *ctx, std::as_const(storage).data(), &key, nullptr, &it);
+    vtable(operation::find, *ctx, std::as_const(storage).data(), &key, storage.policy() == any_policy::cref ? nullptr : this, &it);
     return it;
 }
 
