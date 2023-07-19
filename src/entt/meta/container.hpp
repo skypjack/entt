@@ -52,7 +52,7 @@ struct basic_meta_sequence_container_traits {
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, const void *value, iterator *it) {
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, void *value, iterator *it) {
         switch(const Type *cont = static_cast<const Type *>(container); op) {
         case operation::size:
             return cont->size();
@@ -65,14 +65,14 @@ struct basic_meta_sequence_container_traits {
             }
         case operation::reserve:
             if constexpr(reserve_aware_container<Type>::value) {
-                const_cast<Type *>(cont)->reserve(*static_cast<const size_type *>(value));
+                const_cast<Type *>(cont)->reserve(*static_cast<size_type *>(value));
                 return true;
             } else {
                 break;
             }
         case operation::resize:
             if constexpr(dynamic_sequence_container<Type>::value) {
-                const_cast<Type *>(cont)->resize(*static_cast<const size_type *>(value));
+                const_cast<Type *>(cont)->resize(*static_cast<size_type *>(value));
                 return true;
             } else {
                 break;
@@ -101,9 +101,9 @@ struct basic_meta_sequence_container_traits {
 
                 if(op == operation::insert) {
                     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                    if(static_cast<meta_any *>(const_cast<void *>(value))->allow_cast<typename Type::const_reference>() || static_cast<meta_any *>(const_cast<void *>(value))->allow_cast<typename Type::value_type>()) {
-                        const auto *element = static_cast<meta_any *>(const_cast<void *>(value))->try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        *it = iterator{ctx, const_cast<Type *>(cont)->insert(underlying, element ? *element : static_cast<meta_any *>(const_cast<void *>(value))->cast<typename Type::value_type>())};
+                    if(static_cast<meta_any *>(value)->allow_cast<typename Type::const_reference>() || static_cast<meta_any *>(value)->allow_cast<typename Type::value_type>()) {
+                        const auto *element = static_cast<meta_any *>(value)->try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                        *it = iterator{ctx, const_cast<Type *>(cont)->insert(underlying, element ? *element : static_cast<meta_any *>(value)->cast<typename Type::value_type>())};
                         return true;
                     }
                 } else {
@@ -129,7 +129,7 @@ struct basic_meta_associative_container_traits {
 
     static constexpr auto key_only = key_only_associative_container<Type>::value;
 
-    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, meta_any *key, const void *value, iterator *it) {
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, meta_any *key, void *value, iterator *it) {
         switch(const Type *cont = static_cast<const Type *>(container); op) {
         case operation::size:
             return cont->size();
@@ -138,7 +138,7 @@ struct basic_meta_associative_container_traits {
             return true;
         case operation::reserve:
             if constexpr(reserve_aware_container<Type>::value) {
-                const_cast<Type *>(cont)->reserve(*static_cast<const size_type *>(value));
+                const_cast<Type *>(cont)->reserve(*static_cast<size_type *>(value));
                 return true;
             } else {
                 break;
@@ -164,7 +164,7 @@ struct basic_meta_associative_container_traits {
                 if constexpr(key_only) {
                     return const_cast<Type *>(cont)->insert(key->cast<const typename Type::key_type &>()).second;
                 } else {
-                    meta_any *val = static_cast<meta_any *>(const_cast<void *>(value));
+                    meta_any *val = static_cast<meta_any *>(value);
                     return val->allow_cast<const typename Type::mapped_type &>() && const_cast<Type *>(cont)->emplace(key->cast<const typename Type::key_type &>(), val->cast<const typename Type::mapped_type &>()).second;
                 }
             }
@@ -185,7 +185,7 @@ struct basic_meta_associative_container_traits {
                 }
 
                 return true;
-            }
+            }   
 
             break;
         }
