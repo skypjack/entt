@@ -33,21 +33,11 @@ class meta_type;
 
 namespace internal {
 
-enum class meta_sequence_container_operation {
+enum class meta_container_operation {
     size,
     clear,
     reserve,
     resize,
-    begin,
-    end,
-    insert,
-    erase
-};
-
-enum class meta_associative_container_operation {
-    size,
-    clear,
-    reserve,
     begin,
     end,
     insert,
@@ -65,7 +55,7 @@ enum class meta_associative_container_operation {
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
-    using operation = internal::meta_sequence_container_operation;
+    using operation = internal::meta_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -115,7 +105,7 @@ private:
 /*! @brief Proxy object for associative containers. */
 class meta_associative_container {
     class meta_iterator;
-    using operation = internal::meta_associative_container_operation;
+    using operation = internal::meta_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */

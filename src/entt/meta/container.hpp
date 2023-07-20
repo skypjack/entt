@@ -48,7 +48,7 @@ template<typename Type>
 struct basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    using operation = internal::meta_sequence_container_operation;
+    using operation = internal::meta_container_operation;
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
@@ -113,6 +113,9 @@ struct basic_meta_sequence_container_traits {
             }
 
             break;
+        default:
+            // nothing to do here
+            break;
         }
 
         return false;
@@ -123,7 +126,7 @@ template<typename Type>
 struct basic_meta_associative_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    using operation = internal::meta_associative_container_operation;
+    using operation = internal::meta_container_operation;
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
@@ -187,6 +190,9 @@ struct basic_meta_associative_container_traits {
                 return true;
             }
 
+            break;
+        default:
+            // nothing to do here
             break;
         }
 
