@@ -52,44 +52,44 @@ struct basic_meta_sequence_container_traits {
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, void *value, iterator *it) {
-        switch(const Type *cont = static_cast<const Type *>(container); op) {
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *cvalue, void *value, iterator *it) {
+        switch(op) {
         case operation::size:
-            return cont->size();
+            return static_cast<const Type *>(cvalue)->size();
         case operation::clear:
             if constexpr(dynamic_sequence_container<Type>::value) {
-                const_cast<Type *>(cont)->clear();
+                static_cast<Type *>(value)->clear();
                 return true;
             } else {
                 break;
             }
         case operation::reserve:
             if constexpr(reserve_aware_container<Type>::value) {
-                const_cast<Type *>(cont)->reserve(*static_cast<size_type *>(value));
+                static_cast<Type *>(value)->reserve(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
                 break;
             }
         case operation::resize:
             if constexpr(dynamic_sequence_container<Type>::value) {
-                const_cast<Type *>(cont)->resize(*static_cast<size_type *>(value));
+                static_cast<Type *>(value)->resize(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
                 break;
             }
         case operation::begin:
             if(value) {
-                *it = iterator{ctx, const_cast<Type *>(cont)->begin()};
+                *it = iterator{ctx, static_cast<Type *>(value)->begin()};
             } else {
-                *it = iterator{ctx, cont->begin()};
+                *it = iterator{ctx, static_cast<const Type *>(cvalue)->begin()};
             }
 
             return true;
         case operation::end:
             if(value) {
-                *it = iterator{ctx, const_cast<Type *>(cont)->end()};
+                *it = iterator{ctx, static_cast<Type *>(value)->end()};
             } else {
-                *it = iterator{ctx, cont->end()};
+                *it = iterator{ctx, static_cast<const Type *>(cvalue)->end()};
             }
 
             return true;
@@ -101,13 +101,13 @@ struct basic_meta_sequence_container_traits {
 
                 if(op == operation::insert) {
                     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                    if(static_cast<meta_any *>(value)->allow_cast<typename Type::const_reference>() || static_cast<meta_any *>(value)->allow_cast<typename Type::value_type>()) {
-                        const auto *element = static_cast<meta_any *>(value)->try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        *it = iterator{ctx, const_cast<Type *>(cont)->insert(underlying, element ? *element : static_cast<meta_any *>(value)->cast<typename Type::value_type>())};
+                    if(auto &any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); any.allow_cast<typename Type::const_reference>() || any.allow_cast<typename Type::value_type>()) {
+                        const auto *element = any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                        *it = iterator{ctx, static_cast<Type *>(value)->insert(underlying, element ? *element : any.cast<typename Type::value_type>())};
                         return true;
                     }
                 } else {
-                    *it = iterator{ctx, const_cast<Type *>(cont)->erase(underlying)};
+                    *it = iterator{ctx, static_cast<Type *>(value)->erase(underlying)};
                     return true;
                 }
             }
@@ -129,63 +129,63 @@ struct basic_meta_associative_container_traits {
 
     static constexpr auto key_only = key_only_associative_container<Type>::value;
 
-    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *container, meta_any *key, void *value, iterator *it) {
-        switch(const Type *cont = static_cast<const Type *>(container); op) {
+    static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *cvalue, void *value, meta_any *key, iterator *it) {
+        switch(op) {
         case operation::size:
-            return cont->size();
+            return static_cast<const Type *>(cvalue)->size();
         case operation::clear:
-            const_cast<Type *>(cont)->clear();
+            static_cast<Type *>(value)->clear();
             return true;
         case operation::reserve:
             if constexpr(reserve_aware_container<Type>::value) {
-                const_cast<Type *>(cont)->reserve(*static_cast<size_type *>(value));
+                static_cast<Type *>(value)->reserve(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
                 break;
             }
         case operation::begin:
             if(value) {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->begin()};
+                *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<Type *>(value)->begin()};
             } else {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->begin()};
+                *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<const Type *>(cvalue)->begin()};
             }
 
             return true;
         case operation::end:
             if(value) {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->end()};
+                *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<Type *>(value)->end()};
             } else {
-                *it = iterator{ctx, std::bool_constant<key_only>{}, cont->end()};
+                *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<const Type *>(cvalue)->end()};
             }
 
             return true;
         case operation::insert:
             if(key->allow_cast<const typename Type::key_type &>()) {
                 if constexpr(key_only) {
-                    return const_cast<Type *>(cont)->insert(key->cast<const typename Type::key_type &>()).second;
+                    return static_cast<Type *>(value)->insert(key->cast<const typename Type::key_type &>()).second;
                 } else {
-                    meta_any *val = static_cast<meta_any *>(value);
-                    return val->allow_cast<const typename Type::mapped_type &>() && const_cast<Type *>(cont)->emplace(key->cast<const typename Type::key_type &>(), val->cast<const typename Type::mapped_type &>()).second;
+                    auto &any = *static_cast<meta_any *>(const_cast<void *>(cvalue));
+                    return any.allow_cast<const typename Type::mapped_type &>() && static_cast<Type *>(value)->emplace(key->cast<const typename Type::key_type &>(), any.cast<const typename Type::mapped_type &>()).second;
                 }
             }
 
             break;
         case operation::erase:
             if(key->allow_cast<const typename Type::key_type &>()) {
-                return const_cast<Type *>(cont)->erase(key->cast<const typename Type::key_type &>());
+                return static_cast<Type *>(value)->erase(key->cast<const typename Type::key_type &>());
             }
 
             break;
         case operation::find:
             if(key->allow_cast<const typename Type::key_type &>()) {
                 if(value) {
-                    *it = iterator{ctx, std::bool_constant<key_only>{}, const_cast<Type *>(cont)->find(key->cast<const typename Type::key_type &>())};
+                    *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<Type *>(value)->find(key->cast<const typename Type::key_type &>())};
                 } else {
-                    *it = iterator{ctx, std::bool_constant<key_only>{}, cont->find(key->cast<const typename Type::key_type &>())};
+                    *it = iterator{ctx, std::bool_constant<key_only>{}, static_cast<const Type *>(cvalue)->find(key->cast<const typename Type::key_type &>())};
                 }
 
                 return true;
-            }   
+            }
 
             break;
         }
