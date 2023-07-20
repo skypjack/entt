@@ -145,12 +145,10 @@ public:
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
 
-        key_only_container = meta_associative_container_traits<Type>::key_only;
         vtable = meta_associative_container_traits<Type>::basic_vtable;
         storage = std::move(instance);
     }
 
-    [[nodiscard]] inline bool key_only() const noexcept;
     [[nodiscard]] inline meta_type key_type() const noexcept;
     [[nodiscard]] inline meta_type mapped_type() const noexcept;
     [[nodiscard]] inline meta_type value_type() const noexcept;
@@ -166,7 +164,6 @@ public:
 
 private:
     const meta_ctx *ctx{};
-    bool key_only_container{};
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
@@ -1954,14 +1951,6 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  */
 [[nodiscard]] inline meta_sequence_container::operator bool() const noexcept {
     return static_cast<bool>(storage);
-}
-
-/**
- * @brief Returns true if a container is also key-only, false otherwise.
- * @return True if the associative container is also key-only, false otherwise.
- */
-[[nodiscard]] inline bool meta_associative_container::key_only() const noexcept {
-    return key_only_container;
 }
 
 /**
