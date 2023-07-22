@@ -40,7 +40,7 @@ inline constexpr meta_ctx_arg_t meta_ctx_arg{};
 
 /*! @brief Opaque meta context type. */
 class meta_ctx: private internal::meta_context {
-    /*! @brief Attorney idiom like model to access the base class. */
+    // attorney idiom like model to access the base class
     friend struct internal::meta_context;
 };
 
