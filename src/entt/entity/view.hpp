@@ -539,7 +539,7 @@ public:
     }
 
     /**
-     * @brief Combines two views in a _more specific_ one (friend function).
+     * @brief Combines two views in a _more specific_ one.
      * @tparam OGet Component list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
      * @param other The view to combine with.
@@ -832,7 +832,7 @@ public:
     }
 
     /**
-     * @brief Combines two views in a _more specific_ one (friend function).
+     * @brief Combines two views in a _more specific_ one.
      * @tparam OGet Component list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
      * @param other The view to combine with.
@@ -1141,7 +1141,7 @@ public:
     }
 
     /**
-     * @brief Combines two views in a _more specific_ one (friend function).
+     * @brief Combines two views in a _more specific_ one.
      * @tparam OGet Component list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
      * @param other The view to combine with.
