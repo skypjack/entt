@@ -1620,7 +1620,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 
     if(const auto *value = data(); node.details) {
         if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(*ctx, data());
+            return it->second.conv(*ctx, value);
         }
 
         for(auto &&curr: node.details->base) {
@@ -1636,8 +1636,8 @@ bool meta_any::set(const id_type id, Type &&value) {
         // exploits the fact that arithmetic types and enums are also default constructible
         auto other = type.construct();
         ENTT_ASSERT(other.node.conversion_helper, "Conversion helper not found");
-        const auto value = node.conversion_helper(nullptr, storage.data());
-        other.node.conversion_helper(other.storage.data(), &value);
+        const auto value = node.conversion_helper(nullptr, data());
+        other.node.conversion_helper(other.data(), &value);
         return other;
     }
 
