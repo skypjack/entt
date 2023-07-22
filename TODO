@@ -16,7 +16,6 @@ TODO (high prio):
 * deprecate/drop snapshot orphans function, make it a general purpose one
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
-* meta container: make basic traits publicly available to users
 * meta container: add value type to resize
 * ===> TEST: review view tests after the last changes
 
