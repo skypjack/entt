@@ -17,7 +17,7 @@ namespace entt {
  */
 template<std::size_t N>
 struct choice_t
-    // Unfortunately, doxygen cannot parse such a construct.
+    // unfortunately, doxygen cannot parse such a construct
     : /*! @cond TURN_OFF_DOXYGEN */ choice_t<N - 1> /*! @endcond */
 {};
 
