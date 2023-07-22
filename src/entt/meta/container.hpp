@@ -44,9 +44,22 @@ struct reserve_aware_container: std::false_type {};
 template<typename Type>
 struct reserve_aware_container<Type, std::void_t<decltype(&Type::reserve)>>: std::true_type {};
 
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
+ * @brief General purpose implementation of meta sequence container traits.
+ * @tparam Type Type of underlying sequence container.
+ */
 template<typename Type>
-struct basic_meta_sequence_container_traits {
+class basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
+
+    friend meta_sequence_container;
 
     using operation = internal::meta_container_operation;
     using size_type = typename meta_sequence_container::size_type;
@@ -57,21 +70,21 @@ struct basic_meta_sequence_container_traits {
         case operation::size:
             return static_cast<const Type *>(cvalue)->size();
         case operation::clear:
-            if constexpr(dynamic_sequence_container<Type>::value) {
+            if constexpr(internal::dynamic_sequence_container<Type>::value) {
                 static_cast<Type *>(value)->clear();
                 return true;
             } else {
                 break;
             }
         case operation::reserve:
-            if constexpr(reserve_aware_container<Type>::value) {
+            if constexpr(internal::reserve_aware_container<Type>::value) {
                 static_cast<Type *>(value)->reserve(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
                 break;
             }
         case operation::resize:
-            if constexpr(dynamic_sequence_container<Type>::value) {
+            if constexpr(internal::dynamic_sequence_container<Type>::value) {
                 static_cast<Type *>(value)->resize(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
@@ -95,7 +108,7 @@ struct basic_meta_sequence_container_traits {
             return true;
         case operation::insert:
         case operation::erase:
-            if constexpr(dynamic_sequence_container<Type>::value) {
+            if constexpr(internal::dynamic_sequence_container<Type>::value) {
                 auto *const non_const = any_cast<typename Type::iterator>(&it->base());
                 typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
 
@@ -122,15 +135,21 @@ struct basic_meta_sequence_container_traits {
     }
 };
 
+/**
+ * @brief General purpose implementation of meta associative container traits.
+ * @tparam Type Type of underlying associative container.
+ */
 template<typename Type>
-struct basic_meta_associative_container_traits {
+class basic_meta_associative_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
+
+    friend meta_associative_container;
+
+    static constexpr auto key_only = internal::key_only_associative_container<Type>::value;
 
     using operation = internal::meta_container_operation;
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
-
-    static constexpr auto key_only = key_only_associative_container<Type>::value;
 
     static size_type basic_vtable(const operation op, const meta_ctx &ctx, const void *cvalue, void *value, meta_any *key, iterator *it) {
         switch(op) {
@@ -140,7 +159,7 @@ struct basic_meta_associative_container_traits {
             static_cast<Type *>(value)->clear();
             return true;
         case operation::reserve:
-            if constexpr(reserve_aware_container<Type>::value) {
+            if constexpr(internal::reserve_aware_container<Type>::value) {
                 static_cast<Type *>(value)->reserve(*static_cast<const size_type *>(cvalue));
                 return true;
             } else {
@@ -200,20 +219,13 @@ struct basic_meta_associative_container_traits {
     }
 };
 
-} // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
 /**
  * @brief Meta sequence container traits for `std::vector`s of any type.
  * @tparam Args Template arguments for the container.
  */
 template<typename... Args>
 struct meta_sequence_container_traits<std::vector<Args...>>
-    : internal::basic_meta_sequence_container_traits<std::vector<Args...>> {};
+    : basic_meta_sequence_container_traits<std::vector<Args...>> {};
 
 /**
  * @brief Meta sequence container traits for `std::array`s of any type.
@@ -222,7 +234,7 @@ struct meta_sequence_container_traits<std::vector<Args...>>
  */
 template<typename Type, auto N>
 struct meta_sequence_container_traits<std::array<Type, N>>
-    : internal::basic_meta_sequence_container_traits<std::array<Type, N>> {};
+    : basic_meta_sequence_container_traits<std::array<Type, N>> {};
 
 /**
  * @brief Meta sequence container traits for `std::list`s of any type.
@@ -230,7 +242,7 @@ struct meta_sequence_container_traits<std::array<Type, N>>
  */
 template<typename... Args>
 struct meta_sequence_container_traits<std::list<Args...>>
-    : internal::basic_meta_sequence_container_traits<std::list<Args...>> {};
+    : basic_meta_sequence_container_traits<std::list<Args...>> {};
 
 /**
  * @brief Meta sequence container traits for `std::deque`s of any type.
@@ -238,7 +250,7 @@ struct meta_sequence_container_traits<std::list<Args...>>
  */
 template<typename... Args>
 struct meta_sequence_container_traits<std::deque<Args...>>
-    : internal::basic_meta_sequence_container_traits<std::deque<Args...>> {};
+    : basic_meta_sequence_container_traits<std::deque<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::map`s of any type.
@@ -246,7 +258,7 @@ struct meta_sequence_container_traits<std::deque<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<std::map<Args...>>
-    : internal::basic_meta_associative_container_traits<std::map<Args...>> {};
+    : basic_meta_associative_container_traits<std::map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::unordered_map`s of any
@@ -255,7 +267,7 @@ struct meta_associative_container_traits<std::map<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<std::unordered_map<Args...>>
-    : internal::basic_meta_associative_container_traits<std::unordered_map<Args...>> {};
+    : basic_meta_associative_container_traits<std::unordered_map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::set`s of any type.
@@ -263,7 +275,7 @@ struct meta_associative_container_traits<std::unordered_map<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<std::set<Args...>>
-    : internal::basic_meta_associative_container_traits<std::set<Args...>> {};
+    : basic_meta_associative_container_traits<std::set<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `std::unordered_set`s of any
@@ -272,7 +284,7 @@ struct meta_associative_container_traits<std::set<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<std::unordered_set<Args...>>
-    : internal::basic_meta_associative_container_traits<std::unordered_set<Args...>> {};
+    : basic_meta_associative_container_traits<std::unordered_set<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `dense_map`s of any type.
@@ -280,7 +292,7 @@ struct meta_associative_container_traits<std::unordered_set<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<dense_map<Args...>>
-    : internal::basic_meta_associative_container_traits<dense_map<Args...>> {};
+    : basic_meta_associative_container_traits<dense_map<Args...>> {};
 
 /**
  * @brief Meta associative container traits for `dense_set`s of any type.
@@ -288,7 +300,7 @@ struct meta_associative_container_traits<dense_map<Args...>>
  */
 template<typename... Args>
 struct meta_associative_container_traits<dense_set<Args...>>
-    : internal::basic_meta_associative_container_traits<dense_set<Args...>> {};
+    : basic_meta_associative_container_traits<dense_set<Args...>> {};
 
 } // namespace entt
 
