@@ -190,7 +190,6 @@ decltype(auto) poly_call(Poly &&self, Args &&...args) {
  */
 template<typename Concept, std::size_t Len, std::size_t Align>
 class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align>>> {
-    /*! @brief A poly base is allowed to snoop into a poly object. */
     friend struct poly_base<basic_poly>;
 
 public:
