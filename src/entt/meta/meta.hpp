@@ -1325,6 +1325,15 @@ public:
     }
 
     /**
+     * @brief Checks if a type supports direct casting to another type.
+     * @return True if direct casting is allowed, false otherwise.
+     */
+    [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
+        // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
+        return internal::try_cast(internal::meta_context::from(*ctx), node, other.node, this);
+    }
+
+    /**
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
