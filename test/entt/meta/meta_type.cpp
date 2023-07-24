@@ -304,7 +304,6 @@ TEST_F(MetaType, TemplateInfo) {
 }
 
 TEST_F(MetaType, Base) {
-    using namespace entt::literals;
     auto type = entt::resolve<derived_t>();
 
     ASSERT_NE(type.base().cbegin(), type.base().cend());
@@ -496,8 +495,6 @@ TEST_F(MetaType, ConstructArithmeticConversion) {
 }
 
 TEST_F(MetaType, FromVoid) {
-    using namespace entt::literals;
-
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<double *>(nullptr)));
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<const double *>(nullptr)));
 
