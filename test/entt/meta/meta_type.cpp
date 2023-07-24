@@ -303,6 +303,14 @@ TEST_F(MetaType, TemplateInfo) {
     ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
 }
 
+TEST_F(MetaType, CanCast) {
+    auto type = entt::resolve<derived_t>();
+
+    ASSERT_FALSE(type.can_cast(entt::resolve<void>()));
+    ASSERT_TRUE(type.can_cast(entt::resolve<base_t>()));
+    ASSERT_TRUE(type.can_cast(entt::resolve<derived_t>()));
+}
+
 TEST_F(MetaType, Base) {
     auto type = entt::resolve<derived_t>();
 
