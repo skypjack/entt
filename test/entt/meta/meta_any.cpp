@@ -1215,6 +1215,9 @@ TEST_F(MetaAny, OpaqueAllowCast) {
 
     ASSERT_TRUE(as_cref.allow_cast(entt::resolve<double>()));
     ASSERT_EQ(as_cref.type(), entt::resolve<double>());
+
+    ASSERT_TRUE(as_cref.allow_cast(entt::resolve<float>()));
+    ASSERT_EQ(as_cref.type(), entt::resolve<float>());
 }
 
 TEST_F(MetaAny, Convert) {
