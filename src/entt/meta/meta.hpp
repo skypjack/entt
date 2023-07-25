@@ -1644,7 +1644,6 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(node.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
         // exploits the fact that arithmetic types and enums are also default constructible
         auto other = type.construct();
-        ENTT_ASSERT(other.node.conversion_helper, "Conversion helper not found");
         const auto value = node.conversion_helper(nullptr, data());
         other.node.conversion_helper(other.data(), &value);
         return other;
