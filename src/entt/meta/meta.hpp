@@ -1036,12 +1036,8 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        if constexpr(sizeof...(Args) == 0u) {
-            return invoke(std::move(instance), static_cast<meta_any *>(nullptr), size_type{});
-        } else {
-            meta_any arguments[sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-            return invoke(std::move(instance), arguments, sizeof...(Args));
-        }
+        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
+        return invoke(std::move(instance), arguments, sizeof...(Args));
     }
 
     /*! @copydoc meta_data::prop */
@@ -1449,12 +1445,8 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        if constexpr(sizeof...(Args) == 0u) {
-            return construct(static_cast<meta_any *>(nullptr), size_type{});
-        } else {
-            meta_any arguments[sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-            return construct(arguments, sizeof...(Args));
-        }
+        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
+        return construct(arguments, sizeof...(Args));
     }
 
     /**
@@ -1512,12 +1504,8 @@ public:
      */
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        if constexpr(sizeof...(Args) == 0u) {
-            return invoke(id, std::move(instance), static_cast<meta_any *>(nullptr), size_type{});
-        } else {
-            meta_any arguments[sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-            return invoke(id, std::move(instance), arguments, sizeof...(Args));
-        }
+        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
+        return invoke(id, std::move(instance), arguments, sizeof...(Args));
     }
 
     /**
