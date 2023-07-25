@@ -159,6 +159,26 @@ template<typename... Args>
     return nullptr;
 }
 
+[[nodiscard]] inline bool can_convert(const meta_context &context, const meta_type_node &from, const meta_type_node &to) noexcept {
+    if((from.info && *from.info == *to.info) || (from.conversion_helper && static_cast<bool>(to.traits & (meta_traits::is_arithmetic | meta_traits::is_enum)))) {
+        return true;
+    }
+
+    if(from.details) {
+        if(auto it = from.details->conv.find(to.info->hash()); it != from.details->conv.cend()) {
+            return true;
+        }
+
+        for(auto &&curr: from.details->base) {
+            if(can_convert(context, curr.second.type(context), to)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 [[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
     const auto it = context.value.find(info.hash());
     return it != context.value.end() ? &it->second : nullptr;

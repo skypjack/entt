@@ -311,6 +311,24 @@ TEST_F(MetaType, CanCast) {
     ASSERT_TRUE(type.can_cast(entt::resolve<derived_t>()));
 }
 
+TEST_F(MetaType, CanConvert) {
+    auto clazz = entt::resolve<clazz_t>();
+    auto derived = entt::resolve<derived_t>();
+    auto arithmetic = entt::resolve<int>();
+
+    ASSERT_TRUE(clazz.can_convert(entt::resolve<clazz_t>()));
+    ASSERT_TRUE(clazz.can_convert(entt::resolve<int>()));
+
+    ASSERT_TRUE(derived.can_convert(entt::resolve<derived_t>()));
+    ASSERT_TRUE(derived.can_convert(entt::resolve<base_t>()));
+    ASSERT_FALSE(derived.can_convert(entt::resolve<int>()));
+
+    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<int>()));
+    ASSERT_FALSE(arithmetic.can_convert(entt::resolve<clazz_t>()));
+    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<double>()));
+    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<float>()));
+}
+
 TEST_F(MetaType, Base) {
     auto type = entt::resolve<derived_t>();
 
