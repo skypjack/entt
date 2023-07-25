@@ -1334,6 +1334,14 @@ public:
     }
 
     /**
+     * @brief Checks if a type supports conversion it to another type.
+     * @return True if the conversion is allowed, false otherwise.
+     */
+    [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
+        return internal::can_convert(internal::meta_context::from(*ctx), node, other.node);
+    }
+
+    /**
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
