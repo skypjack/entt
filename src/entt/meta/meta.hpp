@@ -1322,6 +1322,7 @@ public:
 
     /**
      * @brief Checks if a type supports direct casting to another type.
+     * @param other The meta type to test for.
      * @return True if direct casting is allowed, false otherwise.
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
@@ -1331,6 +1332,7 @@ public:
 
     /**
      * @brief Checks if a type supports conversion it to another type.
+     * @param other The meta type to test for.
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
