@@ -114,9 +114,9 @@ class basic_meta_sequence_container_traits {
 
                 if(op == operation::insert) {
                     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                    if(auto &any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); any.allow_cast<typename Type::const_reference>() || any.allow_cast<typename Type::value_type>()) {
-                        const auto *element = any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        *it = iterator{ctx, static_cast<Type *>(value)->insert(underlying, element ? *element : any.cast<typename Type::value_type>())};
+                    if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
+                        const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                        *it = iterator{ctx, static_cast<Type *>(value)->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>())};
                         return true;
                     }
                 } else {
@@ -186,8 +186,8 @@ class basic_meta_associative_container_traits {
                 if constexpr(key_only) {
                     return static_cast<Type *>(value)->insert(key->cast<const typename Type::key_type &>()).second;
                 } else {
-                    auto &any = *static_cast<meta_any *>(const_cast<void *>(cvalue));
-                    return any.allow_cast<const typename Type::mapped_type &>() && static_cast<Type *>(value)->emplace(key->cast<const typename Type::key_type &>(), any.cast<const typename Type::mapped_type &>()).second;
+                    auto &as_any = *static_cast<meta_any *>(const_cast<void *>(cvalue));
+                    return as_any.allow_cast<const typename Type::mapped_type &>() && static_cast<Type *>(value)->emplace(key->cast<const typename Type::key_type &>(), as_any.cast<const typename Type::mapped_type &>()).second;
                 }
             }
 
