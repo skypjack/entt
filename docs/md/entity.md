@@ -2105,28 +2105,27 @@ The same concepts apply to groups as well.
 Views and groups are narrow windows on the entire list of entities. They work by
 filtering entities according to their components.<br/>
 In some cases there may be the need to iterate all the entities still in use
-regardless of their components. The registry offers a specific member function
-to do that:
+regardless of their components. This is done by accessing entity storage:
 
 ```cpp
-registry.each([](auto entity) {
+for(auto entity: registry.view<entt::entity>()) {
     // ...
-});
+}
 ```
 
 As a rule of thumb, consider using a view or a group if the goal is to iterate
 entities that have a determinate set of components. These tools are usually much
-faster than combining the `each` function with a bunch of custom tests.<br/>
+faster than filtering entities with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go. For example, it's possible to
-combine `each` with the `orphan` member function to clean up orphan entities
+combine this view with the `orphan` member function to clean up orphan entities
 (that is, entities that are still in use and have no assigned components):
 
 ```cpp
-registry.each([&registry](auto entity) {
+for(auto entity: registry.view<entt::entity>()) {
     if(registry.orphan(entity)) {
         registry.release(entity);
     }
-});
+}
 ```
 
 In general, iterating all entities can result in poor performance. It should not
