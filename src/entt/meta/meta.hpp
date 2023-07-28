@@ -1703,10 +1703,10 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr meta_iterator() noexcept
+    meta_iterator() noexcept
         : meta_iterator{locator<meta_ctx>::value_or()} {}
 
-    constexpr meta_iterator(const meta_ctx &area) noexcept
+    meta_iterator(const meta_ctx &area) noexcept
         : ctx{&area} {}
 
     template<typename It>
@@ -1793,10 +1793,10 @@ public:
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
 
-    constexpr meta_iterator() noexcept
+    meta_iterator() noexcept
         : meta_iterator{locator<meta_ctx>::value_or()} {}
 
-    constexpr meta_iterator(const meta_ctx &area) noexcept
+    meta_iterator(const meta_ctx &area) noexcept
         : ctx{&area} {}
 
     template<bool KeyOnly, typename It>
