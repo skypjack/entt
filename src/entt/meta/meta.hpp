@@ -662,8 +662,7 @@ template<typename Type>
  * @brief Opaque pointers to instances of any type.
  *
  * A handle doesn't perform copies and isn't responsible for the contained
- * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used to generate references to actual objects when needed.
+ * object. It doesn't prolong the lifetime of the pointed instance.
  */
 struct meta_handle {
     /*! Default constructor. */
@@ -1023,8 +1022,7 @@ struct meta_func {
      * @brief Invokes the underlying function, if possible.
      *
      * @warning
-     * The context of the arguments is **not** changed.<br/>
-     * It's up to the caller to bind them to the right context(s).
+     * The context of the arguments is **never** changed.
      *
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -1270,8 +1268,7 @@ public:
 
     /**
      * @brief Checks whether a type is a pointer-like type or not.
-     * @return True if the underlying type is a pointer-like one, false
-     * otherwise.
+     * @return True if the underlying type is pointer-like, false otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const noexcept {
         return static_cast<bool>(node.traits & internal::meta_traits::is_meta_pointer_like);
@@ -1398,8 +1395,7 @@ public:
     /**
      * @brief Lookup utility for meta functions (bases are also visited).
      *
-     * In case of overloaded functions, the first one with the required
-     * identifier is returned.
+     * In case of overloaded functions, a random one is returned.
      *
      * @param id Unique identifier.
      * @return The registered meta function for the given identifier, if any.
@@ -1423,11 +1419,8 @@ public:
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * If suitable, the implicitly generated default constructor is used.
-     *
      * @warning
-     * The context of the arguments is **not** changed.<br/>
-     * It's up to the caller to bind them to the right context(s).
+     * The context of the arguments is **never** changed.
      *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
@@ -1477,8 +1470,7 @@ public:
      * @brief Invokes a function given an identifier, if possible.
      *
      * @warning
-     * The context of the arguments is **not** changed.<br/>
-     * It's up to the caller to bind them to the right context(s).
+     * The context of the arguments is **never** changed.
      *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
