@@ -159,24 +159,29 @@ template<typename... Args>
     return nullptr;
 }
 
-[[nodiscard]] inline bool can_convert(const meta_context &context, const meta_type_node &from, const meta_type_node &to) noexcept {
-    if((from.info && *from.info == *to.info) || (from.conversion_helper && static_cast<bool>(to.traits & (meta_traits::is_arithmetic | meta_traits::is_enum)))) {
-        return true;
+template<typename Func>
+[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const meta_type_node &to, const void *instance, Func func) {
+    if(from.info && *from.info == *to.info) {
+        return func(instance, from);
     }
 
     if(from.details) {
         if(auto it = from.details->conv.find(to.info->hash()); it != from.details->conv.cend()) {
-            return true;
+            return func(instance, it->second);
         }
 
         for(auto &&curr: from.details->base) {
-            if(can_convert(context, curr.second.type(context), to)) {
-                return true;
+            if(auto other = try_convert(context, curr.second.type(context), to, curr.second.cast(instance), func); other) {
+                return other;
             }
         }
     }
 
-    return false;
+    if(from.conversion_helper && static_cast<bool>(to.traits & (meta_traits::is_arithmetic | meta_traits::is_enum))) {
+        return func(instance, from.conversion_helper);
+    }
+
+    return func(instance);
 }
 
 [[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
