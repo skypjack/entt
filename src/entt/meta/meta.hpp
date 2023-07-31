@@ -1099,6 +1099,8 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
+    friend class meta_any;
+
     template<typename Func>
     [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, [[maybe_unused]] bool constness, Func next) const {
         decltype(next()) candidate = nullptr;
@@ -1341,7 +1343,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return internal::can_convert(internal::meta_context::from(*ctx), node, other.node);
+        return internal::try_convert(internal::meta_context::from(*ctx), node, other.node, nullptr, [](const void *, auto &&...args) { return ((args, 1) + ... + 0u); });
     }
 
     /**
@@ -1621,33 +1623,22 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(node.info && *node.info == type.info()) {
-        return as_ref();
-    }
-
-    if(const auto *value = data(); node.details) {
-        if(auto it = node.details->conv.find(type.info().hash()); it != node.details->conv.cend()) {
-            return it->second.conv(*ctx, value);
+    return internal::try_convert(internal::meta_context::from(*ctx), node, type.node, data(), [this, &type](const void *instance, auto &&...args) {
+        if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
+            return (args.from_void(*ctx, nullptr, instance), ...);
+        } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
+            return (args.conv(*ctx, instance), ...);
+        } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, decltype(internal::meta_type_node::conversion_helper)> || ...)) {
+            // exploits the fact that arithmetic types and enums are also default constructible
+            auto other = type.construct();
+            const auto value = (args(nullptr, instance), ...);
+            other.node.conversion_helper(other.data(), &value);
+            return other;
+        } else {
+            // forwards to force a compile-time error in case of available arguments
+            return meta_any{meta_ctx_arg, *ctx, std::forward<decltype(args)>(args)...};
         }
-
-        for(auto &&curr: node.details->base) {
-            const auto &as_const = curr.second.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.second.cast(value));
-
-            if(auto other = as_const.allow_cast(type); other) {
-                return other;
-            }
-        }
-    }
-
-    if(node.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
-        // exploits the fact that arithmetic types and enums are also default constructible
-        auto other = type.construct();
-        const auto value = node.conversion_helper(nullptr, data());
-        other.node.conversion_helper(other.data(), &value);
-        return other;
-    }
-
-    return meta_any{meta_ctx_arg, *ctx};
+    });
 }
 
 inline bool meta_any::assign(const meta_any &other) {

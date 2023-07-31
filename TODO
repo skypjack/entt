@@ -17,7 +17,6 @@ TODO (high prio):
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
-* review allow_cast and can_convert, we can merge them in a single function probably
 * ===> TEST: review view tests after the last changes
 
 WIP:
