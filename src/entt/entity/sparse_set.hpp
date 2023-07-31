@@ -277,14 +277,17 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     virtual void pop(basic_iterator first, basic_iterator last) {
-        if(mode == deletion_policy::swap_and_pop) {
+        switch(mode) {
+        case deletion_policy::swap_and_pop:
             for(; first != last; ++first) {
                 swap_and_pop(first);
             }
-        } else {
+            break;
+        case deletion_policy::in_place:
             for(; first != last; ++first) {
                 in_place_pop(first);
             }
+            break;
         }
     }
 
