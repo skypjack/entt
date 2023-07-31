@@ -160,24 +160,24 @@ template<typename... Args>
 }
 
 template<typename Func>
-[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const meta_type_node &to, const void *instance, Func func) {
-    if(from.info && *from.info == *to.info) {
+[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const type_info &to, const bool arithmetic_or_enum, const void *instance, Func func) {
+    if(from.info && *from.info == to) {
         return func(instance, from);
     }
 
     if(from.details) {
-        if(auto it = from.details->conv.find(to.info->hash()); it != from.details->conv.cend()) {
+        if(auto it = from.details->conv.find(to.hash()); it != from.details->conv.cend()) {
             return func(instance, it->second);
         }
 
         for(auto &&curr: from.details->base) {
-            if(auto other = try_convert(context, curr.second.type(context), to, curr.second.cast(instance), func); other) {
+            if(auto other = try_convert(context, curr.second.type(context), to, arithmetic_or_enum, curr.second.cast(instance), func); other) {
                 return other;
             }
         }
     }
 
-    if(from.conversion_helper && static_cast<bool>(to.traits & (meta_traits::is_arithmetic | meta_traits::is_enum))) {
+    if(from.conversion_helper && arithmetic_or_enum) {
         return func(instance, from.conversion_helper);
     }
 

@@ -1099,8 +1099,6 @@ private:
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
-    friend class meta_any;
-
     template<typename Func>
     [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, [[maybe_unused]] bool constness, Func next) const {
         decltype(next()) candidate = nullptr;
@@ -1343,7 +1341,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return internal::try_convert(internal::meta_context::from(*ctx), node, other.node, nullptr, [](const void *, auto &&...args) { return ((args, 1) + ... + 0u); });
+        return internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((void(args), 1) + ... + 0u); });
     }
 
     /**
@@ -1623,7 +1621,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    return internal::try_convert(internal::meta_context::from(*ctx), node, type.node, data(), [this, &type](const void *instance, auto &&...args) {
+    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), data(), [this, &type](const void *instance, auto &&...args) {
         if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
             return (args.from_void(*ctx, nullptr, instance), ...);
         } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
