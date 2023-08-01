@@ -44,7 +44,7 @@ template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
 }
 
 template<typename Type>
-[[nodiscard]] inline std::string_view type_name(char) noexcept {
+[[nodiscard]] std::string_view type_name(char) noexcept {
     static const auto value = stripped_type_name<Type>();
     return value;
 }
@@ -57,7 +57,7 @@ template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
 }
 
 template<typename Type>
-[[nodiscard]] inline id_type type_hash(char) noexcept {
+[[nodiscard]] id_type type_hash(char) noexcept {
     static const auto value = [](const auto stripped) {
         return hashed_string::value(stripped.data(), stripped.size());
     }(stripped_type_name<Type>());
