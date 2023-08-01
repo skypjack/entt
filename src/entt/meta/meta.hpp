@@ -1341,7 +1341,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((void(args), 1) + ... + 0u); });
+        return internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); });
     }
 
     /**
@@ -1768,7 +1768,8 @@ public:
 
     meta_iterator operator++(int) noexcept {
         meta_iterator orig = *this;
-        return ++(*this), orig;
+        vtable(handle.data(), nullptr);
+        return orig;
     }
 
     [[nodiscard]] reference operator*() const {
