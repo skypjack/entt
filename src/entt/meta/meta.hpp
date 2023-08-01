@@ -1368,19 +1368,8 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        if(node.details) {
-            if(const auto it = node.details->data.find(id); it != node.details->data.cend()) {
-                return meta_data{*ctx, it->second};
-            }
-        }
-
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.data(id); elem) {
-                return elem;
-            }
-        }
-
-        return meta_data{};
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), node, id);
+        return elem ? meta_data{*ctx, *elem} : meta_data{};
     }
 
     /**
@@ -1401,19 +1390,8 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        if(node.details) {
-            if(const auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                return meta_func{*ctx, it->second};
-            }
-        }
-
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.func(id); elem) {
-                return elem;
-            }
-        }
-
-        return meta_func{};
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), node, id);
+        return elem ? meta_func{*ctx, *elem} : meta_func{};
     }
 
     /**
@@ -1550,19 +1528,8 @@ public:
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        if(node.details) {
-            if(const auto it = node.details->prop.find(key); it != node.details->prop.cend()) {
-                return meta_prop{*ctx, it->second};
-            }
-        }
-
-        for(auto &&curr: base()) {
-            if(auto elem = curr.second.prop(key); elem) {
-                return elem;
-            }
-        }
-
-        return meta_prop{};
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::prop>(internal::meta_context::from(*ctx), node, key);
+        return elem ? meta_prop{*ctx, *elem} : meta_prop{};
     }
 
     /**

@@ -131,6 +131,23 @@ struct meta_type_node {
     std::shared_ptr<meta_type_descriptor> details{};
 };
 
+template<auto Member>
+auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+    if(node.details) {
+        if(const auto it = (node.details.get()->*Member).find(id); it != (node.details.get()->*Member).cend()) {
+            return &it->second;
+        }
+
+        for(auto &&curr: node.details->base) {
+            if(auto *elem = look_for<Member>(context, curr.second.type(context), id); elem) {
+                return elem;
+            }
+        }
+    }
+
+    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::mapped_type *>(nullptr);
+}
+
 template<typename Type>
 meta_type_node resolve(const meta_context &) noexcept;
 
