@@ -62,6 +62,8 @@ function(SETUP_TARGET TARGET_NAME)
                 >
                 # documentation diagnostic turned on for clang-cl only
                 $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wdocumentation>
+                # warnings from compilers that think I don't know what I'm doing
+                $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wcomma>
                 /EHsc /wd4324 /wd4996
                 # disabling INCREMENTAL is required by SizeBench
                 $<$<CONFIG:Debug>:/Od /INCREMENTAL:NO>
