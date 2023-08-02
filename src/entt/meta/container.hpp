@@ -60,7 +60,7 @@ class basic_meta_sequence_container_traits {
 
     friend meta_sequence_container;
 
-    using operation = internal::meta_container_operation;
+    using operation = internal::meta_sequence_container_operation;
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
@@ -125,9 +125,6 @@ class basic_meta_sequence_container_traits {
             }
 
             break;
-        default:
-            // nothing to do here
-            break;
         }
 
         return false;
@@ -146,7 +143,7 @@ class basic_meta_associative_container_traits {
 
     static constexpr auto key_only = internal::key_only_associative_container<Type>::value;
 
-    using operation = internal::meta_container_operation;
+    using operation = internal::meta_associative_container_operation;
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
@@ -208,9 +205,6 @@ class basic_meta_associative_container_traits {
                 return true;
             }
 
-            break;
-        default:
-            // nothing to do here
             break;
         }
 

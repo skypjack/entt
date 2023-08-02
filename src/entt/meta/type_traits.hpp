@@ -7,6 +7,42 @@
 namespace entt {
 
 /**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+namespace internal {
+
+enum class meta_sequence_container_operation {
+    size,
+    clear,
+    reserve,
+    resize,
+    begin,
+    end,
+    insert,
+    erase
+};
+
+enum class meta_associative_container_operation {
+    size,
+    clear,
+    reserve,
+    begin,
+    end,
+    insert,
+    erase,
+    find
+};
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
+
+/**
  * @brief Traits class template to be specialized to enable support for meta
  * template information.
  */

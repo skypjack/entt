@@ -26,36 +26,10 @@ namespace entt {
 class meta_any;
 class meta_type;
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-namespace internal {
-
-enum class meta_container_operation {
-    size,
-    clear,
-    reserve,
-    resize,
-    begin,
-    end,
-    insert,
-    erase,
-    find
-};
-
-} // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
-
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
-    using operation = internal::meta_container_operation;
+    using operation = internal::meta_sequence_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -109,7 +83,7 @@ private:
 /*! @brief Proxy object for associative containers. */
 class meta_associative_container {
     class meta_iterator;
-    using operation = internal::meta_container_operation;
+    using operation = internal::meta_associative_container_operation;
 
 public:
     /*! @brief Unsigned integer type. */
