@@ -151,15 +151,13 @@ class meta_any {
     enum class operation : std::uint8_t {
         deref,
         seq,
-        cseq,
-        assoc,
-        cassoc
+        assoc
     };
 
-    using vtable_type = void(const operation, const void *, void *);
+    using vtable_type = void(const operation, const bool, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
+    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const bool const_only, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(!std::is_void_v<Type>) {
@@ -182,15 +180,13 @@ class meta_any {
                 }
                 break;
             case operation::seq:
-            case operation::cseq:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    op == operation::seq ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value)))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value)));
+                    const_only ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
                 }
                 break;
             case operation::assoc:
-            case operation::cassoc:
                 if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    op == operation::assoc ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value)))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value)));
+                    const_only ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
                 }
                 break;
             }
@@ -522,14 +518,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy{*ctx};
-        vtable(policy() == meta_any_policy::cref ? operation::cseq : operation::seq, std::as_const(*this).data(), &proxy);
+        vtable(operation::seq, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{*ctx};
-        vtable(operation::cseq, data(), &proxy);
+        vtable(operation::seq, true, data(), &proxy);
         return proxy;
     }
 
@@ -539,14 +535,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy{*ctx};
-        vtable(policy() == meta_any_policy::cref ? operation::cassoc : operation::assoc, std::as_const(*this).data(), &proxy);
+        vtable(operation::assoc, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{*ctx};
-        vtable(operation::cassoc, data(), &proxy);
+        vtable(operation::assoc, true, data(), &proxy);
         return proxy;
     }
 
@@ -557,7 +553,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        vtable(operation::deref, storage.data(), &ret);
+        vtable(operation::deref, true, storage.data(), &ret);
         return ret;
     }
 
