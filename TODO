@@ -17,7 +17,8 @@ TODO (high prio):
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
-* make meta_type::lokup function generic, move it to node.hpp or similar
+* meta: make meta container rebind type based (no any)
+* further rework meta_any vtable to reduce it in size (get rid of meta_any operation if possible)
 * ===> TEST: review view tests after the last changes
 
 WIP:
