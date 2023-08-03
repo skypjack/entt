@@ -151,13 +151,15 @@ class meta_any {
     enum class operation : std::uint8_t {
         deref,
         seq,
-        assoc
+        cseq,
+        assoc,
+        cassoc
     };
 
-    using vtable_type = void(const operation, const any &, void *);
+    using vtable_type = void(const operation, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const any &value, [[maybe_unused]] void *other) {
+    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(!std::is_void_v<Type>) {
@@ -165,28 +167,30 @@ class meta_any {
             case operation::deref:
                 if constexpr(is_meta_pointer_like_v<Type>) {
                     if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                        static_cast<meta_any *>(other)->emplace<Type>(any_cast<Type>(value));
+                        static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
                     } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
-                        using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
+                        using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
 
                         if constexpr(std::is_constructible_v<bool, Type>) {
-                            if(const auto &pointer_like = any_cast<const Type &>(value); pointer_like) {
+                            if(const auto &pointer_like = *static_cast<const Type *>(value); pointer_like) {
                                 static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                             }
                         } else {
-                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value)));
+                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
                         }
                     }
                 }
                 break;
             case operation::seq:
+            case operation::cseq:
                 if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    static_cast<meta_sequence_container *>(other)->rebind<Type>(std::move(const_cast<any &>(value)));
+                    op == operation::seq ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value)))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value)));
                 }
                 break;
             case operation::assoc:
+            case operation::cassoc:
                 if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    static_cast<meta_associative_container *>(other)->rebind<Type>(std::move(const_cast<any &>(value)));
+                    op == operation::assoc ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value)))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value)));
                 }
                 break;
             }
@@ -517,17 +521,15 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        any detached = storage.as_ref();
         meta_sequence_container proxy{*ctx};
-        vtable(operation::seq, detached, &proxy);
+        vtable(policy() == meta_any_policy::cref ? operation::cseq : operation::seq, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
-        any detached = storage.as_ref();
         meta_sequence_container proxy{*ctx};
-        vtable(operation::seq, detached, &proxy);
+        vtable(operation::cseq, data(), &proxy);
         return proxy;
     }
 
@@ -536,17 +538,15 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        any detached = storage.as_ref();
         meta_associative_container proxy{*ctx};
-        vtable(operation::assoc, detached, &proxy);
+        vtable(policy() == meta_any_policy::cref ? operation::cassoc : operation::assoc, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
-        any detached = storage.as_ref();
         meta_associative_container proxy{*ctx};
-        vtable(operation::assoc, detached, &proxy);
+        vtable(operation::cassoc, data(), &proxy);
         return proxy;
     }
 
@@ -557,7 +557,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        vtable(operation::deref, storage, &ret);
+        vtable(operation::deref, storage.data(), &ret);
         return ret;
     }
 
