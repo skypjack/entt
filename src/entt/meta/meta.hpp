@@ -54,11 +54,10 @@ public:
      * @param instance The container to wrap.
      */
     template<typename Type>
-    void rebind(any instance) noexcept {
-        ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
+    void rebind(Type &instance) noexcept {
         value_type_node = &internal::resolve<typename Type::value_type>;
-        vtable = &meta_sequence_container_traits<Type>::basic_vtable;
-        storage = std::move(instance);
+        vtable = &meta_sequence_container_traits<std::remove_const_t<Type>>::basic_vtable;
+        storage = forward_as_any(instance);
     }
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
@@ -108,17 +107,16 @@ public:
      * @param instance The container to wrap.
      */
     template<typename Type>
-    void rebind(any instance) noexcept {
-        ENTT_ASSERT(instance.type() == type_id<Type>(), "Unexpected type");
+    void rebind(Type &instance) noexcept {
         key_type_node = &internal::resolve<typename Type::key_type>;
         value_type_node = &internal::resolve<typename Type::value_type>;
 
-        if constexpr(!meta_associative_container_traits<Type>::key_only) {
+        if constexpr(!meta_associative_container_traits<std::remove_const_t<Type>>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
 
-        vtable = meta_associative_container_traits<Type>::basic_vtable;
-        storage = std::move(instance);
+        vtable = meta_associative_container_traits<std::remove_const_t<Type>>::basic_vtable;
+        storage = forward_as_any(instance);
     }
 
     [[nodiscard]] inline meta_type key_type() const noexcept;
@@ -167,9 +165,9 @@ class meta_any {
                 }
             }
         } else if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-            const_only ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
+            const_only ? static_cast<meta_sequence_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_sequence_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
         } else if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-            const_only ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
+            const_only ? static_cast<meta_associative_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_associative_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
         }
     }
 
