@@ -150,8 +150,8 @@ class meta_any {
 
     template<typename Type>
     static std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>> basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const bool const_only, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
-        if(req == internal::meta_traits::is_meta_pointer_like) {
-            if constexpr(is_meta_pointer_like_v<Type>) {
+        if constexpr(is_meta_pointer_like_v<Type>) {
+            if(req == internal::meta_traits::is_meta_pointer_like) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
                     static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
                 } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
@@ -166,12 +166,16 @@ class meta_any {
                     }
                 }
             }
-        } else if(req == internal::meta_traits::is_meta_sequence_container) {
-            if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+        }
+
+        if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+            if(req == internal::meta_traits::is_meta_sequence_container) {
                 const_only ? static_cast<meta_sequence_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_sequence_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
             }
-        } else if(req == internal::meta_traits::is_meta_associative_container) {
-            if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+        }
+
+        if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+            if(req == internal::meta_traits::is_meta_associative_container) {
                 const_only ? static_cast<meta_associative_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_associative_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
             }
         }
