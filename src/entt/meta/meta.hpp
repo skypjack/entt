@@ -148,48 +148,28 @@ using meta_any_policy = any_policy;
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    enum class operation : std::uint8_t {
-        deref,
-        seq,
-        assoc
-    };
-
-    using vtable_type = void(const operation, const bool, const void *, void *);
+    using vtable_type = void(const bool, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const operation op, [[maybe_unused]] const bool const_only, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
-        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+    static std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>> basic_vtable([[maybe_unused]] const bool const_only, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
+        if constexpr(is_meta_pointer_like_v<Type>) {
+            if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
+                static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
+            } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
+                using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
 
-        if constexpr(!std::is_void_v<Type>) {
-            switch(op) {
-            case operation::deref:
-                if constexpr(is_meta_pointer_like_v<Type>) {
-                    if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                        static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
-                    } else if constexpr(!std::is_same_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>, void>) {
-                        using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
-
-                        if constexpr(std::is_constructible_v<bool, Type>) {
-                            if(const auto &pointer_like = *static_cast<const Type *>(value); pointer_like) {
-                                static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
-                            }
-                        } else {
-                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
-                        }
+                if constexpr(std::is_constructible_v<bool, Type>) {
+                    if(const auto &pointer_like = *static_cast<const Type *>(value); pointer_like) {
+                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                     }
+                } else {
+                    static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
                 }
-                break;
-            case operation::seq:
-                if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-                    const_only ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
-                }
-                break;
-            case operation::assoc:
-                if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-                    const_only ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
-                }
-                break;
             }
+        } else if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+            const_only ? static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_sequence_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
+        } else if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+            const_only ? static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<const Type *>(value))) : static_cast<meta_associative_container *>(other)->rebind<Type>(forward_as_any(*static_cast<Type *>(const_cast<void *>(value))));
         }
     }
 
@@ -518,14 +498,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy{*ctx};
-        vtable(operation::seq, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
+        vtable(policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{*ctx};
-        vtable(operation::seq, true, data(), &proxy);
+        vtable(true, data(), &proxy);
         return proxy;
     }
 
@@ -535,14 +515,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy{*ctx};
-        vtable(operation::assoc, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
+        vtable(policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{*ctx};
-        vtable(operation::assoc, true, data(), &proxy);
+        vtable(true, data(), &proxy);
         return proxy;
     }
 
@@ -553,7 +533,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        vtable(operation::deref, true, storage.data(), &ret);
+        vtable(true, storage.data(), &ret);
         return ret;
     }
 

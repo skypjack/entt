@@ -18,7 +18,6 @@ TODO (high prio):
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
 * meta: make meta container rebind type based (no any)
-* further rework meta_any vtable to reduce it in size (get rid of meta_any operation if possible)
 * ===> TEST: review view tests after the last changes
 
 WIP:
