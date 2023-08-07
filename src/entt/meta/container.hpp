@@ -147,7 +147,7 @@ class basic_meta_associative_container_traits {
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *cvalue, void *value, const meta_any *key, iterator *it) {
+    static size_type basic_vtable(const operation op, const void *cvalue, void *value, const void *key, iterator *it) {
         switch(op) {
         case operation::size:
             return static_cast<const Type *>(cvalue)->size();
@@ -179,17 +179,17 @@ class basic_meta_associative_container_traits {
             return true;
         case operation::insert:
             if constexpr(key_only) {
-                return static_cast<Type *>(value)->insert(key->cast<const typename Type::key_type &>()).second;
+                return static_cast<Type *>(value)->insert(*static_cast<const typename Type::key_type *>(key)).second;
             } else {
-                return static_cast<Type *>(value)->emplace(key->cast<const typename Type::key_type &>(), static_cast<meta_any *>(const_cast<void *>(cvalue))->cast<const typename Type::mapped_type &>()).second;
+                return static_cast<Type *>(value)->emplace(*static_cast<const typename Type::key_type *>(key), *static_cast<const typename Type::mapped_type *>(cvalue)).second;
             }
         case operation::erase:
-            return static_cast<Type *>(value)->erase(key->cast<const typename Type::key_type &>());
+            return static_cast<Type *>(value)->erase(*static_cast<const typename Type::key_type *>(key));
         case operation::find:
             if(value) {
-                it->rebind<key_only>(static_cast<Type *>(value)->find(key->cast<const typename Type::key_type &>()));
+                it->rebind<key_only>(static_cast<Type *>(value)->find(*static_cast<const typename Type::key_type *>(key)));
             } else {
-                it->rebind<key_only>(static_cast<const Type *>(cvalue)->find(key->cast<const typename Type::key_type &>()));
+                it->rebind<key_only>(static_cast<const Type *>(cvalue)->find(*static_cast<const typename Type::key_type *>(key)));
             }
 
             return true;
