@@ -147,7 +147,7 @@ class basic_meta_associative_container_traits {
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *cvalue, void *value, meta_any *key, iterator *it) {
+    static size_type basic_vtable(const operation op, const void *cvalue, void *value, const meta_any *key, iterator *it) {
         switch(op) {
         case operation::size:
             return static_cast<const Type *>(cvalue)->size();

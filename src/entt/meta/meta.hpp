@@ -137,7 +137,7 @@ private:
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*vtable)(const operation, const void *, void *, meta_any *, iterator *){};
+    size_type (*vtable)(const operation, const void *, void *, const meta_any *, iterator *){};
     any storage{};
 };
 
