@@ -1922,7 +1922,7 @@ inline bool meta_associative_container::reserve(const size_type sz) {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, &value, storage.data(), &key, nullptr));
+    return (storage.policy() != any_policy::cref) && key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && (!mapped_type_node || value.allow_cast(meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))})) && vtable(operation::insert, &value, storage.data(), &key, nullptr);
 }
 
 /**
@@ -1931,7 +1931,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, nullptr, storage.data(), &key, nullptr));
+    return (storage.policy() != any_policy::cref) && key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && vtable(operation::erase, nullptr, storage.data(), &key, nullptr);
 }
 
 /**
@@ -1942,7 +1942,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
     iterator it{*ctx};
     const void *data = std::as_const(storage).data();
-    vtable(operation::find, data, storage.policy() == any_policy::cref ? nullptr : const_cast<void *>(data), &key, &it);
+    key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && vtable(operation::find, data, storage.policy() == any_policy::cref ? nullptr : const_cast<void *>(data), &key, &it);
     return it;
 }
 
