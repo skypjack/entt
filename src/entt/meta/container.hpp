@@ -64,46 +64,42 @@ class basic_meta_sequence_container_traits {
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *cvalue, void *value, iterator *it) {
+    static size_type basic_vtable(const operation op, const void *container, const void *value, iterator *it) {
         switch(op) {
         case operation::size:
-            return static_cast<const Type *>(cvalue)->size();
+            return static_cast<const Type *>(container)->size();
         case operation::clear:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                static_cast<Type *>(value)->clear();
+                static_cast<Type *>(const_cast<void *>(container))->clear();
                 return true;
             } else {
                 break;
             }
         case operation::reserve:
             if constexpr(internal::reserve_aware_container<Type>::value) {
-                static_cast<Type *>(value)->reserve(*static_cast<const size_type *>(cvalue));
+                static_cast<Type *>(const_cast<void *>(container))->reserve(*static_cast<const size_type *>(value));
                 return true;
             } else {
                 break;
             }
         case operation::resize:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                static_cast<Type *>(value)->resize(*static_cast<const size_type *>(cvalue));
+                static_cast<Type *>(const_cast<void *>(container))->resize(*static_cast<const size_type *>(value));
                 return true;
             } else {
                 break;
             }
         case operation::begin:
-            if(value) {
-                it->rebind(static_cast<Type *>(value)->begin());
-            } else {
-                it->rebind(static_cast<const Type *>(cvalue)->begin());
-            }
-
+            it->rebind(static_cast<Type *>(const_cast<void *>(container))->begin());
+            return true;
+        case operation::cbegin:
+            it->rebind(static_cast<const Type *>(container)->begin());
             return true;
         case operation::end:
-            if(value) {
-                it->rebind(static_cast<Type *>(value)->end());
-            } else {
-                it->rebind(static_cast<const Type *>(cvalue)->end());
-            }
-
+            it->rebind(static_cast<Type *>(const_cast<void *>(container))->end());
+            return true;
+        case operation::cend:
+            it->rebind(static_cast<const Type *>(container)->end());
             return true;
         case operation::insert:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
@@ -111,9 +107,9 @@ class basic_meta_sequence_container_traits {
                 typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
 
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
+                if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(value)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
                     const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    it->rebind(static_cast<Type *>(value)->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>()));
+                    it->rebind(static_cast<Type *>(const_cast<void *>(container))->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>()));
                     return true;
                 }
             }
@@ -123,7 +119,7 @@ class basic_meta_sequence_container_traits {
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
                 auto *const non_const = any_cast<typename Type::iterator>(&it->base());
                 typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
-                it->rebind(static_cast<Type *>(value)->erase(underlying));
+                it->rebind(static_cast<Type *>(const_cast<void *>(container))->erase(underlying));
                 return true;
             } else {
                 break;

@@ -75,7 +75,7 @@ public:
 private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*vtable)(const operation, const void *, void *, iterator *){};
+    size_type (*vtable)(const operation, const void *, const void *, iterator *){};
     any storage{};
 };
 
@@ -1782,7 +1782,7 @@ private:
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::resize(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && vtable(operation::resize, &sz, storage.data(), nullptr);
+    return (storage.policy() != any_policy::cref) && vtable(operation::resize, storage.data(), &sz, nullptr);
 }
 
 /**
@@ -1790,7 +1790,7 @@ inline bool meta_sequence_container::resize(const size_type sz) {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::clear() {
-    return (storage.policy() != any_policy::cref) && vtable(operation::clear, nullptr, storage.data(), nullptr);
+    return (storage.policy() != any_policy::cref) && vtable(operation::clear, storage.data(), nullptr, nullptr);
 }
 
 /**
@@ -1799,7 +1799,7 @@ inline bool meta_sequence_container::clear() {
  * @return True in case of success, false otherwise.
  */
 inline bool meta_sequence_container::reserve(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, &sz, storage.data(), nullptr);
+    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, storage.data(), &sz, nullptr);
 }
 
 /**
@@ -1808,8 +1808,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     iterator it{*ctx};
-    const void *data = std::as_const(storage).data();
-    vtable(operation::begin, data, storage.policy() == any_policy::cref ? nullptr : const_cast<void *>(data), &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, std::as_const(storage).data(), nullptr, &it);
     return it;
 }
 
@@ -1819,8 +1818,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     iterator it{*ctx};
-    const void *data = std::as_const(storage).data();
-    vtable(operation::end, data, storage.policy() == any_policy::cref ? nullptr : const_cast<void *>(data), &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, std::as_const(storage).data(), nullptr, &it);
     return it;
 }
 
@@ -1831,7 +1829,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, &value, storage.data(), &it)) ? it : iterator{*ctx};
+    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, storage.data(), &value, &it)) ? it : iterator{*ctx};
 }
 
 /**
@@ -1840,7 +1838,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, nullptr, storage.data(), &it)) ? it : iterator{*ctx};
+    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, storage.data(), nullptr, &it)) ? it : iterator{*ctx};
 }
 
 /**

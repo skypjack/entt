@@ -19,7 +19,9 @@ enum class meta_sequence_container_operation {
     reserve,
     resize,
     begin,
+    cbegin,
     end,
+    cend,
     insert,
     erase
 };
