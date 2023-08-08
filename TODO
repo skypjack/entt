@@ -17,7 +17,7 @@ TODO (high prio):
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
-* meta: further reduce container vtable (ie move checks on key cast to the callsite)
+* meta: cbegin/cend for meta containers, avoid the branch
 * ===> TEST: review view tests after the last changes
 
 WIP:
