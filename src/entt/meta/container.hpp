@@ -106,25 +106,28 @@ class basic_meta_sequence_container_traits {
 
             return true;
         case operation::insert:
-        case operation::erase:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
                 auto *const non_const = any_cast<typename Type::iterator>(&it->base());
                 typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
 
-                if(op == operation::insert) {
-                    // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                    if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
-                        const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                        it->rebind(static_cast<Type *>(value)->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>()));
-                        return true;
-                    }
-                } else {
-                    it->rebind(static_cast<Type *>(value)->erase(underlying));
+                // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+                if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(cvalue)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
+                    const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                    it->rebind(static_cast<Type *>(value)->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>()));
                     return true;
                 }
             }
 
             break;
+        case operation::erase:
+            if constexpr(internal::dynamic_sequence_container<Type>::value) {
+                auto *const non_const = any_cast<typename Type::iterator>(&it->base());
+                typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
+                it->rebind(static_cast<Type *>(value)->erase(underlying));
+                return true;
+            } else {
+                break;
+            }
         }
 
         return false;
