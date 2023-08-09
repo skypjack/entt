@@ -25,11 +25,11 @@ namespace internal {
 
 template<typename Registry>
 void orphans(Registry &registry) {
-    auto view = registry.template view<typename Registry::entity_type>();
+    auto &storage = registry.template storage<typename Registry::entity_type>();
 
-    for(auto entt: view) {
+    for(auto entt: storage) {
         if(registry.orphan(entt)) {
-            view.storage()->erase(entt);
+            storage.erase(entt);
         }
     }
 }

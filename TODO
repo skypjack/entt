@@ -13,7 +13,6 @@ TODO (high prio):
 * resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
 * doc: bump entities
-* deprecate/drop snapshot orphans function, make it a general purpose one
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
