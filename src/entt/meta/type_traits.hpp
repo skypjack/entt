@@ -31,10 +31,13 @@ enum class meta_associative_container_operation {
     clear,
     reserve,
     begin,
+    cbegin,
     end,
+    cend,
     insert,
     erase,
-    find
+    find,
+    cfind
 };
 
 } // namespace internal
