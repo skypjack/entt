@@ -64,7 +64,7 @@ class basic_meta_sequence_container_traits {
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *container, const void *value, iterator *it) {
+    static size_type basic_vtable(const operation op, const void *container, const void *value, meta_any *elem) {
         switch(op) {
         case operation::size:
             return static_cast<const Type *>(container)->size();
@@ -90,26 +90,25 @@ class basic_meta_sequence_container_traits {
                 break;
             }
         case operation::begin:
-            it->rebind(static_cast<Type *>(const_cast<void *>(container))->begin());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<Type *>(const_cast<void *>(container))->begin());
             return true;
         case operation::cbegin:
-            it->rebind(static_cast<const Type *>(container)->begin());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<const Type *>(container)->begin());
             return true;
         case operation::end:
-            it->rebind(static_cast<Type *>(const_cast<void *>(container))->end());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<Type *>(const_cast<void *>(container))->end());
             return true;
         case operation::cend:
-            it->rebind(static_cast<const Type *>(container)->end());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<const Type *>(container)->end());
             return true;
         case operation::insert:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                auto *const non_const = any_cast<typename Type::iterator>(&it->base());
-                typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
-
                 // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                if(auto &as_any = *static_cast<meta_any *>(const_cast<void *>(value)); as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
+                if(auto &as_any = *elem; as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
+                    auto &it = *static_cast<iterator *>(const_cast<void *>(value));
+                    auto *const non_const = any_cast<typename Type::iterator>(&it.base());
                     const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    it->rebind(static_cast<Type *>(const_cast<void *>(container))->insert(underlying, element ? *element : as_any.cast<typename Type::value_type>()));
+                    it.rebind(static_cast<Type *>(const_cast<void *>(container))->insert(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()), element ? *element : as_any.cast<typename Type::value_type>()));
                     return true;
                 }
             }
@@ -117,9 +116,9 @@ class basic_meta_sequence_container_traits {
             break;
         case operation::erase:
             if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                auto *const non_const = any_cast<typename Type::iterator>(&it->base());
-                typename Type::const_iterator underlying{non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it->base())};
-                it->rebind(static_cast<Type *>(const_cast<void *>(container))->erase(underlying));
+                auto &it = *static_cast<iterator *>(const_cast<void *>(value));
+                auto *const non_const = any_cast<typename Type::iterator>(&it.base());
+                it.rebind(static_cast<Type *>(const_cast<void *>(container))->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base())));
                 return true;
             } else {
                 break;
@@ -146,7 +145,7 @@ class basic_meta_associative_container_traits {
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *container, const void *key, const void *value, iterator *it) {
+    static size_type basic_vtable(const operation op, const void *container, const void *key, const void *value) {
         switch(op) {
         case operation::size:
             return static_cast<const Type *>(const_cast<void *>(container))->size();
@@ -161,16 +160,16 @@ class basic_meta_associative_container_traits {
                 break;
             }
         case operation::begin:
-            it->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
             return true;
         case operation::cbegin:
-            it->rebind<key_only>(static_cast<const Type *>(container)->begin());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->begin());
             return true;
         case operation::end:
-            it->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
             return true;
         case operation::cend:
-            it->rebind<key_only>(static_cast<const Type *>(container)->end());
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->end());
             return true;
         case operation::insert:
             if constexpr(key_only) {
@@ -181,10 +180,10 @@ class basic_meta_associative_container_traits {
         case operation::erase:
             return static_cast<Type *>(const_cast<void *>(container))->erase(*static_cast<const typename Type::key_type *>(key));
         case operation::find:
-            it->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(*static_cast<const typename Type::key_type *>(key)));
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(*static_cast<const typename Type::key_type *>(key)));
             return true;
         case operation::cfind:
-            it->rebind<key_only>(static_cast<const Type *>(container)->find(*static_cast<const typename Type::key_type *>(key)));
+            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->find(*static_cast<const typename Type::key_type *>(key)));
             return true;
         }
 

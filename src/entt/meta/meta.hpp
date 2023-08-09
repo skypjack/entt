@@ -75,7 +75,7 @@ public:
 private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*vtable)(const operation, const void *, const void *, iterator *){};
+    size_type (*vtable)(const operation, const void *, const void *, meta_any *){};
     any storage{};
 };
 
@@ -137,7 +137,7 @@ private:
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    size_type (*vtable)(const operation, const void *, const void *, const void *, iterator *){};
+    size_type (*vtable)(const operation, const void *, const void *, const void *){};
     any storage{};
 };
 
@@ -1808,7 +1808,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
     iterator it{*ctx};
-    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, std::as_const(storage).data(), nullptr, &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, std::as_const(storage).data(), &it, nullptr);
     return it;
 }
 
@@ -1818,7 +1818,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
     iterator it{*ctx};
-    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, std::as_const(storage).data(), nullptr, &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, std::as_const(storage).data(), &it, nullptr);
     return it;
 }
 
@@ -1829,7 +1829,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, storage.data(), &value, &it)) ? it : iterator{*ctx};
+    return ((storage.policy() != any_policy::cref) && vtable(operation::insert, storage.data(), &it, &value)) ? it : iterator{*ctx};
 }
 
 /**
@@ -1838,7 +1838,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
-    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, storage.data(), nullptr, &it)) ? it : iterator{*ctx};
+    return ((storage.policy() != any_policy::cref) && vtable(operation::erase, storage.data(), &it, nullptr)) ? it : iterator{*ctx};
 }
 
 /**
@@ -1884,30 +1884,30 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 
 /*! @copydoc meta_sequence_container::size */
 [[nodiscard]] inline meta_associative_container::size_type meta_associative_container::size() const noexcept {
-    return vtable(operation::size, std::as_const(storage).data(), nullptr, nullptr, nullptr);
+    return vtable(operation::size, std::as_const(storage).data(), nullptr, nullptr);
 }
 
 /*! @copydoc meta_sequence_container::clear */
 inline bool meta_associative_container::clear() {
-    return (storage.policy() != any_policy::cref) && vtable(operation::clear, storage.data(), nullptr, nullptr, nullptr);
+    return (storage.policy() != any_policy::cref) && vtable(operation::clear, storage.data(), nullptr, nullptr);
 }
 
 /*! @copydoc meta_sequence_container::reserve */
 inline bool meta_associative_container::reserve(const size_type sz) {
-    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, storage.data(), nullptr, &sz, nullptr);
+    return (storage.policy() != any_policy::cref) && vtable(operation::reserve, storage.data(), nullptr, &sz);
 }
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
     iterator it{*ctx};
-    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, std::as_const(storage).data(), nullptr, nullptr, &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cbegin : operation::begin, std::as_const(storage).data(), nullptr, &it);
     return it;
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
     iterator it{*ctx};
-    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, std::as_const(storage).data(), nullptr, nullptr, &it);
+    vtable(storage.policy() == any_policy::cref ? operation::cend : operation::end, std::as_const(storage).data(), nullptr, &it);
     return it;
 }
 
@@ -1919,7 +1919,7 @@ inline bool meta_associative_container::reserve(const size_type sz) {
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
     const bool valid_key_value = key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && (!mapped_type_node || value.allow_cast(meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))}));
-    return valid_key_value && (storage.policy() != any_policy::cref) && vtable(operation::insert, storage.data(), std::as_const(key).data(), std::as_const(value).data(), nullptr);
+    return valid_key_value && (storage.policy() != any_policy::cref) && vtable(operation::insert, storage.data(), std::as_const(key).data(), std::as_const(value).data());
 }
 
 /**
@@ -1929,7 +1929,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
     const bool valid_key = key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))});
-    return valid_key && (storage.policy() != any_policy::cref) && vtable(operation::erase, storage.data(), std::as_const(key).data(), nullptr, nullptr);
+    return valid_key && (storage.policy() != any_policy::cref) && vtable(operation::erase, storage.data(), std::as_const(key).data(), nullptr);
 }
 
 /**
@@ -1939,7 +1939,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
     iterator it{*ctx};
-    key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && vtable(storage.policy() == any_policy::cref ? operation::cfind : operation::find, std::as_const(storage).data(), std::as_const(key).data(), nullptr, &it);
+    key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && vtable(storage.policy() == any_policy::cref ? operation::cfind : operation::find, std::as_const(storage).data(), std::as_const(key).data(), &it);
     return it;
 }
 
