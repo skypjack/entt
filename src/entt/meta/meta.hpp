@@ -574,7 +574,7 @@ public:
     }
 
     /*! @copydoc any::owner */
-    [[deprecated("use policy() and meta_any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
+    [[nodiscard]] bool owner() const noexcept {
         return (storage.policy() == any_policy::owner);
     }
 
