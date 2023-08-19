@@ -314,6 +314,7 @@ TEST(MetaContainer, StdMap) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_FALSE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -357,6 +358,7 @@ TEST(MetaContainer, StdSet) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_TRUE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -403,6 +405,7 @@ TEST(MetaContainer, DenseMap) {
     map.emplace(4, '3');
 
     ASSERT_TRUE(view);
+    ASSERT_FALSE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -450,6 +453,7 @@ TEST(MetaContainer, DenseSet) {
     set.emplace(4);
 
     ASSERT_TRUE(view);
+    ASSERT_TRUE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -540,6 +544,7 @@ TEST(MetaContainer, ConstKeyValueAssociativeContainer) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_FALSE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -582,6 +587,7 @@ TEST(MetaContainer, ConstKeyOnlyAssociativeContainer) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_TRUE(view.key_only());
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), (entt::resolve<int>()));
