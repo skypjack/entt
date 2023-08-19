@@ -60,72 +60,78 @@ class basic_meta_sequence_container_traits {
 
     friend meta_sequence_container;
 
-    using operation = internal::meta_sequence_container_operation;
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *container, const void *value, meta_any *elem) {
-        switch(op) {
-        case operation::size:
-            return static_cast<const Type *>(container)->size();
-        case operation::clear:
-            if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                static_cast<Type *>(const_cast<void *>(container))->clear();
-                return true;
-            } else {
-                break;
-            }
-        case operation::reserve:
-            if constexpr(internal::reserve_aware_container<Type>::value) {
-                static_cast<Type *>(const_cast<void *>(container))->reserve(*static_cast<const size_type *>(value));
-                return true;
-            } else {
-                break;
-            }
-        case operation::resize:
-            if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                static_cast<Type *>(const_cast<void *>(container))->resize(*static_cast<const size_type *>(value));
-                return true;
-            } else {
-                break;
-            }
-        case operation::begin:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<Type *>(const_cast<void *>(container))->begin());
-            return true;
-        case operation::cbegin:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<const Type *>(container)->begin());
-            return true;
-        case operation::end:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<Type *>(const_cast<void *>(container))->end());
-            return true;
-        case operation::cend:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind(static_cast<const Type *>(container)->end());
-            return true;
-        case operation::insert:
-            if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-                if(auto &as_any = *elem; as_any.allow_cast<typename Type::const_reference>() || as_any.allow_cast<typename Type::value_type>()) {
-                    auto &it = *static_cast<iterator *>(const_cast<void *>(value));
-                    auto *const non_const = any_cast<typename Type::iterator>(&it.base());
-                    const auto *element = as_any.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                    it.rebind(static_cast<Type *>(const_cast<void *>(container))->insert(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()), element ? *element : as_any.cast<typename Type::value_type>()));
-                    return true;
-                }
-            }
+    static size_type size(const void *container) {
+        return static_cast<const Type *>(container)->size();
+    }
 
-            break;
-        case operation::erase:
-            if constexpr(internal::dynamic_sequence_container<Type>::value) {
-                auto &it = *static_cast<iterator *>(const_cast<void *>(value));
+    static bool clear([[maybe_unused]] void *container) {
+        if constexpr(internal::dynamic_sequence_container<Type>::value) {
+            static_cast<Type *>(container)->clear();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+        if constexpr(internal::reserve_aware_container<Type>::value) {
+            static_cast<Type *>(container)->reserve(sz);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+        if constexpr(internal::dynamic_sequence_container<Type>::value) {
+            static_cast<Type *>(container)->resize(sz);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static void begin(const void *container, const bool as_const, iterator &it) {
+        if(as_const) {
+            it.rebind(static_cast<const Type *>(container)->begin());
+        } else {
+            it.rebind(static_cast<Type *>(const_cast<void *>(container))->begin());
+        }
+    }
+
+    static void end(const void *container, const bool as_const, iterator &it) {
+        if(as_const) {
+            it.rebind(static_cast<const Type *>(container)->end());
+        } else {
+            it.rebind(static_cast<Type *>(const_cast<void *>(container))->end());
+        }
+    }
+
+    static bool insert([[maybe_unused]] void *container, [[maybe_unused]] meta_any &elem, [[maybe_unused]] iterator &it) {
+        if constexpr(internal::dynamic_sequence_container<Type>::value) {
+            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+            if(elem.allow_cast<typename Type::const_reference>() || elem.allow_cast<typename Type::value_type>()) {
                 auto *const non_const = any_cast<typename Type::iterator>(&it.base());
-                it.rebind(static_cast<Type *>(const_cast<void *>(container))->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base())));
+                const auto *element = elem.try_cast<std::remove_reference_t<typename Type::const_reference>>();
+                it.rebind(static_cast<Type *>(container)->insert(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()), element ? *element : elem.cast<typename Type::value_type>()));
                 return true;
-            } else {
-                break;
             }
         }
 
         return false;
+    }
+
+    static bool erase([[maybe_unused]] void *container, [[maybe_unused]] iterator &it) {
+        if constexpr(internal::dynamic_sequence_container<Type>::value) {
+            auto *const non_const = any_cast<typename Type::iterator>(&it.base());
+            it.rebind(static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base())));
+            return true;
+        } else {
+            return false;
+        }
     }
 };
 
@@ -141,53 +147,61 @@ class basic_meta_associative_container_traits {
 
     static constexpr auto key_only = internal::key_only_associative_container<Type>::value;
 
-    using operation = internal::meta_associative_container_operation;
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
-    static size_type basic_vtable(const operation op, const void *container, const void *key, const void *value) {
-        switch(op) {
-        case operation::size:
-            return static_cast<const Type *>(const_cast<void *>(container))->size();
-        case operation::clear:
-            static_cast<Type *>(const_cast<void *>(container))->clear();
-            return true;
-        case operation::reserve:
-            if constexpr(internal::reserve_aware_container<Type>::value) {
-                static_cast<Type *>(const_cast<void *>(container))->reserve(*static_cast<const size_type *>(value));
-                return true;
-            } else {
-                break;
-            }
-        case operation::begin:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
-            return true;
-        case operation::cbegin:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->begin());
-            return true;
-        case operation::end:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
-            return true;
-        case operation::cend:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->end());
-            return true;
-        case operation::insert:
-            if constexpr(key_only) {
-                return static_cast<Type *>(const_cast<void *>(container))->insert(*static_cast<const typename Type::key_type *>(key)).second;
-            } else {
-                return static_cast<Type *>(const_cast<void *>(container))->emplace(*static_cast<const typename Type::key_type *>(key), *static_cast<const typename Type::mapped_type *>(value)).second;
-            }
-        case operation::erase:
-            return static_cast<Type *>(const_cast<void *>(container))->erase(*static_cast<const typename Type::key_type *>(key));
-        case operation::find:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(*static_cast<const typename Type::key_type *>(key)));
-            return true;
-        case operation::cfind:
-            static_cast<iterator *>(const_cast<void *>(value))->rebind<key_only>(static_cast<const Type *>(container)->find(*static_cast<const typename Type::key_type *>(key)));
-            return true;
-        }
+    static size_type size(const void *container) {
+        return static_cast<const Type *>(container)->size();
+    }
 
-        return false;
+    static bool clear(void *container) {
+        static_cast<Type *>(container)->clear();
+        return true;
+    }
+
+    static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+        if constexpr(internal::reserve_aware_container<Type>::value) {
+            static_cast<Type *>(container)->reserve(sz);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static void begin(const void *container, const bool as_const, iterator &it) {
+        if(as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->begin());
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
+        }
+    }
+
+    static void end(const void *container, const bool as_const, iterator &it) {
+        if(as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->end());
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
+        }
+    }
+
+    static bool insert(void *container, const void *key, [[maybe_unused]] const void *value) {
+        if constexpr(internal::key_only_associative_container<Type>::value) {
+            return static_cast<Type *>(container)->insert(*static_cast<const typename Type::key_type *>(key)).second;
+        } else {
+            return static_cast<Type *>(container)->emplace(*static_cast<const typename Type::key_type *>(key), *static_cast<const typename Type::mapped_type *>(value)).second;
+        }
+    }
+
+    static bool erase(void *container, const void *key) {
+        return static_cast<Type *>(container)->erase(*static_cast<const typename Type::key_type *>(key));
+    }
+
+    static void find(const void *container, const bool as_const, const void *key, iterator &it) {
+        if(as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->find(*static_cast<const typename Type::key_type *>(key)));
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(*static_cast<const typename Type::key_type *>(key)));
+        }
     }
 };
 
