@@ -18,7 +18,6 @@ TODO (high prio):
 * meta container: add value type to resize
 * deprecate any::owner and meta_any::owner, use ::policy in the tests
 * deprecate meta_associative_container::key_only before dropping it (use mapped_type instead)
-* refine meta container traits and all in between, make the class public and add comments for users
 * ===> TEST: review view tests after the last changes
 
 WIP:
