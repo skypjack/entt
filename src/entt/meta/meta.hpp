@@ -163,7 +163,7 @@ private:
     void (*begin_fn)(const void *, const bool, iterator &);
     void (*end_fn)(const void *, const bool, iterator &);
     bool (*insert_fn)(void *, const void *, const void *);
-    bool (*erase_fn)(void *, const void *);
+    size_type (*erase_fn)(void *, const void *);
     void (*find_fn)(const void *, const bool, const void *, iterator &);
     any storage{};
 };
@@ -1953,8 +1953,8 @@ inline bool meta_associative_container::reserve(const size_type sz) {
  * @return A bool denoting whether the insertion took place.
  */
 inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
-    const bool valid_key_value = key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && (!mapped_type_node || value.allow_cast(meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))}));
-    return valid_key_value && (storage.policy() != any_policy::cref) && insert_fn(storage.data(), std::as_const(key).data(), std::as_const(value).data());
+    const bool valid_key = key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) && (!mapped_type_node || value.allow_cast(meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))}));
+    return valid_key && (storage.policy() != any_policy::cref) && insert_fn(storage.data(), std::as_const(key).data(), std::as_const(value).data());
 }
 
 /**
@@ -1964,7 +1964,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
     const bool valid_key = key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))});
-    return valid_key && (storage.policy() != any_policy::cref) && erase_fn(storage.data(), std::as_const(key).data());
+    return (valid_key && (storage.policy() != any_policy::cref)) ? erase_fn(storage.data(), std::as_const(key).data()) : 0u;
 }
 
 /**

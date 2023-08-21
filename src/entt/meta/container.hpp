@@ -192,7 +192,7 @@ class basic_meta_associative_container_traits {
         }
     }
 
-    [[nodiscard]] static bool erase(void *container, const void *key) {
+    [[nodiscard]] static size_type erase(void *container, const void *key) {
         return static_cast<Type *>(container)->erase(*static_cast<const typename Type::key_type *>(key));
     }
 
