@@ -63,11 +63,11 @@ class basic_meta_sequence_container_traits {
     using size_type = typename meta_sequence_container::size_type;
     using iterator = typename meta_sequence_container::iterator;
 
-    static size_type size(const void *container) {
+    [[nodiscard]] static size_type size(const void *container) {
         return static_cast<const Type *>(container)->size();
     }
 
-    static bool clear([[maybe_unused]] void *container) {
+    [[nodiscard]] static bool clear([[maybe_unused]] void *container) {
         if constexpr(internal::dynamic_sequence_container<Type>::value) {
             static_cast<Type *>(container)->clear();
             return true;
@@ -76,7 +76,7 @@ class basic_meta_sequence_container_traits {
         }
     }
 
-    static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
         if constexpr(internal::reserve_aware_container<Type>::value) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
@@ -85,7 +85,7 @@ class basic_meta_sequence_container_traits {
         }
     }
 
-    static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+    [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
         if constexpr(internal::dynamic_sequence_container<Type>::value) {
             static_cast<Type *>(container)->resize(sz);
             return true;
@@ -110,7 +110,7 @@ class basic_meta_sequence_container_traits {
         }
     }
 
-    static bool insert([[maybe_unused]] void *container, [[maybe_unused]] meta_any &elem, [[maybe_unused]] iterator &it) {
+    [[nodiscard]] static bool insert([[maybe_unused]] void *container, [[maybe_unused]] meta_any &elem, [[maybe_unused]] iterator &it) {
         if constexpr(internal::dynamic_sequence_container<Type>::value) {
             // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
             if(elem.allow_cast<typename Type::const_reference>() || elem.allow_cast<typename Type::value_type>()) {
@@ -124,7 +124,7 @@ class basic_meta_sequence_container_traits {
         return false;
     }
 
-    static bool erase([[maybe_unused]] void *container, [[maybe_unused]] iterator &it) {
+    [[nodiscard]] static bool erase([[maybe_unused]] void *container, [[maybe_unused]] iterator &it) {
         if constexpr(internal::dynamic_sequence_container<Type>::value) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             it.rebind(static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base())));
@@ -150,16 +150,16 @@ class basic_meta_associative_container_traits {
     using size_type = typename meta_associative_container::size_type;
     using iterator = typename meta_associative_container::iterator;
 
-    static size_type size(const void *container) {
+    [[nodiscard]] static size_type size(const void *container) {
         return static_cast<const Type *>(container)->size();
     }
 
-    static bool clear(void *container) {
+    [[nodiscard]] static bool clear(void *container) {
         static_cast<Type *>(container)->clear();
         return true;
     }
 
-    static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
+    [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
         if constexpr(internal::reserve_aware_container<Type>::value) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
@@ -184,7 +184,7 @@ class basic_meta_associative_container_traits {
         }
     }
 
-    static bool insert(void *container, const void *key, [[maybe_unused]] const void *value) {
+    [[nodiscard]] static bool insert(void *container, const void *key, [[maybe_unused]] const void *value) {
         if constexpr(internal::key_only_associative_container<Type>::value) {
             return static_cast<Type *>(container)->insert(*static_cast<const typename Type::key_type *>(key)).second;
         } else {
@@ -192,7 +192,7 @@ class basic_meta_associative_container_traits {
         }
     }
 
-    static bool erase(void *container, const void *key) {
+    [[nodiscard]] static bool erase(void *container, const void *key) {
         return static_cast<Type *>(container)->erase(*static_cast<const typename Type::key_type *>(key));
     }
 
