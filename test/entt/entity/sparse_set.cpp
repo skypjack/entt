@@ -595,6 +595,56 @@ TEST(SparseSet, CrossStableErase) {
     ASSERT_EQ(set.data()[0u], entity[0u]);
 }
 
+TEST(SparseSet, SwapOnlyErase) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, traits_type::construct(9, 3)};
+
+    ASSERT_EQ(set.policy(), entt::deletion_policy::swap_only);
+    ASSERT_TRUE(set.empty());
+
+    set.push(std::begin(entity), std::end(entity));
+    set.erase(set.begin(), set.end());
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+
+    set.erase(entity[2u]);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+
+    ASSERT_EQ(set.at(0u), entity[0u]);
+    ASSERT_EQ(set.at(1u), entity[1u]);
+    ASSERT_EQ(set.at(2u), entity[2u]);
+}
+
+ENTT_DEBUG_TEST(SparseSetDeathTest, SwapOnlyErase) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::entity entity[2u]{entt::entity{42}, traits_type::construct(9, 3)};
+
+    ASSERT_DEATH(set.erase(std::begin(entity), std::end(entity)), "");
+    ASSERT_DEATH(set.erase(entt::null), "");
+}
+
+TEST(SparseSet, CrossSwapOnlyErase) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::sparse_set other{entt::deletion_policy::swap_only};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.push(std::begin(entity), std::end(entity));
+    other.push(entity[1u]);
+    set.erase(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entity[0u]));
+    ASSERT_TRUE(set.contains(entity[1u]));
+    ASSERT_EQ(set.data()[0u], entity[0u]);
+    ASSERT_EQ(set.data()[1u], entity[1u]);
+}
+
 TEST(SparseSet, Remove) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -808,6 +858,52 @@ TEST(SparseSet, CrossStableRemove) {
     ASSERT_TRUE(set.contains(entity[0u]));
     ASSERT_FALSE(set.contains(entity[1u]));
     ASSERT_EQ(set.data()[0u], entity[0u]);
+}
+
+TEST(SparseSet, SwapOnlyRemove) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, traits_type::construct(9, 3)};
+
+    ASSERT_EQ(set.policy(), entt::deletion_policy::swap_only);
+    ASSERT_TRUE(set.empty());
+
+    ASSERT_EQ(set.remove(std::begin(entity), std::end(entity)), 0u);
+    ASSERT_FALSE(set.remove(entity[1u]));
+
+    ASSERT_TRUE(set.empty());
+
+    set.push(std::begin(entity), std::end(entity));
+
+    ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
+    ASSERT_EQ(set.remove(set.begin(), set.end()), 3u);
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+
+    ASSERT_TRUE(set.remove(entity[2u]));
+    ASSERT_TRUE(set.remove(entity[2u]));
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 3u);
+
+    ASSERT_EQ(set.at(0u), entity[0u]);
+    ASSERT_EQ(set.at(1u), entity[1u]);
+    ASSERT_EQ(set.at(2u), entity[2u]);
+}
+
+TEST(SparseSet, CrossSwapOnlyRemove) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::sparse_set other{entt::deletion_policy::swap_only};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+
+    set.push(std::begin(entity), std::end(entity));
+    other.push(entity[1u]);
+    set.remove(other.begin(), other.end());
+
+    ASSERT_TRUE(set.contains(entity[0u]));
+    ASSERT_TRUE(set.contains(entity[1u]));
+    ASSERT_EQ(set.data()[0u], entity[0u]);
+    ASSERT_EQ(set.data()[1u], entity[1u]);
 }
 
 TEST(SparseSet, Compact) {

@@ -1035,7 +1035,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy::swap_and_pop, allocator},
+        : base_type{type_id<value_type>(), deletion_policy::swap_only, allocator},
           length{} {}
 
     /**

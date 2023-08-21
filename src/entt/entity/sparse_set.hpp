@@ -288,6 +288,9 @@ protected:
                 in_place_pop(first);
             }
             break;
+        case deletion_policy::swap_only:
+            // no-op
+            break;
         }
     }
 
