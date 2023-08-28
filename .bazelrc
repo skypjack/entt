@@ -1,0 +1,17 @@
+common --enable_bzlmod
+build --enable_platform_specific_config
+build --incompatible_use_platforms_repo_for_constraints
+build --incompatible_enable_cc_toolchain_resolution
+build --enable_runfiles
+build --incompatible_strict_action_env
+
+# required for googletest 
+build:linux --cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
+
+common:ci --announce_rc
+common:ci --verbose_failures
+common:ci --keep_going
+test:ci --test_output=errors
+
+try-import %workspace%/user.bazelrc

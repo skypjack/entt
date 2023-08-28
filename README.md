@@ -327,6 +327,18 @@ If you spot errors or have suggestions, any contribution is welcome!
   [documentation](https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml#guide-repositories)
   for more details.
 
+* [`bzlmod`](https://bazel.build/external/overview#bzlmod), Bazel's external
+  dependency management system.<br/>
+  To use the [`entt`](https://registry.bazel.build/modules/entt) module in a
+  `bazel` project, add the following to your `MODULE.bazel` file:
+
+  ```starlark
+  bazel_dep(name = "entt", version = "3.12.2")
+  ```
+
+  EnTT will now be available as `@entt` (short for `@entt//:entt`) to be used
+  in your `cc_*` rule `deps`. 
+
 Consider this list a work in progress and help me to make it longer if you like.
 
 ## pkg-config
