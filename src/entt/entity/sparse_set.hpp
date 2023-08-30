@@ -911,7 +911,7 @@ public:
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
-        ENTT_ASSERT(free_list == null, "Partial sorting with tombstones is not supported");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (free_list == null), "Partial sorting with tombstones is not supported");
 
         algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
