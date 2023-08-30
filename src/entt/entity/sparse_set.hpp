@@ -828,25 +828,27 @@ public:
 
     /*! @brief Removes all tombstones from a sparse set. */
     void compact() {
-        size_type from = packed.size();
-        for(; from && packed[from - 1u] == tombstone; --from) {}
+        if(mode == deletion_policy::in_place) {
+            size_type from = packed.size();
+            for(; from && packed[from - 1u] == tombstone; --from) {}
 
-        for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
-            if(const size_type to = traits_type::to_entity(*it); to < from) {
-                --from;
-                swap_or_move(from, to);
+            for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
+                if(const size_type to = traits_type::to_entity(*it); to < from) {
+                    --from;
+                    swap_or_move(from, to);
 
-                packed[to] = std::exchange(packed[from], tombstone);
-                const auto entity = static_cast<typename traits_type::entity_type>(to);
-                sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
+                    packed[to] = std::exchange(packed[from], tombstone);
+                    const auto entity = static_cast<typename traits_type::entity_type>(to);
+                    sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
 
-                *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), tombstone);
-                for(; from && packed[from - 1u] == tombstone; --from) {}
+                    *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), tombstone);
+                    for(; from && packed[from - 1u] == tombstone; --from) {}
+                }
             }
-        }
 
-        free_list = tombstone;
-        packed.resize(from);
+            free_list = tombstone;
+            packed.resize(from);
+        }
     }
 
     /**
