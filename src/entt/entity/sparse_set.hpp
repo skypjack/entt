@@ -530,7 +530,7 @@ public:
      * @return True if the sparse set is fully packed, false otherwise.
      */
     [[nodiscard]] bool contiguous() const noexcept {
-        return (free_list == null);
+        return (mode != deletion_policy::in_place) || (free_list == null);
     }
 
     /**
