@@ -408,7 +408,7 @@ public:
      * @brief Returns true if a wrapper owns its object, false otherwise.
      * @return True if the wrapper owns its object, false otherwise.
      */
-    [[nodiscard]] bool owner() const noexcept {
+    [[deprecated("use policy() and any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
         return (mode == any_policy::owner);
     }
 
