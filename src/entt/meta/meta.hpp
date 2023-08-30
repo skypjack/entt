@@ -1892,7 +1892,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  * @brief Returns true if a container is also key-only, false otherwise.
  * @return True if the associative container is also key-only, false otherwise.
  */
-[[nodiscard]] inline bool meta_associative_container::key_only() const noexcept {
+[[deprecated("use mapped_type() instead")]] [[nodiscard]] inline bool meta_associative_container::key_only() const noexcept {
     return (mapped_type_node == nullptr);
 }
 
