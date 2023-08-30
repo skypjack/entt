@@ -868,7 +868,12 @@ public:
 
         // basic no-leak guarantee if swapping throws
         swap_or_move(from, to);
-        swap_at(from, to);
+
+        sparse_ref(packed[from]) = traits_type::combine(static_cast<typename traits_type::entity_type>(to), traits_type::to_integral(lhs));
+        sparse_ref(packed[to]) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
+
+        packed[from] = rhs;
+        packed[to] = lhs;
     }
 
     /**
