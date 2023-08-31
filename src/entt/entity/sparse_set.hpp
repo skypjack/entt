@@ -384,8 +384,8 @@ public:
         : sparse{allocator},
           packed{allocator},
           info{&elem},
-          head{tombstone},
-          mode{pol} {}
+          mode{pol},
+          head{tombstone} {}
 
     /**
      * @brief Move constructor.
@@ -395,8 +395,8 @@ public:
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
           info{other.info},
-          head{std::exchange(other.head, tombstone)},
-          mode{other.mode} {}
+          mode{other.mode},
+          head{std::exchange(other.head, tombstone)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -407,8 +407,8 @@ public:
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
           info{other.info},
-          head{std::exchange(other.head, tombstone)},
-          mode{other.mode} {
+          mode{other.mode},
+          head{std::exchange(other.head, tombstone)} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -429,8 +429,8 @@ public:
         sparse = std::move(other.sparse);
         packed = std::move(other.packed);
         info = other.info;
-        head = std::exchange(other.head, tombstone);
         mode = other.mode;
+        head = std::exchange(other.head, tombstone);
         return *this;
     }
 
@@ -443,8 +443,8 @@ public:
         swap(sparse, other.sparse);
         swap(packed, other.packed);
         swap(info, other.info);
-        swap(head, other.head);
         swap(mode, other.mode);
+        swap(head, other.head);
     }
 
     /**
@@ -1001,8 +1001,8 @@ private:
     sparse_container_type sparse;
     packed_container_type packed;
     const type_info *info;
-    entity_type head;
     deletion_policy mode;
+    entity_type head;
 };
 
 } // namespace entt
