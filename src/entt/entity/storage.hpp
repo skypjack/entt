@@ -981,9 +981,11 @@ protected:
             if(const auto pos = base_type::index(*first); pos < length) {
                 base_type::bump(local_traits_type::next(*first));
 
-                if(pos != --length) {
-                    base_type::swap_at(pos, length);
+                if(const size_type slot = length - 1u; pos != slot) {
+                    base_type::swap_elements(base_type::data()[pos], base_type::data()[slot]);
                 }
+
+                --length;
             }
         }
     }
@@ -1135,11 +1137,13 @@ public:
                 base_type::try_emplace(entity_at(base_type::size()), true);
             }
 
-            base_type::swap_at(pos, length++);
+            base_type::swap_elements(base_type::data()[pos], base_type::data()[length]);
+            ++length;
         } else if(const auto idx = base_type::index(curr); idx < length) {
             return emplace();
         } else {
-            base_type::swap_at(idx, length++);
+            base_type::swap_elements(base_type::data()[idx], base_type::data()[length]);
+            ++length;
         }
 
         base_type::bump(hint);
@@ -1165,7 +1169,7 @@ public:
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<typename It>
+    template<typename It>      
     void insert(It first, It last) {
         for(const auto sz = base_type::size(); first != last && length != sz; ++first, ++length) {
             *first = base_type::operator[](length);
@@ -1190,7 +1194,7 @@ public:
         for(; first != last; ++first, --len) {
             const auto pos = base_type::index(*first);
             ENTT_ASSERT(pos < length, "Invalid element");
-            base_type::swap_at(pos, static_cast<size_type>(len - 1u));
+            base_type::swap_elements(base_type::data()[pos], base_type::data()[static_cast<size_type>(len - 1u)]);
         }
 
         return (length - len);
