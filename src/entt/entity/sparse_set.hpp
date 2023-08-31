@@ -267,7 +267,7 @@ protected:
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatched");
         const auto entt = traits_type::to_entity(std::exchange(sparse_ref(*it), null));
-        packed[static_cast<size_type>(entt)] = std::exchange(free_list, traits_type::combine(entt, tombstone));
+        packed[static_cast<size_type>(entt)] = std::exchange(head, traits_type::combine(entt, tombstone));
     }
 
 protected:
@@ -296,7 +296,7 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void pop_all() {
-        if(const auto prev = std::exchange(free_list, tombstone); prev == null) {
+        if(const auto prev = std::exchange(head, tombstone); prev == null) {
             for(auto first = begin(); !(first.index() < 0); ++first) {
                 sparse_ref(*first) = null;
             }
@@ -320,14 +320,14 @@ protected:
     virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
-        if(auto &elem = assure_at_least(entt); free_list == null || force_back) {
+        if(auto &elem = assure_at_least(entt); head == null || force_back) {
             packed.push_back(entt);
             elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             return begin();
         } else {
-            const auto pos = static_cast<size_type>(traits_type::to_entity(free_list));
-            elem = traits_type::combine(traits_type::to_integral(free_list), traits_type::to_integral(entt));
-            free_list = std::exchange(packed[pos], entt);
+            const auto pos = static_cast<size_type>(traits_type::to_entity(head));
+            elem = traits_type::combine(traits_type::to_integral(head), traits_type::to_integral(entt));
+            head = std::exchange(packed[pos], entt);
             return --(end() - pos);
         }
     }
@@ -384,7 +384,7 @@ public:
         : sparse{allocator},
           packed{allocator},
           info{&elem},
-          free_list{tombstone},
+          head{tombstone},
           mode{pol} {}
 
     /**
@@ -395,7 +395,7 @@ public:
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
           info{other.info},
-          free_list{std::exchange(other.free_list, tombstone)},
+          head{std::exchange(other.head, tombstone)},
           mode{other.mode} {}
 
     /**
@@ -407,7 +407,7 @@ public:
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
           info{other.info},
-          free_list{std::exchange(other.free_list, tombstone)},
+          head{std::exchange(other.head, tombstone)},
           mode{other.mode} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
@@ -429,7 +429,7 @@ public:
         sparse = std::move(other.sparse);
         packed = std::move(other.packed);
         info = other.info;
-        free_list = std::exchange(other.free_list, tombstone);
+        head = std::exchange(other.head, tombstone);
         mode = other.mode;
         return *this;
     }
@@ -443,7 +443,7 @@ public:
         swap(sparse, other.sparse);
         swap(packed, other.packed);
         swap(info, other.info);
-        swap(free_list, other.free_list);
+        swap(head, other.head);
         swap(mode, other.mode);
     }
 
@@ -530,7 +530,7 @@ public:
      * @return True if the sparse set is fully packed, false otherwise.
      */
     [[nodiscard]] bool contiguous() const noexcept {
-        return (mode != deletion_policy::in_place) || (free_list == null);
+        return (mode != deletion_policy::in_place) || (head == null);
     }
 
     /**
@@ -832,7 +832,7 @@ public:
             size_type from = packed.size();
             for(; from && packed[from - 1u] == tombstone; --from) {}
 
-            for(auto *it = &free_list; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
+            for(auto *it = &head; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
                 if(const size_type to = traits_type::to_entity(*it); to < from) {
                     --from;
                     swap_or_move(from, to);
@@ -846,7 +846,7 @@ public:
                 }
             }
 
-            free_list = tombstone;
+            head = tombstone;
             packed.resize(from);
         }
     }
@@ -911,7 +911,7 @@ public:
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (free_list == null), "Partial sorting with tombstones is not supported");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Partial sorting with tombstones is not supported");
 
         algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
@@ -982,7 +982,7 @@ public:
         pop_all();
         // sanity check to avoid subtle issues due to storage classes
         ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
-        free_list = tombstone;
+        head = tombstone;
         packed.clear();
     }
 
@@ -1001,7 +1001,7 @@ private:
     sparse_container_type sparse;
     packed_container_type packed;
     const type_info *info;
-    entity_type free_list;
+    entity_type head;
     deletion_policy mode;
 };
 
