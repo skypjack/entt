@@ -228,22 +228,6 @@ protected:
     using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
 
     /**
-     * @brief Swaps two items at specific locations.
-     * @param lhs A position to move from.
-     * @param rhs The other position to move from.
-     */
-    void swap_at(const std::size_t lhs, const std::size_t rhs) {
-        const auto entity = static_cast<typename traits_type::entity_type>(lhs);
-        const auto other = static_cast<typename traits_type::entity_type>(rhs);
-
-        sparse_ref(packed[lhs]) = traits_type::combine(other, traits_type::to_integral(packed[lhs]));
-        sparse_ref(packed[rhs]) = traits_type::combine(entity, traits_type::to_integral(packed[rhs]));
-
-        using std::swap;
-        swap(packed[lhs], packed[rhs]);
-    }
-
-    /**
      * @brief Erases an entity from a sparse set.
      * @param it An iterator to the element to pop.
      */
