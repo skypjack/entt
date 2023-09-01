@@ -280,16 +280,25 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void pop_all() {
-        if(const auto prev = std::exchange(head, tombstone); prev == null) {
+        switch(mode) {
+        case deletion_policy::in_place:
+            if(head != null) {
+                for(auto first = begin(); !(first.index() < 0); ++first) {
+                    if(*first != tombstone) {
+                        sparse_ref(*first) = null;
+                    }
+                }
+
+                head = tombstone;
+                break;
+            }
+            [[fallthrough]];
+        case deletion_policy::swap_and_pop:
+        case deletion_policy::swap_only:
             for(auto first = begin(); !(first.index() < 0); ++first) {
                 sparse_ref(*first) = null;
             }
-        } else {
-            for(auto first = begin(); !(first.index() < 0); ++first) {
-                if(*first != tombstone) {
-                    sparse_ref(*first) = null;
-                }
-            }
+            break;
         }
 
         packed.clear();
@@ -304,15 +313,20 @@ protected:
     virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
         ENTT_ASSERT(!contains(entt), "Set already contains entity");
 
-        if(auto &elem = assure_at_least(entt); head == null || force_back) {
+        switch(auto &elem = assure_at_least(entt); mode) {
+        case deletion_policy::in_place:
+            if(head != null && !force_back) {
+                const auto pos = static_cast<size_type>(traits_type::to_entity(head));
+                elem = traits_type::combine(traits_type::to_integral(head), traits_type::to_integral(entt));
+                head = std::exchange(packed[pos], entt);
+                return --(end() - pos);
+            }
+            [[fallthrough]];
+        case deletion_policy::swap_only:
+        case deletion_policy::swap_and_pop:
             packed.push_back(entt);
             elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             return begin();
-        } else {
-            const auto pos = static_cast<size_type>(traits_type::to_entity(head));
-            elem = traits_type::combine(traits_type::to_integral(head), traits_type::to_integral(entt));
-            head = std::exchange(packed[pos], entt);
-            return --(end() - pos);
         }
     }
 
