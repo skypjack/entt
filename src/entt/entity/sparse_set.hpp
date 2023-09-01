@@ -462,6 +462,14 @@ public:
     }
 
     /**
+     * @brief Returns the head of the free list, if any.
+     * @return The head of the free list.
+     */
+    size_type free_list() const noexcept {
+        return static_cast<size_type>(traits_type::to_entity(head));
+    }
+
+    /**
      * @brief Increases the capacity of a sparse set.
      *
      * If the new capacity is greater than the current capacity, new storage is
