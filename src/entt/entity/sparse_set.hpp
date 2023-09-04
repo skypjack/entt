@@ -168,6 +168,7 @@ class basic_sparse_set {
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, Allocator>;
+    using underlying_type = typename entt_traits<Entity>::entity_type;
 
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
         const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
@@ -216,6 +217,20 @@ class basic_sparse_set {
         }
     }
 
+    void checked_pop_all() {
+        for(auto first = begin(); !(first.index() < 0); ++first) {
+            if(*first != tombstone) {
+                sparse_ref(*first) = null;
+            }
+        }
+    }
+
+    void unchecked_pop_all() {
+        for(auto first = begin(); !(first.index() < 0); ++first) {
+            sparse_ref(*first) = null;
+        }
+    }
+
 private:
     virtual const void *get_at(const std::size_t) const {
         return nullptr;
@@ -251,7 +266,7 @@ protected:
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatched");
         const auto entt = traits_type::to_entity(std::exchange(sparse_ref(*it), null));
-        packed[static_cast<size_type>(entt)] = traits_type::combine(traits_type::to_integral(std::exchange(head, entity_type{entt})), tombstone);
+        packed[static_cast<size_type>(entt)] = traits_type::combine(std::exchange(head, entt), tombstone);
     }
 
 protected:
@@ -282,24 +297,13 @@ protected:
     virtual void pop_all() {
         switch(mode) {
         case deletion_policy::in_place:
-            if(head != null) {
-                for(auto first = begin(); !(first.index() < 0); ++first) {
-                    if(*first != tombstone) {
-                        sparse_ref(*first) = null;
-                    }
-                }
-
-                head = entity_type{traits_type::to_entity(null)};
-                break;
-            }
-            [[fallthrough]];
+            (std::exchange(head, traits_type::entity_mask) == null) ? unchecked_pop_all() : checked_pop_all();
+            break;
         case deletion_policy::swap_only:
             head = {};
             [[fallthrough]];
         case deletion_policy::swap_and_pop:
-            for(auto first = begin(); !(first.index() < 0); ++first) {
-                sparse_ref(*first) = null;
-            }
+            checked_pop_all();
             break;
         }
 
@@ -318,9 +322,9 @@ protected:
         switch(auto &elem = assure_at_least(entt); mode) {
         case deletion_policy::in_place:
             if(head != null && !force_back) {
-                const auto pos = static_cast<size_type>(traits_type::to_integral(head));
-                elem = traits_type::combine(traits_type::to_integral(head), traits_type::to_integral(entt));
-                head = entity_type{traits_type::to_entity(std::exchange(packed[pos], entt))};
+                const auto pos = static_cast<size_type>(head);
+                elem = traits_type::combine(head, traits_type::to_integral(entt));
+                head = traits_type::to_entity(std::exchange(packed[pos], entt));
                 return --(end() - pos);
             }
             [[fallthrough]];
@@ -385,7 +389,7 @@ public:
           packed{allocator},
           info{&elem},
           mode{pol},
-          head{traits_type::to_entity(null)} {}
+          head{traits_type::entity_mask} {}
 
     /**
      * @brief Move constructor.
@@ -396,7 +400,7 @@ public:
           packed{std::move(other.packed)},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, entity_type{traits_type::to_entity(null)})} {}
+          head{std::exchange(other.head, traits_type::entity_mask)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -408,7 +412,7 @@ public:
           packed{std::move(other.packed), allocator},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, entity_type{traits_type::to_entity(null)})} {
+          head{std::exchange(other.head, traits_type::entity_mask)} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -430,7 +434,7 @@ public:
         packed = std::move(other.packed);
         info = other.info;
         mode = other.mode;
-        head = std::exchange(other.head, entity_type{traits_type::to_entity(null)});
+        head = std::exchange(other.head, traits_type::entity_mask);
         return *this;
     }
 
@@ -468,7 +472,7 @@ public:
      * @return The head of the free list.
      */
     size_type free_list() const noexcept {
-        return static_cast<size_type>(traits_type::to_integral(head));
+        return static_cast<size_type>(head);
     }
 
     /**
@@ -630,7 +634,7 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         const auto elem = sparse_ptr(entt);
-        constexpr auto cap = traits_type::to_entity(null);
+        constexpr auto cap = traits_type::entity_mask;
         // testing versions permits to avoid accessing the packed array
         return elem && (((~cap & traits_type::to_integral(entt)) ^ traits_type::to_integral(*elem)) < cap);
     }
@@ -839,23 +843,22 @@ public:
         if(mode == deletion_policy::in_place) {
             size_type from = packed.size();
             for(; from && packed[from - 1u] == tombstone; --from) {}
+            underlying_type pos = std::exchange(head, traits_type::entity_mask);
 
-            for(auto *it = &head; *it != null && from; it = std::addressof(packed[traits_type::to_entity(*it)])) {
-                if(const size_type to = traits_type::to_entity(*it); to < from) {
+            while(pos != null) {
+                if(const auto to = static_cast<size_type>(std::exchange(pos, traits_type::to_entity(packed[pos]))); to < from) {
                     --from;
                     swap_or_move(from, to);
 
-                    packed[to] = std::exchange(packed[from], tombstone);
+                    packed[to] = packed[from];
                     const auto entity = static_cast<typename traits_type::entity_type>(to);
                     sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
 
-                    *it = traits_type::combine(static_cast<typename traits_type::entity_type>(from), tombstone);
                     for(; from && packed[from - 1u] == tombstone; --from) {}
                 }
             }
 
-            head = entity_type{traits_type::to_entity(null)};
-            packed.resize(from);
+            packed.erase(packed.begin() + from, packed.end());
         }
     }
 
@@ -990,7 +993,7 @@ public:
         pop_all();
         // sanity check to avoid subtle issues due to storage classes
         ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
-        head = entity_type{traits_type::to_entity(null)};
+        head = traits_type::entity_mask;
         packed.clear();
     }
 
@@ -1010,7 +1013,7 @@ private:
     packed_container_type packed;
     const type_info *info;
     deletion_policy mode;
-    entity_type head;
+    underlying_type head;
 };
 
 } // namespace entt
