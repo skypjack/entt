@@ -293,8 +293,10 @@ protected:
                 break;
             }
             [[fallthrough]];
-        case deletion_policy::swap_and_pop:
         case deletion_policy::swap_only:
+            head = {};
+            [[fallthrough]];
+        case deletion_policy::swap_and_pop:
             for(auto first = begin(); !(first.index() < 0); ++first) {
                 sparse_ref(*first) = null;
             }
