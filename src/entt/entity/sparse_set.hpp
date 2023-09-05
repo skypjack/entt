@@ -253,6 +253,14 @@ protected:
     using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
 
     /**
+     * @brief Temporary function to make the transition easier. Don't use me.
+     * @param len The length to use.
+     */
+    void swap_only_length_temporary_function(const std::size_t len) {
+        head = static_cast<underlying_type>(len);
+    }
+
+    /**
      * @brief Erases an entity from a sparse set.
      * @param it An iterator to the element to pop.
      */
