@@ -218,13 +218,7 @@ class basic_sparse_set {
     }
 
     underlying_type policy_to_head() {
-        switch(mode) {
-        case deletion_policy::swap_and_pop:
-        case deletion_policy::in_place:
-            return traits_type::entity_mask;
-        case deletion_policy::swap_only:
-            return underlying_type{};
-        }
+        return traits_type::entity_mask * (mode != deletion_policy::swap_only);
     }
 
 private:
