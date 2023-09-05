@@ -170,8 +170,10 @@ struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
 };
 
 /**
- * @copydoc entt_traits<Entity>::to_integral
+ * @brief Converts an entity to its underlying type.
  * @tparam Entity The value type.
+ * @param value The value to convert.
+ * @return The integral representation of the given value.
  */
 template<typename Entity>
 [[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
@@ -179,8 +181,10 @@ template<typename Entity>
 }
 
 /**
- * @copydoc entt_traits<Entity>::to_entity
+ * @brief Returns the entity part once converted to the underlying type.
  * @tparam Entity The value type.
+ * @param value The value to convert.
+ * @return The integral representation of the entity part.
  */
 template<typename Entity>
 [[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
@@ -188,8 +192,10 @@ template<typename Entity>
 }
 
 /**
- * @copydoc entt_traits<Entity>::to_version
+ * @brief Returns the version part once converted to the underlying type.
  * @tparam Entity The value type.
+ * @param value The value to convert.
+ * @return The integral representation of the version part.
  */
 template<typename Entity>
 [[nodiscard]] constexpr typename entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
