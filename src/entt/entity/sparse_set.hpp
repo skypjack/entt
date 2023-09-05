@@ -237,6 +237,7 @@ protected:
      * @param len The length to use.
      */
     void swap_only_length_temporary_function(const std::size_t len) {
+        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatched");
         head = static_cast<underlying_type>(len);
     }
 
