@@ -217,20 +217,6 @@ class basic_sparse_set {
         }
     }
 
-    void checked_pop_all() {
-        for(auto first = begin(); !(first.index() < 0); ++first) {
-            if(*first != tombstone) {
-                sparse_ref(*first) = null;
-            }
-        }
-    }
-
-    void unchecked_pop_all() {
-        for(auto first = begin(); !(first.index() < 0); ++first) {
-            sparse_ref(*first) = null;
-        }
-    }
-
     underlying_type policy_to_head() {
         switch(mode) {
         case deletion_policy::swap_and_pop:
@@ -315,16 +301,24 @@ protected:
     virtual void pop_all() {
         switch(mode) {
         case deletion_policy::in_place:
-            (std::exchange(head, traits_type::entity_mask) == null) ? unchecked_pop_all() : checked_pop_all();
-            break;
-        case deletion_policy::swap_only:
-            head = {};
+            if(head != null) {
+                for(auto first = begin(); !(first.index() < 0); ++first) {
+                    if(*first != tombstone) {
+                        sparse_ref(*first) = null;
+                    }
+                }
+                break;
+            }
             [[fallthrough]];
+        case deletion_policy::swap_only:
         case deletion_policy::swap_and_pop:
-            checked_pop_all();
+            for(auto first = begin(); !(first.index() < 0); ++first) {
+                sparse_ref(*first) = null;
+            }
             break;
         }
 
+        head = policy_to_head();
         packed.clear();
     }
 
