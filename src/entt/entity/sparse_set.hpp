@@ -231,6 +231,16 @@ class basic_sparse_set {
         }
     }
 
+    underlying_type policy_to_head() {
+        switch(mode) {
+        case deletion_policy::swap_and_pop:
+        case deletion_policy::in_place:
+            return traits_type::entity_mask;
+        case deletion_policy::swap_only:
+            return underlying_type{};
+        }
+    }
+
 private:
     virtual const void *get_at(const std::size_t) const {
         return nullptr;
@@ -389,7 +399,7 @@ public:
           packed{allocator},
           info{&elem},
           mode{pol},
-          head{traits_type::entity_mask} {}
+          head{policy_to_head()} {}
 
     /**
      * @brief Move constructor.
@@ -400,7 +410,7 @@ public:
           packed{std::move(other.packed)},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, traits_type::entity_mask)} {}
+          head{std::exchange(other.head, policy_to_head())} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -412,7 +422,7 @@ public:
           packed{std::move(other.packed), allocator},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, traits_type::entity_mask)} {
+          head{std::exchange(other.head, policy_to_head())} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -434,7 +444,7 @@ public:
         packed = std::move(other.packed);
         info = other.info;
         mode = other.mode;
-        head = std::exchange(other.head, traits_type::entity_mask);
+        head = std::exchange(other.head, policy_to_head());
         return *this;
     }
 
@@ -993,7 +1003,7 @@ public:
         pop_all();
         // sanity check to avoid subtle issues due to storage classes
         ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
-        head = traits_type::entity_mask;
+        head = policy_to_head();
         packed.clear();
     }
 

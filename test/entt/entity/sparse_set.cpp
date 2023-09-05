@@ -614,7 +614,7 @@ TEST(SparseSet, SwapOnlyErase) {
     entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, traits_type::construct(9, 3)};
 
     ASSERT_EQ(set.policy(), entt::deletion_policy::swap_only);
-    ASSERT_GT(set.free_list(), set.size());
+    ASSERT_EQ(set.free_list(), set.size());
     ASSERT_TRUE(set.empty());
 
     set.push(std::begin(entity), std::end(entity));
@@ -622,13 +622,13 @@ TEST(SparseSet, SwapOnlyErase) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 3u);
-    ASSERT_GT(set.free_list(), set.size());
+    ASSERT_LT(set.free_list(), set.size());
 
     set.erase(entity[2u]);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 3u);
-    ASSERT_GT(set.free_list(), set.size());
+    ASSERT_LT(set.free_list(), set.size());
 
     ASSERT_EQ(set.at(0u), entity[0u]);
     ASSERT_EQ(set.at(1u), entity[1u]);
