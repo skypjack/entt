@@ -972,25 +972,6 @@ private:
 
 protected:
     /**
-     * @brief Erases entities from a storage.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    void pop(underlying_iterator first, underlying_iterator last) override {
-        for(; first != last; ++first) {
-            if(const auto pos = base_type::index(*first); pos < base_type::free_list()) {
-                base_type::bump(local_traits_type::next(*first));
-
-                if(const size_type slot = base_type::free_list() - 1u; pos != slot) {
-                    base_type::swap_elements(base_type::data()[pos], base_type::data()[slot]);
-                }
-
-                base_type::swap_only_length_temporary_function(base_type::free_list() - 1u);
-            }
-        }
-    }
-
-    /**
      * @brief Assigns an entity to a storage.
      * @param hint A valid identifier.
      * @return Iterator pointing to the emplaced element.
@@ -1147,7 +1128,7 @@ public:
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<typename It>      
+    template<typename It>
     void insert(It first, It last) {
         for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first, base_type::swap_only_length_temporary_function(base_type::free_list() + 1u)) {
             *first = base_type::operator[](base_type::free_list());

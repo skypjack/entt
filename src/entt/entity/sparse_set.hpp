@@ -245,6 +245,25 @@ protected:
      * @brief Erases an entity from a sparse set.
      * @param it An iterator to the element to pop.
      */
+    void swap_only(const basic_iterator it) {
+        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatched");
+
+        if(const auto pos = static_cast<underlying_type>(index(*it)); pos < head) {
+            bump(traits_type::next(*it));
+
+            if(const auto slot = head - 1u; pos != slot) {
+                swap_elements(packed[pos], packed[slot]);
+            }
+
+            // partition check support in derived classes
+            --head;
+        }
+    }
+
+    /**
+     * @brief Erases an entity from a sparse set.
+     * @param it An iterator to the element to pop.
+     */
     void swap_and_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::swap_and_pop, "Deletion policy mismatched");
         auto &self = sparse_ref(*it);
@@ -287,7 +306,9 @@ protected:
             }
             break;
         case deletion_policy::swap_only:
-            // no-op
+            for(; first != last; ++first) {
+                swap_only(first);
+            }
             break;
         }
     }
