@@ -499,7 +499,7 @@ public:
      * @brief Returns the head of the free list, if any.
      * @return The head of the free list.
      */
-    size_type free_list() const noexcept {
+    [[nodiscard]] size_type free_list() const noexcept {
         return static_cast<size_type>(head);
     }
 
