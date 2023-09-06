@@ -251,8 +251,8 @@ protected:
         if(const auto pos = static_cast<underlying_type>(index(*it)); pos < head) {
             bump(traits_type::next(*it));
 
-            if(const auto slot = head - 1u; pos != slot) {
-                swap_elements(packed[pos], packed[slot]);
+            if(const auto next = head - 1u; pos != next) {
+                swap_elements(packed[pos], packed[next]);
             }
 
             // partition check support in derived classes
