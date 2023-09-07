@@ -217,6 +217,16 @@ class basic_sparse_set {
         }
     }
 
+    void swap_at(const std::size_t from, const std::size_t to) {
+        auto &lhs = packed[from];
+        auto &rhs = packed[to];
+
+        sparse_ref(lhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(to), traits_type::to_integral(lhs));
+        sparse_ref(rhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
+
+        std::swap(lhs, rhs);
+    }
+
     underlying_type policy_to_head() {
         return traits_type::entity_mask * (mode != deletion_policy::swap_only);
     }
@@ -909,12 +919,7 @@ public:
 
         // basic no-leak guarantee if swapping throws
         swap_or_move(from, to);
-
-        sparse_ref(packed[from]) = traits_type::combine(static_cast<typename traits_type::entity_type>(to), traits_type::to_integral(lhs));
-        sparse_ref(packed[to]) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
-
-        packed[from] = rhs;
-        packed[to] = lhs;
+        swap_at(from, to);
     }
 
     /**
