@@ -37,6 +37,7 @@
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]">mode,en</Item>
+			<Item Name="[free_list]">head</Item>
 			<Synthetic Name="[sparse]">
 				<DisplayString>{ sparse.size() * traits_type::page_size }</DisplayString>
 				<Expand>
