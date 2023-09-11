@@ -1073,8 +1073,8 @@ public:
      */
     entity_type emplace() {
         const auto len = base_type::free_list();
-        base_type::swap_only_length_temporary_function(len + 1u);
-        return (len == base_type::size()) ? *base_type::try_emplace(entity_at(len), true) : base_type::operator[](len);
+        const auto entt = (len == base_type::size()) ? entity_at(len) : base_type::at(len);
+        return *base_type::try_emplace(entt, true);
     }
 
     /**
@@ -1093,21 +1093,19 @@ public:
             const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
 
             while(!(pos < base_type::size())) {
-                base_type::try_emplace(entity_at(base_type::size()), true);
+                const auto it = base_type::try_emplace(entity_at(base_type::size()), true);
+                const auto entt = *it;
+
+                base_type::swap_only(it);
+                base_type::bump(entt);
             }
 
-            base_type::swap_elements(base_type::data()[pos], base_type::data()[base_type::free_list()]);
-            base_type::swap_only_length_temporary_function(base_type::free_list() + 1u);
+            return *base_type::try_emplace(hint, true);
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
         } else {
-            base_type::swap_elements(base_type::data()[idx], base_type::data()[base_type::free_list()]);
-            base_type::swap_only_length_temporary_function(base_type::free_list() + 1u);
+            return *base_type::try_emplace(hint, true);
         }
-
-        base_type::bump(hint);
-
-        return hint;
     }
 
     /**
@@ -1130,13 +1128,12 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first, base_type::swap_only_length_temporary_function(base_type::free_list() + 1u)) {
-            *first = base_type::operator[](base_type::free_list());
+        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
+            *first = *base_type::try_emplace(base_type::at(base_type::free_list()), true);
         }
 
         for(; first != last; ++first) {
             *first = *base_type::try_emplace(entity_at(base_type::free_list()), true);
-            base_type::swap_only_length_temporary_function(base_type::free_list() + 1u);
         }
     }
 

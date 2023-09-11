@@ -200,9 +200,7 @@ class basic_sparse_set {
             std::uninitialized_fill(sparse[page], sparse[page] + traits_type::page_size, null);
         }
 
-        auto &elem = sparse[page][fast_mod(pos, traits_type::page_size)];
-        ENTT_ASSERT(elem == null, "Slot not available");
-        return elem;
+        return sparse[page][fast_mod(pos, traits_type::page_size)];
     }
 
     void release_sparse_pages() {
@@ -247,7 +245,7 @@ protected:
      * @param len The length to use.
      */
     void swap_only_length_temporary_function(const std::size_t len) {
-        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatched");
+        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatch");
         head = static_cast<underlying_type>(len);
     }
 
@@ -256,18 +254,10 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void swap_only(const basic_iterator it) {
-        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatched");
-
-        if(const auto pos = static_cast<underlying_type>(index(*it)); pos < head) {
-            bump(traits_type::next(*it));
-
-            if(const auto next = head - 1u; pos != next) {
-                swap_elements(packed[pos], packed[next]);
-            }
-
-            // partition check support in derived classes
-            --head;
-        }
+        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatch");
+        const auto pos = static_cast<underlying_type>(index(*it));
+        bump(traits_type::next(*it));
+        swap_at(pos, static_cast<size_type>(head -= (pos < head)));
     }
 
     /**
@@ -275,7 +265,7 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void swap_and_pop(const basic_iterator it) {
-        ENTT_ASSERT(mode == deletion_policy::swap_and_pop, "Deletion policy mismatched");
+        ENTT_ASSERT(mode == deletion_policy::swap_and_pop, "Deletion policy mismatch");
         auto &self = sparse_ref(*it);
         const auto entt = traits_type::to_entity(self);
         sparse_ref(packed.back()) = traits_type::combine(entt, traits_type::to_integral(packed.back()));
@@ -292,7 +282,7 @@ protected:
      * @param it An iterator to the element to pop.
      */
     void in_place_pop(const basic_iterator it) {
-        ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatched");
+        ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
         const auto entt = traits_type::to_entity(std::exchange(sparse_ref(*it), null));
         packed[static_cast<size_type>(entt)] = traits_type::combine(std::exchange(head, entt), tombstone);
     }
@@ -355,23 +345,38 @@ protected:
      * @return Iterator pointing to the emplaced element.
      */
     virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
-        ENTT_ASSERT(!contains(entt), "Set already contains entity");
+        auto &elem = assure_at_least(entt);
+        auto pos = size();
 
-        switch(auto &elem = assure_at_least(entt); mode) {
+        switch(mode) {
         case deletion_policy::in_place:
             if(head != null && !force_back) {
-                const auto pos = static_cast<size_type>(head);
+                pos = static_cast<size_type>(head);
+                ENTT_ASSERT(elem == null, "Slot not available");
                 elem = traits_type::combine(head, traits_type::to_integral(entt));
                 head = traits_type::to_entity(std::exchange(packed[pos], entt));
-                return --(end() - pos);
+                break;
             }
             [[fallthrough]];
-        case deletion_policy::swap_only:
         case deletion_policy::swap_and_pop:
             packed.push_back(entt);
+            ENTT_ASSERT(elem == null, "Slot not available");
             elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
-            return begin();
+            break;
+        case deletion_policy::swap_only:
+            if(elem == null) {
+                packed.push_back(entt);
+                elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
+            } else {
+                ENTT_ASSERT(!(traits_type::to_entity(elem) < head), "Slot not available");
+                bump(entt);
+            }
+
+            swap_at(static_cast<size_type>(traits_type::to_entity(elem)), (pos = static_cast<size_type>(head++)));
+            break;
         }
+
+        return --(end() - pos);
     }
 
 public:

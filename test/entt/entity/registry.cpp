@@ -555,8 +555,8 @@ TEST(Registry, CreateWithHint) {
     auto e3 = registry.create(entt::entity{3});
     auto e2 = registry.create(entt::entity{3});
 
-    ASSERT_EQ(e2, entt::entity{1});
-    ASSERT_FALSE(registry.valid(entt::entity{0}));
+    ASSERT_EQ(e2, entt::entity{0});
+    ASSERT_FALSE(registry.valid(entt::entity{1}));
     ASSERT_FALSE(registry.valid(entt::entity{2}));
     ASSERT_EQ(e3, entt::entity{3});
 
@@ -568,7 +568,7 @@ TEST(Registry, CreateWithHint) {
     e2 = registry.create();
     auto e1 = registry.create(entt::entity{2});
 
-    ASSERT_EQ(traits_type::to_entity(e2), 1u);
+    ASSERT_EQ(traits_type::to_entity(e2), 0u);
     ASSERT_EQ(traits_type::to_version(e2), 1u);
 
     ASSERT_EQ(traits_type::to_entity(e1), 2u);
