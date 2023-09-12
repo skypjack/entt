@@ -1161,7 +1161,7 @@ public:
      * @brief Returns the number of elements considered still in use.
      * @return The number of elements considered still in use.
      */
-    [[nodiscard]] size_type in_use() const noexcept {
+    [[deprecated("use free_list() instead")]] [[nodiscard]] size_type in_use() const noexcept {
         return base_type::free_list();
     }
 
@@ -1169,7 +1169,7 @@ public:
      * @brief Sets the number of elements considered still in use.
      * @param len The number of elements considered still in use.
      */
-    void in_use(const size_type len) noexcept {
+    [[deprecated("use free_list(len) instead")]] void in_use(const size_type len) noexcept {
         base_type::free_list(len);
     }
 
