@@ -241,15 +241,6 @@ protected:
     using basic_iterator = internal::sparse_set_iterator<packed_container_type>;
 
     /**
-     * @brief Temporary function to make the transition easier. Don't use me.
-     * @param len The length to use.
-     */
-    void swap_only_length_temporary_function(const std::size_t len) {
-        ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatch");
-        head = static_cast<underlying_type>(len);
-    }
-
-    /**
      * @brief Erases an entity from a sparse set.
      * @param it An iterator to the element to pop.
      */
@@ -516,6 +507,15 @@ public:
      */
     [[nodiscard]] size_type free_list() const noexcept {
         return static_cast<size_type>(head);
+    }
+
+    /**
+     * @brief Sets the head of the free list, if possible.
+     * @param len The value to use as the new head of the free list.
+     */
+    void free_list(const size_type len) noexcept {
+        ENTT_ASSERT((mode == deletion_policy::swap_only) && !(len > packed.size()), "Invalid value");
+        head = static_cast<underlying_type>(len);
     }
 
     /**

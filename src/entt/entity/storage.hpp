@@ -1170,8 +1170,7 @@ public:
      * @param len The number of elements considered still in use.
      */
     void in_use(const size_type len) noexcept {
-        ENTT_ASSERT(!(len > base_type::size()), "Invalid length");
-        base_type::swap_only_length_temporary_function(len);
+        base_type::free_list(len);
     }
 
     /**
