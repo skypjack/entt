@@ -18,10 +18,7 @@ TODO (high prio):
 * meta container: add value type to resize
 * further improve meta resolve function by id
 * drop specialization for single type views with exclusion list
-* drop in_use with argument, use free_list(N) instead
-* refine/improve emplace(N) with generation of missing elements
 * fully test sparse set with swap only policy and write more tests for entity storage
-* drop sparse set swap_only_length_temporary_function :)
 * ===> TEST: review view tests after the last changes
 
 WIP:
