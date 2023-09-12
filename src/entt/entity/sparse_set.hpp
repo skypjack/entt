@@ -363,7 +363,11 @@ protected:
                 bump(entt);
             }
 
-            swap_at(static_cast<size_type>(traits_type::to_entity(elem)), (pos = static_cast<size_type>(head++)));
+            if(force_back) {
+                pos = static_cast<size_type>(head++);
+                swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
+            }
+
             break;
         }
 
@@ -760,7 +764,7 @@ public:
      * `end()` iterator otherwise.
      */
     iterator push(const entity_type entt, const void *elem = nullptr) {
-        return try_emplace(entt, false, elem);
+        return try_emplace(entt, (mode == deletion_policy::swap_only), elem);
     }
 
     /**

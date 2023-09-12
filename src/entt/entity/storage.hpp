@@ -1091,16 +1091,13 @@ public:
             return emplace();
         } else if(const auto curr = local_traits_type::construct(local_traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
             const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
+            const auto entt = *base_type::try_emplace(hint, true);
 
             while(!(pos < base_type::size())) {
-                const auto it = base_type::try_emplace(entity_at(base_type::size()), true);
-                const auto entt = *it;
-
-                base_type::swap_only(it);
-                base_type::bump(entt);
+                base_type::try_emplace(entity_at(base_type::size() - 1u), false);
             }
 
-            return *base_type::try_emplace(hint, true);
+            return entt;
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
         } else {
