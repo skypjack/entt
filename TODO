@@ -17,7 +17,6 @@ TODO (high prio):
 * update view doc: single vs multi type views are no longer a thing actually
 * meta container: add value type to resize
 * further improve meta resolve function by id
-* drop specialization for single type views with exclusion list
 * fully test sparse set with swap only policy and write more tests for entity storage
 * ===> TEST: review view tests after the last changes
 
