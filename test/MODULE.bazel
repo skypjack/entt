@@ -1,0 +1,11 @@
+module(name = "entt_test")
+
+bazel_dep(name = "rules_cc", version = "0.0.8")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "googletest", version = "1.14.0")
+bazel_dep(name = "entt")
+
+local_path_override(
+    module_name = "entt",
+    path = "..",
+)

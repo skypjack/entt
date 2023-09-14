@@ -1,0 +1,34 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@entt//bazel:copts.bzl", "COPTS")
+
+# buildifier: keep sorted
+_TESTS = [
+    "meta_any",
+    "meta_base",
+    "meta_container",
+    "meta_context",
+    "meta_conv",
+    "meta_ctor",
+    "meta_data",
+    "meta_dtor",
+    "meta_func",
+    "meta_handle",
+    "meta_pointer",
+    "meta_prop",
+    "meta_range",
+    "meta_template",
+    "meta_type",
+    "meta_utility",
+]
+
+[cc_test(
+    name = test,
+    srcs = ["{}.cpp".format(test)],
+    copts = COPTS,
+    deps = [
+        "//entt/common",
+        "@entt",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+    ],
+) for test in _TESTS]

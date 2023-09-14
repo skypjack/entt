@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@entt//bazel:copts.bzl", "COPTS")
+
+package(default_visibility = ["//:__subpackages__"])
+
+cc_library(
+    name = "common",
+    copts = COPTS,
+    hdrs = glob(["*.h", "*.hpp"]),
+)
