@@ -216,7 +216,7 @@ TEST(BasicHandle, Lifetime) {
     handle->emplace<int>();
 
     ASSERT_FALSE(registry.storage<int>().empty());
-    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_NE(registry.storage<entt::entity>().free_list(), 0u);
 
     for(auto [entt]: registry.storage<entt::entity>().each()) {
         ASSERT_EQ(handle->entity(), entt);
@@ -225,7 +225,7 @@ TEST(BasicHandle, Lifetime) {
     delete handle;
 
     ASSERT_FALSE(registry.storage<int>().empty());
-    ASSERT_NE(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_NE(registry.storage<entt::entity>().free_list(), 0u);
 }
 
 TEST(BasicHandle, ImplicitConversions) {

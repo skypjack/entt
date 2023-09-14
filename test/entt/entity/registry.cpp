@@ -242,7 +242,7 @@ TEST(Registry, Functionalities) {
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = registry.get_allocator());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 0u);
-    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
     ASSERT_NO_FATAL_FAILURE(registry.storage<entt::entity>().reserve(42));
     ASSERT_EQ(registry.storage<entt::entity>().capacity(), 42u);
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
@@ -324,7 +324,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e1), 1);
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 3u);
+    ASSERT_EQ(registry.storage<entt::entity>().free_list(), 3u);
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
@@ -337,12 +337,12 @@ TEST(Registry, Functionalities) {
     ASSERT_FALSE(registry.valid(e2));
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 2u);
+    ASSERT_EQ(registry.storage<entt::entity>().free_list(), 2u);
 
     ASSERT_NO_FATAL_FAILURE(registry.clear());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
-    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
     ASSERT_FALSE(registry.storage<entt::entity>().empty());
 
     const auto e3 = registry.create();
@@ -630,7 +630,7 @@ TEST(Registry, CreateDestroyReleaseCornerCase) {
     registry.destroy(e0);
     registry.storage<entt::entity>().erase(e1);
 
-    ASSERT_EQ(registry.storage<entt::entity>().in_use(), 0u);
+    ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
 
     ASSERT_EQ(registry.current(e0), 1u);
     ASSERT_EQ(registry.current(e1), 1u);
@@ -2012,7 +2012,7 @@ TEST(Registry, AssignEntities) {
     auto &dst = other.storage<entt::entity>();
 
     dst.push(src.rbegin(), src.rend());
-    dst.in_use(src.in_use());
+    dst.free_list(src.free_list());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), other.storage<entt::entity>().size());
     ASSERT_TRUE(other.valid(entity[0]));

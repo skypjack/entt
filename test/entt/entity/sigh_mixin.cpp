@@ -481,14 +481,14 @@ TEST(SighMixin, StorageEntity) {
     ASSERT_EQ(on_construct.value, 1);
     ASSERT_EQ(on_destroy.value, 0);
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 1u);
+    ASSERT_EQ(pool.free_list(), 1u);
 
     pool.erase(entt::entity{1});
 
     ASSERT_EQ(on_construct.value, 1);
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 0u);
+    ASSERT_EQ(pool.free_list(), 0u);
 
     pool.push(traits_type::construct(0, 2));
     pool.push(traits_type::construct(2, 1));
@@ -500,12 +500,12 @@ TEST(SighMixin, StorageEntity) {
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 1);
     ASSERT_EQ(pool.size(), 3u);
-    ASSERT_EQ(pool.in_use(), 2u);
+    ASSERT_EQ(pool.free_list(), 2u);
 
     pool.clear();
 
     ASSERT_EQ(pool.size(), 0u);
-    ASSERT_EQ(pool.in_use(), 0u);
+    ASSERT_EQ(pool.free_list(), 0u);
 
     ASSERT_EQ(on_construct.value, 3);
     ASSERT_EQ(on_destroy.value, 3);
@@ -519,12 +519,12 @@ TEST(SighMixin, StorageEntity) {
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 3);
     ASSERT_EQ(pool.size(), 3u);
-    ASSERT_EQ(pool.in_use(), 3u);
+    ASSERT_EQ(pool.free_list(), 3u);
 
     pool.clear();
 
     ASSERT_EQ(pool.size(), 0u);
-    ASSERT_EQ(pool.in_use(), 0u);
+    ASSERT_EQ(pool.free_list(), 0u);
 }
 
 TEST(SighMixin, CustomAllocator) {
