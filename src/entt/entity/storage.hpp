@@ -965,11 +965,6 @@ class basic_storage<Entity, Entity, Allocator>
         return local_traits_type::combine(static_cast<typename local_traits_type::entity_type>(pos), {});
     }
 
-private:
-    void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) override {
-        ENTT_ASSERT(((lhs < base_type::free_list()) + (rhs < base_type::free_list())) != 1u, "Cross swapping is not supported");
-    }
-
 protected:
     /**
      * @brief Assigns an entity to a storage.

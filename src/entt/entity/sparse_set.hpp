@@ -234,7 +234,9 @@ private:
         return nullptr;
     }
 
-    virtual void swap_or_move(const std::size_t, const std::size_t) {}
+    virtual void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {
+        ENTT_ASSERT((mode != deletion_policy::swap_only) || (((lhs < free_list()) + (rhs < free_list())) != 1u), "Cross swapping is not supported");
+    }
 
 protected:
     /*! @brief Random access iterator type. */
