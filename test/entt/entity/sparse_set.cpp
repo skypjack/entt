@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
@@ -1204,9 +1203,9 @@ TEST(SparseSet, Contiguous) {
 TEST(SparseSet, Iterator) {
     using iterator = typename entt::sparse_set::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, entt::entity>);
-    static_assert(std::is_same_v<iterator::pointer, const entt::entity *>);
-    static_assert(std::is_same_v<iterator::reference, const entt::entity &>);
+    testing::StaticAssertTypeEq<iterator::value_type, entt::entity>();
+    testing::StaticAssertTypeEq<iterator::pointer, const entt::entity *>();
+    testing::StaticAssertTypeEq<iterator::reference, const entt::entity &>();
 
     entt::sparse_set set;
     set.push(entt::entity{3});
@@ -1275,9 +1274,9 @@ TEST(SparseSet, Iterator) {
 TEST(SparseSet, ReverseIterator) {
     using reverse_iterator = typename entt::sparse_set::reverse_iterator;
 
-    static_assert(std::is_same_v<reverse_iterator::value_type, entt::entity>);
-    static_assert(std::is_same_v<reverse_iterator::pointer, const entt::entity *>);
-    static_assert(std::is_same_v<reverse_iterator::reference, const entt::entity &>);
+    testing::StaticAssertTypeEq<reverse_iterator::value_type, entt::entity>();
+    testing::StaticAssertTypeEq<reverse_iterator::pointer, const entt::entity *>();
+    testing::StaticAssertTypeEq<reverse_iterator::reference, const entt::entity &>();
 
     entt::sparse_set set;
     set.push(entt::entity{3});

@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <iterator>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
@@ -301,9 +304,9 @@ TEST(StorageEntity, Pack) {
 TEST(StorageEntity, Iterable) {
     using iterator = typename entt::storage<entt::entity>::iterable::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
-    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -337,7 +340,7 @@ TEST(StorageEntity, Iterable) {
     ASSERT_EQ(begin.base(), pool.end());
 
     for(auto [entity]: iterable) {
-        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
         ASSERT_TRUE(entity != entt::entity{3});
     }
 }
@@ -345,9 +348,9 @@ TEST(StorageEntity, Iterable) {
 TEST(StorageEntity, ConstIterable) {
     using iterator = typename entt::storage<entt::entity>::const_iterable::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
-    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -381,7 +384,7 @@ TEST(StorageEntity, ConstIterable) {
     ASSERT_EQ(begin.base(), pool.end());
 
     for(auto [entity]: iterable) {
-        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
         ASSERT_TRUE(entity != entt::entity{3});
     }
 }
@@ -393,8 +396,8 @@ TEST(StorageEntity, IterableIteratorConversion) {
     typename entt::storage<entt::entity>::iterable::iterator it = pool.each().begin();
     typename entt::storage<entt::entity>::const_iterable::iterator cit = it;
 
-    static_assert(std::is_same_v<decltype(*it), std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<decltype(*cit), std::tuple<entt::entity>>);
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
@@ -413,9 +416,9 @@ TEST(StorageEntity, IterableAlgorithmCompatibility) {
 TEST(StorageEntity, ReverseIterable) {
     using iterator = typename entt::storage<entt::entity>::reverse_iterable::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
-    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -449,7 +452,7 @@ TEST(StorageEntity, ReverseIterable) {
     ASSERT_EQ(begin.base(), pool.rbegin() + 2);
 
     for(auto [entity]: iterable) {
-        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
         ASSERT_TRUE(entity != entt::entity{3});
     }
 }
@@ -457,9 +460,9 @@ TEST(StorageEntity, ReverseIterable) {
 TEST(StorageEntity, ReverseConstIterable) {
     using iterator = typename entt::storage<entt::entity>::const_reverse_iterable::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>);
-    static_assert(std::is_same_v<typename iterator::reference, typename iterator::value_type>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -493,7 +496,7 @@ TEST(StorageEntity, ReverseConstIterable) {
     ASSERT_EQ(begin.base(), pool.rbegin() + 2);
 
     for(auto [entity]: iterable) {
-        static_assert(std::is_same_v<decltype(entity), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
         ASSERT_TRUE(entity != entt::entity{3});
     }
 }
@@ -505,8 +508,8 @@ TEST(StorageEntity, ReverseIterableIteratorConversion) {
     typename entt::storage<entt::entity>::reverse_iterable::iterator it = pool.reach().begin();
     typename entt::storage<entt::entity>::const_reverse_iterable::iterator cit = it;
 
-    static_assert(std::is_same_v<decltype(*it), std::tuple<entt::entity>>);
-    static_assert(std::is_same_v<decltype(*cit), std::tuple<entt::entity>>);
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);

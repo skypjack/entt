@@ -1,5 +1,4 @@
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
@@ -275,21 +274,21 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
     entt::delegate lambda{+[](const void *, int) { return 0; }};
 
-    static_assert(std::is_same_v<typename decltype(plain_func)::type, int(const int &)>);
-    static_assert(std::is_same_v<typename decltype(sum_func_with_ref)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(sum_func_with_const_ref)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(sum_func_with_ptr)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(sum_func_with_const_ptr)::type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(member_func_f)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_g)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_h)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_h_const)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_i)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_i_const)::type, void()>);
-    static_assert(std::is_same_v<typename decltype(data_member_u)::type, int()>);
-    static_assert(std::is_same_v<typename decltype(data_member_v)::type, const int()>);
-    static_assert(std::is_same_v<typename decltype(data_member_v_const)::type, const int()>);
-    static_assert(std::is_same_v<typename decltype(lambda)::type, int(int)>);
+    testing::StaticAssertTypeEq<typename decltype(plain_func)::type, int(const int &)>();
+    testing::StaticAssertTypeEq<typename decltype(sum_func_with_ref)::type, int(int)>();
+    testing::StaticAssertTypeEq<typename decltype(sum_func_with_const_ref)::type, int(int)>();
+    testing::StaticAssertTypeEq<typename decltype(sum_func_with_ptr)::type, int(int)>();
+    testing::StaticAssertTypeEq<typename decltype(sum_func_with_const_ptr)::type, int(int)>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_f)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_g)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_h)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_h_const)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_i)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(member_func_i_const)::type, void()>();
+    testing::StaticAssertTypeEq<typename decltype(data_member_u)::type, int()>();
+    testing::StaticAssertTypeEq<typename decltype(data_member_v)::type, const int()>();
+    testing::StaticAssertTypeEq<typename decltype(data_member_v_const)::type, const int()>();
+    testing::StaticAssertTypeEq<typename decltype(lambda)::type, int(int)>();
 
     ASSERT_TRUE(plain_func);
     ASSERT_TRUE(sum_func_with_ref);

@@ -3,7 +3,6 @@
 #include <iterator>
 #include <memory>
 #include <tuple>
-#include <type_traits>
 #include <unordered_set>
 #include <utility>
 #include <gtest/gtest.h>
@@ -1914,36 +1913,36 @@ TEST(Registry, GetOrEmplace) {
 TEST(Registry, Constness) {
     entt::registry registry;
 
-    static_assert((std::is_same_v<decltype(registry.emplace<int>({})), int &>));
-    static_assert((std::is_same_v<decltype(registry.emplace<empty_type>({})), void>));
+    testing::StaticAssertTypeEq<decltype(registry.emplace<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(registry.emplace<empty_type>({})), void>();
 
-    static_assert((std::is_same_v<decltype(registry.get<>({})), std::tuple<>>));
-    static_assert((std::is_same_v<decltype(registry.get<int>({})), int &>));
-    static_assert((std::is_same_v<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>));
+    testing::StaticAssertTypeEq<decltype(registry.get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(registry.get<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>();
 
-    static_assert((std::is_same_v<decltype(registry.try_get<>({})), std::tuple<>>));
-    static_assert((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
-    static_assert((std::is_same_v<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>));
+    testing::StaticAssertTypeEq<decltype(registry.try_get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(registry.try_get<int>({})), int *>();
+    testing::StaticAssertTypeEq<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>();
 
-    static_assert((std::is_same_v<decltype(registry.ctx().get<int>()), int &>));
-    static_assert((std::is_same_v<decltype(registry.ctx().get<const char>()), const char &>));
+    testing::StaticAssertTypeEq<decltype(registry.ctx().get<int>()), int &>();
+    testing::StaticAssertTypeEq<decltype(registry.ctx().get<const char>()), const char &>();
 
-    static_assert((std::is_same_v<decltype(registry.ctx().find<int>()), int *>));
-    static_assert((std::is_same_v<decltype(registry.ctx().find<const char>()), const char *>));
+    testing::StaticAssertTypeEq<decltype(registry.ctx().find<int>()), int *>();
+    testing::StaticAssertTypeEq<decltype(registry.ctx().find<const char>()), const char *>();
 
-    static_assert((std::is_same_v<decltype(std::as_const(registry).get<>({})), std::tuple<>>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>));
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<int>({})), const int &>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>();
 
-    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<>({})), std::tuple<>>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>));
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<int>({})), const int *>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>();
 
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().get<int>()), const int &>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().get<const char>()), const char &>));
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().get<int>()), const int &>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().get<const char>()), const char &>();
 
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().find<int>()), const int *>));
-    static_assert((std::is_same_v<decltype(std::as_const(registry).ctx().find<const char>()), const char *>));
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().find<int>()), const int *>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().find<const char>()), const char *>();
 }
 
 TEST(Registry, MoveOnlyComponent) {
@@ -2046,11 +2045,11 @@ TEST(Registry, RuntimePools) {
     auto &storage = registry.storage<empty_type>("other"_hs);
     const auto entity = registry.create();
 
-    static_assert(std::is_same_v<decltype(registry.storage<empty_type>()), entt::storage_type_t<empty_type> &>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type> *>);
+    testing::StaticAssertTypeEq<decltype(registry.storage<empty_type>()), entt::storage_type_t<empty_type> &>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).storage<empty_type>()), const entt::storage_type_t<empty_type> *>();
 
-    static_assert(std::is_same_v<decltype(registry.storage("other"_hs)), entt::storage_type_t<empty_type>::base_type *>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).storage("other"_hs)), const entt::storage_type_t<empty_type>::base_type *>);
+    testing::StaticAssertTypeEq<decltype(registry.storage("other"_hs)), entt::storage_type_t<empty_type>::base_type *>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).storage("other"_hs)), const entt::storage_type_t<empty_type>::base_type *>();
 
     ASSERT_NE(registry.storage("other"_hs), nullptr);
     ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), nullptr);
@@ -2101,8 +2100,8 @@ TEST(Registry, Storage) {
     storage.emplace(entity);
 
     for(auto [id, pool]: registry.storage()) {
-        static_assert(std::is_same_v<decltype(pool), entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(id), entt::id_type>);
+        testing::StaticAssertTypeEq<decltype(pool), entt::sparse_set &>();
+        testing::StaticAssertTypeEq<decltype(id), entt::id_type>();
 
         ASSERT_TRUE(pool.contains(entity));
         ASSERT_EQ(std::addressof(storage), std::addressof(pool));
@@ -2110,8 +2109,8 @@ TEST(Registry, Storage) {
     }
 
     for(auto &&curr: std::as_const(registry).storage()) {
-        static_assert(std::is_same_v<decltype(curr.second), const entt::sparse_set &>);
-        static_assert(std::is_same_v<decltype(curr.first), entt::id_type>);
+        testing::StaticAssertTypeEq<decltype(curr.second), const entt::sparse_set &>();
+        testing::StaticAssertTypeEq<decltype(curr.first), entt::id_type>();
 
         ASSERT_TRUE(curr.second.contains(entity));
         ASSERT_EQ(std::addressof(storage), std::addressof(curr.second));
@@ -2184,8 +2183,8 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     typename decltype(proxy)::iterator it = proxy.begin();
     typename decltype(cproxy)::iterator cit = it;
 
-    static_assert(std::is_same_v<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>);
-    static_assert(std::is_same_v<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>);
+    testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>();
 
     ASSERT_EQ(it->first, entt::type_id<int>().hash());
     ASSERT_EQ((*it).second.type(), entt::type_id<int>());

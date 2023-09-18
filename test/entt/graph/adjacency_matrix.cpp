@@ -203,9 +203,9 @@ TEST(AdjacencyMatrix, Clear) {
 TEST(AdjacencyMatrix, VertexIterator) {
     using iterator = typename entt::adjacency_matrix<entt::directed_tag>::vertex_iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::size_t>);
-    static_assert(std::is_same_v<iterator::pointer, void>);
-    static_assert(std::is_same_v<iterator::reference, std::size_t>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
+    testing::StaticAssertTypeEq<iterator::pointer, void>();
+    testing::StaticAssertTypeEq<iterator::reference, std::size_t>();
 
     entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2u};
     const auto iterable = adjacency_matrix.vertices();
@@ -229,9 +229,9 @@ TEST(AdjacencyMatrix, VertexIterator) {
 TEST(AdjacencyMatrix, EdgeIterator) {
     using iterator = typename entt::adjacency_matrix<entt::directed_tag>::edge_iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::pair<std::size_t, std::size_t>>);
-    static_assert(std::is_same_v<iterator::pointer, entt::input_iterator_pointer<std::pair<std::size_t, std::size_t>>>);
-    static_assert(std::is_same_v<iterator::reference, std::pair<std::size_t, std::size_t>>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::pair<std::size_t, std::size_t>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<std::size_t, std::size_t>>>();
+    testing::StaticAssertTypeEq<iterator::reference, std::pair<std::size_t, std::size_t>>();
 
     entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{3u};
 

@@ -1,3 +1,5 @@
+#include <memory>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/resource/resource.hpp>
@@ -77,9 +79,9 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
     entt::resource<derived> resource{std::make_shared<derived>()};
     entt::resource<derived> other{resource};
 
-    static_assert(std::is_same_v<decltype(*resource), derived &>);
-    static_assert(std::is_same_v<decltype(*entt::resource<const derived>{other}), const derived &>);
-    static_assert(std::is_same_v<decltype(*std::as_const(resource)), derived &>);
+    testing::StaticAssertTypeEq<decltype(*resource), derived &>();
+    testing::StaticAssertTypeEq<decltype(*entt::resource<const derived>{other}), const derived &>();
+    testing::StaticAssertTypeEq<decltype(*std::as_const(resource)), derived &>();
 
     entt::resource<const derived> copy{resource};
     entt::resource<const derived> move{std::move(other)};

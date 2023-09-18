@@ -147,9 +147,9 @@ TEST(ResourceCache, Iterator) {
 
     using iterator = typename entt::resource_cache<int>::iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::pair<entt::id_type, entt::resource<int>>>);
-    static_assert(std::is_same_v<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<int>>>>);
-    static_assert(std::is_same_v<iterator::reference, std::pair<entt::id_type, entt::resource<int>>>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::pair<entt::id_type, entt::resource<int>>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<int>>>>();
+    testing::StaticAssertTypeEq<iterator::reference, std::pair<entt::id_type, entt::resource<int>>>();
 
     entt::resource_cache<int> cache;
     cache.load("resource"_hs, 42);
@@ -202,9 +202,9 @@ TEST(ResourceCache, ConstIterator) {
 
     using iterator = typename entt::resource_cache<int>::const_iterator;
 
-    static_assert(std::is_same_v<iterator::value_type, std::pair<entt::id_type, entt::resource<const int>>>);
-    static_assert(std::is_same_v<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<const int>>>>);
-    static_assert(std::is_same_v<iterator::reference, std::pair<entt::id_type, entt::resource<const int>>>);
+    testing::StaticAssertTypeEq<iterator::value_type, std::pair<entt::id_type, entt::resource<const int>>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<const int>>>>();
+    testing::StaticAssertTypeEq<iterator::reference, std::pair<entt::id_type, entt::resource<const int>>>();
 
     entt::resource_cache<int> cache;
     cache.load("resource"_hs, 42);
@@ -261,8 +261,8 @@ TEST(ResourceCache, IteratorConversion) {
     typename entt::resource_cache<int>::iterator it = cache.begin();
     typename entt::resource_cache<int>::const_iterator cit = it;
 
-    static_assert(std::is_same_v<decltype(*it), std::pair<entt::id_type, entt::resource<int>>>);
-    static_assert(std::is_same_v<decltype(*cit), std::pair<entt::id_type, entt::resource<const int>>>);
+    testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::resource<int>>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, entt::resource<const int>>>();
 
     ASSERT_EQ(it->first, "resource"_hs);
     ASSERT_EQ((*it).second, 42);
