@@ -27,5 +27,3 @@ WIP:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* review/refine ENTT_ASSERT_CONSTEXPR usage
-* bump: tombstone aware and return version
