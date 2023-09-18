@@ -178,11 +178,13 @@ public:
          * @param vtype True if the vertex is a top-level one, false otherwise.
          * @param data The data associated with the vertex.
          * @param edges The indices of the children in the adjacency list.
+         * @param edges The indices of the dependencies in the adjacency list.
          */
-        vertex(const bool vtype, vertex_data data, std::vector<std::size_t> edges)
-            : is_top_level{vtype},
+        vertex(vertex_data data, std::vector<std::size_t> edges, std::vector<std::size_t> predecessors)
+            : is_top_level{predecessors.empty()},
               node{std::move(data)},
-              reachable{std::move(edges)} {}
+              successors_vec{std::move(edges)},
+              predecessors_vec{std::move(predecessors)} {}
 
         /**
          * @brief Fills a buffer with the type info objects for the writable
@@ -263,11 +265,27 @@ public:
         }
 
         /**
-         * @brief Returns the list of nodes reachable from a given vertex.
-         * @return The list of nodes reachable from the vertex.
+         * @brief Returns the list of predecessors for a given vertex.
+         * @return The list of predecessors' indices for the vertex.
+         */
+        const std::vector<std::size_t> &predecessors() const noexcept {
+            return predecessors_vec;
+        }
+
+        /**
+         * @brief Returns the list of successors for a given vertex.
+         * @return The list of successors' indices for the vertex.
+         */
+        const std::vector<std::size_t> &successors() const noexcept {
+            return successors_vec;
+        }
+
+        /**
+         * @brief Returns the list of successors for a given vertex.
+         * @return The list of successors' indices for the vertex.
          */
         const std::vector<std::size_t> &children() const noexcept {
-            return reachable;
+            return successors_vec;
         }
 
         /**
@@ -282,7 +300,8 @@ public:
     private:
         bool is_top_level;
         vertex_data node;
-        std::vector<std::size_t> reachable;
+        std::vector<std::size_t> successors_vec;
+        std::vector<std::size_t> predecessors_vec;
     };
 
     /**
@@ -384,13 +403,18 @@ public:
 
         for(auto curr: adjacency_matrix.vertices()) {
             const auto iterable = adjacency_matrix.in_edges(curr);
-            std::vector<std::size_t> reachable{};
+            std::vector<std::size_t> successors{};
+            std::vector<std::size_t> predecessors{};
 
-            for(auto &&edge: adjacency_matrix.out_edges(curr)) {
-                reachable.push_back(edge.second);
+            for(auto &&edge: adjacency_matrix.in_edges(curr)) {
+                predecessors.push_back(edge.first);
             }
 
-            adjacency_list.emplace_back(iterable.cbegin() == iterable.cend(), vertices[curr], std::move(reachable));
+            for(auto &&edge: adjacency_matrix.out_edges(curr)) {
+                successors.push_back(edge.second);
+            }
+
+            adjacency_list.emplace_back(vertices[curr], std::move(successors), std::move(predecessors));
         }
 
         return adjacency_list;
