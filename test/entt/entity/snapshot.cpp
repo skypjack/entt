@@ -25,11 +25,11 @@ struct shadow {
 };
 
 TEST(BasicSnapshot, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
 
     entt::registry registry;
     entt::basic_snapshot snapshot{registry};
@@ -219,11 +219,11 @@ TEST(BasicSnapshot, GetTypeSparse) {
 }
 
 TEST(BasicSnapshotLoader, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
 
     entt::registry registry;
     entt::basic_snapshot_loader loader{registry};
@@ -495,11 +495,11 @@ TEST(BasicSnapshotLoader, Orphans) {
 }
 
 TEST(BasicContinuousLoader, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>);
 
     entt::registry registry;
     entt::basic_continuous_loader loader{registry};

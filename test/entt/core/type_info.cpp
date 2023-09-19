@@ -42,10 +42,10 @@ TEST(TypeName, Functionalities) {
 }
 
 TEST(TypeInfo, Functionalities) {
-    static_assert(std::is_copy_constructible_v<entt::type_info>);
-    static_assert(std::is_move_constructible_v<entt::type_info>);
-    static_assert(std::is_copy_assignable_v<entt::type_info>);
-    static_assert(std::is_move_assignable_v<entt::type_info>);
+    ASSERT_TRUE(std::is_copy_constructible_v<entt::type_info>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::type_info>);
+    ASSERT_TRUE(std::is_copy_assignable_v<entt::type_info>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::type_info>);
 
     entt::type_info info{std::in_place_type<int>};
     entt::type_info other{std::in_place_type<void>};

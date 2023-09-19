@@ -8,18 +8,18 @@
 #include <entt/entity/registry.hpp>
 
 TEST(BasicHandle, Assumptions) {
-    static_assert(std::is_trivially_copyable_v<entt::handle>);
-    static_assert(std::is_trivially_assignable_v<entt::handle, entt::handle>);
-    static_assert(std::is_trivially_destructible_v<entt::handle>);
+    ASSERT_TRUE(std::is_trivially_copyable_v<entt::handle>);
+    ASSERT_TRUE((std::is_trivially_assignable_v<entt::handle, entt::handle>));
+    ASSERT_TRUE(std::is_trivially_destructible_v<entt::handle>);
 
-    static_assert(std::is_trivially_copyable_v<entt::const_handle>);
-    static_assert(std::is_trivially_assignable_v<entt::const_handle, entt::const_handle>);
-    static_assert(std::is_trivially_destructible_v<entt::const_handle>);
+    ASSERT_TRUE(std::is_trivially_copyable_v<entt::const_handle>);
+    ASSERT_TRUE((std::is_trivially_assignable_v<entt::const_handle, entt::const_handle>));
+    ASSERT_TRUE(std::is_trivially_destructible_v<entt::const_handle>);
 }
 
 TEST(BasicHandle, DeductionGuide) {
-    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<entt::registry &>(), {}}), entt::basic_handle<entt::registry>>);
-    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<const entt::registry &>(), {}}), entt::basic_handle<const entt::registry>>);
+    testing::StaticAssertTypeEq<decltype(entt::basic_handle{std::declval<entt::registry &>(), {}}), entt::basic_handle<entt::registry>>();
+    testing::StaticAssertTypeEq<decltype(entt::basic_handle{std::declval<const entt::registry &>(), {}}), entt::basic_handle<const entt::registry>>();
 }
 
 TEST(BasicHandle, Construction) {
@@ -39,8 +39,8 @@ TEST(BasicHandle, Construction) {
 
     ASSERT_EQ(handle, chandle);
 
-    static_assert(std::is_same_v<entt::registry *, decltype(handle.registry())>);
-    static_assert(std::is_same_v<const entt::registry *, decltype(chandle.registry())>);
+    testing::StaticAssertTypeEq<entt::registry *, decltype(handle.registry())>();
+    testing::StaticAssertTypeEq<const entt::registry *, decltype(chandle.registry())>();
 }
 
 TEST(BasicHandle, Invalidation) {
@@ -250,8 +250,8 @@ TEST(BasicHandle, Storage) {
     entt::handle handle{registry, entity};
     entt::const_handle chandle{std::as_const(registry), entity};
 
-    static_assert(std::is_same_v<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::sparse_set &>>);
-    static_assert(std::is_same_v<decltype(*chandle.storage().begin()), std::pair<entt::id_type, const entt::sparse_set &>>);
+    testing::StaticAssertTypeEq<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::sparse_set &>>();
+    testing::StaticAssertTypeEq<decltype(*chandle.storage().begin()), std::pair<entt::id_type, const entt::sparse_set &>>();
 
     ASSERT_EQ(handle.storage().begin(), handle.storage().end());
     ASSERT_EQ(chandle.storage().begin(), chandle.storage().end());
