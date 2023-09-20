@@ -501,7 +501,7 @@ public:
      * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
-    bool allow_cast() {
+    [[nodiscard]] bool allow_cast() {
         auto other = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
         return allow_cast(meta_type{*ctx, other}) && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
     }
@@ -1858,16 +1858,10 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    if(storage.policy() != any_policy::cref) {
-        // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-        if(value.allow_cast(meta_type{*ctx, value_type_node(internal::meta_context::from(*ctx))})) {
-            if(insert_fn(storage.data(), std::as_const(value).data(), nullptr, it)) {
-                return it;
-            }
-        } else if(value.allow_cast(meta_type{*ctx, const_reference_node(internal::meta_context::from(*ctx))})) {
-            if(insert_fn(storage.data(), nullptr, std::as_const(value).data(), it)) {
-                return it;
-            }
+    // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+    if(const auto vtype = value_type_node(internal::meta_context::from(*ctx)); (storage.policy() != any_policy::cref) && (value.allow_cast({*ctx, vtype}) || value.allow_cast({*ctx, const_reference_node(internal::meta_context::from(*ctx))}))) {
+        if(const bool is_value_type = (value.type().info() == *vtype.info); insert_fn(storage.data(), is_value_type ? std::as_const(value).data() : nullptr, is_value_type ? nullptr : std::as_const(value).data(), it)) {
+            return it;
         }
     }
 
