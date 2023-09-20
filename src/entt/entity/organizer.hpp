@@ -290,9 +290,10 @@ public:
      * @tparam Candidate Function to add to the task list.
      * @tparam Req Additional requirements and/or override resource access mode.
      * @param name Optional name to associate with the task.
+     * @return The index of the created vertex
      */
     template<auto Candidate, typename... Req>
-    void emplace(const char *name = nullptr) {
+    size_t emplace(const char *name = nullptr) {
         using resource_type = decltype(internal::free_function_to_resource_traits<Req...>(Candidate));
         constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
 
@@ -310,8 +311,10 @@ public:
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        size_t index = vertices.size();
+        track_dependencies(index, requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
+        return index;
     }
 
     /**
@@ -322,9 +325,10 @@ public:
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @param name Optional name to associate with the task.
+     * @return The index of the created vertex
      */
     template<auto Candidate, typename... Req, typename Type>
-    void emplace(Type &value_or_instance, const char *name = nullptr) {
+    size_t emplace(Type &value_or_instance, const char *name = nullptr) {
         using resource_type = decltype(internal::constrained_function_to_resource_traits<Req...>(Candidate));
         constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
 
@@ -343,8 +347,10 @@ public:
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        size_t index = vertices.size();
+        track_dependencies(index, requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
+        return index;
     }
 
     /**
@@ -354,11 +360,13 @@ public:
      * @param func Function to add to the task list.
      * @param payload User defined arbitrary data.
      * @param name Optional name to associate with the task.
+     * @return The index of the created vertex
      */
     template<typename... Req>
-    void emplace(function_type *func, const void *payload = nullptr, const char *name = nullptr) {
+    size_t emplace(function_type *func, const void *payload = nullptr, const char *name = nullptr) {
         using resource_type = internal::resource_traits<type_list<>, type_list<Req...>>;
-        track_dependencies(vertices.size(), true, typename resource_type::ro{}, typename resource_type::rw{});
+        size_t index = vertices.size();
+        track_dependencies(index, true, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertex_data vdata{
             resource_type::ro::size,
@@ -371,6 +379,7 @@ public:
             &type_id<void>()};
 
         vertices.push_back(std::move(vdata));
+        return index;
     }
 
     /**
@@ -378,10 +387,25 @@ public:
      * @return The adjacency list of the task graph.
      */
     std::vector<vertex> graph() {
+        return build_list(build_matrix());
+    }
+
+    /**
+     * @brief Builds an adjacency matrix for the current content.
+     * @return The adjacency matrix for the task graph
+     */
+    entt::adjacency_matrix<entt::directed_tag> build_matrix() {
+        return builder.graph();
+    }
+
+    /**
+     * @brief Builds an adjacency list for the given adjacency matrix.
+     * @param matrix The adjacency matrix for the task graph
+     * @return The adjacency list for the task graph
+     */
+    std::vector<vertex> build_list(const entt::adjacency_matrix<entt::directed_tag> &adjacency_matrix) {
         std::vector<vertex> adjacency_list{};
         adjacency_list.reserve(vertices.size());
-        auto adjacency_matrix = builder.graph();
-
         for(auto curr: adjacency_matrix.vertices()) {
             const auto iterable = adjacency_matrix.in_edges(curr);
             std::vector<std::size_t> reachable{};
