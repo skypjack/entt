@@ -15,9 +15,9 @@ TODO (high prio):
 * doc: bump entities
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
-* meta container: add value type to resize
-* further improve meta resolve function by id
+* further improve meta resolve function by id (bimap)
 * fully test sparse set with swap only policy and write more tests for entity storage
+* make ::pack part of the sparse set interface
 * ===> TEST: review view tests after the last changes
 
 WIP:
