@@ -173,9 +173,9 @@ struct basic_meta_sequence_container_traits {
                 value ? *static_cast<const typename Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref)));
 
             return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     /**
