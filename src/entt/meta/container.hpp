@@ -157,19 +157,22 @@ struct basic_meta_sequence_container_traits {
      * @brief Assigns one element to a container and constructs its object from
      * a given opaque instance.
      * @param container Opaque pointer to a container of the given type.
-     * @param elem An opaque instance of the object to construct.
+     * @param value Optional opaque instance of the object to construct (as
+     * value type).
+     * @param cref Optional opaque instance of the object to construct (as
+     * decayed const reference type).
      * @param it The meta iterator to rebind the underlying iterator to.
      * @return True in case of success, false otherwise.
      */
-    [[nodiscard]] static bool insert([[maybe_unused]] void *container, [[maybe_unused]] meta_any &elem, [[maybe_unused]] iterator &it) {
+    [[nodiscard]] static bool insert([[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] iterator &it) {
         if constexpr(internal::dynamic_sequence_container_v<Type>) {
-            // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
-            if(elem.allow_cast<typename Type::const_reference>() || elem.allow_cast<typename Type::value_type>()) {
-                auto *const non_const = any_cast<typename Type::iterator>(&it.base());
-                const auto *element = elem.try_cast<std::remove_reference_t<typename Type::const_reference>>();
-                it.rebind(static_cast<Type *>(container)->insert(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()), element ? *element : elem.cast<typename Type::value_type>()));
-                return true;
-            }
+            auto *const non_const = any_cast<typename Type::iterator>(&it.base());
+
+            it.rebind(static_cast<Type *>(container)->insert(
+                non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
+                value ? *static_cast<const typename Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref)));
+
+            return true;
         }
 
         return false;
@@ -274,7 +277,7 @@ struct basic_meta_associative_container_traits {
      * @brief Inserts an element into a container, if the key does not exist.
      * @param container Opaque pointer to a container of the given type.
      * @param key An opaque key value of an element to insert.
-     * @param value An optional opaque value to insert (key-value containers).
+     * @param value Optional opaque value to insert (key-value containers).
      * @return True if the insertion took place, false otherwise.
      */
     [[nodiscard]] static bool insert(void *container, const void *key, [[maybe_unused]] const void *value) {

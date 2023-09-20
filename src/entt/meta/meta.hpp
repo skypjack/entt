@@ -55,6 +55,7 @@ public:
     template<typename Type>
     void rebind(Type &instance) noexcept {
         value_type_node = &internal::resolve<typename Type::value_type>;
+        const_reference_node = &internal::resolve<std::remove_const_t<std::remove_reference_t<typename Type::const_reference>>>;
         size_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::size;
         clear_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::clear;
         reserve_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::reserve;
@@ -81,13 +82,14 @@ public:
 private:
     const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
+    internal::meta_type_node (*const_reference_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *);
     bool (*clear_fn)(void *);
     bool (*reserve_fn)(void *, const size_type);
     bool (*resize_fn)(void *, const size_type);
     void (*begin_fn)(const void *, const bool, iterator &);
     void (*end_fn)(const void *, const bool, iterator &);
-    bool (*insert_fn)(void *, meta_any &, iterator &);
+    bool (*insert_fn)(void *, const void *, const void *, iterator &);
     bool (*erase_fn)(void *, iterator &);
     any storage{};
 };
@@ -1856,7 +1858,20 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return A possibly invalid iterator to the inserted element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
-    return ((storage.policy() != any_policy::cref) && insert_fn(storage.data(), value, it)) ? it : iterator{*ctx};
+    if(storage.policy() != any_policy::cref) {
+        // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
+        if(value.allow_cast(meta_type{*ctx, value_type_node(internal::meta_context::from(*ctx))})) {
+            if(insert_fn(storage.data(), std::as_const(value).data(), nullptr, it)) {
+                return it;
+            }
+        } else if(value.allow_cast(meta_type{*ctx, const_reference_node(internal::meta_context::from(*ctx))})) {
+            if(insert_fn(storage.data(), nullptr, std::as_const(value).data(), it)) {
+                return it;
+            }
+        }
+    }
+
+    return iterator{*ctx};
 }
 
 /**
