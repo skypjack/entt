@@ -13,12 +13,11 @@ TODO (high prio):
 * resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
 * doc: bump entities
-* view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
-* fully test sparse set with swap only policy and write more tests for entity storage
 * make ::pack part of the sparse set interface
-* ===> TEST: review view tests after the last changes
+* view with entity storage: begin/end should return filtered iterators
+* ===> TEST: review sparse_set (swap-only) and view (scoped begin) tests after the last changes
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
