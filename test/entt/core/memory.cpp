@@ -133,9 +133,8 @@ TEST(UsesAllocatorConstructionArgs, NoUsesAllocatorConstruction) {
     const auto value = 42;
     const auto args = entt::uses_allocator_construction_args<int>(std::allocator<int>{}, value);
 
-    static_assert(std::tuple_size_v<decltype(args)> == 1u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<const int &>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 1u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<const int &>>();
     ASSERT_EQ(std::get<0>(args), value);
 }
 
@@ -143,9 +142,8 @@ TEST(UsesAllocatorConstructionArgs, LeadingAllocatorConvention) {
     const auto value = 42;
     const auto args = entt::uses_allocator_construction_args<std::tuple<int, char>>(std::allocator<int>{}, value, 'c');
 
-    static_assert(std::tuple_size_v<decltype(args)> == 4u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::allocator_arg_t, const std::allocator<int> &, const int &, char &&>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 4u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::allocator_arg_t, const std::allocator<int> &, const int &, char &&>>();
     ASSERT_EQ(std::get<2>(args), value);
 }
 
@@ -153,9 +151,8 @@ TEST(UsesAllocatorConstructionArgs, TrailingAllocatorConvention) {
     const auto size = 42u;
     const auto args = entt::uses_allocator_construction_args<std::vector<int>>(std::allocator<int>{}, size);
 
-    static_assert(std::tuple_size_v<decltype(args)> == 2u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<const unsigned int &, const std::allocator<int> &>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 2u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<const unsigned int &, const std::allocator<int> &>>();
     ASSERT_EQ(std::get<0>(args), size);
 }
 
@@ -164,26 +161,24 @@ TEST(UsesAllocatorConstructionArgs, PairPiecewiseConstruct) {
     const auto tup = std::make_tuple(size);
     const auto args = entt::uses_allocator_construction_args<std::pair<int, std::vector<int>>>(std::allocator<int>{}, std::piecewise_construct, std::make_tuple(3), tup);
 
-    static_assert(std::tuple_size_v<decltype(args)> == 3u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<const unsigned int &, const std::allocator<int> &>>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 3u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<const unsigned int &, const std::allocator<int> &>>>();
     ASSERT_EQ(std::get<0>(std::get<2>(args)), size);
 }
 
 TEST(UsesAllocatorConstructionArgs, PairNoArgs) {
     [[maybe_unused]] const auto args = entt::uses_allocator_construction_args<std::pair<int, std::vector<int>>>(std::allocator<int>{});
 
-    static_assert(std::tuple_size_v<decltype(args)> == 3u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<>, std::tuple<const std::allocator<int> &>>>);
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 3u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<>, std::tuple<const std::allocator<int> &>>>();
 }
 
 TEST(UsesAllocatorConstructionArgs, PairValues) {
     const auto size = 42u;
     const auto args = entt::uses_allocator_construction_args<std::pair<int, std::vector<int>>>(std::allocator<int>{}, 3, size);
 
-    static_assert(std::tuple_size_v<decltype(args)> == 3u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<const unsigned int &, const std::allocator<int> &>>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 3u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<const unsigned int &, const std::allocator<int> &>>>();
     ASSERT_EQ(std::get<0>(std::get<2>(args)), size);
 }
 
@@ -191,9 +186,8 @@ TEST(UsesAllocatorConstructionArgs, PairConstLValueReference) {
     const auto value = std::make_pair(3, 42u);
     const auto args = entt::uses_allocator_construction_args<std::pair<int, std::vector<int>>>(std::allocator<int>{}, value);
 
-    static_assert(std::tuple_size_v<decltype(args)> == 3u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<const int &>, std::tuple<const unsigned int &, const std::allocator<int> &>>>);
-
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 3u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<const int &>, std::tuple<const unsigned int &, const std::allocator<int> &>>>();
     ASSERT_EQ(std::get<0>(std::get<1>(args)), 3);
     ASSERT_EQ(std::get<0>(std::get<2>(args)), 42u);
 }
@@ -201,8 +195,8 @@ TEST(UsesAllocatorConstructionArgs, PairConstLValueReference) {
 TEST(UsesAllocatorConstructionArgs, PairRValueReference) {
     [[maybe_unused]] const auto args = entt::uses_allocator_construction_args<std::pair<int, std::vector<int>>>(std::allocator<int>{}, std::make_pair(3, 42u));
 
-    static_assert(std::tuple_size_v<decltype(args)> == 3u);
-    static_assert(std::is_same_v<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<unsigned int &&, const std::allocator<int> &>>>);
+    ASSERT_EQ(std::tuple_size_v<decltype(args)>, 3u);
+    testing::StaticAssertTypeEq<decltype(args), const std::tuple<std::piecewise_construct_t, std::tuple<int &&>, std::tuple<unsigned int &&, const std::allocator<int> &>>>();
 }
 
 TEST(MakeObjUsingAllocator, Functionalities) {

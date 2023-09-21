@@ -1817,7 +1817,10 @@ However, it's possible to _enforce_ iteration of a view by given component order
 by means of the `use` function:
 
 ```cpp
-for(auto entity : registry.view<position, velocity>().use<position>()) {
+auto view = registry.view<position, velocity>();
+view.use<position>();
+
+for(auto entity: view) {
     // ...
 }
 ```

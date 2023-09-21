@@ -1,0 +1,11 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
+load("//bazel:copts.bzl", "COPTS")
+
+package(default_visibility = ["//:__subpackages__"])
+
+cc_library(
+    name = "entt",
+    includes = ["."],
+    hdrs = glob(["**/*.h", "**/*.hpp"]),
+    copts = COPTS,
+)

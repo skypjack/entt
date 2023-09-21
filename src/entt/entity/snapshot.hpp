@@ -89,7 +89,7 @@ public:
             archive(static_cast<typename traits_type::entity_type>(storage->size()));
 
             if constexpr(std::is_same_v<Type, entity_type>) {
-                archive(static_cast<typename traits_type::entity_type>(storage->in_use()));
+                archive(static_cast<typename traits_type::entity_type>(storage->free_list()));
 
                 for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
                     archive(*first);
@@ -197,17 +197,17 @@ public:
         archive(length);
 
         if constexpr(std::is_same_v<Type, entity_type>) {
-            typename traits_type::entity_type in_use{};
+            typename traits_type::entity_type count{};
 
             storage.reserve(length);
-            archive(in_use);
+            archive(count);
 
             for(entity_type entity = null; length; --length) {
                 archive(entity);
                 storage.emplace(entity);
             }
 
-            storage.in_use(in_use);
+            storage.free_list(count);
         } else {
             auto &other = reg->template storage<entity_type>();
             entity_type entt{null};

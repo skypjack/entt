@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <iterator>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
@@ -246,8 +245,8 @@ TEST(SingleComponentView, Each) {
     ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
     ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
 
-    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
-    static_assert(std::is_same_v<decltype(std::get<1>(*citerable.begin())), const int &>);
+    testing::StaticAssertTypeEq<decltype(std::get<1>(*iterable.begin())), int &>();
+    testing::StaticAssertTypeEq<decltype(std::get<1>(*citerable.begin())), const int &>();
 
     // do not use iterable, make sure an iterable view works when created from a temporary
     for(auto [entt, value]: view.each()) {
@@ -268,32 +267,32 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
 
-    static_assert(std::is_same_v<decltype(view.get<0u>({})), int &>);
-    static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
-    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
+    testing::StaticAssertTypeEq<decltype(view.get<0u>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(view.get<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(view.get({})), std::tuple<int &>>();
 
-    static_assert(std::is_same_v<decltype(cview.get<0u>({})), const int &>);
-    static_assert(std::is_same_v<decltype(cview.get<const int>({})), const int &>);
-    static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<const int &>>);
+    testing::StaticAssertTypeEq<decltype(cview.get<0u>({})), const int &>();
+    testing::StaticAssertTypeEq<decltype(cview.get<const int>({})), const int &>();
+    testing::StaticAssertTypeEq<decltype(cview.get({})), std::tuple<const int &>>();
 
-    static_assert(std::is_same_v<decltype(std::as_const(registry).view<int>()), decltype(cview)>);
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<int>()), decltype(cview)>();
 
     view.each([](auto &&i) {
-        static_assert(std::is_same_v<decltype(i), int &>);
+        testing::StaticAssertTypeEq<decltype(i), int &>();
     });
 
     cview.each([](auto &&i) {
-        static_assert(std::is_same_v<decltype(i), const int &>);
+        testing::StaticAssertTypeEq<decltype(i), const int &>();
     });
 
     for(auto [entt, iv]: view.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
     }
 
     for(auto [entt, iv]: cview.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), const int &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), const int &>();
     }
 }
 
@@ -310,17 +309,17 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
 
-    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<>>);
-    static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<>>);
+    testing::StaticAssertTypeEq<decltype(view.get({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(cview.get({})), std::tuple<>>();
 
-    static_assert(std::is_same_v<decltype(std::as_const(registry).view<empty_type>()), decltype(cview)>);
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<empty_type>()), decltype(cview)>();
 
     for(auto [entt]: view.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 
     for(auto [entt]: cview.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 }
 
@@ -381,7 +380,7 @@ TEST(SingleComponentView, EmptyTypes) {
     });
 
     for(auto [entt]: registry.view<empty_type>().each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         ASSERT_EQ(entity, entt);
     }
 
@@ -395,8 +394,8 @@ TEST(SingleComponentView, EmptyTypes) {
     });
 
     for(auto [entt, iv]: registry.view<int>().each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
         ASSERT_EQ(entity, entt);
     }
 }
@@ -423,13 +422,13 @@ TEST(SingleComponentView, DeductionGuide) {
     entt::storage_type_t<int> istorage;
     entt::storage_type_t<stable_type> sstorage;
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{sstorage})>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{sstorage})>();
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::make_tuple()})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage))})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(sstorage)})>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::make_tuple()})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage))})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(sstorage)})>();
 }
 
 TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
@@ -476,8 +475,8 @@ TEST(SingleComponentView, StableType) {
     });
 
     for(auto [entt, st]: view.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(st), stable_type &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(st), stable_type &>();
         ASSERT_EQ(other, entt);
     }
 
@@ -492,14 +491,14 @@ TEST(SingleComponentView, Storage) {
     auto view = registry.view<int>();
     auto cview = registry.view<const char>();
 
-    static_assert(std::is_same_v<decltype(view.storage()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<const int>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(cview.storage()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(cview.storage<0u>()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(cview.storage<char>()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(cview.storage<const char>()), const entt::storage_type_t<char> *>);
+    testing::StaticAssertTypeEq<decltype(view.storage()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<0u>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<int>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<const int>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(cview.storage()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(cview.storage<0u>()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(cview.storage<char>()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(cview.storage<const char>()), const entt::storage_type_t<char> *>();
 
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
@@ -923,8 +922,8 @@ TEST(MultiComponentView, Each) {
     ASSERT_EQ(std::get<0>(*iterable.begin()), entity[1u]);
     ASSERT_EQ(std::get<0>(*++citerable.begin()), entity[0u]);
 
-    static_assert(std::is_same_v<decltype(std::get<1>(*iterable.begin())), int &>);
-    static_assert(std::is_same_v<decltype(std::get<2>(*citerable.begin())), const char &>);
+    testing::StaticAssertTypeEq<decltype(std::get<1>(*iterable.begin())), int &>();
+    testing::StaticAssertTypeEq<decltype(std::get<2>(*citerable.begin())), const char &>();
 
     // do not use iterable, make sure an iterable view works when created from a temporary
     for(auto [entt, ivalue, cvalue]: registry.view<int, char>().each()) {
@@ -1024,29 +1023,29 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(view.size_hint(), 1u);
 
-    static_assert(std::is_same_v<decltype(view.get<0u>({})), int &>);
-    static_assert(std::is_same_v<decltype(view.get<2u>({})), const char &>);
-    static_assert(std::is_same_v<decltype(view.get<0u, 2u>({})), std::tuple<int &, const char &>>);
+    testing::StaticAssertTypeEq<decltype(view.get<0u>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(view.get<2u>({})), const char &>();
+    testing::StaticAssertTypeEq<decltype(view.get<0u, 2u>({})), std::tuple<int &, const char &>>();
 
-    static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
-    static_assert(std::is_same_v<decltype(view.get<const char>({})), const char &>);
-    static_assert(std::is_same_v<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>);
+    testing::StaticAssertTypeEq<decltype(view.get<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(view.get<const char>({})), const char &>();
+    testing::StaticAssertTypeEq<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>();
 
-    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &, const char &>>);
+    testing::StaticAssertTypeEq<decltype(view.get({})), std::tuple<int &, const char &>>();
 
-    static_assert(std::is_same_v<decltype(std::as_const(registry).view<char, int>()), decltype(std::as_const(registry).view<const char, const int>())>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).view<char, const int>()), decltype(std::as_const(registry).view<const char, const int>())>);
-    static_assert(std::is_same_v<decltype(std::as_const(registry).view<const char, int>()), decltype(std::as_const(registry).view<const char, const int>())>);
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<char, int>()), decltype(std::as_const(registry).view<const char, const int>())>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<char, const int>()), decltype(std::as_const(registry).view<const char, const int>())>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<const char, int>()), decltype(std::as_const(registry).view<const char, const int>())>();
 
     view.each([](auto &&i, auto &&c) {
-        static_assert(std::is_same_v<decltype(i), int &>);
-        static_assert(std::is_same_v<decltype(c), const char &>);
+        testing::StaticAssertTypeEq<decltype(i), int &>();
+        testing::StaticAssertTypeEq<decltype(c), const char &>();
     });
 
     for(auto [entt, iv, cv]: view.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), const char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), const char &>();
     }
 }
 
@@ -1169,9 +1168,9 @@ TEST(MultiComponentView, EmptyTypes) {
     });
 
     for(auto [entt, iv, cv]: v1.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
@@ -1181,9 +1180,9 @@ TEST(MultiComponentView, EmptyTypes) {
     });
 
     for(auto [entt, iv, cv]: v2.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
@@ -1192,9 +1191,9 @@ TEST(MultiComponentView, EmptyTypes) {
     });
 
     for(auto [entt, iv, cv]: v3.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
@@ -1205,9 +1204,9 @@ TEST(MultiComponentView, EmptyTypes) {
 
     v3.use<0u>();
     for(auto [entt, iv, cv]: v3.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
@@ -1219,9 +1218,9 @@ TEST(MultiComponentView, EmptyTypes) {
 
     v2.use<empty_type>();
     for(auto [entt, iv, cv]: v2.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(cv), char &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 }
@@ -1250,9 +1249,11 @@ TEST(MultiComponentView, FrontBack) {
 
 TEST(MultiComponentView, ExtendedGet) {
     using type = decltype(std::declval<entt::registry>().view<int, empty_type, char>().get({}));
-    static_assert(std::tuple_size_v<type> == 2u);
-    static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
-    static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
+
+    ASSERT_EQ(std::tuple_size_v<type>, 2u);
+
+    testing::StaticAssertTypeEq<std::tuple_element_t<0, type>, int &>();
+    testing::StaticAssertTypeEq<std::tuple_element_t<1, type>, char &>();
 }
 
 TEST(MultiComponentView, DeductionGuide) {
@@ -1261,23 +1262,23 @@ TEST(MultiComponentView, DeductionGuide) {
     entt::storage_type_t<double> dstorage;
     entt::storage_type_t<stable_type> sstorage;
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, dstorage})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), dstorage})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, std::as_const(dstorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), std::as_const(dstorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, sstorage})>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, dstorage})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), dstorage})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, std::as_const(dstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), std::as_const(dstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, sstorage})>();
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, dstorage), std::make_tuple()})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), dstorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, std::as_const(dstorage))})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), std::as_const(dstorage))})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, sstorage)})>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, dstorage), std::make_tuple()})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), dstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, std::as_const(dstorage))})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), std::as_const(dstorage))})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<stable_type>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, sstorage)})>();
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(dstorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(dstorage)})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(std::as_const(dstorage))})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(std::as_const(dstorage))})>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<stable_type>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(sstorage)})>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(dstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(dstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(std::as_const(dstorage))})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(std::as_const(dstorage))})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<stable_type>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(sstorage)})>();
 }
 
 TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
@@ -1331,9 +1332,9 @@ TEST(MultiComponentView, StableType) {
     });
 
     for(auto [entt, iv, st]: view.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), int &>);
-        static_assert(std::is_same_v<decltype(st), stable_type &>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(st), stable_type &>();
         ASSERT_EQ(other, entt);
     }
 
@@ -1433,18 +1434,18 @@ TEST(MultiComponentView, Storage) {
     const auto entity = registry.create();
     auto view = registry.view<int, const char>(entt::exclude<double, const float>);
 
-    static_assert(std::is_same_v<decltype(view.storage<0u>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<int>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<const int>()), entt::storage_type_t<int> *>);
-    static_assert(std::is_same_v<decltype(view.storage<1u>()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(view.storage<char>()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(view.storage<const char>()), const entt::storage_type_t<char> *>);
-    static_assert(std::is_same_v<decltype(view.storage<2u>()), entt::storage_type_t<double> *>);
-    static_assert(std::is_same_v<decltype(view.storage<double>()), entt::storage_type_t<double> *>);
-    static_assert(std::is_same_v<decltype(view.storage<const double>()), entt::storage_type_t<double> *>);
-    static_assert(std::is_same_v<decltype(view.storage<3u>()), const entt::storage_type_t<float> *>);
-    static_assert(std::is_same_v<decltype(view.storage<float>()), const entt::storage_type_t<float> *>);
-    static_assert(std::is_same_v<decltype(view.storage<const float>()), const entt::storage_type_t<float> *>);
+    testing::StaticAssertTypeEq<decltype(view.storage<0u>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<int>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<const int>()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<1u>()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<char>()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<const char>()), const entt::storage_type_t<char> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<2u>()), entt::storage_type_t<double> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<double>()), entt::storage_type_t<double> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<const double>()), entt::storage_type_t<double> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<3u>()), const entt::storage_type_t<float> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<float>()), const entt::storage_type_t<float> *>();
+    testing::StaticAssertTypeEq<decltype(view.storage<const float>()), const entt::storage_type_t<float> *>();
 
     ASSERT_TRUE(view);
 
@@ -1643,9 +1644,9 @@ TEST(View, Pipe) {
     auto view3 = registry.view<empty_type>();
     auto view4 = registry.view<stable_type>();
 
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>);
-    static_assert(std::is_same_v<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>);
-    static_assert(std::is_same_v<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>);
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>();
+    testing::StaticAssertTypeEq<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>();
 
     ASSERT_FALSE((view1 | view2).contains(entity));
     ASSERT_TRUE((view1 | view2).contains(other));

@@ -25,11 +25,11 @@ struct shadow {
 };
 
 TEST(BasicSnapshot, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
 
     entt::registry registry;
     entt::basic_snapshot snapshot{registry};
@@ -57,7 +57,7 @@ TEST(BasicSnapshot, GetEntityType) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.in_use());
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.free_list());
 
     entt::entity entity[3u];
 
@@ -73,7 +73,7 @@ TEST(BasicSnapshot, GetEntityType) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.in_use());
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.free_list());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[2u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), storage.data()[0u]);
@@ -219,11 +219,11 @@ TEST(BasicSnapshot, GetTypeSparse) {
 }
 
 TEST(BasicSnapshotLoader, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
 
     entt::registry registry;
     entt::basic_snapshot_loader loader{registry};
@@ -265,7 +265,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     ASSERT_FALSE(registry.valid(entity[2u]));
 
     ASSERT_EQ(storage.size(), 0u);
-    ASSERT_EQ(storage.in_use(), 0u);
+    ASSERT_EQ(storage.free_list(), 0u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
@@ -281,7 +281,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     ASSERT_FALSE(registry.valid(entity[2u]));
 
     ASSERT_EQ(storage.size(), 3u);
-    ASSERT_EQ(storage.in_use(), 2u);
+    ASSERT_EQ(storage.free_list(), 2u);
 
     ASSERT_EQ(storage[0u], entity[0u]);
     ASSERT_EQ(storage[1u], entity[1u]);
@@ -495,11 +495,11 @@ TEST(BasicSnapshotLoader, Orphans) {
 }
 
 TEST(BasicContinuousLoader, Constructors) {
-    static_assert(!std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(!std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(!std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    static_assert(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>);
 
     entt::registry registry;
     entt::basic_continuous_loader loader{registry};
@@ -542,7 +542,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_EQ(loader.map(entity[2u]), static_cast<entt::entity>(entt::null));
 
     ASSERT_EQ(storage.size(), 0u);
-    ASSERT_EQ(storage.in_use(), 0u);
+    ASSERT_EQ(storage.free_list(), 0u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
@@ -565,7 +565,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 2u);
-    ASSERT_EQ(storage.in_use(), 2u);
+    ASSERT_EQ(storage.free_list(), 2u);
 
     ASSERT_EQ(storage[0u], loader.map(entity[0u]));
     ASSERT_EQ(storage[1u], loader.map(entity[1u]));
@@ -594,7 +594,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_TRUE(registry.valid(loader.map(entity[2u])));
 
     ASSERT_EQ(storage.size(), 4u);
-    ASSERT_EQ(storage.in_use(), 4u);
+    ASSERT_EQ(storage.free_list(), 4u);
 
     ASSERT_EQ(storage[0u], loader.map(entity[0u]));
     ASSERT_EQ(storage[1u], loader.map(entity[1u]));
@@ -638,7 +638,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 4u);
-    ASSERT_EQ(storage.in_use(), 2u);
+    ASSERT_EQ(storage.free_list(), 2u);
 
     ASSERT_EQ(storage[1u], loader.map(entity[1u]));
 }

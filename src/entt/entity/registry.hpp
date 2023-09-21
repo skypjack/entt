@@ -462,7 +462,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        return entities.contains(entt) && (entities.index(entt) < entities.in_use());
+        return entities.contains(entt) && (entities.index(entt) < entities.free_list());
     }
 
     /**

@@ -1,0 +1,8 @@
+module(
+    name = "entt",
+    version = "3.12.2",
+    compatibility_level = 3012,
+)
+
+bazel_dep(name = "rules_cc", version = "0.0.8")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")

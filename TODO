@@ -15,9 +15,9 @@ TODO (high prio):
 * doc: bump entities
 * view with entity storage: begin/end should return filtered iterators
 * update view doc: single vs multi type views are no longer a thing actually
-* meta container: add value type to resize
-* deprecate any::owner and meta_any::owner, use ::policy in the tests
-* deprecate meta_associative_container::key_only before dropping it (use mapped_type instead)
+* further improve meta resolve function by id (bimap)
+* fully test sparse set with swap only policy and write more tests for entity storage
+* make ::pack part of the sparse set interface
 * ===> TEST: review view tests after the last changes
 
 WIP:
@@ -27,5 +27,3 @@ WIP:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* review/refine ENTT_ASSERT_CONSTEXPR usage
-* bump: tombstone aware and return version

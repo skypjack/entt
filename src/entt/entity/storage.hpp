@@ -965,35 +965,7 @@ class basic_storage<Entity, Entity, Allocator>
         return local_traits_type::combine(static_cast<typename local_traits_type::entity_type>(pos), {});
     }
 
-private:
-    void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) override {
-        ENTT_ASSERT(((lhs < length) + (rhs < length)) != 1u, "Cross swapping is not supported");
-    }
-
 protected:
-    /**
-     * @brief Erases entities from a storage.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    void pop(underlying_iterator first, underlying_iterator last) override {
-        for(; first != last; ++first) {
-            if(const auto pos = base_type::index(*first); pos < length) {
-                base_type::bump(local_traits_type::next(*first));
-
-                if(pos != --length) {
-                    base_type::swap_at(pos, length);
-                }
-            }
-        }
-    }
-
-    /*! @brief Erases all entities of a sparse set. */
-    void pop_all() override {
-        length = 0u;
-        base_type::pop_all();
-    }
-
     /**
      * @brief Assigns an entity to a storage.
      * @param hint A valid identifier.
@@ -1035,16 +1007,14 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy::swap_and_pop, allocator},
-          length{} {}
+        : base_type{type_id<value_type>(), deletion_policy::swap_only, allocator} {}
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)},
-          length{std::exchange(other.length, size_type{})} {}
+        : base_type{std::move(other)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -1052,8 +1022,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
-        : base_type{std::move(other), allocator},
-          length{std::exchange(other.length, size_type{})} {}
+        : base_type{std::move(other), allocator} {}
 
     /**
      * @brief Move assignment operator.
@@ -1062,7 +1031,6 @@ public:
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
         base_type::operator=(std::move(other));
-        length = std::exchange(other.length, size_type{});
         return *this;
     }
 
@@ -1076,7 +1044,7 @@ public:
      * @param entt A valid identifier.
      */
     void get([[maybe_unused]] const entity_type entt) const noexcept {
-        ENTT_ASSERT(base_type::index(entt) < length, "The requested entity is not a live one");
+        ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
     }
 
     /**
@@ -1090,18 +1058,8 @@ public:
      * @return Returns an empty tuple.
      */
     [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
-        ENTT_ASSERT(base_type::index(entt) < length, "The requested entity is not a live one");
+        ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
         return std::tuple{};
-    }
-
-    /**
-     * @brief Exchanges the contents with those of a given storage.
-     * @param other Storage to exchange the content with.
-     */
-    void swap(basic_storage &other) {
-        using std::swap;
-        base_type::swap(other);
-        swap(length, other.length);
     }
 
     /**
@@ -1109,11 +1067,9 @@ public:
      * @return A valid identifier.
      */
     entity_type emplace() {
-        if(length == base_type::size()) {
-            return *base_type::try_emplace(entity_at(length++), true);
-        }
-
-        return base_type::operator[](length++);
+        const auto len = base_type::free_list();
+        const auto entt = (len == base_type::size()) ? entity_at(len) : base_type::at(len);
+        return *base_type::try_emplace(entt, true);
     }
 
     /**
@@ -1130,21 +1086,18 @@ public:
             return emplace();
         } else if(const auto curr = local_traits_type::construct(local_traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
             const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
+            const auto entt = *base_type::try_emplace(hint, true);
 
             while(!(pos < base_type::size())) {
-                base_type::try_emplace(entity_at(base_type::size()), true);
+                base_type::try_emplace(entity_at(base_type::size() - 1u), false);
             }
 
-            base_type::swap_at(pos, length++);
-        } else if(const auto idx = base_type::index(curr); idx < length) {
+            return entt;
+        } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
         } else {
-            base_type::swap_at(idx, length++);
+            return *base_type::try_emplace(hint, true);
         }
-
-        base_type::bump(hint);
-
-        return hint;
     }
 
     /**
@@ -1155,7 +1108,7 @@ public:
      */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
-        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
         (std::forward<Func>(func)(), ...);
     }
 
@@ -1167,12 +1120,12 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        for(const auto sz = base_type::size(); first != last && length != sz; ++first, ++length) {
-            *first = base_type::operator[](length);
+        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
+            *first = *base_type::try_emplace(base_type::at(base_type::free_list()), true);
         }
 
         for(; first != last; ++first) {
-            *first = *base_type::try_emplace(entity_at(length++), true);
+            *first = *base_type::try_emplace(entity_at(base_type::free_list()), true);
         }
     }
 
@@ -1185,32 +1138,31 @@ public:
      */
     template<typename It>
     size_type pack(It first, It last) {
-        size_type len = length;
+        size_type len = base_type::free_list();
 
         for(; first != last; ++first, --len) {
             const auto pos = base_type::index(*first);
-            ENTT_ASSERT(pos < length, "Invalid element");
-            base_type::swap_at(pos, static_cast<size_type>(len - 1u));
+            ENTT_ASSERT(pos < base_type::free_list(), "Invalid element");
+            base_type::swap_elements(base_type::data()[pos], base_type::data()[static_cast<size_type>(len - 1u)]);
         }
 
-        return (length - len);
+        return (base_type::free_list() - len);
     }
 
     /**
      * @brief Returns the number of elements considered still in use.
      * @return The number of elements considered still in use.
      */
-    [[nodiscard]] size_type in_use() const noexcept {
-        return length;
+    [[deprecated("use free_list() instead")]] [[nodiscard]] size_type in_use() const noexcept {
+        return base_type::free_list();
     }
 
     /**
      * @brief Sets the number of elements considered still in use.
      * @param len The number of elements considered still in use.
      */
-    void in_use(const size_type len) noexcept {
-        ENTT_ASSERT(!(len > base_type::size()), "Invalid length");
-        length = len;
+    [[deprecated("use free_list(len) instead")]] void in_use(const size_type len) noexcept {
+        base_type::free_list(len);
     }
 
     /**
@@ -1221,12 +1173,12 @@ public:
      * @return An iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] iterable each() noexcept {
-        return {internal::extended_storage_iterator{base_type::end() - length}, internal::extended_storage_iterator{base_type::end()}};
+        return {internal::extended_storage_iterator{base_type::end() - base_type::free_list()}, internal::extended_storage_iterator{base_type::end()}};
     }
 
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
-        return {internal::extended_storage_iterator{base_type::cend() - length}, internal::extended_storage_iterator{base_type::cend()}};
+        return {internal::extended_storage_iterator{base_type::cend() - base_type::free_list()}, internal::extended_storage_iterator{base_type::cend()}};
     }
 
     /**
@@ -1237,16 +1189,13 @@ public:
      * @return A reverse iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] reverse_iterable reach() noexcept {
-        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rbegin() + length}};
+        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rbegin() + base_type::free_list()}};
     }
 
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
-        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crbegin() + length}};
+        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crbegin() + base_type::free_list()}};
     }
-
-private:
-    size_type length;
 };
 
 } // namespace entt

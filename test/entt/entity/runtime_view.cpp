@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
@@ -361,7 +360,7 @@ TYPED_TEST(RuntimeView, StableType) {
     });
 
     for(auto entt: view) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         ASSERT_EQ(e0, entt);
     }
 
