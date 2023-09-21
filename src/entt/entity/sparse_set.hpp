@@ -610,7 +610,7 @@ public:
      *
      * @return An iterator to the first entity of the sparse set.
      */
-    [[nodiscard]] const_iterator begin() const noexcept {
+    [[nodiscard]] iterator begin() const noexcept {
         const auto pos = static_cast<typename iterator::difference_type>(packed.size());
         return iterator{packed, pos};
     }
@@ -643,7 +643,7 @@ public:
      * @return An iterator to the first entity of the reversed internal packed
      * array.
      */
-    [[nodiscard]] const_reverse_iterator rbegin() const noexcept {
+    [[nodiscard]] reverse_iterator rbegin() const noexcept {
         return std::make_reverse_iterator(end());
     }
 
@@ -672,7 +672,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    [[nodiscard]] iterator find(const entity_type entt) const noexcept {
+    [[nodiscard]] const_iterator find(const entity_type entt) const noexcept {
         return contains(entt) ? to_iterator(entt) : end();
     }
 
