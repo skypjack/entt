@@ -1271,6 +1271,80 @@ TEST(SparseSet, Iterator) {
     ASSERT_EQ(begin[1u], entt::entity{3});
 }
 
+TEST(SparseSet, ScopedIterator) {
+    using iterator = typename entt::sparse_set::iterator;
+
+    testing::StaticAssertTypeEq<iterator::value_type, entt::entity>();
+    testing::StaticAssertTypeEq<iterator::pointer, const entt::entity *>();
+    testing::StaticAssertTypeEq<iterator::reference, const entt::entity &>();
+
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{7}};
+
+    set.push(std::begin(entity), std::end(entity));
+    set.erase(entity[1u]);
+
+    iterator end{set.begin(0)};
+    iterator begin{};
+
+    ASSERT_EQ(end.data(), set.data());
+    ASSERT_EQ(begin.data(), nullptr);
+
+    begin = set.end(0);
+    std::swap(begin, end);
+
+    ASSERT_EQ(end.data(), set.data());
+    ASSERT_EQ(begin.data(), set.data());
+
+    ASSERT_EQ(begin, set.cbegin(0));
+    ASSERT_EQ(end, set.cend(0));
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
+    ASSERT_EQ(begin++, set.begin(0));
+    ASSERT_EQ(begin--, set.end(0));
+
+    ASSERT_EQ(begin + 1, set.end(0));
+    ASSERT_EQ(end - 1, set.begin(0));
+
+    ASSERT_EQ(++begin, set.end(0));
+    ASSERT_EQ(--begin, set.begin(0));
+
+    ASSERT_EQ(begin += 1, set.end(0));
+    ASSERT_EQ(begin -= 1, set.begin(0));
+
+    ASSERT_EQ(begin + (end - begin), set.end(0));
+    ASSERT_EQ(begin - (begin - end), set.end(0));
+
+    ASSERT_EQ(end - (end - begin), set.begin(0));
+    ASSERT_EQ(end + (begin - end), set.begin(0));
+
+    ASSERT_EQ(begin[0u], *set.begin(0));
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.begin(0));
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.end(0));
+
+    ASSERT_EQ(*begin, entt::entity{3});
+    ASSERT_EQ(*begin.operator->(), entt::entity{3});
+
+    ASSERT_EQ(begin.index(), 0);
+    ASSERT_EQ(end.index(), -1);
+
+    set.push(entt::entity{42});
+    begin = set.begin(0);
+
+    ASSERT_EQ(begin.index(), 1);
+    ASSERT_EQ(end.index(), -1);
+
+    ASSERT_EQ(begin[0u], entt::entity{42});
+    ASSERT_EQ(begin[1u], entt::entity{3});
+}
+
 TEST(SparseSet, ReverseIterator) {
     using reverse_iterator = typename entt::sparse_set::reverse_iterator;
 
@@ -1327,6 +1401,73 @@ TEST(SparseSet, ReverseIterator) {
 
     set.push(entt::entity{42});
     end = set.rend();
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 1);
+
+    ASSERT_EQ(begin[0u], entt::entity{3});
+    ASSERT_EQ(begin[1u], entt::entity{42});
+}
+
+TEST(SparseSet, ScopedReverseIterator) {
+    using reverse_iterator = typename entt::sparse_set::reverse_iterator;
+
+    testing::StaticAssertTypeEq<reverse_iterator::value_type, entt::entity>();
+    testing::StaticAssertTypeEq<reverse_iterator::pointer, const entt::entity *>();
+    testing::StaticAssertTypeEq<reverse_iterator::reference, const entt::entity &>();
+
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{7}};
+
+    set.push(std::begin(entity), std::end(entity));
+    set.erase(entity[1u]);
+
+    reverse_iterator end{set.rbegin(0)};
+    reverse_iterator begin{};
+    begin = set.rend(0);
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.crbegin(0));
+    ASSERT_EQ(end, set.crend(0));
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
+
+    ASSERT_EQ(begin++, set.rbegin(0));
+    ASSERT_EQ(begin--, set.rend(0));
+
+    ASSERT_EQ(begin + 1, set.rend(0));
+    ASSERT_EQ(end - 1, set.rbegin(0));
+
+    ASSERT_EQ(++begin, set.rend(0));
+    ASSERT_EQ(--begin, set.rbegin(0));
+
+    ASSERT_EQ(begin += 1, set.rend(0));
+    ASSERT_EQ(begin -= 1, set.rbegin(0));
+
+    ASSERT_EQ(begin + (end - begin), set.rend(0));
+    ASSERT_EQ(begin - (begin - end), set.rend(0));
+
+    ASSERT_EQ(end - (end - begin), set.rbegin(0));
+    ASSERT_EQ(end + (begin - end), set.rbegin(0));
+
+    ASSERT_EQ(begin[0u], *set.rbegin(0));
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.rbegin(0));
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.rend(0));
+
+    ASSERT_EQ(*begin, entt::entity{3});
+    ASSERT_EQ(*begin.operator->(), entt::entity{3});
+
+    ASSERT_EQ(begin.base().index(), -1);
+    ASSERT_EQ(end.base().index(), 0);
+
+    set.push(entt::entity{42});
+    end = set.rend(0);
 
     ASSERT_EQ(begin.base().index(), -1);
     ASSERT_EQ(end.base().index(), 1);
