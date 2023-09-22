@@ -536,11 +536,8 @@ public:
      */
     [[nodiscard]] iterable each() const noexcept {
         if(view) {
-            const auto len = (view->policy() == deletion_policy::swap_only) ? view->free_list() : view->size();
-            const auto check_set = opaque_check_set();
-            const auto it = view->end();
-
-            return {internal::extended_view_iterator{iterator{it - len, it, check_set, filter}, pools}, internal::extended_view_iterator{iterator{it, it, check_set, filter}, pools}};
+            const auto check = opaque_check_set();
+            return iterable{internal::extended_view_iterator{iterator{view->begin(0), view->end(0), check, filter}, pools}, internal::extended_view_iterator{iterator{view->end(0), view->end(0), check, filter}, pools}};
         }
 
         return iterable{};
