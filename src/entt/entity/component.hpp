@@ -32,7 +32,7 @@ template<>
 struct page_size<void>: std::integral_constant<std::size_t, 0u> {};
 
 template<typename Type>
-struct page_size<Type, std::enable_if_t<std::is_convertible_v<decltype(Type::page_size), std::size_t>>>
+struct page_size<Type, std::void_t<decltype(Type::page_size)>>
     : std::integral_constant<std::size_t, Type::page_size> {};
 
 } // namespace internal
