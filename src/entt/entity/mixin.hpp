@@ -51,13 +51,13 @@ class sigh_mixin final: public Type {
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            for(auto pos = underlying_type::each().begin().base().index(); !(pos < 0); --pos) {
-                if constexpr(underlying_type::traits_type::in_place_delete) {
-                    if(const auto entt = underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)); entt != tombstone) {
+            for(auto it = underlying_type::base_type::begin(0), last = underlying_type::base_type::end(0); it != last; ++it) {
+                if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
+                    destruction.publish(reg, *it);
+                } else {
+                    if(const auto entt = *it; !underlying_type::traits_type::in_place_delete || entt != tombstone) {
                         destruction.publish(reg, entt);
                     }
-                } else {
-                    destruction.publish(reg, underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)));
                 }
             }
         }
