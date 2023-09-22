@@ -668,7 +668,7 @@ public:
 
     /*! @copydoc begin Useful only in case of swap-only policy. */
     [[nodiscard]] iterator begin(int) const noexcept {
-        return begin() + static_cast<typename iterator::difference_type>((size() - static_cast<size_type>(head)) * (mode == deletion_policy::swap_only));
+        return (mode == deletion_policy::swap_only) ? (end() - static_cast<typename iterator::difference_type>(head)) : begin();
     }
 
     /*! @copydoc cbegin Useful only in case of swap-only policy. */
