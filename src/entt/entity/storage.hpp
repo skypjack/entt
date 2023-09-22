@@ -958,11 +958,10 @@ class basic_storage<Entity, Entity, Allocator>
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = typename underlying_type::basic_iterator;
-    using local_traits_type = entt_traits<Entity>;
 
     auto entity_at(const std::size_t pos) const noexcept {
-        ENTT_ASSERT(pos < local_traits_type::to_entity(null), "Invalid element");
-        return local_traits_type::combine(static_cast<typename local_traits_type::entity_type>(pos), {});
+        ENTT_ASSERT(pos < underlying_type::traits_type::to_entity(null), "Invalid element");
+        return underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(pos), {});
     }
 
 protected:
@@ -1084,8 +1083,8 @@ public:
     entity_type emplace(const entity_type hint) {
         if(hint == null || hint == tombstone) {
             return emplace();
-        } else if(const auto curr = local_traits_type::construct(local_traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
-            const auto pos = static_cast<size_type>(local_traits_type::to_entity(hint));
+        } else if(const auto curr = underlying_type::traits_type::construct(underlying_type::traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
+            const auto pos = static_cast<size_type>(underlying_type::traits_type::to_entity(hint));
             const auto entt = *base_type::try_emplace(hint, true);
 
             while(!(pos < base_type::size())) {
