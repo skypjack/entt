@@ -580,7 +580,7 @@ TEST(SingleComponentView, StorageEntity) {
 
     registry.destroy(entity, entt::to_version(entity));
 
-    ASSERT_EQ(view.size(), 2u);
+    ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_NE(view.begin(), view.end());
 
     // returns all matching identifiers, both in-use and available ones
@@ -589,8 +589,8 @@ TEST(SingleComponentView, StorageEntity) {
     ASSERT_EQ(*(++view.begin()), other);
 
     // skips available identifiers automatically, only returns in-use elements
-    for(auto [entt]: view.each()) {
-        ASSERT_EQ(entt, other);
+    for(auto elem: view.each()) {
+        ASSERT_EQ(std::get<0>(elem), other);
     }
 
     // skips available identifiers automatically, only returns in-use elements
