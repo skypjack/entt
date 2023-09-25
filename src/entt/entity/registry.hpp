@@ -830,7 +830,7 @@ public:
      * @return True if the entity is part of all the storage, false otherwise.
      */
     template<typename... Type>
-    [[nodiscard]] bool all_of(const entity_type entt) const {
+    [[nodiscard]] bool all_of([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1u) {
             auto *cpool = assure<std::remove_const_t<Type>...>();
             return cpool && cpool->contains(entt);
@@ -847,7 +847,7 @@ public:
      * otherwise.
      */
     template<typename... Type>
-    [[nodiscard]] bool any_of(const entity_type entt) const {
+    [[nodiscard]] bool any_of([[maybe_unused]] const entity_type entt) const {
         return (all_of<Type>(entt) || ...);
     }
 
