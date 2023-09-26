@@ -474,7 +474,12 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return view && std::apply([entt](const auto *...curr) { return (curr->contains(entt) && ...); }, pools) && internal::none_of(filter, entt);
+        if (view) {
+            const auto idx = view->find(entt).index();
+            return (!(idx < 0 || idx > view->begin(0).index())) && internal::all_of(opaque_check_set(), entt) && internal::none_of(filter, entt);
+        }
+
+        return false;
     }
 
     /**
