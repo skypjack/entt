@@ -432,9 +432,10 @@ public:
      */
     [[nodiscard]] entity_type back() const noexcept {
         if(view) {
-            auto it = view->rbegin();
-            for(const auto last = view->rend(); it != last && !contains(*it); ++it) {}
-            return it == view->rend() ? null : *it;
+            auto it = view->rbegin(0);
+            const auto last = view->rend(0);
+            for(; it != last && !contains(*it); ++it) {}
+            return it == last ? null : *it;
         }
 
         return null;
