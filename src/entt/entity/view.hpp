@@ -404,7 +404,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return view ? iterator{view->begin(), view->end(), opaque_check_set(), filter} : iterator{};
+        return view ? iterator{view->begin(0), view->end(0), opaque_check_set(), filter} : iterator{};
     }
 
     /**
@@ -412,7 +412,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return view ? iterator{view->end(), view->end(), opaque_check_set(), filter} : iterator{};
+        return view ? iterator{view->end(0), view->end(0), opaque_check_set(), filter} : iterator{};
     }
 
     /**
@@ -535,12 +535,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        if(view) {
-            const auto check = opaque_check_set();
-            return iterable{internal::extended_view_iterator{iterator{view->begin(0), view->end(0), check, filter}, pools}, internal::extended_view_iterator{iterator{view->end(0), view->end(0), check, filter}, pools}};
-        }
-
-        return iterable{};
+        return {internal::extended_view_iterator{begin(), pools}, internal::extended_view_iterator{end(), pools}};
     }
 
     /**
