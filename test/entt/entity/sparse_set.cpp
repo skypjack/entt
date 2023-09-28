@@ -8,7 +8,7 @@
 #include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 
-auto policy_testing_values() {
+auto testing_values() {
     return testing::Values(entt::deletion_policy::swap_and_pop, entt::deletion_policy::in_place, entt::deletion_policy::swap_only);
 }
 
@@ -23,12 +23,11 @@ auto policy_to_string(const testing::TestParamInfo<entt::deletion_policy> &info)
     }
 }
 
-class SparseSet: public testing::TestWithParam<entt::deletion_policy> {};
+class Policy: public testing::TestWithParam<entt::deletion_policy> {};
+class PolicyDeathTest: public testing::TestWithParam<entt::deletion_policy> {};
 
-// TODO using SparseSetDeathTest = SparseSet;
-
-INSTANTIATE_TEST_SUITE_P(Policy, SparseSet, policy_testing_values(), policy_to_string);
-// TODO INSTANTIATE_TEST_SUITE_P(Policy, SparseSetDeathTest, policy_testing_values(), policy_to_string);
+INSTANTIATE_TEST_SUITE_P(All, Policy, testing_values(), policy_to_string);
+INSTANTIATE_TEST_SUITE_P(All, PolicyDeathTest, testing_values(), policy_to_string);
 
 struct empty_type {};
 
@@ -36,7 +35,7 @@ struct boxed_int {
     int value;
 };
 
-TEST_P(SparseSet, Constructors) {
+TEST_P(Policy, Constructors) {
     entt::sparse_set set{};
 
     ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
@@ -62,7 +61,7 @@ TEST_P(SparseSet, Constructors) {
     ASSERT_EQ(set.type(), entt::type_id<int>());
 }
 
-TEST_P(SparseSet, Move) {
+TEST_P(Policy, Move) {
     entt::sparse_set set{GetParam()};
 
     set.push(entt::entity{42});
@@ -120,7 +119,7 @@ TEST_P(SparseSet, Move) {
     ASSERT_EQ(other.at(0u), entt::entity{42});
 }
 
-TEST_P(SparseSet, Swap) {
+TEST_P(Policy, Swap) {
     entt::sparse_set set{GetParam()};
     entt::sparse_set other{entt::deletion_policy::in_place};
 
@@ -248,7 +247,7 @@ TEST(SwapOnlyDeathTest, FreeList) {
     ASSERT_DEATH(set.free_list(2u), "");
 }
 
-TEST_P(SparseSet, Capacity) {
+TEST_P(Policy, Capacity) {
     entt::sparse_set set{GetParam()};
 
     set.reserve(42);
@@ -262,7 +261,7 @@ TEST_P(SparseSet, Capacity) {
     ASSERT_TRUE(set.empty());
 }
 
-TEST_P(SparseSet, Pagination) {
+TEST_P(Policy, Pagination) {
     using traits_type = entt::entt_traits<entt::entity>;
     entt::sparse_set set{GetParam()};
 
@@ -445,13 +444,13 @@ TEST(SwapOnly, Data) {
     ASSERT_EQ(set.data()[1u], traits_type::next(entity));
 }
 
-TEST_P(SparseSet, Bind) {
+TEST_P(Policy, Bind) {
     entt::sparse_set set{GetParam()};
 
     ASSERT_NO_FATAL_FAILURE(set.bind(entt::any{}));
 }
 
-TEST_P(SparseSet, Iterator) {
+TEST_P(Policy, Iterator) {
     using iterator = typename entt::sparse_set::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, entt::entity>();
@@ -522,7 +521,7 @@ TEST_P(SparseSet, Iterator) {
     ASSERT_EQ(begin[1u], entt::entity{3});
 }
 
-TEST_P(SparseSet, ReverseIterator) {
+TEST_P(Policy, ReverseIterator) {
     using reverse_iterator = typename entt::sparse_set::reverse_iterator;
 
     testing::StaticAssertTypeEq<reverse_iterator::value_type, entt::entity>();
@@ -586,242 +585,444 @@ TEST_P(SparseSet, ReverseIterator) {
     ASSERT_EQ(begin[1u], entt::entity{42});
 }
 
-/*
-TEST(SparseSet, ScopedIterator) {
-    using iterator = typename entt::sparse_set::iterator;
+TEST(SwapAndPop, ScopedIterator) {
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
 
-    testing::StaticAssertTypeEq<iterator::value_type, entt::entity>();
-    testing::StaticAssertTypeEq<iterator::pointer, const entt::entity *>();
-    testing::StaticAssertTypeEq<iterator::reference, const entt::entity &>();
+    const entt::entity entity{3};
+    const entt::entity other{42};
 
-    entt::sparse_set set{entt::deletion_policy::swap_only};
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{7}};
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
 
-    set.push(std::begin(entity), std::end(entity));
-    set.erase(entity[1u]);
-
-    iterator end{set.begin(0)};
-    iterator begin{};
-
-    ASSERT_EQ(end.data(), set.data());
-    ASSERT_EQ(begin.data(), nullptr);
-
-    begin = set.end(0);
-    std::swap(begin, end);
-
-    ASSERT_EQ(end.data(), set.data());
-    ASSERT_EQ(begin.data(), set.data());
-
-    ASSERT_EQ(begin, set.cbegin(0));
-    ASSERT_EQ(end, set.cend(0));
-    ASSERT_NE(begin, end);
-
-    ASSERT_EQ(begin.index(), 0);
-    ASSERT_EQ(end.index(), -1);
-
-    ASSERT_EQ(begin++, set.begin(0));
-    ASSERT_EQ(begin--, set.end(0));
-
-    ASSERT_EQ(begin + 1, set.end(0));
-    ASSERT_EQ(end - 1, set.begin(0));
-
-    ASSERT_EQ(++begin, set.end(0));
-    ASSERT_EQ(--begin, set.begin(0));
-
-    ASSERT_EQ(begin += 1, set.end(0));
-    ASSERT_EQ(begin -= 1, set.begin(0));
-
-    ASSERT_EQ(begin + (end - begin), set.end(0));
-    ASSERT_EQ(begin - (begin - end), set.end(0));
-
-    ASSERT_EQ(end - (end - begin), set.begin(0));
-    ASSERT_EQ(end + (begin - end), set.begin(0));
-
-    ASSERT_EQ(begin[0u], *set.begin(0));
-
-    ASSERT_LT(begin, end);
-    ASSERT_LE(begin, set.begin(0));
-
-    ASSERT_GT(end, begin);
-    ASSERT_GE(end, set.end(0));
-
-    ASSERT_EQ(*begin, entt::entity{3});
-    ASSERT_EQ(*begin.operator->(), entt::entity{3});
-
-    ASSERT_EQ(begin.index(), 0);
-    ASSERT_EQ(end.index(), -1);
-
-    set.push(entt::entity{42});
-    begin = set.begin(0);
-
-    ASSERT_EQ(begin.index(), 1);
-    ASSERT_EQ(end.index(), -1);
-
-    ASSERT_EQ(begin[0u], entt::entity{42});
-    ASSERT_EQ(begin[1u], entt::entity{3});
+    ASSERT_EQ(set.begin(), set.begin(0));
+    ASSERT_EQ(set.end(), set.end(0));
+    ASSERT_NE(set.cbegin(0), set.cend(0));
 }
 
-TEST(SparseSet, ScopedReverseIterator) {
-    using reverse_iterator = typename entt::sparse_set::reverse_iterator;
-
-    testing::StaticAssertTypeEq<reverse_iterator::value_type, entt::entity>();
-    testing::StaticAssertTypeEq<reverse_iterator::pointer, const entt::entity *>();
-    testing::StaticAssertTypeEq<reverse_iterator::reference, const entt::entity &>();
-
-    entt::sparse_set set{entt::deletion_policy::swap_only};
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{7}};
-
-    set.push(std::begin(entity), std::end(entity));
-    set.erase(entity[1u]);
-
-    reverse_iterator end{set.rbegin(0)};
-    reverse_iterator begin{};
-    begin = set.rend(0);
-    std::swap(begin, end);
-
-    ASSERT_EQ(begin, set.crbegin(0));
-    ASSERT_EQ(end, set.crend(0));
-    ASSERT_NE(begin, end);
-
-    ASSERT_EQ(begin.base().index(), -1);
-    ASSERT_EQ(end.base().index(), 0);
-
-    ASSERT_EQ(begin++, set.rbegin(0));
-    ASSERT_EQ(begin--, set.rend(0));
-
-    ASSERT_EQ(begin + 1, set.rend(0));
-    ASSERT_EQ(end - 1, set.rbegin(0));
-
-    ASSERT_EQ(++begin, set.rend(0));
-    ASSERT_EQ(--begin, set.rbegin(0));
-
-    ASSERT_EQ(begin += 1, set.rend(0));
-    ASSERT_EQ(begin -= 1, set.rbegin(0));
-
-    ASSERT_EQ(begin + (end - begin), set.rend(0));
-    ASSERT_EQ(begin - (begin - end), set.rend(0));
-
-    ASSERT_EQ(end - (end - begin), set.rbegin(0));
-    ASSERT_EQ(end + (begin - end), set.rbegin(0));
-
-    ASSERT_EQ(begin[0u], *set.rbegin(0));
-
-    ASSERT_LT(begin, end);
-    ASSERT_LE(begin, set.rbegin(0));
-
-    ASSERT_GT(end, begin);
-    ASSERT_GE(end, set.rend(0));
-
-    ASSERT_EQ(*begin, entt::entity{3});
-    ASSERT_EQ(*begin.operator->(), entt::entity{3});
-
-    ASSERT_EQ(begin.base().index(), -1);
-    ASSERT_EQ(end.base().index(), 0);
-
-    set.push(entt::entity{42});
-    end = set.rend(0);
-
-    ASSERT_EQ(begin.base().index(), -1);
-    ASSERT_EQ(end.base().index(), 1);
-
-    ASSERT_EQ(begin[0u], entt::entity{3});
-    ASSERT_EQ(begin[1u], entt::entity{42});
-}
-*/
-
-// ------------------------ REWORK IN PROGRESS ------------------------
-
-TEST(SparseSet, Contains) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
+TEST(InPlace, ScopedIterator) {
     entt::sparse_set set{entt::deletion_policy::in_place};
 
-    set.push(entt::entity{0});
-    set.push(entt::entity{3});
-    set.push(entt::entity{42});
-    set.push(entt::entity{99});
-    set.push(traits_type::construct(1, 5));
+    const entt::entity entity{3};
+    const entt::entity other{42};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.begin(), set.begin(0));
+    ASSERT_EQ(set.end(), set.end(0));
+    ASSERT_NE(set.cbegin(0), set.cend(0));
+}
+
+TEST(SwapOnly, ScopedIterator) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    const entt::entity entity{3};
+    const entt::entity other{42};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_NE(set.begin(), set.begin(0));
+    ASSERT_EQ(set.begin() + 1, set.begin(0));
+    ASSERT_EQ(set.end(), set.end(0));
+    ASSERT_NE(set.cbegin(0), set.cend(0));
+
+    set.free_list(0);
+
+    ASSERT_NE(set.begin(), set.begin(0));
+    ASSERT_EQ(set.begin() + 2, set.begin(0));
+    ASSERT_EQ(set.end(), set.end(0));
+    ASSERT_EQ(set.cbegin(0), set.cend(0));
+
+    set.free_list(2);
+
+    ASSERT_EQ(set.begin(), set.begin(0));
+    ASSERT_EQ(set.end(), set.end(0));
+    ASSERT_NE(set.cbegin(0), set.cend(0));
+}
+
+TEST(SwapAndPop, ScopedReverseIterator) {
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
+
+    const entt::entity entity{3};
+    const entt::entity other{42};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.rbegin(), set.rbegin(0));
+    ASSERT_EQ(set.rend(), set.rend(0));
+    ASSERT_NE(set.crbegin(0), set.crend(0));
+}
+
+TEST(InPlace, ScopedReverseIterator) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    const entt::entity entity{3};
+    const entt::entity other{42};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.rbegin(), set.rbegin(0));
+    ASSERT_EQ(set.rend(), set.rend(0));
+    ASSERT_NE(set.crbegin(0), set.crend(0));
+}
+
+TEST(SwapOnly, ScopedReverseIterator) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    const entt::entity entity{3};
+    const entt::entity other{42};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.rbegin(), set.rbegin(0));
+    ASSERT_NE(set.rend(), set.rend(0));
+    ASSERT_EQ(set.rend() - 1, set.rend(0));
+    ASSERT_NE(set.crbegin(0), set.crend(0));
+
+    set.free_list(0);
+
+    ASSERT_EQ(set.rbegin(), set.rbegin(0));
+    ASSERT_NE(set.rend(), set.rend(0));
+    ASSERT_EQ(set.rend() - 2, set.rend(0));
+    ASSERT_EQ(set.crbegin(0), set.crend(0));
+
+    set.free_list(2);
+
+    ASSERT_EQ(set.rbegin(), set.rbegin(0));
+    ASSERT_EQ(set.rend(), set.rend(0));
+    ASSERT_NE(set.crbegin(0), set.crend(0));
+}
+
+TEST_P(Policy, Find) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{GetParam()};
+
+    ASSERT_EQ(set.find(entt::tombstone), set.cend());
+    ASSERT_EQ(set.find(entt::null), set.cend());
+
+    const entt::entity entity{3};
+    const entt::entity other{traits_type::construct(99, 1)};
+
+    ASSERT_EQ(set.find(entity), set.cend());
+    ASSERT_EQ(set.find(other), set.cend());
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_NE(set.find(entity), set.end());
+    ASSERT_EQ(set.find(traits_type::next(entity)), set.end());
+    ASSERT_EQ(*set.find(other), other);
+}
+
+TEST(SwapAndPop, FindErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
+
+    const entt::entity entity{3};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.find(entity), set.cend());
+    ASSERT_EQ(set.find(traits_type::next(entity)), set.cend());
+}
+
+TEST(InPlace, FindErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    const entt::entity entity{3};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.find(entity), set.cend());
+    ASSERT_EQ(set.find(traits_type::next(entity)), set.cend());
+}
+
+TEST(SwapOnly, FindErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    const entt::entity entity{3};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.find(entity), set.cend());
+    ASSERT_NE(set.find(traits_type::next(entity)), set.cend());
+}
+
+TEST_P(Policy, Contains) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{GetParam()};
+
+    const entt::entity entity{3};
+    const entt::entity other{traits_type::construct(99, 1)};
+
+    set.push(entity);
+    set.push(other);
 
     ASSERT_FALSE(set.contains(entt::null));
     ASSERT_FALSE(set.contains(entt::tombstone));
 
-    ASSERT_TRUE(set.contains(entt::entity{0}));
-    ASSERT_TRUE(set.contains(entt::entity{3}));
-    ASSERT_TRUE(set.contains(entt::entity{42}));
-    ASSERT_TRUE(set.contains(entt::entity{99}));
-    ASSERT_FALSE(set.contains(entt::entity{1}));
-    ASSERT_TRUE(set.contains(traits_type::construct(1, 5)));
+    ASSERT_TRUE(set.contains(entity));
+    ASSERT_TRUE(set.contains(other));
 
-    ASSERT_TRUE(set.contains(traits_type::construct(3, 0)));
-    ASSERT_FALSE(set.contains(traits_type::construct(42, 1)));
+    ASSERT_FALSE(set.contains(entt::entity{1}));
+    ASSERT_FALSE(set.contains(traits_type::construct(3, 1)));
     ASSERT_FALSE(set.contains(traits_type::construct(99, traits_type::to_version(entt::tombstone))));
 
-    set.erase(entt::entity{0});
-    set.erase(entt::entity{3});
+    set.erase(entity);
+    set.remove(other);
 
-    set.remove(entt::entity{42});
-    set.remove(entt::entity{99});
-
-    ASSERT_FALSE(set.contains(entt::null));
-    ASSERT_FALSE(set.contains(entt::tombstone));
-
-    ASSERT_FALSE(set.contains(entt::entity{0}));
-    ASSERT_FALSE(set.contains(entt::entity{3}));
-    ASSERT_FALSE(set.contains(entt::entity{42}));
-    ASSERT_FALSE(set.contains(entt::entity{99}));
-    ASSERT_FALSE(set.contains(entt::entity{1}));
-    ASSERT_TRUE(set.contains(traits_type::construct(1, 5)));
-
-    ASSERT_FALSE(set.contains(traits_type::construct(99, traits_type::to_version(entt::tombstone))));
+    ASSERT_FALSE(set.contains(entity));
+    ASSERT_FALSE(set.contains(other));
 }
 
-TEST(SparseSet, Current) {
+TEST(SwapAndPop, ContainsErased) {
     using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
 
+    const entt::entity entity{3};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 0u);
+    ASSERT_FALSE(set.contains(entity));
+    ASSERT_FALSE(set.contains(traits_type::next(entity)));
+}
+
+TEST(InPlace, ContainsErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
     entt::sparse_set set{entt::deletion_policy::in_place};
 
-    ASSERT_EQ(set.current(traits_type::construct(0, 0)), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(traits_type::construct(3, 3)), traits_type::to_version(entt::tombstone));
+    const entt::entity entity{3};
 
-    set.push(traits_type::construct(0, 0));
-    set.push(traits_type::construct(3, 3));
+    set.push(entity);
+    set.erase(entity);
 
-    ASSERT_NE(set.current(traits_type::construct(0, 0)), traits_type::to_version(entt::tombstone));
-    ASSERT_NE(set.current(traits_type::construct(3, 3)), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(traits_type::construct(3, 0)), traits_type::to_version(traits_type::construct(3, 3)));
-    ASSERT_EQ(set.current(traits_type::construct(42, 1)), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(traits_type::construct(traits_type::page_size, 1)), traits_type::to_version(entt::tombstone));
-
-    set.remove(entt::entity{0});
-
-    ASSERT_EQ(set.current(traits_type::construct(0, 0)), traits_type::to_version(entt::tombstone));
-    ASSERT_EQ(set.current(traits_type::construct(3, 0)), traits_type::to_version(traits_type::construct(3, 3)));
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_FALSE(set.contains(entity));
+    ASSERT_FALSE(set.contains(traits_type::next(entity)));
 }
 
-TEST(SparseSet, Index) {
+TEST(SwapOnly, ContainsErased) {
     using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_only};
 
-    entt::sparse_set set{};
+    const entt::entity entity{3};
 
-    set.push(traits_type::construct(0, 0));
-    set.push(traits_type::construct(3, 3));
+    set.push(entity);
+    set.erase(entity);
 
-    ASSERT_EQ(set.index(traits_type::construct(0, 0)), 0u);
-    ASSERT_EQ(set.index(traits_type::construct(3, 3)), 1u);
-
-    set.erase(traits_type::construct(0, 0));
-
-    ASSERT_EQ(set.index(traits_type::construct(3, 3)), 0u);
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_FALSE(set.contains(entity));
+    ASSERT_TRUE(set.contains(traits_type::next(entity)));
 }
 
-ENTT_DEBUG_TEST(SparseSetDeathTest, Index) {
+TEST_P(Policy, Current) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{GetParam()};
+
+    ASSERT_EQ(set.current(entt::tombstone), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.current(entt::null), traits_type::to_version(entt::tombstone));
+
+    const entt::entity entity{traits_type::construct(0, 0)};
+    const entt::entity other{traits_type::construct(3, 3)};
+
+    ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
+    ASSERT_EQ(set.current(other), traits_type::to_version(entt::tombstone));
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_NE(set.current(entity), traits_type::to_version(entt::tombstone));
+    ASSERT_NE(set.current(other), traits_type::to_version(entt::tombstone));
+
+    ASSERT_EQ(set.current(traits_type::next(entity)), traits_type::to_version(entity));
+    ASSERT_EQ(set.current(traits_type::next(other)), traits_type::to_version(other));
+}
+
+TEST(SwapAndPop, CurrentErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
+
+    const entt::entity entity{traits_type::construct(3, 3)};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
+}
+
+TEST(InPlace, CurrentErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    const entt::entity entity{traits_type::construct(3, 3)};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
+}
+
+TEST(SwapOnly, CurrentErased) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    const entt::entity entity{traits_type::construct(3, 3)};
+
+    set.push(entity);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_EQ(set.current(entity), traits_type::to_version(traits_type::next(entity)));
+}
+
+TEST(SwapAndPop, Index) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
+
+    const entt::entity entity{42};
+    const entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_EQ(set.index(entity), 0u);
+    ASSERT_EQ(set.index(other), 1u);
+
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_FALSE(set.contains(traits_type::next(entity)));
+    ASSERT_EQ(set.index(other), 0u);
+}
+
+TEST(InPlace, Index) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    const entt::entity entity{42};
+    const entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_EQ(set.index(entity), 0u);
+    ASSERT_EQ(set.index(other), 1u);
+
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 2u);
+    ASSERT_FALSE(set.contains(traits_type::next(entity)));
+    ASSERT_EQ(set.index(other), 1u);
+}
+
+TEST(SwapOnly, Index) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    const entt::entity entity{42};
+    const entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_EQ(set.index(entity), 0u);
+    ASSERT_EQ(set.index(other), 1u);
+
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 2u);
+    ASSERT_TRUE(set.contains(traits_type::next(entity)));
+    ASSERT_EQ(set.index(traits_type::next(entity)), 1u);
+    ASSERT_EQ(set.index(other), 0u);
+}
+
+ENTT_DEBUG_TEST_P(PolicyDeathTest, Index) {
     using traits_type = entt::entt_traits<entt::entity>;
 
-    entt::sparse_set set{};
+    entt::sparse_set set{GetParam()};
 
     ASSERT_DEATH(static_cast<void>(set.index(traits_type::construct(3, 0))), "");
     ASSERT_DEATH(static_cast<void>(set.index(entt::null)), "");
 }
+
+TEST_P(Policy, Indexing) {
+    entt::sparse_set set{GetParam()};
+
+    ASSERT_EQ(set.size(), 0u);
+
+    ASSERT_EQ(set.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(set.at(99u), static_cast<entt::entity>(entt::null));
+
+    const entt::entity entity{42};
+    const entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+
+    ASSERT_EQ(set.size(), 2u);
+
+    ASSERT_EQ(set.at(0u), entity);
+    ASSERT_EQ(set.at(1u), other);
+
+    ASSERT_EQ(set.at(0u), set[0u]);
+    ASSERT_EQ(set.at(1u), set[1u]);
+
+    ASSERT_EQ(set.at(0u), set.data()[0u]);
+    ASSERT_EQ(set.at(1u), set.data()[1u]);
+
+    ASSERT_EQ(set.at(2u), static_cast<entt::entity>(entt::null));
+}
+
+TEST_P(PolicyDeathTest, Indexing) {
+    entt::sparse_set set{GetParam()};
+
+    ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
+
+    const entt::entity entity{42};
+
+    set.push(entity);
+
+    ASSERT_EQ(set[0u], entity);
+    ASSERT_DEATH([[maybe_unused]] auto value = set[1u], "");
+}
+
+TEST_P(Policy, Value) {
+    entt::sparse_set set{GetParam()};
+
+    const entt::entity entity{3};
+
+    set.push(entity);
+
+    ASSERT_EQ(set.value(entity), nullptr);
+    ASSERT_EQ(std::as_const(set).value(entity), nullptr);
+}
+
+TEST_P(PolicyDeathTest, Value) {
+    entt::sparse_set set{GetParam()};
+
+    ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entt::entity{3}), "");
+}
+
+// ------------------------ REWORK IN PROGRESS ------------------------
 
 TEST(SparseSet, Push) {
     entt::sparse_set set{entt::deletion_policy::in_place};
@@ -1632,7 +1833,7 @@ TEST(SparseSet, Compact) {
     ASSERT_TRUE(set.empty());
 }
 
-TEST(SparseSet, SwapEntity) {
+TEST(SparseSet, SwapElements) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::sparse_set set;
@@ -1654,7 +1855,7 @@ TEST(SparseSet, SwapEntity) {
     ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);
 }
 
-ENTT_DEBUG_TEST(SparseSetDeathTest, SwapEntity) {
+ENTT_DEBUG_TEST(SparseSetDeathTest, SwapElements) {
     entt::sparse_set set;
 
     ASSERT_TRUE(set.empty());
@@ -1697,31 +1898,6 @@ TEST(SparseSet, Clear) {
     ASSERT_EQ(set.find(entt::entity{3}), set.end());
     ASSERT_EQ(set.find(entt::entity{42}), set.end());
     ASSERT_EQ(set.find(entt::entity{9}), set.end());
-}
-
-TEST(SparseSet, Find) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
-    entt::sparse_set set;
-    set.push(entt::entity{3});
-    set.push(entt::entity{42});
-    set.push(traits_type::construct(99, 1));
-
-    ASSERT_NE(set.find(entt::entity{3}), set.end());
-    ASSERT_NE(set.find(entt::entity{42}), set.end());
-    ASSERT_NE(set.find(traits_type::construct(99, 1)), set.end());
-    ASSERT_EQ(set.find(traits_type::construct(99, 5)), set.end());
-    ASSERT_EQ(set.find(entt::entity{0}), set.end());
-    ASSERT_EQ(set.find(entt::tombstone), set.end());
-    ASSERT_EQ(set.find(entt::null), set.end());
-
-    auto it = set.find(traits_type::construct(99, 1));
-
-    ASSERT_EQ(*it, traits_type::construct(99, 1));
-    ASSERT_EQ(*(++it), entt::entity{42});
-    ASSERT_EQ(*(++it), entt::entity{3});
-    ASSERT_EQ(++it, set.end());
-    ASSERT_EQ(++set.find(entt::entity{3}), set.end());
 }
 
 TEST(SparseSet, SortOrdered) {
@@ -2018,7 +2194,7 @@ TEST(SparseSet, CustomAllocator) {
     ASSERT_EQ(set.capacity(), 0u);
 }
 
-TEST_P(SparseSet, ThrowingAllocator) {
+TEST_P(Policy, ThrowingAllocator) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{GetParam()};
