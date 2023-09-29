@@ -8,11 +8,11 @@
 #include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 
-auto testing_values() {
+static auto testing_values() {
     return testing::Values(entt::deletion_policy::swap_and_pop, entt::deletion_policy::in_place, entt::deletion_policy::swap_only);
 }
 
-auto policy_to_string(const testing::TestParamInfo<entt::deletion_policy> &info) {
+static auto policy_to_string(const testing::TestParamInfo<entt::deletion_policy> &info) {
     const char *ret = nullptr;
 
     switch(info.param) {
