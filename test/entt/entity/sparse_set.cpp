@@ -215,7 +215,6 @@ ENTT_DEBUG_TEST(InPlaceDeathTest, FreeList) {
 }
 
 TEST(SwapOnly, FreeList) {
-    using traits_type = entt::entt_traits<entt::entity>;
     entt::sparse_set set{entt::deletion_policy::swap_only};
 
     ASSERT_EQ(set.size(), 0u);
