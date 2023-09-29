@@ -207,7 +207,10 @@ I hope the following lists can grow much more in the future.
     open-source engine for building 2D & 3D real-time rendering and interactive
     contents.
   * [Kengine](https://github.com/phisko/kengine): the _Koala engine_ is a game
-    engine entirely implemented as an entity-component-ystem.
+    engine entirely implemented as an entity-component-system.
+  * [Scion2D](https://github.com/dwjclark11/Scion2D): 2D game engine with
+    [YouTube series](https://www.youtube.com/playlist?list=PL3HUvSWOJR7XRDwVVQqqWO-zyyscb8L-v)
+    included.
 
 ## Articles, videos and blog posts:
 
@@ -234,6 +237,17 @@ I hope the following lists can grow much more in the future.
     - ... And so on.
       [Check out](https://www.youtube.com/channel/UCQ-W1KE9EYfdxhL6S4twUNw) the
       _Game Engine Series_ by The Cherno for more videos.
+  * [Game Engine series](https://www.youtube.com/@JADE-iteGames/videos) by
+    [dwjclark11](https://github.com/dwjclark11) (not just `EnTT` but a lot of
+    it):
+    - [Getting into ECS](https://youtu.be/k9CbonLopJU?si=za3Tisyc96_92DWM)
+    - [Creating ECS Wrapper Classes](https://youtu.be/yetyuMJRdbo?si=PJTkmap4Ysqbzb_M)
+    - [Runtime Reflection using EnTT meta](https://youtu.be/GrXV5A07GTY?si=fKdWTj9AOhnhtiXq)
+    - [Adding entt::meta and Sol2 bindings](https://youtu.be/IM55JgxOqFA?si=rsbb4AG_NVh4IUmD)
+      (with [part two](https://youtu.be/-PTt-b1tzRw?si=zPJ4vEluyheMcNgO) too)
+    - ... And so on.
+      [Check it out](https://www.youtube.com/playlist?list=PL3HUvSWOJR7XRDwVVQqqWO-zyyscb8L-v)
+      for more videos.
   * [Warmonger Dynasty devlog series](https://david-delassus.medium.com/list/warmonger-dynasty-devlogs-f64b71f556de)
     by [linkdd](https://github.com/linkdd): an interesting walkthrough of
     developing a game (also) with EnTT.
