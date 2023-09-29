@@ -174,7 +174,7 @@ TEST(SwapAndPop, FreeList) {
     ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
 }
 
-TEST(SwapAndPopDeathTest, FreeList) {
+ENTT_DEBUG_TEST(SwapAndPopDeathTest, FreeList) {
     entt::sparse_set set{entt::deletion_policy::swap_and_pop};
 
     set.push(entt::entity{3});
@@ -204,7 +204,7 @@ TEST(InPlace, FreeList) {
     ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
 }
 
-TEST(InPlaceDeathTest, FreeList) {
+ENTT_DEBUG_TEST(InPlaceDeathTest, FreeList) {
     entt::sparse_set set{entt::deletion_policy::in_place};
 
     set.push(entt::entity{3});
@@ -244,7 +244,7 @@ TEST(SwapOnly, FreeList) {
     ASSERT_EQ(set.free_list(), 0u);
 }
 
-TEST(SwapOnlyDeathTest, FreeList) {
+ENTT_DEBUG_TEST(SwapOnlyDeathTest, FreeList) {
     entt::sparse_set set{entt::deletion_policy::swap_only};
 
     set.push(entt::entity{3});
@@ -999,7 +999,7 @@ TEST_P(Policy, Indexing) {
     ASSERT_EQ(set.at(2u), static_cast<entt::entity>(entt::null));
 }
 
-TEST_P(PolicyDeathTest, Indexing) {
+ENTT_DEBUG_TEST_P(PolicyDeathTest, Indexing) {
     entt::sparse_set set{GetParam()};
 
     ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
@@ -1023,7 +1023,7 @@ TEST_P(Policy, Value) {
     ASSERT_EQ(std::as_const(set).value(entity), nullptr);
 }
 
-TEST_P(PolicyDeathTest, Value) {
+ENTT_DEBUG_TEST_P(PolicyDeathTest, Value) {
     entt::sparse_set set{GetParam()};
 
     ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entt::entity{3}), "");
