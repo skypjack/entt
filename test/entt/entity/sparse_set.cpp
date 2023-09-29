@@ -13,14 +13,21 @@ auto testing_values() {
 }
 
 auto policy_to_string(const testing::TestParamInfo<entt::deletion_policy> &info) {
+    const char *ret = nullptr;
+
     switch(info.param) {
     case entt::deletion_policy::swap_and_pop:
-        return "SwapAndPop";
+        ret = "SwapAndPop";
+        break;
     case entt::deletion_policy::in_place:
-        return "InPlace";
+        ret = "InPlace";
+        break;
     case entt::deletion_policy::swap_only:
-        return "SwapOnly";
+        ret = "SwapOnly";
+        break;
     }
+
+    return ret;
 }
 
 class Policy: public testing::TestWithParam<entt::deletion_policy> {};
