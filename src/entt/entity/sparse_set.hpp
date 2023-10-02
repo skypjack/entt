@@ -1005,8 +1005,8 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Partial sorting with tombstones is not supported");
 
         algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
@@ -1040,7 +1040,6 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        compact();
         sort_n(packed.size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
@@ -1055,7 +1054,7 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void sort_as(const basic_sparse_set &other) {
-        compact();
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Sorting with tombstones not allowed");
 
         const auto to = other.end();
         auto from = other.begin();
