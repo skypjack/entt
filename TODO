@@ -16,7 +16,7 @@ TODO (high prio):
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
 * make ::pack part of the sparse set interface
-* ===> TEST: review sparse_set (swap-only) and view (scoped begin) tests after the last changes
+* ===> TEST: view (scoped begin) tests after the last changes
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
