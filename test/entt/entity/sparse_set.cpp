@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
