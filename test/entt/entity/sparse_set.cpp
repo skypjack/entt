@@ -36,12 +36,6 @@ class PolicyDeathTest: public testing::TestWithParam<entt::deletion_policy> {};
 INSTANTIATE_TEST_SUITE_P(All, Policy, testing_values(), policy_to_string);
 INSTANTIATE_TEST_SUITE_P(All, PolicyDeathTest, testing_values(), policy_to_string);
 
-struct empty_type {};
-
-struct boxed_int {
-    int value;
-};
-
 TEST_P(Policy, Constructors) {
     entt::sparse_set set{};
 
@@ -1327,8 +1321,8 @@ TEST(SwapOnly, Erase) {
 
 ENTT_DEBUG_TEST_P(PolicyDeathTest, Erase) {
     using traits_type = entt::entt_traits<entt::entity>;
-
     entt::sparse_set set{GetParam()};
+
     entt::entity entity[2u]{entt::entity{42}, traits_type::construct(9, 3)};
 
     ASSERT_DEATH(set.erase(std::begin(entity), std::end(entity)), "");
@@ -1610,77 +1604,64 @@ TEST(SwapOnly, Compact) {
     ASSERT_EQ(set.index(traits_type::next(entity)), 1u);
 }
 
-// ------------------------ REWORK IN PROGRESS ------------------------
-
-TEST(SparseSet, SwapElements) {
+TEST_P(Policy, SwapElements) {
     using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{GetParam()};
 
-    entt::sparse_set set;
+    const auto entity = traits_type::construct(3, 5);
+    const auto other = traits_type::construct(42, 99);
 
-    set.push(traits_type::construct(3, 5));
-    set.push(traits_type::construct(42, 99));
+    set.push(entity);
+    set.push(other);
 
-    ASSERT_EQ(set.index(traits_type::construct(3, 5)), 0u);
-    ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);
+    ASSERT_EQ(set.index(entity), 0u);
+    ASSERT_EQ(set.index(other), 1u);
 
-    set.swap_elements(traits_type::construct(3, 5), traits_type::construct(42, 99));
+    set.swap_elements(entity, other);
 
-    ASSERT_EQ(set.index(traits_type::construct(3, 5)), 1u);
-    ASSERT_EQ(set.index(traits_type::construct(42, 99)), 0u);
-
-    set.swap_elements(traits_type::construct(3, 5), traits_type::construct(42, 99));
-
-    ASSERT_EQ(set.index(traits_type::construct(3, 5)), 0u);
-    ASSERT_EQ(set.index(traits_type::construct(42, 99)), 1u);
+    ASSERT_EQ(set.index(entity), 1u);
+    ASSERT_EQ(set.index(other), 0u);
 }
 
-ENTT_DEBUG_TEST(SparseSetDeathTest, SwapElements) {
-    entt::sparse_set set;
+ENTT_DEBUG_TEST_P(PolicyDeathTest, SwapElements) {
+    entt::sparse_set set{GetParam()};
 
     ASSERT_TRUE(set.empty());
     ASSERT_DEATH(set.swap_elements(entt::entity{0}, entt::entity{1}), "");
 }
 
-TEST(SparseSet, Clear) {
-    entt::sparse_set set{entt::deletion_policy::in_place};
+ENTT_DEBUG_TEST(SwapOnlyDeathTest, SwapElements) {
+    using traits_type = entt::entt_traits<entt::entity>;
+    entt::sparse_set set{entt::deletion_policy::swap_only};
 
-    set.push(entt::entity{3});
-    set.push(entt::entity{42});
-    set.push(entt::entity{9});
-    set.erase(entt::entity{42});
+    const auto entity = traits_type::construct(3, 5);
+    const auto other = traits_type::construct(42, 99);
 
-    ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 3u);
-    ASSERT_EQ(*set.begin(), entt::entity{9});
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
 
-    set.clear();
+    ASSERT_EQ(set.index(traits_type::next(entity)), 1u);
+    ASSERT_EQ(set.index(other), 0u);
 
-    ASSERT_TRUE(set.empty());
-    ASSERT_EQ(set.size(), 0u);
-
-    ASSERT_EQ(set.find(entt::entity{3}), set.end());
-    ASSERT_EQ(set.find(entt::entity{9}), set.end());
-
-    set.push(entt::entity{3});
-    set.push(entt::entity{42});
-    set.push(entt::entity{9});
-
-    ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.size(), 3u);
-    ASSERT_EQ(*set.begin(), entt::entity{9});
-
-    set.clear();
-
-    ASSERT_TRUE(set.empty());
-    ASSERT_EQ(set.size(), 0u);
-
-    ASSERT_EQ(set.find(entt::entity{3}), set.end());
-    ASSERT_EQ(set.find(entt::entity{42}), set.end());
-    ASSERT_EQ(set.find(entt::entity{9}), set.end());
+    ASSERT_DEATH(set.swap_elements(entity, other), "");
 }
 
-TEST(SparseSet, SortOrdered) {
-    entt::sparse_set set;
+TEST_P(Policy, Clear) {
+    entt::sparse_set set{GetParam()};
+
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
+
+    set.push(std::begin(entity), std::end(entity));
+    set.erase(entity[1u]);
+    set.clear();
+
+    ASSERT_EQ(set.size(), 0u);
+}
+
+TEST_P(Policy, SortOrdered) {
+    entt::sparse_set set{GetParam()};
+
     entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
 
     set.push(std::begin(entity), std::end(entity));
@@ -1689,8 +1670,9 @@ TEST(SparseSet, SortOrdered) {
     ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), set.begin(), set.end()));
 }
 
-TEST(SparseSet, SortReverse) {
-    entt::sparse_set set;
+TEST_P(Policy, SortReverse) {
+    entt::sparse_set set{GetParam()};
+
     entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
 
     set.push(std::begin(entity), std::end(entity));
@@ -1699,43 +1681,57 @@ TEST(SparseSet, SortReverse) {
     ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), set.begin(), set.end()));
 }
 
-TEST(SparseSet, SortUnordered) {
-    entt::sparse_set set;
+TEST_P(Policy, SortUnordered) {
+    entt::sparse_set set{GetParam()};
+
     entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
 
     set.push(std::begin(entity), std::end(entity));
     set.sort(std::less{});
 
     auto begin = set.begin();
-    auto end = set.end();
+    const auto end = set.end();
 
     ASSERT_EQ(*(begin++), entity[2u]);
     ASSERT_EQ(*(begin++), entity[1u]);
     ASSERT_EQ(*(begin++), entity[0u]);
     ASSERT_EQ(*(begin++), entity[3u]);
     ASSERT_EQ(*(begin++), entity[4u]);
+
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSet, SortRange) {
+ENTT_DEBUG_TEST(InPlaceDeathTest, Sort) {
     entt::sparse_set set{entt::deletion_policy::in_place};
+
+    entt::entity entity{42};
+    entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_DEATH(set.sort(std::less{});, "");
+}
+
+ENTT_DEBUG_TEST(SwapOnlyDeathTest, Sort) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    entt::entity entity{42};
+    entt::entity other{3};
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_DEATH(set.sort(std::less{});, "");
+}
+
+TEST_P(Policy, SortN) {
+    entt::sparse_set set{GetParam()};
+
     entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
 
-    set.push(std::begin(entity), std::end(entity));
-    set.erase(entity[0u]);
-
-    ASSERT_EQ(set.size(), 5u);
-
-    set.sort(std::less{});
-
-    ASSERT_EQ(set.size(), 4u);
-    ASSERT_EQ(set[0u], entity[4u]);
-    ASSERT_EQ(set[1u], entity[3u]);
-    ASSERT_EQ(set[2u], entity[1u]);
-    ASSERT_EQ(set[3u], entity[2u]);
-
-    set.clear();
-    set.compact();
     set.push(std::begin(entity), std::end(entity));
     set.sort_n(0u, std::less{});
 
@@ -1745,7 +1741,6 @@ TEST(SparseSet, SortRange) {
 
     ASSERT_EQ(set.data()[0u], entity[1u]);
     ASSERT_EQ(set.data()[1u], entity[0u]);
-    ASSERT_EQ(set.data()[2u], entity[2u]);
 
     set.sort_n(5u, std::less{});
 
@@ -1757,25 +1752,66 @@ TEST(SparseSet, SortRange) {
     ASSERT_EQ(*(begin++), entity[1u]);
     ASSERT_EQ(*(begin++), entity[3u]);
     ASSERT_EQ(*(begin++), entity[4u]);
+
     ASSERT_EQ(begin, end);
 }
 
-ENTT_DEBUG_TEST(SparseSetDeathTest, SortRange) {
-    entt::sparse_set set{entt::deletion_policy::in_place};
+ENTT_DEBUG_TEST(SwapAndPopDeathTest, SortN) {
+    entt::sparse_set set{entt::deletion_policy::swap_and_pop};
+
     entt::entity entity{42};
+    entt::entity other{3};
+
+    ASSERT_DEATH(set.sort_n(1u, std::less{});, "");
 
     set.push(entity);
+    set.push(other);
     set.erase(entity);
 
-    ASSERT_DEATH(set.sort_n(0u, std::less{});, "");
-    ASSERT_DEATH(set.sort_n(3u, std::less{});, "");
+    ASSERT_EQ(set.size(), 1u);
+    ASSERT_NO_FATAL_FAILURE(set.sort_n(1u, std::less{}));
 }
 
-TEST(SparseSet, RespectDisjoint) {
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+ENTT_DEBUG_TEST(InPlaceDeathTest, SortN) {
+    entt::sparse_set set{entt::deletion_policy::in_place};
+
+    entt::entity entity{42};
+    entt::entity other{3};
+
+    ASSERT_DEATH(set.sort_n(1u, std::less{});, "");
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 2u);
+    ASSERT_DEATH(set.sort_n(1u, std::less{});, "");
+    ASSERT_DEATH(set.sort_n(2u, std::less{});, "");
+}
+
+ENTT_DEBUG_TEST(SwapOnlyDeathTest, SortN) {
+    entt::sparse_set set{entt::deletion_policy::swap_only};
+
+    entt::entity entity{42};
+    entt::entity other{3};
+
+    ASSERT_DEATH(set.sort_n(1u, std::less{});, "");
+
+    set.push(entity);
+    set.push(other);
+    set.erase(entity);
+
+    ASSERT_EQ(set.size(), 2u);
+    ASSERT_NO_FATAL_FAILURE(set.sort_n(1u, std::less{}));
+    ASSERT_DEATH(set.sort_n(2u, std::less{});, "");
+}
+
+TEST_P(Policy, SortAsDisjoint) {
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1785,14 +1821,14 @@ TEST(SparseSet, RespectDisjoint) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
 }
 
-TEST(SparseSet, RespectOverlap) {
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+TEST_P(Policy, SortAsOverlap) {
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-
     entt::entity rhs_entity[1u]{entt::entity{12}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1809,14 +1845,14 @@ TEST(SparseSet, RespectOverlap) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSet, RespectOrdered) {
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+TEST_P(Policy, SortAsOrdered) {
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-
     entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1827,14 +1863,14 @@ TEST(SparseSet, RespectOrdered) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 }
 
-TEST(SparseSet, RespectReverse) {
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+TEST_P(Policy, SortAsReverse) {
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-
     entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1854,14 +1890,14 @@ TEST(SparseSet, RespectReverse) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSet, RespectUnordered) {
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+TEST_P(Policy, SortAsUnordered) {
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-
     entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1881,16 +1917,15 @@ TEST(SparseSet, RespectUnordered) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSet, RespectInvalid) {
+TEST_P(Policy, SortAsInvalid) {
     using traits_type = entt::entt_traits<entt::entity>;
-
-    entt::sparse_set lhs;
-    entt::sparse_set rhs;
+    entt::sparse_set lhs{GetParam()};
+    entt::sparse_set rhs{GetParam()};
 
     entt::entity lhs_entity[3u]{entt::entity{1}, entt::entity{2}, traits_type::construct(3, 1)};
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-
     entt::entity rhs_entity[3u]{entt::entity{2}, entt::entity{1}, traits_type::construct(3, 2)};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
@@ -1910,8 +1945,33 @@ TEST(SparseSet, RespectInvalid) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSet, CanModifyDuringIteration) {
-    entt::sparse_set set;
+ENTT_DEBUG_TEST(InPlaceDeathTest, SortAs) {
+    entt::sparse_set lhs{entt::deletion_policy::in_place};
+    entt::sparse_set rhs{entt::deletion_policy::in_place};
+
+    entt::entity entity{42};
+
+    lhs.push(entity);
+    lhs.erase(entity);
+
+    ASSERT_DEATH(lhs.sort_as(rhs);, "");
+}
+
+ENTT_DEBUG_TEST(SwapOnlyDeathTest, SortAs) {
+    entt::sparse_set lhs{entt::deletion_policy::swap_only};
+    entt::sparse_set rhs{entt::deletion_policy::swap_only};
+
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+
+    lhs.push(std::begin(entity), std::end(entity));
+    rhs.push(std::rbegin(entity), std::rend(entity));
+    lhs.erase(entity[1u]);
+
+    ASSERT_DEATH(lhs.sort_as(rhs);, "");
+}
+
+TEST_P(Policy, CanModifyDuringIteration) {
+    entt::sparse_set set{GetParam()};
     set.push(entt::entity{0});
 
     ASSERT_EQ(set.capacity(), 1u);
@@ -1925,9 +1985,9 @@ TEST(SparseSet, CanModifyDuringIteration) {
     [[maybe_unused]] const auto entity = *it;
 }
 
-TEST(SparseSet, CustomAllocator) {
+TEST_P(Policy, CustomAllocator) {
     test::throwing_allocator<entt::entity> allocator{};
-    entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{allocator};
+    entt::basic_sparse_set<entt::entity, test::throwing_allocator<entt::entity>> set{GetParam(), allocator};
 
     ASSERT_EQ(set.get_allocator(), allocator);
 
