@@ -841,7 +841,12 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return allocator_type{base_type::get_allocator()};
+        // std::allocator<void> has no cross constructors (waiting for C++20)
+        if constexpr(std::is_same_v<value_type, void> && !std::is_constructible_v<allocator_type, typename base_type::allocator_type>) {
+            return allocator_type{};
+        } else {
+            return allocator_type{base_type::get_allocator()};
+        }
     }
 
     /**
