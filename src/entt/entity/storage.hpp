@@ -165,7 +165,7 @@ public:
     constexpr extended_storage_iterator()
         : it{} {}
 
-    constexpr extended_storage_iterator(It base, Other... other)
+    constexpr extended_storage_iterator(iterator_type base, Other... other)
         : it{base, other...} {}
 
     template<typename... Args, typename = std::enable_if_t<(!std::is_same_v<Other, Args> && ...) && (std::is_constructible_v<Other, Args> && ...)>>
