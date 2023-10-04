@@ -49,7 +49,7 @@ public:
         : it{},
           pools{} {}
 
-    extended_group_iterator(It from, const std::tuple<Owned *..., Get *...> &cpools)
+    extended_group_iterator(iterator_type from, const std::tuple<Owned *..., Get *...> &cpools)
         : it{from},
           pools{cpools} {}
 
