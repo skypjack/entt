@@ -137,7 +137,7 @@ struct extended_view_iterator final {
         : it{},
           pools{} {}
 
-    extended_view_iterator(It from, std::tuple<Type *...> value)
+    extended_view_iterator(iterator_type from, std::tuple<Type *...> value)
         : it{from},
           pools{value} {}
 
