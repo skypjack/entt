@@ -842,7 +842,7 @@ public:
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         // std::allocator<void> has no cross constructors (waiting for C++20)
-        if constexpr(std::is_same_v<value_type, void> && !std::is_constructible_v<allocator_type, typename base_type::allocator_type>) {
+        if constexpr(std::is_void_v<value_type> && !std::is_constructible_v<allocator_type, typename base_type::allocator_type>) {
             return allocator_type{};
         } else {
             return allocator_type{base_type::get_allocator()};
