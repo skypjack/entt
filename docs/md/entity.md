@@ -1549,7 +1549,7 @@ own API for them. However, there is still no limit to the possibilities of use:
 auto &&other = registry.storage<velocity>("other"_hs);
 
 registry.emplace<velocity>(entity);
-storage.push(entity);
+other.push(entity);
 ```
 
 Anything that can be done via the registry interface can also be done directly
