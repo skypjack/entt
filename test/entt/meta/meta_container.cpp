@@ -15,6 +15,10 @@
 
 struct invalid {};
 
+struct non_default_constructible {
+    non_default_constructible() = delete;
+};
+
 TEST(MetaContainer, Invalid) {
     ASSERT_FALSE(entt::meta_any{42}.as_sequence_container());
     ASSERT_FALSE(entt::meta_any{42}.as_associative_container());
@@ -317,6 +321,14 @@ TEST(SequenceContainer, StdDeque) {
     ASSERT_TRUE(view.clear());
     ASSERT_FALSE(view.reserve(42u));
     ASSERT_EQ(view.size(), 0u);
+}
+
+TEST(SequenceContainer, NonDefaultConstructible) {
+    std::vector<non_default_constructible> vec{};
+    auto any = entt::forward_as_meta(vec);
+    auto view = any.as_sequence_container();
+
+    ASSERT_FALSE(view.resize(5u));
 }
 
 TEST(SequenceContainer, Constness) {
