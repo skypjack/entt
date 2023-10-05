@@ -298,7 +298,7 @@ TYPED_TEST(Poly, Reference) {
     ASSERT_EQ(poly->mul(3), 3);
 }
 
-ENTT_DEBUG_TYPED_TEST(Poly, ConstReference) {
+TYPED_TEST(Poly, ConstReference) {
     using poly_type = typename TestFixture::template type<>;
 
     impl instance{};
@@ -319,7 +319,7 @@ ENTT_DEBUG_TYPED_TEST(Poly, ConstReference) {
     ASSERT_EQ(poly->mul(3), 0);
 }
 
-TYPED_TEST(PolyDeathTest, ConstReference) {
+ENTT_DEBUG_TYPED_TEST(PolyDeathTest, ConstReference) {
     using poly_type = typename TestFixture::template type<>;
 
     impl instance{};
