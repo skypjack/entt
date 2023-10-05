@@ -508,7 +508,7 @@ ENTT_DEBUG_TEST(BasicStorageDeathTest, Getters) {
     ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{41}), "");
 }
 
-// <<<<<<<<<<<< REWORK IN PROGRESS [basic] <<<<<<<<<<<<
+// <<<<<<<<<<<< REWORK IN PROGRESS [basic/TODO] <<<<<<<<<<<<
 
 TEST(EmptyType, Constructors) {
     entt::storage<empty_type> pool;
@@ -849,7 +849,7 @@ TEST(EmptyType, IterableIteratorConversion) {
     ASSERT_NE(++cit, it);
 }
 
-// <<<<<<<<<<<< REWORK IN PROGRESS [empty] <<<<<<<<<<<<
+// <<<<<<<<<<<< REWORK IN PROGRESS [empty/DONE] <<<<<<<<<<<<
 
 TEST(Void, Constructors) {
     entt::storage<void> pool;
@@ -865,7 +865,7 @@ TEST(Void, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<void>());
 }
 
-// <<<<<<<<<<<< REWORK IN PROGRESS [void] <<<<<<<<<<<<
+// <<<<<<<<<<<< REWORK IN PROGRESS [void/TODO] <<<<<<<<<<<<
 
 TEST(PointerStability, Constructors) {
     entt::storage<pointer_stability> pool;
@@ -881,7 +881,7 @@ TEST(PointerStability, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<pointer_stability>());
 }
 
-// <<<<<<<<<<<< REWORK IN PROGRESS [stable] <<<<<<<<<<<<
+// <<<<<<<<<<<< REWORK IN PROGRESS [stable/TODO] <<<<<<<<<<<<
 
 TEST(Entity, Constructors) {
     entt::storage<entt::entity> pool;
@@ -897,14 +897,12 @@ TEST(Entity, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<entt::entity>());
 }
 
-// <<<<<<<<<<<< REWORK IN PROGRESS [entity] <<<<<<<<<<<<
+// <<<<<<<<<<<< REWORK IN PROGRESS [entity/TODO] <<<<<<<<<<<<
+
+// <<<<<<<<<<<< REWORK IN PROGRESS [non-copyable/non-movable/whatever/TODO] <<<<<<<<<<<<
 
 struct pinned_type {
     const int value{42};
-};
-
-struct empty_stable_type {
-    static constexpr auto in_place_delete = true;
 };
 
 struct boxed_int {
