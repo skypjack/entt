@@ -697,7 +697,7 @@ struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Typ
 
 /*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_pointer_t<Type>>, void>>>
+struct is_iterator<Type, std::enable_if_t<!std::is_void_v<std::remove_cv_t<std::remove_pointer_t<Type>>>>>
     : internal::has_iterator_category<Type> {};
 
 /**
