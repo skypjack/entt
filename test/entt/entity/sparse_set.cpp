@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -9,6 +10,26 @@
 #include <entt/entity/sparse_set.hpp>
 #include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
+
+enum entity32_t : std::uint32_t {};
+enum entity64_t : std::uint64_t {};
+
+enum entity32_18_14_t : std::uint32_t {};
+
+struct entity32_18_14_traits {
+    using value_type = entity32_18_14_t;
+
+    using entity_type = std::uint32_t;
+    using version_type = std::uint16_t;
+
+    static constexpr entity_type entity_mask = 0x3FFFF; // 18b
+    static constexpr entity_type version_mask = 0x3FFF; // 14b
+};
+
+template<>
+struct entt::entt_traits<entity32_18_14_t>: entt::basic_entt_traits<entity32_18_14_traits> {
+    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
+};
 
 template<typename Type>
 struct SparseSet: testing::Test {
@@ -24,7 +45,7 @@ struct SparseSet: testing::Test {
 template<typename Type>
 using SparseSetDeathTest = SparseSet<Type>;
 
-using SparseSetTypes = ::testing::Types<entt::entity>;
+using SparseSetTypes = ::testing::Types<entt::entity, entity32_t, entity64_t, entity32_18_14_t>;
 
 TYPED_TEST_SUITE(SparseSet, SparseSetTypes, );
 TYPED_TEST_SUITE(SparseSetDeathTest, SparseSetTypes, );
