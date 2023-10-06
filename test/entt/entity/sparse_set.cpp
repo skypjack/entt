@@ -11,13 +11,10 @@
 #include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 
-enum entity32_t : std::uint32_t {};
-enum entity64_t : std::uint64_t {};
+enum custom_entity : std::uint32_t {};
 
-enum entity32_18_14_t : std::uint32_t {};
-
-struct entity32_18_14_traits {
-    using value_type = entity32_18_14_t;
+struct custom_entity_traits {
+    using value_type = custom_entity;
 
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
@@ -27,7 +24,7 @@ struct entity32_18_14_traits {
 };
 
 template<>
-struct entt::entt_traits<entity32_18_14_t>: entt::basic_entt_traits<entity32_18_14_traits> {
+struct entt::entt_traits<custom_entity>: entt::basic_entt_traits<custom_entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
@@ -45,7 +42,7 @@ struct SparseSet: testing::Test {
 template<typename Type>
 using SparseSetDeathTest = SparseSet<Type>;
 
-using SparseSetTypes = ::testing::Types<entity32_t, entity64_t, entity32_18_14_t>;
+using SparseSetTypes = ::testing::Types<entt::entity, custom_entity>;
 
 TYPED_TEST_SUITE(SparseSet, SparseSetTypes, );
 TYPED_TEST_SUITE(SparseSetDeathTest, SparseSetTypes, );
