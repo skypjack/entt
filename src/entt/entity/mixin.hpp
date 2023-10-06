@@ -55,8 +55,12 @@ class sigh_mixin final: public Type {
                 if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
                     destruction.publish(reg, *it);
                 } else {
-                    if(const auto entt = *it; !underlying_type::traits_type::in_place_delete || entt != tombstone) {
-                        destruction.publish(reg, entt);
+                    if(underlying_type::traits_type::in_place_delete) {
+                        if(const auto entt = *it; entt != tombstone) {
+                            destruction.publish(reg, entt);
+                        }
+                    } else {
+                        destruction.publish(reg, *it);
                     }
                 }
             }
