@@ -45,7 +45,7 @@ struct SparseSet: testing::Test {
 template<typename Type>
 using SparseSetDeathTest = SparseSet<Type>;
 
-using SparseSetTypes = ::testing::Types<entt::entity, entity32_t, entity64_t, entity32_18_14_t>;
+using SparseSetTypes = ::testing::Types<entity32_t, entity64_t, entity32_18_14_t>;
 
 TYPED_TEST_SUITE(SparseSet, SparseSetTypes, );
 TYPED_TEST_SUITE(SparseSetDeathTest, SparseSetTypes, );
