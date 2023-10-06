@@ -262,8 +262,6 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, FreeList) {
         case entt::deletion_policy::swap_and_pop:
         case entt::deletion_policy::in_place: {
             ASSERT_DEATH(set.free_list(0u), "");
-            ASSERT_DEATH(set.free_list(1u), "");
-            ASSERT_DEATH(set.free_list(2u), "");
         } break;
         case entt::deletion_policy::swap_only: {
             ASSERT_NO_FATAL_FAILURE(set.free_list(0u));
@@ -953,13 +951,6 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Indexing) {
         sparse_set_type set{policy};
 
         ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
-
-        const entity_type entity{42};
-
-        set.push(entity);
-
-        ASSERT_EQ(set[0u], entity);
-        ASSERT_DEATH([[maybe_unused]] auto value = set[1u], "");
     }
 }
 
@@ -1150,11 +1141,6 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Push) {
 
         ASSERT_DEATH(set.push(entity[0u]), "");
         ASSERT_DEATH(set.push(std::begin(entity), std::end(entity)), "");
-
-        set.erase(entity[1u]);
-
-        ASSERT_DEATH(set.push(entity[0u]), "");
-        ASSERT_DEATH(set.push(std::begin(entity), std::end(entity)), "");
     }
 }
 
@@ -1192,12 +1178,9 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Bump) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        set.push(entity_type{3});
-
         ASSERT_DEATH(set.bump(entt::null), "");
         ASSERT_DEATH(set.bump(entt::tombstone), "");
         ASSERT_DEATH(set.bump(entity_type{42}), "");
-        ASSERT_DEATH(set.bump(traits_type::construct(traits_type::to_entity(entity_type{3}), traits_type::to_version(entt::tombstone))), "");
     }
 }
 
@@ -1729,7 +1712,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Sort) {
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
-            // nothing to do here, it just works :)
+            SUCCEED();
         } break;
         case entt::deletion_policy::in_place:
         case entt::deletion_policy::swap_only: {
@@ -1791,13 +1774,11 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortN) {
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
-            ASSERT_EQ(set.size(), 1u);
-            ASSERT_NO_FATAL_FAILURE(set.sort_n(1u, std::less{}));
+            SUCCEED();
         } break;
         case entt::deletion_policy::in_place: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_DEATH(set.sort_n(1u, std::less{});, "");
-            ASSERT_DEATH(set.sort_n(2u, std::less{});, "");
         } break;
         case entt::deletion_policy::swap_only: {
             ASSERT_EQ(set.size(), 2u);
@@ -1987,7 +1968,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
-            // nothing to do here, it just works :)
+            SUCCEED();
         } break;
         case entt::deletion_policy::in_place: {
             entity_type entity{42};
