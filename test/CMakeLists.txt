@@ -113,6 +113,7 @@ function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
     target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)
     SETUP_TARGET(${TEST_NAME} ${ARGN})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+    set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 60)
 endfunction()
 
 function(SETUP_LIB_SHARED_TEST TEST_NAME SUB_PATH)
