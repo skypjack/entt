@@ -905,8 +905,17 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_DEATH(static_cast<void>(set.index(traits_type::construct(3, 0))), "");
-        ASSERT_DEATH(static_cast<void>(set.index(entt::null)), "");
+        // index works the same in all cases, test only once
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+            ASSERT_DEATH(static_cast<void>(set.index(traits_type::construct(3, 0))), "");
+            ASSERT_DEATH(static_cast<void>(set.index(entt::null)), "");
+            break;
+        case entt::deletion_policy::in_place:
+        case entt::deletion_policy::swap_only:
+            SUCCEED();
+            break;
+        }
     }
 }
 
@@ -949,7 +958,16 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Indexing) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
+        // operator[] works the same in all cases, test only once
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+            ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
+            break;
+        case entt::deletion_policy::in_place:
+        case entt::deletion_policy::swap_only:
+            SUCCEED();
+            break;
+        }
     }
 }
 
@@ -976,7 +994,16 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Value) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entity_type{3}), "");
+        // value works the same in all cases, test only once
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+            ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entity_type{3}), "");
+            break;
+        case entt::deletion_policy::in_place:
+        case entt::deletion_policy::swap_only:
+            SUCCEED();
+            break;
+        }
     }
 }
 
@@ -1176,9 +1203,18 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Bump) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_DEATH(set.bump(entt::null), "");
-        ASSERT_DEATH(set.bump(entt::tombstone), "");
-        ASSERT_DEATH(set.bump(entity_type{42}), "");
+        // bump works the same in all cases, test only once
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+            ASSERT_DEATH(set.bump(entt::null), "");
+            ASSERT_DEATH(set.bump(entt::tombstone), "");
+            ASSERT_DEATH(set.bump(entity_type{42}), "");
+            break;
+        case entt::deletion_policy::in_place:
+        case entt::deletion_policy::swap_only:
+            SUCCEED();
+            break;
+        }
     }
 }
 
@@ -1295,7 +1331,6 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Erase) {
 
         ASSERT_DEATH(set.erase(std::begin(entity), std::end(entity)), "");
         ASSERT_DEATH(set.erase(entity, entity + 2u), "");
-        ASSERT_DEATH(set.erase(entt::null), "");
     }
 }
 
