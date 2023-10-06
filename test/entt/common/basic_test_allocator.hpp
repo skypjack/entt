@@ -16,6 +16,11 @@ struct basic_test_allocator: std::allocator<Type> {
 
     using std::allocator<Type>::allocator;
 
+    // necessary to avoid a warning by clang-cl :)
+    basic_test_allocator(const basic_test_allocator &other)
+        : base{other} {
+    }
+
     basic_test_allocator &operator=(const basic_test_allocator &other) {
         // necessary to avoid call suppression
         base::operator=(other);
