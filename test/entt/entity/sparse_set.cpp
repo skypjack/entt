@@ -446,7 +446,6 @@ TYPED_TEST(SparseSet, Data) {
 
 TYPED_TEST(SparseSet, Bind) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
-    using entity_type = typename sparse_set_type::entity_type;
 
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
@@ -906,7 +905,6 @@ TYPED_TEST(SparseSet, Index) {
 
 ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
-    using entity_type = typename sparse_set_type::entity_type;
     using traits_type = typename sparse_set_type::traits_type;
 
     for(const auto policy: this->deletion_policy) {
@@ -1597,7 +1595,6 @@ TYPED_TEST(SparseSet, Compact) {
 
 TYPED_TEST(SparseSet, SwapElements) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
-    using entity_type = typename sparse_set_type::entity_type;
     using traits_type = typename sparse_set_type::traits_type;
 
     for(const auto policy: this->deletion_policy) {
@@ -1621,7 +1618,6 @@ TYPED_TEST(SparseSet, SwapElements) {
 
 ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SwapElements) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
-    using entity_type = typename sparse_set_type::entity_type;
     using traits_type = typename sparse_set_type::traits_type;
 
     for(const auto policy: this->deletion_policy) {
