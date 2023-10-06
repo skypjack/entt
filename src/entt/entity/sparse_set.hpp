@@ -310,7 +310,7 @@ protected:
     virtual void pop_all() {
         switch(mode) {
         case deletion_policy::in_place:
-            if(head != null) {
+            if(head != traits_type::to_entity(null)) {
                 for(auto first = begin(); !(first.index() < 0); ++first) {
                     if(*first != tombstone) {
                         sparse_ref(*first) = null;
@@ -343,7 +343,7 @@ protected:
 
         switch(mode) {
         case deletion_policy::in_place:
-            if(head != null && !force_back) {
+            if(head != traits_type::to_entity(null) && !force_back) {
                 pos = static_cast<size_type>(head);
                 ENTT_ASSERT(elem == null, "Slot not available");
                 elem = traits_type::combine(head, traits_type::to_integral(entt));
@@ -591,7 +591,7 @@ public:
      * @return True if the sparse set is fully packed, false otherwise.
      */
     [[nodiscard]] bool contiguous() const noexcept {
-        return (mode != deletion_policy::in_place) || (head == null);
+        return (mode != deletion_policy::in_place) || (head == traits_type::to_entity(null));
     }
 
     /**
@@ -934,7 +934,7 @@ public:
             for(; from && packed[from - 1u] == tombstone; --from) {}
             underlying_type pos = std::exchange(head, traits_type::entity_mask);
 
-            while(pos != null) {
+            while(pos != traits_type::to_entity(null)) {
                 if(const auto to = static_cast<size_type>(std::exchange(pos, traits_type::to_entity(packed[pos]))); to < from) {
                     --from;
                     swap_or_move(from, to);
@@ -1005,7 +1005,7 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Sorting with tombstones not allowed");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
 
         algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
@@ -1054,7 +1054,7 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void sort_as(const basic_sparse_set &other) {
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == null), "Sorting with tombstones not allowed");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
 
         const auto to = other.end();
         auto from = other.begin();
