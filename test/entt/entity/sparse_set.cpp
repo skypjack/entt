@@ -900,7 +900,7 @@ TYPED_TEST(SparseSet, Index) {
 
 ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
-    using traits_type = typename sparse_set_type::traits_type;
+    using entity_type = typename sparse_set_type::entity_type;
 
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
@@ -908,8 +908,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
         // index works the same in all cases, test only once
         switch(policy) {
         case entt::deletion_policy::swap_and_pop:
-            ASSERT_DEATH(static_cast<void>(set.index(traits_type::construct(3, 0))), "");
-            ASSERT_DEATH(static_cast<void>(set.index(entt::null)), "");
+            ASSERT_DEATH([[maybe_unused]] const auto pos = set.index(entity_type{42}), "");
             break;
         case entt::deletion_policy::in_place:
         case entt::deletion_policy::swap_only:
@@ -1639,16 +1638,18 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SwapElements) {
         const auto entity = traits_type::construct(3, 5);
         const auto other = traits_type::construct(42, 99);
 
-        ASSERT_TRUE(set.empty());
-        ASSERT_DEATH(set.swap_elements(entity, other), "");
+        // swap_elements works the same in all cases, test only once
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+        case entt::deletion_policy::in_place:
+            SUCCEED();
+            break;
+        case entt::deletion_policy::swap_only:
+            ASSERT_DEATH(set.swap_elements(entity, other), "");
 
-        if(policy == entt::deletion_policy::swap_only) {
             set.push(entity);
             set.push(other);
             set.erase(entity);
-
-            ASSERT_EQ(set.index(traits_type::next(entity)), 1u);
-            ASSERT_EQ(set.index(other), 0u);
 
             ASSERT_DEATH(set.swap_elements(entity, other), "");
         }
