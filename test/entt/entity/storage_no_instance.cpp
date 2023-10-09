@@ -75,9 +75,10 @@ TYPED_TEST(StorageNoInstance, Emplace) {
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), void>();
 
-    ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
-
-    if constexpr(!std::is_void_v<value_type>) {
+    if constexpr(std::is_void_v<value_type>) {
+        ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
+    } else {
+        ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
         ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[1u], value_type{}));
     }
 }
@@ -90,10 +91,12 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), void>();
 
-    ASSERT_NO_FATAL_FAILURE(pool.emplace(entity));
-    ASSERT_DEATH(pool.emplace(entity), "");
+    pool.emplace(entity);
 
-    if constexpr(!std::is_void_v<value_type>) {
+    if constexpr(std::is_void_v<value_type>) {
+        ASSERT_DEATH(pool.emplace(entity), "");
+    } else {
+        ASSERT_DEATH(pool.emplace(entity), "");
         ASSERT_DEATH(pool.emplace(entity, value_type{}), "");
     }
 }
@@ -190,12 +193,14 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Insert) {
 
     const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
 
-    ASSERT_NO_FATAL_FAILURE(pool.insert(std::begin(entity), std::end(entity)));
-    ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
+    pool.insert(std::begin(entity), std::end(entity));
 
-    if constexpr(!std::is_void_v<value_type>) {
+    if constexpr(std::is_void_v<value_type>) {
+        ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
+    } else {
         const value_type values[2u]{};
 
+        ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
         ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity), std::begin(values)), "");
     }
 }
