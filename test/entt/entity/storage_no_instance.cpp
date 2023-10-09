@@ -12,6 +12,33 @@ struct empty_type {};
 template<typename Type>
 struct StorageNoInstance: testing::Test {
     using type = Type;
+
+    static auto emplace_instance(entt::storage<type> &pool, const entt::entity entt) {
+        if constexpr(std::is_void_v<type>) {
+            return pool.emplace(entt);
+        } else {
+            return pool.emplace(entt, type{});
+        }
+    }
+
+    template<typename It>
+    static auto insert_instance(entt::storage<type> &pool, const It from, const It to) {
+        if constexpr(std::is_void_v<type>) {
+            return pool.insert(from, to);
+        } else {
+            const type values[2u]{};
+            return pool.insert(from, to, std::begin(values));
+        }
+    }
+
+    static auto push_instance(entt::storage<type> &pool, const entt::entity entt) {
+        if constexpr(std::is_void_v<type>) {
+            return pool.entt::sparse_set::push(entt, nullptr);
+        } else {
+            type instance{};
+            return pool.entt::sparse_set::push(entt, &instance);
+        }
+    }
 };
 
 template<typename Type>
@@ -75,12 +102,8 @@ TYPED_TEST(StorageNoInstance, Emplace) {
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), void>();
 
-    if constexpr(std::is_void_v<value_type>) {
-        ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
-    } else {
-        ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
-        ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[1u], value_type{}));
-    }
+    ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
+    ASSERT_NO_FATAL_FAILURE(this->emplace_instance(pool, entity[1u]));
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {
@@ -93,12 +116,8 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {
 
     pool.emplace(entity);
 
-    if constexpr(std::is_void_v<value_type>) {
-        ASSERT_DEATH(pool.emplace(entity), "");
-    } else {
-        ASSERT_DEATH(pool.emplace(entity), "");
-        ASSERT_DEATH(pool.emplace(entity, value_type{}), "");
-    }
+    ASSERT_DEATH(pool.emplace(entity), "");
+    ASSERT_DEATH(this->emplace_instance(pool, entity), "");
 }
 
 TYPED_TEST(StorageNoInstance, TryEmplace) {
@@ -108,13 +127,7 @@ TYPED_TEST(StorageNoInstance, TryEmplace) {
 
     const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
 
-    if constexpr(std::is_void_v<value_type>) {
-        ASSERT_NE(base.push(entity[0u], nullptr), base.end());
-    } else {
-        value_type instance{};
-
-        ASSERT_NE(base.push(entity[0u], &instance), base.end());
-    }
+    ASSERT_NE(this->push_instance(pool, entity[0u]), base.end());
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(base.index(entity[0u]), 0u);
@@ -175,16 +188,12 @@ TYPED_TEST(StorageNoInstance, Insert) {
     ASSERT_EQ(pool.index(entity[0u]), 0u);
     ASSERT_EQ(pool.index(entity[1u]), 1u);
 
-    if constexpr(!std::is_void_v<value_type>) {
-        const value_type values[2u]{};
+    pool.erase(std::begin(entity), std::end(entity));
+    this->insert_instance(pool, std::rbegin(entity), std::rend(entity));
 
-        pool.erase(std::begin(entity), std::end(entity));
-        pool.insert(std::rbegin(entity), std::rend(entity), std::begin(values));
-
-        ASSERT_EQ(pool.size(), 2u);
-        ASSERT_EQ(pool.index(entity[0u]), 1u);
-        ASSERT_EQ(pool.index(entity[1u]), 0u);
-    }
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.index(entity[0u]), 1u);
+    ASSERT_EQ(pool.index(entity[1u]), 0u);
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Insert) {
@@ -195,14 +204,8 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Insert) {
 
     pool.insert(std::begin(entity), std::end(entity));
 
-    if constexpr(std::is_void_v<value_type>) {
-        ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
-    } else {
-        const value_type values[2u]{};
-
-        ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
-        ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity), std::begin(values)), "");
-    }
+    ASSERT_DEATH(pool.insert(std::begin(entity), std::end(entity)), "");
+    ASSERT_DEATH(this->insert_instance(pool, std::begin(entity), std::end(entity)), "");
 }
 
 TYPED_TEST(StorageNoInstance, Iterable) {
