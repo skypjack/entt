@@ -16,25 +16,25 @@
 
 struct empty_type {};
 
-struct pointer_stability {
+struct pointer_stable {
     static constexpr auto in_place_delete = true;
     int value;
 };
 
 template<typename Type>
-struct Storage: testing::Test {
+struct StoragePageSize0: testing::Test {
     using type = Type;
 };
 
 template<typename Type>
-using StorageDeathTest = Storage<Type>;
+using StoragePageSize0DeathTest = StoragePageSize0<Type>;
 
-using StorageTypes = ::testing::Types<empty_type, void>;
+using StoragePageSize0Types = ::testing::Types<empty_type, void>;
 
-TYPED_TEST_SUITE(Storage, StorageTypes, );
-TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
+TYPED_TEST_SUITE(StoragePageSize0, StoragePageSize0Types, );
+TYPED_TEST_SUITE(StoragePageSize0DeathTest, StoragePageSize0Types, );
 
-TEST(BasicStorage, Constructors) {
+TEST(Storage, Constructors) {
     entt::storage<int> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
@@ -48,7 +48,7 @@ TEST(BasicStorage, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<int>());
 }
 
-TEST(BasicStorage, Move) {
+TEST(Storage, Move) {
     entt::storage<int> pool;
 
     pool.emplace(entt::entity{3}, 3);
@@ -114,7 +114,7 @@ TEST(BasicStorage, Move) {
     ASSERT_EQ(other.get(entt::entity{3}), 3);
 }
 
-TEST(BasicStorage, Swap) {
+TEST(Storage, Swap) {
     entt::storage<int> pool;
     entt::storage<int> other;
 
@@ -145,7 +145,7 @@ TEST(BasicStorage, Swap) {
     ASSERT_EQ(other.get(entt::entity{42}), 41);
 }
 
-TEST(BasicStorage, Capacity) {
+TEST(Storage, Capacity) {
     entt::storage<int> pool;
     constexpr auto page_size = decltype(pool)::traits_type::page_size;
 
@@ -160,7 +160,7 @@ TEST(BasicStorage, Capacity) {
     ASSERT_TRUE(pool.empty());
 }
 
-TEST(BasicStorage, ShrinkToFit) {
+TEST(Storage, ShrinkToFit) {
     entt::storage<int> pool;
     constexpr auto page_size = decltype(pool)::traits_type::page_size;
 
@@ -190,7 +190,7 @@ TEST(BasicStorage, ShrinkToFit) {
     ASSERT_EQ(pool.size(), 0u);
 }
 
-TEST(BasicStorage, Raw) {
+TEST(Storage, Raw) {
     entt::storage<int> pool;
 
     pool.emplace(entt::entity{3}, 3);
@@ -206,7 +206,7 @@ TEST(BasicStorage, Raw) {
     ASSERT_EQ(pool.raw()[0u][2u], 9);
 }
 
-TEST(BasicStorage, Iterator) {
+TEST(Storage, Iterator) {
     using iterator = typename entt::storage<int>::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
@@ -268,7 +268,7 @@ TEST(BasicStorage, Iterator) {
     ASSERT_EQ(begin[1u], 42);
 }
 
-TEST(BasicStorage, ConstIterator) {
+TEST(Storage, ConstIterator) {
     using iterator = typename entt::storage<int>::const_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
@@ -331,7 +331,7 @@ TEST(BasicStorage, ConstIterator) {
     ASSERT_EQ(cbegin[1u], 42);
 }
 
-TEST(BasicStorage, ReverseIterator) {
+TEST(Storage, ReverseIterator) {
     using reverse_iterator = typename entt::storage<int>::reverse_iterator;
 
     testing::StaticAssertTypeEq<reverse_iterator::value_type, int>();
@@ -392,7 +392,7 @@ TEST(BasicStorage, ReverseIterator) {
     ASSERT_EQ(begin[1u], 3);
 }
 
-TEST(BasicStorage, ConstReverseIterator) {
+TEST(Storage, ConstReverseIterator) {
     using const_reverse_iterator = typename entt::storage<int>::const_reverse_iterator;
 
     testing::StaticAssertTypeEq<const_reverse_iterator::value_type, int>();
@@ -455,7 +455,7 @@ TEST(BasicStorage, ConstReverseIterator) {
     ASSERT_EQ(cbegin[1u], 3);
 }
 
-TEST(BasicStorage, IteratorConversion) {
+TEST(Storage, IteratorConversion) {
     entt::storage<int> pool;
     pool.emplace(entt::entity{3}, 42);
 
@@ -478,7 +478,7 @@ TEST(BasicStorage, IteratorConversion) {
     ASSERT_NE(++cit, it);
 }
 
-TEST(BasicStorage, IteratorPageSizeAwareness) {
+TEST(Storage, IteratorPageSizeAwareness) {
     entt::storage<int> pool;
     constexpr auto page_size = decltype(pool)::traits_type::page_size;
     const int check{42};
@@ -493,7 +493,7 @@ TEST(BasicStorage, IteratorPageSizeAwareness) {
     ASSERT_EQ(*pool.begin(), check);
 }
 
-TEST(BasicStorage, Getters) {
+TEST(Storage, Getters) {
     entt::storage<int> pool;
 
     pool.emplace(entt::entity{41}, 3);
@@ -511,7 +511,7 @@ TEST(BasicStorage, Getters) {
     ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple(3));
 }
 
-ENTT_DEBUG_TEST(BasicStorageDeathTest, Getters) {
+ENTT_DEBUG_TEST(StorageDeathTest, Getters) {
     entt::storage<int> pool;
 
     ASSERT_DEATH([[maybe_unused]] const auto &value = pool.get(entt::entity{41}), "");
@@ -523,7 +523,7 @@ ENTT_DEBUG_TEST(BasicStorageDeathTest, Getters) {
 
 // <<<<<<<<<<<< REWORK IN PROGRESS [basic/TODO] <<<<<<<<<<<<
 
-TYPED_TEST(Storage, Constructors) {
+TYPED_TEST(StoragePageSize0, Constructors) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -538,7 +538,7 @@ TYPED_TEST(Storage, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 }
 
-TYPED_TEST(Storage, Getters) {
+TYPED_TEST(StoragePageSize0, Getters) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -557,7 +557,7 @@ TYPED_TEST(Storage, Getters) {
     ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple());
 }
 
-ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Getters) {
+ENTT_DEBUG_TYPED_TEST(StoragePageSize0DeathTest, Getters) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -568,7 +568,7 @@ ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Getters) {
     ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{41}), "");
 }
 
-TYPED_TEST(Storage, Emplace) {
+TYPED_TEST(StoragePageSize0, Emplace) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -583,7 +583,7 @@ TYPED_TEST(Storage, Emplace) {
     }
 }
 
-ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Emplace) {
+ENTT_DEBUG_TYPED_TEST(StoragePageSize0DeathTest, Emplace) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -599,7 +599,7 @@ ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Emplace) {
     }
 }
 
-TYPED_TEST(Storage, TryEmplace) {
+TYPED_TEST(StoragePageSize0, TryEmplace) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
     entt::sparse_set &base = pool;
@@ -634,7 +634,7 @@ TYPED_TEST(Storage, TryEmplace) {
     ASSERT_EQ(base.index(entity[1u]), 0u);
 }
 
-TYPED_TEST(Storage, Patch) {
+TYPED_TEST(StoragePageSize0, Patch) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -654,14 +654,14 @@ TYPED_TEST(Storage, Patch) {
     ASSERT_EQ(counter, 3);
 }
 
-ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Patch) {
+ENTT_DEBUG_TYPED_TEST(StoragePageSize0DeathTest, Patch) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
     ASSERT_DEATH(pool.patch(entt::null), "");
 }
 
-TYPED_TEST(Storage, Insert) {
+TYPED_TEST(StoragePageSize0, Insert) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -685,7 +685,7 @@ TYPED_TEST(Storage, Insert) {
     }
 }
 
-ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Insert) {
+ENTT_DEBUG_TYPED_TEST(StoragePageSize0DeathTest, Insert) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -701,7 +701,7 @@ ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Insert) {
     }
 }
 
-TYPED_TEST(Storage, Iterable) {
+TYPED_TEST(StoragePageSize0, Iterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::iterable::iterator;
 
@@ -745,7 +745,7 @@ TYPED_TEST(Storage, Iterable) {
     }
 }
 
-TYPED_TEST(Storage, ConstIterable) {
+TYPED_TEST(StoragePageSize0, ConstIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::const_iterable::iterator;
 
@@ -789,7 +789,7 @@ TYPED_TEST(Storage, ConstIterable) {
     }
 }
 
-TYPED_TEST(Storage, ReverseIterable) {
+TYPED_TEST(StoragePageSize0, ReverseIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::reverse_iterable::iterator;
 
@@ -833,7 +833,7 @@ TYPED_TEST(Storage, ReverseIterable) {
     }
 }
 
-TYPED_TEST(Storage, ConstReverseIterable) {
+TYPED_TEST(StoragePageSize0, ConstReverseIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::const_reverse_iterable::iterator;
 
@@ -877,7 +877,7 @@ TYPED_TEST(Storage, ConstReverseIterable) {
     }
 }
 
-TYPED_TEST(Storage, IterableIteratorConversion) {
+TYPED_TEST(StoragePageSize0, IterableIteratorConversion) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
@@ -896,23 +896,23 @@ TYPED_TEST(Storage, IterableIteratorConversion) {
 // <<<<<<<<<<<< REWORK IN PROGRESS [empty/DONE] <<<<<<<<<<<<
 // <<<<<<<<<<<< REWORK IN PROGRESS [void/DONE] <<<<<<<<<<<<
 
-TEST(PointerStability, Constructors) {
-    entt::storage<pointer_stability> pool;
+TEST(StoragePointerStable, Constructors) {
+    entt::storage<pointer_stable> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<pointer_stability>());
+    ASSERT_EQ(pool.type(), entt::type_id<pointer_stable>());
 
-    pool = entt::storage<pointer_stability>{std::allocator<pointer_stability>{}};
+    pool = entt::storage<pointer_stable>{std::allocator<pointer_stable>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<pointer_stability>());
+    ASSERT_EQ(pool.type(), entt::type_id<pointer_stable>());
 }
 
 // <<<<<<<<<<<< REWORK IN PROGRESS [stable/TODO] <<<<<<<<<<<<
 
-TEST(Entity, Constructors) {
+TEST(StorageEntity, Constructors) {
     entt::storage<entt::entity> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_only);
