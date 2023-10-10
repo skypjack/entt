@@ -64,6 +64,94 @@ TYPED_TEST(StorageNoInstance, Constructors) {
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 }
 
+TYPED_TEST(StorageNoInstance, Move) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    pool.emplace(entt::entity{3});
+
+    ASSERT_TRUE(std::is_move_constructible_v<decltype(pool)>);
+    ASSERT_TRUE(std::is_move_assignable_v<decltype(pool)>);
+
+    entt::storage<value_type> other{std::move(pool)};
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{3});
+
+    entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
+
+    ASSERT_TRUE(other.empty());
+    ASSERT_FALSE(extended.empty());
+
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(extended.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(extended.at(0u), entt::entity{3});
+
+    pool = std::move(extended);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_TRUE(extended.empty());
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(extended.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null));
+
+    other = entt::storage<value_type>{};
+    other.emplace(entt::entity{42}, 42);
+    other = std::move(pool);
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), entt::entity{3});
+}
+
+TYPED_TEST(StorageNoInstance, Swap) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+    entt::storage<value_type> other;
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+
+    pool.emplace(entt::entity{42});
+
+    other.emplace(entt::entity{9});
+    other.emplace(entt::entity{3});
+    other.erase(entt::entity{9});
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    pool.swap(other);
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), entt::entity{42});
+}
+
 TYPED_TEST(StorageNoInstance, Getters) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
