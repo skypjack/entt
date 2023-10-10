@@ -2129,20 +2129,6 @@ TEST_F(StorageOld, UsesAllocatorConstruction) {
 
 #endif
 
-TEST_F(StorageOld, StorageType) {
-    // just a bunch of static asserts to avoid regressions
-    testing::StaticAssertTypeEq<entt::storage_type_t<char, entt::entity>, entt::sigh_mixin<entt::basic_storage<char, entt::entity>>>();
-    testing::StaticAssertTypeEq<entt::storage_type_t<int>, entt::sigh_mixin<entt::storage<int>>>();
-}
-
-TEST_F(StorageOld, StorageFor) {
-    // just a bunch of static asserts to avoid regressions
-    testing::StaticAssertTypeEq<entt::storage_for_t<const double, entt::entity>, const entt::sigh_mixin<entt::basic_storage<double, entt::entity>>>();
-    testing::StaticAssertTypeEq<entt::storage_for_t<char, entt::entity>, entt::sigh_mixin<entt::basic_storage<char, entt::entity>>>();
-    testing::StaticAssertTypeEq<entt::storage_for_t<const bool>, const entt::sigh_mixin<entt::storage<bool>>>();
-    testing::StaticAssertTypeEq<entt::storage_for_t<int>, entt::sigh_mixin<entt::storage<int>>>();
-}
-
 TEST(StorageEntity, TypeAndPolicy) {
     entt::storage<entt::entity> pool;
 
