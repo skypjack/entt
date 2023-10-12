@@ -182,6 +182,22 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Getters) {
     ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{41}), "");
 }
 
+TYPED_TEST(StorageNoInstance, Value) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    pool.emplace(entt::entity{42});
+
+    ASSERT_EQ(pool.value(entt::entity{42}), nullptr);
+}
+
+ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Value) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    ASSERT_DEATH([[maybe_unused]] const void *value = pool.value(entt::entity{42}), "");
+}
+
 TYPED_TEST(StorageNoInstance, Emplace) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
