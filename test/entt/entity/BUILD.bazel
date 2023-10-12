@@ -17,6 +17,8 @@ _TESTS = [
     "sparse_set",
     "storage",
     "storage_entity",
+    "storage_no_instance",
+    "storage_utility",
     "view",
 ]
 
