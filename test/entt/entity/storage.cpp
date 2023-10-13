@@ -790,8 +790,8 @@ TYPED_TEST(Storage, Patch) {
 
     entt::entity entity{42};
 
-    auto callback = [](value_type &elem) {
-        if constexpr(std::is_class_v<value_type>) {
+    auto callback = [](auto &&elem) {
+        if constexpr(std::is_class_v<std::remove_reference_t<decltype(elem)>>) {
             ++elem.value;
         } else {
             ++elem;
