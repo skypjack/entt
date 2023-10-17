@@ -18,6 +18,7 @@ TODO (high prio):
 * make ::pack part of the sparse set interface
 * storage-based invoke helpers (update sigh mixin to also support storage based cbs)
 * make nth_argument use function types rather than pointers
+* use fixed_size_sequence_container_v to skip calls in meta.hpp, make funcs ret type void
 * ===> TEST: view (scoped begin) tests after the last changes
 
 WIP:

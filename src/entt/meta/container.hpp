@@ -26,13 +26,13 @@ namespace entt {
 namespace internal {
 
 template<typename, typename = void>
-struct dynamic_sequence_container: std::false_type {};
+struct fixed_size_sequence_container: std::true_type {};
 
 template<typename Type>
-struct dynamic_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::true_type {};
+struct fixed_size_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::false_type {};
 
 template<typename Type>
-inline constexpr bool dynamic_sequence_container_v = dynamic_sequence_container<Type>::value;
+inline constexpr bool fixed_size_sequence_container_v = fixed_size_sequence_container<Type>::value;
 
 template<typename, typename = void>
 struct key_only_associative_container: std::true_type {};
@@ -67,6 +67,9 @@ template<typename Type>
 struct basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
+    /*! @brief True in case of key-only containers, false otherwise. */
+    static constexpr bool fixed_size = internal::fixed_size_sequence_container_v<Type>;
+
     /*! @brief Unsigned integer type. */
     using size_type = typename meta_sequence_container::size_type;
     /*! @brief Meta iterator type. */
@@ -87,11 +90,11 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool clear([[maybe_unused]] void *container) {
-        if constexpr(internal::dynamic_sequence_container_v<Type>) {
+        if constexpr(fixed_size) {
+            return false;
+        } else {
             static_cast<Type *>(container)->clear();
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -117,11 +120,11 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(internal::dynamic_sequence_container_v<Type> && std::is_default_constructible_v<typename Type::value_type>) {
+        if constexpr(fixed_size || !std::is_default_constructible_v<typename Type::value_type>) {
+            return false;
+        } else {
             static_cast<Type *>(container)->resize(sz);
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -161,7 +164,9 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool insert([[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] iterator &it) {
-        if constexpr(internal::dynamic_sequence_container_v<Type>) {
+        if constexpr(fixed_size) {
+            return false;
+        } else {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
 
             it.rebind(static_cast<Type *>(container)->insert(
@@ -169,8 +174,6 @@ struct basic_meta_sequence_container_traits {
                 value ? *static_cast<const typename Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref)));
 
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -181,12 +184,12 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool erase([[maybe_unused]] void *container, [[maybe_unused]] iterator &it) {
-        if constexpr(internal::dynamic_sequence_container_v<Type>) {
+        if constexpr(fixed_size) {
+            return false;
+        } else {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             it.rebind(static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base())));
             return true;
-        } else {
-            return false;
         }
     }
 };
