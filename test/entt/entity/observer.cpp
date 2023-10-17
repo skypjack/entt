@@ -369,3 +369,34 @@ TEST(Observer, GroupCornerCase) {
     ASSERT_FALSE(add_observer.empty());
     ASSERT_TRUE(remove_observer.empty());
 }
+
+enum class CustomEntity : std::uint32_t
+{
+};
+
+
+// This could be used to add custom methods to the registry or, in case of non-public inheritance,
+// to restrict the access to the registry.
+class CustomRegistry: public entt::basic_registry<CustomEntity> {
+};
+
+template<typename Component>
+struct entt::storage_type<Component, CustomEntity>
+{
+    using type = entt::sigh_mixin<entt::basic_storage<Component, CustomEntity>, CustomRegistry>;
+};
+
+
+TEST(Observer, CustomInheritedRegistry) {
+    CustomRegistry registry;
+    using CustomObserver = entt::basic_observer<CustomRegistry>;
+    CustomObserver observer(registry, entt::collector.group<int>());
+
+    ASSERT_EQ(observer.size(), 0u);
+    ASSERT_TRUE(observer.empty());
+    ASSERT_EQ(observer.begin(), observer.end());
+
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+    ASSERT_EQ(observer.size(), 1u);
+}

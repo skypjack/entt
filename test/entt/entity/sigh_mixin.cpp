@@ -689,3 +689,43 @@ TEST(SighMixin, ThrowingComponent) {
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 3);
 }
+
+enum class CustomEntity : std::uint32_t
+{
+};
+
+
+// This could be used to add custom methods to the registry or, in case of non-public inheritance,
+// to restrict the access to the registry.
+class CustomRegistry: public entt::basic_registry<CustomEntity> {
+};
+
+template<typename Component>
+struct entt::storage_type<Component, CustomEntity>
+{
+  using type = entt::sigh_mixin<entt::basic_storage<Component, CustomEntity>, CustomRegistry>;
+};
+
+void custom_registry_listener(counter &counter, CustomRegistry &, CustomEntity) {
+    ++counter.value;
+}
+
+TEST(SighMixin, CustomRegistry) {
+    CustomRegistry registry;
+
+    counter on_construct_int{};
+    counter on_construct_float{};
+
+    registry.on_construct<int>().connect<&custom_registry_listener>(on_construct_int);
+    registry.on_construct<float>().connect<&custom_registry_listener>(on_construct_float);
+
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.emplace<int>(e1, 1);
+    registry.emplace<int>(e2, 2);
+    registry.emplace<float>(e1, 1.1f);
+
+    ASSERT_EQ(on_construct_int.value, 2);
+    ASSERT_EQ(on_construct_float.value, 1);
+}
