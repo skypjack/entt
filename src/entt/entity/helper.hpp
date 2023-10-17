@@ -9,6 +9,7 @@
 #include "../signal/delegate.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
+#include "storage.hpp"
 #include "view.hpp"
 
 namespace entt {
@@ -115,27 +116,41 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  * @brief Returns the entity associated with a given component.
  *
  * @warning
- * Currently, this function only works correctly with the default pool as it
+ * Currently, this function only works correctly with the default storage as it
  * makes assumptions about how the components are laid out.
  *
- * @tparam Registry Basic registry type.
+ * @tparam Args Storage type template parameters.
+ * @param storage A storage that contains the given component.
+ * @param instance A valid component instance.
+ * @return The entity associated with the given component.
+ */
+template<typename... Args>
+auto to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) -> typename basic_storage<Args...>::entity_type {
+    constexpr auto page_size = basic_storage<Args...>::traits_type::page_size;
+    const typename basic_storage<Args...>::base_type &base = storage;
+    const auto *addr = std::addressof(instance);
+
+    for(auto it = base.rbegin(), last = base.rend(); it < last; it += page_size) {
+        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(page_size)) {
+            return *(it + dist);
+        }
+    }
+
+    return null;
+}
+
+/**
+ * @copybrief to_entity
+ * @tparam Args Registry type template parameters.
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
  * @return The entity associated with the given component.
  */
-template<typename Registry, typename Component>
-typename Registry::entity_type to_entity(const Registry &reg, const Component &instance) {
+template<typename... Args, typename Component>
+[[deprecated("use storage based to_entity instead")]] typename basic_registry<Args...>::entity_type to_entity(const basic_registry<Args...> &reg, const Component &instance) {
     if(const auto *storage = reg.template storage<Component>(); storage) {
-        constexpr auto page_size = std::remove_const_t<std::remove_pointer_t<decltype(storage)>>::traits_type::page_size;
-        const typename Registry::common_type &base = *storage;
-        const auto *addr = std::addressof(instance);
-
-        for(auto it = base.rbegin(), last = base.rend(); it < last; it += page_size) {
-            if(const auto dist = (addr - std::addressof(storage->get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(page_size)) {
-                return *(it + dist);
-            }
-        }
+        return to_entity(*storage, instance);
     }
 
     return null;

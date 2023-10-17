@@ -16,7 +16,7 @@ TODO (high prio):
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
 * make ::pack part of the sparse set interface
-* storage-based to_entity and invoke helpers
+* storage-based invoke helpers (update sigh mixin to also support storage based cbs)
 * make nth_argument use function types rather than pointers
 * ===> TEST: view (scoped begin) tests after the last changes
 
