@@ -28,7 +28,10 @@ class basic_sparse_set;
 template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
-template<typename Type>
+template<typename Entity = entity, typename = std::allocator<Entity>>
+class basic_registry;
+
+template<typename Storage, typename Registry = basic_registry<typename Storage::entity_type, typename Storage::base_type::allocator_type>>
 class sigh_mixin;
 
 /**
@@ -69,8 +72,6 @@ struct storage_for {
 template<typename... Args>
 using storage_for_t = typename storage_for<Args...>::type;
 
-template<typename Entity = entity, typename = std::allocator<Entity>>
-class basic_registry;
 
 template<typename, typename, typename = void>
 class basic_view;

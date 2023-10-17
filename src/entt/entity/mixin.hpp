@@ -22,16 +22,17 @@ namespace entt {
  *
  * This applies to all signals made available.
  *
- * @tparam Type The type of the underlying storage.
+ * @tparam Storage The type of the underlying storage.
+ * @tparam Registry The type of the underlying registry, defaulting to basic_registry
  */
-template<typename Type>
-class sigh_mixin final: public Type {
-    using underlying_type = Type;
+template<typename Storage, typename Registry>
+class sigh_mixin final: public Storage {
+    using underlying_type = Storage;
     using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
-    using sigh_type = sigh<void(basic_registry_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
+    using sigh_type = sigh<void(Registry &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
     using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
-    basic_registry_type &owner_or_assert() const noexcept {
+    Registry &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         return *owner;
     }
@@ -85,7 +86,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename underlying_type::entity_type;
     /*! @brief Expected registry type. */
-    using registry_type = basic_registry_type;
+    using registry_type = Registry;
 
     /*! @brief Default constructor. */
     sigh_mixin()
@@ -280,13 +281,15 @@ public:
      * @param value A variable wrapped in an opaque container.
      */
     void bind(any value) noexcept final {
-        auto *reg = any_cast<basic_registry_type>(&value);
-        owner = reg ? reg : owner;
+        auto *base_registry = any_cast<basic_registry_type>(&value);
+        if(base_registry != nullptr) {
+          owner = reinterpret_cast<Registry *>(base_registry);
+        }
         underlying_type::bind(std::move(value));
     }
 
 private:
-    basic_registry_type *owner;
+    Registry *owner;
     sigh_type construction;
     sigh_type destruction;
     sigh_type update;
