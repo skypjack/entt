@@ -583,7 +583,7 @@ There are two functions that respond to slightly different needs:
 * Components are sorted either directly:
 
   ```cpp
-  registry.sort<renderable>([](const auto &lhs, const auto &rhs) {
+  registry.sort<renderable>([](const renderable &lhs, const renderable &rhs) {
       return lhs.z < rhs.z;
   });
   ```
