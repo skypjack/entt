@@ -1044,23 +1044,23 @@ public:
     }
 
     /**
-     * @brief Sort entities according to their order in another sparse set.
+     * @brief Sort entities according to their order in a range.
      *
-     * Entities that are part of both the sparse sets are ordered internally
-     * according to the order they have in `other`.<br/>
-     * All the other entities goes to the end of the list and there are no
+     * Entities that are part of both the sparse set and the range are ordered
+     * internally according to the order they have in the range.<br/>
+     * All other entities goes to the end of the sparse set and there are no
      * guarantees on their order.
      *
-     * @param other The sparse sets that imposes the order of the entities.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      */
-    void sort_as(const basic_sparse_set &other) {
+    template<typename It>
+    void sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
 
-        const auto to = other.end();
-        auto from = other.begin();
-
-        for(auto it = begin(); it.index() && from != to; ++from) {
-            if(const auto curr = *from; contains(curr)) {
+        for(auto it = begin(); it.index() && first != last; ++first) {
+            if(const auto curr = *first; contains(curr)) {
                 if(const auto entt = *it; entt != curr) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
                     swap_elements(entt, curr);
@@ -1069,6 +1069,14 @@ public:
                 ++it;
             }
         }
+    }
+
+    /**
+     * @copybrief sort_as
+     * @param other The sparse sets that imposes the order of the entities.
+     */
+    [[deprecated("use iterator based sort_as instead")]] void sort_as(const basic_sparse_set &other) {
+        sort_as(other.begin(), other.end());
     }
 
     /*! @brief Clears a sparse set. */
