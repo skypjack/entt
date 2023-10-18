@@ -32,6 +32,8 @@ class sigh_mixin final: public Storage {
     using sigh_type = sigh<void(Registry &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
     using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
+    static_assert(std::is_base_of<basic_registry_type, Registry>());
+
     Registry &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         return *owner;
