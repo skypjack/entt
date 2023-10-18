@@ -33,6 +33,25 @@ void listener(counter &counter, Registry &, typename Registry::entity_type) {
 
 struct empty_each_tag final {};
 
+enum class custom_entity : std::uint32_t
+{
+};
+
+// This could be used to add custom methods to the registry or, in case of non-public inheritance,
+// to restrict the access to the registry.
+class custom_registry: public entt::basic_registry<custom_entity> {
+};
+
+template<typename Component>
+struct entt::storage_type<Component, custom_entity>
+{
+  using type = entt::sigh_mixin<entt::basic_storage<Component, custom_entity>, custom_registry>;
+};
+
+void custom_registry_listener(counter &counter, custom_registry &, custom_entity) {
+    ++counter.value;
+}
+
 TEST(SighMixin, GenericType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
     entt::sigh_mixin<entt::storage<int>> pool;
@@ -690,28 +709,8 @@ TEST(SighMixin, ThrowingComponent) {
     ASSERT_EQ(on_destroy.value, 3);
 }
 
-enum class CustomEntity : std::uint32_t
-{
-};
-
-
-// This could be used to add custom methods to the registry or, in case of non-public inheritance,
-// to restrict the access to the registry.
-class CustomRegistry: public entt::basic_registry<CustomEntity> {
-};
-
-template<typename Component>
-struct entt::storage_type<Component, CustomEntity>
-{
-  using type = entt::sigh_mixin<entt::basic_storage<Component, CustomEntity>, CustomRegistry>;
-};
-
-void custom_registry_listener(counter &counter, CustomRegistry &, CustomEntity) {
-    ++counter.value;
-}
-
 TEST(SighMixin, CustomRegistry) {
-    CustomRegistry registry;
+    custom_registry registry;
 
     counter on_construct_int{};
     counter on_construct_float{};

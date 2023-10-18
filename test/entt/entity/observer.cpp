@@ -3,6 +3,22 @@
 #include <entt/entity/observer.hpp>
 #include <entt/entity/registry.hpp>
 
+enum class custom_entity : std::uint32_t
+{
+};
+
+// This could be used to add custom methods to the registry or, in case of non-public inheritance,
+// to restrict the access to the registry.
+class custom_registry: public entt::basic_registry<custom_entity> {
+};
+
+template<typename Component>
+struct entt::storage_type<Component, custom_entity>
+{
+  using type = entt::sigh_mixin<entt::basic_storage<Component, custom_entity>, custom_registry>;
+};
+
+
 TEST(Observer, Functionalities) {
     entt::registry registry;
     entt::observer observer{registry, entt::collector.group<int>()};
@@ -370,27 +386,10 @@ TEST(Observer, GroupCornerCase) {
     ASSERT_TRUE(remove_observer.empty());
 }
 
-enum class CustomEntity : std::uint32_t
-{
-};
-
-
-// This could be used to add custom methods to the registry or, in case of non-public inheritance,
-// to restrict the access to the registry.
-class CustomRegistry: public entt::basic_registry<CustomEntity> {
-};
-
-template<typename Component>
-struct entt::storage_type<Component, CustomEntity>
-{
-    using type = entt::sigh_mixin<entt::basic_storage<Component, CustomEntity>, CustomRegistry>;
-};
-
-
-TEST(Observer, CustomInheritedRegistry) {
-    CustomRegistry registry;
-    using CustomObserver = entt::basic_observer<CustomRegistry>;
-    CustomObserver observer(registry, entt::collector.group<int>());
+TEST(Observer, CustomRegistry) {
+    custom_registry registry;
+    using custom_observer = entt::basic_observer<custom_registry>;
+    custom_observer observer(registry, entt::collector.group<int>());
 
     ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
