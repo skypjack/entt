@@ -907,7 +907,6 @@ TYPED_TEST(Storage, Erase) {
 
 TYPED_TEST(Storage, CrossErase) {
     using value_type = typename TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
@@ -968,7 +967,6 @@ TYPED_TEST(Storage, Remove) {
 
 TYPED_TEST(Storage, CrossRemove) {
     using value_type = typename TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
