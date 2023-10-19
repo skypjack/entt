@@ -650,17 +650,28 @@ public:
     }
 
     /**
-     * @brief Sort the shared pool of entities according to a given storage.
+     * @brief Sort entities according to their order in a range.
      *
      * The shared pool of entities and thus its order is affected by the changes
      * to each and every pool that it tracks.
      *
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void sort_as(It first, It last) const {
+        if(*this) {
+            descriptor->handle().sort_as(first, last);
+        }
+    }
+
+    /**
+     * @brief Sort entities according to their order in a range.
      * @param other The storage to use to impose the order.
      */
-    void sort_as(const common_type &other) const {
-        if(*this) {
-            descriptor->handle().sort_as(other);
-        }
+    [[deprecated("use iterator based sort_as instead")]] void sort_as(const common_type &other) const {
+        sort_as(other.begin(), other.end());
     }
 
 private:
