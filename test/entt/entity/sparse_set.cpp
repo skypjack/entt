@@ -2013,11 +2013,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             ASSERT_DEATH(lhs.sort_as(rhs);, "");
         } break;
         case entt::deletion_policy::swap_only: {
-            entity_type entity[2u]{entity_type{3}, entity_type{42}};
+            entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
 
             lhs.push(std::begin(entity), std::end(entity));
             rhs.push(std::rbegin(entity), std::rend(entity));
-            lhs.erase(entity[1u]);
+            lhs.erase(entity[0u]);
+            lhs.bump(entity[0u]);
 
             ASSERT_DEATH(lhs.sort_as(rhs);, "");
         } break;

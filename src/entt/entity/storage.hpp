@@ -1139,16 +1139,9 @@ public:
      * @return The number of elements within the newly created range.
      */
     template<typename It>
-    size_type pack(It first, It last) {
-        size_type len = base_type::free_list();
-
-        for(; first != last; ++first, --len) {
-            const auto pos = base_type::index(*first);
-            ENTT_ASSERT(pos < base_type::free_list(), "Invalid element");
-            base_type::swap_elements(base_type::data()[pos], base_type::data()[static_cast<size_type>(len - 1u)]);
-        }
-
-        return (base_type::free_list() - len);
+    [[deprecated("use sort_as instead")]] size_type pack(It first, It last) {
+        base_type::sort_as(first, last);
+        return static_cast<size_type>(std::distance(first, last));
     }
 
     /**

@@ -1059,7 +1059,7 @@ public:
     void sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
 
-        for(auto it = begin(); it.index() && first != last; ++first) {
+        for(auto it = begin(0); it.index() && first != last; ++first) {
             if(const auto curr = *first; contains(curr)) {
                 if(const auto entt = *it; entt != curr) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
