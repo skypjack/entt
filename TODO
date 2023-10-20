@@ -15,10 +15,11 @@ TODO (high prio):
 * doc: bump entities
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
-* make ::pack part of the sparse set interface
 * storage-based invoke helpers (update sigh mixin to also support storage based cbs)
 * make nth_argument use function types rather than pointers
 * use fixed_size_sequence_container_v to skip calls in meta.hpp, make funcs ret type void
+* review storage entity value_type and type passed to sparse set
+* storage entity tests for sort and sort_as (instead of pack)
 * ===> TEST: view (scoped begin) tests after the last changes
 
 WIP:
