@@ -1417,7 +1417,7 @@ TYPED_TEST(Storage, SortRange) {
     ASSERT_EQ(pool.data()[4u], entity[2u]);
 }
 
-TYPED_TEST(Storage, RespectDisjoint) {
+TYPED_TEST(Storage, SortAsDisjoint) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -1436,7 +1436,7 @@ TYPED_TEST(Storage, RespectDisjoint) {
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
 }
 
-TYPED_TEST(Storage, RespectOverlap) {
+TYPED_TEST(Storage, SortAsOverlap) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -1472,7 +1472,7 @@ TYPED_TEST(Storage, RespectOverlap) {
     ASSERT_EQ(lhs.data()[2u], lhs_entity[1u]);
 }
 
-TYPED_TEST(Storage, RespectOrdered) {
+TYPED_TEST(Storage, SortAsOrdered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -1499,7 +1499,7 @@ TYPED_TEST(Storage, RespectOrdered) {
     ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
 }
 
-TYPED_TEST(Storage, RespectReverse) {
+TYPED_TEST(Storage, SortAsReverse) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -1541,7 +1541,7 @@ TYPED_TEST(Storage, RespectReverse) {
     ASSERT_EQ(rhs.data()[5u], rhs_entity[0u]);
 }
 
-TYPED_TEST(Storage, RespectUnordered) {
+TYPED_TEST(Storage, SortAsUnordered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
