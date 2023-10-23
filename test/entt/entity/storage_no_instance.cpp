@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iterator>
 #include <memory>
 #include <tuple>
@@ -542,4 +543,174 @@ TYPED_TEST(StorageNoInstance, ReverseIterableAlgorithmCompatibility) {
     const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
 
     ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+}
+
+TYPED_TEST(StorageNoInstance, SortOrdered) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
+
+    pool.insert(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(), pool.end()));
+}
+
+TYPED_TEST(StorageNoInstance, SortReverse) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
+
+    pool.insert(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), pool.begin(), pool.end()));
+}
+
+TYPED_TEST(StorageNoInstance, SortUnordered) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    pool.insert(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[4u]);
+    ASSERT_EQ(pool.data()[1u], entity[3u]);
+    ASSERT_EQ(pool.data()[2u], entity[0u]);
+    ASSERT_EQ(pool.data()[3u], entity[1u]);
+    ASSERT_EQ(pool.data()[4u], entity[2u]);
+}
+
+TYPED_TEST(StorageNoInstance, SortN) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    pool.insert(std::begin(entity), std::end(entity));
+    pool.sort_n(0u, std::less{});
+
+    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(), pool.end()));
+
+    pool.sort_n(2u, std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[1u]);
+    ASSERT_EQ(pool.data()[1u], entity[0u]);
+    ASSERT_EQ(pool.data()[2u], entity[2u]);
+
+    pool.sort_n(5u, std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[4u]);
+    ASSERT_EQ(pool.data()[1u], entity[3u]);
+    ASSERT_EQ(pool.data()[2u], entity[1u]);
+    ASSERT_EQ(pool.data()[3u], entity[0u]);
+    ASSERT_EQ(pool.data()[4u], entity[2u]);
+}
+
+TYPED_TEST(StorageNoInstance, SortAsDisjoint) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> lhs;
+    entt::storage<value_type> rhs;
+
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+
+    lhs.sort_as(rhs.begin(), rhs.end());
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+}
+
+TYPED_TEST(StorageNoInstance, SortAsOverlap) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> lhs;
+    entt::storage<value_type> rhs;
+
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+    entt::entity rhs_entity[1u]{entt::entity{12}};
+
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
+
+    lhs.sort_as(rhs.begin(), rhs.end());
+
+    ASSERT_EQ(lhs.data()[0u], lhs_entity[0u]);
+    ASSERT_EQ(lhs.data()[1u], lhs_entity[2u]);
+    ASSERT_EQ(lhs.data()[2u], lhs_entity[1u]);
+}
+
+TYPED_TEST(StorageNoInstance, SortAsOrdered) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> lhs;
+    entt::storage<value_type> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
+
+    rhs.sort_as(lhs.begin(), lhs.end());
+
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
+}
+
+TYPED_TEST(StorageNoInstance, SortAsReverse) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> lhs;
+    entt::storage<value_type> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
+
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
+
+    rhs.sort_as(lhs.begin(), lhs.end());
+
+    ASSERT_EQ(rhs.data()[0u], rhs_entity[5u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entity[4u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entity[3u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entity[2u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entity[1u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entity[0u]);
+}
+
+TYPED_TEST(StorageNoInstance, SortAsUnordered) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> lhs;
+    entt::storage<value_type> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
+
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
+
+    rhs.sort_as(lhs.begin(), lhs.end());
+
+    ASSERT_EQ(rhs.data()[0u], rhs_entity[2u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entity[3u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entity[1u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entity[0u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entity[4u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entity[5u]);
 }
