@@ -33,10 +33,10 @@ struct StorageNoInstance: testing::Test {
 
     static auto push_instance(entt::storage<type> &pool, const entt::entity entt) {
         if constexpr(std::is_void_v<type>) {
-            return pool.entt::sparse_set::push(entt, nullptr);
+            return pool.push(entt, nullptr);
         } else {
             type instance{};
-            return pool.entt::sparse_set::push(entt, &instance);
+            return pool.push(entt, &instance);
         }
     }
 };
