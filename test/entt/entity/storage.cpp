@@ -1375,7 +1375,7 @@ TYPED_TEST(Storage, SortUnordered) {
     ASSERT_EQ(pool.data()[4u], entity[2u]);
 }
 
-TYPED_TEST(Storage, SortRange) {
+TYPED_TEST(Storage, SortN) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
