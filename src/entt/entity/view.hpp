@@ -40,11 +40,11 @@ template<typename Type, std::size_t N>
     return pos == N;
 }
 
-template<typename Type, std::size_t N>
-[[nodiscard]] auto fully_initialized(const std::array<const Type *, N> &filter) noexcept {
+template<typename Type>
+[[nodiscard]] auto fully_initialized(const Type *elem, const std::size_t len) noexcept {
     std::size_t pos{};
-    for(; pos < N && filter[pos] != nullptr; ++pos) {}
-    return pos == N;
+    for(; pos < len && elem[pos] != nullptr; ++pos) {}
+    return pos == len;
 }
 
 template<typename... Get, typename... Exclude, std::size_t... Index>
@@ -465,7 +465,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools) && internal::fully_initialized(filter);
+        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools) && internal::fully_initialized(filter.data(), filter.size());
     }
 
     /**
@@ -474,7 +474,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        if (view) {
+        if(view) {
             const auto idx = view->find(entt).index();
             return (!(idx < 0 || idx > view->begin(0).index())) && internal::all_of(opaque_check_set(), entt) && internal::none_of(filter, entt);
         }
