@@ -400,6 +400,34 @@ TYPED_TEST(StorageNoInstance, ConstIterable) {
     }
 }
 
+TYPED_TEST(StorageNoInstance, IterableIteratorConversion) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    pool.emplace(entt::entity{3});
+
+    typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
+    typename entt::storage<value_type>::const_iterable::iterator cit = it;
+
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();
+
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
+}
+
+TYPED_TEST(StorageNoInstance, IterableAlgorithmCompatibility) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    pool.emplace(entt::entity{3});
+
+    const auto iterable = pool.each();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+
+    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+}
+
 TYPED_TEST(StorageNoInstance, ReverseIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::reverse_iterable::iterator;
@@ -488,18 +516,30 @@ TYPED_TEST(StorageNoInstance, ConstReverseIterable) {
     }
 }
 
-TYPED_TEST(StorageNoInstance, IterableIteratorConversion) {
+TYPED_TEST(StorageNoInstance, ReverseIterableIteratorConversion) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
     pool.emplace(entt::entity{3});
 
-    typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
-    typename entt::storage<value_type>::const_iterable::iterator cit = it;
+    typename entt::storage<value_type>::reverse_iterable::iterator it = pool.reach().begin();
+    typename entt::storage<value_type>::const_reverse_iterable::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
+}
+
+TYPED_TEST(StorageNoInstance, ReverseIterableAlgorithmCompatibility) {
+    using value_type = typename TestFixture::type;
+    entt::storage<value_type> pool;
+
+    pool.emplace(entt::entity{3});
+
+    const auto iterable = pool.reach();
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+
+    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
 }
