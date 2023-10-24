@@ -1745,11 +1745,11 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Sort) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+        case entt::deletion_policy::swap_and_pop:
+        case entt::deletion_policy::swap_only: {
             SUCCEED();
         } break;
-        case entt::deletion_policy::in_place:
-        case entt::deletion_policy::swap_only: {
+        case entt::deletion_policy::in_place: {
             ASSERT_DEATH(set.sort(std::less{});, "");
         } break;
         }
