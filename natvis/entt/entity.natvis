@@ -100,7 +100,8 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_view&lt;*&gt;">
-		<DisplayString>{{ size_hint={ view->packed.size() } }}</DisplayString>
+		<DisplayString Optional="true">{{ size_hint={ view->packed.size() } }}</DisplayString>
+		<DisplayString>{{ size_hint={ pools._Myfirst._Val->packed.size() } }}</DisplayString>
 		<Expand>
 			<Item Name="[pools]">pools,na</Item>
 			<Item Name="[filter]">filter,na</Item>
