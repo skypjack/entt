@@ -540,3 +540,164 @@ TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
 
     ASSERT_EQ(std::get<0>(*it), entt::entity{3});
 }
+
+TEST(StorageEntity, SortOrdered) {
+    entt::storage<entt::entity> pool;
+
+    entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
+
+    pool.push(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(0), pool.end(0)));
+}
+
+TEST(StorageEntity, SortReverse) {
+    entt::storage<entt::entity> pool;
+
+    entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
+
+    pool.push(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), pool.begin(0), pool.end(0)));
+}
+
+TEST(StorageEntity, SortUnordered) {
+    entt::storage<entt::entity> pool;
+
+    entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    pool.push(std::begin(entity), std::end(entity));
+    pool.sort(std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[4u]);
+    ASSERT_EQ(pool.data()[1u], entity[3u]);
+    ASSERT_EQ(pool.data()[2u], entity[0u]);
+    ASSERT_EQ(pool.data()[3u], entity[1u]);
+    ASSERT_EQ(pool.data()[4u], entity[2u]);
+}
+
+TEST(StorageEntity, SortN) {
+    entt::storage<entt::entity> pool;
+
+    entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    pool.push(std::begin(entity), std::end(entity));
+    pool.sort_n(0u, std::less{});
+
+    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(0), pool.end(0)));
+
+    pool.sort_n(2u, std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[1u]);
+    ASSERT_EQ(pool.data()[1u], entity[0u]);
+    ASSERT_EQ(pool.data()[2u], entity[2u]);
+
+    pool.sort_n(5u, std::less{});
+
+    ASSERT_EQ(pool.data()[0u], entity[4u]);
+    ASSERT_EQ(pool.data()[1u], entity[3u]);
+    ASSERT_EQ(pool.data()[2u], entity[1u]);
+    ASSERT_EQ(pool.data()[3u], entity[0u]);
+    ASSERT_EQ(pool.data()[4u], entity[2u]);
+}
+
+TEST(StorageEntity, SortAsDisjoint) {
+    entt::storage<entt::entity> lhs;
+    entt::storage<entt::entity> rhs;
+
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+
+    lhs.sort_as(rhs.begin(0), rhs.end(0));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+}
+
+TEST(StorageEntity, SortAsOverlap) {
+    entt::storage<entt::entity> lhs;
+    entt::storage<entt::entity> rhs;
+
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+    entt::entity rhs_entity[1u]{entt::entity{12}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+
+    lhs.sort_as(rhs.begin(0), rhs.end(0));
+
+    ASSERT_EQ(lhs.data()[0u], lhs_entity[0u]);
+    ASSERT_EQ(lhs.data()[1u], lhs_entity[2u]);
+    ASSERT_EQ(lhs.data()[2u], lhs_entity[1u]);
+}
+
+TEST(StorageEntity, SortAsOrdered) {
+    entt::storage<entt::entity> lhs;
+    entt::storage<entt::entity> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+
+    rhs.sort_as(lhs.begin(0), lhs.end(0));
+
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+}
+
+TEST(StorageEntity, SortAsReverse) {
+    entt::storage<entt::entity> lhs;
+    entt::storage<entt::entity> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+
+    rhs.sort_as(lhs.begin(0), lhs.end(0));
+
+    ASSERT_EQ(rhs.data()[0u], rhs_entity[5u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entity[4u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entity[3u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entity[2u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entity[1u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entity[0u]);
+}
+
+TEST(StorageEntity, SortAsUnordered) {
+    entt::storage<entt::entity> lhs;
+    entt::storage<entt::entity> rhs;
+
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
+
+    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+
+    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+
+    rhs.sort_as(lhs.begin(0), lhs.end(0));
+
+    ASSERT_EQ(rhs.data()[0u], rhs_entity[2u]);
+    ASSERT_EQ(rhs.data()[1u], rhs_entity[3u]);
+    ASSERT_EQ(rhs.data()[2u], rhs_entity[1u]);
+    ASSERT_EQ(rhs.data()[3u], rhs_entity[0u]);
+    ASSERT_EQ(rhs.data()[4u], rhs_entity[4u]);
+    ASSERT_EQ(rhs.data()[5u], rhs_entity[5u]);
+}
