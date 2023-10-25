@@ -1319,7 +1319,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return internal::try_cast(internal::meta_context::from(*ctx), node, other.node, this);
+        return (internal::try_cast(internal::meta_context::from(*ctx), node, other.node, this) != nullptr);
     }
 
     /**
@@ -1328,7 +1328,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); });
+        return (internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
     }
 
     /**
