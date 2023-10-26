@@ -51,8 +51,8 @@ template<typename Type, typename View, typename Other, std::size_t... VGet, std:
 [[nodiscard]] auto view_pack(const View &view, const Other &other, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>) {
     Type elem{};
     // friend-initialization, avoid multiple calls to refresh
-    elem.pools = {view.storage<VGet>()..., other.storage<OGet>()...};
-    elem.filter = {view.storage<sizeof...(VGet) + VExclude>()..., other.storage<sizeof...(OGet) + OExclude>()...};
+    elem.pools = {view.template storage<VGet>()..., other.template storage<OGet>()...};
+    elem.filter = {view.template storage<sizeof...(VGet) + VExclude>()..., other.template storage<sizeof...(OGet) + OExclude>()...};
     elem.refresh();
     return elem;
 }
