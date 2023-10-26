@@ -100,11 +100,12 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_view&lt;*&gt;">
-		<DisplayString Optional="true">{{ size_hint={ view->packed.size() } }}</DisplayString>
-		<DisplayString>{{ size_hint={ pools._Myfirst._Val->packed.size() } }}</DisplayString>
+		<DisplayString Condition="view != nullptr">{{ size_hint={ view->packed.size() } }}</DisplayString>
+		<DisplayString>{{ size_hint=0 }}</DisplayString>
 		<Expand>
-			<Item Name="[pools]">pools,na</Item>
-			<Item Name="[filter]">filter,na</Item>
+			<Item Name="[pools]" Optional="true">pools,na</Item>
+			<Item Name="[filter]" Optional="true">filter,na</Item>
+			<Item Name="[handle]" Condition="view != nullptr">view,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_runtime_view&lt;*&gt;">
