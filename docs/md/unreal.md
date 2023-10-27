@@ -14,6 +14,8 @@
 
 ## Enable Cpp17
 
+> Skip this part if you are working with UE5, Since UE5 uses cpp17 by default.
+
 As of writing (Unreal Engine v4.25), the default C++ standard of Unreal Engine
 is C++14.<br/>
 On the other hand, note that `EnTT` requires C++17 to compile. To enable it, in
