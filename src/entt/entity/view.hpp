@@ -21,11 +21,6 @@ namespace entt {
 
 namespace internal {
 
-template<typename... Args, typename Type, std::size_t N, std::size_t... Index>
-[[nodiscard]] auto filter_as_tuple(const std::array<const Type *, N> &filter, std::index_sequence<Index...>) noexcept {
-    return std::make_tuple(static_cast<Args *>(const_cast<constness_as_t<Type, Args> *>(std::get<Index>(filter)))...);
-}
-
 template<typename Type, typename Entity>
 [[nodiscard]] auto all_of(const Type *elem, const std::size_t len, const Entity entt) noexcept {
     std::size_t pos{};
@@ -361,7 +356,12 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        return std::get<Index>(std::tuple_cat(pools, internal::filter_as_tuple<Exclude...>(filter, std::index_sequence_for<Exclude...>{})));
+        if constexpr(Index < sizeof...(Get)) {
+            return std::get<Index>(pools);
+        } else {
+            using type = type_list_element_t<Index - sizeof...(Get), type_list<Exclude...>>;
+            return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(filter[Index - sizeof...(Get)]));
+        }
     }
 
     /**
