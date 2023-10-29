@@ -31,8 +31,6 @@ void listener(counter &counter, Registry &, typename Registry::entity_type) {
     ++counter.value;
 }
 
-struct empty_each_tag final {};
-
 TEST(SighMixin, GenericType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
     entt::sigh_mixin<entt::storage<int>> pool;
