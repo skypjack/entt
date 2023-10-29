@@ -1664,9 +1664,10 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
 }
 
 TEST(Storage, UpdateFromDestructor) {
-    auto test = [](const auto target) {
-        constexpr auto size = 10u;
+    constexpr auto size = 10u;
+    const entt::entity entity[3u]{entt::entity{9u}, entt::entity{8u}, entt::entity{0u}};
 
+    for(auto target: entity) {
         entt::storage<update_from_destructor> pool;
 
         for(std::size_t next{}; next < size; ++next) {
@@ -1687,11 +1688,7 @@ TEST(Storage, UpdateFromDestructor) {
         for(std::size_t next{}; next < size; ++next) {
             ASSERT_FALSE(pool.contains(entt::entity(next)));
         }
-    };
-
-    test(entt::entity{9u});
-    test(entt::entity{8u});
-    test(entt::entity{0u});
+    }
 }
 
 TEST(Storage, CreateFromConstructor) {

@@ -240,13 +240,8 @@ TEST(SigH, CollectorVoid) {
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
 
-    auto test = [&cnt]() {
-        ++cnt;
-        return true;
-    };
-
     cnt = 0;
-    sigh.collect(std::move(test), 42);
+    sigh.collect([&cnt]() { ++cnt; return true; }, 42);
 
     ASSERT_EQ(cnt, 1);
 }
