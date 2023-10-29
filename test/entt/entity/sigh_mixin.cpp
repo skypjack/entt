@@ -8,7 +8,7 @@
 
 struct empty_type {};
 
-struct stable_type {
+struct pointer_stable {
     static constexpr auto in_place_delete = true;
     int value{};
 };
@@ -109,7 +109,7 @@ TEST(SighMixin, GenericType) {
 
 TEST(SighMixin, StableType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
-    entt::sigh_mixin<entt::storage<stable_type>> pool;
+    entt::sigh_mixin<entt::storage<pointer_stable>> pool;
     entt::sparse_set &base = pool;
     entt::registry registry;
 
@@ -156,7 +156,7 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(on_destroy.value, 4);
     ASSERT_EQ(pool.size(), 4u);
 
-    pool.insert(std::begin(entity), std::end(entity), stable_type{3});
+    pool.insert(std::begin(entity), std::end(entity), pointer_stable{3});
 
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 4);
@@ -540,7 +540,7 @@ TEST(SighMixin, CustomAllocator) {
 
     test(entt::sigh_mixin<entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>>{allocator}, allocator);
     test(entt::sigh_mixin<entt::basic_storage<std::true_type, entt::entity, test::throwing_allocator<std::true_type>>>{allocator}, allocator);
-    test(entt::sigh_mixin<entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>>{allocator}, allocator);
+    test(entt::sigh_mixin<entt::basic_storage<pointer_stable, entt::entity, test::throwing_allocator<pointer_stable>>>{allocator}, allocator);
 }
 
 TEST(SighMixin, ThrowingAllocator) {
@@ -616,7 +616,7 @@ TEST(SighMixin, ThrowingAllocator) {
     };
 
     test(entt::sigh_mixin<entt::basic_storage<int, entt::entity, test::throwing_allocator<int>>>{});
-    test(entt::sigh_mixin<entt::basic_storage<stable_type, entt::entity, test::throwing_allocator<stable_type>>>{});
+    test(entt::sigh_mixin<entt::basic_storage<pointer_stable, entt::entity, test::throwing_allocator<pointer_stable>>>{});
 }
 
 TEST(SighMixin, ThrowingComponent) {
