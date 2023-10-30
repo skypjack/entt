@@ -1671,8 +1671,8 @@ TEST(Storage, UpdateFromDestructor) {
         entt::storage<update_from_destructor> pool;
 
         for(std::size_t next{}; next < size; ++next) {
-            const auto entity = entt::entity(next);
-            pool.emplace(entity, pool, entity == entt::entity(size / 2) ? target : entity);
+            const auto other = entt::entity(next);
+            pool.emplace(other, pool, other == entt::entity(size / 2) ? target : other);
         }
 
         pool.erase(entt::entity(size / 2));
