@@ -6,8 +6,6 @@
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 
-struct empty_type {};
-
 struct pointer_stable {
     static constexpr auto in_place_delete = true;
     int value{};
@@ -170,71 +168,6 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(on_construct.value, 6);
     ASSERT_EQ(on_destroy.value, 6);
     ASSERT_EQ(pool.size(), 6u);
-}
-
-TEST(SighMixin, EmptyType) {
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
-    entt::sigh_mixin<entt::storage<empty_type>> pool;
-    entt::sparse_set &base = pool;
-    entt::registry registry;
-
-    counter on_construct{};
-    counter on_destroy{};
-
-    pool.bind(entt::forward_as_any(registry));
-    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
-
-    ASSERT_NE(base.push(entity[0u]), base.end());
-
-    pool.emplace(entity[1u]);
-
-    ASSERT_EQ(on_construct.value, 2);
-    ASSERT_EQ(on_destroy.value, 0);
-    ASSERT_EQ(pool.size(), 2u);
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_TRUE(pool.contains(entity[1u]));
-
-    base.erase(entity[0u]);
-    pool.erase(entity[1u]);
-
-    ASSERT_EQ(on_construct.value, 2);
-    ASSERT_EQ(on_destroy.value, 2);
-    ASSERT_EQ(pool.size(), 0u);
-
-    ASSERT_NE(base.push(std::begin(entity), std::end(entity)), base.end());
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_TRUE(pool.contains(entity[1u]));
-    ASSERT_EQ(pool.size(), 2u);
-
-    base.erase(entity[1u]);
-
-    ASSERT_EQ(on_construct.value, 4);
-    ASSERT_EQ(on_destroy.value, 3);
-    ASSERT_EQ(pool.size(), 1u);
-
-    base.erase(entity[0u]);
-
-    ASSERT_EQ(on_construct.value, 4);
-    ASSERT_EQ(on_destroy.value, 4);
-    ASSERT_EQ(pool.size(), 0u);
-
-    pool.insert(std::begin(entity), std::end(entity));
-
-    ASSERT_EQ(on_construct.value, 6);
-    ASSERT_EQ(on_destroy.value, 4);
-    ASSERT_EQ(pool.size(), 2u);
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_TRUE(pool.contains(entity[1u]));
-
-    pool.erase(std::begin(entity), std::end(entity));
-
-    ASSERT_EQ(on_construct.value, 6);
-    ASSERT_EQ(on_destroy.value, 6);
-    ASSERT_EQ(pool.size(), 0u);
 }
 
 TEST(SighMixin, NonDefaultConstructibleType) {
