@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <sstream>
 #include <string>
 #include <gtest/gtest.h>

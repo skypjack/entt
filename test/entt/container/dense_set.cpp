@@ -7,6 +7,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/container/dense_set.hpp>
 #include <entt/core/memory.hpp>

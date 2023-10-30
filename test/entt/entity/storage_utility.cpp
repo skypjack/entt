@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <entt/core/type_traits.hpp>
 #include <entt/entity/storage.hpp>
 
 template<typename Type>

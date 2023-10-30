@@ -3,7 +3,9 @@
 #include <tuple>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/container/dense_map.hpp>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/iterator.hpp>
 #include <entt/resource/cache.hpp>
 #include <entt/resource/loader.hpp>
 #include <entt/resource/resource.hpp>

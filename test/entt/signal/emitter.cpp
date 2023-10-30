@@ -1,4 +1,5 @@
 #include <functional>
+#include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/emitter.hpp>

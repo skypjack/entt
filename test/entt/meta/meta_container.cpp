@@ -6,7 +6,8 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <entt/core/hashed_string.hpp>
+#include <entt/container/dense_map.hpp>
+#include <entt/container/dense_set.hpp>
 #include <entt/meta/container.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>

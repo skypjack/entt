@@ -1,4 +1,5 @@
 #include <array>
+#include <cstdint>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/algorithm.hpp>
@@ -65,7 +66,7 @@ TEST(Algorithm, InsertionSortEmptyContainer) {
 }
 
 TEST(Algorithm, RadixSort) {
-    std::array<uint32_t, 5> arr{{4, 1, 3, 2, 0}};
+    std::array<std::uint32_t, 5> arr{{4, 1, 3, 2, 0}};
     entt::radix_sort<8, 32> sort;
 
     sort(arr.begin(), arr.end(), [](const auto &value) {

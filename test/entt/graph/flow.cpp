@@ -1,3 +1,6 @@
+#include <cstddef>
+#include <memory>
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/graph/flow.hpp>
