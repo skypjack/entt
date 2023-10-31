@@ -761,6 +761,9 @@ struct has_value_type: std::false_type {};
 template<typename Type>
 struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
 
+template<typename>
+[[nodiscard]] constexpr bool dispatch_is_equality_comparable();
+
 template<typename Type, std::size_t... Index>
 [[nodiscard]] constexpr bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
     return (dispatch_is_equality_comparable<std::tuple_element_t<Index, Type>>() && ...);
