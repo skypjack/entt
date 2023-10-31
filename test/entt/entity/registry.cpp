@@ -11,6 +11,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include "../common/config.h"
+#include "../common/non_default_constructible.h"
 #include "../common/pointer_stable.h"
 
 struct empty_type {};
@@ -22,13 +23,6 @@ struct no_eto_type {
 bool operator==(const no_eto_type &lhs, const no_eto_type &rhs) {
     return &lhs == &rhs;
 }
-
-struct non_default_constructible {
-    non_default_constructible(int v)
-        : value{v} {}
-
-    int value;
-};
 
 struct aggregate {
     int value{};
@@ -1946,7 +1940,7 @@ TEST(Registry, MoveOnlyComponent) {
 TEST(Registry, NonDefaultConstructibleComponent) {
     entt::registry registry;
     // the purpose is to ensure that non default constructible type are always accepted
-    registry.emplace<non_default_constructible>(registry.create(), 42);
+    registry.emplace<test::non_default_constructible>(registry.create(), 42);
 }
 
 TEST(Registry, Dependencies) {
