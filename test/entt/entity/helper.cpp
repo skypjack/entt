@@ -4,6 +4,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
+#include "../common/pointer_stable.h"
 
 struct clazz {
     void func(entt::registry &, entt::entity curr) {
@@ -17,11 +18,6 @@ void sigh_callback(int &value) {
     ++value;
 }
 
-struct pointer_stable {
-    static constexpr auto in_place_delete = true;
-    int value{};
-};
-
 template<typename Type>
 struct ToEntity: testing::Test {
     using type = Type;
@@ -30,7 +26,7 @@ struct ToEntity: testing::Test {
 template<typename Type>
 using ToEntityDeprecated = ToEntity<Type>;
 
-using ToEntityTypes = ::testing::Types<int, pointer_stable>;
+using ToEntityTypes = ::testing::Types<int, test::pointer_stable>;
 
 TYPED_TEST_SUITE(ToEntity, ToEntityTypes, );
 TYPED_TEST_SUITE(ToEntityDeprecated, ToEntityTypes, );
