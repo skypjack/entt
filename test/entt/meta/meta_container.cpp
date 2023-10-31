@@ -13,12 +13,9 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../common/config.h"
+#include "../common/non_default_constructible.h"
 
 struct invalid {};
-
-struct non_default_constructible {
-    non_default_constructible() = delete;
-};
 
 TEST(MetaContainer, Invalid) {
     ASSERT_FALSE(entt::meta_any{42}.as_sequence_container());
@@ -325,7 +322,7 @@ TEST(SequenceContainer, StdDeque) {
 }
 
 TEST(SequenceContainer, NonDefaultConstructible) {
-    std::vector<non_default_constructible> vec{};
+    std::vector<test::non_default_constructible> vec{};
     auto any = entt::forward_as_meta(vec);
     auto view = any.as_sequence_container();
 
