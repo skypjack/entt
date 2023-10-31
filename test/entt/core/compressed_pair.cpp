@@ -5,6 +5,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/compressed_pair.hpp>
+#include "../common/non_default_constructible.h"
 
 struct empty_type {};
 
@@ -34,13 +35,6 @@ struct move_only_type {
     int *value;
 };
 
-struct non_default_constructible {
-    non_default_constructible(int v)
-        : value{v} {}
-
-    int value;
-};
-
 TEST(CompressedPair, Size) {
     struct local {
         int value;
@@ -55,18 +49,18 @@ TEST(CompressedPair, Size) {
 }
 
 TEST(CompressedPair, ConstructCopyMove) {
-    ASSERT_FALSE((std::is_default_constructible_v<entt::compressed_pair<non_default_constructible, empty_type>>));
+    ASSERT_FALSE((std::is_default_constructible_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
     ASSERT_TRUE((std::is_default_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
 
-    ASSERT_TRUE((std::is_copy_constructible_v<entt::compressed_pair<non_default_constructible, empty_type>>));
+    ASSERT_TRUE((std::is_copy_constructible_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
     ASSERT_FALSE((std::is_copy_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
-    ASSERT_TRUE((std::is_copy_assignable_v<entt::compressed_pair<non_default_constructible, empty_type>>));
+    ASSERT_TRUE((std::is_copy_assignable_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
     ASSERT_FALSE((std::is_copy_assignable_v<entt::compressed_pair<move_only_type, empty_type>>));
 
     ASSERT_TRUE((std::is_move_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
     ASSERT_TRUE((std::is_move_assignable_v<entt::compressed_pair<move_only_type, empty_type>>));
 
-    entt::compressed_pair copyable{non_default_constructible{42}, empty_type{}};
+    entt::compressed_pair copyable{test::non_default_constructible{42}, empty_type{}};
     auto by_copy{copyable};
 
     ASSERT_EQ(by_copy.first().value, 42);
