@@ -743,18 +743,6 @@ template<typename Type>
 inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
- * equality comparable, false otherwise.
- * @tparam Type The type to test.
- */
-template<typename Type>
-struct is_equality_comparable;
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-struct is_equality_comparable<const Type>: is_equality_comparable<Type> {};
-
-/**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
@@ -775,7 +763,7 @@ struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_t
 
 template<typename Type, std::size_t... Index>
 [[nodiscard]] constexpr bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
-    return (is_equality_comparable<std::tuple_element_t<Index, Type>>::value && ...);
+    return (dispatch_is_equality_comparable<std::tuple_element_t<Index, Type>>() && ...);
 }
 
 template<typename>
@@ -789,13 +777,15 @@ template<typename Type>
 }
 
 template<typename Type>
-[[nodiscard]] constexpr auto dispatch_is_equality_comparable() {
-    if constexpr(has_tuple_size_value<Type>::value) {
+[[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
+    if constexpr(std::is_array_v<Type>) {
+        return false;
+    } else if constexpr(has_tuple_size_value<Type>::value) {
         return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
     } else if constexpr(has_value_type<Type>::value) {
         if constexpr(is_iterator_v<Type> || std::is_same_v<typename Type::value_type, Type>) {
             return maybe_equality_comparable<Type>(0);
-        } else if constexpr(is_equality_comparable<typename Type::value_type>::value) {
+        } else if constexpr(dispatch_is_equality_comparable<typename Type::value_type>()) {
             return maybe_equality_comparable<Type>(0);
         } else {
             return false;
@@ -807,17 +797,22 @@ template<typename Type>
 
 } // namespace internal
 
-template<typename Type>
-struct is_equality_comparable: std::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
-
 /**
  * Internal details not to be documented.
  * @endcond
  */
 
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * equality comparable, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type>
+struct is_equality_comparable: std::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
+
 /*! @copydoc is_equality_comparable */
-template<typename Type, auto N>
-struct is_equality_comparable<Type[N]>: std::false_type {};
+template<typename Type>
+struct is_equality_comparable<const Type>: is_equality_comparable<Type> {};
 
 /**
  * @brief Helper variable template.
