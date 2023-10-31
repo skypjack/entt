@@ -5,13 +5,9 @@
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../common/pointer_stable.h"
 
 struct empty_type {};
-
-struct pointer_stable {
-    static constexpr auto in_place_delete = true;
-    int value{};
-};
 
 TEST(SingleComponentView, Functionalities) {
     entt::registry registry;
@@ -420,15 +416,15 @@ TEST(SingleComponentView, FrontBack) {
 TEST(SingleComponentView, DeductionGuide) {
     entt::registry registry;
     entt::storage_type_t<int> istorage;
-    entt::storage_type_t<pointer_stable> sstorage;
+    entt::storage_type_t<test::pointer_stable> sstorage;
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage)})>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{sstorage})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<test::pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{sstorage})>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::make_tuple()})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage))})>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(sstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<test::pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(sstorage)})>();
 }
 
 TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
@@ -446,13 +442,13 @@ TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
 
 TEST(SingleComponentView, StableType) {
     entt::registry registry;
-    auto view = registry.view<pointer_stable>();
+    auto view = registry.view<test::pointer_stable>();
 
     const auto entity = registry.create();
     const auto other = registry.create();
 
-    registry.emplace<pointer_stable>(entity);
-    registry.emplace<pointer_stable>(other);
+    registry.emplace<test::pointer_stable>(entity);
+    registry.emplace<test::pointer_stable>(other);
     registry.destroy(entity);
 
     ASSERT_EQ(view.size_hint(), 2u);
@@ -465,18 +461,18 @@ TEST(SingleComponentView, StableType) {
     ASSERT_EQ(*view.begin(), other);
     ASSERT_EQ(++view.begin(), view.end());
 
-    view.each([other](const auto entt, pointer_stable) {
+    view.each([other](const auto entt, test::pointer_stable) {
         ASSERT_EQ(other, entt);
     });
 
-    view.each([check = true](pointer_stable) mutable {
+    view.each([check = true](test::pointer_stable) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
     for(auto [entt, st]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
-        testing::StaticAssertTypeEq<decltype(st), pointer_stable &>();
+        testing::StaticAssertTypeEq<decltype(st), test::pointer_stable &>();
         ASSERT_EQ(other, entt);
     }
 
@@ -1256,25 +1252,25 @@ TEST(MultiComponentView, DeductionGuide) {
     entt::registry registry;
     entt::storage_type_t<int> istorage;
     entt::storage_type_t<double> dstorage;
-    entt::storage_type_t<pointer_stable> sstorage;
+    entt::storage_type_t<test::pointer_stable> sstorage;
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, dstorage})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), dstorage})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, std::as_const(dstorage)})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), std::as_const(dstorage)})>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, sstorage})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<test::pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, sstorage})>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, dstorage), std::make_tuple()})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), dstorage)})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, std::as_const(dstorage))})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, const entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage), std::as_const(dstorage))})>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, sstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<test::pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(istorage, sstorage)})>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(dstorage)})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(dstorage)})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(std::as_const(dstorage))})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<const entt::storage_type_t<double>>>, decltype(entt::basic_view{std::forward_as_tuple(std::as_const(istorage)), std::forward_as_tuple(std::as_const(dstorage))})>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<pointer_stable>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(sstorage)})>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<test::pointer_stable>>>, decltype(entt::basic_view{std::forward_as_tuple(istorage), std::forward_as_tuple(sstorage)})>();
 }
 
 TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
@@ -1293,20 +1289,20 @@ TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
 
 TEST(MultiComponentView, StableType) {
     entt::registry registry;
-    auto view = registry.view<int, pointer_stable>();
+    auto view = registry.view<int, test::pointer_stable>();
 
     const auto entity = registry.create();
     const auto other = registry.create();
 
     registry.emplace<int>(entity);
     registry.emplace<int>(other);
-    registry.emplace<pointer_stable>(entity);
-    registry.emplace<pointer_stable>(other);
+    registry.emplace<test::pointer_stable>(entity);
+    registry.emplace<test::pointer_stable>(other);
     registry.destroy(entity);
 
     ASSERT_EQ(view.size_hint(), 1u);
 
-    view.use<pointer_stable>();
+    view.use<test::pointer_stable>();
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_FALSE(view.contains(entity));
@@ -1318,11 +1314,11 @@ TEST(MultiComponentView, StableType) {
     ASSERT_EQ(*view.begin(), other);
     ASSERT_EQ(++view.begin(), view.end());
 
-    view.each([other](const auto entt, int, pointer_stable) {
+    view.each([other](const auto entt, int, test::pointer_stable) {
         ASSERT_EQ(other, entt);
     });
 
-    view.each([check = true](int, pointer_stable) mutable {
+    view.each([check = true](int, test::pointer_stable) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
@@ -1330,7 +1326,7 @@ TEST(MultiComponentView, StableType) {
     for(auto [entt, iv, st]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
-        testing::StaticAssertTypeEq<decltype(st), pointer_stable &>();
+        testing::StaticAssertTypeEq<decltype(st), test::pointer_stable &>();
         ASSERT_EQ(other, entt);
     }
 
@@ -1341,13 +1337,13 @@ TEST(MultiComponentView, StableType) {
 
 TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     entt::registry registry;
-    auto view = registry.view<pointer_stable>(entt::exclude<int>);
+    auto view = registry.view<test::pointer_stable>(entt::exclude<int>);
 
     const auto entity = registry.create();
     const auto other = registry.create();
 
-    registry.emplace<pointer_stable>(entity, 0);
-    registry.emplace<pointer_stable>(other, 42);
+    registry.emplace<test::pointer_stable>(entity, 0);
+    registry.emplace<test::pointer_stable>(other, 42);
     registry.emplace<int>(entity);
 
     ASSERT_EQ(view.size_hint(), 2u);
@@ -1629,12 +1625,12 @@ TEST(View, Pipe) {
 
     registry.emplace<int>(other);
     registry.emplace<char>(other);
-    registry.emplace<pointer_stable>(other);
+    registry.emplace<test::pointer_stable>(other);
 
     auto view1 = registry.view<int>(entt::exclude<const double>);
     auto view2 = registry.view<const char>(entt::exclude<float>);
     auto view3 = registry.view<empty_type>();
-    auto view4 = registry.view<pointer_stable>();
+    auto view4 = registry.view<test::pointer_stable>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<char>, entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<float>, const entt::storage_type_t<double>>>, decltype(view2 | view1)>();
@@ -1668,7 +1664,7 @@ TEST(View, Pipe) {
 
     ASSERT_EQ(pack14.storage<int>(), nullptr);
     ASSERT_EQ(pack14.storage<const double>(), nullptr);
-    ASSERT_NE(pack14.storage<pointer_stable>(), nullptr);
+    ASSERT_NE(pack14.storage<test::pointer_stable>(), nullptr);
 
     ASSERT_EQ(pack32.storage<empty_type>(), nullptr);
     ASSERT_NE(pack32.storage<const char>(), nullptr);
