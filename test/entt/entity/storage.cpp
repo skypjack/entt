@@ -10,22 +10,10 @@
 #include <entt/entity/component.hpp>
 #include <entt/entity/storage.hpp>
 #include "../common/config.h"
+#include "../common/pointer_stable.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
 #include "../common/tracked_memory_resource.hpp"
-
-struct pointer_stable {
-    static constexpr auto in_place_delete = true;
-    int value{};
-};
-
-inline bool operator==(const pointer_stable &lhs, const pointer_stable &rhs) {
-    return lhs.value == rhs.value;
-}
-
-inline bool operator<(const pointer_stable &lhs, const pointer_stable &rhs) {
-    return lhs.value < rhs.value;
-}
 
 struct update_from_destructor {
     update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
@@ -78,7 +66,7 @@ struct Storage: testing::Test {
 template<typename Type>
 using StorageDeathTest = Storage<Type>;
 
-using StorageTypes = ::testing::Types<int, pointer_stable>;
+using StorageTypes = ::testing::Types<int, test::pointer_stable>;
 
 TYPED_TEST_SUITE(Storage, StorageTypes, );
 TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
@@ -606,9 +594,6 @@ ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Value) {
 }
 
 TYPED_TEST(Storage, Emplace) {
-    // ensure that we've at least an aggregate type to test here
-    static_assert(std::is_aggregate_v<pointer_stable>, "Not an aggregate type");
-
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
