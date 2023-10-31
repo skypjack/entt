@@ -11,6 +11,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include "../common/config.h"
+#include "../common/pointer_stable.h"
 
 struct empty_type {};
 
@@ -21,11 +22,6 @@ struct no_eto_type {
 bool operator==(const no_eto_type &lhs, const no_eto_type &rhs) {
     return &lhs == &rhs;
 }
-
-struct pointer_stable {
-    static constexpr auto in_place_delete = true;
-    int value{};
-};
 
 struct non_default_constructible {
     non_default_constructible(int v)
@@ -748,17 +744,17 @@ TEST(Registry, DestroyRange) {
 TEST(Registry, StableDestroy) {
     entt::registry registry;
     const auto iview = registry.view<int>();
-    const auto icview = registry.view<int, pointer_stable>();
+    const auto icview = registry.view<int, test::pointer_stable>();
     entt::entity entity[3u];
 
     registry.create(std::begin(entity), std::end(entity));
 
     registry.emplace<int>(entity[0u]);
-    registry.emplace<pointer_stable>(entity[0u]);
+    registry.emplace<test::pointer_stable>(entity[0u]);
     registry.emplace<double>(entity[0u]);
 
     registry.emplace<int>(entity[1u]);
-    registry.emplace<pointer_stable>(entity[1u]);
+    registry.emplace<test::pointer_stable>(entity[1u]);
 
     registry.emplace<int>(entity[2u]);
 
@@ -773,7 +769,7 @@ TEST(Registry, StableDestroy) {
     ASSERT_TRUE(registry.valid(entity[2u]));
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 0u);
 
     registry.destroy(iview.begin(), iview.end());
@@ -783,7 +779,7 @@ TEST(Registry, StableDestroy) {
     ASSERT_EQ(icview.size_hint(), 0u);
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 0u);
 }
 
@@ -1577,17 +1573,17 @@ ENTT_DEBUG_TEST(RegistryDeathTest, Erase) {
 TEST(Registry, StableErase) {
     entt::registry registry;
     const auto iview = registry.view<int>();
-    const auto icview = registry.view<int, pointer_stable>();
+    const auto icview = registry.view<int, test::pointer_stable>();
     entt::entity entity[3u];
 
     registry.create(std::begin(entity), std::end(entity));
 
     registry.emplace<int>(entity[0u]);
-    registry.emplace<pointer_stable>(entity[0u]);
+    registry.emplace<test::pointer_stable>(entity[0u]);
     registry.emplace<double>(entity[0u]);
 
     registry.emplace<int>(entity[1u]);
-    registry.emplace<pointer_stable>(entity[1u]);
+    registry.emplace<test::pointer_stable>(entity[1u]);
 
     registry.emplace<int>(entity[2u]);
 
@@ -1595,16 +1591,16 @@ TEST(Registry, StableErase) {
     ASSERT_TRUE(registry.all_of<int>(entity[1u]));
     ASSERT_TRUE(registry.any_of<int>(entity[2u]));
 
-    registry.erase<int, pointer_stable>(entity[0u]);
-    registry.erase<int, pointer_stable>(icview.begin(), icview.end());
-    registry.erase<int, pointer_stable>(icview.begin(), icview.end());
+    registry.erase<int, test::pointer_stable>(entity[0u]);
+    registry.erase<int, test::pointer_stable>(icview.begin(), icview.end());
+    registry.erase<int, test::pointer_stable>(icview.begin(), icview.end());
 
     ASSERT_FALSE(registry.any_of<int>(entity[0u]));
     ASSERT_FALSE(registry.all_of<int>(entity[1u]));
     ASSERT_TRUE(registry.any_of<int>(entity[2u]));
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
     registry.erase<int>(iview.begin(), iview.end());
@@ -1612,7 +1608,7 @@ TEST(Registry, StableErase) {
     ASSERT_FALSE(registry.any_of<int>(entity[2u]));
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 }
 
@@ -1727,17 +1723,17 @@ TEST(Registry, Remove) {
 TEST(Registry, StableRemove) {
     entt::registry registry;
     const auto iview = registry.view<int>();
-    const auto icview = registry.view<int, pointer_stable>();
+    const auto icview = registry.view<int, test::pointer_stable>();
     entt::entity entity[3u];
 
     registry.create(std::begin(entity), std::end(entity));
 
     registry.emplace<int>(entity[0u]);
-    registry.emplace<pointer_stable>(entity[0u]);
+    registry.emplace<test::pointer_stable>(entity[0u]);
     registry.emplace<double>(entity[0u]);
 
     registry.emplace<int>(entity[1u]);
-    registry.emplace<pointer_stable>(entity[1u]);
+    registry.emplace<test::pointer_stable>(entity[1u]);
 
     registry.emplace<int>(entity[2u]);
 
@@ -1745,17 +1741,17 @@ TEST(Registry, StableRemove) {
     ASSERT_TRUE(registry.all_of<int>(entity[1u]));
     ASSERT_TRUE(registry.any_of<int>(entity[2u]));
 
-    registry.remove<int, pointer_stable>(entity[0u]);
+    registry.remove<int, test::pointer_stable>(entity[0u]);
 
-    ASSERT_EQ((registry.remove<int, pointer_stable>(icview.begin(), icview.end())), 2u);
-    ASSERT_EQ((registry.remove<int, pointer_stable>(icview.begin(), icview.end())), 0u);
+    ASSERT_EQ((registry.remove<int, test::pointer_stable>(icview.begin(), icview.end())), 2u);
+    ASSERT_EQ((registry.remove<int, test::pointer_stable>(icview.begin(), icview.end())), 0u);
 
     ASSERT_FALSE(registry.any_of<int>(entity[0u]));
     ASSERT_FALSE(registry.all_of<int>(entity[1u]));
     ASSERT_TRUE(registry.any_of<int>(entity[2u]));
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
     ASSERT_EQ((registry.remove<int>(iview.begin(), iview.end())), 1u);
@@ -1766,7 +1762,7 @@ TEST(Registry, StableRemove) {
     ASSERT_FALSE(registry.any_of<int>(entity[2u]));
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 }
 
@@ -1777,28 +1773,28 @@ TEST(Registry, Compact) {
     registry.create(std::begin(entity), std::end(entity));
 
     registry.emplace<int>(entity[0u]);
-    registry.emplace<pointer_stable>(entity[0u]);
+    registry.emplace<test::pointer_stable>(entity[0u]);
 
     registry.emplace<int>(entity[1u]);
-    registry.emplace<pointer_stable>(entity[1u]);
+    registry.emplace<test::pointer_stable>(entity[1u]);
 
     ASSERT_EQ(registry.storage<int>().size(), 2u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
 
     registry.destroy(std::begin(entity), std::end(entity));
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
 
     registry.compact<int>();
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 2u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
 
     registry.compact();
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
-    ASSERT_EQ(registry.storage<pointer_stable>().size(), 0u);
+    ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 0u);
 }
 
 TEST(Registry, NonOwningGroupInterleaved) {
