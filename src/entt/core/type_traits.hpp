@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <iterator>
-#include <optional>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -786,23 +785,30 @@ template<typename>
 
 template<typename Type>
 [[nodiscard]] constexpr auto maybe_equality_comparable(int) -> decltype(std::declval<Type>() == std::declval<Type>()) {
+    return true;
+}
+
+template<typename Type>
+[[nodiscard]] constexpr auto dispatch_is_equality_comparable() {
     if constexpr(has_tuple_size_value<Type>::value) {
-        return unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
+        return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
     } else if constexpr(has_value_type<Type>::value) {
         if constexpr(is_iterator_v<Type> || std::is_same_v<typename Type::value_type, Type>) {
-            return true;
+            return maybe_equality_comparable<Type>(0);
+        } else if constexpr(is_equality_comparable<typename Type::value_type>::value) {
+            return maybe_equality_comparable<Type>(0);
         } else {
-            return is_equality_comparable<typename Type::value_type>::value;
+            return false;
         }
     } else {
-        return true;
+        return maybe_equality_comparable<Type>(0);
     }
 }
 
 } // namespace internal
 
 template<typename Type>
-struct is_equality_comparable: std::bool_constant<internal::maybe_equality_comparable<Type>(0)> {};
+struct is_equality_comparable: std::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
 
 /**
  * Internal details not to be documented.
@@ -812,11 +818,6 @@ struct is_equality_comparable: std::bool_constant<internal::maybe_equality_compa
 /*! @copydoc is_equality_comparable */
 template<typename Type, auto N>
 struct is_equality_comparable<Type[N]>: std::false_type {};
-
-/*! @copydoc is_equality_comparable */
-template<typename Type>
-// std::optional has a non sfinae-friendly comparison operator :(
-struct is_equality_comparable<std::optional<Type>>: is_equality_comparable<typename std::optional<Type>::value_type> {};
 
 /**
  * @brief Helper variable template.
