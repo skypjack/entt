@@ -212,6 +212,7 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_TRUE((entt::is_equality_comparable_v<std::pair<const int, int>>));
     ASSERT_TRUE((entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>));
     ASSERT_TRUE(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
+    ASSERT_TRUE((entt::is_equality_comparable_v<std::optional<int>>));
     ASSERT_TRUE(entt::is_equality_comparable_v<nlohmann_json_like>);
 
     ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>);
@@ -223,6 +224,7 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_FALSE((entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>));
     ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, not_comparable>>));
     ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>));
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::optional<not_comparable>>));
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
 }
 
