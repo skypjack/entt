@@ -14,19 +14,10 @@
 #include <entt/core/utility.hpp>
 #include "../common/throwing_allocator.hpp"
 #include "../common/tracked_memory_resource.hpp"
-
-struct transparent_equal_to {
-    using is_transparent = void;
-
-    template<typename Type, typename Other>
-    constexpr std::enable_if_t<std::is_convertible_v<Other, Type>, bool>
-    operator()(const Type &lhs, const Other &rhs) const {
-        return lhs == static_cast<Type>(rhs);
-    }
-};
+#include "../common/transparent_equal_to.h"
 
 TEST(DenseSet, Functionalities) {
-    entt::dense_set<int, entt::identity, transparent_equal_to> set;
+    entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
@@ -787,7 +778,7 @@ TEST(DenseSet, Swap) {
 }
 
 TEST(DenseSet, EqualRange) {
-    entt::dense_set<int, entt::identity, transparent_equal_to> set;
+    entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
     set.emplace(42);
