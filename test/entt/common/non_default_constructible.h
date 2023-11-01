@@ -1,8 +1,6 @@
 #ifndef ENTT_COMMON_NON_DEFAULT_CONSTRUCTIBLE_HPP
 #define ENTT_COMMON_NON_DEFAULT_CONSTRUCTIBLE_HPP
 
-#include <type_traits>
-
 namespace test {
 
 struct non_default_constructible {
