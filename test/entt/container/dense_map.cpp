@@ -15,19 +15,10 @@
 #include "../common/config.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/tracked_memory_resource.hpp"
-
-struct transparent_equal_to {
-    using is_transparent = void;
-
-    template<typename Type, typename Other>
-    constexpr std::enable_if_t<std::is_convertible_v<Other, Type>, bool>
-    operator()(const Type &lhs, const Other &rhs) const {
-        return lhs == static_cast<Type>(rhs);
-    }
-};
+#include "../common/transparent_equal_to.h"
 
 TEST(DenseMap, Functionalities) {
-    entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
+    entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
 
     ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = map.get_allocator());
@@ -927,7 +918,7 @@ TEST(DenseMap, Swap) {
 }
 
 TEST(DenseMap, EqualRange) {
-    entt::dense_map<int, int, entt::identity, transparent_equal_to> map;
+    entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
 
     map.emplace(42, 3);
