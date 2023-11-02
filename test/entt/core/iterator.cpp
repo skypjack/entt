@@ -3,13 +3,10 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/iterator.hpp>
-
-struct clazz {
-    int value{0};
-};
+#include "../common/boxed_int.h"
 
 TEST(InputIteratorPointer, Functionalities) {
-    clazz instance{};
+    test::boxed_int instance{};
     entt::input_iterator_pointer ptr{std::move(instance)};
     ptr->value = 42;
 
