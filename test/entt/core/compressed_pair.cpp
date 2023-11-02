@@ -3,37 +3,12 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/compressed_pair.hpp>
 #include "../common/non_default_constructible.h"
 
 struct empty_type {};
-
-struct move_only_type {
-    move_only_type()
-        : value{new int{99}} {}
-
-    move_only_type(int v)
-        : value{new int{v}} {}
-
-    ~move_only_type() {
-        delete value;
-    }
-
-    move_only_type(const move_only_type &) = delete;
-    move_only_type &operator=(const move_only_type &) = delete;
-
-    move_only_type(move_only_type &&other) noexcept
-        : value{std::exchange(other.value, nullptr)} {}
-
-    move_only_type &operator=(move_only_type &&other) noexcept {
-        delete value;
-        value = std::exchange(other.value, nullptr);
-        return *this;
-    }
-
-    int *value;
-};
 
 TEST(CompressedPair, Size) {
     struct local {
@@ -50,15 +25,15 @@ TEST(CompressedPair, Size) {
 
 TEST(CompressedPair, ConstructCopyMove) {
     ASSERT_FALSE((std::is_default_constructible_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
-    ASSERT_TRUE((std::is_default_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
+    ASSERT_TRUE((std::is_default_constructible_v<entt::compressed_pair<std::unique_ptr<int>, empty_type>>));
 
     ASSERT_TRUE((std::is_copy_constructible_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
-    ASSERT_FALSE((std::is_copy_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
+    ASSERT_FALSE((std::is_copy_constructible_v<entt::compressed_pair<std::unique_ptr<int>, empty_type>>));
     ASSERT_TRUE((std::is_copy_assignable_v<entt::compressed_pair<test::non_default_constructible, empty_type>>));
-    ASSERT_FALSE((std::is_copy_assignable_v<entt::compressed_pair<move_only_type, empty_type>>));
+    ASSERT_FALSE((std::is_copy_assignable_v<entt::compressed_pair<std::unique_ptr<int>, empty_type>>));
 
-    ASSERT_TRUE((std::is_move_constructible_v<entt::compressed_pair<move_only_type, empty_type>>));
-    ASSERT_TRUE((std::is_move_assignable_v<entt::compressed_pair<move_only_type, empty_type>>));
+    ASSERT_TRUE((std::is_move_constructible_v<entt::compressed_pair<std::unique_ptr<int>, empty_type>>));
+    ASSERT_TRUE((std::is_move_assignable_v<entt::compressed_pair<std::unique_ptr<int>, empty_type>>));
 
     entt::compressed_pair copyable{test::non_default_constructible{42}, empty_type{}};
     auto by_copy{copyable};
@@ -70,17 +45,17 @@ TEST(CompressedPair, ConstructCopyMove) {
 
     ASSERT_EQ(copyable.first().value, 3);
 
-    entt::compressed_pair<empty_type, move_only_type> movable{};
+    entt::compressed_pair<empty_type, std::unique_ptr<int>> movable{empty_type{}, std::make_unique<int>(99)};
     auto by_move{std::move(movable)};
 
-    ASSERT_EQ(*by_move.second().value, 99);
-    ASSERT_EQ(movable.second().value, nullptr);
+    ASSERT_EQ(*by_move.second(), 99);
+    ASSERT_EQ(movable.second(), nullptr);
 
-    *by_move.second().value = 3;
+    *by_move.second() = 3;
     movable = std::move(by_move);
 
-    ASSERT_EQ(*movable.second().value, 3);
-    ASSERT_EQ(by_move.second().value, nullptr);
+    ASSERT_EQ(*movable.second(), 3);
+    ASSERT_EQ(by_move.second(), nullptr);
 }
 
 TEST(CompressedPair, PiecewiseConstruct) {
