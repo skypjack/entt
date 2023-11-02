@@ -3,10 +3,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/algorithm.hpp>
-
-struct boxed_int {
-    int value;
-};
+#include "../common/boxed_int.h"
 
 TEST(Algorithm, StdSort) {
     // well, I'm pretty sure it works, it's std::sort!!
@@ -22,7 +19,7 @@ TEST(Algorithm, StdSort) {
 
 TEST(Algorithm, StdSortBoxedInt) {
     // well, I'm pretty sure it works, it's std::sort!!
-    std::array<boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
+    std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
     entt::std_sort sort;
 
     sort(arr.begin(), arr.end(), [](const auto &lhs, const auto &rhs) {
@@ -46,7 +43,7 @@ TEST(Algorithm, InsertionSort) {
 }
 
 TEST(Algorithm, InsertionSortBoxedInt) {
-    std::array<boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
+    std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
     entt::insertion_sort sort;
 
     sort(arr.begin(), arr.end(), [](const auto &lhs, const auto &rhs) {
@@ -79,7 +76,7 @@ TEST(Algorithm, RadixSort) {
 }
 
 TEST(Algorithm, RadixSortBoxedInt) {
-    std::array<boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
+    std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
     entt::radix_sort<2, 6> sort;
 
     sort(arr.rbegin(), arr.rend(), [](const auto &instance) {
