@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
+#include "../common/aggregate.h"
 #include "../common/config.h"
 
 struct empty {
@@ -1555,12 +1556,8 @@ TEST_F(Any, NoSboAlignment) {
 }
 
 TEST_F(Any, AggregatesMustWork) {
-    struct aggregate_type {
-        int value;
-    };
-
     // the goal of this test is to enforce the requirements for aggregate types
-    entt::any{std::in_place_type<aggregate_type>, 42}.emplace<aggregate_type>(42);
+    entt::any{std::in_place_type<test::aggregate>, 42}.emplace<test::aggregate>(42);
 }
 
 TEST_F(Any, DeducedArrayType) {
