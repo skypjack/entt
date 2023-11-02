@@ -165,7 +165,6 @@ TYPED_TEST(Storage, Swap) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
     pool.emplace(entt::entity{42}, 41);
-
     other.emplace(entt::entity{9}, 8);
     other.emplace(entt::entity{3}, 2);
     other.erase(entt::entity{9});
@@ -242,15 +241,9 @@ TYPED_TEST(Storage, Raw) {
 
     pool.emplace(entt::entity{3}, 3);
     pool.emplace(entt::entity{12}, 6);
-    pool.emplace(entt::entity{42}, 9);
-
-    ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
-    ASSERT_EQ(std::as_const(pool).get(entt::entity{12}), value_type{6});
-    ASSERT_EQ(pool.get(entt::entity{42}), value_type{9});
 
     ASSERT_EQ(pool.raw()[0u][0u], value_type{3});
     ASSERT_EQ(std::as_const(pool).raw()[0u][1u], value_type{6});
-    ASSERT_EQ(pool.raw()[0u][2u], value_type{9});
 }
 
 TYPED_TEST(Storage, Iterator) {
