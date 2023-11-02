@@ -67,7 +67,7 @@ struct Storage: testing::Test {
 template<typename Type>
 using StorageDeathTest = Storage<Type>;
 
-using StorageTypes = ::testing::Types<int, test::aggregate, test::pointer_stable>;
+using StorageTypes = ::testing::Types<int, test::pointer_stable>;
 
 TYPED_TEST_SUITE(Storage, StorageTypes, );
 TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
@@ -593,16 +593,25 @@ TYPED_TEST(Storage, Emplace) {
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), value_type &>();
 
-    // aggregate types with no args enter the non-aggregate path
     ASSERT_EQ(pool.emplace(entt::entity{3}), value_type{});
-    // aggregate types with args work despite the lack of support in the standard library
     ASSERT_EQ(pool.emplace(entt::entity{42}, 42), value_type{42});
+}
+
+TEST(Storage, EmplaceAggregate) {
+    entt::storage<test::aggregate> pool;
+
+    testing::StaticAssertTypeEq<decltype(pool.emplace({})), test::aggregate &>();
+
+    // aggregate types with no args enter the non-aggregate path
+    ASSERT_EQ(pool.emplace(entt::entity{3}), test::aggregate{});
+    // aggregate types with args work despite the lack of support in the standard library
+    ASSERT_EQ(pool.emplace(entt::entity{42}, 42), test::aggregate{42});
 }
 
 TEST(Storage, EmplaceSelfMoveSupport) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
-    entt::entity entity{};
+    entt::entity entity{42};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
 
@@ -615,7 +624,7 @@ TEST(Storage, EmplaceSelfMoveSupport) {
 TEST(Storage, EmplaceSelfMoveSupportInPlaceDelete) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<char>> pool;
-    entt::entity entity{};
+    entt::entity entity{42};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
 
@@ -1842,7 +1851,7 @@ TYPED_TEST(Storage, NoUsesAllocatorConstruction) {
     using value_type = typename TestFixture::type;
     test::tracked_memory_resource memory_resource{};
     entt::basic_storage<value_type, entt::entity, std::pmr::polymorphic_allocator<value_type>> pool{&memory_resource};
-    const entt::entity entity{};
+    const entt::entity entity{42};
 
     pool.emplace(entity);
     pool.erase(entity);
@@ -1858,7 +1867,7 @@ TEST(Storage, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
     test::tracked_memory_resource memory_resource{};
     entt::basic_storage<string_type, entt::entity, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
-    const entt::entity entity{};
+    const entt::entity entity{42};
 
     pool.emplace(entity);
     pool.erase(entity);
