@@ -10,6 +10,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include "../common/aggregate.h"
 #include "../common/config.h"
 #include "../common/non_default_constructible.h"
 #include "../common/pointer_stable.h"
@@ -23,10 +24,6 @@ struct no_eto_type {
 bool operator==(const no_eto_type &lhs, const no_eto_type &rhs) {
     return &lhs == &rhs;
 }
-
-struct aggregate {
-    int value{};
-};
 
 struct listener {
     template<typename Type>
@@ -448,8 +445,8 @@ TEST(Registry, ReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<aggregate>(entity, 0);
-    auto &instance = registry.replace<aggregate>(entity, 42);
+    registry.emplace<test::aggregate>(entity, 0);
+    auto &instance = registry.replace<test::aggregate>(entity, 42);
 
     ASSERT_EQ(instance.value, 42);
 }
@@ -457,7 +454,7 @@ TEST(Registry, ReplaceAggregate) {
 TEST(Registry, EmplaceOrReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto &instance = registry.emplace_or_replace<aggregate>(entity, 42);
+    auto &instance = registry.emplace_or_replace<test::aggregate>(entity, 42);
 
     ASSERT_EQ(instance.value, 42);
 }
