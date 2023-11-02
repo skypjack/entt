@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/component.hpp>
 #include <entt/entity/storage.hpp>
+#include "../common/aggregate.h"
 #include "../common/config.h"
 #include "../common/pointer_stable.h"
 #include "../common/throwing_allocator.hpp"
@@ -66,7 +67,7 @@ struct Storage: testing::Test {
 template<typename Type>
 using StorageDeathTest = Storage<Type>;
 
-using StorageTypes = ::testing::Types<int, test::pointer_stable>;
+using StorageTypes = ::testing::Types<int, test::aggregate, test::pointer_stable>;
 
 TYPED_TEST_SUITE(Storage, StorageTypes, );
 TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
