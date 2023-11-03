@@ -1797,52 +1797,52 @@ TEST(Storage, ThrowingComponent) {
     entt::storage<test::throwing_type> pool;
     test::throwing_type::trigger_on_value = 42;
 
+    const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}};
+    const test::throwing_type value[2u]{42, 1};
+
     // strong exception safety
-    ASSERT_THROW(pool.emplace(entt::entity{0}, test::throwing_type{42}), typename test::throwing_type::exception_type);
+    ASSERT_THROW(pool.emplace(entity[0u], value[0u]), typename test::throwing_type::exception_type);
     ASSERT_TRUE(pool.empty());
 
-    const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}};
-    const test::throwing_type components[2u]{42, 1};
-
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), test::throwing_type{42}), typename test::throwing_type::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), value[0u]), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 0u);
-    ASSERT_FALSE(pool.contains(entt::entity{1}));
+    ASSERT_FALSE(pool.contains(entity[1u]));
 
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), std::begin(components)), typename test::throwing_type::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), std::begin(value)), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 0u);
-    ASSERT_FALSE(pool.contains(entt::entity{1}));
+    ASSERT_FALSE(pool.contains(entity[1u]));
 
     // basic exception safety
-    ASSERT_THROW(pool.insert(std::rbegin(entity), std::rend(entity), std::rbegin(components)), typename test::throwing_type::exception_type);
+    ASSERT_THROW(pool.insert(std::rbegin(entity), std::rend(entity), std::rbegin(value)), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 1u);
-    ASSERT_TRUE(pool.contains(entt::entity{1}));
-    ASSERT_EQ(pool.get(entt::entity{1}), 1);
+    ASSERT_TRUE(pool.contains(entity[1u]));
+    ASSERT_EQ(pool.get(entity[1u]), value[1u]);
 
     pool.clear();
-    pool.emplace(entt::entity{1}, 1);
-    pool.emplace(entt::entity{42}, 42);
+    pool.emplace(entity[1u], value[1u].get());
+    pool.emplace(entity[0u], value[0u].get());
 
     // basic exception safety
-    ASSERT_THROW(pool.erase(entt::entity{1}), typename test::throwing_type::exception_type);
+    ASSERT_THROW(pool.erase(entity[1u]), typename test::throwing_type::exception_type);
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_TRUE(pool.contains(entt::entity{42}));
-    ASSERT_TRUE(pool.contains(entt::entity{1}));
-    ASSERT_EQ(pool.at(0u), entt::entity{1});
-    ASSERT_EQ(pool.at(1u), entt::entity{42});
-    ASSERT_EQ(pool.get(entt::entity{42}), 42);
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
+    ASSERT_EQ(pool.at(0u), entity[1u]);
+    ASSERT_EQ(pool.at(1u), entity[0u]);
+    ASSERT_EQ(pool.get(entity[0u]), value[0u]);
     // the element may have been moved but it's still there
-    ASSERT_EQ(pool.get(entt::entity{1}), test::throwing_type::moved_from_value);
+    ASSERT_EQ(pool.get(entity[1u]), test::throwing_type::moved_from_value);
 
     test::throwing_type::trigger_on_value = 99;
-    pool.erase(entt::entity{1});
+    pool.erase(entity[1u]);
 
     ASSERT_EQ(pool.size(), 1u);
-    ASSERT_TRUE(pool.contains(entt::entity{42}));
-    ASSERT_FALSE(pool.contains(entt::entity{1}));
-    ASSERT_EQ(pool.at(0u), entt::entity{42});
-    ASSERT_EQ(pool.get(entt::entity{42}), 42);
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[1u]));
+    ASSERT_EQ(pool.at(0u), entity[0u]);
+    ASSERT_EQ(pool.get(entity[0u]), value[0u]);
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
