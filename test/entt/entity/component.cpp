@@ -1,17 +1,11 @@
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
+#include "../common/non_movable.h"
 
 struct empty {};
 
 struct non_empty {
-    int value;
-};
-
-struct non_movable {
-    non_movable() = default;
-    non_movable(const non_movable &) = delete;
-    non_movable &operator=(const non_movable &) = delete;
     int value;
 };
 
@@ -51,7 +45,7 @@ TEST(Component, NonEmpty) {
 }
 
 TEST(Component, NonMovable) {
-    using traits_type = entt::component_traits<non_movable>;
+    using traits_type = entt::component_traits<test::non_movable>;
 
     ASSERT_TRUE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
