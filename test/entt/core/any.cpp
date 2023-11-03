@@ -12,6 +12,7 @@
 #include <entt/core/type_info.hpp>
 #include "../common/aggregate.h"
 #include "../common/config.h"
+#include "../common/non_comparable.h"
 
 struct empty {
     ~empty() {
@@ -35,10 +36,6 @@ struct fat {
 
     inline static int counter{0};
     double value[4];
-};
-
-struct not_comparable {
-    bool operator==(const not_comparable &) const = delete;
 };
 
 struct not_movable {
@@ -1226,7 +1223,7 @@ TEST_F(Any, Comparable) {
     test('c', value);
 }
 
-TEST_F(Any, NotComparable) {
+TEST_F(Any, NonComparable) {
     auto test = [](const auto &instance) {
         auto any = entt::forward_as_any(instance);
 
@@ -1239,9 +1236,9 @@ TEST_F(Any, NotComparable) {
         ASSERT_TRUE(entt::any{} != any);
     };
 
-    test(not_comparable{});
-    test(std::unordered_map<int, not_comparable>{});
-    test(std::vector<not_comparable>{});
+    test(test::non_comparable{});
+    test(std::unordered_map<int, test::non_comparable>{});
+    test(std::vector<test::non_comparable>{});
 }
 
 TEST_F(Any, CompareVoid) {
