@@ -1893,6 +1893,23 @@ TEST(Registry, GetOrEmplace) {
     ASSERT_EQ(registry.get<int>(entity), 3);
 }
 
+TEST(Registry, TryGet) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    ASSERT_EQ(registry.try_get<int>(entity), nullptr);
+    ASSERT_EQ(std::as_const(registry).try_get<int>(entity), nullptr);
+
+    ASSERT_EQ(std::as_const(registry).storage<int>(), nullptr);
+
+    const int &elem = registry.emplace<int>(entity);
+
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+
+    ASSERT_EQ(registry.try_get<int>(entity), &elem);
+    ASSERT_EQ(std::as_const(registry).try_get<int>(entity), &elem);
+}
+
 TEST(Registry, Constness) {
     entt::registry registry;
 
