@@ -8,7 +8,9 @@ class throwing_type {
 
 public:
     using exception_type = test_exception;
+
     static constexpr auto moved_from_value = -1;
+    static constexpr auto trigger_on_value = 42;
 
     throwing_type(int value)
         : data{value} {}
@@ -35,7 +37,9 @@ public:
         return data;
     }
 
-    static inline int trigger_on_value{};
+    void set(int value) {
+        data = value;
+    }
 
 private:
     int data{};

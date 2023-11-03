@@ -557,10 +557,8 @@ TEST(SighMixin, ThrowingComponent) {
     pool.on_construct().connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().connect<&listener<registry_type>>(on_destroy);
 
-    test::throwing_type::trigger_on_value = 42;
-
     const entt::entity entity[2u]{entity[0u], entt::entity{1}};
-    const test::throwing_type value[2u]{42, 1};
+    const test::throwing_type value[2u]{test::throwing_type::trigger_on_value, 1};
 
     // strong exception safety
     ASSERT_THROW(pool.emplace(entity[0u], value[0u]), typename test::throwing_type::exception_type);
@@ -597,14 +595,14 @@ TEST(SighMixin, ThrowingComponent) {
     // the element may have been moved but it's still there
     ASSERT_EQ(pool.get(entity[1u]), test::throwing_type::moved_from_value);
 
-    test::throwing_type::trigger_on_value = 99;
+    pool.get(entity[0u]).set(value[1u].get());
     pool.erase(entity[1u]);
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
     ASSERT_EQ(pool.at(0u), entity[0u]);
-    ASSERT_EQ(pool.get(entity[0u]), value[0u]);
+    ASSERT_EQ(pool.get(entity[0u]), value[1u]);
 
     ASSERT_EQ(on_construct.value, 2);
     ASSERT_EQ(on_destroy.value, 3);

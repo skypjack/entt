@@ -1795,10 +1795,9 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 
 TEST(Storage, ThrowingComponent) {
     entt::storage<test::throwing_type> pool;
-    test::throwing_type::trigger_on_value = 42;
 
     const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}};
-    const test::throwing_type value[2u]{42, 1};
+    const test::throwing_type value[2u]{test::throwing_type::trigger_on_value, 1};
 
     // strong exception safety
     ASSERT_THROW(pool.emplace(entity[0u], value[0u]), typename test::throwing_type::exception_type);
@@ -1835,14 +1834,14 @@ TEST(Storage, ThrowingComponent) {
     // the element may have been moved but it's still there
     ASSERT_EQ(pool.get(entity[1u]), test::throwing_type::moved_from_value);
 
-    test::throwing_type::trigger_on_value = 99;
+    pool.get(entity[0u]).set(value[1u].get());
     pool.erase(entity[1u]);
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
     ASSERT_EQ(pool.at(0u), entity[0u]);
-    ASSERT_EQ(pool.get(entity[0u]), value[0u]);
+    ASSERT_EQ(pool.get(entity[0u]), value[1u]);
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
