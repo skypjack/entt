@@ -1,13 +1,10 @@
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
+#include "../common/boxed_int.h"
 #include "../common/non_movable.h"
 
 struct empty {};
-
-struct non_empty {
-    int value;
-};
 
 struct self_contained {
     static constexpr auto in_place_delete = true;
@@ -38,7 +35,7 @@ TEST(Component, Empty) {
 }
 
 TEST(Component, NonEmpty) {
-    using traits_type = entt::component_traits<non_empty>;
+    using traits_type = entt::component_traits<test::boxed_int>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
