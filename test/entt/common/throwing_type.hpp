@@ -31,7 +31,7 @@ public:
         return *this;
     }
 
-    operator int() const {
+    int get() const {
         return data;
     }
 
@@ -40,6 +40,10 @@ public:
 private:
     int data{};
 };
+
+inline bool operator==(const throwing_type &lhs, const throwing_type &rhs) {
+    return lhs.get() == rhs.get();
+}
 
 } // namespace test
 
