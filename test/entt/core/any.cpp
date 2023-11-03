@@ -13,6 +13,7 @@
 #include "../common/aggregate.h"
 #include "../common/config.h"
 #include "../common/non_comparable.h"
+#include "../common/non_movable.h"
 
 struct empty {
     ~empty() {
@@ -36,18 +37,6 @@ struct fat {
 
     inline static int counter{0};
     double value[4];
-};
-
-struct not_movable {
-    not_movable() = default;
-
-    not_movable(const not_movable &) = default;
-    not_movable(not_movable &&) = delete;
-
-    not_movable &operator=(const not_movable &) = default;
-    not_movable &operator=(not_movable &&) = delete;
-
-    double payload{};
 };
 
 struct alignas(64u) over_aligned {};
@@ -1410,8 +1399,8 @@ TEST_F(Any, NonCopyableValueType) {
 }
 
 TEST_F(Any, NonMovableType) {
-    entt::any any{std::in_place_type<not_movable>};
-    entt::any other{std::in_place_type<not_movable>};
+    entt::any any{std::in_place_type<test::non_movable>};
+    entt::any other{std::in_place_type<test::non_movable>};
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
