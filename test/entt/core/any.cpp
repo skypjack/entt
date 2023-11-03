@@ -1352,7 +1352,7 @@ TEST_F(Any, ForwardAsAny) {
     ASSERT_EQ(ref.data(), &value);
 }
 
-TEST_F(Any, NotCopyableType) {
+TEST_F(Any, NonCopyableType) {
     const std::unique_ptr<int> value{};
     entt::any any{std::in_place_type<std::unique_ptr<int>>};
     entt::any other = entt::forward_as_any(value);
@@ -1392,7 +1392,7 @@ TEST_F(Any, NotCopyableType) {
     ASSERT_EQ(copy.policy(), entt::any_policy::owner);
 }
 
-TEST_F(Any, NotCopyableValueType) {
+TEST_F(Any, NonCopyableValueType) {
     std::vector<entt::any> vec{};
     vec.emplace_back(std::in_place_type<std::unique_ptr<int>>);
     vec.shrink_to_fit();
@@ -1409,7 +1409,7 @@ TEST_F(Any, NotCopyableValueType) {
     ASSERT_TRUE(vec[1u]);
 }
 
-TEST_F(Any, NotMovableType) {
+TEST_F(Any, NonMovableType) {
     entt::any any{std::in_place_type<not_movable>};
     entt::any other{std::in_place_type<not_movable>};
 
