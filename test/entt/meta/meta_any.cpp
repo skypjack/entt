@@ -8,6 +8,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../common/config.h"
+#include "../common/non_comparable.h"
 
 struct clazz_t {
     clazz_t()
@@ -59,10 +60,6 @@ struct fat_t: empty_t {
 enum class enum_class : unsigned short int {
     foo = 0u,
     bar = 42u
-};
-
-struct not_comparable_t {
-    bool operator==(const not_comparable_t &) const = delete;
 };
 
 struct unmanageable_t {
@@ -1053,15 +1050,15 @@ TEST_F(MetaAny, Comparable) {
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
-TEST_F(MetaAny, NotComparable) {
-    entt::meta_any any{not_comparable_t{}};
+TEST_F(MetaAny, NonComparable) {
+    entt::meta_any any{test::non_comparable{}};
 
     ASSERT_EQ(any, any);
-    ASSERT_NE(any, entt::meta_any{not_comparable_t{}});
+    ASSERT_NE(any, entt::meta_any{test::non_comparable{}});
     ASSERT_NE(entt::meta_any{}, any);
 
     ASSERT_TRUE(any == any);
-    ASSERT_FALSE(any == entt::meta_any{not_comparable_t{}});
+    ASSERT_FALSE(any == entt::meta_any{test::non_comparable{}});
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
