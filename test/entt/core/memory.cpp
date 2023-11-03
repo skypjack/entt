@@ -86,15 +86,14 @@ TEST(FastMod, Functionalities) {
 TEST(AllocateUnique, Functionalities) {
     test::throwing_allocator<test::throwing_type> allocator{};
     test::throwing_allocator<test::throwing_type>::trigger_on_allocate = true;
-    test::throwing_type::trigger_on_value = 0;
 
-    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, 0)), test::throwing_allocator<test::throwing_type>::exception_type);
-    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, test::throwing_type{0})), test::throwing_type::exception_type);
+    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, test::throwing_type::trigger_on_value)), test::throwing_allocator<test::throwing_type>::exception_type);
+    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, test::throwing_type{test::throwing_type::trigger_on_value})), test::throwing_type::exception_type);
 
-    std::unique_ptr<test::throwing_type, entt::allocation_deleter<test::throwing_allocator<test::throwing_type>>> ptr = entt::allocate_unique<test::throwing_type>(allocator, 42);
+    std::unique_ptr<test::throwing_type, entt::allocation_deleter<test::throwing_allocator<test::throwing_type>>> ptr = entt::allocate_unique<test::throwing_type>(allocator, 1);
 
     ASSERT_TRUE(ptr);
-    ASSERT_EQ(*ptr, 42);
+    ASSERT_EQ(*ptr, 1);
 
     ptr.reset();
 
