@@ -7,10 +7,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
-
-struct not_comparable {
-    bool operator==(const not_comparable &) const = delete;
-};
+#include "../common/non_comparable.h"
 
 struct nlohmann_json_like final {
     using value_type = nlohmann_json_like;
@@ -189,7 +186,7 @@ TEST(IsIterator, Functionalities) {
 }
 
 TEST(IsEBCOEligible, Functionalities) {
-    ASSERT_TRUE(entt::is_ebco_eligible_v<not_comparable>);
+    ASSERT_TRUE(entt::is_ebco_eligible_v<test::non_comparable>);
     ASSERT_FALSE(entt::is_ebco_eligible_v<nlohmann_json_like>);
     ASSERT_FALSE(entt::is_ebco_eligible_v<double>);
     ASSERT_FALSE(entt::is_ebco_eligible_v<void>);
@@ -211,20 +208,20 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_TRUE((entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, char>>>));
     ASSERT_TRUE((entt::is_equality_comparable_v<std::pair<const int, int>>));
     ASSERT_TRUE((entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, char>>>));
-    ASSERT_TRUE(entt::is_equality_comparable_v<std::vector<not_comparable>::iterator>);
+    ASSERT_TRUE(entt::is_equality_comparable_v<std::vector<test::non_comparable>::iterator>);
     ASSERT_TRUE((entt::is_equality_comparable_v<std::optional<int>>));
     ASSERT_TRUE(entt::is_equality_comparable_v<nlohmann_json_like>);
 
     ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>);
-    ASSERT_FALSE(entt::is_equality_comparable_v<not_comparable>);
-    ASSERT_FALSE(entt::is_equality_comparable_v<const not_comparable>);
-    ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<not_comparable>>);
-    ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<std::vector<not_comparable>>>);
-    ASSERT_FALSE((entt::is_equality_comparable_v<std::unordered_map<int, not_comparable>>));
-    ASSERT_FALSE((entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, not_comparable>>>));
-    ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, not_comparable>>));
-    ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, not_comparable>>>));
-    ASSERT_FALSE((entt::is_equality_comparable_v<std::optional<not_comparable>>));
+    ASSERT_FALSE(entt::is_equality_comparable_v<test::non_comparable>);
+    ASSERT_FALSE(entt::is_equality_comparable_v<const test::non_comparable>);
+    ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<test::non_comparable>>);
+    ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<std::vector<test::non_comparable>>>);
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::unordered_map<int, test::non_comparable>>));
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::unordered_map<int, std::unordered_map<int, test::non_comparable>>>));
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, test::non_comparable>>));
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::pair<const int, std::unordered_map<int, test::non_comparable>>>));
+    ASSERT_FALSE((entt::is_equality_comparable_v<std::optional<test::non_comparable>>));
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
 }
 
