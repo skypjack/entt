@@ -1,6 +1,8 @@
 [
+  # gtest only
   { "include": [ "@<gtest/internal/.*>", "private", "<gtest/gtest.h>", "public" ] },
   { "include": [ "@<gtest/gtest-.*>", "private", "<gtest/gtest.h>", "public" ] },
+  # forward files
   { "include": [ "@[\"<].*/container/fwd\\.hpp[\">]", "private", "<entt/container/dense_map.hpp>", "public" ] },
   { "include": [ "@[\"<].*/container/fwd\\.hpp[\">]", "private", "<entt/container/dense_set.hpp>", "public" ] },
   { "include": [ "@[\"<].*/core/fwd\\.hpp[\">]", "private", "<entt/core/any.hpp>", "public" ] },
