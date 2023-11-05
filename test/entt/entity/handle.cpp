@@ -1,3 +1,4 @@
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -212,7 +213,7 @@ TEST(BasicHandle, FromEntity) {
 TEST(BasicHandle, Lifetime) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto *handle = new entt::handle{registry, entity};
+    auto handle = std::make_unique<entt::handle>(registry, entity);
     handle->emplace<int>();
 
     ASSERT_FALSE(registry.storage<int>().empty());
@@ -222,7 +223,7 @@ TEST(BasicHandle, Lifetime) {
         ASSERT_EQ(handle->entity(), entt);
     }
 
-    delete handle;
+    handle.reset();
 
     ASSERT_FALSE(registry.storage<int>().empty());
     ASSERT_NE(registry.storage<entt::entity>().free_list(), 0u);
