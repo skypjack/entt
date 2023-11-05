@@ -4,6 +4,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/storage.hpp>
 
 template<typename Type, typename Entity>
 struct entt::storage_type<Type, Entity> {

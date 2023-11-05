@@ -1,3 +1,4 @@
+#include <cstring>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>

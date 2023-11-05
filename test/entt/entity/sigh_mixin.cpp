@@ -1,5 +1,11 @@
 #include <iterator>
+#include <type_traits>
+#include <utility>
 #include <gtest/gtest.h>
+#include <entt/core/any.hpp>
+#include <entt/core/type_info.hpp>
+#include <entt/entity/component.hpp>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>

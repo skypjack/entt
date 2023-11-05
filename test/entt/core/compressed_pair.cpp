@@ -1,9 +1,9 @@
 #include <cstddef>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/compressed_pair.hpp>
 #include "../common/non_default_constructible.h"

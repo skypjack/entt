@@ -5,8 +5,8 @@
 #include <memory>
 #include <string>
 #include <tuple>
-#include <type_traits>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/container/dense_map.hpp>
 #include <entt/core/iterator.hpp>

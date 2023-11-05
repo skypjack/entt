@@ -1,8 +1,10 @@
 #include <sstream>
+#include <type_traits>
 #include <vector>
 #include <gtest/gtest.h>
 #include <cereal/archives/json.hpp>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/type_traits.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 
