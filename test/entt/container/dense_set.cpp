@@ -3,6 +3,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <memory_resource>
 #include <string>
 #include <tuple>
 #include <utility>
