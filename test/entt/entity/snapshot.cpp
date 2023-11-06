@@ -10,8 +10,7 @@
 #include <entt/entity/snapshot.hpp>
 #include <entt/signal/sigh.hpp>
 #include "../common/config.h"
-
-struct empty {};
+#include "../common/empty.h"
 
 struct shadow {
     entt::entity target{entt::null};
@@ -134,18 +133,18 @@ TEST(BasicSnapshot, GetEmptyType) {
 
     entt::registry registry;
     entt::basic_snapshot snapshot{registry};
-    const auto &storage = registry.storage<empty>();
+    const auto &storage = registry.storage<test::empty>();
 
     entt::entity entity[3u];
 
     registry.create(std::begin(entity), std::end(entity));
-    registry.insert<empty>(std::begin(entity), std::end(entity));
+    registry.insert<test::empty>(std::begin(entity), std::end(entity));
     registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
     auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
 
-    snapshot.get<empty>(archive, "other"_hs);
+    snapshot.get<test::empty>(archive, "other"_hs);
 
     ASSERT_EQ(data.size(), 1u);
 
@@ -153,7 +152,7 @@ TEST(BasicSnapshot, GetEmptyType) {
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
-    snapshot.get<empty>(archive);
+    snapshot.get<test::empty>(archive);
 
     ASSERT_EQ(data.size(), 3u);
 
@@ -341,7 +340,7 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
 
     entt::registry registry;
     entt::basic_snapshot_loader loader{registry};
-    const auto &storage = registry.storage<empty>();
+    const auto &storage = registry.storage<test::empty>();
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
@@ -353,20 +352,20 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
 
-    loader.get<empty>(archive, "other"_hs);
+    loader.get<test::empty>(archive, "other"_hs);
 
     ASSERT_TRUE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
     ASSERT_EQ(storage.size(), 0u);
-    ASSERT_EQ(registry.storage<empty>("other"_hs).size(), 1u);
+    ASSERT_EQ(registry.storage<test::empty>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
 
-    loader.get<empty>(archive);
+    loader.get<test::empty>(archive);
 
     ASSERT_TRUE(registry.valid(entity[0u]));
     ASSERT_TRUE(registry.valid(entity[1u]));
@@ -756,7 +755,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
 
     entt::registry registry;
     entt::basic_continuous_loader loader{registry};
-    const auto &storage = registry.storage<empty>();
+    const auto &storage = registry.storage<test::empty>();
 
     std::vector<entt::any> data{};
     auto archive = [&data, pos = 0u](auto &elem) mutable { elem = entt::any_cast<std::remove_reference_t<decltype(elem)>>(data[pos++]); };
@@ -771,7 +770,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
 
-    loader.get<empty>(archive, "other"_hs);
+    loader.get<test::empty>(archive, "other"_hs);
 
     ASSERT_TRUE(loader.contains(entity[0u]));
     ASSERT_FALSE(loader.contains(entity[1u]));
@@ -780,14 +779,14 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
     ASSERT_EQ(storage.size(), 0u);
-    ASSERT_EQ(registry.storage<empty>("other"_hs).size(), 1u);
+    ASSERT_EQ(registry.storage<test::empty>("other"_hs).size(), 1u);
 
     data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
 
-    loader.get<empty>(archive);
+    loader.get<test::empty>(archive);
 
     ASSERT_TRUE(loader.contains(entity[0u]));
     ASSERT_TRUE(loader.contains(entity[1u]));
