@@ -2,9 +2,8 @@
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
 #include "../common/boxed_int.h"
+#include "../common/empty.h"
 #include "../common/non_movable.h"
-
-struct empty {};
 
 struct self_contained {
     static constexpr auto in_place_delete = true;
@@ -28,7 +27,7 @@ TEST(Component, VoidType) {
 }
 
 TEST(Component, Empty) {
-    using traits_type = entt::component_traits<empty>;
+    using traits_type = entt::component_traits<test::empty>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 0u);
