@@ -10,9 +10,8 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../common/empty.h"
 #include "../common/pointer_stable.h"
-
-struct empty_type {};
 
 TEST(SingleComponentView, Functionalities) {
     entt::registry registry;
@@ -142,11 +141,11 @@ TEST(SingleComponentView, Handle) {
 
 TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     entt::registry registry{};
-    auto eview = std::as_const(registry).view<const empty_type>();
+    auto eview = std::as_const(registry).view<const test::empty>();
     auto cview = std::as_const(registry).view<const int>();
 
     const auto entity = registry.create();
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<int>(entity);
 
     ASSERT_FALSE(cview);
@@ -299,13 +298,13 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
 
 TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
     entt::registry registry;
-    auto view = registry.view<empty_type>();
-    auto cview = std::as_const(registry).view<const empty_type>();
+    auto view = registry.view<test::empty>();
+    auto cview = std::as_const(registry).view<const test::empty>();
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(cview.size(), 0u);
 
-    registry.emplace<empty_type>(registry.create());
+    registry.emplace<test::empty>(registry.create());
 
     ASSERT_EQ(view.size(), 1u);
     ASSERT_EQ(cview.size(), 1u);
@@ -313,7 +312,7 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
     testing::StaticAssertTypeEq<decltype(view.get({})), std::tuple<>>();
     testing::StaticAssertTypeEq<decltype(cview.get({})), std::tuple<>>();
 
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<empty_type>()), decltype(cview)>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<test::empty>()), decltype(cview)>();
 
     for(auto [entt]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
@@ -369,18 +368,18 @@ TEST(SingleComponentView, EmptyTypes) {
     entt::entity entity = registry.create();
 
     registry.emplace<int>(entity, 0);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
 
-    registry.view<empty_type>().each([&](const auto entt) {
+    registry.view<test::empty>().each([&](const auto entt) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.view<empty_type>().each([check = true]() mutable {
+    registry.view<test::empty>().each([check = true]() mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    for(auto [entt]: registry.view<empty_type>().each()) {
+    for(auto [entt]: registry.view<test::empty>().each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         ASSERT_EQ(entity, entt);
     }
@@ -730,10 +729,10 @@ TEST(MultiComponentView, Handle) {
 
 TEST(MultiComponentView, LazyTypesFromConstRegistry) {
     entt::registry registry{};
-    auto view = std::as_const(registry).view<const empty_type, const int>();
+    auto view = std::as_const(registry).view<const test::empty, const int>();
 
     const auto entity = registry.create();
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<int>(entity);
 
     ASSERT_FALSE(view);
@@ -1009,13 +1008,13 @@ TEST(MultiComponentView, EachWithHoles) {
 
 TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto view = registry.view<int, empty_type, const char>();
+    auto view = registry.view<int, test::empty, const char>();
 
     ASSERT_EQ(view.size_hint(), 0u);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<char>(entity, 'c');
 
     ASSERT_EQ(view.size_hint(), 1u);
@@ -1141,20 +1140,20 @@ TEST(MultiComponentView, ExcludedComponents) {
 TEST(MultiComponentView, EmptyTypes) {
     entt::registry registry;
 
-    auto v1 = registry.view<int, char, empty_type>(entt::exclude<double>);
-    auto v2 = registry.view<int, empty_type, char>(entt::exclude<double>);
-    auto v3 = registry.view<empty_type, int, char>(entt::exclude<double>);
+    auto v1 = registry.view<int, char, test::empty>(entt::exclude<double>);
+    auto v2 = registry.view<int, test::empty, char>(entt::exclude<double>);
+    auto v3 = registry.view<test::empty, int, char>(entt::exclude<double>);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
 
     const auto other = registry.create();
     registry.emplace<int>(other);
     registry.emplace<char>(other);
     registry.emplace<double>(other);
-    registry.emplace<empty_type>(other);
+    registry.emplace<test::empty>(other);
 
     const auto ignored = registry.create();
     registry.emplace<int>(ignored);
@@ -1194,7 +1193,7 @@ TEST(MultiComponentView, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     }
 
-    v3.use<empty_type>();
+    v3.use<test::empty>();
     v3.each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
@@ -1213,7 +1212,7 @@ TEST(MultiComponentView, EmptyTypes) {
         check = false;
     });
 
-    v2.use<empty_type>();
+    v2.use<test::empty>();
     for(auto [entt, iv, cv]: v2.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
@@ -1245,7 +1244,7 @@ TEST(MultiComponentView, FrontBack) {
 }
 
 TEST(MultiComponentView, ExtendedGet) {
-    using type = decltype(std::declval<entt::registry>().view<int, empty_type, char>().get({}));
+    using type = decltype(std::declval<entt::registry>().view<int, test::empty, char>().get({}));
 
     ASSERT_EQ(std::tuple_size_v<type>, 2u);
 
@@ -1626,7 +1625,7 @@ TEST(View, Pipe) {
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
     registry.emplace<double>(entity);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
 
     registry.emplace<int>(other);
     registry.emplace<char>(other);
@@ -1634,7 +1633,7 @@ TEST(View, Pipe) {
 
     auto view1 = registry.view<int>(entt::exclude<const double>);
     auto view2 = registry.view<const char>(entt::exclude<float>);
-    auto view3 = registry.view<empty_type>();
+    auto view3 = registry.view<test::empty>();
     auto view4 = registry.view<test::pointer_stable>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, const entt::storage_type_t<char>>, entt::exclude_t<const entt::storage_type_t<double>, entt::storage_type_t<float>>>, decltype(view1 | view2)>();
@@ -1671,7 +1670,7 @@ TEST(View, Pipe) {
     ASSERT_EQ(pack14.storage<const double>(), nullptr);
     ASSERT_NE(pack14.storage<test::pointer_stable>(), nullptr);
 
-    ASSERT_EQ(pack32.storage<empty_type>(), nullptr);
+    ASSERT_EQ(pack32.storage<test::empty>(), nullptr);
     ASSERT_NE(pack32.storage<const char>(), nullptr);
     ASSERT_NE(pack32.storage<float>(), nullptr);
 }
