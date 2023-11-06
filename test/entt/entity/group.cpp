@@ -10,8 +10,7 @@
 #include <entt/entity/registry.hpp>
 #include "../common/boxed_int.h"
 #include "../common/config.h"
-
-struct empty_type {};
+#include "../common/empty.h"
 
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
@@ -99,10 +98,10 @@ TEST(NonOwningGroup, Handle) {
 
 TEST(NonOwningGroup, Invalid) {
     entt::registry registry{};
-    auto group = std::as_const(registry).group_if_exists(entt::get<const empty_type, const int>);
+    auto group = std::as_const(registry).group_if_exists(entt::get<const test::empty, const int>);
 
     const auto entity = registry.create();
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<int>(entity);
 
     ASSERT_FALSE(group);
@@ -370,13 +369,13 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group(entt::get<int, empty_type, const char>);
+    auto group = registry.group(entt::get<int, test::empty, const char>);
 
     ASSERT_EQ(group.size(), 0u);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<char>(entity, 'c');
 
     ASSERT_EQ(group.size(), 1u);
@@ -385,12 +384,12 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(group.get<int>({})), int &>();
 
     testing::StaticAssertTypeEq<decltype(group.get<1>({})), void>();
-    testing::StaticAssertTypeEq<decltype(group.get<empty_type>({})), void>();
+    testing::StaticAssertTypeEq<decltype(group.get<test::empty>({})), void>();
 
     testing::StaticAssertTypeEq<decltype(group.get<2>({})), const char &>();
     testing::StaticAssertTypeEq<decltype(group.get<const char>({})), const char &>();
 
-    testing::StaticAssertTypeEq<decltype(group.get<int, empty_type, const char>({})), std::tuple<int &, const char &>>();
+    testing::StaticAssertTypeEq<decltype(group.get<int, test::empty, const char>({})), std::tuple<int &, const char &>>();
     testing::StaticAssertTypeEq<decltype(group.get<0, 1, 2>({})), std::tuple<int &, const char &>>();
 
     testing::StaticAssertTypeEq<decltype(group.get({})), std::tuple<int &, const char &>>();
@@ -506,14 +505,14 @@ TEST(NonOwningGroup, ExcludedComponents) {
 
 TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
     entt::registry registry;
-    const auto group = registry.group(entt::get<int, empty_type>);
+    const auto group = registry.group(entt::get<int, test::empty>);
 
     const auto e0 = registry.create();
-    registry.emplace<empty_type>(e0);
+    registry.emplace<test::empty>(e0);
     registry.emplace<int>(e0);
 
     const auto e1 = registry.create();
-    registry.emplace<empty_type>(e1);
+    registry.emplace<test::empty>(e1);
     registry.emplace<int>(e1);
 
     registry.emplace<int>(registry.create());
@@ -559,36 +558,36 @@ TEST(NonOwningGroup, EmptyTypes) {
 
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
 
-    registry.group(entt::get<int, char, empty_type>).each([entity](const auto entt, int, char) {
+    registry.group(entt::get<int, char, test::empty>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.group(entt::get<int, char, empty_type>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<int, char, test::empty>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group(entt::get<int, empty_type, char>).each([check = true](int, char) mutable {
+    registry.group(entt::get<int, test::empty, char>).each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    for(auto [entt, iv, cv]: registry.group(entt::get<int, empty_type, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<int, test::empty, char>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group(entt::get<empty_type, int, char>).each([entity](const auto entt, int, char) {
+    registry.group(entt::get<test::empty, int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.group(entt::get<empty_type, int, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group(entt::get<test::empty, int, char>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
@@ -634,7 +633,7 @@ TEST(NonOwningGroup, SignalRace) {
 }
 
 TEST(NonOwningGroup, ExtendedGet) {
-    using type = decltype(std::declval<entt::registry>().group(entt::get<int, empty_type, char>).get({}));
+    using type = decltype(std::declval<entt::registry>().group(entt::get<int, test::empty, char>).get({}));
 
     ASSERT_EQ(std::tuple_size_v<type>, 2u);
 
@@ -850,10 +849,10 @@ TEST(OwningGroup, Handle) {
 
 TEST(OwningGroup, Invalid) {
     entt::registry registry{};
-    auto group = std::as_const(registry).group_if_exists<const int>(entt::get<const empty_type>);
+    auto group = std::as_const(registry).group_if_exists<const int>(entt::get<const test::empty>);
 
     const auto entity = registry.create();
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<int>(entity);
 
     ASSERT_FALSE(group);
@@ -1199,14 +1198,14 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group<int, const char>(entt::get<empty_type, double, const float>);
+    auto group = registry.group<int, const char>(entt::get<test::empty, double, const float>);
 
     ASSERT_EQ(group.size(), 0u);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
     registry.emplace<double>(entity, 0.);
     registry.emplace<float>(entity, 0.f);
 
@@ -1219,7 +1218,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(group.get<const char>({})), const char &>();
 
     testing::StaticAssertTypeEq<decltype(group.get<2>({})), void>();
-    testing::StaticAssertTypeEq<decltype(group.get<empty_type>({})), void>();
+    testing::StaticAssertTypeEq<decltype(group.get<test::empty>({})), void>();
 
     testing::StaticAssertTypeEq<decltype(group.get<3>({})), double &>();
     testing::StaticAssertTypeEq<decltype(group.get<double>({})), double &>();
@@ -1227,7 +1226,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(group.get<4>({})), const float &>();
     testing::StaticAssertTypeEq<decltype(group.get<const float>({})), const float &>();
 
-    testing::StaticAssertTypeEq<decltype(group.get<int, const char, empty_type, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>();
+    testing::StaticAssertTypeEq<decltype(group.get<int, const char, test::empty, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>();
     testing::StaticAssertTypeEq<decltype(group.get<0, 1, 2, 3, 4>({})), std::tuple<int &, const char &, double &, const float &>>();
 
     testing::StaticAssertTypeEq<decltype(group.get({})), std::tuple<int &, const char &, double &, const float &>>();
@@ -1347,14 +1346,14 @@ TEST(OwningGroup, ExcludedComponents) {
 
 TEST(OwningGroup, EmptyAndNonEmptyTypes) {
     entt::registry registry;
-    const auto group = registry.group<int>(entt::get<empty_type>);
+    const auto group = registry.group<int>(entt::get<test::empty>);
 
     const auto e0 = registry.create();
-    registry.emplace<empty_type>(e0);
+    registry.emplace<test::empty>(e0);
     registry.emplace<int>(e0);
 
     const auto e1 = registry.create();
-    registry.emplace<empty_type>(e1);
+    registry.emplace<test::empty>(e1);
     registry.emplace<int>(e1);
 
     registry.emplace<int>(registry.create());
@@ -1400,36 +1399,36 @@ TEST(OwningGroup, EmptyTypes) {
 
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
-    registry.emplace<empty_type>(entity);
+    registry.emplace<test::empty>(entity);
 
-    registry.group<int>(entt::get<char, empty_type>).each([entity](const auto entt, int, char) {
+    registry.group<int>(entt::get<char, test::empty>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.group<int>(entt::get<char, empty_type>).each()) {
+    for(auto [entt, iv, cv]: registry.group<int>(entt::get<char, test::empty>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group<char>(entt::get<empty_type, int>).each([check = true](char, int) mutable {
+    registry.group<char>(entt::get<test::empty, int>).each([check = true](char, int) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    for(auto [entt, cv, iv]: registry.group<char>(entt::get<empty_type, int>).each()) {
+    for(auto [entt, cv, iv]: registry.group<char>(entt::get<test::empty, int>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group<empty_type>(entt::get<int, char>).each([entity](const auto entt, int, char) {
+    registry.group<test::empty>(entt::get<int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto [entt, iv, cv]: registry.group<empty_type>(entt::get<int, char>).each()) {
+    for(auto [entt, iv, cv]: registry.group<test::empty>(entt::get<int, char>).each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), char &>();
@@ -1506,12 +1505,12 @@ TEST(OwningGroup, PreventEarlyOptOut) {
 
 TEST(OwningGroup, SwappingValuesIsAllowed) {
     entt::registry registry;
-    const auto group = registry.group<test::boxed_int>(entt::get<empty_type>);
+    const auto group = registry.group<test::boxed_int>(entt::get<test::empty>);
 
     for(std::size_t i{}; i < 2u; ++i) {
         const auto entity = registry.create();
         registry.emplace<test::boxed_int>(entity, static_cast<int>(i));
-        registry.emplace<empty_type>(entity);
+        registry.emplace<test::empty>(entity);
     }
 
     registry.destroy(group.back());
@@ -1523,7 +1522,7 @@ TEST(OwningGroup, SwappingValuesIsAllowed) {
 }
 
 TEST(OwningGroup, ExtendedGet) {
-    using type = decltype(std::declval<entt::registry>().group<int, empty_type>(entt::get<char>).get({}));
+    using type = decltype(std::declval<entt::registry>().group<int, test::empty>(entt::get<char>).get({}));
 
     ASSERT_EQ(std::tuple_size_v<type>, 2u);
 
