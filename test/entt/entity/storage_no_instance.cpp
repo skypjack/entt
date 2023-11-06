@@ -11,8 +11,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
 #include "../common/config.h"
-
-struct empty_type {};
+#include "../common/empty.h"
 
 template<typename Type>
 struct StorageNoInstance: testing::Test {
@@ -49,7 +48,7 @@ struct StorageNoInstance: testing::Test {
 template<typename Type>
 using StorageNoInstanceDeathTest = StorageNoInstance<Type>;
 
-using StorageNoInstanceTypes = ::testing::Types<empty_type, void>;
+using StorageNoInstanceTypes = ::testing::Types<test::empty, void>;
 
 TYPED_TEST_SUITE(StorageNoInstance, StorageNoInstanceTypes, );
 TYPED_TEST_SUITE(StorageNoInstanceDeathTest, StorageNoInstanceTypes, );
