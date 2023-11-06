@@ -3,7 +3,6 @@
 #include <functional>
 #include <iterator>
 #include <memory>
-#include <memory_resource>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -1185,6 +1184,7 @@ TEST(DenseMap, ThrowingAllocator) {
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+#    include <memory_resource>
 
 TEST(DenseMap, NoUsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<std::pair<const int, int>>;
