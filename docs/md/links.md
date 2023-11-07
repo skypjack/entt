@@ -213,6 +213,8 @@ I hope the following lists can grow much more in the future.
   * [Scion2D](https://github.com/dwjclark11/Scion2D): 2D game engine with
     [YouTube series](https://www.youtube.com/playlist?list=PL3HUvSWOJR7XRDwVVQqqWO-zyyscb8L-v)
     included.
+  * [EnTT Editor](https://github.com/TheDimin/EnttEditor): an editor for `EnTT`
+    libary that combines its built-in reflection system with `ImGui`.
 
 ## Articles, videos and blog posts:
 
