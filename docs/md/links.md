@@ -131,6 +131,8 @@ I hope the following lists can grow much more in the future.
     where to fight colossal demons in procedurally generated levels of hell.
   * [Saurian Sorcery](https://github.com/cajallen/spellbook): a tower defense
     game where to assemble a tribe of lizards to defend against robot invaders.
+  * [robotfindskitten](https://github.com/autogalkin/robotfindskitten): a clone
+    of `robotfindskitten` inside `Notepad.exe`, powered by `EnTT`.
 
 ## Engines and the like:
 
