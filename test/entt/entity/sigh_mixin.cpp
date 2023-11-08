@@ -32,7 +32,6 @@ TYPED_TEST_SUITE(SighMixin, SighMixinTypes, );
 TEST(SighMixin, GenericType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
     entt::sigh_mixin<entt::storage<int>> pool;
-    entt::sparse_set &base = pool;
     entt::registry registry;
 
     std::size_t on_construct{};
@@ -53,7 +52,7 @@ TEST(SighMixin, GenericType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_NE(base.push(entity[0u]), base.end());
+    ASSERT_NE(pool.push(entity[0u]), pool.entt::sparse_set::end());
 
     pool.emplace(entity[1u]);
 
@@ -64,26 +63,25 @@ TEST(SighMixin, GenericType) {
     ASSERT_EQ(pool.get(entity[0u]), 0);
     ASSERT_EQ(pool.get(entity[1u]), 0);
 
-    base.erase(entity[0u]);
-    pool.erase(entity[1u]);
+    pool.erase(std::begin(entity), std::end(entity));
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 2u);
     ASSERT_EQ(pool.size(), 0u);
 
-    ASSERT_NE(base.push(std::begin(entity), std::end(entity)), base.end());
+    ASSERT_NE(pool.push(std::begin(entity), std::end(entity)), pool.entt::sparse_set::end());
 
     ASSERT_EQ(pool.get(entity[0u]), 0);
     ASSERT_EQ(pool.get(entity[1u]), 0);
     ASSERT_EQ(pool.size(), 2u);
 
-    base.erase(entity[1u]);
+    pool.erase(entity[1u]);
 
     ASSERT_EQ(on_construct, 4u);
     ASSERT_EQ(on_destroy, 3u);
     ASSERT_EQ(pool.size(), 1u);
 
-    base.erase(entity[0u]);
+    pool.erase(entity[0u]);
 
     ASSERT_EQ(on_construct, 4u);
     ASSERT_EQ(on_destroy, 4u);
@@ -98,7 +96,7 @@ TEST(SighMixin, GenericType) {
     ASSERT_EQ(pool.get(entity[0u]), 3);
     ASSERT_EQ(pool.get(entity[1u]), 3);
 
-    pool.erase(std::begin(entity), std::end(entity));
+    pool.clear();
 
     ASSERT_EQ(on_construct, 6u);
     ASSERT_EQ(on_destroy, 6u);
@@ -108,7 +106,6 @@ TEST(SighMixin, GenericType) {
 TEST(SighMixin, StableType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
     entt::sigh_mixin<entt::storage<test::pointer_stable>> pool;
-    entt::sparse_set &base = pool;
     entt::registry registry;
 
     std::size_t on_construct{};
@@ -118,7 +115,7 @@ TEST(SighMixin, StableType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_NE(base.push(entity[0u]), base.end());
+    ASSERT_NE(pool.push(entity[0u]), pool.entt::sparse_set::end());
 
     pool.emplace(entity[1u]);
 
@@ -129,26 +126,25 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(pool.get(entity[0u]).value, 0);
     ASSERT_EQ(pool.get(entity[1u]).value, 0);
 
-    base.erase(entity[0u]);
-    pool.erase(entity[1u]);
+    pool.erase(std::begin(entity), std::end(entity));
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 2u);
     ASSERT_EQ(pool.size(), 2u);
 
-    ASSERT_NE(base.push(std::begin(entity), std::end(entity)), base.end());
+    ASSERT_NE(pool.push(std::begin(entity), std::end(entity)), pool.entt::sparse_set::end());
 
     ASSERT_EQ(pool.get(entity[0u]).value, 0);
     ASSERT_EQ(pool.get(entity[1u]).value, 0);
     ASSERT_EQ(pool.size(), 4u);
 
-    base.erase(entity[1u]);
+    pool.erase(entity[1u]);
 
     ASSERT_EQ(on_construct, 4u);
     ASSERT_EQ(on_destroy, 3u);
     ASSERT_EQ(pool.size(), 4u);
 
-    base.erase(entity[0u]);
+    pool.erase(entity[0u]);
 
     ASSERT_EQ(on_construct, 4u);
     ASSERT_EQ(on_destroy, 4u);
@@ -163,17 +159,16 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(pool.get(entity[0u]).value, 3);
     ASSERT_EQ(pool.get(entity[1u]).value, 3);
 
-    pool.erase(std::begin(entity), std::end(entity));
+    pool.clear();
 
     ASSERT_EQ(on_construct, 6u);
     ASSERT_EQ(on_destroy, 6u);
-    ASSERT_EQ(pool.size(), 6u);
+    ASSERT_EQ(pool.size(), 0u);
 }
 
 TEST(SighMixin, NonDefaultConstructibleType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
     entt::sigh_mixin<entt::storage<test::non_default_constructible>> pool;
-    entt::sparse_set &base = pool;
     entt::registry registry;
 
     std::size_t on_construct{};
@@ -183,7 +178,7 @@ TEST(SighMixin, NonDefaultConstructibleType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    ASSERT_EQ(base.push(entity[0u]), base.end());
+    ASSERT_EQ(pool.push(entity[0u]), pool.entt::sparse_set::end());
 
     pool.emplace(entity[1u], 3);
 
@@ -194,13 +189,13 @@ TEST(SighMixin, NonDefaultConstructibleType) {
     ASSERT_FALSE(pool.contains(entity[0u]));
     ASSERT_EQ(pool.get(entity[1u]).value, 3);
 
-    base.erase(entity[1u]);
+    pool.erase(entity[1u]);
 
     ASSERT_EQ(on_construct, 1u);
     ASSERT_EQ(on_destroy, 1u);
     ASSERT_EQ(pool.size(), 0u);
 
-    ASSERT_EQ(base.push(std::begin(entity), std::end(entity)), base.end());
+    ASSERT_EQ(pool.push(std::begin(entity), std::end(entity)), pool.entt::sparse_set::end());
 
     ASSERT_FALSE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
