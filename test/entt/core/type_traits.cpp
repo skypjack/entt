@@ -240,13 +240,18 @@ TEST(MemberClass, Functionalities) {
 }
 
 TEST(NthArgument, Functionalities) {
-    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, &free_function>, int>();
-    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, &free_function>, const double &>();
-    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, &clazz::bar>, double>();
-    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, &clazz::bar>, float>();
-    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, &clazz::quux>, bool>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, void(int, char, bool)>, int>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, void(int, char, bool)>, char>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<2u, void(int, char, bool)>, bool>();
 
-    ASSERT_EQ(free_function(entt::nth_argument_t<0u, &free_function>{}, entt::nth_argument_t<1u, &free_function>{}), 42);
+    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(&free_function)>, int>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, decltype(&free_function)>, const double &>();
+
+    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(&clazz::bar)>, double>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, decltype(&clazz::bar)>, float>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(&clazz::quux)>, bool>();
+
+    ASSERT_EQ(free_function(entt::nth_argument_t<0u, decltype(&free_function)>{}, entt::nth_argument_t<1u, decltype(&free_function)>{}), 42);
 }
 
 TEST(Tag, Functionalities) {

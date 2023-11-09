@@ -796,12 +796,12 @@ template<typename Type>
     } else if constexpr(is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
             return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
+        } else {
+            return maybe_equality_comparable<Type>(0);
+        }
     } else {
         return maybe_equality_comparable<Type>(0);
     }
-    } else {
-        return maybe_equality_comparable<Type>(0);
-}
 }
 
 } // namespace internal
@@ -888,9 +888,9 @@ using member_class_t = typename member_class<Member>::type;
 /**
  * @brief Extracts the n-th argument of a given function or member function.
  * @tparam Index The index of the argument to extract.
- * @tparam Candidate A valid function, member function or data member.
+ * @tparam Candidate A valid function, member function or data member type.
  */
-template<std::size_t Index, auto Candidate>
+template<std::size_t Index, typename Candidate>
 class nth_argument {
     template<typename Ret, typename... Args>
     static constexpr type_list<Args...> pick_up(Ret (*)(Args...));
@@ -906,15 +906,15 @@ class nth_argument {
 
 public:
     /*! @brief N-th argument of the given function or member function. */
-    using type = type_list_element_t<Index, decltype(pick_up(Candidate))>;
+    using type = type_list_element_t<Index, decltype(pick_up(std::declval<Candidate>()))>;
 };
 
 /**
  * @brief Helper type.
  * @tparam Index The index of the argument to extract.
- * @tparam Candidate A valid function, member function or data member.
+ * @tparam Candidate A valid function, member function or data member type.
  */
-template<std::size_t Index, auto Candidate>
+template<std::size_t Index, typename Candidate>
 using nth_argument_t = typename nth_argument<Index, Candidate>::type;
 
 } // namespace entt
