@@ -773,7 +773,7 @@ A utility to quickly find the n-th argument of a function, member function or
 data member (for blind operations on opaque types):
 
 ```cpp
-using type = entt::nth_argument_t<1u, &clazz::member>;
+using type = entt::nth_argument_t<1u, decltype(&clazz::member)>;
 ```
 
 Disambiguation of overloaded functions is the responsibility of the user, should
