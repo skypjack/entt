@@ -217,7 +217,7 @@ public:
                     const auto entity = other.contains(entt) ? entt : other.emplace(entt);
                     ENTT_ASSERT(entity == entt, "Entity not available for use");
 
-                    if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
+                    if constexpr(std::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
                         storage.emplace(entity);
                     } else {
                         Type elem{};
@@ -399,7 +399,7 @@ public:
                 if(archive(entt); entt != null) {
                     restore(entt);
 
-                    if constexpr(Registry::template storage_for_type<Type>::traits_type::page_size == 0u) {
+                    if constexpr(std::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
                         storage.emplace(map(entt));
                     } else {
                         Type elem{};
