@@ -220,6 +220,7 @@ TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+#    include <memory_resource>
 
 TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
