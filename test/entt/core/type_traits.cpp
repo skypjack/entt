@@ -41,16 +41,20 @@ struct multi_argument_operation {
 
 struct UnpackAsType: ::testing::Test {
     template<typename Type, typename... Args>
-    static inline auto func = [](entt::unpack_as_type<Type, Args>... value) {
-        return (value + ... + Type{});
-    };
+    static auto test_for() {
+        return [](entt::unpack_as_type<Type, Args>... value) {
+            return (value + ... + Type{});
+        };
+    }
 };
 
 struct UnpackAsValue: ::testing::Test {
     template<auto Value>
-    static inline auto func = [](auto &&...args) {
-        return (entt::unpack_as_value<Value, decltype(args)> + ... + 0);
-    };
+    static auto test_for() {
+        return [](auto &&...args) {
+            return (entt::unpack_as_value<Value, decltype(args)> + ... + 0);
+        };
+    }
 };
 
 TEST(SizeOf, Functionalities) {
@@ -61,13 +65,13 @@ TEST(SizeOf, Functionalities) {
 }
 
 TEST_F(UnpackAsType, Functionalities) {
-    ASSERT_EQ((this->func<int, char, double, bool>(1, 2, 3)), 6);
-    ASSERT_EQ((this->func<float, void, int>(2.f, 2.2)), 4.2f);
+    ASSERT_EQ((this->test_for<int, char, double, bool>()(1, 2, 3)), 6);
+    ASSERT_EQ((this->test_for<float, void, int>()(2.f, 2.2)), 4.2f);
 }
 
 TEST_F(UnpackAsValue, Functionalities) {
-    ASSERT_EQ((this->func<2>('c', 42., true)), 6);
-    ASSERT_EQ((this->func<true>('c', 42.)), 2);
+    ASSERT_EQ((this->test_for<2>()('c', 42., true)), 6);
+    ASSERT_EQ((this->test_for<true>()('c', 42.)), 2);
 }
 
 TEST(IntegralConstant, Functionalities) {
