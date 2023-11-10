@@ -822,20 +822,18 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_applicable_v<Func, decltype(*view->each().begin())>) {
-            if(view) {
+        if(view) {
+            if constexpr(is_applicable_v<Func, decltype(*view->each().begin())>) {
                 for(const auto pack: view->each()) {
                     std::apply(func, pack);
                 }
-            }
-        } else if constexpr(Get::traits_type::page_size == 0u) {
-            for(size_type pos{}, last = size(); pos < last; ++pos) {
-                func();
-            }
-        } else {
-            if(view) {
+            } else if constexpr(std::is_invocable_v<Func, decltype(*view->begin())>) {
                 for(auto &&component: *view) {
                     func(component);
+                }
+            } else {
+                for(size_type pos = view->size(); pos; --pos) {
+                    func();
                 }
             }
         }
