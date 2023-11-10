@@ -149,7 +149,11 @@ struct basic_meta_sequence_container_traits {
      * @param it The meta iterator to rebind the underlying iterator to.
      */
     static void end(const void *container, const bool as_const, iterator &it) {
-        as_const ? it.rebind(static_cast<const Type *>(container)->end()) : it.rebind(static_cast<Type *>(const_cast<void *>(container))->end());
+        if(as_const) {
+            it.rebind(static_cast<const Type *>(container)->end());
+        } else {
+            it.rebind(static_cast<Type *>(const_cast<void *>(container))->end());
+        }
     }
 
     /**
@@ -251,7 +255,11 @@ struct basic_meta_associative_container_traits {
      * @param it The meta iterator to rebind the underlying iterator to.
      */
     static void begin(const void *container, const bool as_const, iterator &it) {
-        as_const ? it.rebind<key_only>(static_cast<const Type *>(container)->begin()) : it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
+        if(as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->begin());
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->begin());
+        }
     }
 
     /**
@@ -261,7 +269,11 @@ struct basic_meta_associative_container_traits {
      * @param it The meta iterator to rebind the underlying iterator to.
      */
     static void end(const void *container, const bool as_const, iterator &it) {
-        as_const ? it.rebind<key_only>(static_cast<const Type *>(container)->end()) : it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
+        if(as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->end());
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->end());
+        }
     }
 
     /**
@@ -297,8 +309,11 @@ struct basic_meta_associative_container_traits {
      * @param it The meta iterator to rebind the underlying iterator to.
      */
     static void find(const void *container, const bool as_const, const void *key, iterator &it) {
-        const auto &elem = *static_cast<const typename Type::key_type *>(key);
-        as_const ? it.rebind<key_only>(static_cast<const Type *>(container)->find(elem)) : it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(elem));
+        if(const auto &elem = *static_cast<const typename Type::key_type *>(key); as_const) {
+            it.rebind<key_only>(static_cast<const Type *>(container)->find(elem));
+        } else {
+            it.rebind<key_only>(static_cast<Type *>(const_cast<void *>(container))->find(elem));
+        }
     }
 };
 
