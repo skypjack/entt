@@ -164,7 +164,7 @@ struct basic_meta_sequence_container_traits {
      * value type).
      * @param cref Optional opaque instance of the object to construct (as
      * decayed const reference type).
-     * @param it The meta iterator to rebind the underlying iterator to.
+     * @param it Iterator before which the element will be inserted.
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool insert([[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] iterator &it) {
