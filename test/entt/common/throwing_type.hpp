@@ -9,44 +9,39 @@ class throwing_type {
 public:
     using exception_type = test_exception;
 
-    static constexpr auto moved_from_value = -1;
-    static constexpr auto trigger_on_value = 42;
-
-    throwing_type(int value)
-        : data{value} {}
+    throwing_type(bool mode)
+        : trigger{mode} {}
 
     throwing_type(const throwing_type &other)
-        : data{other.data} {
-        if(data == trigger_on_value) {
-            data = moved_from_value;
+        : trigger{other.trigger} {
+        if(trigger) {
             throw exception_type{};
         }
     }
 
     throwing_type &operator=(const throwing_type &other) {
-        if(other.data == trigger_on_value) {
-            data = moved_from_value;
+        if(trigger) {
             throw exception_type{};
         }
 
-        data = other.data;
+        trigger = other.trigger;
         return *this;
     }
 
-    int get() const {
-        return data;
+    void throw_on_copy(const bool mode) noexcept {
+        trigger = mode;
     }
 
-    void set(int value) {
-        data = value;
+    bool throw_on_copy() const noexcept {
+        return trigger;
     }
 
 private:
-    int data{};
+    bool trigger{};
 };
 
 inline bool operator==(const throwing_type &lhs, const throwing_type &rhs) {
-    return lhs.get() == rhs.get();
+    return lhs.throw_on_copy() == rhs.throw_on_copy();
 }
 
 } // namespace test

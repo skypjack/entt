@@ -1800,7 +1800,7 @@ TEST(Storage, ThrowingComponent) {
     entt::storage<test::throwing_type> pool;
 
     const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}};
-    const test::throwing_type value[2u]{test::throwing_type::trigger_on_value, 1};
+    const test::throwing_type value[2u]{true, false};
 
     // strong exception safety
     ASSERT_THROW(pool.emplace(entity[0u], value[0u]), typename test::throwing_type::exception_type);
@@ -1823,8 +1823,8 @@ TEST(Storage, ThrowingComponent) {
     ASSERT_EQ(pool.get(entity[1u]), value[1u]);
 
     pool.clear();
-    pool.emplace(entity[1u], value[1u].get());
-    pool.emplace(entity[0u], value[0u].get());
+    pool.emplace(entity[1u], value[0u].throw_on_copy());
+    pool.emplace(entity[0u], value[1u].throw_on_copy());
 
     // basic exception safety
     ASSERT_THROW(pool.erase(entity[1u]), typename test::throwing_type::exception_type);
@@ -1833,11 +1833,11 @@ TEST(Storage, ThrowingComponent) {
     ASSERT_TRUE(pool.contains(entity[1u]));
     ASSERT_EQ(pool.at(0u), entity[1u]);
     ASSERT_EQ(pool.at(1u), entity[0u]);
-    ASSERT_EQ(pool.get(entity[0u]), value[0u]);
+    ASSERT_EQ(pool.get(entity[0u]), value[1u]);
     // the element may have been moved but it's still there
-    ASSERT_EQ(pool.get(entity[1u]), test::throwing_type::moved_from_value);
+    ASSERT_EQ(pool.get(entity[1u]), value[0u]);
 
-    pool.get(entity[0u]).set(value[1u].get());
+    pool.get(entity[1u]).throw_on_copy(false);
     pool.erase(entity[1u]);
 
     ASSERT_EQ(pool.size(), 1u);
