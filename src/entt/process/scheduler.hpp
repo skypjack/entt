@@ -35,14 +35,9 @@ struct process_handler {
                 process->tick(delta, data);
 
                 if(process->rejected()) {
+                    handler.next.reset();
                     return true;
                 } else if(process->finished()) {
-                    if(handler.next) {
-                        handler = std::move(*handler.next);
-                        // forces the process to exit the uninitialized state
-                        return handler.update(handler, {}, nullptr);
-                    }
-
                     return true;
                 }
 
@@ -267,9 +262,15 @@ public:
         for(auto pos = handlers.size(); pos; --pos) {
             auto &curr = handlers[pos - 1u];
 
-            if(const auto dead = curr.update(curr, delta, data); dead) {
-                std::swap(curr, handlers.back());
-                handlers.pop_back();
+            if(auto dead = curr.update(curr, delta, data); dead) {
+                if(curr.next) {
+                    curr = std::move(*curr.next);
+                    // forces the process to exit the uninitialized state
+                    curr.update(curr, {}, nullptr);
+                } else {
+                    std::swap(curr, handlers.back());
+                    handlers.pop_back();
+                }
             }
         }
     }
