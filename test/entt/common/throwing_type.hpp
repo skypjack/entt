@@ -20,10 +20,6 @@ public:
     }
 
     throwing_type &operator=(const throwing_type &other) {
-        if(trigger) {
-            throw exception_type{};
-        }
-
         trigger = other.trigger;
         return *this;
     }
