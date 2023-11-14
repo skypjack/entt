@@ -66,7 +66,7 @@ TEST(SizeOf, Functionalities) {
 
 TEST_F(UnpackAsType, Functionalities) {
     ASSERT_EQ((this->test_for<int, char, double, bool>()(1, 2, 3)), 6);
-    ASSERT_EQ((this->test_for<float, void, int>()(2.f, 2.2)), 4.2f);
+    ASSERT_EQ((this->test_for<float, void, int>()(2.f, 2.2f)), 4.2f);
 }
 
 TEST_F(UnpackAsValue, Functionalities) {
