@@ -85,7 +85,10 @@ struct process_handler final: basic_process_handler<Delta> {
  */
 template<typename Delta>
 class basic_scheduler {
-    using handler_type = internal::basic_process_handler<Delta>;
+    template<typename Type>
+    using handler_type = internal::process_handler<Delta, Type>;
+
+    using process_type = std::unique_ptr<internal::basic_process_handler<Delta>>;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -158,7 +161,7 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-        auto &ref = handlers.emplace_back(std::make_unique<internal::process_handler<Delta, Proc>>(std::forward<Args>(args)...));
+        auto &ref = handlers.emplace_back(std::make_unique<handler_type<Proc>>(std::forward<Args>(args)...));
         // forces the process to exit the uninitialized state
         ref->update({}, nullptr);
         return *this;
@@ -232,9 +235,9 @@ public:
     basic_scheduler &then(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
         ENTT_ASSERT(!handlers.empty(), "Process not available");
-        handler_type *curr = handlers.back().get();
+        auto *curr = handlers.back().get();
         for(; curr->next; curr = curr->next.get()) {}
-        curr->next = std::make_unique<internal::process_handler<Delta, Proc>>(std::forward<Args>(args)...);
+        curr->next = std::make_unique<handler_type<Proc>>(std::forward<Args>(args)...);
         return *this;
     }
 
@@ -294,7 +297,7 @@ public:
     }
 
 private:
-    std::vector<std::unique_ptr<handler_type>> handlers{};
+    std::vector<process_type> handlers{};
 };
 
 } // namespace entt
