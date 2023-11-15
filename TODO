@@ -15,17 +15,15 @@ TODO (high prio):
 * doc: bump entities
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
-* storage-based invoke helpers (update sigh mixin to also support storage based cbs)
-* make nth_argument use function types rather than pointers
 * use fixed_size_sequence_container_v to skip calls in meta.hpp, make funcs ret type void
-* review storage entity value_type and type passed to sparse set
-* storage entity tests for sort and sort_as (instead of pack)
+* static-less throwing_allocator
+* share test classes as much as possible
 * ===> TEST: view (scoped begin) tests after the last changes
 
 WIP:
 * get rid of observers, storage based views made them pointless - document alternatives
 * exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
-* process scheduler: reviews, use free lists internally
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
+* allocator-aware process scheduler
