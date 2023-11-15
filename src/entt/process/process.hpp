@@ -176,13 +176,13 @@ public:
      * The function is idempotent and it does nothing if the process isn't
      * alive.
      *
-     * @param immediately Requests an immediate operation.
+     * @param immediate Requests an immediate operation.
      */
-    void abort(const bool immediately = false) {
+    void abort(const bool immediate = false) {
         if(alive()) {
             current = state::aborted;
 
-            if(immediately) {
+            if(immediate) {
                 tick({});
             }
         }
