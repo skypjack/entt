@@ -79,19 +79,18 @@ TEST_F(Scheduler, Functionalities) {
 TEST_F(Scheduler, Then) {
     entt::scheduler scheduler;
 
-    // failing process with successor
-    scheduler.attach<succeeded_process>()
+    scheduler
+        // failing process with successor
+        .attach<succeeded_process>()
         .then<succeeded_process>()
         .then<failed_process>()
-        .then<succeeded_process>();
-
-    // failing process without successor
-    scheduler.attach<succeeded_process>()
         .then<succeeded_process>()
-        .then<failed_process>();
-
-    // non-failing process
-    scheduler.attach<succeeded_process>()
+        // failing process without successor
+        .attach<succeeded_process>()
+        .then<succeeded_process>()
+        .then<failed_process>()
+        // non-failing process
+        .attach<succeeded_process>()
         .then<succeeded_process>();
 
     ASSERT_EQ(succeeded_process::invoked, 0u);
