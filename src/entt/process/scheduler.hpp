@@ -1,12 +1,12 @@
 #ifndef ENTT_PROCESS_SCHEDULER_HPP
 #define ENTT_PROCESS_SCHEDULER_HPP
 
-#include <algorithm>
-#include <deque>
-#include <iterator>
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
+#include "../config/config.h"
 #include "fwd.hpp"
 #include "process.hpp"
 
@@ -20,39 +20,34 @@ namespace entt {
 namespace internal {
 
 template<typename Delta>
-struct process_handler {
-    using instance_type = std::unique_ptr<void, void (*)(void *)>;
-    using update_fn_type = bool(process_handler &, const Delta, void *);
-    using abort_fn_type = void(process_handler &, bool);
-    using next_type = std::unique_ptr<process_handler>;
+struct basic_process_handler {
+    virtual ~basic_process_handler() = default;
 
-    template<typename Proc>
-    static process_handler from(Proc &&proc) {
-        return {
-            {new Proc{std::forward<Proc>(proc)}, +[](void *proc) { delete static_cast<Proc *>(proc); }},
-            +[](process_handler &handler, const Delta delta, void *data) {
-                auto *process = static_cast<Proc *>(handler.instance.get());
-                process->tick(delta, data);
+    virtual bool update(const Delta, void *) = 0;
+    virtual void abort(const bool) = 0;
 
-                if(process->rejected()) {
-                    handler.next.reset();
-                    return true;
-                } else if(process->finished()) {
-                    return true;
-                }
+    std::unique_ptr<basic_process_handler> next;
+};
 
-                return false;
-            },
-            +[](process_handler &handler, const bool immediately) {
-                static_cast<Proc *>(handler.instance.get())->abort(immediately);
-            },
-            nullptr};
+template<typename Delta, typename Type>
+struct process_handler final: basic_process_handler<Delta> {
+    template<typename... Args>
+    process_handler(Args &&...args)
+        : process{std::forward<Args>(args)...} {}
+
+    bool update(const Delta delta, void *data) override {
+        if(process.tick(delta, data); process.rejected()) {
+            this->next.reset();
+        }
+
+        return (process.rejected() || process.finished());
     }
 
-    instance_type instance;
-    update_fn_type *update;
-    abort_fn_type *abort;
-    next_type next;
+    void abort(const bool immediate) override {
+        process.abort(immediate);
+    }
+
+    Type process;
 };
 
 } // namespace internal
@@ -90,28 +85,7 @@ struct process_handler {
  */
 template<typename Delta>
 class basic_scheduler {
-    using handler_type = internal::process_handler<Delta>;
-
-    struct continuation {
-        continuation(handler_type *ref) noexcept
-            : handler{ref} {}
-
-        template<typename Proc, typename... Args>
-        continuation then(Args &&...args) {
-            static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-            handler->next.reset(new handler_type{handler_type::from(Proc{std::forward<Args>(args)...})});
-            handler = handler->next.get();
-            return *this;
-        }
-
-        template<typename Func>
-        continuation then(Func &&func) {
-            return then<process_adaptor<std::decay_t<Func>, Delta>>(std::forward<Func>(func));
-        }
-
-    private:
-        handler_type *handler;
-    };
+    using handler_type = internal::basic_process_handler<Delta>;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -179,15 +153,15 @@ public:
      * @tparam Proc Type of process to schedule.
      * @tparam Args Types of arguments to use to initialize the process.
      * @param args Parameters to use to initialize the process.
-     * @return An opaque object to use to concatenate processes.
+     * @return This process scheduler.
      */
     template<typename Proc, typename... Args>
-    auto attach(Args &&...args) {
+    basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-        auto &ref = handlers.emplace_back(handler_type::from(Proc{std::forward<Args>(args)...}));
+        auto &ref = handlers.emplace_back(std::make_unique<internal::process_handler<Delta, Proc>>(std::forward<Args>(args)...));
         // forces the process to exit the uninitialized state
-        ref.update(ref, {}, nullptr);
-        return continuation{&handlers.back()};
+        ref->update({}, nullptr);
+        return *this;
     }
 
     /**
@@ -239,12 +213,41 @@ public:
      *
      * @tparam Func Type of process to schedule.
      * @param func Either a lambda or a functor to use as a process.
-     * @return An opaque object to use to concatenate processes.
+     * @return This process scheduler.
      */
     template<typename Func>
-    auto attach(Func &&func) {
+    basic_scheduler &attach(Func &&func) {
         using Proc = process_adaptor<std::decay_t<Func>, Delta>;
         return attach<Proc>(std::forward<Func>(func));
+    }
+
+    /**
+     * @brief Sets a process as a continuation of the last scheduled process.
+     * @tparam Proc Type of process to use as a continuation.
+     * @tparam Args Types of arguments to use to initialize the process.
+     * @param args Parameters to use to initialize the process.
+     * @return This process scheduler.
+     */
+    template<typename Proc, typename... Args>
+    basic_scheduler &then(Args &&...args) {
+        static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
+        ENTT_ASSERT(!handlers.empty(), "Process not available");
+        handler_type *curr = handlers.back().get();
+        for(; curr->next; curr = curr->next.get()) {}
+        curr->next = std::make_unique<internal::process_handler<Delta, Proc>>(std::forward<Args>(args)...);
+        return *this;
+    }
+
+    /**
+     * @brief Sets a process as a continuation of the last scheduled process.
+     * @tparam Func Type of process to use as a continuation.
+     * @param func Either a lambda or a functor to use as a process.
+     * @return This process scheduler.
+     */
+    template<typename Func>
+    basic_scheduler &then(Func &&func) {
+        using Proc = process_adaptor<std::decay_t<Func>, Delta>;
+        return then<Proc>(std::forward<Func>(func));
     }
 
     /**
@@ -259,16 +262,15 @@ public:
      * @param data Optional data.
      */
     void update(const delta_type delta, void *data = nullptr) {
-        for(auto pos = handlers.size(); pos; --pos) {
-            auto &curr = handlers[pos - 1u];
-
-            if(auto dead = curr.update(curr, delta, data); dead) {
-                if(curr.next) {
-                    curr = std::move(*curr.next);
+        for(auto next = handlers.size(); next; --next) {
+            if(const auto pos = next - 1u; handlers[pos]->update(delta, data)) {
+                // updating might spawn/reallocate, cannot hold refs until here
+                if(auto &curr = handlers[pos]; curr->next) {
+                    curr = std::move(curr->next);
                     // forces the process to exit the uninitialized state
-                    curr.update(curr, {}, nullptr);
+                    curr->update({}, nullptr);
                 } else {
-                    std::swap(curr, handlers.back());
+                    curr = std::move(handlers.back());
                     handlers.pop_back();
                 }
             }
@@ -283,17 +285,16 @@ public:
      * Once a process is fully aborted and thus finished, it's discarded along
      * with its child, if any.
      *
-     * @param immediately Requests an immediate operation.
+     * @param immediate Requests an immediate operation.
      */
-    void abort(const bool immediately = false) {
-        for(auto pos = handlers.size(); pos; --pos) {
-            auto &curr = handlers[pos - 1u];
-            curr.abort(curr, immediately);
+    void abort(const bool immediate = false) {
+        for(auto &&curr: handlers) {
+            curr->abort(immediate);
         }
     }
 
 private:
-    std::deque<handler_type> handlers{};
+    std::vector<std::unique_ptr<handler_type>> handlers{};
 };
 
 } // namespace entt
