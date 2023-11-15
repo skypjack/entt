@@ -133,9 +133,9 @@ public:
     /**
      * @brief Schedules a process for the next tick.
      *
-     * Returned value is an opaque object that can be used to attach a child to
-     * the given process. The child is automatically scheduled when the process
-     * terminates and only if the process returns with success.
+     * Returned value can be used to attach a continuation for the last process.
+     * The continutation is scheduled automatically when the process terminates
+     * and only if the process returns with success.
      *
      * Example of use (pseudocode):
      *
@@ -190,9 +190,9 @@ public:
      * void();
      * @endcode
      *
-     * Returned value is an opaque object that can be used to attach a child to
-     * the given process. The child is automatically scheduled when the process
-     * terminates and only if the process returns with success.
+     * Returned value can be used to attach a continuation for the last process.
+     * The continutation is scheduled automatically when the process terminates
+     * and only if the process returns with success.
      *
      * Example of use (pseudocode):
      *

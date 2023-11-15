@@ -177,8 +177,8 @@ To attach a process to a scheduler there are mainly two ways:
   scheduler.attach([](auto...){ /* ... */ });
   ```
 
-In both cases, the return value is an opaque object that offers a `then` member
-function used to create chains of processes to run sequentially.<br/>
+In both cases, the scheduler is returned and its `then` member function can be
+used to create chains of processes to run sequentially.<br/>
 As a minimal example of use:
 
 ```cpp
