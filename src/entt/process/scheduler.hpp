@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../core/compressed_pair.hpp"
 #include "fwd.hpp"
 #include "process.hpp"
 
@@ -26,7 +27,8 @@ struct basic_process_handler {
     virtual bool update(const Delta, void *) = 0;
     virtual void abort(const bool) = 0;
 
-    std::unique_ptr<basic_process_handler> next;
+    // std::shared_ptr because of its type erased allocator which is useful here
+    std::shared_ptr<basic_process_handler> next;
 };
 
 template<typename Delta, typename Type>
@@ -82,37 +84,90 @@ struct process_handler final: basic_process_handler<Delta> {
  * @sa process
  *
  * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Delta>
+template<typename Delta, typename Allocator>
 class basic_scheduler {
     template<typename Type>
     using handler_type = internal::process_handler<Delta, Type>;
 
-    using process_type = std::unique_ptr<internal::basic_process_handler<Delta>>;
+    // std::shared_ptr because of its type erased allocator which is useful here
+    using process_type = std::shared_ptr<internal::basic_process_handler<Delta>>;
+
+    using alloc_traits = std::allocator_traits<Allocator>;
+    using container_allocator = typename alloc_traits::template rebind_alloc<process_type>;
+    using container_type = std::vector<process_type, container_allocator>;
 
 public:
-    /*! @brief Unsigned integer type. */
-    using delta_type = Delta;
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Unsigned integer type. */
+    using delta_type = Delta;
 
     /*! @brief Default constructor. */
     basic_scheduler()
-        : handlers{} {
+        : basic_scheduler{allocator_type{}} {}
+
+    /**
+     * @brief Constructs a scheduler with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_scheduler(const allocator_type &allocator)
+        : handlers{allocator, allocator} {}
+
+    /**
+     * @brief Move constructor.
+     * @param other The instance to move from.
+     */
+    basic_scheduler(basic_scheduler &&other) noexcept
+        : handlers{std::move(other.handlers)} {}
+
+    /**
+     * @brief Allocator-extended move constructor.
+     * @param other The instance to move from.
+     * @param allocator The allocator to use.
+     */
+    basic_scheduler(basic_scheduler &&other, const allocator_type &allocator) noexcept
+        : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying a scheduler is not allowed");
     }
 
-    /*! @brief Default move constructor. */
-    basic_scheduler(basic_scheduler &&) = default;
+    /**
+     * @brief Move assignment operator.
+     * @param other The instance to move from.
+     * @return This scheduler.
+     */
+    basic_scheduler &operator=(basic_scheduler &&other) noexcept {
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying a scheduler is not allowed");
+        handlers = std::move(other.handlers);
+        return *this;
+    }
 
-    /*! @brief Default move assignment operator. @return This scheduler. */
-    basic_scheduler &operator=(basic_scheduler &&) = default;
+    /**
+     * @brief Exchanges the contents with those of a given scheduler.
+     * @param other Scheduler to exchange the content with.
+     */
+    void swap(basic_scheduler &other) {
+        using std::swap;
+        swap(handlers, other.handlers);
+    }
+
+    /**
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
+     */
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
+        return handlers.second();
+    }
 
     /**
      * @brief Number of processes currently scheduled.
      * @return Number of processes currently scheduled.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return handlers.size();
+        return handlers.first().size();
     }
 
     /**
@@ -120,7 +175,7 @@ public:
      * @return True if there are scheduled processes, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return handlers.empty();
+        return handlers.first().empty();
     }
 
     /**
@@ -130,7 +185,7 @@ public:
      * and never executed again.
      */
     void clear() {
-        handlers.clear();
+        handlers.first().clear();
     }
 
     /**
@@ -161,7 +216,7 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-        auto &ref = handlers.emplace_back(std::make_unique<handler_type<Proc>>(std::forward<Args>(args)...));
+        auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...));
         // forces the process to exit the uninitialized state
         ref->update({}, nullptr);
         return *this;
@@ -234,10 +289,10 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &then(Args &&...args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
-        ENTT_ASSERT(!handlers.empty(), "Process not available");
-        auto *curr = handlers.back().get();
+        ENTT_ASSERT(!handlers.first().empty(), "Process not available");
+        auto *curr = handlers.first().back().get();
         for(; curr->next; curr = curr->next.get()) {}
-        curr->next = std::make_unique<handler_type<Proc>>(std::forward<Args>(args)...);
+        curr->next = std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -265,16 +320,16 @@ public:
      * @param data Optional data.
      */
     void update(const delta_type delta, void *data = nullptr) {
-        for(auto next = handlers.size(); next; --next) {
-            if(const auto pos = next - 1u; handlers[pos]->update(delta, data)) {
+        for(auto next = handlers.first().size(); next; --next) {
+            if(const auto pos = next - 1u; handlers.first()[pos]->update(delta, data)) {
                 // updating might spawn/reallocate, cannot hold refs until here
-                if(auto &curr = handlers[pos]; curr->next) {
+                if(auto &curr = handlers.first()[pos]; curr->next) {
                     curr = std::move(curr->next);
                     // forces the process to exit the uninitialized state
                     curr->update({}, nullptr);
                 } else {
-                    curr = std::move(handlers.back());
-                    handlers.pop_back();
+                    curr = std::move(handlers.first().back());
+                    handlers.first().pop_back();
                 }
             }
         }
@@ -291,13 +346,13 @@ public:
      * @param immediate Requests an immediate operation.
      */
     void abort(const bool immediate = false) {
-        for(auto &&curr: handlers) {
+        for(auto &&curr: handlers.first()) {
             curr->abort(immediate);
         }
     }
 
 private:
-    std::vector<process_type> handlers{};
+    compressed_pair<container_type, allocator_type> handlers;
 };
 
 } // namespace entt
