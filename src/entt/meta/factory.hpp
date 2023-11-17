@@ -115,7 +115,7 @@ public:
     /**
      * @brief Assigns a custom unique identifier to a meta type.
      * @param id A custom unique identifier.
-     * @return An extended meta factory for the given type.
+     * @return A meta factory for the given type.
      */
     auto type(const id_type id) noexcept {
         auto &&elem = internal::owner(*ctx, *info);
@@ -192,7 +192,7 @@ public:
      *
      * @tparam Candidate The actual function to use as a constructor.
      * @tparam Policy Optional policy (no policy set by default).
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
     auto ctor() noexcept {
@@ -212,7 +212,7 @@ public:
      * type that can be invoked with parameters whose types are those given.
      *
      * @tparam Args Types of arguments to use to construct an instance.
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<typename... Args>
     auto ctor() noexcept {
@@ -264,7 +264,7 @@ public:
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
@@ -329,7 +329,7 @@ public:
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
@@ -386,7 +386,7 @@ public:
      * @tparam Getter The actual getter function.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
@@ -405,7 +405,7 @@ public:
      * @tparam Candidate The actual function to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @return An extended meta factory for the parent type.
+     * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) noexcept {
@@ -434,7 +434,7 @@ public:
      * @tparam Value Optional type of the property value.
      * @param id Property key.
      * @param value Optional property value.
-     * @return An extended meta factory for the given type.
+     * @return A meta factory for the parent type.
      */
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
