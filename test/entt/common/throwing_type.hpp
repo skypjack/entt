@@ -3,19 +3,16 @@
 
 namespace test {
 
-class throwing_type {
-    struct test_exception {};
+struct throwing_type_exception {};
 
-public:
-    using exception_type = test_exception;
-
+struct throwing_type {
     throwing_type(bool mode)
         : trigger{mode} {}
 
     throwing_type(const throwing_type &other)
         : trigger{other.trigger} {
         if(trigger) {
-            throw exception_type{};
+            throw throwing_type_exception{};
         }
     }
 
