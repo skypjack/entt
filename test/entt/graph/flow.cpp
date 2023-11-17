@@ -326,16 +326,12 @@ TEST(Flow, Loop) {
 }
 
 TEST(Flow, ThrowingAllocator) {
-    using allocator = test::throwing_allocator<entt::id_type>;
-    using task_allocator = test::throwing_allocator<std::pair<std::size_t, entt::id_type>>;
-    using task_exception = typename task_allocator::exception_type;
+    entt::basic_flow<test::throwing_allocator<entt::id_type>> flow{};
 
-    entt::basic_flow<allocator> flow{};
-
-    task_allocator::trigger_on_allocate = true;
+    flow.get_allocator().throw_counter<std::pair<std::size_t, entt::id_type>>(0u);
 
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_THROW(flow.bind(1), task_exception);
+    ASSERT_THROW(flow.bind(1), test::throwing_allocator_exception);
     ASSERT_EQ(flow.size(), 0u);
 
     flow.bind(1);

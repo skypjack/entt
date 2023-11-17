@@ -2,18 +2,21 @@
 #define ENTT_COMMON_THROWING_ALLOCATOR_HPP
 
 #include <cstddef>
+#include <limits>
 #include <memory>
 #include <type_traits>
+#include <entt/container/dense_map.hpp>
+#include <entt/core/fwd.hpp>
+#include <entt/core/type_info.hpp>
 
 namespace test {
 
+struct throwing_allocator_exception {};
+
 template<typename Type>
-class throwing_allocator: std::allocator<Type> {
+class throwing_allocator {
     template<typename Other>
     friend class throwing_allocator;
-
-    using base = std::allocator<Type>;
-    struct test_exception {};
 
 public:
     using value_type = Type;
@@ -23,33 +26,42 @@ public:
     using const_void_pointer = const void *;
     using propagate_on_container_move_assignment = std::true_type;
     using propagate_on_container_swap = std::true_type;
-    using exception_type = test_exception;
+    using container_type = entt::dense_map<entt::id_type, std::size_t>;
 
     template<typename Other>
     struct rebind {
         using other = throwing_allocator<Other>;
     };
 
-    throwing_allocator() = default;
+    throwing_allocator()
+        : allocator{},
+          config{std::allocate_shared<container_type>(allocator)} {}
 
     template<typename Other>
     throwing_allocator(const throwing_allocator<Other> &other)
-        : base{other} {}
+        : allocator{other.allocator},
+          config{other.config} {}
 
     pointer allocate(std::size_t length) {
-        if(trigger_on_allocate) {
-            trigger_on_allocate = false;
-            throw test_exception{};
+        if(const auto hash = entt::type_id<Type>().hash(); config->contains(hash)) {
+            if(auto &elem = (*config)[hash]; elem == 0u) {
+                config->erase(hash);
+                throw throwing_allocator_exception{};
+            } else {
+                --elem;
+            }
         }
 
-        trigger_on_allocate = trigger_after_allocate;
-        trigger_after_allocate = false;
-
-        return base::allocate(length);
+        return allocator.allocate(length);
     }
 
     void deallocate(pointer mem, std::size_t length) {
-        base::deallocate(mem, length);
+        allocator.deallocate(mem, length);
+    }
+
+    template<typename Other>
+    void throw_counter(const std::size_t len) {
+        (*config)[entt::type_id<Other>().hash()] = len;
     }
 
     bool operator==(const throwing_allocator<Type> &) const {
@@ -60,8 +72,9 @@ public:
         return !(*this == other);
     }
 
-    static inline bool trigger_on_allocate{};
-    static inline bool trigger_after_allocate{};
+private:
+    std::allocator<Type> allocator;
+    std::shared_ptr<container_type> config;
 };
 
 } // namespace test

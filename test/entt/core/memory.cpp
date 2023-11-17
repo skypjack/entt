@@ -85,10 +85,10 @@ TEST(FastMod, Functionalities) {
 
 TEST(AllocateUnique, Functionalities) {
     test::throwing_allocator<test::throwing_type> allocator{};
-    test::throwing_allocator<test::throwing_type>::trigger_on_allocate = true;
 
-    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, false)), test::throwing_allocator<test::throwing_type>::exception_type);
+    allocator.throw_counter<test::throwing_type>(0u);
 
+    ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, false)), test::throwing_allocator_exception);
     ASSERT_THROW((entt::allocate_unique<test::throwing_type>(allocator, test::throwing_type{true})), test::throwing_type_exception);
 
     std::unique_ptr<test::throwing_type, entt::allocation_deleter<test::throwing_allocator<test::throwing_type>>> ptr = entt::allocate_unique<test::throwing_type>(allocator, false);
@@ -201,9 +201,11 @@ TEST(UsesAllocatorConstructionArgs, PairRValueReference) {
 
 TEST(MakeObjUsingAllocator, Functionalities) {
     const auto size = 42u;
-    test::throwing_allocator<int>::trigger_on_allocate = true;
+    test::throwing_allocator<int> allocator{};
 
-    ASSERT_THROW((entt::make_obj_using_allocator<std::vector<int, test::throwing_allocator<int>>>(test::throwing_allocator<int>{}, size)), test::throwing_allocator<int>::exception_type);
+    allocator.throw_counter<int>(0u);
+
+    ASSERT_THROW((entt::make_obj_using_allocator<std::vector<int, test::throwing_allocator<int>>>(allocator, size)), test::throwing_allocator_exception);
 
     const auto vec = entt::make_obj_using_allocator<std::vector<int>>(std::allocator<int>{}, size);
 

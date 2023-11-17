@@ -472,7 +472,6 @@ TYPED_TEST(SighMixin, CustomAllocator) {
 
 TYPED_TEST(SighMixin, ThrowingAllocator) {
     using value_type = typename TestFixture::type;
-    using allocator_type = test::throwing_allocator<value_type>;
     entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>> pool{};
     typename std::decay_t<decltype(pool)>::base_type &base = pool;
 
@@ -489,53 +488,53 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
     pool.on_construct().template connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
-    allocator_type::trigger_on_allocate = true;
+    pool.get_allocator().template throw_counter<value_type>(0u);
 
-    ASSERT_THROW(pool.reserve(1u), typename allocator_type::exception_type);
+    ASSERT_THROW(pool.reserve(1u), test::throwing_allocator_exception);
     ASSERT_EQ(pool.capacity(), 0u);
 
-    allocator_type::trigger_after_allocate = true;
+    pool.get_allocator().template throw_counter<value_type>(1u);
 
-    ASSERT_THROW(pool.reserve(2 * packed_page_size), typename allocator_type::exception_type);
+    ASSERT_THROW(pool.reserve(2 * packed_page_size), test::throwing_allocator_exception);
     ASSERT_EQ(pool.capacity(), packed_page_size);
 
     pool.shrink_to_fit();
 
     ASSERT_EQ(pool.capacity(), 0u);
 
-    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+    pool.get_allocator().template throw_counter<entt::entity>(0u);
 
-    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_TRUE(pool.empty());
 
-    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+    pool.get_allocator().template throw_counter<entt::entity>(0u);
 
-    ASSERT_THROW(base.push(entt::entity{0}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_THROW(base.push(entt::entity{0}), test::throwing_allocator_exception);
     ASSERT_FALSE(base.contains(entt::entity{0}));
     ASSERT_TRUE(base.empty());
 
-    allocator_type::trigger_on_allocate = true;
+    pool.get_allocator().template throw_counter<value_type>(0u);
 
-    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), typename allocator_type::exception_type);
+    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_NO_FATAL_FAILURE(pool.compact());
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{0}, 0);
     const entt::entity entity[2u]{entt::entity{1}, entt::entity{sparse_page_size}};
-    test::throwing_allocator<entt::entity>::trigger_after_allocate = true;
+    pool.get_allocator().template throw_counter<entt::entity>(1u);
 
-    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), value_type{0}), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), value_type{0}), test::throwing_allocator_exception);
     ASSERT_TRUE(pool.contains(entt::entity{1}));
     ASSERT_FALSE(pool.contains(entt::entity{sparse_page_size}));
 
     pool.erase(entt::entity{1});
     const value_type components[2u]{value_type{1}, value_type{sparse_page_size}};
-    test::throwing_allocator<entt::entity>::trigger_on_allocate = true;
+    pool.get_allocator().template throw_counter<entt::entity>(0u);
     pool.compact();
 
-    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), std::begin(components)), test::throwing_allocator<entt::entity>::exception_type);
+    ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), std::begin(components)), test::throwing_allocator_exception);
     ASSERT_TRUE(pool.contains(entt::entity{1}));
     ASSERT_FALSE(pool.contains(entt::entity{sparse_page_size}));
 

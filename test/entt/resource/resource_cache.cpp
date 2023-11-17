@@ -413,19 +413,14 @@ TEST(ResourceCache, BrokenLoader) {
 TEST(ResourceCache, ThrowingAllocator) {
     using namespace entt::literals;
 
-    using allocator = test::throwing_allocator<std::size_t>;
-    using packed_allocator = test::throwing_allocator<entt::internal::dense_map_node<entt::id_type, std::shared_ptr<std::size_t>>>;
-    using packed_exception = typename packed_allocator::exception_type;
+    entt::resource_cache<std::size_t, entt::resource_loader<std::size_t>, test::throwing_allocator<std::size_t>> cache{};
+    cache.get_allocator().throw_counter<entt::internal::dense_map_node<entt::id_type, std::shared_ptr<std::size_t>>>(0u);
 
-    entt::resource_cache<std::size_t, entt::resource_loader<std::size_t>, allocator> cache{};
-
-    packed_allocator::trigger_on_allocate = true;
-
-    ASSERT_THROW(cache.load("resource"_hs), packed_exception);
+    ASSERT_THROW(cache.load("resource"_hs), test::throwing_allocator_exception);
     ASSERT_FALSE(cache.contains("resource"_hs));
 
-    packed_allocator::trigger_on_allocate = true;
+    cache.get_allocator().throw_counter<entt::internal::dense_map_node<entt::id_type, std::shared_ptr<std::size_t>>>(0u);
 
-    ASSERT_THROW(cache.force_load("resource"_hs), packed_exception);
+    ASSERT_THROW(cache.force_load("resource"_hs), test::throwing_allocator_exception);
     ASSERT_FALSE(cache.contains("resource"_hs));
 }

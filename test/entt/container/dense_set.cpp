@@ -978,32 +978,29 @@ TEST(DenseSet, Reserve) {
 }
 
 TEST(DenseSet, ThrowingAllocator) {
-    using allocator = test::throwing_allocator<std::size_t>;
-    using packed_allocator = test::throwing_allocator<std::pair<std::size_t, std::size_t>>;
-    using packed_exception = typename packed_allocator::exception_type;
-
     constexpr std::size_t minimum_bucket_count = 8u;
+    using allocator = test::throwing_allocator<std::size_t>;
     entt::dense_set<std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> set{};
 
-    packed_allocator::trigger_on_allocate = true;
+    set.get_allocator().throw_counter<std::pair<std::size_t, std::size_t>>(0u);
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
-    ASSERT_THROW(set.reserve(2u * set.bucket_count()), packed_exception);
+    ASSERT_THROW(set.reserve(2u * set.bucket_count()), test::throwing_allocator_exception);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
 
-    packed_allocator::trigger_on_allocate = true;
+    set.get_allocator().throw_counter<std::pair<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(set.emplace(), packed_exception);
+    ASSERT_THROW(set.emplace(), test::throwing_allocator_exception);
     ASSERT_FALSE(set.contains(0u));
 
-    packed_allocator::trigger_on_allocate = true;
+    set.get_allocator().throw_counter<std::pair<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(set.emplace(std::size_t{}), packed_exception);
+    ASSERT_THROW(set.emplace(std::size_t{}), test::throwing_allocator_exception);
     ASSERT_FALSE(set.contains(0u));
 
-    packed_allocator::trigger_on_allocate = true;
+    set.get_allocator().throw_counter<std::pair<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(set.insert(0u), packed_exception);
+    ASSERT_THROW(set.insert(0u), test::throwing_allocator_exception);
     ASSERT_FALSE(set.contains(0u));
 }
 

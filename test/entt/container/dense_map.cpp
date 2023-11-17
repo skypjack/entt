@@ -1154,32 +1154,29 @@ TEST(DenseMap, Reserve) {
 }
 
 TEST(DenseMap, ThrowingAllocator) {
-    using allocator = test::throwing_allocator<std::pair<const std::size_t, std::size_t>>;
-    using packed_allocator = test::throwing_allocator<entt::internal::dense_map_node<std::size_t, std::size_t>>;
-    using packed_exception = typename packed_allocator::exception_type;
-
     constexpr std::size_t minimum_bucket_count = 8u;
+    using allocator = test::throwing_allocator<std::pair<const std::size_t, std::size_t>>;
     entt::dense_map<std::size_t, std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> map{};
 
-    packed_allocator::trigger_on_allocate = true;
+    map.get_allocator().throw_counter<entt::internal::dense_map_node<std::size_t, std::size_t>>(0u);
 
     ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
-    ASSERT_THROW(map.reserve(2u * map.bucket_count()), packed_exception);
+    ASSERT_THROW(map.reserve(2u * map.bucket_count()), test::throwing_allocator_exception);
     ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
 
-    packed_allocator::trigger_on_allocate = true;
+    map.get_allocator().throw_counter<entt::internal::dense_map_node<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(map.emplace(0u, 0u), packed_exception);
+    ASSERT_THROW(map.emplace(0u, 0u), test::throwing_allocator_exception);
     ASSERT_FALSE(map.contains(0u));
 
-    packed_allocator::trigger_on_allocate = true;
+    map.get_allocator().throw_counter<entt::internal::dense_map_node<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(map.emplace(std::piecewise_construct, std::make_tuple(0u), std::make_tuple(0u)), packed_exception);
+    ASSERT_THROW(map.emplace(std::piecewise_construct, std::make_tuple(0u), std::make_tuple(0u)), test::throwing_allocator_exception);
     ASSERT_FALSE(map.contains(0u));
 
-    packed_allocator::trigger_on_allocate = true;
+    map.get_allocator().throw_counter<entt::internal::dense_map_node<std::size_t, std::size_t>>(0u);
 
-    ASSERT_THROW(map.insert_or_assign(0u, 0u), packed_exception);
+    ASSERT_THROW(map.insert_or_assign(0u, 0u), test::throwing_allocator_exception);
     ASSERT_FALSE(map.contains(0u));
 }
 

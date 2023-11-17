@@ -2108,38 +2108,38 @@ TYPED_TEST(SparseSet, ThrowingAllocator) {
     for(const auto policy: this->deletion_policy) {
         entt::basic_sparse_set<entity_type, test::throwing_allocator<entity_type>> set{policy};
 
-        test::throwing_allocator<entity_type>::trigger_on_allocate = true;
+        set.get_allocator().template throw_counter<entity_type>(0u);
 
-        ASSERT_THROW(set.reserve(1u), typename test::throwing_allocator<entity_type>::exception_type);
+        ASSERT_THROW(set.reserve(1u), test::throwing_allocator_exception);
         ASSERT_EQ(set.capacity(), 0u);
         ASSERT_EQ(set.extent(), 0u);
 
-        test::throwing_allocator<entity_type>::trigger_on_allocate = true;
+        set.get_allocator().template throw_counter<entity_type>(0u);
 
-        ASSERT_THROW(set.push(entity_type{0}), typename test::throwing_allocator<entity_type>::exception_type);
+        ASSERT_THROW(set.push(entity_type{0}), test::throwing_allocator_exception);
         ASSERT_EQ(set.extent(), traits_type::page_size);
         ASSERT_EQ(set.capacity(), 0u);
 
         set.push(entity_type{0});
-        test::throwing_allocator<entity_type>::trigger_on_allocate = true;
+        set.get_allocator().template throw_counter<entity_type>(0u);
 
-        ASSERT_THROW(set.reserve(2u), typename test::throwing_allocator<entity_type>::exception_type);
+        ASSERT_THROW(set.reserve(2u), test::throwing_allocator_exception);
         ASSERT_EQ(set.extent(), traits_type::page_size);
         ASSERT_TRUE(set.contains(entity_type{0}));
         ASSERT_EQ(set.capacity(), 1u);
 
-        test::throwing_allocator<entity_type>::trigger_on_allocate = true;
+        set.get_allocator().template throw_counter<entity_type>(0u);
 
-        ASSERT_THROW(set.push(entity_type{1}), typename test::throwing_allocator<entity_type>::exception_type);
+        ASSERT_THROW(set.push(entity_type{1}), test::throwing_allocator_exception);
         ASSERT_EQ(set.extent(), traits_type::page_size);
         ASSERT_TRUE(set.contains(entity_type{0}));
         ASSERT_FALSE(set.contains(entity_type{1}));
         ASSERT_EQ(set.capacity(), 1u);
 
         entity_type entity[2u]{entity_type{1}, entity_type{traits_type::page_size}};
-        test::throwing_allocator<entity_type>::trigger_after_allocate = true;
+        set.get_allocator().template throw_counter<entity_type>(1u);
 
-        ASSERT_THROW(set.push(std::begin(entity), std::end(entity)), typename test::throwing_allocator<entity_type>::exception_type);
+        ASSERT_THROW(set.push(std::begin(entity), std::end(entity)), test::throwing_allocator_exception);
         ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
         ASSERT_TRUE(set.contains(entity_type{0}));
         ASSERT_TRUE(set.contains(entity_type{1}));
