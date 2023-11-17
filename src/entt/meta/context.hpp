@@ -21,8 +21,8 @@ struct meta_type_node;
 struct meta_context {
     dense_map<id_type, meta_type_node, identity> value{};
 
-    [[nodiscard]] static inline meta_context &from(meta_ctx &ctx);
-    [[nodiscard]] static inline const meta_context &from(const meta_ctx &ctx);
+    [[nodiscard]] inline static meta_context &from(meta_ctx &ctx);
+    [[nodiscard]] inline static const meta_context &from(const meta_ctx &ctx);
 };
 
 } // namespace internal

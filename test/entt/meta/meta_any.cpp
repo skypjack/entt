@@ -26,7 +26,7 @@ struct clazz_t {
         return value;
     }
 
-    static inline char c = 'c';
+    inline static char c = 'c';
     int value;
 };
 

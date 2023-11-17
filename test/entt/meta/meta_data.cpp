@@ -93,7 +93,7 @@ struct multi_setter_t {
 };
 
 struct array_t {
-    static inline int global[3];
+    inline static int global[3];
     int local[5];
 };
 
