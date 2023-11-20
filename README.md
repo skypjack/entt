@@ -196,7 +196,11 @@ comparison (this should already tell you a lot). Many of these benchmarks are
 completely wrong, many others are simply incomplete, good at omitting some
 information and using the wrong function to compare a given feature. Certainly
 there are also good ones but they age quickly if nobody updates them, especially
-when the library they are dealing with is actively developed.
+when the library they are dealing with is actively developed.<br/>
+Out of all of them, [this](https://github.com/abeimler/ecs_benchmark) seems like
+the most up-to-date project and also covers a certain number of libraries. I
+can't say exactly whether `EnTT` is used correctly or not. However, even if used
+poorly, it should still give the reader an idea of where it's going to operate.
 
 The choice to use `EnTT` should be based on its carefully designed API, its
 set of features and the general performance, **not** because some single
