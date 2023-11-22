@@ -165,7 +165,7 @@ struct basic_meta_sequence_container_traits {
      * @param it Iterator before which the element will be inserted.
      * @return A possibly invalid iterator to the inserted element.
      */
-    [[nodiscard]] static iterator insert([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] const iterator &it) {
+    [[nodiscard]] static iterator insert(const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] const iterator &it) {
         if constexpr(fixed_size) {
             return iterator{area};
         } else {
@@ -183,7 +183,7 @@ struct basic_meta_sequence_container_traits {
      * @param it An opaque iterator to the element to erase.
      * @return A possibly invalid iterator following the last removed element.
      */
-    [[nodiscard]] static iterator erase([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const iterator &it) {
+    [[nodiscard]] static iterator erase(const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const iterator &it) {
         if constexpr(fixed_size) {
             return iterator{area};
         } else {
