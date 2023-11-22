@@ -10,6 +10,7 @@
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
+#include "../common/custom_entity.h"
 #include "../common/non_default_constructible.h"
 #include "../common/pointer_stable.h"
 #include "../common/throwing_allocator.hpp"
@@ -19,6 +20,13 @@ template<typename Registry>
 void listener(std::size_t &counter, Registry &, typename Registry::entity_type) {
     ++counter;
 }
+
+struct custom_registry: entt::basic_registry<test::custom_entity> {};
+
+template<typename Component>
+struct entt::storage_type<Component, test::custom_entity> {
+    using type = entt::basic_sigh_mixin<entt::basic_storage<Component, test::custom_entity>, custom_registry>;
+};
 
 template<typename Type>
 struct SighMixin: testing::Test {
@@ -412,6 +420,30 @@ TYPED_TEST(SighMixin, Swap) {
 
     ASSERT_EQ(on_construct, 3u);
     ASSERT_EQ(on_destroy, 3u);
+}
+
+TYPED_TEST(SighMixin, CustomRegistry) {
+    using value_type = typename TestFixture::type;
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::custom_entity>, custom_registry> pool;
+    custom_registry registry;
+
+    std::size_t on_construct{};
+    std::size_t on_destroy{};
+
+    pool.bind(entt::forward_as_any(static_cast<entt::basic_registry<test::custom_entity> &>(registry)));
+    pool.on_construct().template connect<&listener<custom_registry>>(on_construct);
+    pool.on_destroy().template connect<&listener<custom_registry>>(on_destroy);
+
+    pool.emplace(test::custom_entity{3});
+    pool.emplace(test::custom_entity{42});
+
+    ASSERT_EQ(on_construct, 2u);
+    ASSERT_EQ(on_destroy, 0u);
+
+    pool.clear();
+
+    ASSERT_EQ(on_construct, 2u);
+    ASSERT_EQ(on_destroy, 2u);
 }
 
 TYPED_TEST(SighMixin, CustomAllocator) {

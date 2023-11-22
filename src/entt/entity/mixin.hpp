@@ -22,18 +22,23 @@ namespace entt {
  *
  * This applies to all signals made available.
  *
- * @tparam Type The type of the underlying storage.
+ * @tparam Type Underlying storage type.
+ * @tparam Registry Basic registry type.
  */
-template<typename Type>
-class sigh_mixin final: public Type {
+template<typename Type, typename Registry>
+class basic_sigh_mixin final: public Type {
     using underlying_type = Type;
+    using owner_type = Registry;
+
     using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
-    using sigh_type = sigh<void(basic_registry_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
+    using sigh_type = sigh<void(owner_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
     using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
-    basic_registry_type &owner_or_assert() const noexcept {
+    static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
+
+    owner_type &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        return *owner;
+        return static_cast<owner_type &>(*owner);
     }
 
     void pop(underlying_iterator first, underlying_iterator last) final {
@@ -85,17 +90,17 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename underlying_type::entity_type;
     /*! @brief Expected registry type. */
-    using registry_type = basic_registry_type;
+    using registry_type = owner_type;
 
     /*! @brief Default constructor. */
-    sigh_mixin()
-        : sigh_mixin{allocator_type{}} {}
+    basic_sigh_mixin()
+        : basic_sigh_mixin{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty storage with a given allocator.
      * @param allocator The allocator to use.
      */
-    explicit sigh_mixin(const allocator_type &allocator)
+    explicit basic_sigh_mixin(const allocator_type &allocator)
         : underlying_type{allocator},
           owner{},
           construction{allocator},
@@ -106,7 +111,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    sigh_mixin(sigh_mixin &&other) noexcept
+    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
         : underlying_type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -118,7 +123,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    sigh_mixin(sigh_mixin &&other, const allocator_type &allocator) noexcept
+    basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator) noexcept
         : underlying_type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
@@ -130,7 +135,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    sigh_mixin &operator=(sigh_mixin &&other) noexcept {
+    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
         underlying_type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
@@ -143,7 +148,7 @@ public:
      * @brief Exchanges the contents with those of a given storage.
      * @param other Storage to exchange the content with.
      */
-    void swap(sigh_mixin &other) {
+    void swap(basic_sigh_mixin &other) {
         using std::swap;
         underlying_type::swap(other);
         swap(owner, other.owner);
