@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 
 namespace entt {
 
