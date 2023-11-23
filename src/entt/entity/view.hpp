@@ -129,6 +129,7 @@ struct extended_view_iterator final {
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
+    using iterator_concept = std::forward_iterator_tag;
 
     constexpr extended_view_iterator()
         : it{},
