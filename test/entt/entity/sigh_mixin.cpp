@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
@@ -23,9 +24,9 @@ void listener(std::size_t &counter, Registry &, typename Registry::entity_type) 
 
 struct custom_registry: entt::basic_registry<test::custom_entity> {};
 
-template<typename Component>
-struct entt::storage_type<Component, test::custom_entity> {
-    using type = entt::basic_sigh_mixin<entt::basic_storage<Component, test::custom_entity>, custom_registry>;
+template<typename Type>
+struct entt::storage_type<Type, test::custom_entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, test::custom_entity>>> {
+    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::custom_entity>, custom_registry>;
 };
 
 template<typename Type>
