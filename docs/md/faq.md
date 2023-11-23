@@ -14,6 +14,7 @@
   * [Warning C4003: the min, the max and the macro](#warning-C4003-the-min-the-max-and-the-macro)
   * [The standard and the non-copyable types](#the-standard-and-the-non-copyable-types)
   * [Which functions trigger which signals](#which-functions-trigger-which-signals)
+  * [Duplicate storage for the same component](#duplicate-storage-for-the-same-component)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -213,3 +214,28 @@ otherwise the latter is replaced and therefore `on_update` is triggered. As for
 the second case, components are removed from their entities and thus freed when
 they are recycled. It means that `on_destroyed` is triggered for every component 
 owned by the entity that is destroyed.
+
+## Duplicate storage for the same component
+
+It's rare but you can see double sometimes, especially when it comes to storage.
+This can be caused by a conflict in the hash assigned to the various component
+types (one of a kind) or by bugs in your compiler
+([more common](https://github.com/skypjack/entt/issues/1063) apparently).<br/>
+Regardless of the cause, `EnTT` offers a customization point that also serves as
+a solution in this case:
+
+```cpp
+template<>
+struct entt::type_hash<Type> final {
+    [[nodiscard]] static constexpr id_type value() noexcept {
+        return hashed_string::value("Type");
+    }
+
+    [[nodiscard]] constexpr operator id_type() const noexcept {
+        return value();
+    }
+};
+```
+
+Specializing `type_hash` directly bypasses the default implementation offered by
+`EnTT`, thus avoiding any possible conflicts or compiler bugs.
