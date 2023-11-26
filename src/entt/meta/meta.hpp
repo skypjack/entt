@@ -1642,6 +1642,7 @@ public:
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
+    using iterator_concept = std::bidirectional_iterator_tag;
 
     meta_iterator() noexcept
         : meta_iterator{locator<meta_ctx>::value_or()} {}
@@ -1732,6 +1733,7 @@ public:
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
+    using iterator_concept = std::forward_iterator_tag;
 
     meta_iterator() noexcept
         : meta_iterator{locator<meta_ctx>::value_or()} {}
