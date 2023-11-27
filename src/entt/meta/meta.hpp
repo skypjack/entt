@@ -91,8 +91,8 @@ private:
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
     bool (*resize_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, const void *, const bool){};
-    iterator (*end_fn)(const meta_ctx &, const void *, const bool){};
+    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
     iterator (*insert_fn)(const meta_ctx &, void *, const void *, const void *, const iterator &){};
     iterator (*erase_fn)(const meta_ctx &, void *, const iterator &){};
     const void *cdata{};
@@ -171,11 +171,11 @@ private:
     size_type (*size_fn)(const void *){};
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, const void *, const bool){};
-    iterator (*end_fn)(const meta_ctx &, const void *, const bool){};
+    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
     bool (*insert_fn)(void *, const void *, const void *){};
     size_type (*erase_fn)(void *, const void *){};
-    iterator (*find_fn)(const meta_ctx &, const void *, const bool, const void *){};
+    iterator (*find_fn)(const meta_ctx &, void *, const void *, const void *){};
     const void *cdata{};
     void *data{};
 };
@@ -1848,7 +1848,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return begin_fn(*ctx, cdata, data == nullptr);
+    return begin_fn(*ctx, data, cdata);
 }
 
 /**
@@ -1856,7 +1856,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return end_fn(*ctx, cdata, data == nullptr);
+    return end_fn(*ctx, data, cdata);
 }
 
 /**
@@ -1950,12 +1950,12 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return begin_fn(*ctx, cdata, data == nullptr);
+    return begin_fn(*ctx, data, cdata);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return end_fn(*ctx, cdata, data == nullptr);
+    return end_fn(*ctx, data, cdata);
 }
 
 /**
@@ -1985,9 +1985,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))})
-               ? find_fn(*ctx, cdata, data == nullptr, std::as_const(key).data())
-               : iterator{*ctx};
+    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) ? find_fn(*ctx, data, cdata, std::as_const(key).data()) : iterator{*ctx};
 }
 
 /**

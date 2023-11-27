@@ -133,24 +133,24 @@ struct basic_meta_sequence_container_traits {
      * @brief Returns a possibly const iterator to the beginning.
      * @param area The context to pass to the newly created iterator.
      * @param container Opaque pointer to a container of the given type.
-     * @param as_const True for const-only containers, false otherwise.
+     * @param as_const Const opaque pointer fallback.
      * @return An iterator to the first element of the container.
      */
-    static iterator begin(const meta_ctx &area, const void *container, const bool as_const) {
-        return as_const ? iterator{area, static_cast<const Type *>(container)->begin()}
-                        : iterator{area, static_cast<Type *>(const_cast<void *>(container))->begin()};
+    static iterator begin(const meta_ctx &area, void *container, const void *as_const) {
+        return container ? iterator{area, static_cast<Type *>(container)->begin()}
+                         : iterator{area, static_cast<const Type *>(as_const)->begin()};
     }
 
     /**
      * @brief Returns a possibly const iterator to the end.
      * @param area The context to pass to the newly created iterator.
      * @param container Opaque pointer to a container of the given type.
-     * @param as_const True for const-only containers, false otherwise.
+     * @param as_const Const opaque pointer fallback.
      * @return An iterator that is past the last element of the container.
      */
-    static iterator end(const meta_ctx &area, const void *container, const bool as_const) {
-        return as_const ? iterator{area, static_cast<const Type *>(container)->end()}
-                        : iterator{area, static_cast<Type *>(const_cast<void *>(container))->end()};
+    static iterator end(const meta_ctx &area, void *container, const void *as_const) {
+        return container ? iterator{area, static_cast<Type *>(container)->end()}
+                         : iterator{area, static_cast<const Type *>(as_const)->end()};
     }
 
     /**
@@ -247,24 +247,24 @@ struct basic_meta_associative_container_traits {
      * @brief Returns a possibly const iterator to the beginning.
      * @param area The context to pass to the newly created iterator.
      * @param container Opaque pointer to a container of the given type.
-     * @param as_const True for const-only containers, false otherwise.
+     * @param as_const Const opaque pointer fallback.
      * @return An iterator to the first element of the container.
      */
-    static iterator begin(const meta_ctx &area, const void *container, const bool as_const) {
-        return as_const ? iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(container)->begin()}
-                        : iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(const_cast<void *>(container))->begin()};
+    static iterator begin(const meta_ctx &area, void *container, const void *as_const) {
+        return container ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->begin()}
+                         : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->begin()};
     }
 
     /**
      * @brief Returns a possibly const iterator to the end.
      * @param area The context to pass to the newly created iterator.
      * @param container Opaque pointer to a container of the given type.
-     * @param as_const True for const-only containers, false otherwise.
+     * @param as_const Const opaque pointer fallback.
      * @return An iterator that is past the last element of the container.
      */
-    static iterator end(const meta_ctx &area, const void *container, const bool as_const) {
-        return as_const ? iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(container)->end()}
-                        : iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(const_cast<void *>(container))->end()};
+    static iterator end(const meta_ctx &area, void *container, const void *as_const) {
+        return container ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->end()}
+                         : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->end()};
     }
 
     /**
@@ -296,13 +296,13 @@ struct basic_meta_associative_container_traits {
      * @brief Finds an element with a given key.
      * @param area The context to pass to the newly created iterator.
      * @param container Opaque pointer to a container of the given type.
-     * @param as_const True for const-only containers, false otherwise.
+     * @param as_const Const opaque pointer fallback.
      * @param key Opaque key value of an element to search for.
      * @return An iterator to the element with the given key, if any.
      */
-    static iterator find(const meta_ctx &area, const void *container, const bool as_const, const void *key) {
-        return as_const ? iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(container)->find(*static_cast<const typename Type::key_type *>(key))}
-                        : iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(const_cast<void *>(container))->find(*static_cast<const typename Type::key_type *>(key))};
+    static iterator find(const meta_ctx &area, void *container, const void *as_const, const void *key) {
+        return container ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->find(*static_cast<const typename Type::key_type *>(key))}
+                         : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(*static_cast<const typename Type::key_type *>(key))};
     }
 };
 
