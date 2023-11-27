@@ -66,7 +66,7 @@ public:
         erase_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::erase;
         cdata = &instance;
 
-        if constexpr(!std::is_const_v<std::remove_reference_t<Type>>) {
+        if constexpr(!std::is_const_v<Type>) {
             data = &instance;
         }
     }
@@ -144,7 +144,7 @@ public:
         find_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::find;
         cdata = &instance;
 
-        if constexpr(!std::is_const_v<std::remove_reference_t<Type>>) {
+        if constexpr(!std::is_const_v<Type>) {
             data = &instance;
         }
     }
