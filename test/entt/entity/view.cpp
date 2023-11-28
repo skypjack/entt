@@ -578,7 +578,13 @@ TEST(SingleComponentView, StorageEntity) {
     const auto entity = registry.create();
     const auto other = registry.create();
 
-    registry.destroy(entity);
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    ASSERT_EQ(view.front(), other);
+    ASSERT_EQ(view.back(), other);
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_NE(view.begin(), view.end());
@@ -1544,6 +1550,12 @@ TEST(MultiComponentView, StorageEntity) {
 
     registry.destroy(entity, entt::to_version(entity));
 
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+
+    ASSERT_EQ(view.front(), other);
+    ASSERT_EQ(view.back(), other);
+
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_NE(view.begin(), view.end());
 
@@ -1575,6 +1587,13 @@ TEST(MultiComponentView, StorageEntityWithExcludedComponent) {
 
     registry.destroy(entity, entt::to_version(entity));
 
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+    ASSERT_FALSE(view.contains(excluded));
+
+    ASSERT_EQ(view.front(), other);
+    ASSERT_EQ(view.back(), other);
+
     ASSERT_EQ(view.size_hint(), 3u);
     ASSERT_NE(view.begin(), view.end());
 
@@ -1600,7 +1619,14 @@ TEST(MultiComponentView, StorageEntityExcludeOnly) {
 
     registry.emplace<int>(excluded);
 
-    registry.destroy(entity);
+    registry.destroy(entity, entt::to_version(entity));
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_TRUE(view.contains(other));
+    ASSERT_FALSE(view.contains(excluded));
+
+    ASSERT_EQ(view.front(), other);
+    ASSERT_EQ(view.back(), other);
 
     ASSERT_EQ(view.size_hint(), 3u);
     ASSERT_NE(view.begin(), view.end());
