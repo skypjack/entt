@@ -77,7 +77,7 @@ TYPED_TEST(Entity, Null) {
     ASSERT_EQ(traits_type::combine(entt::null, entt::to_integral(null)), null);
     ASSERT_EQ(traits_type::combine(entt::null, entt::tombstone), null);
 
-    registry.emplace<int>(entity, 42);
+    registry.template emplace<int>(entity, 42);
 
     ASSERT_FALSE(entity == entt::null);
     ASSERT_FALSE(entt::null == entity);
@@ -107,7 +107,7 @@ TYPED_TEST(Entity, Tombstone) {
     ASSERT_EQ(traits_type::combine(entt::tombstone, entt::to_integral(tombstone)), tombstone);
     ASSERT_EQ(traits_type::combine(entt::tombstone, entt::null), tombstone);
 
-    registry.emplace<int>(entity, 42);
+    registry.template emplace<int>(entity, 42);
 
     ASSERT_FALSE(entity == entt::tombstone);
     ASSERT_FALSE(entt::tombstone == entity);
