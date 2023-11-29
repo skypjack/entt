@@ -12,7 +12,8 @@
 namespace entt {
 
 /**
- * @brief Checks whether a value is a power of two or not.
+ * @brief Checks whether a value is a power of two or not (waiting for C++20 and
+ * `std::has_single_bit`).
  * @param value A value that may or may not be a power of two.
  * @return True if the value is a power of two, false otherwise.
  */
@@ -21,7 +22,8 @@ namespace entt {
 }
 
 /**
- * @brief Computes the smallest power of two greater than or equal to a value.
+ * @brief Computes the smallest power of two greater than or equal to a value
+ * (waiting for C++20 and `std::bit_ceil`).
  * @param value The value to use.
  * @return The smallest power of two greater than or equal to the given value.
  */

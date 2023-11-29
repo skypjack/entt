@@ -16,7 +16,7 @@ namespace entt {
 
 namespace internal {
 
-// waiting for C++20 (and std::popcount)
+// waiting for C++20 and std::popcount
 template<typename Type>
 constexpr int popcount(Type value) noexcept {
     return value ? (int(value & 1) + popcount(value >> 1)) : 0;
