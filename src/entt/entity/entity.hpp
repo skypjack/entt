@@ -124,7 +124,7 @@ public:
      */
     [[nodiscard]] static constexpr value_type next(const value_type value) noexcept {
         const auto vers = to_version(value) + 1;
-        return construct(to_entity(value), static_cast<version_type>(vers + (vers == version_mask)));
+        return construct(to_integral(value), static_cast<version_type>(vers + (vers == version_mask)));
     }
 
     /**
