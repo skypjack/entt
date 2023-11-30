@@ -64,8 +64,8 @@ TYPED_TEST(Entity, Traits) {
 
         ASSERT_NE(reserved, entity);
 
-        ASSERT_NE(traits_type::to_integral(null), ~traits_type::entity_type{});
-        ASSERT_NE(traits_type::to_integral(tombstone), ~traits_type::entity_type{});
+        ASSERT_NE(traits_type::to_integral(null), ~typename traits_type::entity_type{});
+        ASSERT_NE(traits_type::to_integral(tombstone), ~typename traits_type::entity_type{});
 
         ASSERT_EQ(traits_type::to_entity(reserved), traits_type::to_entity(entity));
         ASSERT_EQ(traits_type::to_version(reserved), traits_type::to_version(entity));
