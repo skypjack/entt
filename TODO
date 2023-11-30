@@ -12,7 +12,7 @@ TODO:
 * check natvis files (periodically :)
 * resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
-* doc: bump entities
+* doc: bump entities, reserved bits on identifiers
 * update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
 * share test classes as much as possible
