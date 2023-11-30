@@ -724,8 +724,9 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         const auto elem = sparse_ptr(entt);
         constexpr auto cap = traits_type::entity_mask;
+        constexpr auto mask = traits_type::to_integral(null) & ~cap;
         // testing versions permits to avoid accessing the packed array
-        return elem && (((~cap & traits_type::to_integral(entt)) ^ traits_type::to_integral(*elem)) < cap);
+        return elem && (((mask & traits_type::to_integral(entt)) ^ traits_type::to_integral(*elem)) < cap);
     }
 
     /**

@@ -21,7 +21,7 @@ struct custom_entity_traits {
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
     static constexpr entity_type entity_mask = 0x3FFFF; // 18b
-    static constexpr entity_type version_mask = 0x3FFF; // 14b
+    static constexpr entity_type version_mask = 0x0FFF; // 12b
 };
 
 template<>
@@ -765,6 +765,36 @@ TYPED_TEST(SparseSet, Contains) {
 
         ASSERT_FALSE(set.contains(entity));
         ASSERT_FALSE(set.contains(other));
+
+        if constexpr(traits_type::to_integral(entt::tombstone) != ~traits_type::entity_type{}) {
+            // test reserved bits, if any
+            constexpr entity_type reserved{traits_type::to_integral(entity) | (traits_type::to_integral(entt::tombstone) + 1u)};
+
+            ASSERT_NE(entity, reserved);
+
+            set.push(reserved);
+
+            ASSERT_TRUE(set.contains(entity));
+            ASSERT_TRUE(set.contains(reserved));
+
+            ASSERT_NE(*set.find(entity), entity);
+            ASSERT_EQ(*set.find(entity), reserved);
+
+            set.bump(entity);
+
+            ASSERT_TRUE(set.contains(entity));
+            ASSERT_TRUE(set.contains(reserved));
+
+            ASSERT_NE(*set.find(reserved), reserved);
+            ASSERT_EQ(*set.find(reserved), entity);
+
+            set.erase(reserved);
+
+            ASSERT_FALSE(set.contains(entity));
+            ASSERT_FALSE(set.contains(reserved));
+
+            ASSERT_EQ(set.find(reserved), set.end());
+        }
     }
 }
 
