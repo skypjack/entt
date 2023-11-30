@@ -7,7 +7,7 @@ struct custom_entity_traits {
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
     static constexpr entity_type entity_mask = 0x3FFFF; // 18b
-    static constexpr entity_type version_mask = 0x3FFF; // 14b
+    static constexpr entity_type version_mask = 0x0FFF; // 12b
 };
 
 template<>
@@ -57,6 +57,41 @@ TYPED_TEST(Entity, Traits) {
 
     ASSERT_EQ(traits_type::next(entt::tombstone), traits_type::construct(entt::null, {}));
     ASSERT_EQ(traits_type::next(entt::null), traits_type::construct(entt::null, {}));
+
+    if constexpr(traits_type::to_integral(tombstone) != ~traits_type::entity_type{}) {
+        // test reserved bits, if any
+        constexpr entity_type reserved{traits_type::to_integral(entity) | (traits_type::to_integral(tombstone) + 1u)};
+
+        ASSERT_NE(reserved, entity);
+
+        ASSERT_NE(traits_type::to_integral(null), ~traits_type::entity_type{});
+        ASSERT_NE(traits_type::to_integral(tombstone), ~traits_type::entity_type{});
+
+        ASSERT_EQ(traits_type::to_entity(reserved), traits_type::to_entity(entity));
+        ASSERT_EQ(traits_type::to_version(reserved), traits_type::to_version(entity));
+
+        ASSERT_EQ(traits_type::to_version(null), traits_type::version_mask);
+        ASSERT_EQ(traits_type::to_version(tombstone), traits_type::version_mask);
+
+        ASSERT_EQ(traits_type::to_version(traits_type::next(null)), 0u);
+        ASSERT_EQ(traits_type::to_version(traits_type::next(tombstone)), 0u);
+
+        ASSERT_EQ(traits_type::construct(traits_type::to_integral(entity), traits_type::version_mask + 1u), entity_type{traits_type::to_entity(entity)});
+
+        ASSERT_EQ(traits_type::construct(traits_type::to_integral(null), traits_type::to_version(null) + 1u), entity_type{traits_type::to_entity(null)});
+        ASSERT_EQ(traits_type::construct(traits_type::to_integral(tombstone), traits_type::to_version(tombstone) + 1u), entity_type{traits_type::to_entity(tombstone)});
+
+        ASSERT_EQ(traits_type::next(reserved), traits_type::next(entity));
+
+        ASSERT_EQ(traits_type::next(null), traits_type::combine(null, entity_type{}));
+        ASSERT_EQ(traits_type::next(tombstone), traits_type::combine(tombstone, entity_type{}));
+
+        ASSERT_EQ(traits_type::combine(entity, reserved), entity);
+        ASSERT_NE(traits_type::combine(entity, reserved), reserved);
+
+        ASSERT_EQ(traits_type::combine(reserved, entity), entity);
+        ASSERT_NE(traits_type::combine(reserved, entity), reserved);
+    }
 }
 
 TYPED_TEST(Entity, Null) {
