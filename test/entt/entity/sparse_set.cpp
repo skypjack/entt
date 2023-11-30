@@ -766,7 +766,7 @@ TYPED_TEST(SparseSet, Contains) {
         ASSERT_FALSE(set.contains(entity));
         ASSERT_FALSE(set.contains(other));
 
-        if constexpr(traits_type::to_integral(entt::tombstone) != ~traits_type::entity_type{}) {
+        if constexpr(traits_type::to_integral(entt::tombstone) != ~typename traits_type::entity_type{}) {
             // test reserved bits, if any
             constexpr entity_type reserved{traits_type::to_integral(entity) | (traits_type::to_integral(entt::tombstone) + 1u)};
 

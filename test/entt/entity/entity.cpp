@@ -58,7 +58,7 @@ TYPED_TEST(Entity, Traits) {
     ASSERT_EQ(traits_type::next(entt::tombstone), traits_type::construct(entt::null, {}));
     ASSERT_EQ(traits_type::next(entt::null), traits_type::construct(entt::null, {}));
 
-    if constexpr(traits_type::to_integral(tombstone) != ~traits_type::entity_type{}) {
+    if constexpr(traits_type::to_integral(tombstone) != ~typename traits_type::entity_type{}) {
         // test reserved bits, if any
         constexpr entity_type reserved{traits_type::to_integral(entity) | (traits_type::to_integral(tombstone) + 1u)};
 
