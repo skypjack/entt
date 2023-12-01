@@ -4,22 +4,19 @@ EXAMPLES
 
 DOC:
 * custom storage/view
-* examples (and credits) from @alanjfs :)
 * update entity doc when the storage based model is in place
 * in-place O(1) release/destroy for non-orphaned entities, out-of-sync model
+* view: single vs multi type views are no longer a thing actually
+* bump entities, reserved bits on identifiers
 
 TODO:
-* check natvis files (periodically :)
 * resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
-* doc: bump entities, reserved bits on identifiers
-* update view doc: single vs multi type views are no longer a thing actually
 * further improve meta resolve function by id (bimap)
-* share test classes as much as possible
 * get rid of observers, storage based views made them pointless - document alternatives
-* exploit the tombstone mechanism to allow enabling/disabling entities (see bump, compact and clear for further details)
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * view: fixed check set to also reuse in each
 * view: reduce inst due to/improve perf with index-based approach in dispatch_get, pick_and_each and each
+* combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
