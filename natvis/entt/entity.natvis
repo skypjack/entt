@@ -30,6 +30,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_sparse_set&lt;*&gt;">
+		<Intrinsic Name="cap" Expression="(traits_type::version_mask &lt;&lt; traits_type::length)"/>
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
@@ -48,7 +49,7 @@
 							<Break Condition="pos == last"/>
 							<Exec>page = pos / traits_type::page_size</Exec>
 							<Exec>offset = pos &amp; (traits_type::page_size - 1)</Exec>
-							<If Condition="sparse[page] &amp;&amp; (*((traits_type::entity_type *)&amp;sparse[page][offset]) &lt; ~traits_type::entity_mask)">
+							<If Condition="sparse[page] &amp;&amp; (*((traits_type::entity_type *)&amp;sparse[page][offset]) &lt; cap())">
 								<Item Name="[{ pos }]">*((traits_type::entity_type *)&amp;sparse[page][offset]) &amp; traits_type::entity_mask</Item>
 							</If>
 							<Exec>++pos</Exec>
@@ -65,7 +66,7 @@
 						<Variable Name="last" InitialValue="packed.size()"/>
 						<Loop>
 							<Break Condition="pos == last"/>
-							<If Condition="*((traits_type::entity_type *)&amp;packed[pos]) &lt; ~traits_type::entity_mask">
+							<If Condition="*((traits_type::entity_type *)&amp;packed[pos]) &lt; cap()">
 								<Item Name="[{ pos }]">packed[pos]</Item>
 							</If>
 							<Exec>++pos</Exec>
@@ -76,6 +77,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
+		<Intrinsic Name="cap" Expression="(base_type::traits_type::version_mask &lt;&lt; base_type::traits_type::length)"/>
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" Optional="true" ExcludeView="simple">payload.capacity() * traits_type::page_size</Item>
@@ -88,7 +90,7 @@
 				<Variable Name="last" InitialValue="base_type::packed.size()"/>
 				<Loop>
 					<Break Condition="pos == last"/>
-					<If Condition="*((base_type::traits_type::entity_type *)&amp;base_type::packed[pos]) &lt; ~base_type::traits_type::entity_mask">
+					<If Condition="*((base_type::traits_type::entity_type *)&amp;base_type::packed[pos]) &lt; cap()">
 						<Item Name="[{ pos }:{ base_type::packed[pos] }]">payload[pos / traits_type::page_size][pos &amp; (traits_type::page_size - 1)]</Item>
 					</If>
 					<Exec>++pos</Exec>
