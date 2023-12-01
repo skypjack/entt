@@ -292,6 +292,14 @@ if(ENTT_BUILD_TESTING)
     add_subdirectory(test)
 endif()
 
+# Tools
+
+option(ENTT_BUILD_TOOLS "Enable building tools." OFF)
+
+if(ENTT_BUILD_TOOLS)
+    add_subdirectory(tools)
+endif()
+
 # Documentation
 
 option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
