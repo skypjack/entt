@@ -468,7 +468,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return std::apply([](const auto *...curr) { return ((curr != nullptr) && ...); }, pools) && internal::fully_initialized(filter.data(), filter.size());
+        return (view != nullptr) && internal::fully_initialized(filter.data(), filter.size());
     }
 
     /**
