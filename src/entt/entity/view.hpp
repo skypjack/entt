@@ -229,15 +229,14 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
-    [[nodiscard]] auto opaque_check_set() const noexcept {
-        std::array<const common_type *, sizeof...(Get) - 1u> other{};
-        std::apply([&other, pos = 0u, view = view](const auto *...curr) mutable { ((curr == view ? void() : void(other[pos++] = curr)), ...); }, pools);
-        return other;
+    void opaque_check_set() noexcept {
+        std::apply([this, pos = 0u](const auto *...curr) mutable { ((curr == view ? void() : void(check[pos++] = curr)), ...); }, pools);
     }
 
     void unchecked_refresh() noexcept {
         view = std::get<0>(pools);
         std::apply([this](auto *, auto *...other) { ((this->view = other->size() < this->view->size() ? other : this->view), ...); }, pools);
+        opaque_check_set();
     }
 
     template<std::size_t Curr, std::size_t Other, typename... Args>
@@ -252,7 +251,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: std::get<Curr>(pools)->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || std::get<Index>(pools)->contains(entt)) && ...) && internal::none_of(filter.data(), filter.size(), entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of(check.data(), check.size(), entt) && internal::none_of(filter.data(), filter.size(), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -283,6 +282,7 @@ public:
     basic_view() noexcept
         : pools{},
           filter{},
+          check{},
           view{} {}
 
     /**
@@ -293,6 +293,7 @@ public:
     basic_view(Get &...value, Exclude &...excl) noexcept
         : pools{&value...},
           filter{&excl...},
+          check{},
           view{} {
         unchecked_refresh();
     }
@@ -322,6 +323,7 @@ public:
     void use() noexcept {
         if(view) {
             view = std::get<Index>(pools);
+            opaque_check_set();
         }
     }
 
@@ -407,7 +409,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return view ? iterator{view->begin(0), view->end(0), opaque_check_set(), filter} : iterator{};
+        return view ? iterator{view->begin(0), view->end(0), check, filter} : iterator{};
     }
 
     /**
@@ -415,7 +417,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return view ? iterator{view->end(0), view->end(0), opaque_check_set(), filter} : iterator{};
+        return view ? iterator{view->end(0), view->end(0), check, filter} : iterator{};
     }
 
     /**
@@ -451,7 +453,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{view->find(entt), view->end(), opaque_check_set(), filter} : end();
+        return contains(entt) ? iterator{view->find(entt), view->end(), check, filter} : end();
     }
 
     /**
@@ -478,7 +480,6 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         if(view) {
-            auto check = opaque_check_set();
             const auto idx = view->find(entt).index();
             return (!(idx < 0 || idx > view->begin(0).index())) && internal::all_of(check.data(), check.size(), entt) && internal::none_of(filter.data(), filter.size(), entt);
         }
@@ -564,6 +565,7 @@ public:
 private:
     std::tuple<Get *...> pools;
     std::array<const common_type *, sizeof...(Exclude)> filter;
+    std::array<const common_type *, sizeof...(Get) - 1u> check;
     const common_type *view;
 };
 
