@@ -784,7 +784,7 @@ public:
      * @param elem A storage to assign to the view.
      */
     void storage(Get &elem) noexcept {
-        this->view = &elem;
+        storage<0>(elem);
     }
 
     /**
