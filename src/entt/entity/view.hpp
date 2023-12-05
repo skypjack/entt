@@ -42,9 +42,9 @@ template<typename Type>
     return pos == len;
 }
 
-template<typename Type, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
-[[nodiscard]] auto view_pack(const View &view, const Other &other, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>) {
-    Type elem{};
+template<typename Result, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
+[[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>) {
+    Result elem{};
     // friend-initialization, avoid multiple calls to refresh
     elem.pools = {view.template storage<VGet>()..., other.template storage<OGet>()...};
     elem.filter = {view.template storage<sizeof...(VGet) + VExclude>()..., other.template storage<sizeof...(OGet) + OExclude>()...};
@@ -220,8 +220,8 @@ class basic_view;
  */
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>> {
-    template<typename Type, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
-    friend auto internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
+    template<typename Result, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
+    friend Result internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
 
     using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;
