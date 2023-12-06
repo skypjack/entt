@@ -402,7 +402,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of(this->check.data(), sizeof...(Get), entt) && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of(this->check.data(), sizeof...(Get) - 1u, entt) && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
