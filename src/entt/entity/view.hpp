@@ -220,26 +220,26 @@ class basic_common_view {
 
 protected:
     void use(const std::size_t pos) noexcept {
-        if(view) {
-            view = pools[pos];
+        if(leading) {
+            leading = pools[pos];
             opaque_check_set();
         }
     }
 
     void opaque_check_set() noexcept {
         for(size_type pos{}, curr{}; pos < Get; ++pos) {
-            if(pools[pos] != view) {
+            if(pools[pos] != leading) {
                 check[curr++] = pools[pos];
             }
         }
     }
 
     void unchecked_refresh() noexcept {
-        view = pools[0u];
+        leading = pools[0u];
 
         for(size_type pos{1u}; pos < Get; ++pos) {
-            if(pools[pos]->size() < view->size()) {
-                view = pools[pos];
+            if(pools[pos]->size() < leading->size()) {
+                leading = pools[pos];
             }
         }
 
@@ -258,7 +258,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        size_type pos = (view != nullptr) * Get;
+        size_type pos = (leading != nullptr) * Get;
         for(; pos < Get && pools[pos] != nullptr; ++pos) {}
 
         if(pos == Get) {
@@ -271,7 +271,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type *handle() const noexcept {
-        return view;
+        return leading;
     }
 
     /**
@@ -279,7 +279,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return view ? view->size() : size_type{};
+        return leading ? leading->size() : size_type{};
     }
 
     /**
@@ -290,7 +290,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return view ? iterator{view->begin(0), view->end(0), check, filter} : iterator{};
+        return leading ? iterator{leading->begin(0), leading->end(0), check, filter} : iterator{};
     }
 
     /**
@@ -298,7 +298,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return view ? iterator{view->end(0), view->end(0), check, filter} : iterator{};
+        return leading ? iterator{leading->end(0), leading->end(0), check, filter} : iterator{};
     }
 
     /**
@@ -317,9 +317,9 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        if(view) {
-            auto it = view->rbegin(0);
-            const auto last = view->rend(0);
+        if(leading) {
+            auto it = leading->rbegin(0);
+            const auto last = leading->rend(0);
             for(; it != last && !contains(*it); ++it) {}
             return it == last ? null : *it;
         }
@@ -334,7 +334,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{view->find(entt), view->end(), check, filter} : end();
+        return contains(entt) ? iterator{leading->find(entt), leading->end(), check, filter} : end();
     }
 
     /**
@@ -342,7 +342,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (view != nullptr) && internal::fully_initialized(filter.data(), filter.size());
+        return (leading != nullptr) && internal::fully_initialized(filter.data(), filter.size());
     }
 
     /**
@@ -351,9 +351,9 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        if(view) {
-            const auto idx = view->find(entt).index();
-            return (!(idx < 0 || idx > view->begin(0).index())) && internal::all_of(check.data(), check.size(), entt) && internal::none_of(filter.data(), filter.size(), entt);
+        if(leading) {
+            const auto idx = leading->find(entt).index();
+            return (!(idx < 0 || idx > leading->begin(0).index())) && internal::all_of(check.data(), check.size(), entt) && internal::none_of(filter.data(), filter.size(), entt);
         }
 
         return false;
@@ -363,7 +363,7 @@ protected:
     std::array<const common_type *, Get> pools{};
     std::array<const common_type *, Exclude> filter{};
     std::array<const common_type *, Get - 1u> check{};
-    const common_type *view{};
+    const common_type *leading{};
 };
 
 /**
@@ -636,7 +636,7 @@ struct basic_storage_view {
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type *handle() const noexcept {
-        return view;
+        return leading;
     }
 
     /**
@@ -644,7 +644,7 @@ struct basic_storage_view {
      * @return Number of entities that have the given component.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return view ? view->size() : size_type{};
+        return leading ? leading->size() : size_type{};
     }
 
     /**
@@ -652,7 +652,7 @@ struct basic_storage_view {
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !view || view->empty();
+        return !leading || leading->empty();
     }
 
     /**
@@ -663,7 +663,7 @@ struct basic_storage_view {
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return view ? view->begin() : iterator{};
+        return leading ? leading->begin() : iterator{};
     }
 
     /**
@@ -671,7 +671,7 @@ struct basic_storage_view {
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return view ? view->end() : iterator{};
+        return leading ? leading->end() : iterator{};
     }
 
     /**
@@ -682,7 +682,7 @@ struct basic_storage_view {
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return view ? view->rbegin() : reverse_iterator{};
+        return leading ? leading->rbegin() : reverse_iterator{};
     }
 
     /**
@@ -692,7 +692,7 @@ struct basic_storage_view {
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return view ? view->rend() : reverse_iterator{};
+        return leading ? leading->rend() : reverse_iterator{};
     }
 
     /**
@@ -701,7 +701,7 @@ struct basic_storage_view {
      * otherwise.
      */
     [[nodiscard]] entity_type front() const noexcept {
-        return empty() ? null : *view->begin();
+        return empty() ? null : *leading->begin();
     }
 
     /**
@@ -710,7 +710,7 @@ struct basic_storage_view {
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        return empty() ? null : *view->rbegin();
+        return empty() ? null : *leading->rbegin();
     }
 
     /**
@@ -720,7 +720,7 @@ struct basic_storage_view {
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return view ? view->find(entt) : iterator{};
+        return leading ? leading->find(entt) : iterator{};
     }
 
     /**
@@ -737,7 +737,7 @@ struct basic_storage_view {
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (view != nullptr);
+        return (leading != nullptr);
     }
 
     /**
@@ -746,11 +746,11 @@ struct basic_storage_view {
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return view && view->contains(entt);
+        return leading && leading->contains(entt);
     }
 
 protected:
-    const common_type *view{};
+    const common_type *leading{};
 };
 
 /**
@@ -791,7 +791,7 @@ public:
      */
     basic_view(Get &value) noexcept
         : basic_view{} {
-        this->view = &value;
+        this->leading = &value;
     }
 
     /**
@@ -820,7 +820,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->view));
+        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->leading));
     }
 
     /**
@@ -839,7 +839,7 @@ public:
     template<std::size_t Index>
     void storage(Get &elem) noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        this->view = &elem;
+        this->leading = &elem;
     }
 
     /**
@@ -931,7 +931,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return this->view ? storage()->each() : iterable{};
+        return this->leading ? storage()->each() : iterable{};
     }
 
     /**
