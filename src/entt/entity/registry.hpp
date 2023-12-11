@@ -250,10 +250,11 @@ class basic_registry {
 
     template<typename Type>
     [[nodiscard]] auto &assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
+
         if constexpr(std::is_same_v<Type, entity_type>) {
             return entities;
         } else {
-            static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
             auto &cpool = pools[id];
 
             if(!cpool) {
@@ -277,11 +278,11 @@ class basic_registry {
 
     template<typename Type>
     [[nodiscard]] const auto *assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) const {
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
+
         if constexpr(std::is_same_v<Type, entity_type>) {
             return &entities;
         } else {
-            static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-
             if(const auto it = pools.find(id); it != pools.cend()) {
                 ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
                 return static_cast<const storage_for_type<Type> *>(it->second.get());
