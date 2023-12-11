@@ -315,6 +315,10 @@ public:
     using common_type = base_type;
     /*! @brief Context type. */
     using context = internal::registry_context<allocator_type>;
+    /*! @brief Iterable registry type. */
+    using iterable = iterable_adaptor<internal::registry_storage_iterator<typename pool_container_type::iterator>>;
+    /*! @brief Constant iterable registry type. */
+    using const_iterable = iterable_adaptor<internal::registry_storage_iterator<typename pool_container_type::const_iterator>>;
 
     /**
      * @copybrief storage_for
@@ -408,12 +412,12 @@ public:
      *
      * @return An iterable object to use to _visit_ the registry.
      */
-    [[nodiscard]] auto storage() noexcept {
+    [[nodiscard]] iterable storage() noexcept {
         return iterable_adaptor{internal::registry_storage_iterator{pools.begin()}, internal::registry_storage_iterator{pools.end()}};
     }
 
     /*! @copydoc storage */
-    [[nodiscard]] auto storage() const noexcept {
+    [[nodiscard]] const_iterable storage() const noexcept {
         return iterable_adaptor{internal::registry_storage_iterator{pools.cbegin()}, internal::registry_storage_iterator{pools.cend()}};
     }
 
