@@ -720,15 +720,6 @@ struct basic_storage_view {
     }
 
     /**
-     * @brief Returns the identifier that occupies the given position.
-     * @param pos Position of the element to return.
-     * @return The identifier that occupies the given position.
-     */
-    [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return begin()[pos];
-    }
-
-    /**
      * @brief Checks if a view is fully initialized.
      * @return True if the view is fully initialized, false otherwise.
      */
@@ -855,7 +846,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return this->base_type::operator[](pos);
+        return this->base_type::begin()[pos];
     }
 
     /**
