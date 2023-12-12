@@ -675,11 +675,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 template<typename, typename = void>
@@ -689,11 +685,7 @@ template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /*! @copydoc is_iterator */
 template<typename Type>
@@ -742,11 +734,7 @@ struct is_transparent<Type, std::void_t<typename Type::is_transparent>>: std::tr
 template<typename Type>
 inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 template<typename, typename = void>
@@ -805,11 +793,7 @@ template<typename Type>
 }
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief Provides the member constant `value` to true if a given type is

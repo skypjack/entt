@@ -13,11 +13,7 @@
 
 namespace entt {
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 enum class any_operation : std::uint8_t {
@@ -31,11 +27,7 @@ enum class any_operation : std::uint8_t {
 };
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /*! @brief Possible modes of an any object. */
 enum class any_policy : std::uint8_t {
