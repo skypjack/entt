@@ -9,11 +9,7 @@ namespace entt {
 
 class meta_ctx;
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 struct meta_type_node;
@@ -26,11 +22,7 @@ struct meta_context {
 };
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /*! @brief Disambiguation tag for constructors and the like. */
 class meta_ctx_arg_t final {};
@@ -44,11 +36,7 @@ class meta_ctx: private internal::meta_context {
     friend struct internal::meta_context;
 };
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 [[nodiscard]] inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {
     return ctx;
 }
@@ -56,11 +44,7 @@ class meta_ctx: private internal::meta_context {
 [[nodiscard]] inline const internal::meta_context &internal::meta_context::from(const meta_ctx &ctx) {
     return ctx;
 }
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 } // namespace entt
 

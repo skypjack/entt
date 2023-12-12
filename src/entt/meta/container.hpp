@@ -19,11 +19,7 @@
 
 namespace entt {
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 template<typename, typename = void>
@@ -54,11 +50,7 @@ template<typename Type>
 inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>::value;
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief General purpose implementation of meta sequence container traits.

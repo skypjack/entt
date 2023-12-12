@@ -313,11 +313,7 @@ template<typename Type, auto Data, typename Policy = as_is_t>
     return meta_getter<Type, Data, Policy>(locator<meta_ctx>::value_or(), std::move(instance));
 }
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 template<typename Policy, typename Candidate, typename... Args>
@@ -361,11 +357,7 @@ template<typename Type, typename... Args, std::size_t... Index>
 }
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief Tries to _invoke_ an object given a list of erased parameters.

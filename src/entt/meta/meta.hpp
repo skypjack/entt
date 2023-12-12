@@ -1626,11 +1626,7 @@ inline bool meta_any::assign(meta_any &&other) {
     return index < arity() ? node->arg(*ctx, index) : meta_type{};
 }
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 class meta_sequence_container::meta_iterator final {
     using vtable_type = void(const void *, const std::ptrdiff_t, meta_any *);
 
@@ -1789,11 +1785,7 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief Returns the meta value type of a container.

@@ -22,11 +22,7 @@
 
 namespace entt {
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 [[nodiscard]] inline decltype(auto) owner(meta_ctx &ctx, const type_info &info) {
@@ -57,11 +53,7 @@ inline meta_func_node &meta_extend(internal::meta_type_node &parent, const id_ty
 }
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief Basic meta factory to be used for reflection purposes.

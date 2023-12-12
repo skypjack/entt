@@ -22,11 +22,7 @@ class meta_any;
 class meta_type;
 struct meta_handle;
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 enum class meta_traits : std::uint32_t {
@@ -267,11 +263,7 @@ template<typename Type>
 }
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 } // namespace entt
 
