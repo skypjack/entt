@@ -14,11 +14,7 @@
 
 namespace entt {
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 template<typename Type, typename Entity>
@@ -179,11 +175,7 @@ template<typename... Lhs, typename... Rhs>
 }
 
 } // namespace internal
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 /**
  * @brief View implementation.
@@ -219,6 +211,7 @@ class basic_common_view {
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
 
 protected:
+    /*! @cond TURN_OFF_DOXYGEN */
     void use(const std::size_t pos) noexcept {
         if(leading) {
             leading = pools[pos];
@@ -245,6 +238,7 @@ protected:
 
         opaque_check_set();
     }
+    /*! @endcond */
 
 public:
     /*! @brief Common type among all storage types. */
@@ -360,10 +354,12 @@ public:
     }
 
 protected:
+    /*! @cond TURN_OFF_DOXYGEN */
     std::array<const common_type *, Get> pools{};
     std::array<const common_type *, Exclude> filter{};
     std::array<const common_type *, Get - 1u> check{};
     const common_type *leading{};
+    /*! @endcond */
 };
 
 /**
@@ -750,7 +746,9 @@ struct basic_storage_view {
     }
 
 protected:
+    /*! @cond TURN_OFF_DOXYGEN */
     const common_type *leading{};
+    /*! @endcond */
 };
 
 /**
