@@ -1,11 +1,7 @@
 #ifndef ENTT_PLATFORM_ANDROID_NDK_R17_HPP
 #define ENTT_PLATFORM_ANDROID_NDK_R17_HPP
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
+/*! @cond TURN_OFF_DOXYGEN */
 #ifdef __ANDROID__
 #    include <android/ndk-version.h>
 #    if __NDK_MAJOR__ == 17
@@ -58,10 +54,6 @@ using invoke_result_t = typename std::invoke_result<Func, Args...>::type;
 
 #    endif
 #endif
-
-/**
- * Internal details not to be documented.
- * @endcond
- */
+/*! @endcond */
 
 #endif
