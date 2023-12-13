@@ -6,12 +6,11 @@
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
 [![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/zxW73f)
+[![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://skypjack.github.io/entt/)
 [![Vcpkg port](https://img.shields.io/vcpkg/v/entt)](https://vcpkg.link/ports/entt)
 [![Conan Center](https://img.shields.io/conan/v/entt)](https://conan.io/center/recipes/entt)
-[![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://skypjack.github.io/entt/)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Discord channel](https://img.shields.io/discord/707607951396962417?logo=discord)](https://discord.gg/5BjPWBd)
-[![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
 
 > `EnTT` has been a dream so far, we haven't found a single bug to date and it's
 > super easy to work with
@@ -40,7 +39,8 @@ Don't forget to check the
 there.
 
 Do you want to support `EnTT`? Consider becoming a
-[**sponsor**](https://github.com/users/skypjack/sponsorship).
+[**sponsor**](https://github.com/users/skypjack/sponsorship) or making a
+donation via [**PayPal**](https://www.paypal.me/skypjack).<br/>
 Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 **special** thanks to:
 
