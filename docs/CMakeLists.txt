@@ -1,5 +1,7 @@
 # Doxygen configuration (documentation)
 
+include(FetchContent)
+
 FetchContent_Declare(
     doxygen-awesome-css
     GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
