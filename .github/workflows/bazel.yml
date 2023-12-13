@@ -13,6 +13,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: bazelisk test --config=ci ...
       working-directory: test
