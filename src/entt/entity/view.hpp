@@ -410,7 +410,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
 
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
-        ((storage<Index>() == this->handle() ? each<Index>(func, seq) : void()), ...);
+        ((storage<Index>() == base_type::handle() ? each<Index>(func, seq) : void()), ...);
     }
 
 public:
@@ -438,7 +438,7 @@ public:
         : base_type{} {
         this->pools = {&value...};
         this->filter = {&excl...};
-        this->unchecked_refresh();
+        base_type::unchecked_refresh();
     }
 
     /**
@@ -515,7 +515,7 @@ public:
 
         if constexpr(Index < sizeof...(Get)) {
             this->pools[Index] = &elem;
-            this->refresh();
+            base_type::refresh();
         } else {
             this->filter[Index - sizeof...(Get)] = &elem;
         }
@@ -576,7 +576,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(this->handle() != nullptr) {
+        if(base_type::handle() != nullptr) {
             pick_and_each(func, std::index_sequence_for<Get...>{});
         }
     }
@@ -592,7 +592,7 @@ public:
      */
     [[nodiscard]] iterable each() const noexcept {
         const auto as_pools = storage(std::index_sequence_for<Get...>{});
-        return {internal::extended_view_iterator{this->begin(), as_pools}, internal::extended_view_iterator{this->end(), as_pools}};
+        return {internal::extended_view_iterator{base_type::begin(), as_pools}, internal::extended_view_iterator{base_type::end(), as_pools}};
     }
 
     /**
@@ -780,7 +780,7 @@ public:
      */
     basic_view(Get &value) noexcept
         : basic_view{} {
-        this->leading = &value;
+        storage(value);
     }
 
     /**
@@ -846,7 +846,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return this->base_type::begin()[pos];
+        return base_type::begin()[pos];
     }
 
     /**
@@ -920,7 +920,8 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        return this->leading ? storage()->each() : iterable{};
+        auto *elem = storage();
+        return elem ? elem->each() : iterable{};
     }
 
     /**
