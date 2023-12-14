@@ -212,6 +212,20 @@ class basic_common_view {
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
+    basic_common_view() noexcept
+        : pools{},
+          filter{},
+          check{},
+          leading{} {}
+
+    basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
+        : pools{value},
+          filter{excl},
+          check{},
+          leading{} {
+        unchecked_refresh();
+    }
+
     void use(const std::size_t pos) noexcept {
         if(leading) {
             leading = pools[pos];
@@ -355,10 +369,10 @@ public:
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    std::array<const common_type *, Get> pools{};
-    std::array<const common_type *, Exclude> filter{};
-    std::array<const common_type *, Get - 1u> check{};
-    const common_type *leading{};
+    std::array<const common_type *, Get> pools;
+    std::array<const common_type *, Exclude> filter;
+    std::array<const common_type *, Get - 1u> check;
+    const common_type *leading;
     /*! @endcond */
 };
 
@@ -435,10 +449,7 @@ public:
      * @param excl The storage for the types used to filter the view.
      */
     basic_view(Get &...value, Exclude &...excl) noexcept
-        : base_type{} {
-        this->pools = {&value...};
-        this->filter = {&excl...};
-        base_type::unchecked_refresh();
+        : base_type{{&value...}, {&excl...}} {
     }
 
     /**
