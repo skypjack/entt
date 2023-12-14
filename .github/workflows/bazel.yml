@@ -16,3 +16,5 @@ jobs:
     - uses: actions/checkout@v4
     - run: bazelisk test --config=ci ...
       working-directory: test
+      env:
+        USE_BAZEL_VERSION: 6.x
