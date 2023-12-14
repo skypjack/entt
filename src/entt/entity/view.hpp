@@ -615,7 +615,17 @@ public:
  * @tparam Type Common type among all storage types.
  */
 template<typename Type>
-struct basic_storage_view {
+class basic_storage_view {
+protected:
+    /*! @cond TURN_OFF_DOXYGEN */
+    basic_storage_view() noexcept
+        : leading{} {}
+
+    basic_storage_view(const Type *value) noexcept
+        : leading{value} {}
+    /*! @endcond */
+
+public:
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Underlying entity identifier. */
@@ -738,7 +748,7 @@ struct basic_storage_view {
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    const common_type *leading{};
+    const common_type *leading;
     /*! @endcond */
 };
 
@@ -779,8 +789,7 @@ public:
      * @param value The storage for the type to iterate.
      */
     basic_view(Get &value) noexcept
-        : basic_view{} {
-        storage(value);
+        : base_type{&value} {
     }
 
     /**
