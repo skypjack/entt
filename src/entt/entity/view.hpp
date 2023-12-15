@@ -220,14 +220,12 @@ protected:
     basic_common_view() noexcept
         : pools{},
           filter{},
-          check{},
           leading{},
           index{Get} {}
 
     basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
-          check{},
           leading{},
           index{Get} {
         unchecked_refresh();
@@ -237,17 +235,6 @@ protected:
         if(leading) {
             index = pos;
             leading = pools[index];
-            opaque_check_set();
-        }
-    }
-
-    void opaque_check_set() noexcept {
-        for(size_type pos{}; pos < index; ++pos) {
-            check[pos] = pools[pos];
-        }
-
-        for(size_type pos = index + 1u; pos < Get; ++pos) {
-            check[pos - 1u] = pools[pos];
         }
     }
 
@@ -261,7 +248,6 @@ protected:
         }
 
         leading = pools[index];
-        opaque_check_set();
     }
     /*! @endcond */
 
@@ -372,7 +358,9 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         if(leading) {
             const auto idx = leading->find(entt).index();
-            return (!(idx < 0 || idx > leading->begin(0).index())) && internal::all_of(check.data(), check.size(), entt) && internal::none_of(filter.data(), filter.size(), entt);
+            return (!(idx < 0 || idx > leading->begin(0).index()))
+                   && internal::all_of(pools.data(), index, entt) && internal::all_of(pools.data() + index + 1u, Get - index - 1u, entt)
+                   && internal::none_of(filter.data(), filter.size(), entt);
         }
 
         return false;
@@ -382,7 +370,6 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     std::array<const common_type *, Get> pools;
     std::array<const common_type *, Exclude> filter;
-    std::array<const common_type *, Get - 1u> check;
     const common_type *leading;
     size_type index;
     /*! @endcond */
@@ -424,7 +411,9 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of(this->check.data(), sizeof...(Get) - 1u, entt) && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone))
+                                                    && internal::all_of(this->pools.data(), this->index, entt) && internal::all_of(this->pools.data() + this->index + 1u, sizeof...(Get) - this->index - 1u, entt)
+                                                    && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
