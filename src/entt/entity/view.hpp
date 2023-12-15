@@ -216,40 +216,46 @@ protected:
         : pools{},
           filter{},
           check{},
-          leading{} {}
+          leading{},
+          index{Get} {}
 
     basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
           check{},
-          leading{} {
+          leading{},
+          index{Get} {
         unchecked_refresh();
     }
 
     void use(const std::size_t pos) noexcept {
         if(leading) {
-            leading = pools[pos];
+            index = pos;
+            leading = pools[index];
             opaque_check_set();
         }
     }
 
     void opaque_check_set() noexcept {
-        for(size_type pos{}, curr{}; pos < Get; ++pos) {
-            if(pools[pos] != leading) {
-                check[curr++] = pools[pos];
-            }
+        for(size_type pos{}; pos < index; ++pos) {
+            check[pos] = pools[pos];
+        }
+
+        for(size_type pos = index + 1u; pos < Get; ++pos) {
+            check[pos - 1u] = pools[pos];
         }
     }
 
     void unchecked_refresh() noexcept {
-        leading = pools[0u];
+        index = 0u;
 
         for(size_type pos{1u}; pos < Get; ++pos) {
-            if(pools[pos]->size() < leading->size()) {
-                leading = pools[pos];
+            if(pools[pos]->size() < pools[index]->size()) {
+                index = pos;
             }
         }
 
+        leading = pools[index];
         opaque_check_set();
     }
     /*! @endcond */
@@ -350,7 +356,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (leading != nullptr) && internal::fully_initialized(filter.data(), filter.size());
+        return leading && internal::fully_initialized(filter.data(), filter.size());
     }
 
     /**
@@ -373,6 +379,7 @@ protected:
     std::array<const common_type *, Exclude> filter;
     std::array<const common_type *, Get - 1u> check;
     const common_type *leading;
+    size_type index;
     /*! @endcond */
 };
 
