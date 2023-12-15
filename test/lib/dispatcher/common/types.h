@@ -2,7 +2,7 @@
 #define ENTT_LIB_DISPATCHER_COMMON_TYPES_H
 
 struct message {
-    int payload;
+    int payload{};
 };
 
 struct event {};

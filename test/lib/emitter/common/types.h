@@ -7,7 +7,7 @@ struct test_emitter
     : entt::emitter<test_emitter> {};
 
 struct message {
-    int payload;
+    int payload{};
 };
 
 struct event {};
