@@ -17,28 +17,30 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename It, typename Entity>
-[[nodiscard]] bool check_but(const std::size_t index, It it, It last, const Entity entt) noexcept {
-    const auto to = it + index;
-    for(; it != to && (*it)->contains(entt); ++it) {}
+template<typename Type, typename Entity>
+[[nodiscard]] bool all_of_but(const std::size_t index, const Type *const *it, const std::size_t len, const Entity entt) noexcept {
+    std::size_t pos{};
+    for(; (pos != index) && it[pos]->contains(entt); ++pos) {}
 
-    if(it == to) {
-        for(++it; it != last && (*it)->contains(entt); ++it) {}
+    if(pos == index) {
+        for(++pos; (pos != len) && it[pos]->contains(entt); ++pos) {}
     }
 
-    return it == last;
+    return pos == len;
 }
 
-template<typename It, typename Entity>
-[[nodiscard]] bool reject(It it, It last, const Entity entt) noexcept {
-    for(; (it != last) && !(*it && (*it)->contains(entt)); ++it) {}
-    return it == last;
+template<typename Type, typename Entity>
+[[nodiscard]] bool none_of(const Type *const *it, const std::size_t len, const Entity entt) noexcept {
+    std::size_t pos{};
+    for(; (pos != len) && !(it[pos] && it[pos]->contains(entt)); ++pos) {}
+    return pos == len;
 }
 
-template<typename It>
-[[nodiscard]] bool fully_initialized(It it, It last) noexcept {
-    for(; (it != last) && *it; ++it) {}
-    return it == last;
+template<typename Type>
+[[nodiscard]] bool fully_initialized(const Type *const *it, const std::size_t len) noexcept {
+    std::size_t pos{};
+    for(; (pos != len) && it[pos]; ++pos) {}
+    return pos == len;
 }
 
 template<typename Result, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
@@ -56,7 +58,7 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
-        return ((Get != 1u) || (entt != tombstone)) && check_but(index, pools.begin(), pools.end(), entt) && reject(filter.begin(), filter.end(), entt);
+        return ((Get != 1u) || (entt != tombstone)) && all_of_but(index, pools.data(), Get, entt) && none_of(filter.data(), Exclude, entt);
     }
 
 public:
@@ -348,7 +350,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return leading && internal::fully_initialized(filter.begin(), filter.end());
+        return leading && internal::fully_initialized(filter.data(), Exclude);
     }
 
     /**
@@ -359,7 +361,7 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         if(leading) {
             const auto idx = leading->find(entt).index();
-            return (!(idx < 0 || idx > leading->begin(0).index())) && internal::check_but(index, pools.begin(), pools.end(), entt) && internal::reject(filter.begin(), filter.end(), entt);
+            return (!(idx < 0 || idx > leading->begin(0).index())) && internal::all_of_but(index, pools.data(), Get, entt) && internal::none_of(filter.data(), Exclude, entt);
         }
 
         return false;
@@ -410,7 +412,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::check_but(this->index, this->pools.begin(), this->pools.end(), entt) && internal::reject(this->filter.begin(), this->filter.end(), entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of_but(this->index, this->pools.data(), sizeof...(Get), entt) && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
