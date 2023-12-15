@@ -18,21 +18,21 @@ namespace entt {
 namespace internal {
 
 template<typename Type, typename Entity>
-[[nodiscard]] bool all_of(const Type *elem, const std::size_t len, const Entity entt) noexcept {
+[[nodiscard]] bool all_of(const Type *const *elem, const std::size_t len, const Entity entt) noexcept {
     std::size_t pos{};
     for(; pos < len && elem[pos]->contains(entt); ++pos) {}
     return pos == len;
 }
 
 template<typename Type, typename Entity>
-[[nodiscard]] bool none_of(const Type *elem, const std::size_t len, const Entity entt) noexcept {
+[[nodiscard]] bool none_of(const Type *const *elem, const std::size_t len, const Entity entt) noexcept {
     std::size_t pos{};
     for(; pos < len && !(elem[pos] && elem[pos]->contains(entt)); ++pos) {}
     return pos == len;
 }
 
 template<typename Type>
-[[nodiscard]] bool fully_initialized(const Type *elem, const std::size_t len) noexcept {
+[[nodiscard]] bool fully_initialized(const Type *const *elem, const std::size_t len) noexcept {
     std::size_t pos{};
     for(; pos < len && elem[pos] != nullptr; ++pos) {}
     return pos == len;
