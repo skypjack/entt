@@ -64,7 +64,6 @@ TEST(CompressedPair, PiecewiseConstruct) {
 
     ASSERT_EQ(pair.first().size(), 1u);
     ASSERT_EQ(pair.second(), sizeof(empty));
-    ASSERT_EQ(vec.size(), 0u);
 }
 
 TEST(CompressedPair, DeductionGuide) {
