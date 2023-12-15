@@ -78,7 +78,7 @@ public:
         }
     }
 
-    std::size_t size() const noexcept override {
+    [[nodiscard]] std::size_t size() const noexcept override {
         return events.size();
     }
 
