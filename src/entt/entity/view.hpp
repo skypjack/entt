@@ -220,11 +220,7 @@ class basic_common_view {
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    basic_common_view() noexcept
-        : pools{},
-          filter{},
-          leading{},
-          index{Get} {}
+    basic_common_view() noexcept = default;
 
     basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : pools{value},
@@ -369,10 +365,10 @@ public:
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    std::array<const common_type *, Get> pools;
-    std::array<const common_type *, Exclude> filter;
-    const common_type *leading;
-    size_type index;
+    std::array<const common_type *, Get> pools{};
+    std::array<const common_type *, Exclude> filter{};
+    const common_type *leading{};
+    size_type index{Get};
     /*! @endcond */
 };
 
@@ -629,8 +625,7 @@ template<typename Type>
 class basic_storage_view {
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    basic_storage_view() noexcept
-        : leading{} {}
+    basic_storage_view() noexcept = default;
 
     basic_storage_view(const Type *value) noexcept
         : leading{value} {}
@@ -759,7 +754,7 @@ public:
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    const common_type *leading;
+    const common_type *leading{};
     /*! @endcond */
 };
 
