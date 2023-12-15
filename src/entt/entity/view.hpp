@@ -53,7 +53,9 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
-        return ((Get != 0u) || (entt != tombstone)) && (all_of(pools.data(), Get, entt)) && none_of(filter.data(), Exclude, entt);
+        return ((Get != 1u) || (entt != tombstone))
+               && all_of(pools.data(), index, entt) && all_of(pools.data() + index + 1u, Get - index - 1u, entt)
+               && none_of(filter.data(), Exclude, entt);
     }
 
 public:
@@ -67,13 +69,15 @@ public:
         : it{},
           last{},
           pools{},
-          filter{} {}
+          filter{},
+          index{} {}
 
-    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
+    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
         : it{curr},
           last{to},
           pools{value},
-          filter{excl} {
+          filter{excl},
+          index{idx} {
         while(it != last && !valid(*it)) {
             ++it;
         }
@@ -105,6 +109,7 @@ private:
     iterator_type last;
     std::array<const Type *, Get> pools;
     std::array<const Type *, Exclude> filter;
+    std::size_t index;
 };
 
 template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
@@ -268,7 +273,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = internal::view_iterator<common_type, Get - 1u, Exclude>;
+    using iterator = internal::view_iterator<common_type, Get, Exclude>;
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
@@ -304,7 +309,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return leading ? iterator{leading->begin(0), leading->end(0), check, filter} : iterator{};
+        return leading ? iterator{leading->begin(0), leading->end(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -312,7 +317,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return leading ? iterator{leading->end(0), leading->end(0), check, filter} : iterator{};
+        return leading ? iterator{leading->end(0), leading->end(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -348,7 +353,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{leading->find(entt), leading->end(), check, filter} : end();
+        return contains(entt) ? iterator{leading->find(entt), leading->end(), pools, filter, index} : end();
     }
 
     /**
