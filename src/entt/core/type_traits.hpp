@@ -250,37 +250,44 @@ struct type_list_cat<type_list<Type...>> {
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
 
-/*! @brief Primary template isn't defined on purpose. */
-template<typename>
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename...>
 struct type_list_unique;
+
+template<typename First, typename... Other, typename... Type>
+struct type_list_unique<type_list<First, Other...>, Type...> {
+    using type = std::conditional_t<
+        (std::is_same_v<First, Type> || ...),
+        typename type_list_unique<type_list<Other...>, Type...>::type,
+        typename type_list_unique<type_list<Other...>, Type..., First>::type>;
+};
+
+template<typename... Type>
+struct type_list_unique<type_list<>, Type...> {
+    using type = type_list<Type...>;
+};
+
+} // namespace internal
+/*! @endcond */
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
- * @tparam Other The other types provided by the given type list.
+ * @tparam List Type list.
  */
-template<typename Type, typename... Other>
-struct type_list_unique<type_list<Type, Other...>> {
+template<typename List>
+struct type_list_unique {
     /*! @brief A type list without duplicate types. */
-    using type = std::conditional_t<
-        (std::is_same_v<Type, Other> || ...),
-        typename type_list_unique<type_list<Other...>>::type,
-        type_list_cat_t<type_list<Type>, typename type_list_unique<type_list<Other...>>::type>>;
-};
-
-/*! @brief Removes duplicates types from a type list. */
-template<>
-struct type_list_unique<type_list<>> {
-    /*! @brief A type list without duplicate types. */
-    using type = type_list<>;
+    using type = typename internal::type_list_unique<List>::type;
 };
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam List Type list.
  */
-template<typename Type>
-using type_list_unique_t = typename type_list_unique<Type>::type;
+template<typename List>
+using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
