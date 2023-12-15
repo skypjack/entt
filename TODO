@@ -17,8 +17,7 @@ TODO:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* view: improve construction of base, reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too)
+* view: reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too)
 * view: update natvis as needed after the last rework, merge pools/filter in the same array, drop check (?) and turn view into a position
-* view: Type-only view_iterator (dyn get/excl sizes)
-* view: Type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
+* view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
