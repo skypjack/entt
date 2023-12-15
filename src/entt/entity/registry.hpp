@@ -944,8 +944,8 @@ public:
                 pools.begin()[pos - 1u].second->clear();
             }
 
-            const auto iterable = entities.each();
-            entities.erase(iterable.begin().base(), iterable.end().base());
+            const auto elem = entities.each();
+            entities.erase(elem.begin().base(), elem.end().base());
         } else {
             (assure<Type>().clear(), ...);
         }
