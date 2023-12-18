@@ -23,7 +23,7 @@ struct clazz {
         return {};
     }
 
-    int bar(double, float) const {
+    [[nodiscard]] int bar(double, float) const {
         return {};
     }
 
@@ -75,7 +75,7 @@ TEST_F(UnpackAsValue, Functionalities) {
 }
 
 TEST(IntegralConstant, Functionalities) {
-    entt::integral_constant<3> constant{};
+    const entt::integral_constant<3> constant{};
 
     testing::StaticAssertTypeEq<typename entt::integral_constant<3>::value_type, int>();
     ASSERT_EQ(constant.value, 3);
