@@ -178,21 +178,17 @@ amazing set of features. And even more, of course.
 
 ## Performance
 
-The proposed entity-component system is incredibly fast to iterate entities and
-components, this is a fact. Some compilers make a lot of optimizations because
-of how `EnTT` works, some others aren't that good. In general, if we consider
-real world cases, `EnTT` is somewhere between a bit and much faster than many of
-the other solutions around, although I couldn't check them all for obvious
-reasons.
+For what it's worth, you'll **never** see me trying to make other projects look
+bad or make dubious comparisons just to make this library seem cooler.<br/>
+I leave this activity to others, if they enjoy it (and it seems that some people
+actually like it). I prefer to make better use of my time.
 
 If you are interested, you can compile the `benchmark` test in release mode (to
 enable compiler optimizations, otherwise it would make little sense) by setting
 the `ENTT_BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself
 whether you're satisfied with the results or not.
 
-Honestly I got tired of updating the README file whenever there is an
-improvement.<br/>
-There are already a lot of projects out there that use `EnTT` as a basis for
+There are also a lot of projects out there that use `EnTT` as a basis for
 comparison (this should already tell you a lot). Many of these benchmarks are
 completely wrong, many others are simply incomplete, good at omitting some
 information and using the wrong function to compare a given feature. Certainly
@@ -202,15 +198,6 @@ Out of all of them, [this](https://github.com/abeimler/ecs_benchmark) seems like
 the most up-to-date project and also covers a certain number of libraries. I
 can't say exactly whether `EnTT` is used correctly or not. However, even if used
 poorly, it should still give the reader an idea of where it's going to operate.
-
-The choice to use `EnTT` should be based on its carefully designed API, its
-set of features and the general performance, **not** because some single
-benchmark shows it to be the fastest tool available.
-
-In the future I'll likely try to get even better performance while still adding
-new features, mainly for fun.<br/>
-If you want to contribute and/or have suggestions, feel free to make a PR or
-open an issue to discuss your idea.
 
 # Integration
 
