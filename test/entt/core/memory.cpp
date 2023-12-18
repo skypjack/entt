@@ -15,7 +15,7 @@
 #include "../common/tracked_memory_resource.hpp"
 
 TEST(ToAddress, Functionalities) {
-    std::shared_ptr<int> shared = std::make_shared<int>();
+    const std::shared_ptr<int> shared = std::make_shared<int>();
     auto *plain = std::addressof(*shared);
 
     ASSERT_EQ(entt::to_address(shared), plain);
@@ -108,7 +108,7 @@ TEST(AllocateUnique, NoUsesAllocatorConstruction) {
     std::pmr::polymorphic_allocator<int> allocator{&memory_resource};
 
     using type = std::unique_ptr<int, entt::allocation_deleter<std::pmr::polymorphic_allocator<int>>>;
-    type ptr = entt::allocate_unique<int>(allocator, 0);
+    [[maybe_unused]] const type ptr = entt::allocate_unique<int>(allocator, 0);
 
     ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
@@ -121,7 +121,7 @@ TEST(AllocateUnique, UsesAllocatorConstruction) {
     std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
 
     using type = std::unique_ptr<string_type, entt::allocation_deleter<std::pmr::polymorphic_allocator<string_type>>>;
-    type ptr = entt::allocate_unique<string_type>(allocator, test::tracked_memory_resource::default_value);
+    [[maybe_unused]] const type ptr = entt::allocate_unique<string_type>(allocator, test::tracked_memory_resource::default_value);
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 1u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
@@ -215,7 +215,7 @@ TEST(MakeObjUsingAllocator, Functionalities) {
 
 TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
     alignas(int) std::byte storage[sizeof(int)];
-    std::allocator<int> allocator{};
+    const std::allocator<int> allocator{};
 
     int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42);
 
@@ -229,7 +229,7 @@ TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
     using string_type = typename test::tracked_memory_resource::string_type;
 
     test::tracked_memory_resource memory_resource{};
-    std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
+    const std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
     alignas(string_type) std::byte storage[sizeof(string_type)];
 
     string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value);
