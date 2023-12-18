@@ -12,7 +12,7 @@ struct functions {
 };
 
 TEST(Identity, Functionalities) {
-    entt::identity identity;
+    const entt::identity identity;
     int value = 42;
 
     ASSERT_TRUE(entt::is_transparent_v<entt::identity>);
@@ -40,7 +40,7 @@ TEST(Overloaded, Functionalities) {
     int iv = 0;
     char cv = '\0';
 
-    entt::overloaded func{
+    const entt::overloaded func{
         [&iv](int value) { iv = value; },
         [&cv](char value) { cv = value; }};
 
