@@ -42,10 +42,10 @@ TEST(TypeName, Functionalities) {
 }
 
 TEST(TypeInfo, Functionalities) {
-    ASSERT_TRUE(std::is_copy_constructible_v<entt::type_info>);
-    ASSERT_TRUE(std::is_move_constructible_v<entt::type_info>);
-    ASSERT_TRUE(std::is_copy_assignable_v<entt::type_info>);
-    ASSERT_TRUE(std::is_move_assignable_v<entt::type_info>);
+    static_assert(std::is_copy_constructible_v<entt::type_info>, "Copy constructible type required");
+    static_assert(std::is_move_constructible_v<entt::type_info>, "Move constructible type required");
+    static_assert(std::is_copy_assignable_v<entt::type_info>, "Copy assignable type required");
+    static_assert(std::is_move_assignable_v<entt::type_info>, "Move assignable type required");
 
     entt::type_info info{std::in_place_type<int>};
     entt::type_info other{std::in_place_type<void>};
@@ -68,19 +68,11 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(other.name(), entt::type_name<int>::value());
 
-    ASSERT_EQ(other.index(), info.index());
-    ASSERT_EQ(other.hash(), info.hash());
-    ASSERT_EQ(other.name(), info.name());
-
     other = std::move(info);
 
     ASSERT_EQ(other.index(), entt::type_index<int>::value());
     ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(other.name(), entt::type_name<int>::value());
-
-    ASSERT_EQ(other.index(), info.index());
-    ASSERT_EQ(other.hash(), info.hash());
-    ASSERT_EQ(other.name(), info.name());
 }
 
 TEST(TypeInfo, Order) {
