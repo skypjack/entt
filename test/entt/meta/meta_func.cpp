@@ -23,7 +23,7 @@ struct base_t {
         value = v;
     }
 
-    int getter() const {
+    [[nodiscard]] int getter() const {
         return value;
     }
 
@@ -39,7 +39,7 @@ void fake_member(base_t &instance, int value) {
     instance.value = value;
 }
 
-int fake_const_member(const base_t &instance) {
+[[nodiscard]] int fake_const_member(const base_t &instance) {
     return instance.value;
 }
 
@@ -49,16 +49,16 @@ struct derived_t: base_t {
 };
 
 struct func_t {
-    int f(const base_t &, int a, int b) {
+    [[nodiscard]] int f(const base_t &, int a, int b) {
         return f(a, b);
     }
 
-    int f(int a, int b) {
+    [[nodiscard]] int f(int a, int b) {
         value = a;
         return b * b;
     }
 
-    int f(int v) const {
+    [[nodiscard]] int f(int v) const {
         return v * v;
     }
 
@@ -66,7 +66,7 @@ struct func_t {
         value = v * v;
     }
 
-    static int h(int &v) {
+    [[nodiscard]] static int h(int &v) {
         return (v *= value);
     }
 
@@ -74,15 +74,15 @@ struct func_t {
         value = v;
     }
 
-    int v(int v) const {
+    [[nodiscard]] int v(int v) const {
         return (value = v);
     }
 
-    int &a() const {
+    [[nodiscard]] int &a() const {
         return value;
     }
 
-    operator int() const {
+    [[nodiscard]] operator int() const {
         return value;
     }
 

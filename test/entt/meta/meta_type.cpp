@@ -66,7 +66,7 @@ struct clazz_t {
     void member() {}
     static void func() {}
 
-    operator int() const {
+    [[nodiscard]] operator int() const {
         return value;
     }
 
@@ -74,33 +74,33 @@ struct clazz_t {
 };
 
 struct overloaded_func_t {
-    int e(int v) const {
+    [[nodiscard]] int e(int v) const {
         return v + v;
     }
 
-    int f(const base_t &, int a, int b) {
+    [[nodiscard]] int f(const base_t &, int a, int b) {
         return f(a, b);
     }
 
-    int f(int a, int b) {
+    [[nodiscard]] int f(int a, int b) {
         value = a;
         return g(b);
     }
 
-    int f(int v) {
+    [[nodiscard]] int f(int v) {
         return 2 * std::as_const(*this).f(v);
     }
 
-    int f(int v) const {
+    [[nodiscard]] int f(int v) const {
         return g(v);
     }
 
-    float f(int a, float b) {
+    [[nodiscard]] float f(int a, float b) {
         value = a;
         return static_cast<float>(e(static_cast<int>(b)));
     }
 
-    int g(int v) const {
+    [[nodiscard]] int g(int v) const {
         return v * v;
     }
 

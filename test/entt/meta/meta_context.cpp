@@ -19,7 +19,7 @@ struct base {
     base(char v)
         : value{v} {}
 
-    char get() const {
+    [[nodiscard]] char get() const {
         return value;
     }
 
@@ -37,11 +37,11 @@ struct clazz: base {
         : base{c},
           value{v} {}
 
-    int func(int v) {
+    [[nodiscard]] int func(int v) {
         return (value = v);
     }
 
-    int cfunc(int v) const {
+    [[nodiscard]] int cfunc(int v) const {
         return v;
     }
 
@@ -57,11 +57,11 @@ struct argument {
     argument(int val)
         : value{val} {}
 
-    int get() const {
+    [[nodiscard]] int get() const {
         return value;
     }
 
-    int get_mul() const {
+    [[nodiscard]] int get_mul() const {
         return value * 2;
     }
 
@@ -452,9 +452,9 @@ TEST_F(MetaContext, MetaSequenceContainer) {
 TEST_F(MetaContext, MetaAny) {
     using namespace entt::literals;
 
-    entt::meta_any global{42};
-    entt::meta_any ctx_value{context, 42};
-    entt::meta_any in_place{context, std::in_place_type<int>, 42};
+    const entt::meta_any global{42};
+    const entt::meta_any ctx_value{context, 42};
+    const entt::meta_any in_place{context, std::in_place_type<int>, 42};
     entt::meta_any two_step_local{entt::meta_ctx_arg, context};
 
     ASSERT_TRUE(global);

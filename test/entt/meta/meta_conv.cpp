@@ -15,7 +15,7 @@ struct clazz_t {
         return value;
     }
 
-    bool to_bool() const {
+    [[nodiscard]] bool to_bool() const {
         return (value != 0);
     }
 

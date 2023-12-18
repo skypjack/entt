@@ -307,7 +307,7 @@ TEST_F(MetaData, SetMetaAnyArg) {
     using namespace entt::literals;
 
     entt::meta_any any{clazz_t{}};
-    entt::meta_any value{42};
+    const entt::meta_any value{42};
 
     ASSERT_EQ(any.cast<clazz_t>().i, 0);
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, value));

@@ -377,7 +377,7 @@ ENTT_DEBUG_TEST(SequenceContainerDeathTest, Constness) {
 }
 
 TEST(SequenceContainer, FromConstAny) {
-    std::vector<int> vec{42};
+    const std::vector<int> vec{42};
     const entt::meta_any any{vec};
     auto view = any.as_sequence_container();
 
@@ -407,7 +407,7 @@ TEST(SequenceContainer, FromConstAnyConstRef) {
 }
 
 ENTT_DEBUG_TEST(SequenceContainerDeathTest, FromConstAny) {
-    std::vector<int> vec{42};
+    const std::vector<int> vec{42};
     const entt::meta_any any{vec};
     auto view = any.as_sequence_container();
 
@@ -477,7 +477,7 @@ TEST(AssociativeContainer, StdMap) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_FALSE(view.key_only());
+    ASSERT_FALSE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -521,7 +521,7 @@ TEST(AssociativeContainer, StdSet) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_TRUE(view.key_only());
+    ASSERT_TRUE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -568,7 +568,7 @@ TEST(AssociativeContainer, DenseMap) {
     map.emplace(4, '3');
 
     ASSERT_TRUE(view);
-    ASSERT_FALSE(view.key_only());
+    ASSERT_FALSE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -616,7 +616,7 @@ TEST(AssociativeContainer, DenseSet) {
     set.emplace(4);
 
     ASSERT_TRUE(view);
-    ASSERT_TRUE(view.key_only());
+    ASSERT_TRUE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
@@ -659,7 +659,7 @@ TEST(KeyValueAssociativeContainer, Constness) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_FALSE(view.key_only());
+    ASSERT_FALSE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -702,7 +702,7 @@ TEST(KeyOnlyAssociativeContainer, Constness) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_TRUE(view.key_only());
+    ASSERT_TRUE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), (entt::resolve<int>()));
@@ -735,7 +735,7 @@ TEST(KeyOnlyAssociativeContainer, Constness) {
 }
 
 TEST(KeyValueAssociativeContainer, FromConstAny) {
-    std::map<int, char> map{{2, 'c'}};
+    const std::map<int, char> map{{2, 'c'}};
     const entt::meta_any any{map};
     auto view = any.as_associative_container();
 
@@ -765,7 +765,7 @@ TEST(KeyValueAssociativeContainer, FromConstAnyConstRef) {
 }
 
 ENTT_DEBUG_TEST(KeyValueAssociativeContainerDeathTest, FromConstAny) {
-    std::map<int, char> map{{2, 'c'}};
+    const std::map<int, char> map{{2, 'c'}};
     const entt::meta_any any{map};
     auto view = any.as_associative_container();
 
@@ -792,7 +792,7 @@ ENTT_DEBUG_TEST(KeyValueAssociativeContainerDeathTest, FromConstAnyConstRef) {
 }
 
 TEST(KeyOnlyAssociativeContainer, FromConstAny) {
-    std::set<int> set{2};
+    const std::set<int> set{2};
     const entt::meta_any any{set};
     auto view = any.as_associative_container();
 
