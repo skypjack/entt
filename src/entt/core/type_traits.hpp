@@ -257,12 +257,8 @@ template<typename...>
 struct type_list_unique;
 
 template<typename First, typename... Other, typename... Type>
-struct type_list_unique<type_list<First, Other...>, Type...> {
-    using type = std::conditional_t<
-        (std::is_same_v<First, Type> || ...),
-        typename type_list_unique<type_list<Other...>, Type...>::type,
-        typename type_list_unique<type_list<Other...>, Type..., First>::type>;
-};
+struct type_list_unique<type_list<First, Other...>, Type...>
+    : std::conditional_t<(std::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
 
 template<typename... Type>
 struct type_list_unique<type_list<>, Type...> {
