@@ -275,7 +275,7 @@ TEST(SigH, ScopedConnection) {
     {
         ASSERT_FALSE(listener.k);
 
-        entt::scoped_connection conn = sink.connect<&sigh_listener::g>(listener);
+        const entt::scoped_connection conn = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
@@ -300,7 +300,7 @@ TEST(SigH, ScopedConnectionMove) {
     ASSERT_TRUE(outer);
 
     {
-        entt::scoped_connection inner{std::move(outer)};
+        const entt::scoped_connection inner{std::move(outer)};
 
         ASSERT_FALSE(listener.k);
         ASSERT_FALSE(outer);
@@ -455,7 +455,7 @@ TEST(SigH, ConnectAndAutoDisconnect) {
 }
 
 TEST(SigH, CustomAllocator) {
-    std::allocator<void (*)(int)> allocator;
+    const std::allocator<void (*)(int)> allocator;
     entt::sigh<void(int), decltype(allocator)> sigh{allocator};
 
     ASSERT_EQ(sigh.get_allocator(), allocator);
