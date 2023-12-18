@@ -44,7 +44,7 @@ TEST(HashedString, Functionalities) {
     ASSERT_EQ(foo_hs, foo_hs);
     ASSERT_NE(foo_hs, bar_hs);
 
-    entt::hashed_string hs{"foobar"};
+    const entt::hashed_string hs{"foobar"};
 
     ASSERT_EQ(static_cast<hash_type>(hs), expected_v);
     ASSERT_EQ(hs.value(), expected_v);
@@ -66,7 +66,7 @@ TEST(HashedString, Functionalities) {
 TEST(HashedString, Empty) {
     using hash_type = entt::hashed_string::hash_type;
 
-    entt::hashed_string hs{};
+    const entt::hashed_string hs{};
 
     ASSERT_EQ(hs.size(), 0u);
     ASSERT_EQ(static_cast<hash_type>(hs), hash_type{});
@@ -75,7 +75,7 @@ TEST(HashedString, Empty) {
 
 TEST(HashedString, Correctness) {
     const char *foobar = "foobar";
-    std::string_view view{"foobar__", 6};
+    const std::string_view view{"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_string{foobar}, expected_v);
     ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), expected_v);
@@ -148,7 +148,7 @@ TEST(HashedWString, Functionalities) {
     ASSERT_EQ(foo_hws, foo_hws);
     ASSERT_NE(foo_hws, bar_hws);
 
-    entt::hashed_wstring hws{L"foobar"};
+    const entt::hashed_wstring hws{L"foobar"};
 
     ASSERT_EQ(static_cast<hash_type>(hws), expected_v);
     ASSERT_EQ(hws.value(), expected_v);
@@ -160,7 +160,7 @@ TEST(HashedWString, Functionalities) {
 TEST(HashedWString, Empty) {
     using hash_type = entt::hashed_wstring::hash_type;
 
-    entt::hashed_wstring hws{};
+    const entt::hashed_wstring hws{};
 
     ASSERT_EQ(hws.size(), 0u);
     ASSERT_EQ(static_cast<hash_type>(hws), hash_type{});
@@ -169,7 +169,7 @@ TEST(HashedWString, Empty) {
 
 TEST(HashedWString, Correctness) {
     const wchar_t *foobar = L"foobar";
-    std::wstring_view view{L"foobar__", 6};
+    const std::wstring_view view{L"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_wstring{foobar}, expected_v);
     ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), expected_v);
