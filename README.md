@@ -52,7 +52,7 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 * [Introduction](#introduction)
   * [Code Example](#code-example)
   * [Motivation](#motivation)
-  * [Performance](#performance)
+  * [Benchmark](#benchmark)
 * [Integration](#integration)
   * [Requirements](#requirements)
   * [CMake](#cmake)
@@ -176,10 +176,10 @@ Nowadays, `EnTT` is finally what I was looking for: still faster than its
 _competitors_, lower memory usage in the average case, a really good API and an
 amazing set of features. And even more, of course.
 
-## Performance
+## Benchmark
 
 For what it's worth, you'll **never** see me trying to make other projects look
-bad or make dubious comparisons just to make this library seem cooler.<br/>
+bad or offer dubious comparisons just to make this library seem cooler.<br/>
 I leave this activity to others, if they enjoy it (and it seems that some people
 actually like it). I prefer to make better use of my time.
 
