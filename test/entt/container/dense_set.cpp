@@ -101,7 +101,7 @@ TEST(DenseSet, Constructors) {
     set.emplace(3);
 
     entt::dense_set<int> temp{set, set.get_allocator()};
-    entt::dense_set<int> other{std::move(temp), set.get_allocator()};
+    const entt::dense_set<int> other{std::move(temp), set.get_allocator()};
 
     ASSERT_EQ(set.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
@@ -144,7 +144,7 @@ TEST(DenseSet, Move) {
 
     entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
 
-    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_EQ(set.max_load_factor(), other.max_load_factor());
 
@@ -154,7 +154,7 @@ TEST(DenseSet, Move) {
     other.emplace(0u);
     other = std::move(set);
 
-    ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_TRUE(other.contains(1u));
     ASSERT_TRUE(other.contains(11u));
@@ -381,7 +381,7 @@ TEST(DenseSet, IteratorConversion) {
     entt::dense_set<int> set;
     set.emplace(3);
 
-    typename entt::dense_set<int, int>::iterator it = set.begin();
+    const typename entt::dense_set<int, int>::iterator it = set.begin();
     typename entt::dense_set<int, int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), const int &>();
@@ -871,7 +871,7 @@ TEST(DenseSet, LocalIteratorConversion) {
     entt::dense_set<int> set;
     set.emplace(3);
 
-    typename entt::dense_set<int>::local_iterator it = set.begin(set.bucket(3));
+    const typename entt::dense_set<int>::local_iterator it = set.begin(set.bucket(3));
     typename entt::dense_set<int>::const_local_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), const int &>();

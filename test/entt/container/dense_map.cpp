@@ -103,7 +103,7 @@ TEST(DenseMap, Constructors) {
     map.emplace(3u, 42u);
 
     entt::dense_map<int, int> temp{map, map.get_allocator()};
-    entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
+    const entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
 
     ASSERT_EQ(map.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
@@ -150,7 +150,7 @@ TEST(DenseMap, Move) {
 
     entt::dense_map<std::size_t, std::size_t, entt::identity> other{std::move(map)};
 
-    ASSERT_EQ(map.size(), 0u);
+    ASSERT_EQ(map.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_EQ(map.max_load_factor(), other.max_load_factor());
 
@@ -160,7 +160,7 @@ TEST(DenseMap, Move) {
     other.emplace(0u, 0u);
     other = std::move(map);
 
-    ASSERT_EQ(map.size(), 0u);
+    ASSERT_EQ(map.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_TRUE(other.contains(1u));
     ASSERT_TRUE(other.contains(11u));
@@ -285,7 +285,7 @@ TEST(DenseMap, IteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(3, 42);
 
-    typename entt::dense_map<int, int>::iterator it = map.begin();
+    const typename entt::dense_map<int, int>::iterator it = map.begin();
     typename entt::dense_map<int, int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<const int &, int &>>();
@@ -1039,7 +1039,7 @@ TEST(DenseMap, LocalIteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(3, 42);
 
-    typename entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
+    const typename entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
     typename entt::dense_map<int, int>::const_local_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<const int &, int &>>();
@@ -1214,7 +1214,7 @@ TEST(DenseMap, KeyUsesAllocatorConstruction) {
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 
     memory_resource.reset();
-    decltype(map) other{map, &memory_resource};
+    const decltype(map) other{map, &memory_resource};
 
     ASSERT_TRUE(memory_resource.is_equal(*other.get_allocator().resource()));
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
@@ -1236,7 +1236,7 @@ TEST(DenseMap, ValueUsesAllocatorConstruction) {
     ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
 
-    decltype(map) other{std::move(map), &memory_resource};
+    const decltype(map) other{std::move(map), &memory_resource};
 
     ASSERT_TRUE(other.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
