@@ -999,7 +999,7 @@ TEST(MultiComponentView, EachWithHoles) {
 
     auto view = registry.view<char, int>();
 
-    view.each([e0](auto entity, const char &c, const int &i) {
+    view.each([e0](auto entity, const char &c, const int &i) { // NOLINT
         ASSERT_EQ(entity, e0);
         ASSERT_EQ(c, '0');
         ASSERT_EQ(i, 0);

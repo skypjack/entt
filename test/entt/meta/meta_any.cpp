@@ -270,7 +270,7 @@ TEST_F(MetaAny, SBOMoveConstruction) {
     entt::meta_any any{42};
     entt::meta_any other{std::move(any)};
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<int>(), 42);
@@ -284,7 +284,7 @@ TEST_F(MetaAny, SBOMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<int>(), 42);
@@ -540,7 +540,7 @@ TEST_F(MetaAny, NoSBOMoveConstruction) {
     entt::meta_any any{instance};
     entt::meta_any other{std::move(any)};
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<fat_t>(), instance);
@@ -555,7 +555,7 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<fat_t>(), instance);
@@ -743,7 +743,7 @@ TEST_F(MetaAny, VoidMoveConstruction) {
     entt::meta_any any{std::in_place_type<void>};
     const entt::meta_any other{std::move(any)};
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::resolve<void>());
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
@@ -755,7 +755,7 @@ TEST_F(MetaAny, VoidMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::resolve<void>());
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
@@ -766,8 +766,8 @@ TEST_F(MetaAny, SBOMoveInvalidate) {
     entt::meta_any other{std::move(any)};
     const entt::meta_any valid = std::move(other);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(other);
+    ASSERT_FALSE(any);   // NOLINT
+    ASSERT_FALSE(other); // NOLINT
     ASSERT_TRUE(valid);
 }
 
@@ -777,8 +777,8 @@ TEST_F(MetaAny, NoSBOMoveInvalidate) {
     entt::meta_any other{std::move(any)};
     const entt::meta_any valid = std::move(other);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(other);
+    ASSERT_FALSE(any);   // NOLINT
+    ASSERT_FALSE(other); // NOLINT
     ASSERT_TRUE(valid);
 }
 
@@ -787,8 +787,8 @@ TEST_F(MetaAny, VoidMoveInvalidate) {
     entt::meta_any other{std::move(any)};
     const entt::meta_any valid = std::move(other);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(other);
+    ASSERT_FALSE(any);   // NOLINT
+    ASSERT_FALSE(other); // NOLINT
     ASSERT_TRUE(valid);
 }
 

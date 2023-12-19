@@ -216,7 +216,7 @@ TEST_F(Any, SBOMoveConstruction) {
     entt::any any{42};
     entt::any other{std::move(any)};
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -233,7 +233,7 @@ TEST_F(Any, SBOMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -475,7 +475,7 @@ TEST_F(Any, NoSBOMoveConstruction) {
     entt::any any{instance};
     entt::any other{std::move(any)};
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -493,7 +493,7 @@ TEST_F(Any, NoSBOMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -665,7 +665,7 @@ TEST_F(Any, VoidMoveConstruction) {
     entt::any any{std::in_place_type<void>};
     entt::any other{std::move(any)};
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_FALSE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -681,7 +681,7 @@ TEST_F(Any, VoidMoveAssignment) {
 
     other = std::move(any);
 
-    ASSERT_FALSE(any);
+    ASSERT_FALSE(any); // NOLINT
     ASSERT_FALSE(other);
     ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
@@ -696,8 +696,8 @@ TEST_F(Any, SBOMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_TRUE(any);
-    ASSERT_TRUE(other);
+    ASSERT_TRUE(any);   // NOLINT
+    ASSERT_TRUE(other); // NOLINT
     ASSERT_TRUE(valid);
 }
 
@@ -707,8 +707,8 @@ TEST_F(Any, NoSBOMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_TRUE(any);
-    ASSERT_TRUE(other);
+    ASSERT_TRUE(any);   // NOLINT
+    ASSERT_TRUE(other); // NOLINT
     ASSERT_TRUE(valid);
 }
 
@@ -717,8 +717,8 @@ TEST_F(Any, VoidMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(other);
+    ASSERT_FALSE(any);   // NOLINT
+    ASSERT_FALSE(other); // NOLINT
     ASSERT_FALSE(valid);
 }
 
@@ -1423,7 +1423,7 @@ TEST_F(Any, CopyMoveReference) {
     entt::any move = std::move(any);
     entt::any copy = move;
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(move);
     ASSERT_TRUE(copy);
 
@@ -1452,7 +1452,7 @@ TEST_F(Any, CopyMoveConstReference) {
     entt::any move = std::move(any);
     entt::any copy = move;
 
-    ASSERT_TRUE(any);
+    ASSERT_TRUE(any); // NOLINT
     ASSERT_TRUE(move);
     ASSERT_TRUE(copy);
 

@@ -13,6 +13,7 @@
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 #include "../common/aggregate.h"
 #include "../common/config.h"
 #include "../common/custom_entity.h"
@@ -873,7 +874,7 @@ TEST(Registry, View) {
     ASSERT_EQ(std::distance(fview.begin(), fview.end()), 1);
 
     mview.each([&entity, first = true](auto entt, auto &&...) mutable {
-        ASSERT_EQ(entt, entity[2u * first]);
+        ASSERT_EQ(entt, entity[2u * first]); // NOLINT
         first = false;
     });
 

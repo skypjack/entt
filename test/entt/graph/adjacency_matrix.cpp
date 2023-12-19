@@ -33,7 +33,7 @@ TEST(AdjacencyMatrix, Constructors) {
     const entt::adjacency_matrix<entt::directed_tag> temp{adjacency_matrix, adjacency_matrix.get_allocator()};
     const entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
 
-    ASSERT_EQ(adjacency_matrix.size(), 0u);
+    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
     ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));

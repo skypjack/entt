@@ -82,7 +82,7 @@ struct overloaded_func_t {
         return f(a, b);
     }
 
-    [[nodiscard]] int f(int a, int b) {
+    [[nodiscard]] int f(int a, int b) { // NOLINT
         value = a;
         return g(b);
     }
@@ -95,7 +95,7 @@ struct overloaded_func_t {
         return g(v);
     }
 
-    [[nodiscard]] float f(int a, float b) {
+    [[nodiscard]] float f(int a, float b) { // NOLINT
         value = a;
         return static_cast<float>(e(static_cast<int>(b)));
     }

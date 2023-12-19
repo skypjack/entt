@@ -303,7 +303,7 @@ TEST(SigH, ScopedConnectionMove) {
         const entt::scoped_connection inner{std::move(outer)};
 
         ASSERT_FALSE(listener.k);
-        ASSERT_FALSE(outer);
+        ASSERT_FALSE(outer); // NOLINT
         ASSERT_TRUE(inner);
 
         sigh.publish(42);
@@ -327,7 +327,7 @@ TEST(SigH, ScopedConnectionMove) {
 
         inner = std::move(outer);
 
-        ASSERT_FALSE(outer);
+        ASSERT_FALSE(outer); // NOLINT
         ASSERT_TRUE(inner);
 
         sigh.publish(42);
@@ -479,7 +479,7 @@ TEST(SigH, CustomAllocator) {
 
     decltype(sigh) move{std::move(copy), allocator};
 
-    ASSERT_TRUE(copy.empty());
+    ASSERT_TRUE(copy.empty()); // NOLINT
     ASSERT_FALSE(move.empty());
 
     sink = entt::sink{move};

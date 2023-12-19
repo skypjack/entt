@@ -221,7 +221,7 @@ TYPED_TEST(Poly, Functionalities) {
     poly_type move = std::move(copy);
 
     ASSERT_TRUE(move);
-    ASSERT_TRUE(copy);
+    ASSERT_TRUE(copy); // NOLINT
     ASSERT_EQ(move->get(), 3);
 
     move.reset();

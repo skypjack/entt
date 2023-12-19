@@ -33,7 +33,7 @@ struct clazz: base {
         : base{},
           value{v} {}
 
-    clazz(char c, int v)
+    clazz(char c, int v) // NOLINT
         : base{c},
           value{v} {}
 

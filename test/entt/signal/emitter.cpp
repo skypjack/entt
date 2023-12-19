@@ -26,13 +26,13 @@ TEST(Emitter, Move) {
 
     ASSERT_FALSE(other.empty());
     ASSERT_TRUE(other.contains<foo_event>());
-    ASSERT_TRUE(emitter.empty());
+    ASSERT_TRUE(emitter.empty()); // NOLINT
 
     emitter = std::move(other);
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_TRUE(emitter.contains<foo_event>());
-    ASSERT_TRUE(other.empty());
+    ASSERT_TRUE(other.empty()); // NOLINT
 }
 
 TEST(Emitter, Swap) {
@@ -166,6 +166,6 @@ TEST(Emitter, CustomAllocator) {
     emitter.on<foo_event>([](auto &, const auto &) {});
     const decltype(emitter) other{std::move(emitter), allocator};
 
-    ASSERT_TRUE(emitter.empty());
+    ASSERT_TRUE(emitter.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
 }

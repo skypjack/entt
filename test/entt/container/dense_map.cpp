@@ -967,7 +967,7 @@ TEST(DenseMap, Indexing) {
 
     ASSERT_TRUE(map.contains(key));
     ASSERT_EQ(map[std::move(key)], 99);
-    ASSERT_EQ(cmap.at(key), 99);
+    ASSERT_EQ(cmap.at(key), 99); // NOLINT
     ASSERT_EQ(map.at(key), 99);
 }
 
