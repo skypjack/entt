@@ -17,7 +17,7 @@ struct common_type: Base {
         entt::poly_call<1>(*this, v);
     }
 
-    int get() const {
+    [[nodiscard]] int get() const {
         return static_cast<int>(entt::poly_call<2>(*this));
     }
 
@@ -25,11 +25,11 @@ struct common_type: Base {
         entt::poly_call<3>(*this);
     }
 
-    int mul(int v) const {
+    [[nodiscard]] int mul(int v) const {
         return static_cast<int>(entt::poly_call<4>(*this, v));
     }
 
-    int rand() const {
+    [[nodiscard]] int rand() const {
         return static_cast<int>(entt::poly_call<5>(*this));
     }
 };
@@ -40,7 +40,7 @@ struct common_members {
         self.set(self.get() - 1);
     }
 
-    static double mul(const Type &self, double v) {
+    [[nodiscard]] static double mul(const Type &self, double v) {
         return v * self.get();
     }
 };
@@ -92,7 +92,7 @@ struct DeducedEmbedded
     : entt::type_list<> {
     template<typename Base>
     struct type: Base {
-        int get() const {
+        [[nodiscard]] int get() const {
             return entt::poly_call<0>(*this);
         }
     };
@@ -106,7 +106,7 @@ struct DefinedEmbedded
     template<typename Base>
     struct type: Base {
         // non-const get on purpose
-        int get() {
+        [[nodiscard]] int get() {
             return entt::poly_call<0>(*this);
         }
     };
@@ -129,7 +129,7 @@ struct impl {
         value = v;
     }
 
-    int get() const {
+    [[nodiscard]] int get() const {
         return value;
     }
 
