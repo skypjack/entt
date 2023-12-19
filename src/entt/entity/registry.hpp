@@ -556,11 +556,13 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        const auto from = entities.each().cbegin().base();
-        const auto to = from + entities.pack(first, last);
+        entities.sort_as(first, last);
 
-        for(size_type pos = pools.size(); pos; --pos) {
-            pools.begin()[pos - 1u].second->remove(from, to);
+        const auto from = entities.cbegin(0);
+        const auto to = from + std::distance(first, last);
+
+        for(auto &&curr: pools) {
+            curr.second->remove(from, to);
         }
 
         entities.erase(from, to);
