@@ -23,3 +23,4 @@ TODO:
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
 * basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) uses move-from packed in assert (same for storage)
 * view unchecked_refresh loop is never executed if Get is 1u
+* review all // NOLINT
