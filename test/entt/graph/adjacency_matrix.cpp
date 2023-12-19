@@ -30,8 +30,8 @@ TEST(AdjacencyMatrix, Constructors) {
 
     adjacency_matrix.insert(0u, 1u);
 
-    entt::adjacency_matrix<entt::directed_tag> temp{adjacency_matrix, adjacency_matrix.get_allocator()};
-    entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
+    const entt::adjacency_matrix<entt::directed_tag> temp{adjacency_matrix, adjacency_matrix.get_allocator()};
+    const entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
 
     ASSERT_EQ(adjacency_matrix.size(), 0u);
     ASSERT_EQ(other.size(), 3u);
@@ -72,10 +72,10 @@ TEST(AdjacencyMatrix, Move) {
 
     entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix)};
 
-    ASSERT_EQ(adjacency_matrix.size(), 0u);
+    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_FALSE(adjacency_matrix.contains(0u, 1u)); // NOLINT
     ASSERT_TRUE(other.contains(0u, 1u));
 
     adjacency_matrix = {};
@@ -86,7 +86,7 @@ TEST(AdjacencyMatrix, Move) {
     other = std::move(adjacency_matrix);
 
     ASSERT_EQ(other.size(), 4u);
-    ASSERT_EQ(adjacency_matrix.size(), 0u);
+    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
 
     ASSERT_FALSE(other.contains(0u, 1u));
     ASSERT_FALSE(other.contains(1u, 2u));
@@ -208,7 +208,7 @@ TEST(AdjacencyMatrix, VertexIterator) {
     testing::StaticAssertTypeEq<iterator::pointer, void>();
     testing::StaticAssertTypeEq<iterator::reference, std::size_t>();
 
-    entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2u};
+    const entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2u};
     const auto iterable = adjacency_matrix.vertices();
 
     iterator end{iterable.begin()};

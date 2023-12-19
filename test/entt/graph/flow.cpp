@@ -22,10 +22,10 @@ TEST(Flow, Constructors) {
 
     ASSERT_EQ(flow.size(), 3u);
 
-    entt::flow temp{flow, flow.get_allocator()};
-    entt::flow other{std::move(flow), flow.get_allocator()};
+    const entt::flow temp{flow, flow.get_allocator()};
+    const entt::flow other{std::move(flow), flow.get_allocator()};
 
-    ASSERT_EQ(flow.size(), 0u);
+    ASSERT_EQ(flow.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
     ASSERT_EQ(other[0u], 0u);
@@ -72,7 +72,7 @@ TEST(Flow, Move) {
 
     entt::flow other{std::move(flow)};
 
-    ASSERT_EQ(flow.size(), 0u);
+    ASSERT_EQ(flow.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
     ASSERT_EQ(other[0u], 0u);
@@ -86,7 +86,7 @@ TEST(Flow, Move) {
     other = std::move(flow);
 
     ASSERT_EQ(other.size(), 1u);
-    ASSERT_EQ(flow.size(), 0u);
+    ASSERT_EQ(flow.size(), 0u); // NOLINT
 
     ASSERT_EQ(other[0u], 1u);
 }
