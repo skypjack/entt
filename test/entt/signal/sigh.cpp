@@ -456,7 +456,7 @@ TEST(SigH, ConnectAndAutoDisconnect) {
 
 TEST(SigH, CustomAllocator) {
     const std::allocator<void (*)(int)> allocator;
-    entt::sigh<void(int), decltype(allocator)> sigh{allocator};
+    entt::sigh<void(int), std::allocator<void (*)(int)>> sigh{allocator};
 
     ASSERT_EQ(sigh.get_allocator(), allocator);
     ASSERT_FALSE(sigh.get_allocator() != allocator);
@@ -464,7 +464,7 @@ TEST(SigH, CustomAllocator) {
 
     entt::sink sink{sigh};
     sigh_listener listener;
-    sink.connect<&sigh_listener::g>(listener);
+    sink.template connect<&sigh_listener::g>(listener);
 
     decltype(sigh) copy{sigh, allocator};
     sink.disconnect(&listener);
@@ -488,7 +488,7 @@ TEST(SigH, CustomAllocator) {
     ASSERT_TRUE(copy.empty());
     ASSERT_TRUE(move.empty());
 
-    sink.connect<&sigh_listener::g>(listener);
+    sink.template connect<&sigh_listener::g>(listener);
     copy.swap(move);
 
     ASSERT_FALSE(copy.empty());
