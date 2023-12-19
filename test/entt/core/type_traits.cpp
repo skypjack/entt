@@ -82,8 +82,8 @@ TEST(IntegralConstant, Functionalities) {
 }
 
 TEST(Choice, Functionalities) {
-    ASSERT_TRUE((std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>));
-    ASSERT_FALSE((std::is_base_of_v<entt::choice_t<1>, entt::choice_t<0>>));
+    static_assert(std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>, "Base type required");
+    static_assert(!std::is_base_of_v<entt::choice_t<1>, entt::choice_t<0>>, "Base type not allowed");
 }
 
 TEST(TypeList, Functionalities) {
