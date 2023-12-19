@@ -8,12 +8,12 @@ struct sigh_listener {
         v = 42;
     }
 
-    bool g(int) {
+    [[nodiscard]] bool g(int) {
         k = !k;
         return true;
     }
 
-    bool h(const int &) {
+    [[nodiscard]] bool h(const int &) {
         return k;
     }
 
@@ -60,8 +60,8 @@ TEST(SigH, Lifetime) {
 
     ASSERT_NO_FATAL_FAILURE(signal{src});
     ASSERT_NO_FATAL_FAILURE(signal{std::move(other)});
-    ASSERT_NO_FATAL_FAILURE(src = other);
-    ASSERT_NO_FATAL_FAILURE(src = std::move(other));
+    ASSERT_NO_FATAL_FAILURE(src = other);            // NOLINT
+    ASSERT_NO_FATAL_FAILURE(src = std::move(other)); // NOLINT
 
     ASSERT_NO_FATAL_FAILURE(delete new signal{});
 }
@@ -90,7 +90,7 @@ TEST(SigH, Swap) {
     entt::sigh<void(int &)> sigh1;
     entt::sigh<void(int &)> sigh2;
     entt::sink sink1{sigh1};
-    entt::sink sink2{sigh2};
+    const entt::sink sink2{sigh2};
 
     sink1.connect<&sigh_listener::f>();
 

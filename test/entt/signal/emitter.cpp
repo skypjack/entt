@@ -143,7 +143,7 @@ TEST(Emitter, On) {
 
 TEST(Emitter, OnAndErase) {
     test_emitter emitter{};
-    std::function<void(bar_event &, test_emitter &)> func{};
+    const std::function<void(bar_event &, test_emitter &)> func{};
 
     emitter.on(func);
 
@@ -157,14 +157,14 @@ TEST(Emitter, OnAndErase) {
 }
 
 TEST(Emitter, CustomAllocator) {
-    std::allocator<void> allocator{};
+    const std::allocator<void> allocator{};
     test_emitter emitter{allocator};
 
     ASSERT_EQ(emitter.get_allocator(), allocator);
     ASSERT_FALSE(emitter.get_allocator() != allocator);
 
     emitter.on<foo_event>([](auto &, const auto &) {});
-    decltype(emitter) other{std::move(emitter), allocator};
+    const decltype(emitter) other{std::move(emitter), allocator};
 
     ASSERT_TRUE(emitter.empty());
     ASSERT_FALSE(other.empty());

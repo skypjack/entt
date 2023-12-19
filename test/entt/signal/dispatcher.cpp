@@ -30,11 +30,10 @@ struct receiver {
 
 TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher{};
-    entt::dispatcher other{};
     receiver receiver{};
 
-    ASSERT_NO_FATAL_FAILURE(entt::dispatcher{std::move(dispatcher)});
-    ASSERT_NO_FATAL_FAILURE(dispatcher = std::move(other));
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] const entt::dispatcher other{entt::dispatcher{}});
+    ASSERT_NO_FATAL_FAILURE(dispatcher = entt::dispatcher{});
 
     ASSERT_EQ(dispatcher.size<an_event>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);
@@ -187,14 +186,14 @@ TEST(Dispatcher, NamedQueue) {
 }
 
 TEST(Dispatcher, CustomAllocator) {
-    std::allocator<void> allocator{};
+    const std::allocator<void> allocator{};
     entt::dispatcher dispatcher{allocator};
 
     ASSERT_EQ(dispatcher.get_allocator(), allocator);
     ASSERT_FALSE(dispatcher.get_allocator() != allocator);
 
     dispatcher.enqueue<an_event>();
-    decltype(dispatcher) other{std::move(dispatcher), allocator};
+    const decltype(dispatcher) other{std::move(dispatcher), allocator};
 
     ASSERT_EQ(other.size<an_event>(), 1u);
 }
