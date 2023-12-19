@@ -84,7 +84,7 @@ TEST(ResourceCache, Constructors) {
     cache.load("resource"_hs, 42u);
 
     entt::resource_cache<int> temp{cache, cache.get_allocator()};
-    entt::resource_cache<int> other{std::move(temp), cache.get_allocator()};
+    const entt::resource_cache<int> other{std::move(temp), cache.get_allocator()};
 
     ASSERT_EQ(cache.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
@@ -124,7 +124,7 @@ TEST(ResourceCache, Move) {
 
     entt::resource_cache<std::size_t> other{std::move(cache)};
 
-    ASSERT_EQ(cache.size(), 0u);
+    ASSERT_EQ(cache.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains("resource"_hs));
 
     cache = other;
@@ -133,7 +133,7 @@ TEST(ResourceCache, Move) {
     other.load("quux"_hs, 0u);
     other = std::move(cache);
 
-    ASSERT_EQ(cache.size(), 0u);
+    ASSERT_EQ(cache.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains("resource"_hs));
     ASSERT_TRUE(other.contains("foo"_hs));
     ASSERT_TRUE(other.contains("bar"_hs));
@@ -260,7 +260,7 @@ TEST(ResourceCache, IteratorConversion) {
     entt::resource_cache<int> cache;
     cache.load("resource"_hs, 42);
 
-    typename entt::resource_cache<int>::iterator it = cache.begin();
+    const typename entt::resource_cache<int>::iterator it = cache.begin();
     typename entt::resource_cache<int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::resource<int>>>();
