@@ -167,7 +167,7 @@ public:
      * @return The size of the hashed string.
      */
     [[nodiscard]] constexpr size_type size() const noexcept {
-        return base_type::length;
+        return base_type::length; // NOLINT
     }
 
     /**
