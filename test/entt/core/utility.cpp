@@ -27,7 +27,7 @@ TEST(Overload, Functionalities) {
     ASSERT_EQ(entt::overload<void(int)>(&functions::bar), static_cast<void (functions::*)(int)>(&functions::bar));
     ASSERT_EQ(entt::overload<void()>(&functions::bar), static_cast<void (functions::*)()>(&functions::bar));
 
-    functions instance;
+    functions instance; // NOLINT
 
     ASSERT_NO_FATAL_FAILURE(entt::overload<void(int)>(&functions::foo)(0));
     ASSERT_NO_FATAL_FAILURE(entt::overload<void()>(&functions::foo)());

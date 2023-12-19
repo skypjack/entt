@@ -23,16 +23,16 @@ TEST(CompressedPair, Size) {
 }
 
 TEST(CompressedPair, ConstructCopyMove) {
-    ASSERT_FALSE((std::is_default_constructible_v<entt::compressed_pair<test::non_default_constructible, test::empty>>));
-    ASSERT_TRUE((std::is_default_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>));
+    static_assert(!std::is_default_constructible_v<entt::compressed_pair<test::non_default_constructible, test::empty>>, "Default constructible type not allowed");
+    static_assert(std::is_default_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Default constructible type required");
 
-    ASSERT_TRUE((std::is_copy_constructible_v<entt::compressed_pair<test::non_default_constructible, test::empty>>));
-    ASSERT_FALSE((std::is_copy_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>));
-    ASSERT_TRUE((std::is_copy_assignable_v<entt::compressed_pair<test::non_default_constructible, test::empty>>));
-    ASSERT_FALSE((std::is_copy_assignable_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>));
+    static_assert(std::is_copy_constructible_v<entt::compressed_pair<test::non_default_constructible, test::empty>>, "Copy constructible type required");
+    static_assert(!std::is_copy_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Copy constructible type not allowed");
+    static_assert(std::is_copy_assignable_v<entt::compressed_pair<test::non_default_constructible, test::empty>>, "Copy assignable type required");
+    static_assert(!std::is_copy_assignable_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Copy assignable type not allowed");
 
-    ASSERT_TRUE((std::is_move_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>));
-    ASSERT_TRUE((std::is_move_assignable_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>));
+    static_assert(std::is_move_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Move constructible type required");
+    static_assert(std::is_move_assignable_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Move assignable type required");
 
     entt::compressed_pair copyable{test::non_default_constructible{42}, test::empty{}};
     auto by_copy{copyable};
@@ -48,27 +48,27 @@ TEST(CompressedPair, ConstructCopyMove) {
     auto by_move{std::move(movable)};
 
     ASSERT_EQ(*by_move.second(), 99);
-    ASSERT_EQ(movable.second(), nullptr);
+    ASSERT_EQ(movable.second(), nullptr); // NOLINT
 
     *by_move.second() = 3;
     movable = std::move(by_move);
 
     ASSERT_EQ(*movable.second(), 3);
-    ASSERT_EQ(by_move.second(), nullptr);
+    ASSERT_EQ(by_move.second(), nullptr); // NOLINT
 }
 
 TEST(CompressedPair, PiecewiseConstruct) {
-    std::vector<int> vec{42};
-    entt::compressed_pair<test::empty, test::empty> empty{std::piecewise_construct, std::make_tuple(), std::make_tuple()};
-    entt::compressed_pair<std::vector<int>, std::size_t> pair{std::piecewise_construct, std::forward_as_tuple(std::move(vec)), std::make_tuple(sizeof(empty))};
+    std::vector<int> vec{42}; // NOLINT
+    const entt::compressed_pair<test::empty, test::empty> empty{std::piecewise_construct, std::make_tuple(), std::make_tuple()};
+    const entt::compressed_pair<std::vector<int>, std::size_t> pair{std::piecewise_construct, std::forward_as_tuple(std::move(vec)), std::make_tuple(sizeof(empty))};
 
     ASSERT_EQ(pair.first().size(), 1u);
     ASSERT_EQ(pair.second(), sizeof(empty));
 }
 
 TEST(CompressedPair, DeductionGuide) {
-    int value = 42;
-    test::empty empty{};
+    const int value = 42;
+    const test::empty empty{};
     entt::compressed_pair pair{value, 3};
 
     testing::StaticAssertTypeEq<decltype(entt::compressed_pair{test::empty{}, empty}), entt::compressed_pair<test::empty, test::empty>>();

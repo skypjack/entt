@@ -8,7 +8,7 @@
 TEST(Algorithm, StdSort) {
     // well, I'm pretty sure it works, it's std::sort!!
     std::array<int, 5> arr{{4, 1, 3, 2, 0}};
-    entt::std_sort sort;
+    const entt::std_sort sort;
 
     sort(arr.begin(), arr.end());
 
@@ -20,7 +20,7 @@ TEST(Algorithm, StdSort) {
 TEST(Algorithm, StdSortBoxedInt) {
     // well, I'm pretty sure it works, it's std::sort!!
     std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
-    entt::std_sort sort;
+    const entt::std_sort sort;
 
     sort(arr.begin(), arr.end(), [](const auto &lhs, const auto &rhs) {
         return lhs.value > rhs.value;
@@ -33,7 +33,7 @@ TEST(Algorithm, StdSortBoxedInt) {
 
 TEST(Algorithm, InsertionSort) {
     std::array<int, 5> arr{{4, 1, 3, 2, 0}};
-    entt::insertion_sort sort;
+    const entt::insertion_sort sort;
 
     sort(arr.begin(), arr.end());
 
@@ -44,7 +44,7 @@ TEST(Algorithm, InsertionSort) {
 
 TEST(Algorithm, InsertionSortBoxedInt) {
     std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
-    entt::insertion_sort sort;
+    const entt::insertion_sort sort;
 
     sort(arr.begin(), arr.end(), [](const auto &lhs, const auto &rhs) {
         return lhs.value > rhs.value;
@@ -57,14 +57,14 @@ TEST(Algorithm, InsertionSortBoxedInt) {
 
 TEST(Algorithm, InsertionSortEmptyContainer) {
     std::vector<int> vec{};
-    entt::insertion_sort sort;
+    const entt::insertion_sort sort;
     // this should crash with asan enabled if we break the constraint
     sort(vec.begin(), vec.end());
 }
 
 TEST(Algorithm, RadixSort) {
     std::array<std::uint32_t, 5> arr{{4, 1, 3, 2, 0}};
-    entt::radix_sort<8, 32> sort;
+    const entt::radix_sort<8, 32> sort;
 
     sort(arr.begin(), arr.end(), [](const auto &value) {
         return value;
@@ -77,7 +77,7 @@ TEST(Algorithm, RadixSort) {
 
 TEST(Algorithm, RadixSortBoxedInt) {
     std::array<test::boxed_int, 6> arr{{{4}, {1}, {3}, {2}, {0}, {6}}};
-    entt::radix_sort<2, 6> sort;
+    const entt::radix_sort<2, 6> sort;
 
     sort(arr.rbegin(), arr.rend(), [](const auto &instance) {
         return instance.value;
@@ -90,7 +90,7 @@ TEST(Algorithm, RadixSortBoxedInt) {
 
 TEST(Algorithm, RadixSortEmptyContainer) {
     std::vector<int> vec{};
-    entt::radix_sort<8, 32> sort;
+    const entt::radix_sort<8, 32> sort;
     // this should crash with asan enabled if we break the constraint
     sort(vec.begin(), vec.end());
 }
