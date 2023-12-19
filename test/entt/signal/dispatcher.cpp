@@ -30,10 +30,11 @@ struct receiver {
 
 TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher{};
-    receiver receiver{};
+    entt::dispatcher other{std::move(dispatcher)};
 
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] const entt::dispatcher other{entt::dispatcher{}});
-    ASSERT_NO_FATAL_FAILURE(dispatcher = entt::dispatcher{});
+    dispatcher = std::move(other);
+
+    receiver receiver{};
 
     ASSERT_EQ(dispatcher.size<an_event>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);

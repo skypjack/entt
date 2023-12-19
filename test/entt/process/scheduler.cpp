@@ -48,12 +48,12 @@ struct Scheduler: ::testing::Test {
 
 TEST_F(Scheduler, Functionalities) {
     entt::scheduler scheduler{};
+    entt::scheduler other{std::move(scheduler)};
+
+    scheduler = std::move(other);
 
     bool updated = false;
     bool aborted = false;
-
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] const entt::scheduler other{entt::scheduler{}});
-    ASSERT_NO_FATAL_FAILURE(scheduler = entt::scheduler{});
 
     ASSERT_EQ(scheduler.size(), 0u);
     ASSERT_TRUE(scheduler.empty());
