@@ -8,9 +8,9 @@
 TEST(Lib, Registry) {
     entt::registry registry;
 
-    for(auto i = 0; i < 3; ++i) {
-        registry.emplace<position>(registry.create(), i, i);
-    }
+    registry.emplace<position>(registry.create(), 0, 0);
+    registry.emplace<position>(registry.create(), 1, 1);
+    registry.emplace<position>(registry.create(), 2, 2);
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
