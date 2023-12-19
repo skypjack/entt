@@ -464,7 +464,7 @@ TEST(SigH, CustomAllocator) {
 
     entt::sink sink{sigh};
     sigh_listener listener;
-    sink.template connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::g>(listener);
 
     decltype(sigh) copy{sigh, allocator};
     sink.disconnect(&listener);
@@ -488,7 +488,7 @@ TEST(SigH, CustomAllocator) {
     ASSERT_TRUE(copy.empty());
     ASSERT_TRUE(move.empty());
 
-    sink.template connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::g>(listener);
     copy.swap(move);
 
     ASSERT_FALSE(copy.empty());
