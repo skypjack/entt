@@ -13,7 +13,7 @@ struct clazz {
         member = v;
     }
 
-    int getter() const {
+    [[nodiscard]] int getter() const {
         return member;
     }
 
@@ -21,7 +21,7 @@ struct clazz {
         instance.member = v;
     }
 
-    static int static_getter(const clazz &instance) {
+    [[nodiscard]] static int static_getter(const clazz &instance) {
         return instance.member;
     }
 
@@ -29,11 +29,11 @@ struct clazz {
         value = 0;
     }
 
-    static int get_value() {
+    [[nodiscard]] static int get_value() {
         return value;
     }
 
-    static clazz factory(int v) {
+    [[nodiscard]] static clazz factory(int v) {
         clazz instance{};
         instance.member = v;
         return instance;
