@@ -21,13 +21,13 @@ struct shadow {
 };
 
 TEST(BasicSnapshot, Constructors) {
-    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>);
-    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>);
-    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>);
+    static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>, "Default constructible type not allowed");
+    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>, "Copy constructible type not allowed");
+    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>, "Copy assignable type not allowed");
+    static_assert(std::is_move_constructible_v<entt::basic_snapshot<entt::registry>>, "Move constructible type required");
+    static_assert(std::is_move_assignable_v<entt::basic_snapshot<entt::registry>>, "Move assignable type required");
 
-    entt::registry registry;
+    const entt::registry registry;
     entt::basic_snapshot snapshot{registry};
     entt::basic_snapshot other{std::move(snapshot)};
 
@@ -39,7 +39,7 @@ TEST(BasicSnapshot, GetEntityType) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::basic_snapshot snapshot{registry};
+    const entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<entt::entity>();
 
     std::vector<entt::any> data{};
@@ -86,7 +86,7 @@ TEST(BasicSnapshot, GetType) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::basic_snapshot snapshot{registry};
+    const entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<int>();
 
     entt::entity entity[3u];
@@ -132,7 +132,7 @@ TEST(BasicSnapshot, GetEmptyType) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::basic_snapshot snapshot{registry};
+    const entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<test::empty>();
 
     entt::entity entity[3u];
@@ -171,7 +171,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::basic_snapshot snapshot{registry};
+    const entt::basic_snapshot snapshot{registry};
 
     entt::entity entity[3u];
     const int values[3u]{1, 2, 3};
@@ -215,11 +215,11 @@ TEST(BasicSnapshot, GetTypeSparse) {
 }
 
 TEST(BasicSnapshotLoader, Constructors) {
-    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
-    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>);
-    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>);
+    static_assert(!std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>, "Default constructible type not allowed");
+    static_assert(!std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>, "Copy constructible type not allowed");
+    static_assert(!std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>, "Copy assignable type not allowed");
+    static_assert(std::is_move_constructible_v<entt::basic_snapshot_loader<entt::registry>>, "Move constructible type required");
+    static_assert(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>, "Move assignable type required");
 
     entt::registry registry;
     entt::basic_snapshot_loader loader{registry};
@@ -232,7 +232,7 @@ ENTT_DEBUG_TEST(BasicSnapshotLoaderDeathTest, Constructors) {
     entt::registry registry;
     registry.emplace<int>(registry.create());
 
-    ASSERT_DEATH([[maybe_unused]] entt::basic_snapshot_loader loader{registry}, "");
+    ASSERT_DEATH([[maybe_unused]] const entt::basic_snapshot_loader loader{registry}, "");
 }
 
 TEST(BasicSnapshotLoader, GetEntityType) {
@@ -491,11 +491,11 @@ TEST(BasicSnapshotLoader, Orphans) {
 }
 
 TEST(BasicContinuousLoader, Constructors) {
-    ASSERT_FALSE(std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    ASSERT_FALSE(std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>);
-    ASSERT_TRUE(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>);
-    ASSERT_TRUE(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>);
+    static_assert(!std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>, "Default constructible type not allowed");
+    static_assert(!std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>, "Copy constructible type not allowed");
+    static_assert(!std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>, "Copy assignable type not allowed");
+    static_assert(std::is_move_constructible_v<entt::basic_continuous_loader<entt::registry>>, "Move constructible type required");
+    static_assert(std::is_move_assignable_v<entt::basic_continuous_loader<entt::registry>>, "Move assignable type required");
 
     entt::registry registry;
     entt::basic_continuous_loader loader{registry};

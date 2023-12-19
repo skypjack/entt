@@ -89,56 +89,56 @@ TYPED_TEST(SparseSet, Move) {
 
         set.push(entity_type{42});
 
-        ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
-        ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
+        static_assert(std::is_move_constructible_v<decltype(set)>, "Move constructible type required");
+        static_assert(std::is_move_assignable_v<decltype(set)>, "Move assignable type required");
 
         sparse_set_type other{std::move(set)};
 
-        ASSERT_TRUE(set.empty());
+        ASSERT_TRUE(set.empty()); // NOLINT
         ASSERT_FALSE(other.empty());
 
-        ASSERT_EQ(set.policy(), policy);
+        ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
         ASSERT_EQ(other.at(0u), entity_type{42});
 
         sparse_set_type extended{std::move(other), allocator_type{}};
 
-        ASSERT_TRUE(other.empty());
+        ASSERT_TRUE(other.empty()); // NOLINT
         ASSERT_FALSE(extended.empty());
 
-        ASSERT_EQ(other.policy(), policy);
+        ASSERT_EQ(other.policy(), policy); // NOLINT
         ASSERT_EQ(extended.policy(), policy);
 
-        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
         ASSERT_EQ(extended.at(0u), entity_type{42});
 
         set = std::move(extended);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());
-        ASSERT_TRUE(extended.empty());
+        ASSERT_TRUE(other.empty());    // NOLINT
+        ASSERT_TRUE(extended.empty()); // NOLINT
 
         ASSERT_EQ(set.policy(), policy);
-        ASSERT_EQ(other.policy(), policy);
-        ASSERT_EQ(extended.policy(), policy);
+        ASSERT_EQ(other.policy(), policy);    // NOLINT
+        ASSERT_EQ(extended.policy(), policy); // NOLINT
 
         ASSERT_EQ(set.at(0u), entity_type{42});
-        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null));
-        ASSERT_EQ(extended.at(0u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null));    // NOLINT
+        ASSERT_EQ(extended.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
 
         other = sparse_set_type{policy};
         other.push(entity_type{3});
         other = std::move(set);
 
-        ASSERT_TRUE(set.empty());
+        ASSERT_TRUE(set.empty()); // NOLINT
         ASSERT_FALSE(other.empty());
 
-        ASSERT_EQ(set.policy(), policy);
+        ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
         ASSERT_EQ(other.at(0u), entity_type{42});
     }
 }
@@ -934,7 +934,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
     using entity_type = typename sparse_set_type::entity_type;
 
     for(const auto policy: this->deletion_policy) {
-        sparse_set_type set{policy};
+        const sparse_set_type set{policy};
 
         // index works the same in all cases, test only once
         switch(policy) {
@@ -986,7 +986,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Indexing) {
     using sparse_set_type = entt::basic_sparse_set<typename TestFixture::type>;
 
     for(const auto policy: this->deletion_policy) {
-        sparse_set_type set{policy};
+        const sparse_set_type set{policy};
 
         // operator[] works the same in all cases, test only once
         switch(policy) {
@@ -1768,8 +1768,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Sort) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity{42};
-        entity_type other{3};
+        const entity_type entity{42};
+        const entity_type other{3};
 
         set.push(entity);
         set.push(other);
@@ -1828,8 +1828,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortN) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity{42};
-        entity_type other{3};
+        const entity_type entity{42};
+        const entity_type other{3};
 
         ASSERT_DEATH(set.sort_n(1u, std::less{}), "");
 
@@ -1860,7 +1860,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
     for(const auto policy: this->deletion_policy) {
         sparse_set_type lhs{policy};
-        sparse_set_type rhs{policy};
+        const sparse_set_type rhs{policy};
 
         entity_type lhs_entity[3u]{entity_type{3}, entity_type{12}, entity_type{42}};
 
@@ -1868,7 +1868,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
 
-        lhs.sort_as(rhs);
+        lhs.sort_as(rhs); // NOLINT
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
     }
@@ -1891,7 +1891,7 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        lhs.sort_as(rhs);
+        lhs.sort_as(rhs); // NOLINT
 
         auto begin = lhs.begin();
         auto end = lhs.end();
@@ -1920,7 +1920,7 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs);
+        rhs.sort_as(lhs); // NOLINT
 
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
     }
@@ -1943,7 +1943,7 @@ TYPED_TEST(SparseSet, SortAsReverse) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs);
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -1975,7 +1975,7 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs);
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2008,7 +2008,7 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs);
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2036,12 +2036,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             SUCCEED();
         } break;
         case entt::deletion_policy::in_place: {
-            entity_type entity{42};
+            const entity_type entity{42};
 
             lhs.push(entity);
             lhs.erase(entity);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), "");
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
         } break;
         case entt::deletion_policy::swap_only: {
             entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
@@ -2051,7 +2051,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             lhs.erase(entity[0u]);
             lhs.bump(entity[0u]);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), "");
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
         } break;
         }
     }
@@ -2082,7 +2082,7 @@ TYPED_TEST(SparseSet, CustomAllocator) {
     using entity_type = typename sparse_set_type::entity_type;
 
     for(const auto policy: this->deletion_policy) {
-        test::throwing_allocator<entity_type> allocator{};
+        const test::throwing_allocator<entity_type> allocator{};
         entt::basic_sparse_set<entity_type, test::throwing_allocator<entity_type>> set{policy, allocator};
 
         ASSERT_EQ(set.get_allocator(), allocator);
@@ -2096,17 +2096,17 @@ TYPED_TEST(SparseSet, CustomAllocator) {
 
         entt::basic_sparse_set<entity_type, test::throwing_allocator<entity_type>> other{std::move(set), allocator};
 
-        ASSERT_TRUE(set.empty());
+        ASSERT_TRUE(set.empty()); // NOLINT
         ASSERT_FALSE(other.empty());
-        ASSERT_EQ(set.capacity(), 0u);
+        ASSERT_EQ(set.capacity(), 0u); // NOLINT
         ASSERT_EQ(other.capacity(), 2u);
         ASSERT_EQ(other.size(), 2u);
 
         set = std::move(other);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());
-        ASSERT_EQ(other.capacity(), 0u);
+        ASSERT_TRUE(other.empty());      // NOLINT
+        ASSERT_EQ(other.capacity(), 0u); // NOLINT
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);
 
@@ -2114,8 +2114,8 @@ TYPED_TEST(SparseSet, CustomAllocator) {
         set = std::move(other);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());
-        ASSERT_EQ(other.capacity(), 0u);
+        ASSERT_TRUE(other.empty());      // NOLINT
+        ASSERT_EQ(other.capacity(), 0u); // NOLINT
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);
 

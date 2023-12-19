@@ -28,7 +28,7 @@ void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, en
 
 TEST(Organizer, EmplaceFreeFunction) {
     entt::organizer organizer;
-    entt::registry registry;
+    entt::registry registry; // NOLINT
 
     organizer.emplace<&ro_int_rw_char_double>("t1");
     organizer.emplace<&ro_char_rw_int>("t2");
@@ -84,7 +84,7 @@ TEST(Organizer, EmplaceFreeFunction) {
 
 TEST(Organizer, EmplaceMemberFunction) {
     entt::organizer organizer;
-    entt::registry registry;
+    entt::registry registry; // NOLINT
     clazz instance;
 
     organizer.emplace<&clazz::ro_int_char_double>(instance, "t1");
@@ -140,7 +140,7 @@ TEST(Organizer, EmplaceMemberFunction) {
 
 TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     entt::organizer organizer;
-    entt::registry registry;
+    entt::registry registry; // NOLINT
     clazz instance;
 
     organizer.emplace<&clazz::ro_int_char_double>(instance, "t1");
@@ -204,7 +204,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
 
 TEST(Organizer, EmplaceDirectFunction) {
     entt::organizer organizer;
-    entt::registry registry;
+    entt::registry registry; // NOLINT
     clazz instance;
 
     // no aggressive comdat
@@ -277,7 +277,7 @@ TEST(Organizer, EmplaceDirectFunction) {
 
 TEST(Organizer, SyncPoint) {
     entt::organizer organizer;
-    entt::registry registry;
+    entt::registry registry; // NOLINT
     clazz instance;
 
     organizer.emplace<&ro_int_double>("before");

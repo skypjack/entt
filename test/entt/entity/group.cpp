@@ -69,7 +69,7 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(group.capacity(), 0u);
 
-    decltype(group) invalid{};
+    const decltype(group) invalid{};
 
     ASSERT_TRUE(group);
     ASSERT_TRUE(cgroup);
@@ -175,7 +175,7 @@ TEST(NonOwningGroup, Empty) {
 
 TEST(NonOwningGroup, Each) {
     entt::registry registry;
-    entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()};
 
     auto group = registry.group(entt::get<int, char>);
     auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
@@ -319,7 +319,7 @@ TEST(NonOwningGroup, SortAsAPool) {
     }
 
     registry.sort<unsigned int>(std::less<unsigned int>{});
-    group.sort_as(*group.storage<unsigned int>());
+    group.sort_as(*group.storage<unsigned int>()); // NOLINT
 
     ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
     ASSERT_EQ((group.get<0, 1>(e1)), (std::make_tuple(1, 1u)));
@@ -820,7 +820,7 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_EQ(cgroup.rbegin(), cgroup.rend());
     ASSERT_TRUE(group.empty());
 
-    decltype(group) invalid{};
+    const decltype(group) invalid{};
 
     ASSERT_TRUE(group);
     ASSERT_TRUE(cgroup);
@@ -924,7 +924,7 @@ TEST(OwningGroup, Empty) {
 
 TEST(OwningGroup, Each) {
     entt::registry registry;
-    entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()};
 
     auto group = registry.group<int>(entt::get<char>);
     auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);

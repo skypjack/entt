@@ -199,7 +199,7 @@ TEST(Registry, ContextAsRef) {
     ASSERT_EQ(registry.ctx().get<int>(), 42);
     ASSERT_EQ(value, 42);
 
-    value = 3;
+    value = 3; // NOLINT
 
     ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 3);
 }
@@ -215,7 +215,7 @@ TEST(Registry, ContextAsConstRef) {
     ASSERT_NE(std::as_const(registry).ctx().find<const int>(), nullptr);
     ASSERT_EQ(registry.ctx().get<const int>(), 3);
 
-    value = 42;
+    value = 42; // NOLINT
 
     ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 42);
 }
@@ -1911,7 +1911,7 @@ TEST(Registry, TryGet) {
 }
 
 TEST(Registry, Constness) {
-    entt::registry registry;
+    entt::registry registry; // NOLINT
 
     testing::StaticAssertTypeEq<decltype(registry.emplace<int>({})), int &>();
     testing::StaticAssertTypeEq<decltype(registry.emplace<test::empty>({})), void>();
@@ -2229,7 +2229,7 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     auto proxy = registry.storage();
     auto cproxy = std::as_const(registry).storage();
 
-    typename decltype(proxy)::iterator it = proxy.begin();
+    const typename decltype(proxy)::iterator it = proxy.begin();
     typename decltype(cproxy)::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>();

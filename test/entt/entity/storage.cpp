@@ -97,31 +97,31 @@ TYPED_TEST(Storage, Move) {
 
     pool.emplace(entt::entity{3}, 3);
 
-    ASSERT_TRUE(std::is_move_constructible_v<decltype(pool)>);
-    ASSERT_TRUE(std::is_move_assignable_v<decltype(pool)>);
+    static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
+    static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
 
     entt::storage<value_type> other{std::move(pool)};
 
-    ASSERT_TRUE(pool.empty());
+    ASSERT_TRUE(pool.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
     ASSERT_EQ(other.at(0u), entt::entity{3});
 
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
 
-    ASSERT_TRUE(other.empty());
+    ASSERT_TRUE(other.empty()); // NOLINT
     ASSERT_FALSE(extended.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
     ASSERT_EQ(extended.at(0u), entt::entity{3});
 
     ASSERT_EQ(extended.get(entt::entity{3}), value_type{3});
@@ -129,16 +129,16 @@ TYPED_TEST(Storage, Move) {
     pool = std::move(extended);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());
-    ASSERT_TRUE(extended.empty());
+    ASSERT_TRUE(other.empty());    // NOLINT
+    ASSERT_TRUE(extended.empty()); // NOLINT
 
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
-    ASSERT_EQ(extended.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());    // NOLINT
+    ASSERT_EQ(extended.type(), entt::type_id<value_type>()); // NOLINT
 
     ASSERT_EQ(pool.at(0u), entt::entity{3});
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));
-    ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));    // NOLINT
+    ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
 
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
 
@@ -146,13 +146,13 @@ TYPED_TEST(Storage, Move) {
     other.emplace(entt::entity{42}, 42);
     other = std::move(pool);
 
-    ASSERT_TRUE(pool.empty());
+    ASSERT_TRUE(pool.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
     ASSERT_EQ(other.at(0u), entt::entity{3});
 
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
@@ -508,7 +508,7 @@ TYPED_TEST(Storage, IteratorConversion) {
 
     pool.emplace(entt::entity{3}, 42);
 
-    typename entt::storage<value_type>::iterator it = pool.begin();
+    const typename entt::storage<value_type>::iterator it = pool.begin();
     typename entt::storage<value_type>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), value_type &>();
@@ -614,7 +614,7 @@ TEST(Storage, EmplaceAggregate) {
 TEST(Storage, EmplaceSelfMoveSupport) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
-    entt::entity entity{42};
+    const entt::entity entity{42};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
 
@@ -627,7 +627,7 @@ TEST(Storage, EmplaceSelfMoveSupport) {
 TEST(Storage, EmplaceSelfMoveSupportInPlaceDelete) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<char>> pool;
-    entt::entity entity{42};
+    const entt::entity entity{42};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
 
@@ -779,7 +779,7 @@ TYPED_TEST(Storage, Patch) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity{42};
+    const entt::entity entity{42};
 
     auto callback = [](auto &&elem) {
         if constexpr(std::is_class_v<std::remove_reference_t<decltype(elem)>>) {
@@ -901,7 +901,7 @@ TYPED_TEST(Storage, CrossErase) {
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
 
     pool.emplace(entity[0u], 3);
     pool.emplace(entity[1u], 42);
@@ -961,7 +961,7 @@ TYPED_TEST(Storage, CrossRemove) {
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
 
     pool.emplace(entity[0u], 3);
     pool.emplace(entity[1u], 42);
@@ -1076,7 +1076,7 @@ TYPED_TEST(Storage, Iterable) {
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
+    const entt::sparse_set &base = pool;
 
     pool.emplace(entt::entity{1}, 99);
     pool.emplace(entt::entity{3}, 42);
@@ -1123,7 +1123,7 @@ TYPED_TEST(Storage, ConstIterable) {
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
+    const entt::sparse_set &base = pool;
 
     pool.emplace(entt::entity{1}, 99);
     pool.emplace(entt::entity{3}, 42);
@@ -1167,7 +1167,7 @@ TYPED_TEST(Storage, IterableIteratorConversion) {
 
     pool.emplace(entt::entity{3}, 42);
 
-    typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
+    const typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
     typename entt::storage<value_type>::const_iterable::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity, value_type &>>();
@@ -1198,7 +1198,7 @@ TYPED_TEST(Storage, ReverseIterable) {
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
+    const entt::sparse_set &base = pool;
 
     pool.emplace(entt::entity{1}, 99);
     pool.emplace(entt::entity{3}, 42);
@@ -1245,7 +1245,7 @@ TYPED_TEST(Storage, ConstReverseIterable) {
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
     entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
+    const entt::sparse_set &base = pool;
 
     pool.emplace(entt::entity{1}, 99);
     pool.emplace(entt::entity{3}, 42);
@@ -1289,7 +1289,7 @@ TYPED_TEST(Storage, ReverseIterableIteratorConversion) {
 
     pool.emplace(entt::entity{3}, 42);
 
-    typename entt::storage<value_type>::reverse_iterable::iterator it = pool.reach().begin();
+    const typename entt::storage<value_type>::reverse_iterable::iterator it = pool.reach().begin();
     typename entt::storage<value_type>::const_reverse_iterable::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity, value_type &>>();
@@ -1411,7 +1411,7 @@ TYPED_TEST(Storage, SortN) {
 TYPED_TEST(Storage, SortAsDisjoint) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> lhs;
-    entt::storage<value_type> rhs;
+    const entt::storage<value_type> rhs;
 
     entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
     value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};
@@ -1579,14 +1579,14 @@ TEST(Storage, MoveOnlyComponent) {
     static_assert(!std::is_copy_assignable_v<value_type>, "Copy assignable types not allowed");
     static_assert(std::is_move_assignable_v<value_type>, "Move assignable type required");
     // the purpose is to ensure that move only components are always accepted
-    [[maybe_unused]] entt::storage<value_type> pool;
+    [[maybe_unused]] const entt::storage<value_type> pool;
 }
 
 TEST(Storage, NonMovableComponent) {
     using value_type = std::pair<const int, const int>;
     static_assert(!std::is_move_assignable_v<value_type>, "Move assignable types not allowed");
     // the purpose is to ensure that non-movable components are always accepted
-    [[maybe_unused]] entt::storage<value_type> pool;
+    [[maybe_unused]] const entt::storage<value_type> pool;
 }
 
 ENTT_DEBUG_TEST(StorageDeathTest, NonMovableComponent) {
@@ -1695,7 +1695,7 @@ TEST(Storage, CreateFromConstructor) {
 
 TYPED_TEST(Storage, CustomAllocator) {
     using value_type = typename TestFixture::type;
-    test::throwing_allocator<entt::entity> allocator{};
+    const test::throwing_allocator<entt::entity> allocator{};
     entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>> pool{allocator};
 
     pool.reserve(1u);
@@ -1707,17 +1707,17 @@ TYPED_TEST(Storage, CustomAllocator) {
 
     decltype(pool) other{std::move(pool), allocator};
 
-    ASSERT_TRUE(pool.empty());
+    ASSERT_TRUE(pool.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(pool.capacity(), 0u);
+    ASSERT_EQ(pool.capacity(), 0u); // NOLINT
     ASSERT_NE(other.capacity(), 0u);
     ASSERT_EQ(other.size(), 2u);
 
     pool = std::move(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());
-    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_TRUE(other.empty());      // NOLINT
+    ASSERT_EQ(other.capacity(), 0u); // NOLINT
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
@@ -1725,8 +1725,8 @@ TYPED_TEST(Storage, CustomAllocator) {
     pool = std::move(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());
-    ASSERT_EQ(other.capacity(), 0u);
+    ASSERT_TRUE(other.empty());      // NOLINT
+    ASSERT_EQ(other.capacity(), 0u); // NOLINT
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 

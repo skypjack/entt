@@ -36,7 +36,7 @@ TYPED_TEST(BasicHandle, Construction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    handle_type handle{registry, entity};
+    const handle_type handle{registry, entity};
 
     ASSERT_FALSE(entt::null == handle.entity());
     ASSERT_EQ(entity, handle);
@@ -146,7 +146,7 @@ TYPED_TEST(BasicHandle, Comparison) {
 
     entt::registry diff;
     handle = {registry, entity};
-    handle_type other = {diff, diff.create()};
+    const handle_type other = {diff, diff.create()};
 
     ASSERT_NE(handle, other);
     ASSERT_FALSE(other == handle);
@@ -158,7 +158,7 @@ TYPED_TEST(BasicHandle, Comparison) {
 TEST(BasicHandle, Component) {
     entt::registry registry;
     const auto entity = registry.create();
-    entt::handle_view<int, char, double> handle{registry, entity};
+    const entt::handle_view<int, char, double> handle{registry, entity};
 
     ASSERT_EQ(3, handle.emplace<int>(3));
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
@@ -208,7 +208,7 @@ TYPED_TEST(BasicHandle, FromEntity) {
     registry.emplace<int>(entity, 42);
     registry.emplace<char>(entity, 'c');
 
-    handle_type handle{registry, entity};
+    const handle_type handle{registry, entity};
 
     ASSERT_TRUE(handle);
     ASSERT_EQ(entity, handle.entity());
@@ -256,7 +256,7 @@ TYPED_TEST(BasicHandle, Storage) {
 
     entt::registry registry;
     const auto entity = registry.create();
-    handle_type handle{registry, entity};
+    const handle_type handle{registry, entity};
 
     testing::StaticAssertTypeEq<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::constness_as_t<entt::sparse_set, typename handle_type::registry_type> &>>();
 
@@ -281,7 +281,7 @@ TYPED_TEST(BasicHandle, HandleStorageIterator) {
     // required to test the find-first initialization step
     registry.storage<entt::entity>().erase(entity);
 
-    handle_type handle{registry, entity};
+    const handle_type handle{registry, entity};
     auto iterable = handle.storage();
 
     ASSERT_FALSE(registry.valid(entity));

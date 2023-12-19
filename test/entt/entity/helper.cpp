@@ -112,8 +112,8 @@ TYPED_TEST(ToEntityDeprecated, Functionalities) {
     constexpr auto page_size = entt::storage_type_t<value_type>::traits_type::page_size;
     const value_type value{42};
 
-    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null);
-    ASSERT_EQ(entt::to_entity(registry, value), null);
+    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
+    ASSERT_EQ(entt::to_entity(registry, value), null);          // NOLINT
 
     const auto entity = registry.create();
     auto &&storage = registry.storage<value_type>();
@@ -129,21 +129,21 @@ TYPED_TEST(ToEntityDeprecated, Functionalities) {
     registry.emplace<value_type>(other);
     registry.emplace<value_type>(next);
 
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity);
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(other)), other);
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(next)), next);
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity); // NOLINT
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(other)), other);   // NOLINT
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(next)), next);     // NOLINT
 
     ASSERT_EQ(&registry.get<value_type>(entity) + page_size - (1u + traits_type::in_place_delete), &registry.get<value_type>(other));
 
     registry.destroy(other);
 
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity);
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(next)), next);
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity); // NOLINT
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(next)), next);     // NOLINT
 
     ASSERT_EQ(&registry.get<value_type>(entity) + page_size - 1u, &registry.get<value_type>(next));
 
-    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null);
-    ASSERT_EQ(entt::to_entity(registry, value), null);
+    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
+    ASSERT_EQ(entt::to_entity(registry, value), null);          // NOLINT
 }
 
 TEST(SighHelper, Functionalities) {

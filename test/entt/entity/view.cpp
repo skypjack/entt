@@ -61,7 +61,7 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(view.rbegin(), view.rend());
     ASSERT_TRUE(view.empty());
 
-    decltype(view) invalid{};
+    const decltype(view) invalid{};
 
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
@@ -107,9 +107,9 @@ TEST(SingleComponentView, InvalidView) {
 TEST(SingleComponentView, Constructors) {
     entt::storage<int> storage{};
 
-    entt::view<entt::get_t<int>> invalid{};
-    entt::basic_view from_storage{storage};
-    entt::basic_view from_tuple{std::forward_as_tuple(storage)};
+    const entt::view<entt::get_t<int>> invalid{};
+    const entt::basic_view from_storage{storage};
+    const entt::basic_view from_tuple{std::forward_as_tuple(storage)};
 
     ASSERT_FALSE(invalid);
     ASSERT_TRUE(from_storage);
@@ -210,7 +210,7 @@ TEST(SingleComponentView, Empty) {
 
 TEST(SingleComponentView, Each) {
     entt::registry registry;
-    entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()};
 
     auto view = registry.view<int>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int>();
@@ -418,9 +418,9 @@ TEST(SingleComponentView, FrontBack) {
 }
 
 TEST(SingleComponentView, DeductionGuide) {
-    entt::registry registry;
-    entt::storage_type_t<int> istorage;
-    entt::storage_type_t<test::pointer_stable> sstorage;
+    entt::registry registry;                             // NOLINT
+    entt::storage_type_t<int> istorage;                  // NOLINT
+    entt::storage_type_t<test::pointer_stable> sstorage; // NOLINT
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage)})>();
@@ -636,7 +636,7 @@ TEST(MultiComponentView, Functionalities) {
         ASSERT_EQ(cview.get<1u>(entity), '2');
     }
 
-    decltype(view) invalid{};
+    const decltype(view) invalid{};
 
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
@@ -686,9 +686,9 @@ TEST(MultiComponentView, InvalidView) {
 TEST(MultiComponentView, Constructors) {
     entt::storage<int> storage{};
 
-    entt::view<entt::get_t<int, int>> invalid{};
-    entt::basic_view from_storage{storage, storage};
-    entt::basic_view from_tuple{std::forward_as_tuple(storage, storage)};
+    const entt::view<entt::get_t<int, int>> invalid{};
+    const entt::basic_view from_storage{storage, storage};
+    const entt::basic_view from_tuple{std::forward_as_tuple(storage, storage)};
 
     ASSERT_FALSE(invalid);
     ASSERT_TRUE(from_storage);
@@ -854,7 +854,7 @@ TEST(MultiComponentView, SizeHint) {
 
 TEST(MultiComponentView, UseAndRefresh) {
     entt::registry registry;
-    entt::entity entity[3]{registry.create(), registry.create(), registry.create()};
+    const entt::entity entity[3]{registry.create(), registry.create(), registry.create()};
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<int>(entity[1u]);
@@ -884,7 +884,7 @@ TEST(MultiComponentView, UseAndRefresh) {
 
 TEST(MultiComponentView, Each) {
     entt::registry registry;
-    entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()};
 
     auto view = registry.view<int, char>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int, const char>();
@@ -1259,10 +1259,9 @@ TEST(MultiComponentView, ExtendedGet) {
 }
 
 TEST(MultiComponentView, DeductionGuide) {
-    entt::registry registry;
-    entt::storage_type_t<int> istorage;
-    entt::storage_type_t<double> dstorage;
-    entt::storage_type_t<test::pointer_stable> sstorage;
+    entt::storage_type_t<int> istorage;                  // NOLINT
+    entt::storage_type_t<double> dstorage;               // NOLINT
+    entt::storage_type_t<test::pointer_stable> sstorage; // NOLINT
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{istorage, dstorage})>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage_type_t<int>, entt::storage_type_t<double>>, entt::exclude_t<>>, decltype(entt::basic_view{std::as_const(istorage), dstorage})>();
