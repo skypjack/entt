@@ -48,13 +48,12 @@ struct Scheduler: ::testing::Test {
 
 TEST_F(Scheduler, Functionalities) {
     entt::scheduler scheduler{};
-    entt::scheduler other{};
 
     bool updated = false;
     bool aborted = false;
 
-    ASSERT_NO_FATAL_FAILURE(entt::scheduler{std::move(scheduler)});
-    ASSERT_NO_FATAL_FAILURE(scheduler = std::move(other));
+    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] const entt::scheduler other{entt::scheduler{}});
+    ASSERT_NO_FATAL_FAILURE(scheduler = entt::scheduler{});
 
     ASSERT_EQ(scheduler.size(), 0u);
     ASSERT_TRUE(scheduler.empty());
@@ -185,14 +184,14 @@ TEST_F(Scheduler, SpawningProcess) {
 }
 
 TEST_F(Scheduler, CustomAllocator) {
-    std::allocator<void> allocator{};
+    const std::allocator<void> allocator{};
     entt::scheduler scheduler{allocator};
 
     ASSERT_EQ(scheduler.get_allocator(), allocator);
     ASSERT_FALSE(scheduler.get_allocator() != allocator);
 
     scheduler.attach([](auto &&...) {});
-    decltype(scheduler) other{std::move(scheduler), allocator};
+    const decltype(scheduler) other{std::move(scheduler), allocator};
 
     ASSERT_EQ(other.size(), 1u);
 }
