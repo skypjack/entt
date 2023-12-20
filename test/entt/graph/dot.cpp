@@ -55,7 +55,7 @@ TEST(Dot, CustomWriter) {
         }
     });
 
-    const std::string expected = "digraph{0[label=\"v0\",shape=\"box\"];1[label=\"v1\"];2[label=\"v2\"];0->1;0->2;1->2;}";
+    const std::string expected = R"(digraph{0[label="v0",shape="box"];1[label="v1"];2[label="v2"];0->1;0->2;1->2;})";
     const auto str = output.str();
 
     ASSERT_FALSE(str.empty());
