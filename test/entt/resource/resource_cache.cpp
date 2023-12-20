@@ -376,8 +376,8 @@ TEST(ResourceCache, Indexing) {
     cache.load("resource"_hs, 99);
 
     ASSERT_TRUE(cache.contains("resource"_hs));
-    ASSERT_EQ(cache[std::move("resource"_hs)], 99);
     ASSERT_EQ(std::as_const(cache)["resource"_hs], 99);
+    ASSERT_EQ(cache["resource"_hs], 99);
 }
 
 TEST(ResourceCache, LoaderDispatching) {

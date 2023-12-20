@@ -47,7 +47,7 @@ TEST(TypeInfo, Functionalities) {
     static_assert(std::is_copy_assignable_v<entt::type_info>, "Copy assignable type required");
     static_assert(std::is_move_assignable_v<entt::type_info>, "Move assignable type required");
 
-    entt::type_info info{std::in_place_type<int>};
+    const entt::type_info info{std::in_place_type<int>};
     entt::type_info other{std::in_place_type<void>};
 
     ASSERT_EQ(info, entt::type_info{std::in_place_type<int &>});
@@ -63,12 +63,6 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
 
     other = info;
-
-    ASSERT_EQ(other.index(), entt::type_index<int>::value());
-    ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
-    ASSERT_EQ(other.name(), entt::type_name<int>::value());
-
-    other = std::move(info);
 
     ASSERT_EQ(other.index(), entt::type_index<int>::value());
     ASSERT_EQ(other.hash(), entt::type_hash<int>::value());

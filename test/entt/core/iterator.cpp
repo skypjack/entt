@@ -6,11 +6,12 @@
 #include "../common/boxed_int.h"
 
 TEST(InputIteratorPointer, Functionalities) {
-    test::boxed_int instance{};
-    entt::input_iterator_pointer ptr{std::move(instance)};
+    entt::input_iterator_pointer ptr{test::boxed_int{0}};
+
+    ASSERT_EQ(ptr->value, 0);
+
     ptr->value = 42;
 
-    ASSERT_EQ(instance.value, 0); // NOLINT
     ASSERT_EQ(ptr->value, 42);
     ASSERT_EQ(ptr->value, (*ptr).value);
     ASSERT_EQ(ptr.operator->(), &ptr.operator*());
