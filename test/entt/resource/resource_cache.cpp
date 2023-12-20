@@ -286,7 +286,7 @@ TEST(ResourceCache, Load) {
 
     entt::resource_cache<int> cache;
     typename entt::resource_cache<int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(cache.empty());
     ASSERT_EQ(cache.size(), 0u);

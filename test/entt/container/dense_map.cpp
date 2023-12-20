@@ -309,7 +309,7 @@ TEST(DenseMap, IteratorConversion) {
 TEST(DenseMap, Insert) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(map.empty());
     ASSERT_EQ(map.size(), 0u);
@@ -442,7 +442,7 @@ TEST(DenseMap, InsertSameBucket) {
 TEST(DenseMap, InsertOrAssign) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(map.empty());
     ASSERT_EQ(map.size(), 0u);
@@ -505,7 +505,7 @@ TEST(DenseMap, InsertOrAssign) {
 TEST(DenseMap, Emplace) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(map.empty());
     ASSERT_EQ(map.size(), 0u);
@@ -646,7 +646,7 @@ TEST(DenseMap, EmplaceSameBucket) {
 TEST(DenseMap, TryEmplace) {
     entt::dense_map<int, int> map;
     typename entt::dense_map<int, int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(map.empty());
     ASSERT_EQ(map.size(), 0u);

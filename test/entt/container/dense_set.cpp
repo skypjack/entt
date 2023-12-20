@@ -405,7 +405,7 @@ TEST(DenseSet, IteratorConversion) {
 TEST(DenseSet, Insert) {
     entt::dense_set<int> set;
     typename entt::dense_set<int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
@@ -507,7 +507,7 @@ TEST(DenseSet, InsertSameBucket) {
 TEST(DenseSet, Emplace) {
     entt::dense_set<int> set;
     typename entt::dense_set<int>::iterator it;
-    bool result;
+    bool result{};
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
