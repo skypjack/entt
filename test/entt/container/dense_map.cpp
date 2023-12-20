@@ -1156,7 +1156,7 @@ TEST(DenseMap, Reserve) {
 TEST(DenseMap, ThrowingAllocator) {
     constexpr std::size_t minimum_bucket_count = 8u;
     using allocator = test::throwing_allocator<std::pair<const std::size_t, std::size_t>>;
-    entt::dense_map<std::size_t, std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> map{};
+    entt::dense_map<std::size_t, std::size_t, std::hash<std::size_t>, std::equal_to<>, allocator> map{};
 
     map.get_allocator().throw_counter<entt::internal::dense_map_node<std::size_t, std::size_t>>(0u);
 
@@ -1187,7 +1187,7 @@ TEST(DenseMap, NoUsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<std::pair<const int, int>>;
 
     test::tracked_memory_resource memory_resource{};
-    entt::dense_map<int, int, std::hash<int>, std::equal_to<int>, allocator> map{&memory_resource};
+    entt::dense_map<int, int, std::hash<int>, std::equal_to<>, allocator> map{&memory_resource};
 
     map.reserve(1u);
     memory_resource.reset();
@@ -1203,7 +1203,7 @@ TEST(DenseMap, KeyUsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<std::pair<const string_type, int>>;
 
     test::tracked_memory_resource memory_resource{};
-    entt::dense_map<string_type, int, std::hash<string_type>, std::equal_to<string_type>, allocator> map{&memory_resource};
+    entt::dense_map<string_type, int, std::hash<string_type>, std::equal_to<>, allocator> map{&memory_resource};
 
     map.reserve(1u);
     memory_resource.reset();
@@ -1226,7 +1226,7 @@ TEST(DenseMap, ValueUsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<std::pair<const int, string_type>>;
 
     test::tracked_memory_resource memory_resource{};
-    entt::dense_map<int, string_type, std::hash<int>, std::equal_to<int>, allocator> map{std::pmr::get_default_resource()};
+    entt::dense_map<int, string_type, std::hash<int>, std::equal_to<>, allocator> map{std::pmr::get_default_resource()};
 
     map.reserve(1u);
     memory_resource.reset();

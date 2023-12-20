@@ -980,7 +980,7 @@ TEST(DenseSet, Reserve) {
 TEST(DenseSet, ThrowingAllocator) {
     constexpr std::size_t minimum_bucket_count = 8u;
     using allocator = test::throwing_allocator<std::size_t>;
-    entt::dense_set<std::size_t, std::hash<std::size_t>, std::equal_to<std::size_t>, allocator> set{};
+    entt::dense_set<std::size_t, std::hash<std::size_t>, std::equal_to<>, allocator> set{};
 
     set.get_allocator().throw_counter<std::pair<std::size_t, std::size_t>>(0u);
 
@@ -1011,7 +1011,7 @@ TEST(DenseSet, NoUsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<int>;
 
     test::tracked_memory_resource memory_resource{};
-    entt::dense_set<int, std::hash<int>, std::equal_to<int>, allocator> set{&memory_resource};
+    entt::dense_set<int, std::hash<int>, std::equal_to<>, allocator> set{&memory_resource};
 
     set.reserve(1u);
     memory_resource.reset();
@@ -1027,7 +1027,7 @@ TEST(DenseSet, UsesAllocatorConstruction) {
     using allocator = std::pmr::polymorphic_allocator<string_type>;
 
     test::tracked_memory_resource memory_resource{};
-    entt::dense_set<string_type, std::hash<string_type>, std::equal_to<string_type>, allocator> set{&memory_resource};
+    entt::dense_set<string_type, std::hash<string_type>, std::equal_to<>, allocator> set{&memory_resource};
 
     set.reserve(1u);
     memory_resource.reset();
