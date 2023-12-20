@@ -719,10 +719,11 @@ TEST_F(MetaAny, VoidInPlaceTypeConstruction) {
 
 TEST_F(MetaAny, VoidCopyConstruction) {
     const entt::meta_any any{std::in_place_type<void>};
-    const entt::meta_any other{any};
+    entt::meta_any other{any};
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
@@ -735,6 +736,7 @@ TEST_F(MetaAny, VoidCopyAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
+    ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
