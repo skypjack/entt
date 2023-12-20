@@ -22,9 +22,13 @@ struct entt::entt_traits<my_entity>: entt::basic_entt_traits<custom_entity_trait
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
-static bool is_disabled(const my_entity entity) {
+namespace {
+
+[[nodiscard]] bool is_disabled(const my_entity entity) {
     return ((entity & my_entity::disabled) == my_entity::disabled);
 }
+
+} // namespace
 
 TEST(Example, DisabledEntity) {
     entt::basic_registry<my_entity> registry{};

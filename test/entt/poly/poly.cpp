@@ -45,9 +45,13 @@ struct common_members {
     }
 };
 
-static int absolutely_random() {
+namespace {
+
+[[nodiscard]] int absolutely_random() {
     return 42;
 }
+
+} // namespace
 
 template<typename Type>
 using common_impl = entt::value_list<
