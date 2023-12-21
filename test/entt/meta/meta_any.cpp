@@ -1357,7 +1357,7 @@ TEST_F(MetaAny, ForwardAsMeta) {
     int value = 42;
     auto ref = entt::forward_as_meta(value);
     auto cref = entt::forward_as_meta(std::as_const(value));
-    auto any = entt::forward_as_meta(int{value});
+    auto any = entt::forward_as_meta(static_cast<int &&>(value));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(ref);
