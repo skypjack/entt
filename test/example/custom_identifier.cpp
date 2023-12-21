@@ -10,13 +10,8 @@ struct entity_id {
     constexpr entity_id(entity_type value = null) noexcept
         : entt{value} {}
 
-    constexpr entity_id(const entity_id &other) noexcept
-        : entt{other.entt} {}
-
-    constexpr entity_id &operator=(const entity_id &other) noexcept {
-        entt = other.entt;
-        return *this;
-    }
+    constexpr entity_id(const entity_id &other) noexcept = default;
+    constexpr entity_id &operator=(const entity_id &other) noexcept = default;
 
     constexpr operator entity_type() const noexcept {
         return entt;

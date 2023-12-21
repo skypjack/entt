@@ -12,7 +12,7 @@
 #include "../common/config.h"
 
 struct base_t {
-    base_t() {}
+    base_t() = default;
     virtual ~base_t() = default;
 
     static void destroy(base_t &) {

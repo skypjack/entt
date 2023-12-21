@@ -26,7 +26,7 @@ struct base_t {
 };
 
 struct derived_t: base_t {
-    derived_t() {}
+    derived_t() = default;
 };
 
 struct clazz_t {
