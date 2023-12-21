@@ -11,10 +11,7 @@
 #include <entt/meta/resolve.hpp>
 
 struct base_t {
-    base_t()
-        : value{'c'} {}
-
-    char value;
+    char value{'c'};
 };
 
 struct derived_t: base_t {

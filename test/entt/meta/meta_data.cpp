@@ -30,11 +30,6 @@ struct derived_t: base_t {
 };
 
 struct clazz_t {
-    clazz_t()
-        : i{0},
-          j{1},
-          base{} {}
-
     operator int() const {
         return h;
     }
@@ -47,9 +42,6 @@ struct clazz_t {
 };
 
 struct setter_getter_t {
-    setter_getter_t()
-        : value{0} {}
-
     int setter(double val) {
         return value = static_cast<int>(val);
     }
@@ -74,13 +66,10 @@ struct setter_getter_t {
         return type.value;
     }
 
-    int value;
+    int value{0};
 };
 
 struct multi_setter_t {
-    multi_setter_t()
-        : value{0} {}
-
     void from_double(double val) {
         value = static_cast<int>(val);
     }
@@ -89,7 +78,7 @@ struct multi_setter_t {
         value = std::atoi(val);
     }
 
-    int value;
+    int value{0};
 };
 
 struct array_t {

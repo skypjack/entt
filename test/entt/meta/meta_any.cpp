@@ -11,9 +11,6 @@
 #include "../common/non_comparable.h"
 
 struct clazz_t {
-    clazz_t()
-        : value{0} {}
-
     void member(int i) {
         value = i;
     }
@@ -27,7 +24,7 @@ struct clazz_t {
     }
 
     inline static char c = 'c';
-    int value;
+    int value{0};
 };
 
 struct empty_t {

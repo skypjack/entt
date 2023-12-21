@@ -9,13 +9,6 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
     using process_type = entt::process<fake_process<Delta>, Delta>;
     using delta_type = typename process_type::delta_type;
 
-    fake_process()
-        : init_invoked{false},
-          update_invoked{false},
-          succeeded_invoked{false},
-          failed_invoked{false},
-          aborted_invoked{false} {}
-
     void succeed() noexcept {
         process_type::succeed();
     }
@@ -56,11 +49,11 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
         update_invoked = true;
     }
 
-    bool init_invoked;
-    bool update_invoked;
-    bool succeeded_invoked;
-    bool failed_invoked;
-    bool aborted_invoked;
+    bool init_invoked{};
+    bool update_invoked{};
+    bool succeeded_invoked{};
+    bool failed_invoked{};
+    bool aborted_invoked{};
 };
 
 TEST(Process, Basics) {
