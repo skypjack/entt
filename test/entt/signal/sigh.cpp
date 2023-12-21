@@ -9,20 +9,20 @@ struct sigh_listener {
     }
 
     [[nodiscard]] bool g(int) {
-        k = !k;
+        val = !val;
         return true;
     }
 
     [[nodiscard]] bool h(const int &) {
-        return k;
+        return val;
     }
 
     // useless definition just because msvc does weird things if both are empty
-    void l() {
-        k = true && k;
+    void i() {
+        val = true && val;
     }
 
-    bool k{false};
+    bool val{false};
 };
 
 struct const_nonconst_noexcept {
@@ -165,14 +165,14 @@ TEST(SigH, Members) {
     sink.connect<&sigh_listener::g>(l1);
     sigh.publish(42);
 
-    ASSERT_TRUE(l1.k);
+    ASSERT_TRUE(l1.val);
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(1u, sigh.size());
 
     sink.disconnect<&sigh_listener::g>(l1);
     sigh.publish(42);
 
-    ASSERT_TRUE(l1.k);
+    ASSERT_TRUE(l1.val);
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(0u, sigh.size());
 
@@ -204,11 +204,11 @@ TEST(SigH, Collector) {
 
     auto no_return = [&listener, &cnt](bool value) {
         ASSERT_TRUE(value);
-        listener.k = true;
+        listener.val = true;
         ++cnt;
     };
 
-    listener.k = true;
+    listener.val = true;
     sigh.collect(std::move(no_return), 42);
 
     ASSERT_FALSE(sigh.empty());
@@ -273,20 +273,20 @@ TEST(SigH, ScopedConnection) {
     entt::sink sink{sigh};
 
     {
-        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(listener.val);
 
         const entt::scoped_connection conn = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
-        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(listener.val);
         ASSERT_TRUE(conn);
     }
 
     sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_TRUE(listener.k);
+    ASSERT_TRUE(listener.val);
 }
 
 TEST(SigH, ScopedConnectionMove) {
@@ -302,13 +302,13 @@ TEST(SigH, ScopedConnectionMove) {
     {
         const entt::scoped_connection inner{std::move(outer)};
 
-        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(listener.val);
         ASSERT_FALSE(outer); // NOLINT
         ASSERT_TRUE(inner);
 
         sigh.publish(42);
 
-        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(listener.val);
     }
 
     ASSERT_TRUE(sigh.empty());
@@ -321,7 +321,7 @@ TEST(SigH, ScopedConnectionMove) {
     {
         entt::scoped_connection inner{};
 
-        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(listener.val);
         ASSERT_TRUE(outer);
         ASSERT_FALSE(inner);
 
@@ -332,7 +332,7 @@ TEST(SigH, ScopedConnectionMove) {
 
         sigh.publish(42);
 
-        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(listener.val);
     }
 
     ASSERT_TRUE(sigh.empty());
@@ -347,14 +347,14 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         entt::scoped_connection inner{};
 
         ASSERT_TRUE(sigh.empty());
-        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(listener.val);
         ASSERT_FALSE(inner);
 
         inner = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
-        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(listener.val);
         ASSERT_TRUE(inner);
 
         inner.release();
@@ -367,14 +367,14 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
-        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(listener.val);
         ASSERT_TRUE(inner);
     }
 
     sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_FALSE(listener.k);
+    ASSERT_FALSE(listener.val);
 }
 
 TEST(SigH, ConstNonConstNoExcept) {
@@ -407,12 +407,12 @@ TEST(SigH, UnboundDataMember) {
     entt::sigh<bool &(sigh_listener &)> sigh;
     entt::sink sink{sigh};
 
-    ASSERT_FALSE(listener.k);
+    ASSERT_FALSE(listener.val);
 
-    sink.connect<&sigh_listener::k>();
+    sink.connect<&sigh_listener::val>();
     sigh.collect([](bool &value) { value = !value; }, listener);
 
-    ASSERT_TRUE(listener.k);
+    ASSERT_TRUE(listener.val);
 }
 
 TEST(SigH, UnboundMemberFunction) {
@@ -420,12 +420,12 @@ TEST(SigH, UnboundMemberFunction) {
     entt::sigh<void(sigh_listener *, int)> sigh;
     entt::sink sink{sigh};
 
-    ASSERT_FALSE(listener.k);
+    ASSERT_FALSE(listener.val);
 
     sink.connect<&sigh_listener::g>();
     sigh.publish(&listener, 42);
 
-    ASSERT_TRUE(listener.k);
+    ASSERT_TRUE(listener.val);
 }
 
 TEST(SigH, ConnectAndAutoDisconnect) {
@@ -437,19 +437,19 @@ TEST(SigH, ConnectAndAutoDisconnect) {
     sink.connect<&sigh_listener::g>(listener);
     sink.connect<&connect_and_auto_disconnect>(sigh);
 
-    ASSERT_FALSE(listener.k);
+    ASSERT_FALSE(listener.val);
     ASSERT_EQ(sigh.size(), 2u);
     ASSERT_EQ(v, 0);
 
     sigh.publish(v);
 
-    ASSERT_TRUE(listener.k);
+    ASSERT_TRUE(listener.val);
     ASSERT_EQ(sigh.size(), 2u);
     ASSERT_EQ(v, 0);
 
     sigh.publish(v);
 
-    ASSERT_FALSE(listener.k);
+    ASSERT_FALSE(listener.val);
     ASSERT_EQ(sigh.size(), 2u);
     ASSERT_EQ(v, 42);
 }
