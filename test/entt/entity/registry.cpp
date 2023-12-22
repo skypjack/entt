@@ -66,6 +66,9 @@ struct destruction_order {
         *ctx_check = (registry->ctx().find<ctx_check_type>() != nullptr);
     }
 
+    destruction_order(const destruction_order &) = default;
+    destruction_order &operator=(const destruction_order &) = default;
+
     ~destruction_order() {
         *ctx_check = *ctx_check && (registry->ctx().find<ctx_check_type>() != nullptr);
     }

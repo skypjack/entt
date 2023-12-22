@@ -24,6 +24,9 @@ struct update_from_destructor {
         : storage{&ref},
           target{other} {}
 
+    update_from_destructor(const update_from_destructor &) = default;
+    update_from_destructor &operator=(const update_from_destructor &) = default;
+
     update_from_destructor(update_from_destructor &&other) noexcept
         : storage{std::exchange(other.storage, nullptr)},
           target{std::exchange(other.target, entt::null)} {}

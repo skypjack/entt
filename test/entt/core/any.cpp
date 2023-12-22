@@ -16,6 +16,9 @@
 #include "../common/non_movable.h"
 
 struct empty {
+    empty(const empty &) = default;
+    empty &operator=(const empty &) = default;
+
     ~empty() {
         ++counter;
     }
@@ -26,6 +29,9 @@ struct empty {
 struct fat {
     fat(double v1, double v2, double v3, double v4)
         : value{v1, v2, v3, v4} {}
+
+    fat(const fat &) = default;
+    fat &operator=(const fat &) = default;
 
     ~fat() {
         ++counter;

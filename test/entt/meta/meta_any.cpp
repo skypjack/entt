@@ -28,6 +28,11 @@ struct clazz_t {
 };
 
 struct empty_t {
+    empty_t() = default;
+
+    empty_t(const empty_t &) = default;
+    empty_t &operator=(const empty_t &) = default;
+
     virtual ~empty_t() {
         ++destructor_counter;
     }
@@ -47,6 +52,11 @@ struct fat_t: empty_t {
     fat_t(double v1, double v2, double v3, double v4)
         : value{v1, v2, v3, v4} {}
 
+    ~fat_t() override = default;
+
+    fat_t(const fat_t &) = default;
+    fat_t &operator=(const fat_t &) = default;
+
     bool operator==(const fat_t &other) const {
         return std::equal(std::begin(value), std::end(value), std::begin(other.value), std::end(other.value));
     }
@@ -61,6 +71,7 @@ enum class enum_class : unsigned short int {
 
 struct unmanageable_t {
     unmanageable_t() = default;
+    ~unmanageable_t() = default;
     unmanageable_t(const unmanageable_t &) = delete;
     unmanageable_t(unmanageable_t &&) = delete;
     unmanageable_t &operator=(const unmanageable_t &) = delete;
