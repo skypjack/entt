@@ -187,9 +187,10 @@ class basic_sparse_set {
         }
 
         if(!sparse[page]) {
+            constexpr entity_type init = null;
             auto page_allocator{packed.get_allocator()};
             sparse[page] = alloc_traits::allocate(page_allocator, traits_type::page_size);
-            std::uninitialized_fill(sparse[page], sparse[page] + traits_type::page_size, null);
+            std::uninitialized_fill(sparse[page], sparse[page] + traits_type::page_size, init);
         }
 
         return sparse[page][fast_mod(pos, traits_type::page_size)];
