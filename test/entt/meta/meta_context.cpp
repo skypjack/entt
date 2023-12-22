@@ -137,11 +137,17 @@ public:
         entt::meta_reset();
     }
 
+    [[nodiscard]] const entt::meta_ctx& ctx() const noexcept {
+        return context;
+    }
+
 protected:
     static constexpr int global_marker = 1;
     static constexpr int local_marker = 42;
     static constexpr int bucket_value = 99;
     static constexpr int prop_value = 3;
+
+private:
     entt::meta_ctx context{};
 };
 
@@ -149,35 +155,35 @@ TEST_F(MetaContext, Resolve) {
     using namespace entt::literals;
 
     ASSERT_TRUE(entt::resolve<clazz>());
-    ASSERT_TRUE(entt::resolve<clazz>(context));
+    ASSERT_TRUE(entt::resolve<clazz>(ctx()));
 
     ASSERT_TRUE(entt::resolve<test::empty>());
-    ASSERT_TRUE(entt::resolve<test::empty>(context));
+    ASSERT_TRUE(entt::resolve<test::empty>(ctx()));
 
     ASSERT_TRUE(entt::resolve(entt::type_id<clazz>()));
-    ASSERT_TRUE(entt::resolve(context, entt::type_id<clazz>()));
+    ASSERT_TRUE(entt::resolve(ctx(), entt::type_id<clazz>()));
 
     ASSERT_FALSE(entt::resolve(entt::type_id<test::empty>()));
-    ASSERT_TRUE(entt::resolve(context, entt::type_id<test::empty>()));
+    ASSERT_TRUE(entt::resolve(ctx(), entt::type_id<test::empty>()));
 
     ASSERT_TRUE(entt::resolve("foo"_hs));
-    ASSERT_FALSE(entt::resolve(context, "foo"_hs));
+    ASSERT_FALSE(entt::resolve(ctx(), "foo"_hs));
 
     ASSERT_FALSE(entt::resolve("bar"_hs));
-    ASSERT_TRUE(entt::resolve(context, "bar"_hs));
+    ASSERT_TRUE(entt::resolve(ctx(), "bar"_hs));
 
     ASSERT_FALSE(entt::resolve("quux"_hs));
-    ASSERT_TRUE(entt::resolve(context, "quux"_hs));
+    ASSERT_TRUE(entt::resolve(ctx(), "quux"_hs));
 
     ASSERT_EQ((std::distance(entt::resolve().cbegin(), entt::resolve().cend())), 4);
-    ASSERT_EQ((std::distance(entt::resolve(context).cbegin(), entt::resolve(context).cend())), 6);
+    ASSERT_EQ((std::distance(entt::resolve(ctx()).cbegin(), entt::resolve(ctx()).cend())), 6);
 }
 
 TEST_F(MetaContext, MetaType) {
     using namespace entt::literals;
 
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);
@@ -185,7 +191,7 @@ TEST_F(MetaContext, MetaType) {
     ASSERT_NE(global, local);
 
     ASSERT_EQ(global, entt::resolve("foo"_hs));
-    ASSERT_EQ(local, entt::resolve(context, "bar"_hs));
+    ASSERT_EQ(local, entt::resolve(ctx(), "bar"_hs));
 
     ASSERT_EQ(global.id(), "foo"_hs);
     ASSERT_EQ(local.id(), "bar"_hs);
@@ -207,7 +213,7 @@ TEST_F(MetaContext, MetaType) {
 
 TEST_F(MetaContext, MetaBase) {
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     ASSERT_EQ((std::distance(global.base().cbegin(), global.base().cend())), 0);
     ASSERT_EQ((std::distance(local.base().cbegin(), local.base().cend())), 1);
@@ -215,14 +221,14 @@ TEST_F(MetaContext, MetaBase) {
     ASSERT_EQ(local.base().cbegin()->second.info(), entt::type_id<base>());
 
     ASSERT_FALSE(entt::resolve(entt::type_id<base>()));
-    ASSERT_TRUE(entt::resolve(context, entt::type_id<base>()));
+    ASSERT_TRUE(entt::resolve(ctx(), entt::type_id<base>()));
 }
 
 TEST_F(MetaContext, MetaData) {
     using namespace entt::literals;
 
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     ASSERT_TRUE(global.data("value"_hs));
     ASSERT_TRUE(local.data("value"_hs));
@@ -257,7 +263,7 @@ TEST_F(MetaContext, MetaFunc) {
     using namespace entt::literals;
 
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     ASSERT_TRUE(global.func("func"_hs));
     ASSERT_TRUE(local.func("func"_hs));
@@ -288,7 +294,7 @@ TEST_F(MetaContext, MetaFunc) {
 
 TEST_F(MetaContext, MetaCtor) {
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     auto any = global.construct();
     auto other = local.construct();
@@ -320,7 +326,7 @@ TEST_F(MetaContext, MetaConv) {
     argument value{2};
 
     auto global = entt::forward_as_meta(value);
-    auto local = entt::forward_as_meta(context, value);
+    auto local = entt::forward_as_meta(ctx(), value);
 
     ASSERT_TRUE(global.allow_cast<int>());
     ASSERT_TRUE(local.allow_cast<int>());
@@ -331,7 +337,7 @@ TEST_F(MetaContext, MetaConv) {
 
 TEST_F(MetaContext, MetaDtor) {
     auto global = entt::resolve<clazz>().construct();
-    auto local = entt::resolve<clazz>(context).construct();
+    auto local = entt::resolve<clazz>(ctx()).construct();
 
     ASSERT_EQ(clazz::bucket, bucket_value);
 
@@ -348,13 +354,13 @@ TEST_F(MetaContext, MetaProp) {
     using namespace entt::literals;
 
     const auto global = entt::resolve<clazz>();
-    const auto local = entt::resolve<clazz>(context);
+    const auto local = entt::resolve<clazz>(ctx());
 
     ASSERT_TRUE(global.prop("prop"_hs));
     ASSERT_TRUE(local.prop("prop"_hs));
 
     ASSERT_EQ(global.prop("prop"_hs).value().type(), entt::resolve<int>());
-    ASSERT_EQ(local.prop("prop"_hs).value().type(), entt::resolve<int>(context));
+    ASSERT_EQ(local.prop("prop"_hs).value().type(), entt::resolve<int>(ctx()));
 
     ASSERT_EQ(global.prop("prop"_hs).value().cast<int>(), prop_value);
     ASSERT_EQ(local.prop("prop"_hs).value().cast<int>(), prop_value);
@@ -367,7 +373,7 @@ TEST_F(MetaContext, MetaTemplate) {
     using namespace entt::literals;
 
     const auto global = entt::resolve("template"_hs);
-    const auto local = entt::resolve(context, "template"_hs);
+    const auto local = entt::resolve(ctx(), "template"_hs);
 
     ASSERT_TRUE(global.is_template_specialization());
     ASSERT_TRUE(local.is_template_specialization());
@@ -376,8 +382,8 @@ TEST_F(MetaContext, MetaTemplate) {
     ASSERT_EQ(local.template_arity(), 2u);
 
     ASSERT_EQ(global.template_arg(0u), entt::resolve<int>());
-    ASSERT_EQ(local.template_arg(0u), entt::resolve<int>(context));
-    ASSERT_EQ(local.template_arg(1u), entt::resolve<char>(context));
+    ASSERT_EQ(local.template_arg(0u), entt::resolve<int>(ctx()));
+    ASSERT_EQ(local.template_arg(1u), entt::resolve<char>(ctx()));
 
     ASSERT_EQ(global.template_arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
     ASSERT_EQ(local.template_arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
@@ -389,7 +395,7 @@ TEST_F(MetaContext, MetaPointer) {
     int value = 42;
 
     const entt::meta_any global{&value};
-    const entt::meta_any local{context, &value};
+    const entt::meta_any local{ctx(), &value};
 
     ASSERT_TRUE(global.type().is_pointer());
     ASSERT_TRUE(local.type().is_pointer());
@@ -407,7 +413,7 @@ TEST_F(MetaContext, MetaAssociativeContainer) {
     std::unordered_map<int, int> map{{{0, 0}}};
 
     auto global = entt::forward_as_meta(map).as_associative_container();
-    auto local = entt::forward_as_meta(context, map).as_associative_container();
+    auto local = entt::forward_as_meta(ctx(), map).as_associative_container();
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);
@@ -434,7 +440,7 @@ TEST_F(MetaContext, MetaSequenceContainer) {
     std::vector<int> vec{0};
 
     auto global = entt::forward_as_meta(vec).as_sequence_container();
-    auto local = entt::forward_as_meta(context, vec).as_sequence_container();
+    auto local = entt::forward_as_meta(ctx(), vec).as_sequence_container();
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);
@@ -453,9 +459,9 @@ TEST_F(MetaContext, MetaAny) {
     using namespace entt::literals;
 
     const entt::meta_any global{42};
-    const entt::meta_any ctx_value{context, 42};
-    const entt::meta_any in_place{context, std::in_place_type<int>, 42};
-    entt::meta_any two_step_local{entt::meta_ctx_arg, context};
+    const entt::meta_any ctx_value{ctx(), 42};
+    const entt::meta_any in_place{ctx(), std::in_place_type<int>, 42};
+    entt::meta_any two_step_local{entt::meta_ctx_arg, ctx()};
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(ctx_value);
@@ -478,8 +484,8 @@ TEST_F(MetaContext, MetaHandle) {
     int value = 42;
 
     entt::meta_handle global{value};
-    entt::meta_handle ctx_value{context, value};
-    entt::meta_handle two_step_local{entt::meta_ctx_arg, context};
+    entt::meta_handle ctx_value{ctx(), value};
+    entt::meta_handle two_step_local{entt::meta_ctx_arg, ctx()};
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(ctx_value);
@@ -498,7 +504,7 @@ TEST_F(MetaContext, ForwardAsMeta) {
     using namespace entt::literals;
 
     const auto global = entt::forward_as_meta(42);
-    const auto local = entt::forward_as_meta(context, 42);
+    const auto local = entt::forward_as_meta(ctx(), 42);
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);
