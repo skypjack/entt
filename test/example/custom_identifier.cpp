@@ -3,15 +3,20 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
-struct entity_id {
+struct entity_id final {
     using entity_type = std::uint32_t;
     static constexpr auto null = entt::null;
 
     constexpr entity_id(entity_type value = null) noexcept
         : entt{value} {}
 
-    constexpr entity_id(const entity_id &other) noexcept = default;
-    constexpr entity_id &operator=(const entity_id &other) noexcept = default;
+    ~entity_id() noexcept = default;
+
+    constexpr entity_id(const entity_id &other) = default;
+    constexpr entity_id(entity_id &&other) noexcept = default;
+
+    constexpr entity_id &operator=(const entity_id &other) = default;
+    constexpr entity_id &operator=(entity_id &&other) noexcept = default;
 
     constexpr operator entity_type() const noexcept {
         return entt;
