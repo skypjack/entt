@@ -16,6 +16,8 @@
 #include "../common/non_movable.h"
 
 struct empty {
+    empty() = default;
+
     empty(const empty &) = default;
     empty &operator=(const empty &) = default;
 
