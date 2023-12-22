@@ -32,9 +32,16 @@ else()
     add_library(GTest::Main ALIAS gtest_main)
 
     target_compile_features(gtest PUBLIC cxx_std_17)
+    set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")
+
     target_compile_features(gtest_main PUBLIC cxx_std_17)
+    set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")
+
     target_compile_features(gmock PUBLIC cxx_std_17)
+    set_target_properties(gmock PROPERTIES CXX_CLANG_TIDY "")
+
     target_compile_features(gmock_main PUBLIC cxx_std_17)
+    set_target_properties(gmock_main PROPERTIES CXX_CLANG_TIDY "")
 endif()
 
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
@@ -121,6 +128,7 @@ function(SETUP_LIB_SHARED_TEST TEST_NAME SUB_PATH)
     add_library(_${TARGET_NAME} SHARED $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/${SUB_PATH}/lib.cpp)
     SETUP_TARGET(_${TARGET_NAME} ENTT_API_EXPORT)
     SETUP_BASIC_TEST(lib_${TARGET_NAME} lib/${TEST_NAME}/${SUB_PATH}/main.cpp ENTT_API_IMPORT)
+    set_target_properties(lib_${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "")
     target_link_libraries(lib_${TARGET_NAME} PRIVATE _${TARGET_NAME})
 endfunction()
 
@@ -129,6 +137,8 @@ function(SETUP_LIB_PLUGIN_TEST TEST_NAME SUB_PATH)
     add_library(_${TARGET_NAME} MODULE $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/${SUB_PATH}/plugin.cpp)
     SETUP_TARGET(_${TARGET_NAME} ${ARGVN})
     SETUP_BASIC_TEST(lib_${TARGET_NAME} lib/${TEST_NAME}/${SUB_PATH}/main.cpp PLUGIN="$<TARGET_FILE:_${TARGET_NAME}>" ${ARGVN})
+    set_target_properties(_${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "")
+    set_target_properties(lib_${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "")
     target_include_directories(_${TARGET_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TARGET_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_link_libraries(lib_${TARGET_NAME} PRIVATE ${CMAKE_DL_LIBS})
@@ -139,6 +149,7 @@ endfunction()
 
 if(ENTT_BUILD_BENCHMARK)
     SETUP_BASIC_TEST(benchmark benchmark/benchmark.cpp)
+    set_target_properties(benchmark PROPERTIES CXX_CLANG_TIDY "")
 endif()
 
 # Test example
@@ -202,6 +213,8 @@ if(ENTT_BUILD_SNAPSHOT)
     endif()
 
     SETUP_BASIC_TEST(cereal snapshot/snapshot.cpp)
+
+    set_target_properties(cereal PROPERTIES CXX_CLANG_TIDY "")
     target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
 endif()
 

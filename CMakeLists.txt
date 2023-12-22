@@ -36,6 +36,7 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if available." OFF)
 option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if available." OFF)
+option(ENTT_USE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
 
 if(ENTT_USE_LIBCPP)
     if(NOT WIN32)
@@ -55,7 +56,7 @@ if(ENTT_USE_LIBCPP)
     endif()
 
     if(NOT ENTT_HAS_LIBCPP)
-        message(VERBOSE "The option ENTT_USE_LIBCPP is set but libc++ is not available. The flag will not be added to the target.")
+        message(VERBOSE "The option ENTT_USE_LIBCPP is set but libc++ is not available.")
     endif()
 endif()
 
@@ -66,7 +67,15 @@ if(ENTT_USE_SANITIZER)
     endif()
 
     if(NOT ENTT_HAS_SANITIZER)
-        message(VERBOSE "The option ENTT_USE_SANITIZER is set but sanitizer support is not available. The flags will not be added to the target.")
+        message(VERBOSE "The option ENTT_USE_SANITIZER is set but sanitizer support is not available.")
+    endif()
+endif()
+
+if(ENTT_USE_CLANG_TIDY)
+    find_program(ENTT_CLANG_TIDY_EXECUTABLE "clang-tidy")
+
+    if(NOT ENTT_CLANG_TIDY_EXECUTABLE)
+        message(VERBOSE "The option ENTT_USE_CLANG_TIDY is set but clang-tidy executable is not available.")
     endif()
 endif()
 
@@ -202,6 +211,10 @@ endif()
 if(ENTT_HAS_SANITIZER)
     target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
     target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+endif()
+
+if(ENTT_CLANG_TIDY_EXECUTABLE)
+    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*;--extra-arg=/EHsc")
 endif()
 
 if(ENTT_HAS_LIBCPP)

@@ -1,0 +1,27 @@
+Checks: >
+    bugprone-*,
+    concurrency-*,
+    cppcoreguidelines-*,
+    -cppcoreguidelines-avoid-c-arrays,
+    -cppcoreguidelines-avoid-const-or-ref-data-members,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-avoid-non-const-global-variables,
+    -cppcoreguidelines-non-private-member-variables-in-classes,
+    -cppcoreguidelines-pro-*,
+    misc-*,
+    -misc-no-recursion,
+    -misc-non-private-member-variables-in-classes,
+    modernize-*,
+    -modernize-avoid-c-arrays,
+    -modernize-macro-to-enum,
+    -modernize-use-trailing-return-type,
+    performance-*,
+    portability-*,
+    readibility-*
+CheckOptions:
+    - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+      value: true
+    - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+      value: true
+    - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+      value: true
