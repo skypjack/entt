@@ -1868,7 +1868,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
 
-        lhs.sort_as(rhs); // NOLINT
+        lhs.sort_as(rhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
     }
@@ -1891,7 +1891,7 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        lhs.sort_as(rhs); // NOLINT
+        lhs.sort_as(rhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         auto begin = lhs.begin();
         auto end = lhs.end();
@@ -1920,7 +1920,7 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT
+        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
     }
@@ -1943,7 +1943,7 @@ TYPED_TEST(SparseSet, SortAsReverse) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT
+        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -1975,7 +1975,7 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT
+        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2008,7 +2008,7 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT
+        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2041,7 +2041,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             lhs.push(entity);
             lhs.erase(entity);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT(clang-diagnostic-deprecated-declarations)
         } break;
         case entt::deletion_policy::swap_only: {
             entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
@@ -2051,7 +2051,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             lhs.erase(entity[0u]);
             lhs.bump(entity[0u]);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT(clang-diagnostic-deprecated-declarations)
         } break;
         }
     }
