@@ -19,7 +19,7 @@ struct empty {
     empty() = default;
 
     empty(const empty &) = default;
-    empty &operator=(const empty &) = default;
+    empty &operator=(const empty &) = delete;
 
     ~empty() {
         ++counter;
