@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -70,12 +71,18 @@ enum class enum_class : unsigned short int {
 };
 
 struct unmanageable_t {
-    unmanageable_t() = default;
+    unmanageable_t()
+        : value{std::make_unique<int>(42)} {}
+
     ~unmanageable_t() = default;
+
     unmanageable_t(const unmanageable_t &) = delete;
     unmanageable_t(unmanageable_t &&) = delete;
+
     unmanageable_t &operator=(const unmanageable_t &) = delete;
     unmanageable_t &operator=(unmanageable_t &&) = delete;
+
+    std::unique_ptr<int> value;
 };
 
 struct MetaAny: ::testing::Test {
@@ -1303,7 +1310,7 @@ TEST_F(MetaAny, EnumConversion) {
 }
 
 TEST_F(MetaAny, UnmanageableType) {
-    unmanageable_t instance;
+    unmanageable_t instance{};
     auto any = entt::forward_as_meta(instance);
     entt::meta_any other = any.as_ref();
 
