@@ -58,9 +58,8 @@ TEST(CompressedPair, ConstructCopyMove) {
 }
 
 TEST(CompressedPair, PiecewiseConstruct) {
-    std::vector<int> vec{42}; // NOLINT
     const entt::compressed_pair<test::empty, test::empty> empty{std::piecewise_construct, std::make_tuple(), std::make_tuple()};
-    const entt::compressed_pair<std::vector<int>, std::size_t> pair{std::piecewise_construct, std::forward_as_tuple(std::move(vec)), std::make_tuple(sizeof(empty))};
+    const entt::compressed_pair<std::vector<int>, std::size_t> pair{std::piecewise_construct, std::forward_as_tuple(std::vector<int>{42}), std::make_tuple(sizeof(empty))};
 
     ASSERT_EQ(pair.first().size(), 1u);
     ASSERT_EQ(pair.second(), sizeof(empty));
