@@ -860,7 +860,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    [[nodiscard]] entity_type operator[](const size_type pos) const {
+    [[deprecated("use .begin()[pos] instead")]] [[nodiscard]] entity_type operator[](const size_type pos) const {
         return base_type::begin()[pos];
     }
 
