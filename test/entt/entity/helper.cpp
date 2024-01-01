@@ -70,7 +70,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     constexpr auto page_size = entt::storage_type_t<value_type>::traits_type::page_size;
     const value_type value{42};
 
-    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
     ASSERT_EQ(entt::to_entity(storage, value), null);
 
     const auto entity = registry.create();
@@ -86,7 +86,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     registry.emplace<value_type>(other);
     registry.emplace<value_type>(next);
 
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity); // NOLINT
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(other)), other);
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
 

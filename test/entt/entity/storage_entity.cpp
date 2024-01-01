@@ -43,7 +43,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
     ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
 
     entt::storage<entt::entity> extended{std::move(other), std::allocator<entt::entity>{}};
 
@@ -54,7 +54,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(extended.type(), entt::type_id<void>());
 
     ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(extended.at(0u), entt::entity{3});
+    ASSERT_EQ(extended.at(0u), entt::entity{3});                    // NOLINT
 
     pool = std::move(extended);
 
@@ -66,7 +66,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(other.type(), entt::type_id<void>());    // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<void>()); // NOLINT
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(pool.at(0u), entt::entity{3});                           // NOLINT
     ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));    // NOLINT
     ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
 
@@ -81,7 +81,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
     ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
 }
 
 TEST(StorageEntity, Swap) {
@@ -108,8 +108,8 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.size(), 10u);
     ASSERT_EQ(other.size(), 43u);
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});
-    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(pool.at(0u), entt::entity{3});   // NOLINT
+    ASSERT_EQ(other.at(0u), entt::entity{42}); // NOLINT
 }
 
 TEST(StorageEntity, Getters) {
@@ -153,13 +153,13 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(pool.emplace(traits_type::construct(1, 1)), entt::entity{4});
     ASSERT_EQ(pool.emplace(traits_type::construct(6, 3)), traits_type::construct(6, 3));
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{4}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_GE(pool.index(entt::entity{5}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{4}), pool.in_use());              // NOLINT
+    ASSERT_GE(pool.index(entt::entity{5}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.in_use()); // NOLINT
 
     ASSERT_EQ(pool.emplace(traits_type::construct(5, 42)), traits_type::construct(5, 42));
     ASSERT_EQ(pool.emplace(traits_type::construct(5, 43)), entt::entity{7});
@@ -186,12 +186,12 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(*pool.push(traits_type::construct(1, 1)), entt::entity{3});
     ASSERT_EQ(*pool.push(traits_type::construct(5, 3)), traits_type::construct(5, 3));
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_GE(pool.index(entt::entity{4}), pool.in_use());              // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(traits_type::construct(5, 3)), pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT
+    ASSERT_GE(pool.index(entt::entity{4}), pool.in_use());              // NOLINT
+    ASSERT_LT(pool.index(traits_type::construct(5, 3)), pool.in_use()); // NOLINT
 
     ASSERT_EQ(*pool.push(traits_type::construct(4, 42)), traits_type::construct(4, 42));
     ASSERT_EQ(*pool.push(traits_type::construct(4, 43)), entt::entity{6});
@@ -205,12 +205,12 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(pool.current(entity[1u]), 4);
     ASSERT_EQ(pool.current(entt::entity{2}), 1);
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());               // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_GE(pool.index(traits_type::construct(1, 1)), pool.in_use());  // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_GE(pool.index(traits_type::construct(2, 1)), pool.in_use());  // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());               // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_LT(pool.index(traits_type::construct(4, 42)), pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
-    ASSERT_GE(pool.index(traits_type::construct(5, 4)), pool.in_use());  // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());               // NOLINT
+    ASSERT_GE(pool.index(traits_type::construct(1, 1)), pool.in_use());  // NOLINT
+    ASSERT_GE(pool.index(traits_type::construct(2, 1)), pool.in_use());  // NOLINT
+    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());               // NOLINT
+    ASSERT_LT(pool.index(traits_type::construct(4, 42)), pool.in_use()); // NOLINT
+    ASSERT_GE(pool.index(traits_type::construct(5, 4)), pool.in_use());  // NOLINT
 
     ASSERT_EQ(*pool.push(entt::null), traits_type::construct(2, 1));
     ASSERT_EQ(*pool.push(traits_type::construct(1, 3)), traits_type::construct(1, 3));
@@ -251,13 +251,13 @@ TEST(StorageEntity, Insert) {
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 2u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 2u); // NOLINT
 
     pool.erase(std::begin(entity), std::end(entity));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 0u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 0u); // NOLINT
 
     pool.insert(entity, entity + 1u);
 
@@ -266,7 +266,7 @@ TEST(StorageEntity, Insert) {
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
 }
 
 TEST(StorageEntity, Pack) {
@@ -276,7 +276,7 @@ TEST(StorageEntity, Pack) {
     pool.push(entity, entity + 3u);
     std::swap(entity[0u], entity[1u]);
 
-    const auto len = pool.pack(entity + 1u, entity + 3u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    const auto len = pool.pack(entity + 1u, entity + 3u); // NOLINT
     auto it = pool.each().cbegin().base();
 
     ASSERT_NE(it, pool.cbegin());
@@ -299,17 +299,17 @@ TEST(StorageEntity, InUse) {
 
     pool.emplace(entt::entity{0});
 
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
     ASSERT_EQ(pool.free_list(), 1u);
 
-    pool.in_use(0u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    pool.in_use(0u); // NOLINT
 
-    ASSERT_EQ(pool.in_use(), 0u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 0u); // NOLINT
     ASSERT_EQ(pool.free_list(), 0u);
 
-    pool.in_use(1u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    pool.in_use(1u); // NOLINT
 
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
     ASSERT_EQ(pool.free_list(), 1u);
 }
 
@@ -318,7 +318,7 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, InUse) {
 
     pool.emplace(entt::entity{0});
 
-    ASSERT_DEATH(pool.in_use(2u), ""); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_DEATH(pool.in_use(2u), ""); // NOLINT
 }
 
 TEST(StorageEntity, Iterable) {
@@ -348,7 +348,7 @@ TEST(StorageEntity, Iterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{42});
@@ -392,7 +392,7 @@ TEST(StorageEntity, ConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{42});
@@ -460,7 +460,7 @@ TEST(StorageEntity, ReverseIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
@@ -504,7 +504,7 @@ TEST(StorageEntity, ReverseConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});

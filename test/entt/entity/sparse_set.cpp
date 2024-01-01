@@ -101,7 +101,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy);
 
         ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(other.at(0u), entity_type{42});
+        ASSERT_EQ(other.at(0u), entity_type{42});                    // NOLINT
 
         sparse_set_type extended{std::move(other), allocator_type{}};
 
@@ -112,7 +112,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(extended.policy(), policy);
 
         ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(extended.at(0u), entity_type{42});
+        ASSERT_EQ(extended.at(0u), entity_type{42});                   // NOLINT
 
         set = std::move(extended);
 
@@ -124,7 +124,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy);    // NOLINT
         ASSERT_EQ(extended.policy(), policy); // NOLINT
 
-        ASSERT_EQ(set.at(0u), entity_type{42});
+        ASSERT_EQ(set.at(0u), entity_type{42});                           // NOLINT
         ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null));    // NOLINT
         ASSERT_EQ(extended.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
 
@@ -139,7 +139,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy);
 
         ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(other.at(0u), entity_type{42});
+        ASSERT_EQ(other.at(0u), entity_type{42});                    // NOLINT
     }
 }
 
@@ -171,8 +171,8 @@ TYPED_TEST(SparseSet, Swap) {
         ASSERT_EQ(set.size(), 2u);
         ASSERT_EQ(other.size(), 1u);
 
-        ASSERT_EQ(set.at(1u), entity_type{3});
-        ASSERT_EQ(other.at(0u), entity_type{42});
+        ASSERT_EQ(set.at(1u), entity_type{3});    // NOLINT
+        ASSERT_EQ(other.at(0u), entity_type{42}); // NOLINT
     }
 }
 
@@ -958,8 +958,8 @@ TYPED_TEST(SparseSet, Indexing) {
 
         ASSERT_EQ(set.size(), 0u);
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null));
-        ASSERT_EQ(set.at(99u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null));  // NOLINT
+        ASSERT_EQ(set.at(99u), static_cast<entity_type>(entt::null)); // NOLINT
 
         const entity_type entity{42};
         const entity_type other{3};
@@ -969,16 +969,16 @@ TYPED_TEST(SparseSet, Indexing) {
 
         ASSERT_EQ(set.size(), 2u);
 
-        ASSERT_EQ(set.at(0u), entity);
-        ASSERT_EQ(set.at(1u), other);
+        ASSERT_EQ(set.at(0u), entity); // NOLINT
+        ASSERT_EQ(set.at(1u), other);  // NOLINT
 
-        ASSERT_EQ(set.at(0u), set[0u]);
-        ASSERT_EQ(set.at(1u), set[1u]);
+        ASSERT_EQ(set.at(0u), set[0u]); // NOLINT
+        ASSERT_EQ(set.at(1u), set[1u]); // NOLINT
 
-        ASSERT_EQ(set.at(0u), set.data()[0u]);
-        ASSERT_EQ(set.at(1u), set.data()[1u]);
+        ASSERT_EQ(set.at(0u), set.data()[0u]); // NOLINT
+        ASSERT_EQ(set.at(1u), set.data()[1u]); // NOLINT
 
-        ASSERT_EQ(set.at(2u), static_cast<entity_type>(entt::null));
+        ASSERT_EQ(set.at(2u), static_cast<entity_type>(entt::null)); // NOLINT
     }
 }
 
@@ -1053,8 +1053,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1063,8 +1063,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1072,8 +1072,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(std::begin(entity), std::end(entity)), entity[0u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1087,8 +1087,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1097,8 +1097,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[1u]);
-            ASSERT_EQ(set.at(1u), entity[0u]);
+            ASSERT_EQ(set.at(0u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[0u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1106,8 +1106,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(std::begin(entity), std::end(entity)), entity[0u]);
             ASSERT_EQ(set.size(), 4u);
 
-            ASSERT_EQ(set.at(2u), entity[0u]);
-            ASSERT_EQ(set.at(3u), entity[1u]);
+            ASSERT_EQ(set.at(2u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(3u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
             set.compact();
@@ -1124,8 +1124,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1136,8 +1136,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1147,8 +1147,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]);
-            ASSERT_EQ(set.at(1u), entity[1u]);
+            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1868,7 +1868,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
 
-        lhs.sort_as(rhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        lhs.sort_as(rhs); // NOLINT
 
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
     }
@@ -1891,7 +1891,7 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        lhs.sort_as(rhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        lhs.sort_as(rhs); // NOLINT
 
         auto begin = lhs.begin();
         auto end = lhs.end();
@@ -1920,7 +1920,7 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        rhs.sort_as(lhs); // NOLINT
 
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
     }
@@ -1943,7 +1943,7 @@ TYPED_TEST(SparseSet, SortAsReverse) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -1975,7 +1975,7 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2008,7 +2008,7 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
         ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT(clang-diagnostic-deprecated-declarations)
+        rhs.sort_as(lhs); // NOLINT
 
         auto begin = rhs.begin();
         auto end = rhs.end();
@@ -2041,7 +2041,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             lhs.push(entity);
             lhs.erase(entity);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT(clang-diagnostic-deprecated-declarations)
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
         } break;
         case entt::deletion_policy::swap_only: {
             entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
@@ -2051,7 +2051,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             lhs.erase(entity[0u]);
             lhs.bump(entity[0u]);
 
-            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT(clang-diagnostic-deprecated-declarations)
+            ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
         } break;
         }
     }

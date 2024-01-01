@@ -86,7 +86,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
 
     entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
 
@@ -97,7 +97,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_EQ(extended.type(), entt::type_id<value_type>());
 
     ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(extended.at(0u), entt::entity{3});
+    ASSERT_EQ(extended.at(0u), entt::entity{3});                    // NOLINT
 
     pool = std::move(extended);
 
@@ -109,7 +109,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>());    // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<value_type>()); // NOLINT
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});
+    ASSERT_EQ(pool.at(0u), entt::entity{3});                           // NOLINT
     ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));    // NOLINT
     ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
 
@@ -124,7 +124,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});
+    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
 }
 
 TYPED_TEST(StorageNoInstance, Swap) {
@@ -152,8 +152,8 @@ TYPED_TEST(StorageNoInstance, Swap) {
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u);
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});
-    ASSERT_EQ(other.at(0u), entt::entity{42});
+    ASSERT_EQ(pool.at(0u), entt::entity{3});   // NOLINT
+    ASSERT_EQ(other.at(0u), entt::entity{42}); // NOLINT
 }
 
 TYPED_TEST(StorageNoInstance, Getters) {
