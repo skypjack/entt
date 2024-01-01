@@ -133,6 +133,10 @@ I hope the following lists can grow much more in the future.
     game where to assemble a tribe of lizards to defend against robot invaders.
   * [robotfindskitten](https://github.com/autogalkin/robotfindskitten): a clone
     of `robotfindskitten` inside `Notepad.exe`, powered by `EnTT`.
+  * [Orion](https://github.com/alekskoloch/Orion): Outer-space Research and
+    Interstellar Observation Network (a space shooter game).
+  * [EnTT Boids](https://github.com/DanielEliasib/entt_boids): a simple boids
+    implementation using `EnTT` and `Raylib`.
 
 ## Engines and the like:
 
@@ -215,6 +219,8 @@ I hope the following lists can grow much more in the future.
     included.
   * [EnTT Editor](https://github.com/TheDimin/EnttEditor): an editor for `EnTT`
     libary that combines its built-in reflection system with `ImGui`.
+  * [Era Game Engine](https://github.com/EldarMuradov/EraGameEngine): a modern
+    ECS-based game engine.
 
 ## Articles, videos and blog posts:
 
