@@ -17,11 +17,11 @@ TODO:
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* view: reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too)
+* view: reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too, define storage ::at and ::at_as_tuple)
 * view: update natvis as needed after the last rework, merge pools/filter in the same array, drop check (?) and turn view into a position
 * view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
-* basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) uses move-from packed in assert (same for storage)
+* basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) uses moved-from packed in assert (same for storage)
 * maybe drop begin(v)/end(v) from sparse set and only use scoped begin/end at call sites
 * view unchecked_refresh loop is never executed if Get is 1u
 * review all // NOLINT + linter workflow + review clang-tidy file
