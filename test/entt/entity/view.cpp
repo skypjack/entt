@@ -174,8 +174,8 @@ TEST(SingleComponentView, ElementAccess) {
     registry.emplace<int>(e1, 3);
 
     for(auto i = 0u; i < view.size(); ++i) {
-        ASSERT_EQ(view[i], i ? e0 : e1);
-        ASSERT_EQ(cview[i], i ? e0 : e1);
+        ASSERT_EQ(view[i], i ? e0 : e1); // NOLINT(clang-diagnostic-deprecated-declarations)
+        ASSERT_EQ(cview[i], i ? e0 : e1); // NOLINT(clang-diagnostic-deprecated-declarations)
     }
 
     ASSERT_EQ(view[e0], 42);
