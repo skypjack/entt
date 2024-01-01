@@ -411,8 +411,8 @@ TYPED_TEST(SighMixin, Swap) {
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
     ASSERT_EQ(other.size(), 1u);
 
-    ASSERT_EQ(pool.at(traits_type::in_place_delete), entt::entity{3}); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{42});                         // NOLINT
+    ASSERT_EQ(pool.index(entt::entity{3}), traits_type::in_place_delete);
+    ASSERT_EQ(other.index(entt::entity{42}), 0u);
 
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{2});
     ASSERT_EQ(other.get(entt::entity{42}), value_type{41});
@@ -620,8 +620,8 @@ TEST(SighMixin, ThrowingComponent) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_TRUE(pool.contains(entity[1u]));
-    ASSERT_EQ(pool.at(0u), entity[1u]); // NOLINT
-    ASSERT_EQ(pool.at(1u), entity[0u]); // NOLINT
+    ASSERT_EQ(pool.index(entity[0u]), 1u);
+    ASSERT_EQ(pool.index(entity[1u]), 0u);
     ASSERT_EQ(pool.get(entity[0u]), value[1u]);
     // the element may have been moved but it's still there
     ASSERT_EQ(pool.get(entity[1u]), value[0u]);
@@ -632,7 +632,7 @@ TEST(SighMixin, ThrowingComponent) {
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
-    ASSERT_EQ(pool.at(0u), entity[0u]); // NOLINT
+    ASSERT_EQ(pool.index(entity[0u]), 0u);
     ASSERT_EQ(pool.get(entity[0u]), value[1u]);
 
     ASSERT_EQ(on_construct, 2u);

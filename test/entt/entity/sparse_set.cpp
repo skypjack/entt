@@ -171,8 +171,8 @@ TYPED_TEST(SparseSet, Swap) {
         ASSERT_EQ(set.size(), 2u);
         ASSERT_EQ(other.size(), 1u);
 
-        ASSERT_EQ(set.at(1u), entity_type{3});    // NOLINT
-        ASSERT_EQ(other.at(0u), entity_type{42}); // NOLINT
+        ASSERT_EQ(set.index(entity_type{3}), 1u);
+        ASSERT_EQ(other.index(entity_type{42}), 0u);
     }
 }
 
@@ -1053,8 +1053,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1063,8 +1063,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1072,8 +1072,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(std::begin(entity), std::end(entity)), entity[0u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1087,8 +1087,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1097,8 +1097,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[1u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[0u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 1u);
+            ASSERT_EQ(set.index(entity[1u]), 0u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1106,8 +1106,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(*set.push(std::begin(entity), std::end(entity)), entity[0u]);
             ASSERT_EQ(set.size(), 4u);
 
-            ASSERT_EQ(set.at(2u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(3u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 2u);
+            ASSERT_EQ(set.index(entity[1u]), 3u);
 
             set.erase(std::begin(entity), std::end(entity));
             set.compact();
@@ -1124,8 +1124,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1136,8 +1136,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 
@@ -1147,8 +1147,8 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
 
-            ASSERT_EQ(set.at(0u), entity[0u]); // NOLINT
-            ASSERT_EQ(set.at(1u), entity[1u]); // NOLINT
+            ASSERT_EQ(set.index(entity[0u]), 0u);
+            ASSERT_EQ(set.index(entity[1u]), 1u);
 
             set.erase(std::begin(entity), std::end(entity));
 

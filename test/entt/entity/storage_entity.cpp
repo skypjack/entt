@@ -108,8 +108,8 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.size(), 10u);
     ASSERT_EQ(other.size(), 43u);
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});   // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{42}); // NOLINT
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
+    ASSERT_EQ(other.index(entt::entity{42}), 0u);
 }
 
 TEST(StorageEntity, Getters) {
