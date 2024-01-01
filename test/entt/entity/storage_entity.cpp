@@ -42,8 +42,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(pool.type(), entt::type_id<void>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
 
     entt::storage<entt::entity> extended{std::move(other), std::allocator<entt::entity>{}};
 
@@ -53,8 +52,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(other.type(), entt::type_id<void>()); // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<void>());
 
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(extended.at(0u), entt::entity{3});                    // NOLINT
+    ASSERT_EQ(extended.index(entt::entity{3}), 0u);
 
     pool = std::move(extended);
 
@@ -66,9 +64,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(other.type(), entt::type_id<void>());    // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<void>()); // NOLINT
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});                           // NOLINT
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));    // NOLINT
-    ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
 
     other = entt::storage<entt::entity>{};
     other.emplace(entt::entity{42});
@@ -80,8 +76,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(pool.type(), entt::type_id<void>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
 }
 
 TEST(StorageEntity, Swap) {

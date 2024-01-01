@@ -345,18 +345,19 @@ TYPED_TEST(SighMixin, Move) {
 
     ASSERT_TRUE(pool.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
+
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
+
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     pool = std::move(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());              // NOLINT
-    ASSERT_EQ(pool.at(0u), entt::entity{3}); // NOLINT
+    ASSERT_TRUE(other.empty()); // NOLINT
+
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
 
     other = entt::sigh_mixin<entt::storage<value_type>>{};
     other.bind(entt::forward_as_any(registry));
@@ -366,8 +367,8 @@ TYPED_TEST(SighMixin, Move) {
 
     ASSERT_TRUE(pool.empty()); // NOLINT
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
+
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     other.clear();

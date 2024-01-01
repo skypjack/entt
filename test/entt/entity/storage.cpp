@@ -111,9 +111,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
-
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
@@ -124,9 +122,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(extended.at(0u), entt::entity{3});                    // NOLINT
-
+    ASSERT_EQ(extended.index(entt::entity{3}), 0u);
     ASSERT_EQ(extended.get(entt::entity{3}), value_type{3});
 
     pool = std::move(extended);
@@ -139,10 +135,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(other.type(), entt::type_id<value_type>());    // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<value_type>()); // NOLINT
 
-    ASSERT_EQ(pool.at(0u), entt::entity{3});                           // NOLINT
-    ASSERT_EQ(other.at(0u), static_cast<entt::entity>(entt::null));    // NOLINT
-    ASSERT_EQ(extended.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-
+    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
 
     other = entt::storage<value_type>{};
@@ -155,9 +148,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
-    ASSERT_EQ(pool.at(0u), static_cast<entt::entity>(entt::null)); // NOLINT
-    ASSERT_EQ(other.at(0u), entt::entity{3});                      // NOLINT
-
+    ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 }
 

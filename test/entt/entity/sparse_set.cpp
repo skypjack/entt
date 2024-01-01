@@ -100,8 +100,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(other.at(0u), entity_type{42});                    // NOLINT
+        ASSERT_EQ(other.index(entity_type{42}), 0u);
 
         sparse_set_type extended{std::move(other), allocator_type{}};
 
@@ -111,8 +110,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy); // NOLINT
         ASSERT_EQ(extended.policy(), policy);
 
-        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(extended.at(0u), entity_type{42});                   // NOLINT
+        ASSERT_EQ(extended.index(entity_type{42}), 0u);
 
         set = std::move(extended);
 
@@ -124,9 +122,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy);    // NOLINT
         ASSERT_EQ(extended.policy(), policy); // NOLINT
 
-        ASSERT_EQ(set.at(0u), entity_type{42});                           // NOLINT
-        ASSERT_EQ(other.at(0u), static_cast<entity_type>(entt::null));    // NOLINT
-        ASSERT_EQ(extended.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
+        ASSERT_EQ(set.index(entity_type{42}), 0u);
 
         other = sparse_set_type{policy};
         other.push(entity_type{3});
@@ -138,8 +134,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(other.at(0u), entity_type{42});                    // NOLINT
+        ASSERT_EQ(other.index(entity_type{42}), 0u);
     }
 }
 
