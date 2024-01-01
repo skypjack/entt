@@ -22,5 +22,6 @@ TODO:
 * view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
 * basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) uses move-from packed in assert (same for storage)
+* maybe drop begin(v)/end(v) from sparse set and only use scoped begin/end at call sites
 * view unchecked_refresh loop is never executed if Get is 1u
 * review all // NOLINT + linter workflow + review clang-tidy file
