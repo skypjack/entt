@@ -60,8 +60,11 @@ TEST(SigH, Lifetime) {
 
     ASSERT_NO_THROW(signal{src});
     ASSERT_NO_THROW(signal{std::move(other)});
-    ASSERT_NO_THROW(src = other);            // NOLINT
-    ASSERT_NO_THROW(src = std::move(other)); // NOLINT
+
+    other = {};
+
+    ASSERT_NO_THROW(src = other);
+    ASSERT_NO_THROW(src = std::move(other));
 
     ASSERT_NO_THROW(delete new signal{});
 }
