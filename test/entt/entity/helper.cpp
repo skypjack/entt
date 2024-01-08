@@ -66,6 +66,9 @@ TYPED_TEST(ToEntity, Functionalities) {
 
     entt::registry registry;
     const entt::entity null = entt::null;
+
+    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
+
     auto &storage = registry.storage<value_type>();
     constexpr auto page_size = entt::storage_type_t<value_type>::traits_type::page_size;
     const value_type value{42};
