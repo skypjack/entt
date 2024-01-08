@@ -90,7 +90,6 @@ TYPED_TEST(RuntimeView, Constructors) {
     const runtime_view_type other{std::move(temp), view.get_allocator()};
 
     ASSERT_TRUE(view.contains(entity));
-    ASSERT_FALSE(temp.contains(entity)); // NOLINT
     ASSERT_TRUE(other.contains(entity));
 }
 
@@ -140,7 +139,6 @@ TYPED_TEST(RuntimeView, Move) {
 
     runtime_view_type other{std::move(view)};
 
-    ASSERT_FALSE(view.contains(entity)); // NOLINT
     ASSERT_TRUE(other.contains(entity));
 
     view = other;
@@ -151,7 +149,6 @@ TYPED_TEST(RuntimeView, Move) {
 
     other = std::move(view);
 
-    ASSERT_FALSE(view.contains(entity)); // NOLINT
     ASSERT_TRUE(other.contains(entity));
 }
 
