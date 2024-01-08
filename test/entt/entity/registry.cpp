@@ -229,11 +229,11 @@ TEST(Registry, Functionalities) {
 
     entt::registry registry;
 
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = registry.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = registry.get_allocator());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 0u);
     ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
-    ASSERT_NO_FATAL_FAILURE(registry.storage<entt::entity>().reserve(42));
+    ASSERT_NO_THROW(registry.storage<entt::entity>().reserve(42));
     ASSERT_EQ(registry.storage<entt::entity>().capacity(), 42u);
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
 
@@ -272,8 +272,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.emplace<int>(e0, 42), 42);
     ASSERT_EQ(registry.emplace<char>(e0, 'c'), 'c');
-    ASSERT_NO_FATAL_FAILURE(registry.erase<int>(e1));
-    ASSERT_NO_FATAL_FAILURE(registry.erase<char>(e1));
+    ASSERT_NO_THROW(registry.erase<int>(e1));
+    ASSERT_NO_THROW(registry.erase<char>(e1));
 
     ASSERT_TRUE((registry.all_of<const int, char>(e0)));
     ASSERT_FALSE((registry.all_of<int, const char>(e1)));
@@ -308,8 +308,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.patch<int>(e0, [](auto &instance) { instance = 2; }), 2);
     ASSERT_EQ(registry.replace<int>(e0, 3), 3);
 
-    ASSERT_NO_FATAL_FAILURE(registry.emplace_or_replace<int>(e0, 1));
-    ASSERT_NO_FATAL_FAILURE(registry.emplace_or_replace<int>(e1, 1));
+    ASSERT_NO_THROW(registry.emplace_or_replace<int>(e0, 1));
+    ASSERT_NO_THROW(registry.emplace_or_replace<int>(e1, 1));
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e1), 1);
 
@@ -318,7 +318,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 0u);
-    ASSERT_NO_FATAL_FAILURE(registry.destroy(e2));
+    ASSERT_NO_THROW(registry.destroy(e2));
     ASSERT_EQ(traits_type::to_version(e2), 0u);
     ASSERT_EQ(registry.current(e2), 1u);
 
@@ -329,7 +329,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
     ASSERT_EQ(registry.storage<entt::entity>().free_list(), 2u);
 
-    ASSERT_NO_FATAL_FAILURE(registry.clear());
+    ASSERT_NO_THROW(registry.clear());
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 3u);
     ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
@@ -348,14 +348,14 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.get<int>(e3), 3);
     ASSERT_EQ(registry.get<char>(e3), 'c');
 
-    ASSERT_NO_FATAL_FAILURE(registry.clear<int>());
+    ASSERT_NO_THROW(registry.clear<int>());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
     ASSERT_TRUE(registry.storage<int>().empty());
     ASSERT_FALSE(registry.storage<char>().empty());
 
-    ASSERT_NO_FATAL_FAILURE(registry.clear());
+    ASSERT_NO_THROW(registry.clear());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
@@ -694,7 +694,7 @@ TEST(Registry, DestroyRange) {
     registry.destroy(iview.begin(), iview.end());
 
     ASSERT_FALSE(registry.valid(entity[2u]));
-    ASSERT_NO_FATAL_FAILURE(registry.destroy(iview.rbegin(), iview.rend()));
+    ASSERT_NO_THROW(registry.destroy(iview.rbegin(), iview.rend()));
     ASSERT_EQ(iview.size(), 0u);
     ASSERT_EQ(icview.size_hint(), 0u);
 
@@ -1523,7 +1523,7 @@ TEST(Registry, Erase) {
     registry.erase<int>(iview.begin(), iview.end());
 
     ASSERT_FALSE(registry.any_of<int>(entity[2u]));
-    ASSERT_NO_FATAL_FAILURE(registry.erase<int>(iview.rbegin(), iview.rend()));
+    ASSERT_NO_THROW(registry.erase<int>(iview.rbegin(), iview.rend()));
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);

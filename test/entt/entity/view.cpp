@@ -25,10 +25,10 @@ TEST(SingleComponentView, Functionalities) {
 
     registry.emplace<char>(e1);
 
-    ASSERT_NO_FATAL_FAILURE(view.begin()++);
-    ASSERT_NO_FATAL_FAILURE(++cview.begin());
-    ASSERT_NO_FATAL_FAILURE([](auto it) { return it++; }(view.rbegin()));
-    ASSERT_NO_FATAL_FAILURE([](auto it) { return ++it; }(cview.rbegin()));
+    ASSERT_NO_THROW(view.begin()++);
+    ASSERT_NO_THROW(++cview.begin());
+    ASSERT_NO_THROW([](auto it) { return it++; }(view.rbegin()));
+    ASSERT_NO_THROW([](auto it) { return ++it; }(cview.rbegin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
@@ -222,7 +222,7 @@ TEST(SingleComponentView, Each) {
     auto citerable = cview.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
-    ASSERT_NO_FATAL_FAILURE(iterable.begin()->operator=(*iterable.begin()));
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
     ASSERT_EQ(decltype(iterable.end()){}, iterable.end());
 
     auto it = iterable.begin();
@@ -618,8 +618,8 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_EQ(++view.begin(), (view.end()));
     ASSERT_EQ(++cview.begin(), (cview.end()));
 
-    ASSERT_NO_FATAL_FAILURE((view.begin()++));
-    ASSERT_NO_FATAL_FAILURE((++cview.begin()));
+    ASSERT_NO_THROW((view.begin()++));
+    ASSERT_NO_THROW((++cview.begin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
@@ -899,7 +899,7 @@ TEST(MultiComponentView, Each) {
     auto citerable = cview.each();
 
     ASSERT_NE(citerable.begin(), citerable.end());
-    ASSERT_NO_FATAL_FAILURE(iterable.begin()->operator=(*iterable.begin()));
+    ASSERT_NO_THROW(iterable.begin()->operator=(*iterable.begin()));
     ASSERT_EQ(decltype(iterable.end()){}, iterable.end());
 
     auto it = iterable.begin();

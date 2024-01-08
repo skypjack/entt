@@ -84,13 +84,13 @@ TYPED_TEST(Storage, Constructors) {
     entt::storage<value_type> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 
     pool = entt::storage<value_type>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 }
 
@@ -1764,7 +1764,7 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 
     ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
     ASSERT_FALSE(pool.contains(entt::entity{0}));
-    ASSERT_NO_FATAL_FAILURE(pool.compact());
+    ASSERT_NO_THROW(pool.compact());
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{0}, 0);

@@ -58,13 +58,13 @@ TYPED_TEST(StorageNoInstance, Constructors) {
     entt::storage<value_type> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 
     pool = entt::storage<value_type>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
-    ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = pool.get_allocator());
+    ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
 }
 
@@ -163,8 +163,8 @@ TYPED_TEST(StorageNoInstance, Getters) {
     testing::StaticAssertTypeEq<decltype(pool.get_as_tuple({})), std::tuple<>>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get_as_tuple({})), std::tuple<>>();
 
-    ASSERT_NO_FATAL_FAILURE(pool.get(entt::entity{41}));
-    ASSERT_NO_FATAL_FAILURE(std::as_const(pool).get(entt::entity{41}));
+    ASSERT_NO_THROW(pool.get(entt::entity{41}));
+    ASSERT_NO_THROW(std::as_const(pool).get(entt::entity{41}));
 
     ASSERT_EQ(pool.get_as_tuple(entt::entity{41}), std::make_tuple());
     ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple());
@@ -205,8 +205,8 @@ TYPED_TEST(StorageNoInstance, Emplace) {
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), void>();
 
-    ASSERT_NO_FATAL_FAILURE(pool.emplace(entity[0u]));
-    ASSERT_NO_FATAL_FAILURE(this->emplace_instance(pool, entity[1u]));
+    ASSERT_NO_THROW(pool.emplace(entity[0u]));
+    ASSERT_NO_THROW(this->emplace_instance(pool, entity[1u]));
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {

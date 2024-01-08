@@ -774,10 +774,10 @@ TEST_F(MetaType, ReRegistration) {
 TEST_F(MetaType, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("clazz"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz_t>().type("clazz"_hs));
     ASSERT_TRUE(entt::resolve("clazz"_hs));
 
-    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("quux"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz_t>().type("quux"_hs));
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }

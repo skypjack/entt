@@ -664,8 +664,8 @@ TEST_F(MetaData, CollisionAndReuse) {
     ASSERT_FALSE(entt::resolve<clazz_t>().data("cj"_hs));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).is_const());
 
-    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::i>("j"_hs));
-    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz_t>().data<&clazz_t::i>("j"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
 
     ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
     ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));

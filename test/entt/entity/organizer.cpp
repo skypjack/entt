@@ -74,7 +74,7 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -130,7 +130,7 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -194,7 +194,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_EQ(graph[3u].children()[0u], 4u);
 
     for(auto &&vertex: graph) {
-        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -267,7 +267,7 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -320,7 +320,7 @@ TEST(Organizer, SyncPoint) {
     ASSERT_EQ(graph[4u].children()[0u], 5u);
 
     for(auto &&vertex: graph) {
-        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
+        ASSERT_NO_THROW(vertex.callback()(vertex.data(), registry));
     }
 }
 

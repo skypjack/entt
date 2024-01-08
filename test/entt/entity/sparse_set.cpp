@@ -56,25 +56,25 @@ TYPED_TEST(SparseSet, Constructors) {
         sparse_set_type set{};
 
         ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
-        ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
+        ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
         ASSERT_EQ(set.type(), entt::type_id<void>());
 
         set = sparse_set_type{allocator_type{}};
 
         ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
-        ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
+        ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
         ASSERT_EQ(set.type(), entt::type_id<void>());
 
         set = sparse_set_type{policy, allocator_type{}};
 
         ASSERT_EQ(set.policy(), policy);
-        ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
+        ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
         ASSERT_EQ(set.type(), entt::type_id<void>());
 
         set = sparse_set_type{entt::type_id<int>(), policy, allocator_type{}};
 
         ASSERT_EQ(set.policy(), policy);
-        ASSERT_NO_FATAL_FAILURE([[maybe_unused]] auto alloc = set.get_allocator());
+        ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
         ASSERT_EQ(set.type(), entt::type_id<int>());
     }
 }
@@ -260,8 +260,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, FreeList) {
             ASSERT_DEATH(set.free_list(0u), "");
         } break;
         case entt::deletion_policy::swap_only: {
-            ASSERT_NO_FATAL_FAILURE(set.free_list(0u));
-            ASSERT_NO_FATAL_FAILURE(set.free_list(1u));
+            ASSERT_NO_THROW(set.free_list(0u));
+            ASSERT_NO_THROW(set.free_list(1u));
             ASSERT_DEATH(set.free_list(2u), "");
         } break;
         }
@@ -441,7 +441,7 @@ TYPED_TEST(SparseSet, Bind) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_NO_FATAL_FAILURE(set.bind(entt::any{}));
+        ASSERT_NO_THROW(set.bind(entt::any{}));
     }
 }
 
@@ -1842,7 +1842,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortN) {
         } break;
         case entt::deletion_policy::swap_only: {
             ASSERT_EQ(set.size(), 2u);
-            ASSERT_NO_FATAL_FAILURE(set.sort_n(1u, std::less{}));
+            ASSERT_NO_THROW(set.sort_n(1u, std::less{}));
             ASSERT_DEATH(set.sort_n(2u, std::less{}), "");
         } break;
         }

@@ -31,7 +31,7 @@ TEST(BasicSnapshot, Constructors) {
     entt::basic_snapshot snapshot{registry};
     entt::basic_snapshot other{std::move(snapshot)};
 
-    ASSERT_NO_FATAL_FAILURE(snapshot = std::move(other));
+    ASSERT_NO_THROW(snapshot = std::move(other));
 }
 
 TEST(BasicSnapshot, GetEntityType) {
@@ -225,7 +225,7 @@ TEST(BasicSnapshotLoader, Constructors) {
     entt::basic_snapshot_loader loader{registry};
     entt::basic_snapshot_loader other{std::move(loader)};
 
-    ASSERT_NO_FATAL_FAILURE(loader = std::move(other));
+    ASSERT_NO_THROW(loader = std::move(other));
 }
 
 ENTT_DEBUG_TEST(BasicSnapshotLoaderDeathTest, Constructors) {
@@ -501,7 +501,7 @@ TEST(BasicContinuousLoader, Constructors) {
     entt::basic_continuous_loader loader{registry};
     entt::basic_continuous_loader other{std::move(loader)};
 
-    ASSERT_NO_FATAL_FAILURE(loader = std::move(other));
+    ASSERT_NO_THROW(loader = std::move(other));
 }
 
 TEST(BasicContinuousLoader, GetEntityType) {

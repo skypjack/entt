@@ -54,16 +54,16 @@ void connect_and_auto_disconnect(entt::sigh<void(int &)> &sigh, const int &) {
 TEST(SigH, Lifetime) {
     using signal = entt::sigh<void(void)>;
 
-    ASSERT_NO_FATAL_FAILURE(signal{});
+    ASSERT_NO_THROW(signal{});
 
     signal src{}, other{};
 
-    ASSERT_NO_FATAL_FAILURE(signal{src});
-    ASSERT_NO_FATAL_FAILURE(signal{std::move(other)});
-    ASSERT_NO_FATAL_FAILURE(src = other);            // NOLINT
-    ASSERT_NO_FATAL_FAILURE(src = std::move(other)); // NOLINT
+    ASSERT_NO_THROW(signal{src});
+    ASSERT_NO_THROW(signal{std::move(other)});
+    ASSERT_NO_THROW(src = other);            // NOLINT
+    ASSERT_NO_THROW(src = std::move(other)); // NOLINT
 
-    ASSERT_NO_FATAL_FAILURE(delete new signal{});
+    ASSERT_NO_THROW(delete new signal{});
 }
 
 TEST(SigH, Clear) {

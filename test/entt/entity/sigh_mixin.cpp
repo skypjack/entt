@@ -553,7 +553,7 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
 
     ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
     ASSERT_FALSE(pool.contains(entt::entity{0}));
-    ASSERT_NO_FATAL_FAILURE(pool.compact());
+    ASSERT_NO_THROW(pool.compact());
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{0}, 0);

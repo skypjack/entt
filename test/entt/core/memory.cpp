@@ -28,7 +28,7 @@ TEST(PoccaPocmaAndPocs, Functionalities) {
 
     // code coverage purposes
     ASSERT_FALSE(lhs == rhs);
-    ASSERT_NO_FATAL_FAILURE(entt::propagate_on_container_swap(no_pocs, no_pocs));
+    ASSERT_NO_THROW(entt::propagate_on_container_swap(no_pocs, no_pocs));
 
     // honestly, I don't even know how one is supposed to test such a thing :)
     entt::propagate_on_container_copy_assignment(lhs, rhs);

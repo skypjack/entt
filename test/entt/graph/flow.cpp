@@ -282,8 +282,8 @@ ENTT_DEBUG_TEST(FlowDeathTest, NoBind) {
 
     flow.bind(0);
 
-    ASSERT_NO_FATAL_FAILURE(flow.ro(1));
-    ASSERT_NO_FATAL_FAILURE(flow.rw(2));
+    ASSERT_NO_THROW(flow.ro(1));
+    ASSERT_NO_THROW(flow.rw(2));
 }
 
 TEST(Flow, DirectRebind) {
