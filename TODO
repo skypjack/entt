@@ -26,3 +26,4 @@ TODO:
 * view unchecked_refresh loop is never executed if Get is 1u
 * review all // NOLINT + linter workflow + review clang-tidy file
 * self contained entity traits to avoid explicit specializations (ie enum constants)
+* allow to zero-sized versions (with non-regression tests)
