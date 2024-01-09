@@ -145,15 +145,14 @@ TEST(DenseMap, Copy) {
 
 TEST(DenseMap, Move) {
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    const auto load_factor = map.max_load_factor() - .05f;
-
-    map.max_load_factor(load_factor);
+    map.max_load_factor(map.max_load_factor() - .05f);
     map.emplace(3u, 42u);
 
     entt::dense_map<std::size_t, std::size_t, entt::identity> other{std::move(map)};
 
+    ASSERT_EQ(map.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_EQ(other.max_load_factor(), load_factor);
+    ASSERT_EQ(map.max_load_factor(), other.max_load_factor());
 
     map = other;
     map.emplace(1u, 99u);
@@ -161,6 +160,7 @@ TEST(DenseMap, Move) {
     other.emplace(0u, 0u);
     other = std::move(map);
 
+    ASSERT_EQ(map.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_TRUE(other.contains(1u));
     ASSERT_TRUE(other.contains(11u));

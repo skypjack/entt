@@ -139,15 +139,14 @@ TEST(DenseSet, Copy) {
 
 TEST(DenseSet, Move) {
     entt::dense_set<std::size_t, entt::identity> set;
-    const auto load_factor = set.max_load_factor() - .05f;
-
-    set.max_load_factor(load_factor);
+    set.max_load_factor(set.max_load_factor() - .05f);
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
 
+    ASSERT_EQ(set.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_EQ(other.max_load_factor(), load_factor);
+    ASSERT_EQ(set.max_load_factor(), other.max_load_factor());
 
     set = other;
     set.emplace(1u);
@@ -155,6 +154,7 @@ TEST(DenseSet, Move) {
     other.emplace(0u);
     other = std::move(set);
 
+    ASSERT_EQ(set.size(), 0u); // NOLINT
     ASSERT_TRUE(other.contains(3u));
     ASSERT_TRUE(other.contains(1u));
     ASSERT_TRUE(other.contains(11u));
