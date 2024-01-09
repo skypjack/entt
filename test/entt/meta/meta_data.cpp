@@ -21,7 +21,7 @@ struct base_t {
         ++counter;
     }
 
-    inline static int counter = 0;
+    inline static int counter = 0; // NOLINT
     int value{3};
 };
 
@@ -37,8 +37,8 @@ struct clazz_t {
     int i{0};
     const int j{1};
     base_t base{};
-    inline static int h{2};
-    inline static const int k{3};
+    inline static int h{2};       // NOLINT
+    inline static const int k{3}; // NOLINT
 };
 
 struct setter_getter_t {
@@ -82,7 +82,7 @@ struct multi_setter_t {
 };
 
 struct array_t {
-    inline static int global[3];
+    inline static int global[3]; // NOLINT
     int local[5];
 };
 

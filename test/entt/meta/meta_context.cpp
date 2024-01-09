@@ -50,7 +50,7 @@ struct clazz: base {
     }
 
     int value{};
-    inline static int bucket{};
+    inline static int bucket{}; // NOLINT
 };
 
 struct argument {
@@ -137,7 +137,7 @@ public:
         entt::meta_reset();
     }
 
-    [[nodiscard]] const entt::meta_ctx& ctx() const noexcept {
+    [[nodiscard]] const entt::meta_ctx &ctx() const noexcept {
         return context;
     }
 

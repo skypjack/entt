@@ -31,7 +31,7 @@ struct base_t {
         ref.value = v;
     }
 
-    inline static int counter = 0;
+    inline static int counter = 0; // NOLINT
     int value{3};
 };
 
@@ -86,7 +86,7 @@ struct func_t {
         return value;
     }
 
-    inline static int value = 0;
+    inline static int value = 0; // NOLINT
 };
 
 double double_member(const double &value) {

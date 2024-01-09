@@ -21,7 +21,7 @@ struct clazz_t {
         ++counter;
     }
 
-    inline static int counter = 0;
+    inline static int counter = 0; // NOLINT
 };
 
 struct MetaDtor: ::testing::Test {

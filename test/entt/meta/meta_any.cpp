@@ -24,7 +24,7 @@ struct clazz_t {
         return value;
     }
 
-    inline static char c = 'c';
+    inline static char c = 'c'; // NOLINT
     int value{0};
 };
 
@@ -42,8 +42,8 @@ struct empty_t {
         ++destroy_counter;
     }
 
-    inline static int destroy_counter = 0;
-    inline static int destructor_counter = 0;
+    inline static int destroy_counter = 0;    // NOLINT
+    inline static int destructor_counter = 0; // NOLINT
 };
 
 struct fat_t: empty_t {

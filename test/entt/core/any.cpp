@@ -25,7 +25,7 @@ struct empty {
         ++counter;
     }
 
-    inline static int counter = 0;
+    inline static int counter = 0; // NOLINT
 };
 
 struct fat {
@@ -43,7 +43,7 @@ struct fat {
         return std::equal(std::begin(value), std::end(value), std::begin(other.value), std::end(other.value));
     }
 
-    inline static int counter{0};
+    inline static int counter{0}; // NOLINT
     double value[4];
 };
 

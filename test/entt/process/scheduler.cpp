@@ -27,7 +27,7 @@ struct succeeded_process: entt::process<succeeded_process, entt::scheduler::delt
         succeed();
     }
 
-    inline static unsigned int invoked;
+    inline static unsigned int invoked; // NOLINT
 };
 
 struct failed_process: entt::process<failed_process, entt::scheduler::delta_type> {
@@ -36,7 +36,7 @@ struct failed_process: entt::process<failed_process, entt::scheduler::delta_type
         fail();
     }
 
-    inline static unsigned int invoked;
+    inline static unsigned int invoked; // NOLINT
 };
 
 struct Scheduler: ::testing::Test {

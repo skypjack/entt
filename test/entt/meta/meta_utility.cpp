@@ -41,9 +41,9 @@ struct clazz {
 
     int member{};
     const int cmember{};
-    inline static int value{};
-    inline static const int cvalue{};
-    inline static int arr[3u]{};
+    inline static int value{};        // NOLINT
+    inline static const int cvalue{}; // NOLINT
+    inline static int arr[3u]{};      // NOLINT
 };
 
 struct MetaUtility: ::testing::Test {
