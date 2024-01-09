@@ -393,13 +393,13 @@ TYPED_TEST(Poly, SboAlignment) {
     typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u); // NOLINT
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u); // NOLINT
 
     std::swap(sbo[0], sbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u); // NOLINT
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u); // NOLINT
 
     ASSERT_NE(data, sbo[1].data());
 }
@@ -409,13 +409,13 @@ TYPED_TEST(Poly, NoSboAlignment) {
     typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u); // NOLINT
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u); // NOLINT
 
     std::swap(nosbo[0], nosbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u); // NOLINT
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u); // NOLINT
 
     ASSERT_EQ(data, nosbo[1].data());
 }

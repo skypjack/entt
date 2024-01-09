@@ -217,7 +217,7 @@ TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
     alignas(int) std::byte storage[sizeof(int)];
     const std::allocator<int> allocator{};
 
-    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42);
+    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42); // NOLINT
 
     ASSERT_EQ(*value, 42);
 }
@@ -232,7 +232,7 @@ TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
     const std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
     alignas(string_type) std::byte storage[sizeof(string_type)];
 
-    string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value);
+    string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value); // NOLINT
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
