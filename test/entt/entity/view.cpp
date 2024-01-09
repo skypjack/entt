@@ -418,7 +418,6 @@ TEST(SingleComponentView, FrontBack) {
 }
 
 TEST(SingleComponentView, DeductionGuide) {
-    entt::registry registry;                             // NOLINT
     entt::storage_type_t<int> istorage;                  // NOLINT
     entt::storage_type_t<test::pointer_stable> sstorage; // NOLINT
 
