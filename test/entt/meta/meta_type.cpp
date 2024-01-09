@@ -101,7 +101,7 @@ struct overloaded_func_t {
         return v * v;
     }
 
-    inline static int value = 0;
+    int value{};
 };
 
 enum class property_t : entt::id_type {
@@ -220,7 +220,7 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_EQ(type.id(), "clazz"_hs);
     ASSERT_EQ(type.info(), entt::type_id<clazz_t>());
 
-    for(auto curr: type.prop()) {
+    for(auto &&curr: type.prop()) {
         ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
         ASSERT_EQ(curr.second.value(), 42);
     }
@@ -358,7 +358,7 @@ TEST_F(MetaType, Data) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
-    for([[maybe_unused]] auto curr: type.data()) {
+    for([[maybe_unused]] auto &&curr: type.data()) {
         ++counter;
     }
 
@@ -378,7 +378,7 @@ TEST_F(MetaType, Func) {
     clazz_t instance{};
     int counter{};
 
-    for([[maybe_unused]] auto curr: type.func()) {
+    for([[maybe_unused]] auto &&curr: type.func()) {
         ++counter;
     }
 
@@ -431,42 +431,42 @@ TEST_F(MetaType, OverloadedFunc) {
     res = type.invoke("f"_hs, instance, base_t{}, 1, 2);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 1);
+    ASSERT_EQ(instance.value, 1);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 4);
 
     res = type.invoke("f"_hs, instance, 3, 4);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 16);
 
     res = type.invoke("f"_hs, instance, 5);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 50);
 
     res = type.invoke("f"_hs, std::as_const(instance), 5);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 25);
 
     res = type.invoke("f"_hs, instance, 6, 7.f);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 6);
+    ASSERT_EQ(instance.value, 6);
     ASSERT_NE(res.try_cast<float>(), nullptr);
     ASSERT_EQ(res.cast<float>(), 14.f);
 
     res = type.invoke("f"_hs, instance, 8, 9.f);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(overloaded_func_t::value, 8);
+    ASSERT_EQ(instance.value, 8);
     ASSERT_NE(res.try_cast<float>(), nullptr);
     ASSERT_EQ(res.cast<float>(), 18.f);
 
