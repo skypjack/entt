@@ -15,7 +15,7 @@ TEST(CompressedPair, Size) {
         test::empty empty;
     };
 
-    ASSERT_EQ(sizeof(entt::compressed_pair<int, int>), sizeof(int[2u]));
+    ASSERT_EQ(sizeof(entt::compressed_pair<int, int>), sizeof(int) * 2u);
     ASSERT_EQ(sizeof(entt::compressed_pair<test::empty, int>), sizeof(int));
     ASSERT_EQ(sizeof(entt::compressed_pair<int, test::empty>), sizeof(int));
     ASSERT_LT(sizeof(entt::compressed_pair<int, test::empty>), sizeof(local));
