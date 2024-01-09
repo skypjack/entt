@@ -1,3 +1,4 @@
+#include <array>
 #include <cstddef>
 #include <utility>
 #include <gtest/gtest.h>
@@ -396,40 +397,40 @@ TEST(Organizer, Dependencies) {
     organizer.emplace<char, const double>(+[](const void *, entt::registry &) {});
 
     const auto graph = organizer.graph();
-    const entt::type_info *buffer[5u]{};
+    std::array<const entt::type_info *, 5u> buffer{};
 
     ASSERT_EQ(graph.size(), 3u);
 
     ASSERT_EQ(graph[0u].ro_count(), 2u);
     ASSERT_EQ(graph[0u].rw_count(), 0u);
 
-    ASSERT_EQ(graph[0u].ro_dependency(buffer, 0u), 0u);
-    ASSERT_EQ(graph[0u].rw_dependency(buffer, 2u), 0u);
+    ASSERT_EQ(graph[0u].ro_dependency(buffer.data(), 0u), 0u);
+    ASSERT_EQ(graph[0u].rw_dependency(buffer.data(), 2u), 0u);
 
-    ASSERT_EQ(graph[0u].ro_dependency(buffer, 5u), 2u);
+    ASSERT_EQ(graph[0u].ro_dependency(buffer.data(), 5u), 2u);
     ASSERT_EQ(*buffer[0u], entt::type_id<int>());
     ASSERT_EQ(*buffer[1u], entt::type_id<double>());
 
     ASSERT_EQ(graph[1u].ro_count(), 0u);
     ASSERT_EQ(graph[1u].rw_count(), 2u);
 
-    ASSERT_EQ(graph[1u].ro_dependency(buffer, 2u), 0u);
-    ASSERT_EQ(graph[1u].rw_dependency(buffer, 0u), 0u);
+    ASSERT_EQ(graph[1u].ro_dependency(buffer.data(), 2u), 0u);
+    ASSERT_EQ(graph[1u].rw_dependency(buffer.data(), 0u), 0u);
 
-    ASSERT_EQ(graph[1u].rw_dependency(buffer, 5u), 2u);
+    ASSERT_EQ(graph[1u].rw_dependency(buffer.data(), 5u), 2u);
     ASSERT_EQ(*buffer[0u], entt::type_id<int>());
     ASSERT_EQ(*buffer[1u], entt::type_id<char>());
 
     ASSERT_EQ(graph[2u].ro_count(), 1u);
     ASSERT_EQ(graph[2u].rw_count(), 1u);
 
-    ASSERT_EQ(graph[2u].ro_dependency(buffer, 2u), 1u);
-    ASSERT_EQ(graph[2u].rw_dependency(buffer, 0u), 0u);
+    ASSERT_EQ(graph[2u].ro_dependency(buffer.data(), 2u), 1u);
+    ASSERT_EQ(graph[2u].rw_dependency(buffer.data(), 0u), 0u);
 
-    ASSERT_EQ(graph[2u].ro_dependency(buffer, 5u), 1u);
+    ASSERT_EQ(graph[2u].ro_dependency(buffer.data(), 5u), 1u);
     ASSERT_EQ(*buffer[0u], entt::type_id<double>());
 
-    ASSERT_EQ(graph[2u].rw_dependency(buffer, 5u), 1u);
+    ASSERT_EQ(graph[2u].rw_dependency(buffer.data(), 5u), 1u);
     ASSERT_EQ(*buffer[0u], entt::type_id<char>());
 }
 
