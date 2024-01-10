@@ -54,7 +54,7 @@ TEST(EntityCopy, SameRegistry) {
     const auto dst = registry.create();
 
     custom.emplace(src, 1.);
-    registry.emplace<int>(src, 42);
+    registry.emplace<int>(src, 42); // NOLINT
     registry.emplace<char>(src, 'c');
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 2u);
@@ -90,7 +90,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     const auto entity = src.create();
     const auto copy = dst.create();
 
-    src.emplace<int>(entity, 42);
+    src.emplace<int>(entity, 42); // NOLINT
     src.emplace<char>(entity, 'c');
 
     ASSERT_EQ(src.storage<entt::entity>().size(), 1u);

@@ -79,7 +79,7 @@ Type &dereference_meta_pointer_like(const adl_wrapped_shared_ptr<Type> &ptr) {
 }
 
 int test_function() {
-    return 42;
+    return 42; // NOLINT
 }
 
 TEST(MetaPointerLike, DereferenceOperatorInvalidType) {
@@ -125,7 +125,7 @@ ENTT_DEBUG_TEST(MetaPointerLikeDeathTest, DereferenceOperatorConstType) {
 }
 
 TEST(MetaPointerLike, DereferenceOperatorConstAnyNonConstType) {
-    int value = 42;
+    int value = 42; // NOLINT
     const entt::meta_any any{&value};
     auto deref = *any;
 
@@ -179,7 +179,7 @@ TEST(MetaPointerLike, DereferenceOperatorRawPointer) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int &>() = 42;
+    deref.cast<int &>() = 42; // NOLINT
 
     ASSERT_EQ(*any.cast<int *>(), 42);
     ASSERT_EQ(value, 42);
@@ -200,7 +200,7 @@ TEST(MetaPointerLike, DereferenceOperatorSmartPointer) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int &>() = 42;
+    deref.cast<int &>() = 42; // NOLINT
 
     ASSERT_EQ(*any.cast<std::shared_ptr<int>>(), 42);
     ASSERT_EQ(*value, 42);
@@ -235,14 +235,14 @@ TEST(MetaPointerLike, AsRef) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int &>() = 42;
+    deref.cast<int &>() = 42; // NOLINT
 
     ASSERT_EQ(*any.cast<int *>(), 42);
     ASSERT_EQ(value, 42);
 }
 
 TEST(MetaPointerLike, AsConstRef) {
-    int value = 42;
+    int value = 42; // NOLINT
     int *const ptr = &value;
     entt::meta_any any{entt::forward_as_meta(ptr)};
 
@@ -257,7 +257,7 @@ TEST(MetaPointerLike, AsConstRef) {
     ASSERT_FALSE(deref.type().is_pointer_like());
     ASSERT_EQ(deref.type(), entt::resolve<int>());
 
-    deref.cast<int &>() = 42;
+    deref.cast<int &>() = 42; // NOLINT
 
     ASSERT_EQ(*any.cast<int *>(), 42);
     ASSERT_EQ(value, 42);
@@ -401,7 +401,7 @@ TEST(MetaPointerLike, DereferencePointerToFunction) {
 }
 
 TEST(MetaPointerLike, DereferenceSelfPointer) {
-    self_ptr obj{42};
+    self_ptr obj{42}; // NOLINT
     const entt::meta_any any{entt::forward_as_meta(obj)};
     entt::meta_any deref = *any;
 
@@ -422,17 +422,17 @@ TEST(MetaPointerLike, DereferenceProxyPointer) {
     ASSERT_EQ(*deref.cast<const proxy_ptr &>().value, value);
     ASSERT_TRUE(deref.try_cast<proxy_ptr>());
 
-    *deref.cast<proxy_ptr &>().value = 42;
+    *deref.cast<proxy_ptr &>().value = 42; // NOLINT
 
     ASSERT_EQ(value, 42);
 }
 
 TEST(MetaPointerLike, DereferenceArray) {
-    const entt::meta_any array{std::in_place_type<int[3]>};
-    const entt::meta_any array_of_array{std::in_place_type<int[3][3]>};
+    const entt::meta_any array{std::in_place_type<int[3]>};             // NOLINT
+    const entt::meta_any array_of_array{std::in_place_type<int[3][3]>}; // NOLINT
 
-    ASSERT_EQ(array.type(), entt::resolve<int[3]>());
-    ASSERT_EQ(array_of_array.type(), entt::resolve<int[3][3]>());
+    ASSERT_EQ(array.type(), entt::resolve<int[3]>());             // NOLINT
+    ASSERT_EQ(array_of_array.type(), entt::resolve<int[3][3]>()); // NOLINT
 
     ASSERT_FALSE(*array);
     ASSERT_FALSE(*array_of_array);

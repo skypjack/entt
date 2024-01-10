@@ -35,7 +35,7 @@ struct clazz_t {
     }
 
     int i{0};
-    const int j{1};
+    const int j{1}; // NOLINT
     base_t base{};
     inline static int h{2};       // NOLINT
     inline static const int k{3}; // NOLINT
@@ -83,7 +83,7 @@ struct multi_setter_t {
 
 struct array_t {
     inline static int global[3]; // NOLINT
-    int local[5];
+    int local[5];                // NOLINT
 };
 
 enum class property_t : entt::id_type {
@@ -277,7 +277,7 @@ TEST_F(MetaData, GetMetaAnyArg) {
     using namespace entt::literals;
 
     entt::meta_any any{clazz_t{}};
-    any.cast<clazz_t &>().i = 99;
+    any.cast<clazz_t &>().i = 99; // NOLINT
     const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
 
     ASSERT_TRUE(value);
@@ -323,7 +323,7 @@ TEST_F(MetaData, SetConvert) {
     using namespace entt::literals;
 
     clazz_t instance{};
-    instance.h = 42;
+    instance.h = 42; // NOLINT
 
     ASSERT_EQ(instance.i, 0);
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, instance));
@@ -334,7 +334,7 @@ TEST_F(MetaData, SetByRef) {
     using namespace entt::literals;
 
     entt::meta_any any{clazz_t{}};
-    int value{42};
+    int value{42}; // NOLINT
 
     ASSERT_EQ(any.cast<clazz_t>().i, 0);
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(value)));
@@ -351,7 +351,7 @@ TEST_F(MetaData, SetByConstRef) {
     using namespace entt::literals;
 
     entt::meta_any any{clazz_t{}};
-    int value{42};
+    int value{42}; // NOLINT
 
     ASSERT_EQ(any.cast<clazz_t>().i, 0);
     ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(std::as_const(value))));
@@ -526,8 +526,8 @@ TEST_F(MetaData, ArrayStatic) {
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int[3]>());
-    ASSERT_EQ(data.arg(0u), entt::resolve<int[3]>());
+    ASSERT_EQ(data.type(), entt::resolve<int[3]>());  // NOLINT
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[3]>()); // NOLINT
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
@@ -542,8 +542,8 @@ TEST_F(MetaData, Array) {
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int[5]>());
-    ASSERT_EQ(data.arg(0u), entt::resolve<int[5]>());
+    ASSERT_EQ(data.type(), entt::resolve<int[5]>());  // NOLINT
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[5]>()); // NOLINT
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_TRUE(data.type().is_array());

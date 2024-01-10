@@ -164,7 +164,7 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
     ASSERT_EQ(.3, handle.emplace_or_replace<double>(.3));
 
-    const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; });
+    const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; }); // NOLINT
 
     ASSERT_EQ(42, patched);
     ASSERT_EQ('a', handle.replace<char>('a'));
@@ -205,7 +205,7 @@ TYPED_TEST(BasicHandle, FromEntity) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<int>(entity, 42);
+    registry.emplace<int>(entity, 42); // NOLINT
     registry.emplace<char>(entity, 'c');
 
     const handle_type handle{registry, entity};
@@ -243,7 +243,7 @@ TEST(BasicHandle, ImplicitConversions) {
     const entt::handle_view<int, char> handle_view = handle;
     const entt::const_handle_view<int> const_handle_view = handle_view;
 
-    handle.emplace<int>(42);
+    handle.emplace<int>(42); // NOLINT
 
     ASSERT_EQ(handle.get<int>(), const_handle.get<int>());
     ASSERT_EQ(const_handle.get<int>(), handle_view.get<int>());

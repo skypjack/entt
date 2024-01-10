@@ -40,7 +40,7 @@ struct clazz {
     }
 
     int member{};
-    const int cmember{};
+    const int cmember{};              // NOLINT
     inline static int value{};        // NOLINT
     inline static const int cvalue{}; // NOLINT
     inline static int arr[3u]{};      // NOLINT
@@ -55,7 +55,7 @@ struct MetaUtility: ::testing::Test {
 using MetaUtilityDeathTest = MetaUtility;
 
 TEST_F(MetaUtility, MetaDispatch) {
-    int value = 42;
+    int value = 42; // NOLINT
 
     auto as_void = entt::meta_dispatch<entt::as_void_t>(value);
     auto as_ref = entt::meta_dispatch<entt::as_ref_t>(value);
@@ -78,7 +78,7 @@ TEST_F(MetaUtility, MetaDispatch) {
 }
 
 TEST_F(MetaUtility, MetaDispatchMetaAny) {
-    entt::meta_any any{42};
+    entt::meta_any any{42}; // NOLINT
 
     auto from_any = entt::meta_dispatch(any);
     auto from_const_any = entt::meta_dispatch(std::as_const(any));
@@ -94,7 +94,7 @@ TEST_F(MetaUtility, MetaDispatchMetaAny) {
 }
 
 TEST_F(MetaUtility, MetaDispatchMetaAnyAsRef) {
-    entt::meta_any any{42};
+    entt::meta_any any{42}; // NOLINT
 
     auto from_any = entt::meta_dispatch(any.as_ref());
     auto from_const_any = entt::meta_dispatch(std::as_const(any).as_ref());
@@ -187,14 +187,14 @@ TEST_F(MetaUtility, MetaGetter) {
 }
 
 TEST_F(MetaUtility, MetaInvokeWithCandidate) {
-    entt::meta_any args[2u]{clazz{}, 42};
-    args[0u].cast<clazz &>().value = 99;
+    entt::meta_any args[2u]{clazz{}, 42}; // NOLINT
+    args[0u].cast<clazz &>().value = 99;  // NOLINT
 
     ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::setter, nullptr)));
     ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::getter, nullptr)));
 
-    ASSERT_TRUE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, args + 1u)));
-    ASSERT_FALSE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, args)));
+    ASSERT_TRUE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, args + 1u))); // NOLINT
+    ASSERT_FALSE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, args)));     // NOLINT
     ASSERT_EQ((entt::meta_invoke<clazz>(args[0u], &clazz::getter, nullptr)).cast<int>(), 42);
     ASSERT_FALSE((entt::meta_invoke<clazz>(args[1u], &clazz::getter, nullptr)));
 
@@ -205,19 +205,19 @@ TEST_F(MetaUtility, MetaInvokeWithCandidate) {
     const auto setter = [](int &value) { value = 3; };
     const auto getter = [](int value) { return value * 2; };
 
-    ASSERT_TRUE(entt::meta_invoke<test::empty>({}, setter, args + 1u));
-    ASSERT_EQ(entt::meta_invoke<test::empty>({}, getter, args + 1u).cast<int>(), 6);
+    ASSERT_TRUE(entt::meta_invoke<test::empty>({}, setter, args + 1u));              // NOLINT
+    ASSERT_EQ(entt::meta_invoke<test::empty>({}, getter, args + 1u).cast<int>(), 6); // NOLINT
 }
 
 TEST_F(MetaUtility, MetaInvoke) {
-    entt::meta_any args[2u]{clazz{}, 42};
-    args[0u].cast<clazz &>().value = 99;
+    entt::meta_any args[2u]{clazz{}, 42}; // NOLINT
+    args[0u].cast<clazz &>().value = 99;  // NOLINT
 
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>({}, nullptr)));
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>({}, nullptr)));
 
-    ASSERT_TRUE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], args + 1u)));
-    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], args)));
+    ASSERT_TRUE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], args + 1u))); // NOLINT
+    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], args)));     // NOLINT
     ASSERT_EQ((entt::meta_invoke<clazz, &clazz::getter>(args[0u], nullptr)).cast<int>(), 42);
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>(args[1u], nullptr)));
 
@@ -227,42 +227,42 @@ TEST_F(MetaUtility, MetaInvoke) {
 }
 
 TEST_F(MetaUtility, MetaConstructArgsOnly) {
-    entt::meta_any args[2u]{clazz{}, 42};
-    const auto any = entt::meta_construct<clazz, int>(args + 1u);
+    entt::meta_any args[2u]{clazz{}, 42};                         // NOLINT
+    const auto any = entt::meta_construct<clazz, int>(args + 1u); // NOLINT
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE((entt::meta_construct<clazz, int>(args)));
+    ASSERT_FALSE((entt::meta_construct<clazz, int>(args))); // NOLINT
     ASSERT_EQ(any.cast<const clazz &>().member, 42);
 }
 
 TEST_F(MetaUtility, MetaConstructWithCandidate) {
-    entt::meta_any args[2u]{clazz{}, 42};
-    const auto any = entt::meta_construct<clazz>(&clazz::factory, args + 1u);
+    entt::meta_any args[2u]{clazz{}, 42};                                     // NOLINT
+    const auto any = entt::meta_construct<clazz>(&clazz::factory, args + 1u); // NOLINT
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE((entt::meta_construct<clazz>(&clazz::factory, args)));
+    ASSERT_FALSE((entt::meta_construct<clazz>(&clazz::factory, args))); // NOLINT
     ASSERT_EQ(any.cast<const clazz &>().member, 42);
 
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 0);
-    ASSERT_TRUE((entt::meta_construct<clazz>(&clazz::static_setter, args)));
+    ASSERT_TRUE((entt::meta_construct<clazz>(&clazz::static_setter, args))); // NOLINT
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 42);
 
     const auto setter = [](int &value) { value = 3; };
     const auto builder = [](int value) { return value * 2; };
 
-    ASSERT_TRUE(entt::meta_construct<test::empty>(setter, args + 1u));
-    ASSERT_EQ(entt::meta_construct<test::empty>(builder, args + 1u).cast<int>(), 6);
+    ASSERT_TRUE(entt::meta_construct<test::empty>(setter, args + 1u));               // NOLINT
+    ASSERT_EQ(entt::meta_construct<test::empty>(builder, args + 1u).cast<int>(), 6); // NOLINT
 }
 
 TEST_F(MetaUtility, MetaConstruct) {
-    entt::meta_any args[2u]{clazz{}, 42};
-    const auto any = entt::meta_construct<clazz, &clazz::factory>(args + 1u);
+    entt::meta_any args[2u]{clazz{}, 42};                                     // NOLINT
+    const auto any = entt::meta_construct<clazz, &clazz::factory>(args + 1u); // NOLINT
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE((entt::meta_construct<clazz, &clazz::factory>(args)));
+    ASSERT_FALSE((entt::meta_construct<clazz, &clazz::factory>(args))); // NOLINT
     ASSERT_EQ(any.cast<const clazz &>().member, 42);
 
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 0);
-    ASSERT_TRUE((entt::meta_construct<clazz, &clazz::static_setter>(args)));
+    ASSERT_TRUE((entt::meta_construct<clazz, &clazz::static_setter>(args))); // NOLINT
     ASSERT_EQ(args[0u].cast<const clazz &>().member, 42);
 }

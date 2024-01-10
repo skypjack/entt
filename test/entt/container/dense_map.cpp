@@ -100,7 +100,7 @@ TEST(DenseMap, Constructors) {
     map = entt::dense_map<int, int>{2u * minimum_bucket_count, std::allocator<float>{}};
     map = entt::dense_map<int, int>{4u * minimum_bucket_count, std::hash<int>(), std::allocator<double>{}};
 
-    map.emplace(3u, 42u);
+    map.emplace(3u, 42u); // NOLINT
 
     entt::dense_map<int, int> temp{map, map.get_allocator()};
     const entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
@@ -114,7 +114,7 @@ TEST(DenseMap, Constructors) {
 TEST(DenseMap, Copy) {
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
     map.max_load_factor(map.max_load_factor() - .05f);
-    map.emplace(3u, 42u);
+    map.emplace(3u, 42u); // NOLINT
 
     entt::dense_map<std::size_t, std::size_t, entt::identity> other{map};
 
@@ -122,8 +122,8 @@ TEST(DenseMap, Copy) {
     ASSERT_TRUE(other.contains(3u));
     ASSERT_EQ(map.max_load_factor(), other.max_load_factor());
 
-    map.emplace(1u, 99u);
-    map.emplace(11u, 77u);
+    map.emplace(1u, 99u);  // NOLINT
+    map.emplace(11u, 77u); // NOLINT
     other.emplace(0u, 0u);
     other = map;
 
@@ -146,7 +146,7 @@ TEST(DenseMap, Copy) {
 TEST(DenseMap, Move) {
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
     map.max_load_factor(map.max_load_factor() - .05f);
-    map.emplace(3u, 42u);
+    map.emplace(3u, 42u); // NOLINT
 
     entt::dense_map<std::size_t, std::size_t, entt::identity> other{std::move(map)};
 
@@ -155,8 +155,8 @@ TEST(DenseMap, Move) {
     ASSERT_EQ(map.max_load_factor(), other.max_load_factor());
 
     map = other;
-    map.emplace(1u, 99u);
-    map.emplace(11u, 77u);
+    map.emplace(1u, 99u);  // NOLINT
+    map.emplace(11u, 77u); // NOLINT
     other.emplace(0u, 0u);
     other = std::move(map);
 
@@ -183,7 +183,7 @@ TEST(DenseMap, Iterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<const int &, int &>>();
 
     entt::dense_map<int, int> map;
-    map.emplace(3, 42);
+    map.emplace(3, 42); // NOLINT
 
     iterator end{map.begin()};
     iterator begin{};
@@ -221,7 +221,7 @@ TEST(DenseMap, Iterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, map.end());
 
-    map.emplace(42, 3);
+    map.emplace(42, 3); // NOLINT
     begin = map.begin();
 
     ASSERT_EQ(begin[0u].first, 3);
@@ -236,7 +236,7 @@ TEST(DenseMap, ConstIterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<const int &, const int &>>();
 
     entt::dense_map<int, int> map;
-    map.emplace(3, 42);
+    map.emplace(3, 42); // NOLINT
 
     iterator cend{map.cbegin()};
     iterator cbegin{};
@@ -274,7 +274,7 @@ TEST(DenseMap, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, map.cend());
 
-    map.emplace(42, 3);
+    map.emplace(42, 3); // NOLINT
     cbegin = map.cbegin();
 
     ASSERT_EQ(cbegin[0u].first, 3);
@@ -283,7 +283,7 @@ TEST(DenseMap, ConstIterator) {
 
 TEST(DenseMap, IteratorConversion) {
     entt::dense_map<int, int> map;
-    map.emplace(3, 42);
+    map.emplace(3, 42); // NOLINT
 
     const typename entt::dense_map<int, int>::iterator it = map.begin();
     typename entt::dense_map<int, int>::const_iterator cit = it;
@@ -327,7 +327,7 @@ TEST(DenseMap, Insert) {
     ASSERT_EQ(it->first, 1);
     ASSERT_EQ(it->second, 2);
 
-    value.second = 99;
+    value.second = 99; // NOLINT
     std::tie(it, result) = map.insert(value);
 
     ASSERT_FALSE(result);
@@ -345,14 +345,14 @@ TEST(DenseMap, Insert) {
     ASSERT_EQ(it->first, 3);
     ASSERT_EQ(it->second, 4);
 
-    std::tie(it, result) = map.insert(std::pair<const int, int>{3, 99});
+    std::tie(it, result) = map.insert(std::pair<const int, int>{3, 99}); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 2u);
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 4);
 
-    std::tie(it, result) = map.insert(std::pair<int, unsigned int>{5, 6u});
+    std::tie(it, result) = map.insert(std::pair<int, unsigned int>{5, 6u}); // NOLINT
 
     ASSERT_TRUE(result);
     ASSERT_EQ(map.size(), 3u);
@@ -362,22 +362,22 @@ TEST(DenseMap, Insert) {
     ASSERT_EQ(it->first, 5);
     ASSERT_EQ(it->second, 6);
 
-    std::tie(it, result) = map.insert(std::pair<int, unsigned int>{5, 99u});
+    std::tie(it, result) = map.insert(std::pair<int, unsigned int>{5, 99u}); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 3u);
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 6);
 
-    std::pair<const int, int> range[2u]{std::make_pair(7, 8), std::make_pair(9, 10)};
+    std::pair<const int, int> range[2u]{std::make_pair(7, 8), std::make_pair(9, 10)}; // NOLINT
     map.insert(std::begin(range), std::end(range));
 
     ASSERT_EQ(map.size(), 5u);
     ASSERT_TRUE(map.contains(7));
     ASSERT_NE(map.find(9), map.end());
 
-    range[0u].second = 99;
-    range[1u].second = 99;
+    range[0u].second = 99; // NOLINT
+    range[1u].second = 99; // NOLINT
     map.insert(std::begin(range), std::end(range));
 
     ASSERT_EQ(map.size(), 5u);
@@ -460,7 +460,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it->first, 1);
     ASSERT_EQ(it->second, 2);
 
-    std::tie(it, result) = map.insert_or_assign(key, 99);
+    std::tie(it, result) = map.insert_or_assign(key, 99); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 1u);
@@ -477,14 +477,14 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it->first, 3);
     ASSERT_EQ(it->second, 4);
 
-    std::tie(it, result) = map.insert_or_assign(3, 99);
+    std::tie(it, result) = map.insert_or_assign(3, 99); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 2u);
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 99);
 
-    std::tie(it, result) = map.insert_or_assign(5, 6u);
+    std::tie(it, result) = map.insert_or_assign(5, 6u); // NOLINT
 
     ASSERT_TRUE(result);
     ASSERT_EQ(map.size(), 3u);
@@ -494,7 +494,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it->first, 5);
     ASSERT_EQ(it->second, 6);
 
-    std::tie(it, result) = map.insert_or_assign(5, 99u);
+    std::tie(it, result) = map.insert_or_assign(5, 99u); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 3u);
@@ -539,7 +539,7 @@ TEST(DenseMap, Emplace) {
     ASSERT_EQ(it->first, 1);
     ASSERT_EQ(it->second, 2);
 
-    std::tie(it, result) = map.emplace(std::make_pair(1, 99));
+    std::tie(it, result) = map.emplace(std::make_pair(1, 99)); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 2u);
@@ -556,14 +556,14 @@ TEST(DenseMap, Emplace) {
     ASSERT_EQ(it->first, 3);
     ASSERT_EQ(it->second, 4);
 
-    std::tie(it, result) = map.emplace(3, 99);
+    std::tie(it, result) = map.emplace(3, 99); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 3u);
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 4);
 
-    std::tie(it, result) = map.emplace(std::piecewise_construct, std::make_tuple(5), std::make_tuple(6u));
+    std::tie(it, result) = map.emplace(std::piecewise_construct, std::make_tuple(5), std::make_tuple(6u)); // NOLINT
 
     ASSERT_TRUE(result);
     ASSERT_EQ(map.size(), 4u);
@@ -573,14 +573,14 @@ TEST(DenseMap, Emplace) {
     ASSERT_EQ(it->first, 5);
     ASSERT_EQ(it->second, 6);
 
-    std::tie(it, result) = map.emplace(std::piecewise_construct, std::make_tuple(5), std::make_tuple(99u));
+    std::tie(it, result) = map.emplace(std::piecewise_construct, std::make_tuple(5), std::make_tuple(99u)); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 4u);
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 6);
 
-    std::tie(it, result) = map.emplace(std::make_pair(1, 99));
+    std::tie(it, result) = map.emplace(std::make_pair(1, 99)); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 4u);
@@ -663,7 +663,7 @@ TEST(DenseMap, TryEmplace) {
     ASSERT_EQ(it->first, 1);
     ASSERT_EQ(it->second, 2);
 
-    std::tie(it, result) = map.try_emplace(1, 99);
+    std::tie(it, result) = map.try_emplace(1, 99); // NOLINT
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 1u);
@@ -727,13 +727,13 @@ TEST(DenseMap, TryEmplaceSameBucket) {
 
 TEST(DenseMap, TryEmplaceMovableType) {
     entt::dense_map<int, std::unique_ptr<int>> map;
-    std::unique_ptr<int> value = std::make_unique<int>(42);
+    std::unique_ptr<int> value = std::make_unique<int>(42); // NOLINT
 
     ASSERT_TRUE(map.try_emplace(*value, std::move(value)).second);
     ASSERT_FALSE(map.empty());
     ASSERT_FALSE(value);
 
-    value = std::make_unique<int>(42);
+    value = std::make_unique<int>(42); // NOLINT
 
     ASSERT_FALSE(map.try_emplace(*value, std::move(value)).second);
     ASSERT_TRUE(value);
@@ -769,7 +769,7 @@ TEST(DenseMap, Erase) {
     ASSERT_EQ((--map.end())->first, 5u);
 
     for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
-        if(next == 1u || next == 8u || next == 6u) {
+        if(next == 1u || next == 8u || next == 6u) { // NOLINT
             ASSERT_FALSE(map.contains(next));
             ASSERT_EQ(map.bucket_size(next), 0u);
         } else {
@@ -853,7 +853,7 @@ TEST(DenseMap, EraseFromBucket) {
 
     map.erase((++map.begin(0u))->first);
     map.erase((++map.begin(2u))->first);
-    map.erase((++map.begin(15u))->first);
+    map.erase((++map.begin(15u))->first); // NOLINT
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_EQ(map.size(), 6u);
@@ -866,8 +866,8 @@ TEST(DenseMap, EraseFromBucket) {
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 1u + 2u));
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * (1u + 1u) - 1u));
 
-    while(map.begin(15) != map.end(15u)) {
-        map.erase(map.begin(15)->first);
+    while(map.begin(15) != map.end(15u)) { // NOLINT
+        map.erase(map.begin(15)->first);   // NOLINT
     }
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
@@ -921,7 +921,7 @@ TEST(DenseMap, EqualRange) {
     entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
 
-    map.emplace(42, 3);
+    map.emplace(42, 3); // NOLINT
 
     ASSERT_EQ(map.equal_range(0).first, map.end());
     ASSERT_EQ(map.equal_range(0).second, map.end());
@@ -963,7 +963,7 @@ TEST(DenseMap, Indexing) {
 
     ASSERT_FALSE(map.contains(key));
 
-    map[key] = 99;
+    map[key] = 99; // NOLINT
 
     ASSERT_TRUE(map.contains(key));
     ASSERT_EQ(map[int{key}], 99);
@@ -988,8 +988,8 @@ TEST(DenseMap, LocalIterator) {
 
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    map.emplace(3u, 42u);
-    map.emplace(3u + minimum_bucket_count, 99u);
+    map.emplace(3u, 42u);                        // NOLINT
+    map.emplace(3u + minimum_bucket_count, 99u); // NOLINT
 
     iterator end{map.begin(3u)};
     iterator begin{};
@@ -1016,8 +1016,8 @@ TEST(DenseMap, ConstLocalIterator) {
 
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    map.emplace(3u, 42u);
-    map.emplace(3u + minimum_bucket_count, 99u);
+    map.emplace(3u, 42u);                        // NOLINT
+    map.emplace(3u + minimum_bucket_count, 99u); // NOLINT
 
     iterator cend{map.begin(3u)};
     iterator cbegin{};
@@ -1037,7 +1037,7 @@ TEST(DenseMap, ConstLocalIterator) {
 
 TEST(DenseMap, LocalIteratorConversion) {
     entt::dense_map<int, int> map;
-    map.emplace(3, 42);
+    map.emplace(3, 42); // NOLINT
 
     const typename entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
     typename entt::dense_map<int, int>::const_local_iterator cit = it;
@@ -1057,21 +1057,21 @@ TEST(DenseMap, LocalIteratorConversion) {
 TEST(DenseMap, Rehash) {
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    map[32u] = 99u;
+    map[32u] = 99u; // NOLINT
 
     ASSERT_EQ(map.bucket_count(), minimum_bucket_count);
     ASSERT_TRUE(map.contains(32u));
     ASSERT_EQ(map.bucket(32u), 0u);
     ASSERT_EQ(map[32u], 99u);
 
-    map.rehash(12u);
+    map.rehash(12u); // NOLINT
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(map.contains(32u));
     ASSERT_EQ(map.bucket(32u), 0u);
     ASSERT_EQ(map[32u], 99u);
 
-    map.rehash(44u);
+    map.rehash(44u); // NOLINT
 
     ASSERT_EQ(map.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(map.contains(32u));
@@ -1097,7 +1097,7 @@ TEST(DenseMap, Rehash) {
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(map.contains(32u));
 
-    map.rehash(55u);
+    map.rehash(55u); // NOLINT
 
     ASSERT_EQ(map.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(map.contains(32u));

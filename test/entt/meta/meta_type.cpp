@@ -122,7 +122,7 @@ struct MetaType: ::testing::Test {
         entt::meta<unsigned int>()
             .type("unsigned int"_hs)
             .data<0u>("min"_hs)
-            .data<100u>("max"_hs);
+            .data<100u>("max"_hs); // NOLINT
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -172,7 +172,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .prop(static_cast<entt::id_type>(property_t::value), 42)
+            .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
@@ -237,8 +237,8 @@ TEST_F(MetaType, Functionalities) {
 TEST_F(MetaType, SizeOf) {
     ASSERT_EQ(entt::resolve<void>().size_of(), 0u);
     ASSERT_EQ(entt::resolve<int>().size_of(), sizeof(int));
-    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);
-    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3]));
+    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);              // NOLINT
+    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3])); // NOLINT
 }
 
 TEST_F(MetaType, Traits) {
@@ -254,8 +254,8 @@ TEST_F(MetaType, Traits) {
     ASSERT_FALSE(entt::resolve<unsigned int>().is_signed());
     ASSERT_FALSE(entt::resolve<clazz_t>().is_signed());
 
-    ASSERT_TRUE(entt::resolve<int[5]>().is_array());
-    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
+    ASSERT_TRUE(entt::resolve<int[5]>().is_array());    // NOLINT
+    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array()); // NOLINT
     ASSERT_FALSE(entt::resolve<int>().is_array());
 
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
@@ -442,21 +442,21 @@ TEST_F(MetaType, OverloadedFunc) {
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 16);
 
-    res = type.invoke("f"_hs, instance, 5);
+    res = type.invoke("f"_hs, instance, 5); // NOLINT
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 50);
 
-    res = type.invoke("f"_hs, std::as_const(instance), 5);
+    res = type.invoke("f"_hs, std::as_const(instance), 5); // NOLINT
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 25);
 
-    res = type.invoke("f"_hs, instance, 6, 7.f);
+    res = type.invoke("f"_hs, instance, 6, 7.f); // NOLINT
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 6);
@@ -475,7 +475,7 @@ TEST_F(MetaType, OverloadedFunc) {
 }
 
 TEST_F(MetaType, Construct) {
-    auto any = entt::resolve<clazz_t>().construct(base_t{}, 42);
+    auto any = entt::resolve<clazz_t>().construct(base_t{}, 42); // NOLINT
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -489,7 +489,7 @@ TEST_F(MetaType, ConstructNoArgs) {
 }
 
 TEST_F(MetaType, ConstructMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42});
+    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42}); // NOLINT
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -504,7 +504,7 @@ TEST_F(MetaType, LessArgs) {
 }
 
 TEST_F(MetaType, ConstructCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42});
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42}); // NOLINT
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -610,7 +610,7 @@ TEST_F(MetaType, AbstractClass) {
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
-    type.func("func"_hs).invoke(instance, 42);
+    type.func("func"_hs).invoke(instance, 42); // NOLINT
 
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 42);
@@ -739,7 +739,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-        .prop(static_cast<entt::id_type>(property_t::value), 42)
+        .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
         .prop(static_cast<entt::id_type>(property_t::random), 3);
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::value)));

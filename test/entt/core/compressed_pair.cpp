@@ -34,7 +34,7 @@ TEST(CompressedPair, ConstructCopyMove) {
     static_assert(std::is_move_constructible_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Move constructible type required");
     static_assert(std::is_move_assignable_v<entt::compressed_pair<std::unique_ptr<int>, test::empty>>, "Move assignable type required");
 
-    entt::compressed_pair copyable{test::non_default_constructible{42}, test::empty{}};
+    entt::compressed_pair copyable{test::non_default_constructible{42}, test::empty{}}; // NOLINT
     auto by_copy{copyable};
 
     ASSERT_EQ(by_copy.first().value, 42);
@@ -44,7 +44,7 @@ TEST(CompressedPair, ConstructCopyMove) {
 
     ASSERT_EQ(copyable.first().value, 3);
 
-    entt::compressed_pair<test::empty, std::unique_ptr<int>> movable{test::empty{}, std::make_unique<int>(99)};
+    entt::compressed_pair<test::empty, std::unique_ptr<int>> movable{test::empty{}, std::make_unique<int>(99)}; // NOLINT
     auto by_move{std::move(movable)};
 
     ASSERT_EQ(*by_move.second(), 99);
@@ -138,7 +138,7 @@ TEST(CompressedPair, Get) {
     testing::StaticAssertTypeEq<decltype(cfirst), const int>();
     testing::StaticAssertTypeEq<decltype(csecond), const int>();
 
-    auto [tfirst, tsecond] = entt::compressed_pair{9, 99};
+    auto [tfirst, tsecond] = entt::compressed_pair{9, 99}; // NOLINT
 
     ASSERT_EQ(tfirst, 9);
     ASSERT_EQ(tsecond, 99);

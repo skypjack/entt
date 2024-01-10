@@ -139,7 +139,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
 
     other = entt::storage<value_type>{};
-    other.emplace(entt::entity{42}, 42);
+    other.emplace(entt::entity{42}, 42); // NOLINT
     other = std::move(pool);
 
     ASSERT_TRUE(pool.empty()); // NOLINT
@@ -161,10 +161,10 @@ TYPED_TEST(Storage, Swap) {
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
 
-    pool.emplace(entt::entity{42}, 41);
-    other.emplace(entt::entity{9}, 8);
+    pool.emplace(entt::entity{42}, 41); // NOLINT
+    other.emplace(entt::entity{9}, 8);  // NOLINT
     other.emplace(entt::entity{3}, 2);
-    other.erase(entt::entity{9});
+    other.erase(entt::entity{9}); // NOLINT
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u + traits_type::in_place_delete);
@@ -189,7 +189,7 @@ TYPED_TEST(Storage, Capacity) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    pool.reserve(42);
+    pool.reserve(42); // NOLINT
 
     ASSERT_EQ(pool.capacity(), traits_type::page_size);
     ASSERT_TRUE(pool.empty());
@@ -237,7 +237,7 @@ TYPED_TEST(Storage, Raw) {
     entt::storage<value_type> pool;
 
     pool.emplace(entt::entity{3}, 3);
-    pool.emplace(entt::entity{12}, 6);
+    pool.emplace(entt::entity{12}, 6); // NOLINT
 
     ASSERT_EQ(pool.raw()[0u][0u], value_type{3});
     ASSERT_EQ(std::as_const(pool).raw()[0u][1u], value_type{6});
@@ -252,7 +252,7 @@ TYPED_TEST(Storage, Iterator) {
     testing::StaticAssertTypeEq<typename iterator::reference, value_type &>();
 
     entt::storage<value_type> pool;
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     iterator end{pool.begin()};
     iterator begin{};
@@ -296,7 +296,7 @@ TYPED_TEST(Storage, Iterator) {
     ASSERT_EQ(begin.index(), 0);
     ASSERT_EQ(end.index(), -1);
 
-    pool.emplace(entt::entity{42}, 3);
+    pool.emplace(entt::entity{42}, 3); // NOLINT
     begin = pool.begin();
 
     ASSERT_EQ(begin.index(), 1);
@@ -315,7 +315,7 @@ TYPED_TEST(Storage, ConstIterator) {
     testing::StaticAssertTypeEq<typename iterator::reference, const value_type &>();
 
     entt::storage<value_type> pool;
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     iterator cend{pool.cbegin()};
     iterator cbegin{};
@@ -360,7 +360,7 @@ TYPED_TEST(Storage, ConstIterator) {
     ASSERT_EQ(cbegin.index(), 0);
     ASSERT_EQ(cend.index(), -1);
 
-    pool.emplace(entt::entity{42}, 3);
+    pool.emplace(entt::entity{42}, 3); // NOLINT
     cbegin = pool.cbegin();
 
     ASSERT_EQ(cbegin.index(), 1);
@@ -379,7 +379,7 @@ TYPED_TEST(Storage, ReverseIterator) {
     testing::StaticAssertTypeEq<typename reverse_iterator::reference, value_type &>();
 
     entt::storage<value_type> pool;
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     reverse_iterator end{pool.rbegin()};
     reverse_iterator begin{};
@@ -422,7 +422,7 @@ TYPED_TEST(Storage, ReverseIterator) {
     ASSERT_EQ(begin.base().index(), -1);
     ASSERT_EQ(end.base().index(), 0);
 
-    pool.emplace(entt::entity{42}, 3);
+    pool.emplace(entt::entity{42}, 3); // NOLINT
     end = pool.rend();
 
     ASSERT_EQ(begin.base().index(), -1);
@@ -441,7 +441,7 @@ TYPED_TEST(Storage, ConstReverseIterator) {
     testing::StaticAssertTypeEq<typename const_reverse_iterator::reference, const value_type &>();
 
     entt::storage<value_type> pool;
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const_reverse_iterator cend{pool.crbegin()};
     const_reverse_iterator cbegin{};
@@ -486,7 +486,7 @@ TYPED_TEST(Storage, ConstReverseIterator) {
     ASSERT_EQ(cbegin.base().index(), -1);
     ASSERT_EQ(cend.base().index(), 0);
 
-    pool.emplace(entt::entity{42}, 3);
+    pool.emplace(entt::entity{42}, 3); // NOLINT
     cend = pool.crend();
 
     ASSERT_EQ(cbegin.base().index(), -1);
@@ -500,7 +500,7 @@ TYPED_TEST(Storage, IteratorConversion) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const typename entt::storage<value_type>::iterator it = pool.begin();
     typename entt::storage<value_type>::const_iterator cit = it;
@@ -542,7 +542,7 @@ TYPED_TEST(Storage, Getters) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{41}, 3);
+    pool.emplace(entt::entity{41}, 3); // NOLINT
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), value_type &>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), const value_type &>();
@@ -572,7 +572,7 @@ TYPED_TEST(Storage, Value) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
     ASSERT_EQ(pool.value(entt::entity{42}), &pool.get(entt::entity{42}));
 }
@@ -612,7 +612,7 @@ TEST(Storage, EmplaceSelfMoveSupport) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
 
-    pool.emplace(entity).insert(42);
+    pool.emplace(entity).insert(42); // NOLINT
     pool.erase(entity);
 
     ASSERT_FALSE(pool.contains(entity));
@@ -625,7 +625,7 @@ TEST(Storage, EmplaceSelfMoveSupportInPlaceDelete) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
 
-    pool.emplace(entity).insert(42);
+    pool.emplace(entity).insert(42); // NOLINT
     pool.erase(entity);
 
     ASSERT_FALSE(pool.contains(entity));
@@ -637,8 +637,8 @@ TYPED_TEST(Storage, TryEmplace) {
     entt::storage<value_type> pool;
     entt::sparse_set &base = pool;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
-    value_type instance{42};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
+    value_type instance{42};                                    // NOLINT
 
     ASSERT_NE(base.push(entity[0u], &instance), base.end());
 
@@ -689,7 +689,7 @@ TEST(Storage, TryEmplaceNonDefaultConstructible) {
     entt::storage<value_type> pool;
     entt::sparse_set &base = pool;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
 
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
     ASSERT_EQ(pool.type(), base.type());
@@ -704,7 +704,7 @@ TEST(Storage, TryEmplaceNonDefaultConstructible) {
     ASSERT_EQ(base.find(entity[0u]), base.end());
     ASSERT_TRUE(pool.empty());
 
-    int value = 42;
+    int value = 42; // NOLINT
     value_type instance{value, value};
 
     ASSERT_NE(base.push(entity[0u], &instance), base.end());
@@ -733,7 +733,7 @@ TEST(Storage, TryEmplaceNonCopyConstructible) {
     entt::storage<value_type> pool;
     entt::sparse_set &base = pool;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
 
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
     ASSERT_EQ(pool.type(), base.type());
@@ -806,10 +806,10 @@ TYPED_TEST(Storage, Insert) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
     typename entt::storage<value_type>::iterator it{};
 
-    it = pool.insert(std::begin(entity), std::end(entity), value_type{99});
+    it = pool.insert(std::begin(entity), std::end(entity), value_type{99}); // NOLINT
 
     ASSERT_EQ(it, pool.cbegin());
 
@@ -823,7 +823,7 @@ TYPED_TEST(Storage, Insert) {
     ASSERT_EQ(*it++.operator->(), value_type{99});
     ASSERT_EQ(*it.operator->(), value_type{99});
 
-    const value_type values[2u] = {value_type{42}, value_type{3}};
+    const value_type values[2u] = {value_type{42}, value_type{3}}; // NOLINT
 
     pool.erase(std::begin(entity), std::end(entity));
     it = pool.insert(std::rbegin(entity), std::rend(entity), std::begin(values));
@@ -851,8 +851,8 @@ TYPED_TEST(Storage, Erase) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
-    const value_type values[3u]{value_type{0}, value_type{1}, value_type{2}};
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}}; // NOLINT
+    const value_type values[3u]{value_type{0}, value_type{1}, value_type{2}};    // NOLINT
 
     pool.insert(std::begin(entity), std::end(entity), std::begin(values));
     pool.erase(std::begin(entity), std::end(entity));
@@ -865,7 +865,7 @@ TYPED_TEST(Storage, Erase) {
     }
 
     pool.insert(std::begin(entity), std::end(entity), std::begin(values));
-    pool.erase(entity, entity + 2u);
+    pool.erase(entity, entity + 2u); // NOLINT
 
     ASSERT_EQ(*pool.begin(), values[2u]);
 
@@ -891,10 +891,10 @@ TYPED_TEST(Storage, CrossErase) {
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
-    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
 
     pool.emplace(entity[0u], 3);
-    pool.emplace(entity[1u], 42);
+    pool.emplace(entity[1u], 42); // NOLINT
     set.push(entity[1u]);
     pool.erase(set.begin(), set.end());
 
@@ -908,8 +908,8 @@ TYPED_TEST(Storage, Remove) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
-    const value_type values[3u]{value_type{0}, value_type{1}, value_type{2}};
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}}; // NOLINT
+    const value_type values[3u]{value_type{0}, value_type{1}, value_type{2}};    // NOLINT
 
     pool.insert(std::begin(entity), std::end(entity), std::begin(values));
 
@@ -925,7 +925,7 @@ TYPED_TEST(Storage, Remove) {
 
     pool.insert(std::begin(entity), std::end(entity), std::begin(values));
 
-    ASSERT_EQ(pool.remove(entity, entity + 2u), 2u);
+    ASSERT_EQ(pool.remove(entity, entity + 2u), 2u); // NOLINT
     ASSERT_EQ(*pool.begin(), values[2u]);
 
     if constexpr(traits_type::in_place_delete) {
@@ -951,10 +951,10 @@ TYPED_TEST(Storage, CrossRemove) {
     entt::storage<value_type> pool;
     entt::sparse_set set;
 
-    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}};
+    const entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
 
     pool.emplace(entity[0u], 3);
-    pool.emplace(entity[1u], 42);
+    pool.emplace(entity[1u], 42); // NOLINT
     set.push(entity[1u]);
     pool.remove(set.begin(), set.end());
 
@@ -968,7 +968,7 @@ TYPED_TEST(Storage, Clear) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}};
+    entt::entity entity[3u]{entt::entity{3}, entt::entity{42}, entt::entity{9}}; // NOLINT
 
     pool.insert(std::begin(entity), std::end(entity));
 
@@ -1004,7 +1004,7 @@ TYPED_TEST(Storage, Compact) {
 
     ASSERT_EQ(pool.size(), 1u);
 
-    pool.emplace(entt::entity{42}, value_type{42});
+    pool.emplace(entt::entity{42}, value_type{42}); // NOLINT
     pool.erase(entt::entity{0});
 
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
@@ -1027,7 +1027,7 @@ TYPED_TEST(Storage, Compact) {
     ASSERT_EQ(pool.get(entt::entity{0}), value_type{0});
 
     pool.erase(entt::entity{0});
-    pool.erase(entt::entity{42});
+    pool.erase(entt::entity{42}); // NOLINT
     pool.compact();
 
     ASSERT_TRUE(pool.empty());
@@ -1039,17 +1039,17 @@ TYPED_TEST(Storage, SwapElements) {
     entt::storage<value_type> pool;
 
     pool.emplace(entt::entity{3}, 3);
-    pool.emplace(entt::entity{12}, 6);
-    pool.emplace(entt::entity{42}, 9);
+    pool.emplace(entt::entity{12}, 6); // NOLINT
+    pool.emplace(entt::entity{42}, 9); // NOLINT
 
-    pool.erase(entt::entity{12});
+    pool.erase(entt::entity{12}); // NOLINT
 
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
     ASSERT_EQ(pool.get(entt::entity{42}), value_type{9});
     ASSERT_EQ(pool.index(entt::entity{3}), 0u);
     ASSERT_EQ(pool.index(entt::entity{42}), 1u + traits_type::in_place_delete);
 
-    pool.swap_elements(entt::entity{3}, entt::entity{42});
+    pool.swap_elements(entt::entity{3}, entt::entity{42}); // NOLINT
 
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
     ASSERT_EQ(pool.get(entt::entity{42}), value_type{9});
@@ -1068,8 +1068,8 @@ TYPED_TEST(Storage, Iterable) {
     entt::storage<value_type> pool;
     const entt::sparse_set &base = pool;
 
-    pool.emplace(entt::entity{1}, 99);
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{1}, 99); // NOLINT
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     auto iterable = pool.each();
 
@@ -1115,8 +1115,8 @@ TYPED_TEST(Storage, ConstIterable) {
     entt::storage<value_type> pool;
     const entt::sparse_set &base = pool;
 
-    pool.emplace(entt::entity{1}, 99);
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{1}, 99); // NOLINT
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     auto iterable = std::as_const(pool).each();
 
@@ -1155,7 +1155,7 @@ TYPED_TEST(Storage, IterableIteratorConversion) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
     typename entt::storage<value_type>::const_iterable::iterator cit = it;
@@ -1171,7 +1171,7 @@ TYPED_TEST(Storage, IterableAlgorithmCompatibility) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const auto iterable = pool.each();
     const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
@@ -1190,8 +1190,8 @@ TYPED_TEST(Storage, ReverseIterable) {
     entt::storage<value_type> pool;
     const entt::sparse_set &base = pool;
 
-    pool.emplace(entt::entity{1}, 99);
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{1}, 99); // NOLINT
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     auto iterable = pool.reach();
 
@@ -1237,8 +1237,8 @@ TYPED_TEST(Storage, ConstReverseIterable) {
     entt::storage<value_type> pool;
     const entt::sparse_set &base = pool;
 
-    pool.emplace(entt::entity{1}, 99);
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{1}, 99); // NOLINT
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     auto iterable = std::as_const(pool).reach();
 
@@ -1277,7 +1277,7 @@ TYPED_TEST(Storage, ReverseIterableIteratorConversion) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const typename entt::storage<value_type>::reverse_iterable::iterator it = pool.reach().begin();
     typename entt::storage<value_type>::const_reverse_iterable::iterator cit = it;
@@ -1293,7 +1293,7 @@ TYPED_TEST(Storage, ReverseIterableAlgorithmCompatibility) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    pool.emplace(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42); // NOLINT
 
     const auto iterable = pool.reach();
     const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
@@ -1305,10 +1305,10 @@ TYPED_TEST(Storage, SortOrdered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    value_type values[5u]{value_type{12}, value_type{9}, value_type{6}, value_type{3}, value_type{1}};
+    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
+    value_type values[5u]{value_type{12}, value_type{9}, value_type{6}, value_type{3}, value_type{1}};              // NOLINT
 
-    pool.insert(std::begin(entity), std::end(entity), values);
+    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -1319,10 +1319,10 @@ TYPED_TEST(Storage, SortReverse) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    value_type values[5u]{value_type{1}, value_type{3}, value_type{6}, value_type{9}, value_type{12}};
+    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
+    value_type values[5u]{value_type{1}, value_type{3}, value_type{6}, value_type{9}, value_type{12}};              // NOLINT
 
-    pool.insert(std::begin(entity), std::end(entity), values);
+    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -1333,10 +1333,10 @@ TYPED_TEST(Storage, SortUnordered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    value_type values[5u]{value_type{6}, value_type{3}, value_type{1}, value_type{9}, value_type{12}};
+    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
+    value_type values[5u]{value_type{6}, value_type{3}, value_type{1}, value_type{9}, value_type{12}};              // NOLINT
 
-    pool.insert(std::begin(entity), std::end(entity), values);
+    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     auto begin = pool.begin();
@@ -1360,10 +1360,10 @@ TYPED_TEST(Storage, SortN) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    value_type values[5u]{value_type{3}, value_type{6}, value_type{1}, value_type{9}, value_type{12}};
+    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
+    value_type values[5u]{value_type{3}, value_type{6}, value_type{1}, value_type{9}, value_type{12}};              // NOLINT
 
-    pool.insert(std::begin(entity), std::end(entity), values);
+    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
     pool.sort_n(0u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
@@ -1379,7 +1379,7 @@ TYPED_TEST(Storage, SortN) {
     ASSERT_EQ(pool.data()[1u], entity[0u]);
     ASSERT_EQ(pool.data()[2u], entity[2u]);
 
-    pool.sort_n(5u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
+    pool.sort_n(5u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); }); // NOLINT
 
     auto begin = pool.begin();
     auto end = pool.end();
@@ -1403,10 +1403,10 @@ TYPED_TEST(Storage, SortAsDisjoint) {
     entt::storage<value_type> lhs;
     const entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};           // NOLINT
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values);
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1422,15 +1422,15 @@ TYPED_TEST(Storage, SortAsOverlap) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};           // NOLINT
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values);
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
 
-    entt::entity rhs_entity[1u]{entt::entity{12}};
-    value_type rhs_values[1u]{value_type{6}};
+    entt::entity rhs_entity[1u]{entt::entity{12}}; // NOLINT
+    value_type rhs_values[1u]{value_type{6}};      // NOLINT
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values);
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1458,15 +1458,15 @@ TYPED_TEST(Storage, SortAsOrdered) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values);
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
 
-    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    value_type rhs_values[6u]{value_type{6}, value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};
+    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    value_type rhs_values[6u]{value_type{6}, value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};               // NOLINT
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values);
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1485,15 +1485,15 @@ TYPED_TEST(Storage, SortAsReverse) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values);
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
 
-    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
-    value_type rhs_values[6u]{value_type{5}, value_type{4}, value_type{3}, value_type{2}, value_type{1}, value_type{6}};
+    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}}; // NOLINT
+    value_type rhs_values[6u]{value_type{5}, value_type{4}, value_type{3}, value_type{2}, value_type{1}, value_type{6}};               // NOLINT
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values);
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1527,15 +1527,15 @@ TYPED_TEST(Storage, SortAsUnordered) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values);
+    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
 
-    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
-    value_type rhs_values[6u]{value_type{3}, value_type{2}, value_type{6}, value_type{1}, value_type{4}, value_type{5}};
+    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    value_type rhs_values[6u]{value_type{3}, value_type{2}, value_type{6}, value_type{1}, value_type{4}, value_type{5}};               // NOLINT
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values);
+    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
 
     ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
     ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
@@ -1601,7 +1601,7 @@ TYPED_TEST(Storage, CanModifyDuringIteration) {
     using traits_type = entt::component_traits<value_type>;
     entt::storage<value_type> pool;
 
-    auto *ptr = &pool.emplace(entt::entity{0}, 42);
+    auto *ptr = &pool.emplace(entt::entity{0}, 42); // NOLINT
 
     ASSERT_EQ(pool.capacity(), traits_type::page_size);
 
@@ -1627,7 +1627,7 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
 
     for(auto &&elem: pool) {
         if(!(elem == value_type{})) {
-            elem = value_type{42};
+            elem = value_type{42}; // NOLINT
         }
     }
 
@@ -1646,7 +1646,7 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
 
 TEST(Storage, UpdateFromDestructor) {
     constexpr auto size = 10u;
-    const entt::entity entity[3u]{entt::entity{9u}, entt::entity{8u}, entt::entity{0u}};
+    const entt::entity entity[3u]{entt::entity{9u}, entt::entity{8u}, entt::entity{0u}}; // NOLINT
 
     for(auto target: entity) {
         entt::storage<update_from_destructor> pool;
@@ -1768,7 +1768,7 @@ TYPED_TEST(Storage, ThrowingAllocator) {
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{0}, 0);
-    const entt::entity entity[2u]{entt::entity{1}, entt::entity{sparse_page_size}};
+    const entt::entity entity[2u]{entt::entity{1}, entt::entity{sparse_page_size}}; // NOLINT
     pool.get_allocator().template throw_counter<entt::entity>(1u);
 
     ASSERT_THROW(pool.insert(std::begin(entity), std::end(entity), value_type{0}), test::throwing_allocator_exception);
@@ -1776,7 +1776,7 @@ TYPED_TEST(Storage, ThrowingAllocator) {
     ASSERT_FALSE(pool.contains(entt::entity{sparse_page_size}));
 
     pool.erase(entt::entity{1});
-    const value_type components[2u]{value_type{1}, value_type{sparse_page_size}};
+    const value_type components[2u]{value_type{1}, value_type{sparse_page_size}}; // NOLINT
     pool.get_allocator().template throw_counter<entt::entity>(0u);
     pool.compact();
 
@@ -1788,8 +1788,8 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 TEST(Storage, ThrowingComponent) {
     entt::storage<test::throwing_type> pool;
 
-    const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}};
-    const test::throwing_type value[2u]{true, false};
+    const entt::entity entity[2u]{entt::entity{42}, entt::entity{1}}; // NOLINT
+    const test::throwing_type value[2u]{true, false};                 // NOLINT
 
     // strong exception safety
     ASSERT_THROW(pool.emplace(entity[0u], value[0u]), test::throwing_type_exception);

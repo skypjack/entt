@@ -93,14 +93,14 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(other)), other);
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
 
-    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - (1u + traits_type::in_place_delete), &registry.get<value_type>(other));
+    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - (1u + traits_type::in_place_delete), &registry.get<value_type>(other)); // NOLINT
 
     registry.destroy(other);
 
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(entity)), entity);
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
 
-    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - 1u, &registry.get<value_type>(next));
+    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - 1u, &registry.get<value_type>(next)); // NOLINT
 
     ASSERT_EQ(entt::to_entity(storage, value_type{42}), null);
     ASSERT_EQ(entt::to_entity(storage, value), null);

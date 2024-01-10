@@ -168,13 +168,13 @@ TEST(SingleComponentView, ElementAccess) {
     auto cview = std::as_const(registry).view<const int>();
 
     const auto e0 = registry.create();
-    registry.emplace<int>(e0, 42);
+    registry.emplace<int>(e0, 42); // NOLINT
 
     const auto e1 = registry.create();
     registry.emplace<int>(e1, 3);
 
     for(auto i = 0u; i < view.size(); ++i) {
-        ASSERT_EQ(view[i], i ? e0 : e1); // NOLINT
+        ASSERT_EQ(view[i], i ? e0 : e1);  // NOLINT
         ASSERT_EQ(cview[i], i ? e0 : e1); // NOLINT
     }
 
@@ -210,7 +210,7 @@ TEST(SingleComponentView, Empty) {
 
 TEST(SingleComponentView, Each) {
     entt::registry registry;
-    const entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()}; // NOLINT
 
     auto view = registry.view<int>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int>();
@@ -609,7 +609,7 @@ TEST(MultiComponentView, Functionalities) {
     registry.emplace<char>(e0, '1');
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1, 42);
+    registry.emplace<int>(e1, 42); // NOLINT
     registry.emplace<char>(e1, '2');
 
     ASSERT_EQ(*view.begin(), e1);
@@ -772,7 +772,7 @@ TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
 
 TEST(MultiComponentView, Iterator) {
     entt::registry registry;
-    const entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()}; // NOLINT
 
     registry.insert<int>(std::begin(entity), std::end(entity));
     registry.insert<char>(std::begin(entity), std::end(entity));
@@ -804,7 +804,7 @@ TEST(MultiComponentView, ElementAccess) {
     auto cview = std::as_const(registry).view<const int, const char>();
 
     const auto e0 = registry.create();
-    registry.emplace<int>(e0, 42);
+    registry.emplace<int>(e0, 42); // NOLINT
     registry.emplace<char>(e0, '0');
 
     const auto e1 = registry.create();
@@ -853,7 +853,7 @@ TEST(MultiComponentView, SizeHint) {
 
 TEST(MultiComponentView, UseAndRefresh) {
     entt::registry registry;
-    const entt::entity entity[3]{registry.create(), registry.create(), registry.create()};
+    const entt::entity entity[3]{registry.create(), registry.create(), registry.create()}; // NOLINT
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<int>(entity[1u]);
@@ -883,7 +883,7 @@ TEST(MultiComponentView, UseAndRefresh) {
 
 TEST(MultiComponentView, Each) {
     entt::registry registry;
-    const entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()}; // NOLINT
 
     auto view = registry.view<int, char>(entt::exclude<double>);
     auto cview = std::as_const(registry).view<const int, const char>();
@@ -945,7 +945,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
 
     // makes char a better candidate during iterations
     const auto entity = registry.create();
-    registry.emplace<int>(entity, 99);
+    registry.emplace<int>(entity, 99); // NOLINT
 
     view.use<int>();
     view.each([value = 2](const auto curr, const auto) mutable {
@@ -1351,7 +1351,7 @@ TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     const auto other = registry.create();
 
     registry.emplace<test::pointer_stable>(entity, 0);
-    registry.emplace<test::pointer_stable>(other, 42);
+    registry.emplace<test::pointer_stable>(other, 42); // NOLINT
     registry.emplace<int>(entity);
 
     ASSERT_EQ(view.size_hint(), 2u);
@@ -1396,8 +1396,8 @@ TEST(MultiComponentView, SameComponentTypes) {
     const entt::entity e0{42u};
     const entt::entity e1{3u};
 
-    storage.emplace(e0, 7);
-    other.emplace(e0, 9);
+    storage.emplace(e0, 7); // NOLINT
+    other.emplace(e0, 9);   // NOLINT
     other.emplace(e1, 1);
 
     ASSERT_TRUE(view.contains(e0));

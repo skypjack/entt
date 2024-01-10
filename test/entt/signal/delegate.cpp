@@ -34,7 +34,7 @@ struct delegate_functor {
     }
 
     static const int static_value = 3;
-    const int data_member = 42;
+    const int data_member = 42; // NOLINT
 };
 
 struct const_nonconst_noexcept {
@@ -55,7 +55,7 @@ struct const_nonconst_noexcept {
     }
 
     int u{};
-    const int v{};
+    const int v{}; // NOLINT
     mutable int cnt{0};
 };
 

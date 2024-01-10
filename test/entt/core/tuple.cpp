@@ -11,8 +11,8 @@ TEST(Tuple, IsTuple) {
 }
 
 TEST(Tuple, UnwrapTuple) {
-    auto single = std::make_tuple(42);
-    auto multi = std::make_tuple(42, 'c');
+    auto single = std::make_tuple(42);     // NOLINT
+    auto multi = std::make_tuple(42, 'c'); // NOLINT
     auto ref = std::forward_as_tuple(std::get<0>(single));
 
     testing::StaticAssertTypeEq<decltype(entt::unwrap_tuple(single)), int &>();

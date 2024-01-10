@@ -214,7 +214,7 @@ TEST(MakeObjUsingAllocator, Functionalities) {
 }
 
 TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
-    alignas(int) std::byte storage[sizeof(int)];
+    alignas(int) std::byte storage[sizeof(int)]; // NOLINT
     const std::allocator<int> allocator{};
 
     int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42); // NOLINT
@@ -230,7 +230,7 @@ TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     const std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
-    alignas(string_type) std::byte storage[sizeof(string_type)];
+    alignas(string_type) std::byte storage[sizeof(string_type)]; // NOLINT
 
     string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value); // NOLINT
 

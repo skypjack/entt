@@ -248,7 +248,7 @@ TEST(ProcessAdaptor, Data) {
     int value = 0;
 
     auto lambda = [](std::uint64_t, void *data, auto resolve, auto) {
-        *static_cast<int *>(data) = 42;
+        *static_cast<int *>(data) = 42; // NOLINT
         resolve();
     };
 

@@ -13,7 +13,7 @@ struct functions {
 
 TEST(Identity, Functionalities) {
     const entt::identity identity;
-    int value = 42;
+    int value = 42; // NOLINT
 
     ASSERT_TRUE(entt::is_transparent_v<entt::identity>);
     ASSERT_EQ(identity(value), value);
@@ -44,10 +44,10 @@ TEST(Overloaded, Functionalities) {
         [&iv](int value) { iv = value; },
         [&cv](char value) { cv = value; }};
 
-    func(42);
+    func(42); // NOLINT
     func('c');
 
-    ASSERT_EQ(iv, 42);
+    ASSERT_EQ(iv, 42); // NOLINT
     ASSERT_EQ(cv, 'c');
 }
 

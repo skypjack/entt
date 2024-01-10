@@ -67,7 +67,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(pool.index(entt::entity{3}), 0u);
 
     other = entt::storage<entt::entity>{};
-    other.emplace(entt::entity{42});
+    other.emplace(entt::entity{42}); // NOLINT
     other = std::move(pool);
 
     ASSERT_TRUE(pool.empty()); // NOLINT
@@ -86,11 +86,11 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
-    other.emplace(entt::entity{9});
+    other.emplace(entt::entity{9}); // NOLINT
     other.emplace(entt::entity{3});
-    other.erase(entt::entity{9});
+    other.erase(entt::entity{9}); // NOLINT
 
     ASSERT_EQ(pool.size(), 43u);
     ASSERT_EQ(other.size(), 10u);
@@ -110,7 +110,7 @@ TEST(StorageEntity, Swap) {
 TEST(StorageEntity, Getters) {
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{41});
+    pool.emplace(entt::entity{41}); // NOLINT
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), void>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), void>();
@@ -139,7 +139,7 @@ TEST(StorageEntity, Emplace) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::storage<entt::entity> pool;
-    entt::entity entity[2u]{};
+    entt::entity entity[2u]{}; // NOLINT
 
     ASSERT_EQ(pool.emplace(), entt::entity{0});
     ASSERT_EQ(pool.emplace(entt::null), entt::entity{1});
@@ -164,7 +164,7 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(pool.emplace(), traits_type::construct(2, 1));
 
     pool.erase(traits_type::construct(2, 1));
-    pool.insert(entity, entity + 2u);
+    pool.insert(entity, entity + 2u); // NOLINT
 
     ASSERT_EQ(entity[0u], traits_type::construct(2, 2));
     ASSERT_EQ(entity[1u], entt::entity{8});
@@ -191,9 +191,9 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(*pool.push(traits_type::construct(4, 42)), traits_type::construct(4, 42));
     ASSERT_EQ(*pool.push(traits_type::construct(4, 43)), entt::entity{6});
 
-    entt::entity entity[2u]{entt::entity{1}, traits_type::construct(5, 3)};
+    entt::entity entity[2u]{entt::entity{1}, traits_type::construct(5, 3)}; // NOLINT
 
-    pool.erase(entity, entity + 2u);
+    pool.erase(entity, entity + 2u); // NOLINT
     pool.erase(entt::entity{2});
 
     ASSERT_EQ(pool.current(entity[0u]), 1);
@@ -237,7 +237,7 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
 
 TEST(StorageEntity, Insert) {
     entt::storage<entt::entity> pool;
-    entt::entity entity[2u]{};
+    entt::entity entity[2u]{}; // NOLINT
 
     pool.insert(std::begin(entity), std::end(entity));
 
@@ -254,7 +254,7 @@ TEST(StorageEntity, Insert) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.in_use(), 0u); // NOLINT
 
-    pool.insert(entity, entity + 1u);
+    pool.insert(entity, entity + 1u); // NOLINT
 
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
@@ -266,9 +266,9 @@ TEST(StorageEntity, Insert) {
 
 TEST(StorageEntity, Pack) {
     entt::storage<entt::entity> pool;
-    entt::entity entity[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}};
+    entt::entity entity[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}}; // NOLINT
 
-    pool.push(entity, entity + 3u);
+    pool.push(entity, entity + 3u); // NOLINT
     std::swap(entity[0u], entity[1u]);
 
     const auto len = pool.pack(entity + 1u, entity + 3u); // NOLINT
@@ -327,7 +327,7 @@ TEST(StorageEntity, Iterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
     pool.erase(entt::entity{3});
 
@@ -371,7 +371,7 @@ TEST(StorageEntity, ConstIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
     pool.erase(entt::entity{3});
 
@@ -439,7 +439,7 @@ TEST(StorageEntity, ReverseIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
     pool.erase(entt::entity{3});
 
@@ -483,7 +483,7 @@ TEST(StorageEntity, ReverseConstIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42});
+    pool.emplace(entt::entity{42}); // NOLINT
 
     pool.erase(entt::entity{3});
 
@@ -543,7 +543,7 @@ TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
 TEST(StorageEntity, SortOrdered) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
+    entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}}; // NOLINT
 
     pool.push(std::begin(entity), std::end(entity));
     pool.sort(std::less{});
@@ -554,7 +554,7 @@ TEST(StorageEntity, SortOrdered) {
 TEST(StorageEntity, SortReverse) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
+    entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}}; // NOLINT
 
     pool.push(std::begin(entity), std::end(entity));
     pool.sort(std::less{});
@@ -565,7 +565,7 @@ TEST(StorageEntity, SortReverse) {
 TEST(StorageEntity, SortUnordered) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+    entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
 
     pool.push(std::begin(entity), std::end(entity));
     pool.sort(std::less{});
@@ -580,7 +580,7 @@ TEST(StorageEntity, SortUnordered) {
 TEST(StorageEntity, SortN) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
+    entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
 
     pool.push(std::begin(entity), std::end(entity));
     pool.sort_n(0u, std::less{});
@@ -593,7 +593,7 @@ TEST(StorageEntity, SortN) {
     ASSERT_EQ(pool.data()[1u], entity[0u]);
     ASSERT_EQ(pool.data()[2u], entity[2u]);
 
-    pool.sort_n(5u, std::less{});
+    pool.sort_n(5u, std::less{}); // NOLINT
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
     ASSERT_EQ(pool.data()[1u], entity[3u]);
@@ -606,7 +606,7 @@ TEST(StorageEntity, SortAsDisjoint) {
     entt::storage<entt::entity> lhs;
     const entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
 
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
 
@@ -621,8 +621,8 @@ TEST(StorageEntity, SortAsOverlap) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}};
-    entt::entity rhs_entity[1u]{entt::entity{12}};
+    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    entt::entity rhs_entity[1u]{entt::entity{12}};                                    // NOLINT
 
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -641,8 +641,8 @@ TEST(StorageEntity, SortAsOrdered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
+    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
 
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -659,8 +659,8 @@ TEST(StorageEntity, SortAsReverse) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
+    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}}; // NOLINT
 
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -682,8 +682,8 @@ TEST(StorageEntity, SortAsUnordered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};
-    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}};
+    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
+    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}}; // NOLINT
 
     lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
     rhs.push(std::begin(rhs_entity), std::end(rhs_entity));

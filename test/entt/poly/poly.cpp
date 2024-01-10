@@ -30,7 +30,7 @@ struct common_type: Base {
     }
 
     [[nodiscard]] int rand() const {
-        return static_cast<int>(entt::poly_call<5>(*this));
+        return static_cast<int>(entt::poly_call<5>(*this)); // NOLINT
     }
 };
 
@@ -48,7 +48,7 @@ struct common_members {
 namespace {
 
 [[nodiscard]] int absolutely_random() {
-    return 42;
+    return 42; // NOLINT
 }
 
 } // namespace
@@ -390,7 +390,7 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 
 TYPED_TEST(Poly, SboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}};
+    typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
     const auto *data = sbo[0].data();
 
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u); // NOLINT
@@ -406,7 +406,7 @@ TYPED_TEST(Poly, SboAlignment) {
 
 TYPED_TEST(Poly, NoSboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}};
+    typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
     const auto *data = nosbo[0].data();
 
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u); // NOLINT

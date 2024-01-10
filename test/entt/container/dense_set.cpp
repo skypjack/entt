@@ -27,7 +27,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(set.max_load_factor(), .875f);
     ASSERT_EQ(set.max_size(), (std::vector<std::pair<std::size_t, int>>{}.max_size()));
 
-    set.max_load_factor(.9f);
+    set.max_load_factor(.9f); // NOLINT
 
     ASSERT_EQ(set.max_load_factor(), .9f);
 
@@ -111,7 +111,7 @@ TEST(DenseSet, Constructors) {
 
 TEST(DenseSet, Copy) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f);
+    set.max_load_factor(set.max_load_factor() - .05f); // NOLINT
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{set};
@@ -121,7 +121,7 @@ TEST(DenseSet, Copy) {
     ASSERT_EQ(set.max_load_factor(), other.max_load_factor());
 
     set.emplace(1u);
-    set.emplace(11u);
+    set.emplace(11u); // NOLINT
     other.emplace(0u);
     other = set;
 
@@ -139,7 +139,7 @@ TEST(DenseSet, Copy) {
 
 TEST(DenseSet, Move) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f);
+    set.max_load_factor(set.max_load_factor() - .05f); // NOLINT
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
@@ -150,7 +150,7 @@ TEST(DenseSet, Move) {
 
     set = other;
     set.emplace(1u);
-    set.emplace(11u);
+    set.emplace(11u); // NOLINT
     other.emplace(0u);
     other = std::move(set);
 
@@ -211,7 +211,7 @@ TEST(DenseSet, Iterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, set.end());
 
-    set.emplace(42);
+    set.emplace(42); // NOLINT
     begin = set.begin();
 
     ASSERT_EQ(begin[0u], 3);
@@ -264,7 +264,7 @@ TEST(DenseSet, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, set.cend());
 
-    set.emplace(42);
+    set.emplace(42); // NOLINT
     cbegin = set.cbegin();
 
     ASSERT_EQ(cbegin[0u], 3);
@@ -317,7 +317,7 @@ TEST(DenseSet, ReverseIterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, set.rend());
 
-    set.emplace(42);
+    set.emplace(42); // NOLINT
     begin = set.rbegin();
 
     ASSERT_EQ(begin[0u], 42);
@@ -370,7 +370,7 @@ TEST(DenseSet, ConstReverseIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, set.crend());
 
-    set.emplace(42);
+    set.emplace(42); // NOLINT
     cbegin = set.crbegin();
 
     ASSERT_EQ(cbegin[0u], 42);
@@ -445,7 +445,7 @@ TEST(DenseSet, Insert) {
     ASSERT_EQ(it, --set.end());
     ASSERT_EQ(*it, 3);
 
-    int range[2u]{7, 9};
+    int range[2u]{7, 9}; // NOLINT
     set.insert(std::begin(range), std::end(range));
 
     ASSERT_EQ(set.size(), 4u);
@@ -629,7 +629,7 @@ TEST(DenseSet, Erase) {
     ASSERT_EQ(*--set.end(), 5u);
 
     for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
-        if(next == 1u || next == 8u || next == 6u) {
+        if(next == 1u || next == 8u || next == 6u) { // NOLINT
             ASSERT_FALSE(set.contains(next));
             ASSERT_EQ(set.bucket_size(next), 0u);
         } else {
@@ -712,7 +712,7 @@ TEST(DenseSet, EraseFromBucket) {
 
     set.erase(*++set.begin(0u));
     set.erase(*++set.begin(2u));
-    set.erase(*++set.begin(15u));
+    set.erase(*++set.begin(15u)); // NOLINT
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_EQ(set.size(), 6u);
@@ -725,8 +725,8 @@ TEST(DenseSet, EraseFromBucket) {
     ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 1u + 2u));
     ASSERT_FALSE(set.contains(2u * minimum_bucket_count * (1u + 1u) - 1u));
 
-    while(set.begin(15) != set.end(15u)) {
-        set.erase(*set.begin(15));
+    while(set.begin(15) != set.end(15u)) { // NOLINT
+        set.erase(*set.begin(15));         // NOLINT
     }
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
@@ -780,7 +780,7 @@ TEST(DenseSet, EqualRange) {
     entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
-    set.emplace(42);
+    set.emplace(42); // NOLINT
 
     ASSERT_EQ(set.equal_range(0).first, set.end());
     ASSERT_EQ(set.equal_range(0).second, set.end());
@@ -895,13 +895,13 @@ TEST(DenseSet, Rehash) {
     ASSERT_TRUE(set.contains(32u));
     ASSERT_EQ(set.bucket(32u), 0u);
 
-    set.rehash(12u);
+    set.rehash(12u); // NOLINT
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
     ASSERT_EQ(set.bucket(32u), 0u);
 
-    set.rehash(44u);
+    set.rehash(44u); // NOLINT
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
@@ -925,7 +925,7 @@ TEST(DenseSet, Rehash) {
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
 
-    set.rehash(55u);
+    set.rehash(55u); // NOLINT
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));

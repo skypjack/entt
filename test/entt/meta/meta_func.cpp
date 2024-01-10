@@ -259,7 +259,7 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
-    auto any = func.invoke(instance, 5);
+    auto any = func.invoke(instance, 5); // NOLINT
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
@@ -328,7 +328,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
-    auto any = func.invoke({}, 42);
+    auto any = func.invoke({}, 42); // NOLINT
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
@@ -353,7 +353,7 @@ TEST_F(MetaFunc, StaticAsMember) {
 
     base_t instance{};
     auto func = entt::resolve<base_t>().func("fake_member"_hs);
-    auto any = func.invoke(instance, 42);
+    auto any = func.invoke(instance, 42); // NOLINT
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.arity(), 1u);
@@ -555,7 +555,7 @@ TEST_F(MetaFunc, InvokeBaseFunction) {
     ASSERT_TRUE(type.func("setter"_hs));
     ASSERT_EQ(instance.value, 3);
 
-    type.func("setter"_hs).invoke(instance, 42);
+    type.func("setter"_hs).invoke(instance, 42); // NOLINT
 
     ASSERT_EQ(instance.value, 42);
 }
@@ -571,7 +571,7 @@ TEST_F(MetaFunc, InvokeFromBase) {
     ASSERT_TRUE(setter_from_base);
     ASSERT_EQ(instance.value, 3);
 
-    setter_from_base.invoke(instance, 42);
+    setter_from_base.invoke(instance, 42); // NOLINT
 
     ASSERT_EQ(instance.value, 42);
 

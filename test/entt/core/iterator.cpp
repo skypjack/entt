@@ -10,7 +10,7 @@ TEST(InputIteratorPointer, Functionalities) {
 
     ASSERT_EQ(ptr->value, 0);
 
-    ptr->value = 42;
+    ptr->value = 42; // NOLINT
 
     ASSERT_EQ(ptr->value, 42);
     ASSERT_EQ(ptr->value, (*ptr).value);
@@ -46,7 +46,7 @@ TEST(IterableAdaptor, Functionalities) {
     ASSERT_EQ(*++iterable.cbegin(), 2);
     ASSERT_EQ(++iterable.cbegin(), --iterable.end());
 
-    for(auto value: entt::iterable_adaptor<const int *, const void *>{vec.data(), vec.data() + 1u}) {
+    for(auto value: entt::iterable_adaptor<const int *, const void *>{vec.data(), vec.data() + 1u}) { // NOLINT
         ASSERT_EQ(value, 1);
     }
 }

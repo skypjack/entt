@@ -31,7 +31,7 @@ struct clazz {
 };
 
 int free_function(int, const double &) {
-    return 42;
+    return 42; // NOLINT
 }
 
 template<typename, typename Type = void>
@@ -60,8 +60,8 @@ struct UnpackAsValue: ::testing::Test {
 TEST(SizeOf, Functionalities) {
     ASSERT_EQ(entt::size_of_v<void>, 0u);
     ASSERT_EQ(entt::size_of_v<char>, sizeof(char));
-    ASSERT_EQ(entt::size_of_v<int[]>, 0u);
-    ASSERT_EQ(entt::size_of_v<int[3]>, sizeof(int[3]));
+    ASSERT_EQ(entt::size_of_v<int[]>, 0u);              // NOLINT
+    ASSERT_EQ(entt::size_of_v<int[3]>, sizeof(int[3])); // NOLINT
 }
 
 TEST_F(UnpackAsType, Functionalities) {
@@ -165,9 +165,9 @@ TEST(ValueList, Functionalities) {
     ASSERT_EQ((std::tuple_size_v<entt::value_list<42>>), 1u);
     ASSERT_EQ((std::tuple_size_v<entt::value_list<42, 'a'>>), 2u);
 
-    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42>>>();
-    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42, 'a'>>>();
-    testing::StaticAssertTypeEq<char, std::tuple_element_t<1, entt::value_list<42, 'a'>>>();
+    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42>>>();       // NOLINT
+    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42, 'a'>>>();  // NOLINT
+    testing::StaticAssertTypeEq<char, std::tuple_element_t<1, entt::value_list<42, 'a'>>>(); // NOLINT
 }
 
 TEST(IsApplicable, Functionalities) {
@@ -223,7 +223,7 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_TRUE((entt::is_equality_comparable_v<std::optional<int>>));
     ASSERT_TRUE(entt::is_equality_comparable_v<nlohmann_json_like>);
 
-    ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>);
+    ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>); // NOLINT
     ASSERT_FALSE(entt::is_equality_comparable_v<test::non_comparable>);
     ASSERT_FALSE(entt::is_equality_comparable_v<const test::non_comparable>);
     ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<test::non_comparable>>);

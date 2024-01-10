@@ -12,7 +12,7 @@ struct MetaRange: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<int>().type("int"_hs).data<42>("answer"_hs);
+        entt::meta<int>().type("int"_hs).data<42>("answer"_hs); // NOLINT
     }
 
     void TearDown() override {

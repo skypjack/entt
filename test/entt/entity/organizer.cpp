@@ -397,7 +397,7 @@ TEST(Organizer, Dependencies) {
     organizer.emplace<char, const double>(+[](const void *, entt::registry &) {});
 
     const auto graph = organizer.graph();
-    std::array<const entt::type_info *, 5u> buffer{};
+    std::array<const entt::type_info *, 5u> buffer{}; // NOLINT
 
     ASSERT_EQ(graph.size(), 3u);
 
@@ -439,7 +439,7 @@ TEST(Organizer, ToArgsIntegrity) {
     entt::registry registry;
 
     organizer.emplace<&to_args_integrity>();
-    registry.ctx().emplace<std::size_t>(42u);
+    registry.ctx().emplace<std::size_t>(42u); // NOLINT
 
     auto graph = organizer.graph();
     graph[0u].callback()(graph[0u].data(), registry);

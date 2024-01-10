@@ -23,7 +23,7 @@ TEST(NonOwningGroup, Functionalities) {
     registry.emplace<char>(e0, '1');
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1, 42);
+    registry.emplace<int>(e1, 42); // NOLINT
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
@@ -175,7 +175,7 @@ TEST(NonOwningGroup, Empty) {
 
 TEST(NonOwningGroup, Each) {
     entt::registry registry;
-    const entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()}; // NOLINT
 
     auto group = registry.group(entt::get<int, char>);
     auto cgroup = std::as_const(registry).group_if_exists(entt::get<const int, const char>);
@@ -347,7 +347,7 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
     registry.emplace<int>(e1, 1);
 
     registry.destroy(e0);
-    registry.emplace<int>(registry.create(), 42);
+    registry.emplace<int>(registry.create(), 42); // NOLINT
 
     ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group[{}], e1);
@@ -643,7 +643,7 @@ TEST(NonOwningGroup, ExtendedGet) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<int>(entity, 42);
+    registry.emplace<int>(entity, 42); // NOLINT
     registry.emplace<char>(entity, 'c');
 
     const auto tup = registry.group(entt::get<int, char>).get(entity);
@@ -754,7 +754,7 @@ TEST(NonOwningGroup, Overlapping) {
     ASSERT_FALSE(group.empty());
     ASSERT_TRUE(other.empty());
 
-    registry.emplace<int>(entity, 42);
+    registry.emplace<int>(entity, 42); // NOLINT
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(other.empty());
@@ -776,7 +776,7 @@ TEST(OwningGroup, Functionalities) {
     registry.emplace<char>(e0, '1');
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1, 42);
+    registry.emplace<int>(e1, 42); // NOLINT
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
@@ -924,7 +924,7 @@ TEST(OwningGroup, Empty) {
 
 TEST(OwningGroup, Each) {
     entt::registry registry;
-    const entt::entity entity[2]{registry.create(), registry.create()};
+    const entt::entity entity[2]{registry.create(), registry.create()}; // NOLINT
 
     auto group = registry.group<int>(entt::get<char>);
     auto cgroup = std::as_const(registry).group_if_exists<const int>(entt::get<const char>);
@@ -978,16 +978,16 @@ TEST(OwningGroup, SortOrdered) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int, char>();
 
-    entt::entity entity[5]{};
+    entt::entity entity[5]{}; // NOLINT
     registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<test::boxed_int>(entity[0], 12);
+    registry.emplace<test::boxed_int>(entity[0], 12); // NOLINT
     registry.emplace<char>(entity[0], 'a');
 
-    registry.emplace<test::boxed_int>(entity[1], 9);
+    registry.emplace<test::boxed_int>(entity[1], 9); // NOLINT
     registry.emplace<char>(entity[1], 'b');
 
-    registry.emplace<test::boxed_int>(entity[2], 6);
+    registry.emplace<test::boxed_int>(entity[2], 6); // NOLINT
     registry.emplace<char>(entity[2], 'c');
 
     registry.emplace<test::boxed_int>(entity[3], 1);
@@ -1025,16 +1025,16 @@ TEST(OwningGroup, SortReverse) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int, char>();
 
-    entt::entity entity[5]{};
+    entt::entity entity[5]{}; // NOLINT
     registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<test::boxed_int>(entity[0], 6);
+    registry.emplace<test::boxed_int>(entity[0], 6); // NOLINT
     registry.emplace<char>(entity[0], 'a');
 
-    registry.emplace<test::boxed_int>(entity[1], 9);
+    registry.emplace<test::boxed_int>(entity[1], 9); // NOLINT
     registry.emplace<char>(entity[1], 'b');
 
-    registry.emplace<test::boxed_int>(entity[2], 12);
+    registry.emplace<test::boxed_int>(entity[2], 12); // NOLINT
     registry.emplace<char>(entity[2], 'c');
 
     registry.emplace<test::boxed_int>(entity[3], 1);
@@ -1072,10 +1072,10 @@ TEST(OwningGroup, SortUnordered) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int>(entt::get<char>);
 
-    entt::entity entity[7]{};
+    entt::entity entity[7]{}; // NOLINT
     registry.create(std::begin(entity), std::end(entity));
 
-    registry.emplace<test::boxed_int>(entity[0], 6);
+    registry.emplace<test::boxed_int>(entity[0], 6); // NOLINT
     registry.emplace<char>(entity[0], 'c');
 
     registry.emplace<test::boxed_int>(entity[1], 3);
@@ -1084,14 +1084,14 @@ TEST(OwningGroup, SortUnordered) {
     registry.emplace<test::boxed_int>(entity[2], 1);
     registry.emplace<char>(entity[2], 'a');
 
-    registry.emplace<test::boxed_int>(entity[3], 9);
+    registry.emplace<test::boxed_int>(entity[3], 9); // NOLINT
     registry.emplace<char>(entity[3], 'd');
 
-    registry.emplace<test::boxed_int>(entity[4], 12);
+    registry.emplace<test::boxed_int>(entity[4], 12); // NOLINT
     registry.emplace<char>(entity[4], 'e');
 
-    registry.emplace<test::boxed_int>(entity[5], 4);
-    registry.emplace<test::boxed_int>(entity[6], 5);
+    registry.emplace<test::boxed_int>(entity[5], 4); // NOLINT
+    registry.emplace<test::boxed_int>(entity[6], 5); // NOLINT
 
     group.sort<test::boxed_int, char>([](const auto lhs, const auto rhs) {
         testing::StaticAssertTypeEq<decltype(std::get<0>(lhs)), test::boxed_int &>();
@@ -1129,7 +1129,7 @@ TEST(OwningGroup, SortWithExclusionList) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int>(entt::get<>, entt::exclude<char>);
 
-    entt::entity entity[5]{};
+    entt::entity entity[5]{}; // NOLINT
     registry.create(std::begin(entity), std::end(entity));
 
     registry.emplace<test::boxed_int>(entity[0], 0);
@@ -1176,7 +1176,7 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
     registry.emplace<int>(e1, 1);
 
     registry.destroy(e0);
-    registry.emplace<int>(registry.create(), 42);
+    registry.emplace<int>(registry.create(), 42); // NOLINT
 
     ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group[{}], e1);
@@ -1476,7 +1476,7 @@ TEST(OwningGroup, SignalRace) {
 TEST(OwningGroup, StableLateInitialization) {
     entt::registry registry;
 
-    for(std::size_t i{}; i < 30u; ++i) {
+    for(std::size_t i{}; i < 30u; ++i) { // NOLINT
         auto entity = registry.create();
         if(!(i % 2u)) registry.emplace<int>(entity);
         if(!(i % 3u)) registry.emplace<char>(entity);
@@ -1532,7 +1532,7 @@ TEST(OwningGroup, ExtendedGet) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<int>(entity, 42);
+    registry.emplace<int>(entity, 42); // NOLINT
     registry.emplace<char>(entity, 'c');
 
     const auto tup = registry.group<int>(entt::get<char>).get(entity);

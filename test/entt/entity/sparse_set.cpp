@@ -87,7 +87,7 @@ TYPED_TEST(SparseSet, Move) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        set.push(entity_type{42});
+        set.push(entity_type{42}); // NOLINT
 
         static_assert(std::is_move_constructible_v<decltype(set)>, "Move constructible type required");
         static_assert(std::is_move_assignable_v<decltype(set)>, "Move assignable type required");
@@ -100,7 +100,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(other.index(entity_type{42}), 0u);
+        ASSERT_EQ(other.index(entity_type{42}), 0u); // NOLINT
 
         sparse_set_type extended{std::move(other), allocator_type{}};
 
@@ -110,7 +110,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy); // NOLINT
         ASSERT_EQ(extended.policy(), policy);
 
-        ASSERT_EQ(extended.index(entity_type{42}), 0u);
+        ASSERT_EQ(extended.index(entity_type{42}), 0u); // NOLINT
 
         set = std::move(extended);
 
@@ -122,10 +122,10 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(other.policy(), policy);    // NOLINT
         ASSERT_EQ(extended.policy(), policy); // NOLINT
 
-        ASSERT_EQ(set.index(entity_type{42}), 0u);
+        ASSERT_EQ(set.index(entity_type{42}), 0u); // NOLINT
 
         other = sparse_set_type{policy};
-        other.push(entity_type{3});
+        other.push(entity_type{3}); // NOLINT
         other = std::move(set);
 
         ASSERT_TRUE(set.empty()); // NOLINT
@@ -134,7 +134,7 @@ TYPED_TEST(SparseSet, Move) {
         ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
 
-        ASSERT_EQ(other.index(entity_type{42}), 0u);
+        ASSERT_EQ(other.index(entity_type{42}), 0u); // NOLINT
     }
 }
 
@@ -149,11 +149,11 @@ TYPED_TEST(SparseSet, Swap) {
         ASSERT_EQ(set.policy(), policy);
         ASSERT_EQ(other.policy(), entt::deletion_policy::in_place);
 
-        set.push(entity_type{42});
+        set.push(entity_type{42}); // NOLINT
 
-        other.push(entity_type{9});
-        other.push(entity_type{3});
-        other.erase(entity_type{9});
+        other.push(entity_type{9});  // NOLINT
+        other.push(entity_type{3});  // NOLINT
+        other.erase(entity_type{9}); // NOLINT
 
         ASSERT_EQ(set.size(), 1u);
         ASSERT_EQ(other.size(), 2u);
@@ -166,8 +166,8 @@ TYPED_TEST(SparseSet, Swap) {
         ASSERT_EQ(set.size(), 2u);
         ASSERT_EQ(other.size(), 1u);
 
-        ASSERT_EQ(set.index(entity_type{3}), 1u);
-        ASSERT_EQ(other.index(entity_type{42}), 0u);
+        ASSERT_EQ(set.index(entity_type{3}), 1u);    // NOLINT
+        ASSERT_EQ(other.index(entity_type{42}), 0u); // NOLINT
     }
 }
 
@@ -179,8 +179,8 @@ TYPED_TEST(SparseSet, FreeList) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
@@ -252,7 +252,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, FreeList) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        set.push(entity_type{3});
+        set.push(entity_type{3}); // NOLINT
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop:
@@ -274,14 +274,14 @@ TYPED_TEST(SparseSet, Capacity) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        set.reserve(42);
+        set.reserve(64);
 
-        ASSERT_EQ(set.capacity(), 42u);
+        ASSERT_EQ(set.capacity(), 64u);
         ASSERT_TRUE(set.empty());
 
         set.reserve(0);
 
-        ASSERT_EQ(set.capacity(), 42u);
+        ASSERT_EQ(set.capacity(), 64u);
         ASSERT_TRUE(set.empty());
     }
 }
@@ -296,30 +296,30 @@ TYPED_TEST(SparseSet, Pagination) {
 
         ASSERT_EQ(set.extent(), 0u);
 
-        set.push(entity_type{traits_type::page_size - 1u});
+        set.push(entity_type{traits_type::page_size - 1u}); // NOLINT
 
         ASSERT_EQ(set.extent(), traits_type::page_size);
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
+        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u})); // NOLINT
 
-        set.push(entity_type{traits_type::page_size});
-
-        ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size + 1u}));
-
-        set.erase(entity_type{traits_type::page_size - 1u});
+        set.push(entity_type{traits_type::page_size}); // NOLINT
 
         ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
+        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));  // NOLINT
+        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));       // NOLINT
+        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size + 1u})); // NOLINT
+
+        set.erase(entity_type{traits_type::page_size - 1u}); // NOLINT
+
+        ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u})); // NOLINT
+        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));       // NOLINT
 
         set.shrink_to_fit();
-        set.erase(entity_type{traits_type::page_size});
+        set.erase(entity_type{traits_type::page_size}); // NOLINT
 
         ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u})); // NOLINT
+        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));      // NOLINT
 
         set.shrink_to_fit();
 
@@ -334,8 +334,8 @@ TYPED_TEST(SparseSet, Contiguous) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         ASSERT_TRUE(set.contiguous());
 
@@ -389,8 +389,8 @@ TYPED_TEST(SparseSet, Data) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
-        const entity_type other{42};
+        const entity_type entity{3}; // NOLINT
+        const entity_type other{42}; // NOLINT
 
         ASSERT_EQ(set.data(), nullptr);
 
@@ -457,7 +457,7 @@ TYPED_TEST(SparseSet, Iterator) {
         testing::StaticAssertTypeEq<typename iterator::pointer, const entity_type *>();
         testing::StaticAssertTypeEq<typename iterator::reference, const entity_type &>();
 
-        set.push(entity_type{3});
+        set.push(entity_type{3}); // NOLINT
 
         iterator end{set.begin()};
         iterator begin{};
@@ -504,20 +504,20 @@ TYPED_TEST(SparseSet, Iterator) {
         ASSERT_GT(end, begin);
         ASSERT_GE(end, set.end());
 
-        ASSERT_EQ(*begin, entity_type{3});
-        ASSERT_EQ(*begin.operator->(), entity_type{3});
+        ASSERT_EQ(*begin, entity_type{3});              // NOLINT
+        ASSERT_EQ(*begin.operator->(), entity_type{3}); // NOLINT
 
         ASSERT_EQ(begin.index(), 0);
         ASSERT_EQ(end.index(), -1);
 
-        set.push(entity_type{42});
+        set.push(entity_type{42}); // NOLINT
         begin = set.begin();
 
         ASSERT_EQ(begin.index(), 1);
         ASSERT_EQ(end.index(), -1);
 
-        ASSERT_EQ(begin[0u], entity_type{42});
-        ASSERT_EQ(begin[1u], entity_type{3});
+        ASSERT_EQ(begin[0u], entity_type{42}); // NOLINT
+        ASSERT_EQ(begin[1u], entity_type{3});  // NOLINT
     }
 }
 
@@ -533,7 +533,7 @@ TYPED_TEST(SparseSet, ReverseIterator) {
         testing::StaticAssertTypeEq<typename reverse_iterator::pointer, const entity_type *>();
         testing::StaticAssertTypeEq<typename reverse_iterator::reference, const entity_type &>();
 
-        set.push(entity_type{3});
+        set.push(entity_type{3}); // NOLINT
 
         reverse_iterator end{set.rbegin()};
         reverse_iterator begin{};
@@ -573,20 +573,20 @@ TYPED_TEST(SparseSet, ReverseIterator) {
         ASSERT_GT(end, begin);
         ASSERT_GE(end, set.rend());
 
-        ASSERT_EQ(*begin, entity_type{3});
-        ASSERT_EQ(*begin.operator->(), entity_type{3});
+        ASSERT_EQ(*begin, entity_type{3});              // NOLINT
+        ASSERT_EQ(*begin.operator->(), entity_type{3}); // NOLINT
 
         ASSERT_EQ(begin.base().index(), -1);
         ASSERT_EQ(end.base().index(), 0);
 
-        set.push(entity_type{42});
+        set.push(entity_type{42}); // NOLINT
         end = set.rend();
 
         ASSERT_EQ(begin.base().index(), -1);
         ASSERT_EQ(end.base().index(), 1);
 
-        ASSERT_EQ(begin[0u], entity_type{3});
-        ASSERT_EQ(begin[1u], entity_type{42});
+        ASSERT_EQ(begin[0u], entity_type{3});  // NOLINT
+        ASSERT_EQ(begin[1u], entity_type{42}); // NOLINT
     }
 }
 
@@ -597,8 +597,8 @@ TYPED_TEST(SparseSet, ScopedIterator) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
-        const entity_type other{42};
+        const entity_type entity{3}; // NOLINT
+        const entity_type other{42}; // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -641,8 +641,8 @@ TYPED_TEST(SparseSet, ScopedReverseIterator) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
-        const entity_type other{42};
+        const entity_type entity{3}; // NOLINT
+        const entity_type other{42}; // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -689,8 +689,8 @@ TYPED_TEST(SparseSet, Find) {
         ASSERT_EQ(set.find(entt::tombstone), set.cend());
         ASSERT_EQ(set.find(entt::null), set.cend());
 
-        const entity_type entity{3};
-        const entity_type other{traits_type::construct(99, 1)};
+        const entity_type entity{3};                            // NOLINT
+        const entity_type other{traits_type::construct(99, 1)}; // NOLINT
 
         ASSERT_EQ(set.find(entity), set.cend());
         ASSERT_EQ(set.find(other), set.cend());
@@ -712,7 +712,7 @@ TYPED_TEST(SparseSet, FindErased) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
+        const entity_type entity{3}; // NOLINT
 
         set.push(entity);
         set.erase(entity);
@@ -739,8 +739,8 @@ TYPED_TEST(SparseSet, Contains) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
-        const entity_type other{traits_type::construct(99, 1)};
+        const entity_type entity{3};                            // NOLINT
+        const entity_type other{traits_type::construct(99, 1)}; // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -751,9 +751,9 @@ TYPED_TEST(SparseSet, Contains) {
         ASSERT_TRUE(set.contains(entity));
         ASSERT_TRUE(set.contains(other));
 
-        ASSERT_FALSE(set.contains(entity_type{1}));
-        ASSERT_FALSE(set.contains(traits_type::construct(3, 1)));
-        ASSERT_FALSE(set.contains(traits_type::construct(99, traits_type::to_version(entt::tombstone))));
+        ASSERT_FALSE(set.contains(entity_type{1}));                                                       // NOLINT
+        ASSERT_FALSE(set.contains(traits_type::construct(3, 1)));                                         // NOLINT
+        ASSERT_FALSE(set.contains(traits_type::construct(99, traits_type::to_version(entt::tombstone)))); // NOLINT
 
         set.erase(entity);
         set.remove(other);
@@ -801,7 +801,7 @@ TYPED_TEST(SparseSet, ContainsErased) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
+        const entity_type entity{3}; // NOLINT
 
         set.push(entity);
         set.erase(entity);
@@ -837,8 +837,8 @@ TYPED_TEST(SparseSet, Current) {
         ASSERT_EQ(set.current(entt::tombstone), traits_type::to_version(entt::tombstone));
         ASSERT_EQ(set.current(entt::null), traits_type::to_version(entt::tombstone));
 
-        const entity_type entity{traits_type::construct(0, 0)};
-        const entity_type other{traits_type::construct(3, 3)};
+        const entity_type entity{traits_type::construct(0, 0)}; // NOLINT
+        const entity_type other{traits_type::construct(3, 3)};  // NOLINT
 
         ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
         ASSERT_EQ(set.current(other), traits_type::to_version(entt::tombstone));
@@ -862,7 +862,7 @@ TYPED_TEST(SparseSet, CurrentErased) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{traits_type::construct(3, 3)};
+        const entity_type entity{traits_type::construct(3, 3)}; // NOLINT
 
         set.push(entity);
         set.erase(entity);
@@ -892,8 +892,8 @@ TYPED_TEST(SparseSet, Index) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -956,8 +956,8 @@ TYPED_TEST(SparseSet, Indexing) {
         ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null));  // NOLINT
         ASSERT_EQ(set.at(99u), static_cast<entity_type>(entt::null)); // NOLINT
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -1003,7 +1003,7 @@ TYPED_TEST(SparseSet, Value) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
+        const entity_type entity{3}; // NOLINT
 
         set.push(entity);
 
@@ -1022,7 +1022,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Value) {
         // value works the same in all cases, test only once
         switch(policy) {
         case entt::deletion_policy::swap_and_pop:
-            ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entity_type{3}), "");
+            ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entity_type{3}), ""); // NOLINT
             break;
         case entt::deletion_policy::in_place:
         case entt::deletion_policy::swap_only:
@@ -1039,7 +1039,7 @@ TYPED_TEST(SparseSet, Push) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity[2u]{entity_type{3}, entity_type{42}};
+        const entity_type entity[2u]{entity_type{3}, entity_type{42}}; // NOLINT
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
@@ -1165,7 +1165,7 @@ TYPED_TEST(SparseSet, PushOutOfBounds) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity[2u]{entity_type{0}, entity_type{traits_type::page_size}};
+        const entity_type entity[2u]{entity_type{0}, entity_type{traits_type::page_size}}; // NOLINT
 
         ASSERT_EQ(*set.push(entity[0u]), entity[0u]);
         ASSERT_EQ(set.extent(), traits_type::page_size);
@@ -1186,7 +1186,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Push) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity[2u]{entity_type{3}, entity_type{42}};
+        const entity_type entity[2u]{entity_type{3}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
 
@@ -1203,7 +1203,7 @@ TYPED_TEST(SparseSet, Bump) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)};
+        const entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
 
@@ -1233,7 +1233,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Bump) {
         case entt::deletion_policy::swap_and_pop:
             ASSERT_DEATH(set.bump(entt::null), "");
             ASSERT_DEATH(set.bump(entt::tombstone), "");
-            ASSERT_DEATH(set.bump(entity_type{42}), "");
+            ASSERT_DEATH(set.bump(entity_type{42}), ""); // NOLINT
             break;
         case entt::deletion_policy::in_place:
         case entt::deletion_policy::swap_only:
@@ -1251,7 +1251,7 @@ TYPED_TEST(SparseSet, Erase) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)};
+        entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)}; // NOLINT
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
@@ -1265,7 +1265,7 @@ TYPED_TEST(SparseSet, Erase) {
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
 
             set.push(std::begin(entity), std::end(entity));
-            set.erase(entity, entity + 2u);
+            set.erase(entity, entity + 2u); // NOLINT
 
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
@@ -1292,8 +1292,8 @@ TYPED_TEST(SparseSet, Erase) {
             ASSERT_EQ(set.current(entity[2u]), traits_type::to_version(entt::tombstone));
 
             set.push(entity[0u]);
-            set.push(std::begin(entity) + 1, std::end(entity));
-            set.erase(entity, entity + 2u);
+            set.push(std::begin(entity) + 1, std::end(entity)); // NOLINT
+            set.erase(entity, entity + 2u);                     // NOLINT
 
             ASSERT_EQ(set.size(), 5u);
             ASSERT_EQ(set.free_list(), 3u);
@@ -1323,7 +1323,7 @@ TYPED_TEST(SparseSet, Erase) {
             ASSERT_TRUE(set.contains(traits_type::next(entity[2u])));
 
             set.push(std::begin(entity), std::end(entity));
-            set.erase(entity, entity + 2u);
+            set.erase(entity, entity + 2u); // NOLINT
 
             ASSERT_EQ(set.size(), 3u);
             ASSERT_EQ(set.free_list(), 1u);
@@ -1352,10 +1352,10 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Erase) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[2u]{entity_type{42}, traits_type::construct(9, 3)};
+        entity_type entity[2u]{entity_type{42}, traits_type::construct(9, 3)}; // NOLINT
 
         ASSERT_DEATH(set.erase(std::begin(entity), std::end(entity)), "");
-        ASSERT_DEATH(set.erase(entity, entity + 2u), "");
+        ASSERT_DEATH(set.erase(entity, entity + 2u), ""); // NOLINT
     }
 }
 
@@ -1367,7 +1367,7 @@ TYPED_TEST(SparseSet, CrossErase) {
         sparse_set_type set{policy};
         sparse_set_type other{policy};
 
-        entity_type entity[2u]{entity_type{3}, entity_type{42}};
+        entity_type entity[2u]{entity_type{3}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         other.push(entity[1u]);
@@ -1387,7 +1387,7 @@ TYPED_TEST(SparseSet, Remove) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)};
+        entity_type entity[3u]{entity_type{3}, entity_type{42}, traits_type::construct(9, 3)}; // NOLINT
 
         switch(policy) {
         case entt::deletion_policy::swap_and_pop: {
@@ -1409,7 +1409,7 @@ TYPED_TEST(SparseSet, Remove) {
 
             set.push(std::begin(entity), std::end(entity));
 
-            ASSERT_EQ(set.remove(entity, entity + 2u), 2u);
+            ASSERT_EQ(set.remove(entity, entity + 2u), 2u); // NOLINT
 
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
@@ -1444,9 +1444,9 @@ TYPED_TEST(SparseSet, Remove) {
             ASSERT_EQ(set.current(entity[2u]), traits_type::to_version(entt::tombstone));
 
             set.push(entity[0u]);
-            set.push(std::begin(entity) + 1, std::end(entity));
+            set.push(std::begin(entity) + 1, std::end(entity)); // NOLINT
 
-            ASSERT_EQ(set.remove(entity, entity + 2u), 2u);
+            ASSERT_EQ(set.remove(entity, entity + 2u), 2u); // NOLINT
 
             ASSERT_EQ(set.size(), 5u);
             ASSERT_EQ(set.free_list(), 3u);
@@ -1485,7 +1485,7 @@ TYPED_TEST(SparseSet, Remove) {
 
             set.push(std::begin(entity), std::end(entity));
 
-            ASSERT_EQ(set.remove(entity, entity + 2u), 2u);
+            ASSERT_EQ(set.remove(entity, entity + 2u), 2u); // NOLINT
 
             ASSERT_EQ(set.size(), 3u);
             ASSERT_EQ(set.free_list(), 1u);
@@ -1519,7 +1519,7 @@ TYPED_TEST(SparseSet, CrossRemove) {
         sparse_set_type set{policy};
         sparse_set_type other{policy};
 
-        entity_type entity[2u]{entity_type{3}, entity_type{42}};
+        entity_type entity[2u]{entity_type{3}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         other.push(entity[1u]);
@@ -1539,8 +1539,8 @@ TYPED_TEST(SparseSet, Compact) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{3};
-        const entity_type other{42};
+        const entity_type entity{3}; // NOLINT
+        const entity_type other{42}; // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -1638,8 +1638,8 @@ TYPED_TEST(SparseSet, SwapElements) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const auto entity = traits_type::construct(3, 5);
-        const auto other = traits_type::construct(42, 99);
+        const auto entity = traits_type::construct(3, 5);  // NOLINT
+        const auto other = traits_type::construct(42, 99); // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -1661,8 +1661,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SwapElements) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const auto entity = traits_type::construct(3, 5);
-        const auto other = traits_type::construct(42, 99);
+        const auto entity = traits_type::construct(3, 5);  // NOLINT
+        const auto other = traits_type::construct(42, 99); // NOLINT
 
         // swap_elements works the same in all cases, test only once
         switch(policy) {
@@ -1689,7 +1689,7 @@ TYPED_TEST(SparseSet, Clear) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
+        entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         set.erase(entity[1u]);
@@ -1706,7 +1706,7 @@ TYPED_TEST(SparseSet, SortOrdered) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[5u]{entity_type{42}, entity_type{12}, entity_type{9}, entity_type{7}, entity_type{3}};
+        entity_type entity[5u]{entity_type{42}, entity_type{12}, entity_type{9}, entity_type{7}, entity_type{3}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         set.sort(std::less{});
@@ -1722,7 +1722,7 @@ TYPED_TEST(SparseSet, SortReverse) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[5u]{entity_type{3}, entity_type{7}, entity_type{9}, entity_type{12}, entity_type{42}};
+        entity_type entity[5u]{entity_type{3}, entity_type{7}, entity_type{9}, entity_type{12}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         set.sort(std::less{});
@@ -1738,7 +1738,7 @@ TYPED_TEST(SparseSet, SortUnordered) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[5u]{entity_type{9}, entity_type{7}, entity_type{3}, entity_type{12}, entity_type{42}};
+        entity_type entity[5u]{entity_type{9}, entity_type{7}, entity_type{3}, entity_type{12}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         set.sort(std::less{});
@@ -1763,8 +1763,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Sort) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         set.push(entity);
         set.push(other);
@@ -1789,7 +1789,7 @@ TYPED_TEST(SparseSet, SortN) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        entity_type entity[5u]{entity_type{7}, entity_type{9}, entity_type{3}, entity_type{12}, entity_type{42}};
+        entity_type entity[5u]{entity_type{7}, entity_type{9}, entity_type{3}, entity_type{12}, entity_type{42}}; // NOLINT
 
         set.push(std::begin(entity), std::end(entity));
         set.sort_n(0u, std::less{});
@@ -1801,7 +1801,7 @@ TYPED_TEST(SparseSet, SortN) {
         ASSERT_EQ(set.data()[0u], entity[1u]);
         ASSERT_EQ(set.data()[1u], entity[0u]);
 
-        set.sort_n(5u, std::less{});
+        set.sort_n(5u, std::less{}); // NOLINT
 
         auto begin = set.begin();
         auto end = set.end();
@@ -1823,8 +1823,8 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortN) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        const entity_type entity{42};
-        const entity_type other{3};
+        const entity_type entity{42}; // NOLINT
+        const entity_type other{3};   // NOLINT
 
         ASSERT_DEATH(set.sort_n(1u, std::less{}), "");
 
@@ -1857,7 +1857,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
         sparse_set_type lhs{policy};
         const sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[3u]{entity_type{3}, entity_type{12}, entity_type{42}};
+        entity_type lhs_entity[3u]{entity_type{3}, entity_type{12}, entity_type{42}}; // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
 
@@ -1877,8 +1877,8 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
         sparse_set_type lhs{policy};
         sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[3u]{entity_type{3}, entity_type{12}, entity_type{42}};
-        entity_type rhs_entity[1u]{entity_type{12}};
+        entity_type lhs_entity[3u]{entity_type{3}, entity_type{12}, entity_type{42}}; // NOLINT
+        entity_type rhs_entity[1u]{entity_type{12}};                                  // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
         rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -1906,8 +1906,8 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         sparse_set_type lhs{policy};
         sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};
-        entity_type rhs_entity[6u]{entity_type{6}, entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};
+        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};                 // NOLINT
+        entity_type rhs_entity[6u]{entity_type{6}, entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}}; // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
         rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -1929,8 +1929,8 @@ TYPED_TEST(SparseSet, SortAsReverse) {
         sparse_set_type lhs{policy};
         sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};
-        entity_type rhs_entity[6u]{entity_type{5}, entity_type{4}, entity_type{3}, entity_type{2}, entity_type{1}, entity_type{6}};
+        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};                 // NOLINT
+        entity_type rhs_entity[6u]{entity_type{5}, entity_type{4}, entity_type{3}, entity_type{2}, entity_type{1}, entity_type{6}}; // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
         rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -1961,8 +1961,8 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
         sparse_set_type lhs{policy};
         sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};
-        entity_type rhs_entity[6u]{entity_type{3}, entity_type{2}, entity_type{6}, entity_type{1}, entity_type{4}, entity_type{5}};
+        entity_type lhs_entity[5u]{entity_type{1}, entity_type{2}, entity_type{3}, entity_type{4}, entity_type{5}};                 // NOLINT
+        entity_type rhs_entity[6u]{entity_type{3}, entity_type{2}, entity_type{6}, entity_type{1}, entity_type{4}, entity_type{5}}; // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
         rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -1994,8 +1994,8 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
         sparse_set_type lhs{policy};
         sparse_set_type rhs{policy};
 
-        entity_type lhs_entity[3u]{entity_type{1}, entity_type{2}, traits_type::construct(3, 1)};
-        entity_type rhs_entity[3u]{entity_type{2}, entity_type{1}, traits_type::construct(3, 2)};
+        entity_type lhs_entity[3u]{entity_type{1}, entity_type{2}, traits_type::construct(3, 1)}; // NOLINT
+        entity_type rhs_entity[3u]{entity_type{2}, entity_type{1}, traits_type::construct(3, 2)}; // NOLINT
 
         lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
         rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
@@ -2031,7 +2031,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             SUCCEED();
         } break;
         case entt::deletion_policy::in_place: {
-            const entity_type entity{42};
+            const entity_type entity{42}; // NOLINT
 
             lhs.push(entity);
             lhs.erase(entity);
@@ -2039,7 +2039,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
             ASSERT_DEATH(lhs.sort_as(rhs), ""); // NOLINT
         } break;
         case entt::deletion_policy::swap_only: {
-            entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}};
+            entity_type entity[3u]{entity_type{3}, entity_type{42}, entity_type{9}}; // NOLINT
 
             lhs.push(std::begin(entity), std::end(entity));
             rhs.push(std::rbegin(entity), std::rend(entity));
@@ -2058,7 +2058,7 @@ TYPED_TEST(SparseSet, CanModifyDuringIteration) {
 
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
-        set.push(entity_type{0});
+        set.push(entity_type{0}); // NOLINT
 
         ASSERT_EQ(set.capacity(), 1u);
 
@@ -2086,8 +2086,8 @@ TYPED_TEST(SparseSet, CustomAllocator) {
 
         ASSERT_EQ(set.capacity(), 1u);
 
-        set.push(entity_type{0});
-        set.push(entity_type{1});
+        set.push(entity_type{0}); // NOLINT
+        set.push(entity_type{1}); // NOLINT
 
         entt::basic_sparse_set<entity_type, test::throwing_allocator<entity_type>> other{std::move(set), allocator};
 
@@ -2145,7 +2145,7 @@ TYPED_TEST(SparseSet, ThrowingAllocator) {
         ASSERT_EQ(set.extent(), traits_type::page_size);
         ASSERT_EQ(set.capacity(), 0u);
 
-        set.push(entity_type{0});
+        set.push(entity_type{0}); // NOLINT
         set.get_allocator().template throw_counter<entity_type>(0u);
 
         ASSERT_THROW(set.reserve(2u), test::throwing_allocator_exception);
@@ -2155,19 +2155,19 @@ TYPED_TEST(SparseSet, ThrowingAllocator) {
 
         set.get_allocator().template throw_counter<entity_type>(0u);
 
-        ASSERT_THROW(set.push(entity_type{1}), test::throwing_allocator_exception);
+        ASSERT_THROW(set.push(entity_type{1}), test::throwing_allocator_exception); // NOLINT
         ASSERT_EQ(set.extent(), traits_type::page_size);
-        ASSERT_TRUE(set.contains(entity_type{0}));
-        ASSERT_FALSE(set.contains(entity_type{1}));
+        ASSERT_TRUE(set.contains(entity_type{0}));  // NOLINT
+        ASSERT_FALSE(set.contains(entity_type{1})); // NOLINT
         ASSERT_EQ(set.capacity(), 1u);
 
-        entity_type entity[2u]{entity_type{1}, entity_type{traits_type::page_size}};
+        entity_type entity[2u]{entity_type{1}, entity_type{traits_type::page_size}}; // NOLINT
         set.get_allocator().template throw_counter<entity_type>(1u);
 
         ASSERT_THROW(set.push(std::begin(entity), std::end(entity)), test::throwing_allocator_exception);
         ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        ASSERT_TRUE(set.contains(entity_type{0}));
-        ASSERT_TRUE(set.contains(entity_type{1}));
+        ASSERT_TRUE(set.contains(entity_type{0})); // NOLINT
+        ASSERT_TRUE(set.contains(entity_type{1})); // NOLINT
         ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);

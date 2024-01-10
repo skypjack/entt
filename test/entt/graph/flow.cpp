@@ -18,7 +18,7 @@ TEST(Flow, Constructors) {
 
     flow.bind(0);
     flow.bind(3);
-    flow.bind(99);
+    flow.bind(99); // NOLINT
 
     ASSERT_EQ(flow.size(), 3u);
 
@@ -38,7 +38,7 @@ TEST(Flow, Copy) {
 
     flow.bind(0);
     flow.bind(3);
-    flow.bind(99);
+    flow.bind(99); // NOLINT
 
     entt::flow other{flow};
 
@@ -68,7 +68,7 @@ TEST(Flow, Move) {
 
     flow.bind(0);
     flow.bind(3);
-    flow.bind(99);
+    flow.bind(99); // NOLINT
 
     entt::flow other{std::move(flow)};
 
@@ -95,7 +95,7 @@ TEST(Flow, Swap) {
     entt::flow flow{};
     entt::flow other{};
 
-    flow.bind(7);
+    flow.bind(7); // NOLINT
 
     ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(flow.size(), 1u);
@@ -112,7 +112,7 @@ TEST(Flow, Clear) {
     entt::flow flow{};
 
     flow.bind(0);
-    flow.bind(99);
+    flow.bind(99); // NOLINT
 
     ASSERT_EQ(flow.size(), 2u);
     ASSERT_EQ(flow[0u], 0u);
@@ -125,7 +125,7 @@ TEST(Flow, Clear) {
 
 TEST(Flow, Set) {
     entt::flow flow{};
-    flow.bind(0).set(10, true).bind(1).set(10, true).set(11, false);
+    flow.bind(0).set(10, true).bind(1).set(10, true).set(11, false); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -138,7 +138,7 @@ TEST(Flow, Set) {
 
 TEST(Flow, RO) {
     entt::flow flow{};
-    flow.bind(0).ro(10).bind(1).ro(10).ro(11);
+    flow.bind(0).ro(10).bind(1).ro(10).ro(11); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -148,8 +148,8 @@ TEST(Flow, RO) {
 
 TEST(Flow, RangeRO) {
     entt::flow flow{};
-    const entt::id_type res[2u]{10, 11};
-    flow.bind(0).ro(res, res + 1).bind(1).ro(res, res + 2);
+    const entt::id_type res[2u]{10, 11};                    // NOLINT
+    flow.bind(0).ro(res, res + 1).bind(1).ro(res, res + 2); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -159,7 +159,7 @@ TEST(Flow, RangeRO) {
 
 TEST(Flow, RW) {
     entt::flow flow{};
-    flow.bind(0).rw(10).bind(1).rw(10).rw(11);
+    flow.bind(0).rw(10).bind(1).rw(10).rw(11); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -172,8 +172,8 @@ TEST(Flow, RW) {
 
 TEST(Flow, RangeRW) {
     entt::flow flow{};
-    const entt::id_type res[2u]{10, 11};
-    flow.bind(0).rw(res, res + 1).bind(1).rw(res, res + 2);
+    const entt::id_type res[2u]{10, 11};                    // NOLINT
+    flow.bind(0).rw(res, res + 1).bind(1).rw(res, res + 2); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -288,7 +288,7 @@ ENTT_DEBUG_TEST(FlowDeathTest, NoBind) {
 
 TEST(Flow, DirectRebind) {
     entt::flow flow{};
-    flow.bind(0).ro(10).rw(10).bind(1).ro(10);
+    flow.bind(0).ro(10).rw(10).bind(1).ro(10); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -301,7 +301,7 @@ TEST(Flow, DirectRebind) {
 
 TEST(Flow, DeferredRebind) {
     entt::flow flow{};
-    flow.bind(0).ro(10).bind(1).ro(10).bind(0).rw(10);
+    flow.bind(0).ro(10).bind(1).ro(10).bind(0).rw(10); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -314,7 +314,7 @@ TEST(Flow, DeferredRebind) {
 
 TEST(Flow, Loop) {
     entt::flow flow{};
-    flow.bind(0).rw(10).bind(1).ro(10).bind(0).rw(10);
+    flow.bind(0).rw(10).bind(1).ro(10).bind(0).rw(10); // NOLINT
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
