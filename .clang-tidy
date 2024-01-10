@@ -2,15 +2,9 @@ Checks: >
     bugprone-*,
     concurrency-*,
     cppcoreguidelines-*,
-    -cppcoreguidelines-avoid-c-arrays,
-    -cppcoreguidelines-avoid-const-or-ref-data-members,
-    -cppcoreguidelines-avoid-magic-numbers,
-    -cppcoreguidelines-pro-*,
     misc-*,
     -misc-no-recursion,
     modernize-*,
-    -modernize-avoid-c-arrays,
-    -modernize-macro-to-enum,
     -modernize-use-trailing-return-type,
     performance-*,
     portability-*,
@@ -25,4 +19,8 @@ CheckOptions:
     - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
       value: true
     - key: misc-non-private-member-variables-in-classes.IgnorePublicMemberVariables
+      value: true
+    - key: cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
+      value: true
+    - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
       value: true
