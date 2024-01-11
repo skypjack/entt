@@ -727,13 +727,13 @@ TEST(DenseMap, TryEmplaceSameBucket) {
 
 TEST(DenseMap, TryEmplaceMovableType) {
     entt::dense_map<int, std::unique_ptr<int>> map;
-    std::unique_ptr<int> value = std::make_unique<int>(42); // NOLINT
+    std::unique_ptr<int> value = std::make_unique<int>(0);
 
     ASSERT_TRUE(map.try_emplace(*value, std::move(value)).second);
     ASSERT_FALSE(map.empty());
     ASSERT_FALSE(value);
 
-    value = std::make_unique<int>(42); // NOLINT
+    value = std::make_unique<int>(0);
 
     ASSERT_FALSE(map.try_emplace(*value, std::move(value)).second);
     ASSERT_TRUE(value);

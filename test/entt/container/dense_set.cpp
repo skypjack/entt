@@ -211,11 +211,11 @@ TEST(DenseSet, Iterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, set.end());
 
-    set.emplace(42); // NOLINT
+    set.emplace(1);
     begin = set.begin();
 
     ASSERT_EQ(begin[0u], 3);
-    ASSERT_EQ(begin[1u], 42);
+    ASSERT_EQ(begin[1u], 1);
 }
 
 TEST(DenseSet, ConstIterator) {
@@ -264,11 +264,11 @@ TEST(DenseSet, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, set.cend());
 
-    set.emplace(42); // NOLINT
+    set.emplace(1);
     cbegin = set.cbegin();
 
     ASSERT_EQ(cbegin[0u], 3);
-    ASSERT_EQ(cbegin[1u], 42);
+    ASSERT_EQ(cbegin[1u], 1);
 }
 
 TEST(DenseSet, ReverseIterator) {
@@ -317,10 +317,10 @@ TEST(DenseSet, ReverseIterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, set.rend());
 
-    set.emplace(42); // NOLINT
+    set.emplace(1);
     begin = set.rbegin();
 
-    ASSERT_EQ(begin[0u], 42);
+    ASSERT_EQ(begin[0u], 1);
     ASSERT_EQ(begin[1u], 3);
 }
 
@@ -370,10 +370,10 @@ TEST(DenseSet, ConstReverseIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, set.crend());
 
-    set.emplace(42); // NOLINT
+    set.emplace(1);
     cbegin = set.crbegin();
 
-    ASSERT_EQ(cbegin[0u], 42);
+    ASSERT_EQ(cbegin[0u], 1);
     ASSERT_EQ(cbegin[1u], 3);
 }
 
@@ -780,7 +780,7 @@ TEST(DenseSet, EqualRange) {
     entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
-    set.emplace(42); // NOLINT
+    set.emplace(1);
 
     ASSERT_EQ(set.equal_range(0).first, set.end());
     ASSERT_EQ(set.equal_range(0).second, set.end());
@@ -794,21 +794,21 @@ TEST(DenseSet, EqualRange) {
     ASSERT_EQ(cset.equal_range(0.0).first, cset.cend());
     ASSERT_EQ(cset.equal_range(0.0).second, cset.cend());
 
-    ASSERT_NE(set.equal_range(42).first, set.end());
-    ASSERT_EQ(*set.equal_range(42).first, 42);
-    ASSERT_EQ(set.equal_range(42).second, set.end());
+    ASSERT_NE(set.equal_range(1).first, set.end());
+    ASSERT_EQ(*set.equal_range(1).first, 1);
+    ASSERT_EQ(set.equal_range(1).second, set.end());
 
-    ASSERT_NE(cset.equal_range(42).first, cset.cend());
-    ASSERT_EQ(*cset.equal_range(42).first, 42);
-    ASSERT_EQ(cset.equal_range(42).second, cset.cend());
+    ASSERT_NE(cset.equal_range(1).first, cset.cend());
+    ASSERT_EQ(*cset.equal_range(1).first, 1);
+    ASSERT_EQ(cset.equal_range(1).second, cset.cend());
 
-    ASSERT_NE(set.equal_range(42.0).first, set.end());
-    ASSERT_EQ(*set.equal_range(42.0).first, 42);
-    ASSERT_EQ(set.equal_range(42.0).second, set.end());
+    ASSERT_NE(set.equal_range(1.0).first, set.end());
+    ASSERT_EQ(*set.equal_range(1.0).first, 1);
+    ASSERT_EQ(set.equal_range(1.0).second, set.end());
 
-    ASSERT_NE(cset.equal_range(42.0).first, cset.cend());
-    ASSERT_EQ(*cset.equal_range(42.0).first, 42);
-    ASSERT_EQ(cset.equal_range(42.0).second, cset.cend());
+    ASSERT_NE(cset.equal_range(1.0).first, cset.cend());
+    ASSERT_EQ(*cset.equal_range(1.0).first, 1);
+    ASSERT_EQ(cset.equal_range(1.0).second, cset.cend());
 }
 
 TEST(DenseSet, LocalIterator) {
