@@ -41,10 +41,10 @@ TEST(Example, CustomIdentifier) {
     ASSERT_FALSE((registry.all_of<int, char>(entity)));
     ASSERT_EQ(registry.try_get<int>(entity), nullptr);
 
-    registry.emplace<int>(entity, 42); // NOLINT
+    registry.emplace<int>(entity, 2);
 
     ASSERT_TRUE((registry.any_of<int, char>(entity)));
-    ASSERT_EQ(registry.get<int>(entity), 42); // NOLINT
+    ASSERT_EQ(registry.get<int>(entity), 2);
 
     registry.destroy(entity);
 
