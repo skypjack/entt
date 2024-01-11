@@ -24,5 +24,5 @@ TEST(Lib, Dispatcher) {
     dispatcher.sink<message>().connect<entt::overload<void(message)>(&listener::on)>(listener);
     trigger(dispatcher);
 
-    ASSERT_EQ(listener.value, 42);
+    ASSERT_EQ(listener.value, 2);
 }

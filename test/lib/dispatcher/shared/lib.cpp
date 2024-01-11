@@ -4,5 +4,5 @@
 
 ENTT_API void trigger(entt::dispatcher &dispatcher) {
     dispatcher.trigger<event>();
-    dispatcher.trigger(message{42}); // NOLINT
+    dispatcher.trigger(message{2});
 }

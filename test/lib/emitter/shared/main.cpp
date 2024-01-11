@@ -17,5 +17,5 @@ TEST(Lib, Emitter) {
 
     emit(emitter);
 
-    ASSERT_EQ(value, 42);
+    ASSERT_EQ(value, 2);
 }
