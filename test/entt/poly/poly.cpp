@@ -48,7 +48,7 @@ struct common_members {
 namespace {
 
 [[nodiscard]] int absolutely_random() {
-    return 42; // NOLINT
+    return 4;
 }
 
 } // namespace
@@ -188,7 +188,7 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_EQ(alias.data(), &instance);
     ASSERT_EQ(std::as_const(alias).data(), &instance);
 
-    ASSERT_EQ(value->rand(), 42);
+    ASSERT_EQ(value->rand(), 4);
 
     empty = impl{};
 
