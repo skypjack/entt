@@ -48,15 +48,15 @@ TEST(Emitter, Swap) {
     ASSERT_TRUE(other.empty());
 
     emitter.swap(other);
-    emitter.publish(foo_event{42}); // NOLINT
+    emitter.publish(foo_event{1});
 
     ASSERT_EQ(value, 0);
     ASSERT_TRUE(emitter.empty());
     ASSERT_FALSE(other.empty());
 
-    other.publish(foo_event{42}); // NOLINT
+    other.publish(foo_event{1});
 
-    ASSERT_EQ(value, 42);
+    ASSERT_EQ(value, 1);
 }
 
 TEST(Emitter, Clear) {
@@ -136,9 +136,9 @@ TEST(Emitter, On) {
     ASSERT_TRUE(emitter.contains<foo_event>());
     ASSERT_EQ(value, 0);
 
-    emitter.publish(foo_event{42}); // NOLINT
+    emitter.publish(foo_event{1});
 
-    ASSERT_EQ(value, 42);
+    ASSERT_EQ(value, 1);
 }
 
 TEST(Emitter, OnAndErase) {

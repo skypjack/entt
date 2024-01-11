@@ -39,8 +39,8 @@ TEST(Dispatcher, Functionalities) {
     ASSERT_EQ(dispatcher.size<an_event>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);
 
-    dispatcher.trigger(one_more_event{42}); // NOLINT
-    dispatcher.enqueue<one_more_event>(42); // NOLINT
+    dispatcher.trigger(one_more_event{1});
+    dispatcher.enqueue<one_more_event>(2);
     dispatcher.update<one_more_event>();
 
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
