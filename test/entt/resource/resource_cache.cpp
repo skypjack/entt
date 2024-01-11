@@ -50,7 +50,7 @@ TEST(ResourceCache, Functionalities) {
 
     ASSERT_FALSE(cache.contains("resource"_hs));
 
-    cache.load("resource"_hs, 42); // NOLINT
+    cache.load("resource"_hs, 2);
 
     ASSERT_FALSE(cache.empty());
     ASSERT_EQ(cache.size(), 1u);
@@ -81,7 +81,7 @@ TEST(ResourceCache, Constructors) {
     cache = entt::resource_cache<int>{std::allocator<int>{}};
     cache = entt::resource_cache<int>{entt::resource_loader<int>{}, std::allocator<float>{}};
 
-    cache.load("resource"_hs, 42u); // NOLINT
+    cache.load("resource"_hs, 2u);
 
     entt::resource_cache<int> temp{cache, cache.get_allocator()};
     const entt::resource_cache<int> other{std::move(temp), cache.get_allocator()};
@@ -154,7 +154,7 @@ TEST(ResourceCache, Iterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<entt::id_type, entt::resource<int>>>();
 
     entt::resource_cache<int> cache;
-    cache.load("resource"_hs, 42); // NOLINT
+    cache.load("resource"_hs, 2);
 
     iterator end{cache.begin()};
     iterator begin{};
@@ -209,7 +209,7 @@ TEST(ResourceCache, ConstIterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<entt::id_type, entt::resource<const int>>>();
 
     entt::resource_cache<int> cache;
-    cache.load("resource"_hs, 42); // NOLINT
+    cache.load("resource"_hs, 2);
 
     iterator cend{cache.cbegin()};
     iterator cbegin{};
@@ -258,7 +258,7 @@ TEST(ResourceCache, IteratorConversion) {
     using namespace entt::literals;
 
     entt::resource_cache<int> cache;
-    cache.load("resource"_hs, 42); // NOLINT
+    cache.load("resource"_hs, 2);
 
     const typename entt::resource_cache<int>::iterator it = cache.begin();
     typename entt::resource_cache<int>::const_iterator cit = it;
@@ -267,7 +267,7 @@ TEST(ResourceCache, IteratorConversion) {
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, entt::resource<const int>>>();
 
     ASSERT_EQ(it->first, "resource"_hs);
-    ASSERT_EQ((*it).second, 42);
+    ASSERT_EQ((*it).second, 2);
     ASSERT_EQ(it->first, cit->first);
     ASSERT_EQ((*it).second, (*cit).second);
 
@@ -373,26 +373,26 @@ TEST(ResourceCache, Indexing) {
     ASSERT_FALSE(cache["resource"_hs]);
     ASSERT_FALSE(std::as_const(cache)["resource"_hs]);
 
-    cache.load("resource"_hs, 99); // NOLINT
+    cache.load("resource"_hs, 1);
 
     ASSERT_TRUE(cache.contains("resource"_hs));
-    ASSERT_EQ(std::as_const(cache)["resource"_hs], 99);
-    ASSERT_EQ(cache["resource"_hs], 99);
+    ASSERT_EQ(std::as_const(cache)["resource"_hs], 1);
+    ASSERT_EQ(cache["resource"_hs], 1);
 }
 
 TEST(ResourceCache, LoaderDispatching) {
     using namespace entt::literals;
 
     entt::resource_cache<int, loader<int>> cache;
-    cache.force_load("resource"_hs, 99); // NOLINT
+    cache.force_load("resource"_hs, 1);
 
     ASSERT_TRUE(cache.contains("resource"_hs));
-    ASSERT_EQ(cache["resource"_hs], 99);
+    ASSERT_EQ(cache["resource"_hs], 1);
 
-    cache.force_load("resource"_hs, with_callback{}, []() { return std::make_shared<int>(42); }); // NOLINT
+    cache.force_load("resource"_hs, with_callback{}, []() { return std::make_shared<int>(2); });
 
     ASSERT_TRUE(cache.contains("resource"_hs));
-    ASSERT_EQ(cache["resource"_hs], 42);
+    ASSERT_EQ(cache["resource"_hs], 2);
 }
 
 TEST(ResourceCache, BrokenLoader) {
@@ -404,7 +404,7 @@ TEST(ResourceCache, BrokenLoader) {
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_FALSE(cache["resource"_hs]);
 
-    cache.force_load("resource"_hs, 42); // NOLINT
+    cache.force_load("resource"_hs, 2);
 
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_TRUE(cache["resource"_hs]);
