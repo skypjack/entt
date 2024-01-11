@@ -31,7 +31,7 @@ struct clazz {
 };
 
 int free_function(int, const double &) {
-    return 42; // NOLINT
+    return 64;
 }
 
 template<typename, typename Type = void>
@@ -70,8 +70,8 @@ TEST_F(UnpackAsType, Functionalities) {
 }
 
 TEST_F(UnpackAsValue, Functionalities) {
-    ASSERT_EQ((this->test_for<2>()('c', 42., true)), 6);
-    ASSERT_EQ((this->test_for<true>()('c', 42.)), 2);
+    ASSERT_EQ((this->test_for<2>()('c', 1., true)), 6);
+    ASSERT_EQ((this->test_for<true>()('c', 2.)), 2);
 }
 
 TEST(IntegralConstant, Functionalities) {
@@ -162,12 +162,12 @@ TEST(ValueList, Functionalities) {
     testing::StaticAssertTypeEq<entt::value_list_diff_t<entt::value_list<0, 1, 2>, entt::value_list<1>>, entt::value_list<0, 2>>();
 
     ASSERT_EQ((std::tuple_size_v<entt::value_list<>>), 0u);
-    ASSERT_EQ((std::tuple_size_v<entt::value_list<42>>), 1u);
-    ASSERT_EQ((std::tuple_size_v<entt::value_list<42, 'a'>>), 2u);
+    ASSERT_EQ((std::tuple_size_v<entt::value_list<4>>), 1u);
+    ASSERT_EQ((std::tuple_size_v<entt::value_list<4, 'a'>>), 2u);
 
-    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42>>>();       // NOLINT
-    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<42, 'a'>>>();  // NOLINT
-    testing::StaticAssertTypeEq<char, std::tuple_element_t<1, entt::value_list<42, 'a'>>>(); // NOLINT
+    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<4>>>();
+    testing::StaticAssertTypeEq<int, std::tuple_element_t<0, entt::value_list<4, 'a'>>>();
+    testing::StaticAssertTypeEq<char, std::tuple_element_t<1, entt::value_list<4, 'a'>>>();
 }
 
 TEST(IsApplicable, Functionalities) {
@@ -261,7 +261,7 @@ TEST(NthArgument, Functionalities) {
     testing::StaticAssertTypeEq<entt::nth_argument_t<1u, decltype(&clazz::bar)>, float>();
     testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(&clazz::quux)>, bool>();
 
-    ASSERT_EQ(free_function(entt::nth_argument_t<0u, decltype(&free_function)>{}, entt::nth_argument_t<1u, decltype(&free_function)>{}), 42);
+    ASSERT_EQ(free_function(entt::nth_argument_t<0u, decltype(&free_function)>{}, entt::nth_argument_t<1u, decltype(&free_function)>{}), 64);
 }
 
 TEST(Tag, Functionalities) {

@@ -217,9 +217,9 @@ TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
     alignas(int) std::byte storage[sizeof(int)]; // NOLINT
     const std::allocator<int> allocator{};
 
-    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 42); // NOLINT
+    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 1); // NOLINT
 
-    ASSERT_EQ(*value, 42);
+    ASSERT_EQ(*value, 1);
 }
 
 #if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)

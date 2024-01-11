@@ -85,7 +85,6 @@ TEST_F(Any, Empty) {
     entt::any any{};
 
     ASSERT_FALSE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -96,7 +95,6 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
     entt::any any{std::in_place_type<int>, 2};
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -105,7 +103,6 @@ TEST_F(Any, SBOInPlaceTypeConstruction) {
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
-    ASSERT_FALSE(other.owner()); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::ref);
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -117,7 +114,6 @@ TEST_F(Any, SBOAsRefConstruction) {
     entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::ref);
     ASSERT_EQ(any.type(), entt::type_id<int>());
 
@@ -136,7 +132,6 @@ TEST_F(Any, SBOAsRefConstruction) {
     any.emplace<int &>(value);
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::ref);
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(&any), &value);
@@ -144,7 +139,6 @@ TEST_F(Any, SBOAsRefConstruction) {
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
-    ASSERT_FALSE(other.owner()); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::ref);
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -156,7 +150,6 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     entt::any any{entt::forward_as_any(value)};
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::cref);
     ASSERT_EQ(any.type(), entt::type_id<int>());
 
@@ -175,7 +168,6 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     any.emplace<const int &>(value);
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::cref);
     ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<const int>(&any), &value);
@@ -183,7 +175,6 @@ TEST_F(Any, SBOAsConstRefConstruction) {
     auto other = any.as_ref();
 
     ASSERT_TRUE(other);
-    ASSERT_FALSE(other.owner()); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::cref);
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(other), 2);

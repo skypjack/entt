@@ -12,11 +12,11 @@ TEST(Monostate, Functionalities) {
     ASSERT_EQ(i_pre, int{});
 
     entt::monostate<"foobar"_hs>{} = true;
-    entt::monostate_v<"foobar"_hs> = 42; // NOLINT
+    entt::monostate_v<"foobar"_hs> = 2;
 
     const bool &b_post = entt::monostate<"foobar"_hs>{};
     const int &i_post = entt::monostate_v<entt::hashed_string{"foobar"}>;
 
     ASSERT_TRUE(b_post);
-    ASSERT_EQ(i_post, 42);
+    ASSERT_EQ(i_post, 2);
 }
