@@ -34,7 +34,7 @@ TEST(Example, SignalLess) {
     ASSERT_TRUE((has_on_construct_v<entt::entity, char>));
 
     entt::registry registry;
-    const std::array<entt::entity, 1u> entity{registry.create()};
+    const std::array entity{registry.create()};
 
     // literally a test for storage_adapter_mixin
     registry.emplace<int>(entity[0], 0);
