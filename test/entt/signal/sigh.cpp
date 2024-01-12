@@ -2,10 +2,11 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
+#include "../common/linter.hpp"
 
 struct sigh_listener {
     static void f(int &v) {
-        v = 42; // NOLINT
+        ++v;
     }
 
     [[nodiscard]] bool g(int) {
@@ -121,15 +122,15 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(1u, sigh.size());
-    ASSERT_EQ(42, v);
+    ASSERT_EQ(sigh.size(), 1u);
+    ASSERT_EQ(v, 1);
 
     v = 0;
     sink.disconnect<&sigh_listener::f>();
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(0u, sigh.size());
+    ASSERT_EQ(sigh.size(), 0u);
     ASSERT_EQ(v, 0);
 }
 
@@ -142,15 +143,15 @@ TEST(SigH, FunctionsWithPayload) {
     sigh.publish();
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(1u, sigh.size());
-    ASSERT_EQ(42, v);
+    ASSERT_EQ(sigh.size(), 1u);
+    ASSERT_EQ(v, 1);
 
     v = 0;
     sink.disconnect<&sigh_listener::f>(v);
     sigh.publish();
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(0u, sigh.size());
+    ASSERT_EQ(sigh.size(), 0u);
     ASSERT_EQ(v, 0);
 
     sink.connect<&sigh_listener::f>(v);
@@ -166,34 +167,34 @@ TEST(SigH, Members) {
     entt::sink sink{sigh};
 
     sink.connect<&sigh_listener::g>(l1);
-    sigh.publish(42); // NOLINT
+    sigh.publish(3);
 
     ASSERT_TRUE(l1.val);
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(1u, sigh.size());
+    ASSERT_EQ(sigh.size(), 1u);
 
     sink.disconnect<&sigh_listener::g>(l1);
-    sigh.publish(42); // NOLINT
+    sigh.publish(3);
 
     ASSERT_TRUE(l1.val);
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(0u, sigh.size());
+    ASSERT_EQ(sigh.size(), 0u);
 
     sink.connect<&sigh_listener::g>(&l1);
     sink.connect<&sigh_listener::h>(l2);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(2u, sigh.size());
+    ASSERT_EQ(sigh.size(), 2u);
 
     sink.disconnect(static_cast<const void *>(nullptr));
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(2u, sigh.size());
+    ASSERT_EQ(sigh.size(), 2u);
 
     sink.disconnect(&l1);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(1u, sigh.size());
+    ASSERT_EQ(sigh.size(), 1u);
 }
 
 TEST(SigH, Collector) {
@@ -212,7 +213,7 @@ TEST(SigH, Collector) {
     };
 
     listener.val = true;
-    sigh.collect(std::move(no_return), 42); // NOLINT
+    sigh.collect(std::move(no_return), 3);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
@@ -225,7 +226,7 @@ TEST(SigH, Collector) {
     };
 
     cnt = 0;
-    sigh.collect(std::move(bool_return), 42); // NOLINT
+    sigh.collect(std::move(bool_return), 3);
 
     ASSERT_EQ(cnt, 1);
 }
@@ -238,13 +239,13 @@ TEST(SigH, CollectorVoid) {
 
     sink.connect<&sigh_listener::g>(&listener);
     sink.connect<&sigh_listener::h>(listener);
-    sigh.collect([&cnt]() { ++cnt; }, 42); // NOLINT
+    sigh.collect([&cnt]() { ++cnt; }, 3);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(cnt, 2);
 
     cnt = 0;
-    sigh.collect([&cnt]() { ++cnt; return true; }, 42); // NOLINT
+    sigh.collect([&cnt]() { ++cnt; return true; }, 3);
 
     ASSERT_EQ(cnt, 1);
 }
@@ -259,7 +260,7 @@ TEST(SigH, Connection) {
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_TRUE(conn);
-    ASSERT_EQ(42, v);
+    ASSERT_EQ(v, 1);
 
     v = 0;
     conn.release();
@@ -279,14 +280,14 @@ TEST(SigH, ScopedConnection) {
         ASSERT_FALSE(listener.val);
 
         const entt::scoped_connection conn = sink.connect<&sigh_listener::g>(listener);
-        sigh.publish(42); // NOLINT
+        sigh.publish(1);
 
         ASSERT_FALSE(sigh.empty());
         ASSERT_TRUE(listener.val);
         ASSERT_TRUE(conn);
     }
 
-    sigh.publish(42); // NOLINT
+    sigh.publish(1);
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_TRUE(listener.val);
@@ -304,12 +305,13 @@ TEST(SigH, ScopedConnectionMove) {
 
     {
         const entt::scoped_connection inner{std::move(outer)};
+        test::is_initialized(outer);
 
         ASSERT_FALSE(listener.val);
-        ASSERT_FALSE(outer); // NOLINT
+        ASSERT_FALSE(outer);
         ASSERT_TRUE(inner);
 
-        sigh.publish(42); // NOLINT
+        sigh.publish(1);
 
         ASSERT_TRUE(listener.val);
     }
@@ -329,11 +331,12 @@ TEST(SigH, ScopedConnectionMove) {
         ASSERT_FALSE(inner);
 
         inner = std::move(outer);
+        test::is_initialized(outer);
 
-        ASSERT_FALSE(outer); // NOLINT
+        ASSERT_FALSE(outer);
         ASSERT_TRUE(inner);
 
-        sigh.publish(42); // NOLINT
+        sigh.publish(1);
 
         ASSERT_FALSE(listener.val);
     }
@@ -354,7 +357,7 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         ASSERT_FALSE(inner);
 
         inner = sink.connect<&sigh_listener::g>(listener);
-        sigh.publish(42); // NOLINT
+        sigh.publish(1);
 
         ASSERT_FALSE(sigh.empty());
         ASSERT_TRUE(listener.val);
@@ -367,14 +370,14 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
 
         auto basic = sink.connect<&sigh_listener::g>(listener);
         inner = std::as_const(basic);
-        sigh.publish(42); // NOLINT
+        sigh.publish(1);
 
         ASSERT_FALSE(sigh.empty());
         ASSERT_FALSE(listener.val);
         ASSERT_TRUE(inner);
     }
 
-    sigh.publish(42); // NOLINT
+    sigh.publish(1);
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_FALSE(listener.val);
@@ -426,7 +429,7 @@ TEST(SigH, UnboundMemberFunction) {
     ASSERT_FALSE(listener.val);
 
     sink.connect<&sigh_listener::g>();
-    sigh.publish(&listener, 42); // NOLINT
+    sigh.publish(&listener, 1);
 
     ASSERT_TRUE(listener.val);
 }
@@ -454,7 +457,7 @@ TEST(SigH, ConnectAndAutoDisconnect) {
 
     ASSERT_FALSE(listener.val);
     ASSERT_EQ(sigh.size(), 2u);
-    ASSERT_EQ(v, 42);
+    ASSERT_EQ(v, 1);
 }
 
 TEST(SigH, CustomAllocator) {
@@ -481,8 +484,9 @@ TEST(SigH, CustomAllocator) {
     ASSERT_FALSE(copy.empty());
 
     decltype(sigh) move{std::move(copy), allocator};
+    test::is_initialized(copy);
 
-    ASSERT_TRUE(copy.empty()); // NOLINT
+    ASSERT_TRUE(copy.empty());
     ASSERT_FALSE(move.empty());
 
     sink = entt::sink{move};
