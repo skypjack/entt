@@ -1,5 +1,5 @@
-#ifndef ENTT_COMMON_BOXED_INT_HPP
-#define ENTT_COMMON_BOXED_INT_HPP
+#ifndef ENTT_COMMON_BOXED_INT_H
+#define ENTT_COMMON_BOXED_INT_H
 
 namespace test {
 

@@ -1,5 +1,5 @@
-#ifndef ENTT_COMMON_EMPTY_HPP
-#define ENTT_COMMON_EMPTY_HPP
+#ifndef ENTT_COMMON_EMPTY_H
+#define ENTT_COMMON_EMPTY_H
 
 namespace test {
 

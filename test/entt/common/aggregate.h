@@ -1,5 +1,5 @@
-#ifndef ENTT_COMMON_AGGREGATE_HPP
-#define ENTT_COMMON_AGGREGATE_HPP
+#ifndef ENTT_COMMON_AGGREGATE_H
+#define ENTT_COMMON_AGGREGATE_H
 
 #include <type_traits>
 
