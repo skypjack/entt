@@ -16,9 +16,9 @@ TEST(Flow, Constructors) {
 
     ASSERT_EQ(flow.size(), 0u);
 
-    flow.bind(0);
-    flow.bind(3);
-    flow.bind(99); // NOLINT
+    flow.bind(2);
+    flow.bind(4);
+    flow.bind(8);
 
     ASSERT_EQ(flow.size(), 3u);
 
@@ -28,95 +28,95 @@ TEST(Flow, Constructors) {
     ASSERT_EQ(flow.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0u);
-    ASSERT_EQ(other[1u], 3u);
-    ASSERT_EQ(other[2u], 99u);
+    ASSERT_EQ(other[0u], 2);
+    ASSERT_EQ(other[1u], 4);
+    ASSERT_EQ(other[2u], 8);
 }
 
 TEST(Flow, Copy) {
     entt::flow flow{};
 
-    flow.bind(0);
-    flow.bind(3);
-    flow.bind(99); // NOLINT
+    flow.bind(2);
+    flow.bind(4);
+    flow.bind(8);
 
     entt::flow other{flow};
 
     ASSERT_EQ(flow.size(), 3u);
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0u);
-    ASSERT_EQ(other[1u], 3u);
-    ASSERT_EQ(other[2u], 99u);
+    ASSERT_EQ(other[0u], 2);
+    ASSERT_EQ(other[1u], 4);
+    ASSERT_EQ(other[2u], 8);
 
     flow.bind(1);
-    other.bind(2);
+    other.bind(3);
 
     other = flow;
 
     ASSERT_EQ(other.size(), 4u);
     ASSERT_EQ(flow.size(), 4u);
 
-    ASSERT_EQ(other[0u], 0u);
-    ASSERT_EQ(other[1u], 3u);
-    ASSERT_EQ(other[2u], 99u);
-    ASSERT_EQ(other[3u], 1u);
+    ASSERT_EQ(other[0u], 2);
+    ASSERT_EQ(other[1u], 4);
+    ASSERT_EQ(other[2u], 8);
+    ASSERT_EQ(other[3u], 1);
 }
 
 TEST(Flow, Move) {
     entt::flow flow{};
 
-    flow.bind(0);
-    flow.bind(3);
-    flow.bind(99); // NOLINT
+    flow.bind(2);
+    flow.bind(4);
+    flow.bind(8);
 
     entt::flow other{std::move(flow)};
 
     ASSERT_EQ(flow.size(), 0u); // NOLINT
     ASSERT_EQ(other.size(), 3u);
 
-    ASSERT_EQ(other[0u], 0u);
-    ASSERT_EQ(other[1u], 3u);
-    ASSERT_EQ(other[2u], 99u);
+    ASSERT_EQ(other[0u], 2);
+    ASSERT_EQ(other[1u], 4);
+    ASSERT_EQ(other[2u], 8);
 
     flow = {};
     flow.bind(1);
-    other.bind(2);
+    other.bind(3);
 
     other = std::move(flow);
 
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u); // NOLINT
 
-    ASSERT_EQ(other[0u], 1u);
+    ASSERT_EQ(other[0u], 1);
 }
 
 TEST(Flow, Swap) {
     entt::flow flow{};
     entt::flow other{};
 
-    flow.bind(7); // NOLINT
+    flow.bind(8);
 
     ASSERT_EQ(other.size(), 0u);
     ASSERT_EQ(flow.size(), 1u);
-    ASSERT_EQ(flow[0u], 7u);
+    ASSERT_EQ(flow[0u], 8);
 
     flow.swap(other);
 
     ASSERT_EQ(other.size(), 1u);
     ASSERT_EQ(flow.size(), 0u);
-    ASSERT_EQ(other[0u], 7u);
+    ASSERT_EQ(other[0u], 8);
 }
 
 TEST(Flow, Clear) {
     entt::flow flow{};
 
     flow.bind(0);
-    flow.bind(99); // NOLINT
+    flow.bind(4);
 
     ASSERT_EQ(flow.size(), 2u);
-    ASSERT_EQ(flow[0u], 0u);
-    ASSERT_EQ(flow[1u], 99u);
+    ASSERT_EQ(flow[0u], 0);
+    ASSERT_EQ(flow[1u], 4);
 
     flow.clear();
 
@@ -125,7 +125,7 @@ TEST(Flow, Clear) {
 
 TEST(Flow, Set) {
     entt::flow flow{};
-    flow.bind(0).set(10, true).bind(1).set(10, true).set(11, false); // NOLINT
+    flow.bind(0).set(2, true).bind(1).set(2, true).set(3, false);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -138,7 +138,7 @@ TEST(Flow, Set) {
 
 TEST(Flow, RO) {
     entt::flow flow{};
-    flow.bind(0).ro(10).bind(1).ro(10).ro(11); // NOLINT
+    flow.bind(0).ro(2).bind(1).ro(2).ro(3);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -159,7 +159,7 @@ TEST(Flow, RangeRO) {
 
 TEST(Flow, RW) {
     entt::flow flow{};
-    flow.bind(0).rw(10).bind(1).rw(10).rw(11); // NOLINT
+    flow.bind(0).rw(2).bind(1).rw(2).rw(3);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -288,7 +288,7 @@ ENTT_DEBUG_TEST(FlowDeathTest, NoBind) {
 
 TEST(Flow, DirectRebind) {
     entt::flow flow{};
-    flow.bind(0).ro(10).rw(10).bind(1).ro(10); // NOLINT
+    flow.bind(0).ro(2).rw(2).bind(1).ro(2);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -301,7 +301,7 @@ TEST(Flow, DirectRebind) {
 
 TEST(Flow, DeferredRebind) {
     entt::flow flow{};
-    flow.bind(0).ro(10).bind(1).ro(10).bind(0).rw(10); // NOLINT
+    flow.bind(0).ro(2).bind(1).ro(2).bind(0).rw(2);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -314,7 +314,7 @@ TEST(Flow, DeferredRebind) {
 
 TEST(Flow, Loop) {
     entt::flow flow{};
-    flow.bind(0).rw(10).bind(1).ro(10).bind(0).rw(10); // NOLINT
+    flow.bind(0).rw(2).bind(1).ro(2).bind(0).rw(2);
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
