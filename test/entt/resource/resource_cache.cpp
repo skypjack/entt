@@ -94,15 +94,15 @@ TEST(ResourceCache, Copy) {
     using namespace entt::literals;
 
     entt::resource_cache<std::size_t> cache;
-    cache.load("resource"_hs, 42u); // NOLINT
+    cache.load("resource"_hs, 3u);
 
     entt::resource_cache<std::size_t> other{cache};
 
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_TRUE(other.contains("resource"_hs));
 
-    cache.load("foo"_hs, 99u); // NOLINT
-    cache.load("bar"_hs, 77u); // NOLINT
+    cache.load("foo"_hs, 2u);
+    cache.load("bar"_hs, 1u);
     other.load("quux"_hs, 0u);
     other = cache;
 
@@ -111,16 +111,16 @@ TEST(ResourceCache, Copy) {
     ASSERT_TRUE(other.contains("bar"_hs));
     ASSERT_FALSE(other.contains("quux"_hs));
 
-    ASSERT_EQ(other["resource"_hs], 42u);
-    ASSERT_EQ(other["foo"_hs], 99u);
-    ASSERT_EQ(other["bar"_hs], 77u);
+    ASSERT_EQ(other["resource"_hs], 3u);
+    ASSERT_EQ(other["foo"_hs], 2u);
+    ASSERT_EQ(other["bar"_hs], 1u);
 }
 
 TEST(ResourceCache, Move) {
     using namespace entt::literals;
 
     entt::resource_cache<std::size_t> cache;
-    cache.load("resource"_hs, 42u); // NOLINT
+    cache.load("resource"_hs, 3u);
 
     entt::resource_cache<std::size_t> other{std::move(cache)};
 
@@ -128,8 +128,8 @@ TEST(ResourceCache, Move) {
     ASSERT_TRUE(other.contains("resource"_hs));
 
     cache = other;
-    cache.load("foo"_hs, 99u); // NOLINT
-    cache.load("bar"_hs, 77u); // NOLINT
+    cache.load("foo"_hs, 2u);
+    cache.load("bar"_hs, 1u);
     other.load("quux"_hs, 0u);
     other = std::move(cache);
 
@@ -139,9 +139,9 @@ TEST(ResourceCache, Move) {
     ASSERT_TRUE(other.contains("bar"_hs));
     ASSERT_FALSE(other.contains("quux"_hs));
 
-    ASSERT_EQ(other["resource"_hs], 42u);
-    ASSERT_EQ(other["foo"_hs], 99u);
-    ASSERT_EQ(other["bar"_hs], 77u);
+    ASSERT_EQ(other["resource"_hs], 3u);
+    ASSERT_EQ(other["foo"_hs], 2u);
+    ASSERT_EQ(other["bar"_hs], 1u);
 }
 
 TEST(ResourceCache, Iterator) {

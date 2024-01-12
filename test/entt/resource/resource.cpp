@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/resource/resource.hpp>
+#include "../common/linter.hpp"
 
 struct base {
     virtual ~base() = default;
@@ -85,9 +86,10 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 
     entt::resource<const derived> copy{resource};
     entt::resource<const derived> move{std::move(other)};
+    test::is_initialized(other);
 
     ASSERT_TRUE(resource);
-    ASSERT_FALSE(other); // NOLINT
+    ASSERT_FALSE(other);
 
     ASSERT_TRUE(copy);
     ASSERT_EQ(copy, resource);
@@ -101,8 +103,9 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 
     copy = resource;
     move = std::move(resource);
+    test::is_initialized(resource);
 
-    ASSERT_FALSE(resource); // NOLINT
+    ASSERT_FALSE(resource);
     ASSERT_FALSE(other);
 
     ASSERT_TRUE(copy);
