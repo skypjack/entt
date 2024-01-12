@@ -12,6 +12,7 @@
 #include <entt/core/type_info.hpp>
 #include "../common/aggregate.h"
 #include "../common/config.h"
+#include "../common/linter.hpp"
 #include "../common/non_comparable.h"
 #include "../common/non_movable.h"
 
@@ -187,9 +188,7 @@ TEST_F(Any, SBOCopyConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -203,9 +202,7 @@ TEST_F(Any, SBOCopyAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -215,12 +212,11 @@ TEST_F(Any, SBOMoveConstruction) {
     entt::any any{2};
     entt::any other{std::move(any)};
 
-    ASSERT_TRUE(any); // NOLINT
+    test::is_initialized(any);
+
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_NE(any.data(), nullptr);
-    ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -231,13 +227,11 @@ TEST_F(Any, SBOMoveAssignment) {
     entt::any other{3};
 
     other = std::move(any);
+    test::is_initialized(any);
 
-    ASSERT_TRUE(any); // NOLINT
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_NE(any.data(), nullptr);
-    ASSERT_EQ(any.type(), entt::type_id<int>());
     ASSERT_EQ(other.type(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<int>(other), 2);
@@ -444,9 +438,7 @@ TEST_F(Any, NoSBOCopyConstruction) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -461,9 +453,7 @@ TEST_F(Any, NoSBOCopyAssignment) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -474,12 +464,11 @@ TEST_F(Any, NoSBOMoveConstruction) {
     entt::any any{instance};
     entt::any other{std::move(any)};
 
-    ASSERT_TRUE(any); // NOLINT
+    test::is_initialized(any);
+
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.data(), nullptr);
-    ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -491,13 +480,11 @@ TEST_F(Any, NoSBOMoveAssignment) {
     entt::any other{3};
 
     other = std::move(any);
+    test::is_initialized(any);
 
-    ASSERT_TRUE(any); // NOLINT
+    ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.data(), nullptr);
-    ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(other.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
@@ -636,9 +623,7 @@ TEST_F(Any, VoidCopyConstruction) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -652,9 +637,7 @@ TEST_F(Any, VoidCopyAssignment) {
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
@@ -664,13 +647,12 @@ TEST_F(Any, VoidMoveConstruction) {
     entt::any any{std::in_place_type<void>};
     entt::any other{std::move(any)};
 
-    ASSERT_FALSE(any); // NOLINT
+    test::is_initialized(any);
+
+    ASSERT_FALSE(any);
     ASSERT_FALSE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
-    ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
 
@@ -679,14 +661,12 @@ TEST_F(Any, VoidMoveAssignment) {
     entt::any other{2};
 
     other = std::move(any);
+    test::is_initialized(any);
 
-    ASSERT_FALSE(any); // NOLINT
+    ASSERT_FALSE(any);
     ASSERT_FALSE(other);
-    ASSERT_EQ(any.policy(), entt::any_policy::owner); // NOLINT
     ASSERT_EQ(other.policy(), entt::any_policy::owner);
-    ASSERT_EQ(any.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
-    ASSERT_EQ(entt::any_cast<int>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
 
@@ -695,8 +675,11 @@ TEST_F(Any, SBOMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_TRUE(any);   // NOLINT
-    ASSERT_TRUE(other); // NOLINT
+    test::is_initialized(any);
+    test::is_initialized(other);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
     ASSERT_TRUE(valid);
 }
 
@@ -706,8 +689,11 @@ TEST_F(Any, NoSBOMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_TRUE(any);   // NOLINT
-    ASSERT_TRUE(other); // NOLINT
+    test::is_initialized(any);
+    test::is_initialized(other);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
     ASSERT_TRUE(valid);
 }
 
@@ -716,8 +702,11 @@ TEST_F(Any, VoidMoveValidButUnspecifiedState) {
     entt::any other{std::move(any)};
     const entt::any valid = std::move(other);
 
-    ASSERT_FALSE(any);   // NOLINT
-    ASSERT_FALSE(other); // NOLINT
+    test::is_initialized(any);
+    test::is_initialized(other);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(other);
     ASSERT_FALSE(valid);
 }
 
@@ -1422,11 +1411,12 @@ TEST_F(Any, CopyMoveReference) {
     entt::any move = std::move(any);
     entt::any copy = move;
 
-    ASSERT_TRUE(any); // NOLINT
+    test::is_initialized(any);
+
+    ASSERT_TRUE(any);
     ASSERT_TRUE(move);
     ASSERT_TRUE(copy);
 
-    ASSERT_EQ(any.policy(), entt::any_policy::ref); // NOLINT
     ASSERT_EQ(move.policy(), entt::any_policy::ref);
     ASSERT_EQ(copy.policy(), entt::any_policy::owner);
 
@@ -1451,11 +1441,12 @@ TEST_F(Any, CopyMoveConstReference) {
     entt::any move = std::move(any);
     entt::any copy = move;
 
-    ASSERT_TRUE(any); // NOLINT
+    test::is_initialized(any);
+
+    ASSERT_TRUE(any);
     ASSERT_TRUE(move);
     ASSERT_TRUE(copy);
 
-    ASSERT_EQ(any.policy(), entt::any_policy::cref); // NOLINT
     ASSERT_EQ(move.policy(), entt::any_policy::cref);
     ASSERT_EQ(copy.policy(), entt::any_policy::owner);
 
