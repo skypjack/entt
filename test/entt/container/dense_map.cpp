@@ -183,7 +183,7 @@ TEST(DenseMap, Iterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<const int &, int &>>();
 
     entt::dense_map<int, int> map;
-    map.emplace(3, 42); // NOLINT
+    map.emplace(1, 2);
 
     iterator end{map.begin()};
     iterator begin{};
@@ -221,11 +221,11 @@ TEST(DenseMap, Iterator) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, map.end());
 
-    map.emplace(42, 3); // NOLINT
+    map.emplace(3, 4);
     begin = map.begin();
 
-    ASSERT_EQ(begin[0u].first, 3);
-    ASSERT_EQ(begin[1u].second, 3);
+    ASSERT_EQ(begin[0u].first, 1);
+    ASSERT_EQ(begin[1u].second, 4);
 }
 
 TEST(DenseMap, ConstIterator) {
@@ -236,7 +236,7 @@ TEST(DenseMap, ConstIterator) {
     testing::StaticAssertTypeEq<iterator::reference, std::pair<const int &, const int &>>();
 
     entt::dense_map<int, int> map;
-    map.emplace(3, 42); // NOLINT
+    map.emplace(1, 2);
 
     iterator cend{map.cbegin()};
     iterator cbegin{};
@@ -274,16 +274,16 @@ TEST(DenseMap, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, map.cend());
 
-    map.emplace(42, 3); // NOLINT
+    map.emplace(3, 4); // NOLINT
     cbegin = map.cbegin();
 
-    ASSERT_EQ(cbegin[0u].first, 3);
-    ASSERT_EQ(cbegin[1u].second, 3);
+    ASSERT_EQ(cbegin[0u].first, 1);
+    ASSERT_EQ(cbegin[1u].second, 4);
 }
 
 TEST(DenseMap, IteratorConversion) {
     entt::dense_map<int, int> map;
-    map.emplace(3, 42); // NOLINT
+    map.emplace(1, 3);
 
     const typename entt::dense_map<int, int>::iterator it = map.begin();
     typename entt::dense_map<int, int>::const_iterator cit = it;
@@ -291,8 +291,8 @@ TEST(DenseMap, IteratorConversion) {
     testing::StaticAssertTypeEq<decltype(*it), std::pair<const int &, int &>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<const int &, const int &>>();
 
-    ASSERT_EQ(it->first, 3);
-    ASSERT_EQ((*it).second, 42);
+    ASSERT_EQ(it->first, 1);
+    ASSERT_EQ((*it).second, 3);
     ASSERT_EQ(it->first, cit->first);
     ASSERT_EQ((*it).second, (*cit).second);
 

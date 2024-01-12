@@ -27,7 +27,7 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(set.max_load_factor(), .875f);
     ASSERT_EQ(set.max_size(), (std::vector<std::pair<std::size_t, int>>{}.max_size()));
 
-    set.max_load_factor(.9f); // NOLINT
+    set.max_load_factor(.9f);
 
     ASSERT_EQ(set.max_load_factor(), .9f);
 
@@ -111,7 +111,7 @@ TEST(DenseSet, Constructors) {
 
 TEST(DenseSet, Copy) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f); // NOLINT
+    set.max_load_factor(set.max_load_factor() - .05f);
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{set};
@@ -139,7 +139,7 @@ TEST(DenseSet, Copy) {
 
 TEST(DenseSet, Move) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f); // NOLINT
+    set.max_load_factor(set.max_load_factor() - .05f);
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
