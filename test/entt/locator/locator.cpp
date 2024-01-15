@@ -68,8 +68,9 @@ TEST_F(ServiceLocator, ResetHandle) {
 
 TEST_F(ServiceLocator, ElementWithDeleter) {
     derived_service service{1};
-    entt::locator<base_service>::reset(&service, [](base_service *serv) {
-        *static_cast<derived_service *>(serv) = derived_service{2}; // NOLINT
+    entt::locator<base_service>::reset(&service, [&service](base_service *serv) {
+        ASSERT_EQ(serv, &service);
+        service = derived_service{2};
     });
 
     ASSERT_TRUE(entt::locator<base_service>::has_value());
