@@ -1,3 +1,4 @@
+#include <array>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -148,8 +149,8 @@ TEST(Flow, RO) {
 
 TEST(Flow, RangeRO) {
     entt::flow flow{};
-    const entt::id_type res[2u]{10, 11};                    // NOLINT
-    flow.bind(0).ro(res, res + 1).bind(1).ro(res, res + 2); // NOLINT
+    const std::array<entt::id_type, 2u> res{10, 11};
+    flow.bind(0).ro(res.begin(), res.begin() + 1u).bind(1).ro(res.begin(), res.end());
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
@@ -172,8 +173,8 @@ TEST(Flow, RW) {
 
 TEST(Flow, RangeRW) {
     entt::flow flow{};
-    const entt::id_type res[2u]{10, 11};                    // NOLINT
-    flow.bind(0).rw(res, res + 1).bind(1).rw(res, res + 2); // NOLINT
+    const std::array<entt::id_type, 2u> res{10, 11};
+    flow.bind(0).rw(res.begin(), res.begin() + 1u).bind(1).rw(res.begin(), res.end());
     auto graph = flow.graph();
 
     ASSERT_EQ(flow.size(), 2u);
