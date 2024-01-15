@@ -100,7 +100,7 @@ TEST(DenseMap, Constructors) {
     map = entt::dense_map<int, int>{2u * minimum_bucket_count, std::allocator<float>{}};
     map = entt::dense_map<int, int>{4u * minimum_bucket_count, std::hash<int>(), std::allocator<double>{}};
 
-    map.emplace(3u, 42u); // NOLINT
+    map.emplace(3u, 2u);
 
     entt::dense_map<int, int> temp{map, map.get_allocator()};
     const entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
@@ -274,7 +274,7 @@ TEST(DenseMap, ConstIterator) {
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, map.cend());
 
-    map.emplace(3, 4); // NOLINT
+    map.emplace(3, 4);
     cbegin = map.cbegin();
 
     ASSERT_EQ(cbegin[0u].first, 1);
@@ -663,7 +663,7 @@ TEST(DenseMap, TryEmplace) {
     ASSERT_EQ(it->first, 1);
     ASSERT_EQ(it->second, 2);
 
-    std::tie(it, result) = map.try_emplace(1, 99); // NOLINT
+    std::tie(it, result) = map.try_emplace(1, 3);
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 1u);
@@ -921,7 +921,7 @@ TEST(DenseMap, EqualRange) {
     entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
 
-    map.emplace(42, 3); // NOLINT
+    map.emplace(4, 1);
 
     ASSERT_EQ(map.equal_range(0).first, map.end());
     ASSERT_EQ(map.equal_range(0).second, map.end());
@@ -935,25 +935,25 @@ TEST(DenseMap, EqualRange) {
     ASSERT_EQ(cmap.equal_range(0.0).first, cmap.cend());
     ASSERT_EQ(cmap.equal_range(0.0).second, cmap.cend());
 
-    ASSERT_NE(map.equal_range(42).first, map.end());
-    ASSERT_EQ(map.equal_range(42).first->first, 42);
-    ASSERT_EQ(map.equal_range(42).first->second, 3);
-    ASSERT_EQ(map.equal_range(42).second, map.end());
+    ASSERT_NE(map.equal_range(4).first, map.end());
+    ASSERT_EQ(map.equal_range(4).first->first, 4);
+    ASSERT_EQ(map.equal_range(4).first->second, 1);
+    ASSERT_EQ(map.equal_range(4).second, map.end());
 
-    ASSERT_NE(cmap.equal_range(42).first, cmap.cend());
-    ASSERT_EQ(cmap.equal_range(42).first->first, 42);
-    ASSERT_EQ(cmap.equal_range(42).first->second, 3);
-    ASSERT_EQ(cmap.equal_range(42).second, cmap.cend());
+    ASSERT_NE(cmap.equal_range(4).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(4).first->first, 4);
+    ASSERT_EQ(cmap.equal_range(4).first->second, 1);
+    ASSERT_EQ(cmap.equal_range(4).second, cmap.cend());
 
-    ASSERT_NE(map.equal_range(42.0).first, map.end());
-    ASSERT_EQ(map.equal_range(42.0).first->first, 42);
-    ASSERT_EQ(map.equal_range(42.0).first->second, 3);
-    ASSERT_EQ(map.equal_range(42.0).second, map.end());
+    ASSERT_NE(map.equal_range(4.0).first, map.end());
+    ASSERT_EQ(map.equal_range(4.0).first->first, 4);
+    ASSERT_EQ(map.equal_range(4.0).first->second, 1);
+    ASSERT_EQ(map.equal_range(4.0).second, map.end());
 
-    ASSERT_NE(cmap.equal_range(42.0).first, cmap.cend());
-    ASSERT_EQ(cmap.equal_range(42.0).first->first, 42);
-    ASSERT_EQ(cmap.equal_range(42.0).first->second, 3);
-    ASSERT_EQ(cmap.equal_range(42.0).second, cmap.cend());
+    ASSERT_NE(cmap.equal_range(4.0).first, cmap.cend());
+    ASSERT_EQ(cmap.equal_range(4.0).first->first, 4);
+    ASSERT_EQ(cmap.equal_range(4.0).first->second, 1);
+    ASSERT_EQ(cmap.equal_range(4.0).second, cmap.cend());
 }
 
 TEST(DenseMap, Indexing) {
@@ -963,12 +963,12 @@ TEST(DenseMap, Indexing) {
 
     ASSERT_FALSE(map.contains(key));
 
-    map[key] = 99; // NOLINT
+    map[key] = 3;
 
     ASSERT_TRUE(map.contains(key));
-    ASSERT_EQ(map[int{key}], 99);
-    ASSERT_EQ(cmap.at(key), 99);
-    ASSERT_EQ(map.at(key), 99);
+    ASSERT_EQ(map[int{key}], 3);
+    ASSERT_EQ(cmap.at(key), 3);
+    ASSERT_EQ(map.at(key), 3);
 }
 
 ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
@@ -976,7 +976,7 @@ ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
     const auto &cmap = map;
 
     ASSERT_DEATH([[maybe_unused]] auto value = cmap.at(0), "");
-    ASSERT_DEATH([[maybe_unused]] auto value = map.at(42), "");
+    ASSERT_DEATH([[maybe_unused]] auto value = map.at(3), "");
 }
 
 TEST(DenseMap, LocalIterator) {
@@ -988,8 +988,8 @@ TEST(DenseMap, LocalIterator) {
 
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    map.emplace(3u, 42u);                        // NOLINT
-    map.emplace(3u + minimum_bucket_count, 99u); // NOLINT
+    map.emplace(3u, 2u);
+    map.emplace(3u + minimum_bucket_count, 1u);
 
     iterator end{map.begin(3u)};
     iterator begin{};
@@ -1001,7 +1001,7 @@ TEST(DenseMap, LocalIterator) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin->first, 3u + minimum_bucket_count);
-    ASSERT_EQ((*begin).second, 99u);
+    ASSERT_EQ((*begin).second, 1u);
 
     ASSERT_EQ(begin++, map.begin(3u));
     ASSERT_EQ(++begin, map.end(3u));
@@ -1016,8 +1016,8 @@ TEST(DenseMap, ConstLocalIterator) {
 
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<std::size_t, std::size_t, entt::identity> map;
-    map.emplace(3u, 42u);                        // NOLINT
-    map.emplace(3u + minimum_bucket_count, 99u); // NOLINT
+    map.emplace(3u, 2u);
+    map.emplace(3u + minimum_bucket_count, 1u);
 
     iterator cend{map.begin(3u)};
     iterator cbegin{};
@@ -1029,7 +1029,7 @@ TEST(DenseMap, ConstLocalIterator) {
     ASSERT_NE(cbegin, cend);
 
     ASSERT_EQ(cbegin->first, 3u + minimum_bucket_count);
-    ASSERT_EQ((*cbegin).second, 99u);
+    ASSERT_EQ((*cbegin).second, 1u);
 
     ASSERT_EQ(cbegin++, map.begin(3u));
     ASSERT_EQ(++cbegin, map.end(3u));
@@ -1037,7 +1037,7 @@ TEST(DenseMap, ConstLocalIterator) {
 
 TEST(DenseMap, LocalIteratorConversion) {
     entt::dense_map<int, int> map;
-    map.emplace(3, 42); // NOLINT
+    map.emplace(3, 2);
 
     const typename entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
     typename entt::dense_map<int, int>::const_local_iterator cit = it;
@@ -1046,7 +1046,7 @@ TEST(DenseMap, LocalIteratorConversion) {
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<const int &, const int &>>();
 
     ASSERT_EQ(it->first, 3);
-    ASSERT_EQ((*it).second, 42);
+    ASSERT_EQ((*it).second, 2);
     ASSERT_EQ(it->first, cit->first);
     ASSERT_EQ((*it).second, (*cit).second);
 
