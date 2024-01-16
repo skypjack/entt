@@ -240,9 +240,11 @@ protected:
     void unchecked_refresh() noexcept {
         index = 0u;
 
-        for(size_type pos{1u}; pos < Get; ++pos) {
-            if(pools[pos]->size() < pools[index]->size()) {
-                index = pos;
+        if constexpr(Get > 1u) {
+            for(size_type pos{1u}; pos < Get; ++pos) {
+                if(pools[pos]->size() < pools[index]->size()) {
+                    index = pos;
+                }
             }
         }
 
