@@ -33,7 +33,7 @@ template<typename Type>
 struct SparseSet: testing::Test {
     using type = Type;
 
-    inline static const std::array deletion_policy{
+    inline static const std::array<entt::deletion_policy, 3u> deletion_policy{
         entt::deletion_policy::swap_and_pop,
         entt::deletion_policy::in_place,
         entt::deletion_policy::swap_only,
