@@ -59,10 +59,10 @@ TYPED_TEST(RuntimeView, Functionalities) {
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
-    registry.get<int>(e1) = 42; // NOLINT
+    registry.get<int>(e1) = 3;
 
     for(auto entity: view) {
-        ASSERT_EQ(registry.get<int>(entity), 42);
+        ASSERT_EQ(registry.get<int>(entity), 3);
         ASSERT_EQ(registry.get<char>(entity), '2');
     }
 
@@ -375,7 +375,7 @@ TYPED_TEST(RuntimeView, StableTypeWithExcludedComponent) {
     const auto other = registry.create();
 
     registry.emplace<test::pointer_stable>(entity, 0);
-    registry.emplace<test::pointer_stable>(other, 42); // NOLINT
+    registry.emplace<test::pointer_stable>(other, 1);
     registry.emplace<int>(entity);
 
     view.iterate(registry.storage<test::pointer_stable>()).exclude(registry.storage<int>());

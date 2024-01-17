@@ -164,12 +164,12 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
     ASSERT_EQ(.3, handle.emplace_or_replace<double>(.3));
 
-    const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; }); // NOLINT
+    const auto &patched = handle.patch<int>([](auto &comp) { comp = 2; });
 
-    ASSERT_EQ(42, patched);
+    ASSERT_EQ(2, patched);
     ASSERT_EQ('a', handle.replace<char>('a'));
     ASSERT_TRUE((handle.all_of<int, char, double>()));
-    ASSERT_EQ((std::make_tuple(42, 'a', .3)), (handle.get<int, char, double>()));
+    ASSERT_EQ((std::make_tuple(2, 'a', .3)), (handle.get<int, char, double>()));
 
     handle.erase<char, double>();
 
@@ -190,11 +190,11 @@ TEST(BasicHandle, Component) {
     ASSERT_TRUE(registry.storage<int>().empty());
     ASSERT_TRUE(handle.orphan());
 
-    ASSERT_EQ(42, handle.get_or_emplace<int>(42));
-    ASSERT_EQ(42, handle.get_or_emplace<int>(1));
-    ASSERT_EQ(42, handle.get<int>());
+    ASSERT_EQ(2, handle.get_or_emplace<int>(2));
+    ASSERT_EQ(2, handle.get_or_emplace<int>(1));
+    ASSERT_EQ(2, handle.get<int>());
 
-    ASSERT_EQ(42, *handle.try_get<int>());
+    ASSERT_EQ(2, *handle.try_get<int>());
     ASSERT_EQ(nullptr, handle.try_get<char>());
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
 }
@@ -205,7 +205,7 @@ TYPED_TEST(BasicHandle, FromEntity) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<int>(entity, 42); // NOLINT
+    registry.emplace<int>(entity, 2);
     registry.emplace<char>(entity, 'c');
 
     const handle_type handle{registry, entity};
@@ -213,7 +213,7 @@ TYPED_TEST(BasicHandle, FromEntity) {
     ASSERT_TRUE(handle);
     ASSERT_EQ(entity, handle.entity());
     ASSERT_TRUE((handle.template all_of<int, char>()));
-    ASSERT_EQ(handle.template get<int>(), 42);
+    ASSERT_EQ(handle.template get<int>(), 2);
     ASSERT_EQ(handle.template get<char>(), 'c');
 }
 
@@ -243,12 +243,12 @@ TEST(BasicHandle, ImplicitConversions) {
     const entt::handle_view<int, char> handle_view = handle;
     const entt::const_handle_view<int> const_handle_view = handle_view;
 
-    handle.emplace<int>(42); // NOLINT
+    handle.emplace<int>(2);
 
     ASSERT_EQ(handle.get<int>(), const_handle.get<int>());
     ASSERT_EQ(const_handle.get<int>(), handle_view.get<int>());
     ASSERT_EQ(handle_view.get<int>(), const_handle_view.get<int>());
-    ASSERT_EQ(const_handle_view.get<int>(), 42);
+    ASSERT_EQ(const_handle_view.get<int>(), 2);
 }
 
 TYPED_TEST(BasicHandle, Storage) {

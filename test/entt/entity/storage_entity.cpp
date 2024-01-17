@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -110,7 +111,7 @@ TEST(StorageEntity, Swap) {
 TEST(StorageEntity, Getters) {
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{41}); // NOLINT
+    pool.emplace(entt::entity{4});
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), void>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), void>();
@@ -118,21 +119,21 @@ TEST(StorageEntity, Getters) {
     testing::StaticAssertTypeEq<decltype(pool.get_as_tuple({})), std::tuple<>>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get_as_tuple({})), std::tuple<>>();
 
-    ASSERT_NO_THROW(pool.get(entt::entity{41}));
-    ASSERT_NO_THROW(std::as_const(pool).get(entt::entity{41}));
+    ASSERT_NO_THROW(pool.get(entt::entity{4}));
+    ASSERT_NO_THROW(std::as_const(pool).get(entt::entity{4}));
 
-    ASSERT_EQ(pool.get_as_tuple(entt::entity{41}), std::make_tuple());
-    ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{41}), std::make_tuple());
+    ASSERT_EQ(pool.get_as_tuple(entt::entity{4}), std::make_tuple());
+    ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{4}), std::make_tuple());
 }
 
 ENTT_DEBUG_TEST(StorageEntityDeathTest, Getters) {
     entt::storage<entt::entity> pool;
 
-    ASSERT_DEATH(pool.get(entt::entity{41}), "");
-    ASSERT_DEATH(std::as_const(pool).get(entt::entity{41}), "");
+    ASSERT_DEATH(pool.get(entt::entity{4}), "");
+    ASSERT_DEATH(std::as_const(pool).get(entt::entity{4}), "");
 
-    ASSERT_DEATH([[maybe_unused]] const auto value = pool.get_as_tuple(entt::entity{41}), "");
-    ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{41}), "");
+    ASSERT_DEATH([[maybe_unused]] const auto value = pool.get_as_tuple(entt::entity{4}), "");
+    ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{4}), "");
 }
 
 TEST(StorageEntity, Emplace) {
@@ -148,13 +149,13 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(pool.emplace(traits_type::construct(1, 1)), entt::entity{4});
     ASSERT_EQ(pool.emplace(traits_type::construct(6, 3)), traits_type::construct(6, 3));
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{4}), pool.in_use());              // NOLINT
-    ASSERT_GE(pool.index(entt::entity{5}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.in_use()); // NOLINT
+    ASSERT_LT(pool.index(entt::entity{0}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{1}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{2}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{3}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{4}), pool.free_list());
+    ASSERT_GE(pool.index(entt::entity{5}), pool.free_list());
+    ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.free_list());
 
     ASSERT_EQ(pool.emplace(traits_type::construct(5, 42)), traits_type::construct(5, 42));
     ASSERT_EQ(pool.emplace(traits_type::construct(5, 43)), entt::entity{7});
@@ -181,12 +182,12 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(*pool.push(traits_type::construct(1, 1)), entt::entity{3});
     ASSERT_EQ(*pool.push(traits_type::construct(5, 3)), traits_type::construct(5, 3));
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{1}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{2}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());              // NOLINT
-    ASSERT_GE(pool.index(entt::entity{4}), pool.in_use());              // NOLINT
-    ASSERT_LT(pool.index(traits_type::construct(5, 3)), pool.in_use()); // NOLINT
+    ASSERT_LT(pool.index(entt::entity{0}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{1}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{2}), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{3}), pool.free_list());
+    ASSERT_GE(pool.index(entt::entity{4}), pool.free_list());
+    ASSERT_LT(pool.index(traits_type::construct(5, 3)), pool.free_list());
 
     ASSERT_EQ(*pool.push(traits_type::construct(4, 42)), traits_type::construct(4, 42));
     ASSERT_EQ(*pool.push(traits_type::construct(4, 43)), entt::entity{6});
@@ -200,12 +201,12 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(pool.current(entity[1u]), 4);
     ASSERT_EQ(pool.current(entt::entity{2}), 1);
 
-    ASSERT_LT(pool.index(entt::entity{0}), pool.in_use());               // NOLINT
-    ASSERT_GE(pool.index(traits_type::construct(1, 1)), pool.in_use());  // NOLINT
-    ASSERT_GE(pool.index(traits_type::construct(2, 1)), pool.in_use());  // NOLINT
-    ASSERT_LT(pool.index(entt::entity{3}), pool.in_use());               // NOLINT
-    ASSERT_LT(pool.index(traits_type::construct(4, 42)), pool.in_use()); // NOLINT
-    ASSERT_GE(pool.index(traits_type::construct(5, 4)), pool.in_use());  // NOLINT
+    ASSERT_LT(pool.index(entt::entity{0}), pool.free_list());
+    ASSERT_GE(pool.index(traits_type::construct(1, 1)), pool.free_list());
+    ASSERT_GE(pool.index(traits_type::construct(2, 1)), pool.free_list());
+    ASSERT_LT(pool.index(entt::entity{3}), pool.free_list());
+    ASSERT_LT(pool.index(traits_type::construct(4, 42)), pool.free_list());
+    ASSERT_GE(pool.index(traits_type::construct(5, 4)), pool.free_list());
 
     ASSERT_EQ(*pool.push(entt::null), traits_type::construct(2, 1));
     ASSERT_EQ(*pool.push(traits_type::construct(1, 3)), traits_type::construct(1, 3));
@@ -237,41 +238,41 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
 
 TEST(StorageEntity, Insert) {
     entt::storage<entt::entity> pool;
-    entt::entity entity[2u]{}; // NOLINT
+    std::array<entt::entity, 2u> entity{};
 
-    pool.insert(std::begin(entity), std::end(entity));
+    pool.insert(entity.begin(), entity.end());
 
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_TRUE(pool.contains(entity[1u]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 2u); // NOLINT
+    ASSERT_EQ(pool.free_list(), 2u);
 
-    pool.erase(std::begin(entity), std::end(entity));
+    pool.erase(entity.begin(), entity.end());
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 0u); // NOLINT
+    ASSERT_EQ(pool.free_list(), 0u);
 
-    pool.insert(entity, entity + 1u); // NOLINT
+    pool.insert(entity.begin(), entity.begin() + 1u);
 
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
+    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 TEST(StorageEntity, Pack) {
     entt::storage<entt::entity> pool;
-    entt::entity entity[3u]{entt::entity{1}, entt::entity{3}, entt::entity{42}}; // NOLINT
+    std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{4}};
 
-    pool.push(entity, entity + 3u); // NOLINT
+    pool.push(entity.begin(), entity.end());
     std::swap(entity[0u], entity[1u]);
 
-    const auto len = pool.pack(entity + 1u, entity + 3u); // NOLINT
+    const auto len = pool.pack(entity.begin() + 1u, entity.end()); // NOLINT
     auto it = pool.each().cbegin().base();
 
     ASSERT_NE(it, pool.cbegin());
@@ -313,7 +314,7 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, InUse) {
 
     pool.emplace(entt::entity{0});
 
-    ASSERT_DEATH(pool.in_use(2u), ""); // NOLINT
+    ASSERT_DEATH(pool.free_list(2u), "");
 }
 
 TEST(StorageEntity, Iterable) {
@@ -327,7 +328,7 @@ TEST(StorageEntity, Iterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42}); // NOLINT
+    pool.emplace(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -343,11 +344,11 @@ TEST(StorageEntity, Iterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT
+    ASSERT_EQ(begin.base(), pool.end() - pool.free_list());
     ASSERT_EQ(end.base(), pool.end());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{42});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{42});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
+    ASSERT_EQ(std::get<0>(*begin), entt::entity{4});
 
     ASSERT_EQ(begin++, iterable.begin());
     ASSERT_EQ(begin.base(), pool.end() - 1);
@@ -371,7 +372,7 @@ TEST(StorageEntity, ConstIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42}); // NOLINT
+    pool.emplace(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -387,11 +388,11 @@ TEST(StorageEntity, ConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.in_use()); // NOLINT
+    ASSERT_EQ(begin.base(), pool.end() - pool.free_list());
     ASSERT_EQ(end.base(), pool.end());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{42});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{42});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
+    ASSERT_EQ(std::get<0>(*begin), entt::entity{4});
 
     ASSERT_EQ(begin++, iterable.begin());
     ASSERT_EQ(begin.base(), pool.end() - 1);
@@ -439,7 +440,7 @@ TEST(StorageEntity, ReverseIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42}); // NOLINT
+    pool.emplace(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -455,7 +456,7 @@ TEST(StorageEntity, ReverseIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.free_list());
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
@@ -483,7 +484,7 @@ TEST(StorageEntity, ReverseConstIterable) {
 
     pool.emplace(entt::entity{1});
     pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{42}); // NOLINT
+    pool.emplace(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -499,7 +500,7 @@ TEST(StorageEntity, ReverseConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.in_use()); // NOLINT
+    ASSERT_EQ(end.base(), pool.rbegin() + pool.free_list());
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
