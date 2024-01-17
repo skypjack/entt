@@ -48,23 +48,23 @@ TEST(DenseSet, Functionalities) {
     ASSERT_EQ(cset.begin(1u), cset.end(1u));
     ASSERT_EQ(set.cbegin(1u), set.cend(1u));
 
-    ASSERT_FALSE(set.contains(42));
-    ASSERT_FALSE(set.contains(4.2));
+    ASSERT_FALSE(set.contains(64));
+    ASSERT_FALSE(set.contains(6.4));
 
-    ASSERT_EQ(set.find(42), set.end());
-    ASSERT_EQ(set.find(4.2), set.end());
-    ASSERT_EQ(cset.find(42), set.cend());
-    ASSERT_EQ(cset.find(4.2), set.cend());
+    ASSERT_EQ(set.find(64), set.end());
+    ASSERT_EQ(set.find(6.4), set.end());
+    ASSERT_EQ(cset.find(64), set.cend());
+    ASSERT_EQ(cset.find(6.4), set.cend());
 
-    ASSERT_EQ(set.hash_function()(42), 42);
-    ASSERT_TRUE(set.key_eq()(42, 42));
+    ASSERT_EQ(set.hash_function()(64), 64);
+    ASSERT_TRUE(set.key_eq()(64, 64));
 
     set.emplace(0);
 
     ASSERT_EQ(set.count(0), 1u);
-    ASSERT_EQ(set.count(4.2), 0u);
+    ASSERT_EQ(set.count(6.4), 0u);
     ASSERT_EQ(cset.count(0.0), 1u);
-    ASSERT_EQ(cset.count(42), 0u);
+    ASSERT_EQ(cset.count(64), 0u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);

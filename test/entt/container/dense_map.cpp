@@ -50,23 +50,23 @@ TEST(DenseMap, Functionalities) {
     ASSERT_EQ(cmap.begin(1u), cmap.end(1u));
     ASSERT_EQ(map.cbegin(1u), map.cend(1u));
 
-    ASSERT_FALSE(map.contains(42));
-    ASSERT_FALSE(map.contains(4.2));
+    ASSERT_FALSE(map.contains(64));
+    ASSERT_FALSE(map.contains(6.4));
 
-    ASSERT_EQ(map.find(42), map.end());
-    ASSERT_EQ(map.find(4.2), map.end());
-    ASSERT_EQ(cmap.find(42), map.cend());
-    ASSERT_EQ(cmap.find(4.2), map.cend());
+    ASSERT_EQ(map.find(64), map.end());
+    ASSERT_EQ(map.find(6.4), map.end());
+    ASSERT_EQ(cmap.find(64), map.cend());
+    ASSERT_EQ(cmap.find(6.4), map.cend());
 
-    ASSERT_EQ(map.hash_function()(42), 42);
-    ASSERT_TRUE(map.key_eq()(42, 42));
+    ASSERT_EQ(map.hash_function()(64), 64);
+    ASSERT_TRUE(map.key_eq()(64, 64));
 
     map.emplace(0, 0);
 
     ASSERT_EQ(map.count(0), 1u);
-    ASSERT_EQ(map.count(4.2), 0u);
+    ASSERT_EQ(map.count(6.4), 0u);
     ASSERT_EQ(cmap.count(0.0), 1u);
-    ASSERT_EQ(cmap.count(42), 0u);
+    ASSERT_EQ(cmap.count(64), 0u);
 
     ASSERT_FALSE(map.empty());
     ASSERT_EQ(map.size(), 1u);
