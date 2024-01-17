@@ -39,7 +39,7 @@ TEST(Example, SignalLess) {
     // literally a test for storage_adapter_mixin
     registry.emplace<int>(entity[0], 0);
     registry.erase<int>(entity[0]);
-    registry.insert<int>(std::begin(entity), std::end(entity), 3);
+    registry.insert<int>(entity.begin(), entity.end(), 3);
     registry.patch<int>(entity[0], [](auto &value) { value = 2; });
 
     ASSERT_EQ(registry.get<int>(entity[0]), 2);
