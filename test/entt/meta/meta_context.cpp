@@ -197,7 +197,7 @@ TEST_F(MetaContext, MetaType) {
     ASSERT_EQ(global.id(), "foo"_hs);
     ASSERT_EQ(local.id(), "bar"_hs);
 
-    clazz instance{'c', 99}; // NOLINT
+    clazz instance{'c', 8};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
@@ -243,7 +243,7 @@ TEST_F(MetaContext, MetaData) {
     ASSERT_EQ(global.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
     ASSERT_EQ(local.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    clazz instance{'c', 99}; // NOLINT
+    clazz instance{'c', 8};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
@@ -278,7 +278,7 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_EQ(global.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), global_marker);
     ASSERT_EQ(local.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    clazz instance{'c', 99}; // NOLINT
+    clazz instance{'c', 8};
     const argument value{2};
 
     ASSERT_NE(instance.value, value.get());
@@ -393,7 +393,7 @@ TEST_F(MetaContext, MetaTemplate) {
 TEST_F(MetaContext, MetaPointer) {
     using namespace entt::literals;
 
-    int value = 42; // NOLINT
+    int value = 2;
 
     const entt::meta_any global{&value};
     const entt::meta_any local{ctx(), &value};
@@ -459,9 +459,9 @@ TEST_F(MetaContext, MetaSequenceContainer) {
 TEST_F(MetaContext, MetaAny) {
     using namespace entt::literals;
 
-    const entt::meta_any global{42};
-    const entt::meta_any ctx_value{ctx(), 42};
-    const entt::meta_any in_place{ctx(), std::in_place_type<int>, 42};
+    const entt::meta_any global{2};
+    const entt::meta_any ctx_value{ctx(), 2};
+    const entt::meta_any in_place{ctx(), std::in_place_type<int>, 2};
     entt::meta_any two_step_local{entt::meta_ctx_arg, ctx()};
 
     ASSERT_TRUE(global);
@@ -469,7 +469,7 @@ TEST_F(MetaContext, MetaAny) {
     ASSERT_TRUE(in_place);
     ASSERT_FALSE(two_step_local);
 
-    two_step_local = 42; // NOLINT
+    two_step_local = 2;
 
     ASSERT_TRUE(two_step_local);
 
@@ -482,7 +482,7 @@ TEST_F(MetaContext, MetaAny) {
 TEST_F(MetaContext, MetaHandle) {
     using namespace entt::literals;
 
-    int value = 42; // NOLINT
+    int value = 2;
 
     entt::meta_handle global{value};
     entt::meta_handle ctx_value{ctx(), value};
@@ -504,8 +504,8 @@ TEST_F(MetaContext, MetaHandle) {
 TEST_F(MetaContext, ForwardAsMeta) {
     using namespace entt::literals;
 
-    const auto global = entt::forward_as_meta(42);
-    const auto local = entt::forward_as_meta(ctx(), 42);
+    const auto global = entt::forward_as_meta(2);
+    const auto local = entt::forward_as_meta(ctx(), 2);
 
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);

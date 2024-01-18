@@ -44,7 +44,7 @@ struct MetaConv: ::testing::Test {
 
 TEST_F(MetaConv, Functionalities) {
     auto any = entt::resolve<clazz_t>().construct();
-    any.cast<clazz_t &>().value = 42; // NOLINT
+    any.cast<clazz_t &>().value = 2;
 
     const auto as_int = std::as_const(any).allow_cast<int>();
     const auto as_bool = std::as_const(any).allow_cast<bool>();
