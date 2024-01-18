@@ -1,4 +1,5 @@
-<map id="entt::is_equality_comparable&lt; Type, typename &gt;" name="entt::is_equality_comparable&lt; Type, typename &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if a given type is equality comparable,..." alt="" coords="5,79,193,119"/>
-<area shape="rect" id="node2" title=" " alt="" coords="46,5,153,31"/>
+<map id="entt::is_equality_comparable&lt; Type &gt;" name="entt::is_equality_comparable&lt; Type &gt;">
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is equality comparable,..." alt="" coords="5,123,193,163"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="17,5,182,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,89,102,122,97,122,97,89"/>
 </map>

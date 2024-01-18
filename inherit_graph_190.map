@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,49,124,74"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1is__applicable_3_01Func_00_01Tuple_3_01Args_8_8_8_01_4_01_4.html" title="Same as std::is_invocable, but with tuples." alt="" coords="172,5,349,45"/>
+<area shape="poly" id="edge75_Node000000_Node000001" title=" " alt="" coords="137,45,171,39,172,44,138,51"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1is__applicable_3_01Func_00_01const_01Tuple_3_01Args_8_8_8_01_4_01_4.html" title="Same as std::is_invocable, but with tuples." alt="" coords="191,70,330,125"/>
+<area shape="poly" id="edge76_Node000000_Node000002" title=" " alt="" coords="138,72,192,82,191,87,137,77"/>
+</map>

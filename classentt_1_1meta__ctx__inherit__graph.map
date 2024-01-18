@@ -1,4 +1,5 @@
 <map id="entt::meta_ctx" name="entt::meta_ctx">
-<area shape="rect" id="node1" title="Opaque meta context type." alt="" coords="27,79,134,104"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,156,31"/>
+<area shape="rect" id="Node000001" title="Opaque meta context type." alt="" coords="27,79,134,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,156,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,44,83,79,78,79,78,44"/>
 </map>

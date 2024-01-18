@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__continuous__loader.html" title="Utility class for continuous loading." alt="" coords="5,5,159,45"/>
+<area shape="rect" id="Node000000" href="$classentt_1_1basic__common__view.html" title=" " alt="" coords="5,5,179,104"/>
+<area shape="rect" id="Node000001" href="$classentt_1_1basic__view_3_01get__t_3_01Get_8_8_8_01_4_00_01exclude__t_3_01Exclude_8_8_8_01_4_01_4.html" title="General purpose view." alt="" coords="227,27,371,82"/>
+<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="193,52,226,52,226,57,193,57"/>
 </map>

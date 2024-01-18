@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['deletion_5fpolicy_0',['deletion_policy',['../namespaceentt.html#abc4d0fa77fae26e7c01793990996c581',1,'entt']]]
+  ['any_5fpolicy_0',['any_policy',['../namespaceentt.html#add777bc22ff30abfbf52abd37d4e1549',1,'entt']]]
 ];

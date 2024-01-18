@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1poly__inspector.html" title="Inspector class used to infer the type of the virtual table." alt="" coords="5,5,141,31"/>
+<area shape="rect" id="Node000000" href="$structentt_1_1meta__function__descriptor__traits.html" title=" " alt="" coords="5,5,196,133"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1meta__function__descriptor_3_01Type_00_01Ret_07Class_1_1_5_08_07Args_8_8_8_08_4.html" title="Meta function descriptor." alt="" coords="244,42,399,97"/>
+<area shape="poly" id="edge26_Node000000_Node000001" title=" " alt="" coords="210,67,244,67,244,72,210,72"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="entt::is_transparent&lt; Type, typename &gt;" name="entt::is_transparent&lt; Type, typename &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if Type::is_transparent is valid and denotes a type,..." alt="" coords="5,79,144,119"/>
-<area shape="rect" id="node2" title=" " alt="" coords="21,5,128,31"/>
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if Type::is_transparent is valid and denotes a type,..." alt="" coords="5,79,144,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="21,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,44,77,79,72,79,72,44"/>
 </map>

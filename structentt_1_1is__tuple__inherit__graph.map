@@ -1,4 +1,5 @@
 <map id="entt::is_tuple&lt; Type &gt;" name="entt::is_tuple&lt; Type &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if a given type is a tuple, false otherwise." alt="" coords="6,108,155,133"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,156,60"/>
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is a tuple, false otherwise." alt="" coords="6,108,155,133"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,156,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,74,83,108,78,108,78,74"/>
 </map>

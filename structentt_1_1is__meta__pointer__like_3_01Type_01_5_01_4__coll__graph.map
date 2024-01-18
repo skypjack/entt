@@ -1,4 +1,5 @@
 <map id="entt::is_meta_pointer_like&lt; Type * &gt;" name="entt::is_meta_pointer_like&lt; Type * &gt;">
-<area shape="rect" id="node1" title="Makes plain pointers pointer&#45;like types for the meta system." alt="" coords="5,79,149,119"/>
-<area shape="rect" id="node2" title=" " alt="" coords="26,5,129,31"/>
+<area shape="rect" id="Node000001" title="Makes plain pointers pointer&#45;like types for the meta system." alt="" coords="5,79,149,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="26,5,129,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,44,80,79,75,79,75,44"/>
 </map>

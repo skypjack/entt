@@ -1,4 +1,5 @@
 <map id="std::tuple_size&lt; entt::compressed_pair&lt; First, Second &gt; &gt;" name="std::tuple_size&lt; entt::compressed_pair&lt; First, Second &gt; &gt;">
-<area shape="rect" id="node1" title="std::tuple_size specialization for compressed_pairs." alt="" coords="5,93,176,148"/>
-<area shape="rect" id="node2" title=" " alt="" coords="17,5,164,45"/>
+<area shape="rect" id="Node000001" title="std::tuple_size specialization for compressed_pairs." alt="" coords="5,93,176,148"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="17,5,164,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,59,93,93,88,93,88,59"/>
 </map>

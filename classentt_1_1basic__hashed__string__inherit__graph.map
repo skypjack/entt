@@ -1,4 +1,5 @@
 <map id="entt::basic_hashed_string&lt; Char &gt;" name="entt::basic_hashed_string&lt; Char &gt;">
-<area shape="rect" id="node1" title="Zero overhead unique identifier." alt="" coords="15,93,147,133"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,157,45"/>
+<area shape="rect" id="Node000001" title="Zero overhead unique identifier." alt="" coords="15,93,147,133"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,157,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,59,84,93,79,93,79,59"/>
 </map>

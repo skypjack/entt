@@ -1,4 +1,5 @@
 <map id="entt::basic_storage&lt; Type, Entity, Allocator, std::enable_if_t&lt; component_traits&lt; Type &gt;::page_size==0u &gt; &gt;" name="entt::basic_storage&lt; Type, Entity, Allocator, std::enable_if_t&lt; component_traits&lt; Type &gt;::page_size==0u &gt; &gt;">
-<area shape="rect" id="node1" title="Default constructor." alt="" coords="244,5,475,75"/>
-<area shape="rect" id="node2" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,196,75"/>
+<area shape="rect" id="Node000001" title="Default constructor." alt="" coords="244,5,475,75"/>
+<area shape="rect" id="Node000002" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,196,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,37,244,37,244,43,210,43"/>
 </map>

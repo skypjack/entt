@@ -1,4 +1,5 @@
 <map id="entt::value_list_element&lt; Index, value_list&lt; Value, Other... &gt; &gt;" name="entt::value_list_element&lt; Index, value_list&lt; Value, Other... &gt; &gt;">
-<area shape="rect" id="node1" title="Provides compile&#45;time indexed access to the values of a value list." alt="" coords="5,108,180,163"/>
-<area shape="rect" id="node2" href="$structentt_1_1value__list__element.html" title=" " alt="" coords="13,5,172,60"/>
+<area shape="rect" id="Node000001" title="Provides compile&#45;time indexed access to the values of a value list." alt="" coords="5,108,180,163"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1value__list__element.html" title=" " alt="" coords="13,5,172,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,74,95,108,90,108,90,74"/>
 </map>

@@ -80,21 +80,21 @@ html {
     --toc-max-height: calc(100vh - 2 * var(--spacing-medium) - 85px);
 
     /* colors for various content boxes: @warning, @note, @deprecated @bug */
-    --warning-color: #f8d1cc;
-    --warning-color-dark: #b61825;
-    --warning-color-darker: #75070f;
-    --note-color: #faf3d8;
-    --note-color-dark: #f3a600;
-    --note-color-darker: #5f4204;
-    --todo-color: #e4f3ff;
-    --todo-color-dark: #1879C4;
-    --todo-color-darker: #274a5c;
+    --warning-color: #faf3d8;
+    --warning-color-dark: #f3a600;
+    --warning-color-darker: #5f4204;
+    --note-color: #e4f3ff;
+    --note-color-dark: #1879C4;
+    --note-color-darker: #274a5c;
+    --todo-color: #e4dafd;
+    --todo-color-dark: #5b2bdd;
+    --todo-color-darker: #2a0d72;
     --deprecated-color: #ecf0f3;
     --deprecated-color-dark: #5b6269;
     --deprecated-color-darker: #43454a;
-    --bug-color: #e4dafd;
-    --bug-color-dark: #5b2bdd;
-    --bug-color-darker: #2a0d72;
+    --bug-color: #f8d1cc;
+    --bug-color-dark: #b61825;
+    --bug-color-darker: #75070f;
     --invariant-color: #d8f1e3;
     --invariant-color-dark: #44b86f;
     --invariant-color-darker: #265532;
@@ -169,6 +169,8 @@ html {
     --webkit-scrollbar-size: 7px;
     --webkit-scrollbar-padding: 4px;
     --webkit-scrollbar-color: var(--separator-color);
+
+    --animation-duration: .12s
 }
 
 @media screen and (max-width: 767px) {
@@ -208,21 +210,21 @@ html {
         --blockquote-background: #222325;
         --blockquote-foreground: #7e8c92;
 
-        --warning-color: #2e1917;
-        --warning-color-dark: #ad2617;
-        --warning-color-darker: #f5b1aa;
-        --note-color: #3b2e04;
-        --note-color-dark: #f1b602;
-        --note-color-darker: #ceb670;
-        --todo-color: #163750;
-        --todo-color-dark: #1982D2;
-        --todo-color-darker: #dcf0fa;
+        --warning-color: #3b2e04;
+        --warning-color-dark: #f1b602;
+        --warning-color-darker: #ceb670;
+        --note-color: #163750;
+        --note-color-dark: #1982D2;
+        --note-color-darker: #dcf0fa;
+        --todo-color: #2a2536;
+        --todo-color-dark: #7661b3;
+        --todo-color-darker: #ae9ed6;
         --deprecated-color: #2e323b;
         --deprecated-color-dark: #738396;
         --deprecated-color-darker: #abb0bd;
-        --bug-color: #2a2536;
-        --bug-color-dark: #7661b3;
-        --bug-color-darker: #ae9ed6;
+        --bug-color: #2e1917;
+        --bug-color-dark: #ad2617;
+        --bug-color-darker: #f5b1aa;
         --invariant-color: #303a35;
         --invariant-color-dark: #76ce96;
         --invariant-color-darker: #cceed5;
@@ -269,21 +271,21 @@ html.dark-mode {
     --blockquote-background: #222325;
     --blockquote-foreground: #7e8c92;
 
-    --warning-color: #2e1917;
-    --warning-color-dark: #ad2617;
-    --warning-color-darker: #f5b1aa;
-    --note-color: #3b2e04;
-    --note-color-dark: #f1b602;
-    --note-color-darker: #ceb670;
-    --todo-color: #163750;
-    --todo-color-dark: #1982D2;
-    --todo-color-darker: #dcf0fa;
+    --warning-color: #3b2e04;
+    --warning-color-dark: #f1b602;
+    --warning-color-darker: #ceb670;
+    --note-color: #163750;
+    --note-color-dark: #1982D2;
+    --note-color-darker: #dcf0fa;
+    --todo-color: #2a2536;
+    --todo-color-dark: #7661b3;
+    --todo-color-darker: #ae9ed6;
     --deprecated-color: #2e323b;
     --deprecated-color-dark: #738396;
     --deprecated-color-darker: #abb0bd;
-    --bug-color: #2a2536;
-    --bug-color-dark: #7661b3;
-    --bug-color-darker: #ae9ed6;
+    --bug-color: #2e1917;
+    --bug-color-dark: #ad2617;
+    --bug-color-darker: #f5b1aa;
     --invariant-color: #303a35;
     --invariant-color-dark: #76ce96;
     --invariant-color-darker: #cceed5;
@@ -316,7 +318,7 @@ body, table, div, p, dl, #nav-tree .label, .title,
 }
 
 h1, h2, h3, h4, h5 {
-    margin-top: .9em;
+    margin-top: 1em;
     font-weight: 600;
     line-height: initial;
 }
@@ -1174,7 +1176,7 @@ div.toc li a.aboveActive {
         margin-right: var(--spacing-small);
         margin-bottom: calc(var(--navigation-font-size) / 4);
         transform: rotate(-90deg);
-        transition: transform 0.25s ease-out;
+        transition: transform var(--animation-duration) ease-out;
     }
 
     div.contents .toc.interactive.open > h3::before {
@@ -1231,9 +1233,13 @@ div.fragment, pre.fragment {
     .contents > div.fragment,
     .textblock > div.fragment,
     .textblock > pre.fragment,
+    .textblock > .tabbed > ul > li > div.fragment,
+    .textblock > .tabbed > ul > li > pre.fragment,
     .contents > .doxygen-awesome-fragment-wrapper > div.fragment,
     .textblock > .doxygen-awesome-fragment-wrapper > div.fragment,
-    .textblock > .doxygen-awesome-fragment-wrapper > pre.fragment {
+    .textblock > .doxygen-awesome-fragment-wrapper > pre.fragment,
+    .textblock > .tabbed > ul > li > .doxygen-awesome-fragment-wrapper > div.fragment,
+    .textblock > .tabbed > ul > li > .doxygen-awesome-fragment-wrapper > pre.fragment {
         margin: var(--spacing-medium) calc(0px - var(--spacing-large));
         border-radius: 0;
         border-left: 0;
@@ -1323,8 +1329,9 @@ div.fragment span.lineno a {
     color: var(--fragment-link) !important;
 }
 
-div.fragment .line:first-child .lineno {
+div.fragment > .line:first-child .lineno {
     box-shadow: -999999px 0px 0 999999px var(--fragment-linenumber-background), -999998px 0px 0 999999px var(--fragment-linenumber-border);
+    background-color: var(--fragment-linenumber-background) !important;
 }
 
 div.line {
@@ -1383,8 +1390,8 @@ dl.todo {
     color: var(--todo-color-darker);
 }
 
-dl.todo dt {
-    color: var(--todo-color-dark);
+dl.todo dt a {
+    color: var(--todo-color-dark) !important;
 }
 
 dl.bug dt a {
@@ -1866,7 +1873,7 @@ div.dynheader img[src="closed.png"] {
     display: block;
     float: left;
     margin-left: -10px;
-    transition: transform 0.25s ease-out;
+    transition: transform var(--animation-duration) ease-out;
 }
 
 table.memberdecls img {
@@ -2344,7 +2351,7 @@ doxygen-awesome-dark-mode-toggle {
 }
 
 doxygen-awesome-dark-mode-toggle > svg {
-    transition: transform .1s ease-in-out;
+    transition: transform var(--animation-duration) ease-in-out;
 }
 
 doxygen-awesome-dark-mode-toggle:active > svg {
@@ -2429,7 +2436,7 @@ a.anchorlink {
     text-decoration: none;
     opacity: .15;
     display: none;
-    transition: opacity .1s ease-in-out, color .1s ease-in-out;
+    transition: opacity var(--animation-duration) ease-in-out, color var(--animation-duration) ease-in-out;
 }
 
 a.anchorlink svg {
@@ -2453,15 +2460,10 @@ h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.
  Optional tab feature
 */
 
-.tabbed {
-    margin: var(--spacing-medium) auto;
-}
-
 .tabbed ul {
     padding-inline-start: 0px;
     margin: 0;
     padding: var(--spacing-small) 0;
-    border-bottom: 1px solid var(--separator-color);
 }
 
 .tabbed li {
@@ -2484,24 +2486,46 @@ h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.
     flex-direction: row;
 }
 
+@media screen and (max-width: 767px) {
+    .tabs-overview-container {
+        margin: 0 calc(0px - var(--spacing-large));
+    }
+    .tabs-overview {
+        padding: 0 var(--spacing-large)
+    }
+}
+
 .tabs-overview button.tab-button {
     color: var(--page-foreground-color);
     margin: 0;
     border: none;
     background: transparent;
-    padding: var(--spacing-small) 0;
+    padding: calc(var(--spacing-large) / 2) 0;
     display: inline-block;
     font-size: var(--page-font-size);
     cursor: pointer;
     box-shadow: 0 1px 0 0 var(--separator-color);
     position: relative;
+    
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tabs-overview button.tab-button .tab-title::before {
+    display: block;
+    content: attr(title);
+    font-weight: 600;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
 }
 
 .tabs-overview button.tab-button .tab-title {
     float: left;
     white-space: nowrap;
-    padding: var(--spacing-small) var(--spacing-large);
+    font-weight: normal;
+    padding: calc(var(--spacing-large) / 2) var(--spacing-large);
     border-radius: var(--border-radius-medium);
+    transition: background-color var(--animation-duration) ease-in-out, font-weight var(--animation-duration) ease-in-out;
 }
 
 .tabs-overview button.tab-button:not(:last-child) .tab-title {
@@ -2513,18 +2537,133 @@ h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.
     box-shadow: none;
 }
 
-.tabs-overview button.tab-button.active {
-    color: var(--primary-color);
+.tabs-overview button.tab-button.active .tab-title {
+    font-weight: 600;
 }
 
-.tabs-overview button.tab-button.active::after {
+.tabs-overview button.tab-button::after {
     content: '';
     display: block;
     position: absolute;
-    left: 0px;
+    left: 0;
     bottom: 0;
-    right: 0px;
-    height: 3px;
+    right: 0;
+    height: 0;
+    width: 0%;
+    margin: 0 auto;
     border-radius: var(--border-radius-small) var(--border-radius-small) 0 0;
     background-color: var(--primary-color);
+    transition: width var(--animation-duration) ease-in-out, height var(--animation-duration) ease-in-out;
+}
+
+.tabs-overview button.tab-button.active::after {
+    width: 100%;
+    box-sizing: border-box;
+    height: 3px;
+}
+
+
+/*
+ Navigation Buttons
+*/
+
+.section_buttons:not(:empty) {
+    margin-top: calc(var(--spacing-large) * 3);
+}
+
+.section_buttons table.markdownTable {
+    display: block;
+    width: 100%;
+}
+
+.section_buttons table.markdownTable tbody {
+    display: table !important;
+    width: 100%;
+    box-shadow: none;
+    border-spacing: 10px;
+}
+
+.section_buttons table.markdownTable td {
+    padding: 0;
+}
+
+.section_buttons table.markdownTable th {
+    display: none;
+}
+
+.section_buttons table.markdownTable tr.markdownTableHead {
+    border: none;
+}
+
+.section_buttons tr th, .section_buttons tr td {
+    background: none;
+    border: none;
+    padding: var(--spacing-large) 0 var(--spacing-small);
+}
+
+.section_buttons a {
+    display: inline-block;
+    border: 1px solid var(--separator-color);
+    border-radius: var(--border-radius-medium);
+    color: var(--page-secondary-foreground-color) !important;
+    text-decoration: none;
+    transition: color var(--animation-duration) ease-in-out, background-color var(--animation-duration) ease-in-out;
+}
+
+.section_buttons a:hover {
+    color: var(--page-foreground-color) !important;
+    background-color: var(--odd-color);
+}
+
+.section_buttons tr td.markdownTableBodyLeft a {
+    padding: var(--spacing-medium) var(--spacing-large) var(--spacing-medium) calc(var(--spacing-large) / 2);
+}
+
+.section_buttons tr td.markdownTableBodyRight a {
+    padding: var(--spacing-medium) calc(var(--spacing-large) / 2) var(--spacing-medium) var(--spacing-large);
+}
+
+.section_buttons tr td.markdownTableBodyLeft a::before,
+.section_buttons tr td.markdownTableBodyRight a::after {
+    color: var(--page-secondary-foreground-color) !important;
+    display: inline-block;
+    transition: color .08s ease-in-out, transform .09s ease-in-out;
+}
+
+.section_buttons tr td.markdownTableBodyLeft a::before {
+    content: '〈';
+    padding-right: var(--spacing-large);
+}
+
+
+.section_buttons tr td.markdownTableBodyRight a::after {
+    content: '〉';
+    padding-left: var(--spacing-large);
+}
+
+
+.section_buttons tr td.markdownTableBodyLeft a:hover::before {
+    color: var(--page-foreground-color) !important;
+    transform: translateX(-3px);
+}
+
+.section_buttons tr td.markdownTableBodyRight a:hover::after {
+    color: var(--page-foreground-color) !important;
+    transform: translateX(3px);
+}
+
+@media screen and (max-width: 450px) {
+    .section_buttons a {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .section_buttons tr td:nth-of-type(1).markdownTableBodyLeft a {
+        border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+        border-right: none;
+    }
+
+    .section_buttons tr td:nth-of-type(2).markdownTableBodyRight a {
+        border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
+    }
 }

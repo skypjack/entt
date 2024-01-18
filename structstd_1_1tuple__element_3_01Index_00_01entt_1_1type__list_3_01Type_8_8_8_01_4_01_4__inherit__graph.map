@@ -1,4 +1,5 @@
 <map id="std::tuple_element&lt; Index, entt::type_list&lt; Type... &gt; &gt;" name="std::tuple_element&lt; Index, entt::type_list&lt; Type... &gt; &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="18,108,147,163"/>
-<area shape="rect" id="node2" href="$structentt_1_1type__list__element.html" title=" " alt="" coords="5,5,160,60"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,108,147,163"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1type__list__element.html" title=" " alt="" coords="5,5,160,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,74,85,108,80,108,80,74"/>
 </map>

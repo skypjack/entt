@@ -1,4 +1,5 @@
 <map id="entt::is_applicable&lt; typename, typename &gt;" name="entt::is_applicable&lt; typename, typename &gt;">
-<area shape="rect" id="node1" title="Same as std::is_invocable, but with tuples." alt="" coords="5,79,173,119"/>
-<area shape="rect" id="node2" title=" " alt="" coords="36,5,143,31"/>
+<area shape="rect" id="Node000001" title="Same as std::is_invocable, but with tuples." alt="" coords="5,79,173,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="36,5,143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,44,92,79,87,79,87,44"/>
 </map>

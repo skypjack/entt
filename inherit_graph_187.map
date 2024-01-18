@@ -1,0 +1,23 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,285,112,310"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1is__meta__pointer__like.html" title=" " alt="" coords="173,5,317,45"/>
+<area shape="poly" id="edge59_Node000000_Node000001" title=" " alt="" coords="61,271,71,225,89,168,118,108,136,80,158,55,174,43,178,48,162,59,140,83,122,111,94,170,76,226,67,272"/>
+<area shape="rect" id="Node000003" href="$structentt_1_1enum__as__bitmask.html" title="Enable bitmask support for enum classes." alt="" coords="166,69,325,109"/>
+<area shape="poly" id="edge61_Node000000_Node000003" title=" " alt="" coords="66,270,79,237,99,196,125,155,158,119,176,107,179,112,162,123,129,159,103,199,84,239,71,272"/>
+<area shape="rect" id="Node000004" href="$structentt_1_1is__applicable.html" title="Same as std::is_invocable, but with tuples." alt="" coords="161,133,329,173"/>
+<area shape="poly" id="edge62_Node000000_Node000004" title=" " alt="" coords="74,272,110,227,133,204,159,183,180,171,183,176,161,188,136,208,114,231,78,275"/>
+<area shape="rect" id="Node000005" href="$structentt_1_1is__applicable__r.html" title="Same as std::is_invocable_r, but with tuples for arguments." alt="" coords="160,198,331,253"/>
+<area shape="poly" id="edge63_Node000000_Node000005" title=" " alt="" coords="104,277,173,250,175,255,106,282"/>
+<area shape="rect" id="Node000006" href="$structentt_1_1is__complete.html" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="180,277,311,317"/>
+<area shape="poly" id="edge64_Node000000_Node000006" title=" " alt="" coords="126,295,180,295,180,300,126,300"/>
+<area shape="rect" id="Node000007" href="$structentt_1_1is__iterator.html" title="Provides the member constant value to true if a given type is an iterator, false otherwise." alt="" coords="180,341,311,381"/>
+<area shape="poly" id="edge65_Node000000_Node000007" title=" " alt="" coords="110,312,187,339,185,344,109,317"/>
+<area shape="rect" id="Node000008" href="$structentt_1_1is__meta__pointer__like.html" title="Provides the member constant value to true if a given type is a pointer&#45;like type from the point of v..." alt="" coords="173,405,317,445"/>
+<area shape="poly" id="edge66_Node000000_Node000008" title=" " alt="" coords="81,319,116,355,161,391,184,403,181,408,159,396,113,359,77,322"/>
+<area shape="rect" id="Node000009" href="$structentt_1_1is__meta__pointer__like_3_01Type_07_5_08_0fN_0e_4.html" title="Partial specialization used to reject pointers to arrays." alt="" coords="173,469,317,509"/>
+<area shape="poly" id="edge67_Node000000_Node000009" title=" " alt="" coords="72,322,106,388,131,424,162,455,180,467,177,472,158,459,127,427,101,391,67,324"/>
+<area shape="rect" id="Node000010" href="$structentt_1_1is__transparent.html" title="Provides the member constant value to true if Type::is_transparent is valid and denotes a type,..." alt="" coords="176,533,315,573"/>
+<area shape="poly" id="edge68_Node000000_Node000010" title=" " alt="" coords="67,323,78,365,97,418,124,472,142,497,162,519,178,531,175,535,158,523,137,500,119,475,92,420,73,367,62,324"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1is__meta__pointer__like_3_01const_01Type_01_4.html" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="379,5,523,45"/>
+<area shape="poly" id="edge60_Node000001_Node000002" title=" " alt="" coords="331,23,378,23,378,28,331,28"/>
+</map>

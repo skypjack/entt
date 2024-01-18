@@ -1,4 +1,5 @@
 <map id="entt::owned_t&lt; Type &gt;" name="entt::owned_t&lt; Type &gt;">
-<area shape="rect" id="node1" title="Alias for lists of owned components." alt="" coords="12,79,164,104"/>
-<area shape="rect" id="node2" href="$structentt_1_1type__list.html" title=" " alt="" coords="5,5,171,31"/>
+<area shape="rect" id="Node000001" title="Alias for lists of owned components." alt="" coords="12,79,164,104"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1type__list.html" title=" " alt="" coords="5,5,171,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,44,91,79,85,79,85,44"/>
 </map>

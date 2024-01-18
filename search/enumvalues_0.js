@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['in_5fplace_0',['in_place',['../namespaceentt.html#abc4d0fa77fae26e7c01793990996c581aa49f99ae99ae9daddd1fb79b73d2db28',1,'entt']]]
+  ['cref_0',['cref',['../namespaceentt.html#add777bc22ff30abfbf52abd37d4e1549a1e67f2ff0161fbaf51eccefa9abc6ad2',1,'entt']]]
 ];

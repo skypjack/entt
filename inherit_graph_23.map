@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1basic__group_3_01owned__t_3_4_00_01get__t_3_01Get_8_8_8_01_4_00_01exclude__t_3_01Exclude_8_8_8_01_4_01_4.html" title="Non&#45;owning group." alt="" coords="5,5,199,60"/>
+<area shape="rect" id="Node000000" href="$classentt_1_1basic__entt__traits.html" title="Common basic entity traits implementation." alt="" coords="5,37,153,77"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="201,5,360,45"/>
+<area shape="poly" id="edge6_Node000000_Node000001" title=" " alt="" coords="166,41,201,35,202,41,167,46"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="221,69,340,109"/>
+<area shape="poly" id="edge7_Node000000_Node000002" title=" " alt="" coords="168,69,221,77,220,83,167,74"/>
 </map>

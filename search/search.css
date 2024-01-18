@@ -139,7 +139,7 @@ dark-mode-toggle {
 
 span.SelectionMark {
     margin-right: 4px;
-    font-family: monospace,fixed;
+    font-family: 'JetBrains Mono',Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace,fixed;
     outline-style: none;
     text-decoration: none;
 }

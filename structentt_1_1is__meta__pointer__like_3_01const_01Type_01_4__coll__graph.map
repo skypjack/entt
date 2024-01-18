@@ -1,5 +1,7 @@
 <map id="entt::is_meta_pointer_like&lt; const Type &gt;" name="entt::is_meta_pointer_like&lt; const Type &gt;">
-<area shape="rect" id="node1" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="5,167,149,207"/>
-<area shape="rect" id="node2" href="$structentt_1_1is__meta__pointer__like.html" title=" " alt="" coords="5,79,149,119"/>
-<area shape="rect" id="node3" title=" " alt="" coords="24,5,131,31"/>
+<area shape="rect" id="Node000001" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="5,167,149,207"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1is__meta__pointer__like.html" title=" " alt="" coords="5,79,149,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,133,80,166,75,166,75,133"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="24,5,131,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="80,44,80,79,75,79,75,44"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="entt::is_meta_policy&lt; Type &gt;" name="entt::is_meta_policy&lt; Type &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if a type also is a meta policy, false otherwise." alt="" coords="243,42,381,82"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,195,119"/>
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if a type also is a meta policy, false otherwise." alt="" coords="243,42,381,82"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,195,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,59,242,59,242,65,208,65"/>
 </map>

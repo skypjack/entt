@@ -154,7 +154,6 @@ var menudata={children:[
 {text:"r",url:"functions_type_r.html#index_r"},
 {text:"s",url:"functions_type_s.html#index_s"},
 {text:"t",url:"functions_type_t.html#index_t"},
-{text:"v",url:"functions_type_v.html#index_v"}]},
-{text:"Related Functions",url:"functions_rela.html"}]}]},
+{text:"v",url:"functions_type_v.html#index_v"}]}]}]},
 {text:"Files",url:"files.html",children:[
 {text:"File List",url:"files.html"}]}]}
