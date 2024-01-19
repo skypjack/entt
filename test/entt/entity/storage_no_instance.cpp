@@ -601,7 +601,8 @@ TYPED_TEST(StorageNoInstance, SortN) {
     ASSERT_EQ(pool.data()[1u], entity[0u]);
     ASSERT_EQ(pool.data()[2u], entity[2u]);
 
-    pool.sort_n(5u, std::less{}); // NOLINT
+    const auto length = 5u;
+    pool.sort_n(length, std::less{});
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
     ASSERT_EQ(pool.data()[1u], entity[3u]);

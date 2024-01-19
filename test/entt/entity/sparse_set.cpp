@@ -1795,7 +1795,8 @@ TYPED_TEST(SparseSet, SortN) {
         ASSERT_EQ(set.data()[0u], entity[1u]);
         ASSERT_EQ(set.data()[1u], entity[0u]);
 
-        set.sort_n(5u, std::less{}); // NOLINT
+        const auto length = 5u;
+        set.sort_n(length, std::less{});
 
         auto begin = set.begin();
         auto end = set.end();

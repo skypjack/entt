@@ -1307,48 +1307,48 @@ TYPED_TEST(Storage, SortOrdered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
-    value_type values[5u]{value_type{12}, value_type{9}, value_type{6}, value_type{3}, value_type{1}};              // NOLINT
+    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    const std::array value{value_type{8}, value_type{4}, value_type{2}, value_type{1}, value_type{0}};
 
-    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
+    pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(values), std::rend(values), pool.begin(), pool.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 }
 
 TYPED_TEST(Storage, SortReverse) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
-    value_type values[5u]{value_type{1}, value_type{3}, value_type{6}, value_type{9}, value_type{12}};              // NOLINT
+    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    const std::array value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
-    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
+    pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::begin(values), std::end(values), pool.begin(), pool.end()));
+    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(value.begin(), value.end(), pool.begin(), pool.end()));
 }
 
 TYPED_TEST(Storage, SortUnordered) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
-    value_type values[5u]{value_type{6}, value_type{3}, value_type{1}, value_type{9}, value_type{12}};              // NOLINT
+    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    const std::array value{value_type{2}, value_type{1}, value_type{0}, value_type{4}, value_type{8}};
 
-    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
+    pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     auto begin = pool.begin();
     auto end = pool.end();
 
-    ASSERT_EQ(*(begin++), values[2u]);
-    ASSERT_EQ(*(begin++), values[1u]);
-    ASSERT_EQ(*(begin++), values[0u]);
-    ASSERT_EQ(*(begin++), values[3u]);
-    ASSERT_EQ(*(begin++), values[4u]);
+    ASSERT_EQ(*(begin++), value[2u]);
+    ASSERT_EQ(*(begin++), value[1u]);
+    ASSERT_EQ(*(begin++), value[0u]);
+    ASSERT_EQ(*(begin++), value[3u]);
+    ASSERT_EQ(*(begin++), value[4u]);
     ASSERT_EQ(begin, end);
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
@@ -1362,35 +1362,36 @@ TYPED_TEST(Storage, SortN) {
     using value_type = typename TestFixture::type;
     entt::storage<value_type> pool;
 
-    entt::entity entity[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}}; // NOLINT
-    value_type values[5u]{value_type{3}, value_type{6}, value_type{1}, value_type{9}, value_type{12}};              // NOLINT
+    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    const std::array value{value_type{1}, value_type{2}, value_type{0}, value_type{4}, value_type{8}};
 
-    pool.insert(std::begin(entity), std::end(entity), values); // NOLINT
+    pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort_n(0u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(values), std::rend(values), pool.begin(), pool.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 
     pool.sort_n(2u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_EQ(pool.raw()[0u][0u], values[1u]);
-    ASSERT_EQ(pool.raw()[0u][1u], values[0u]);
-    ASSERT_EQ(pool.raw()[0u][2u], values[2u]);
+    ASSERT_EQ(pool.raw()[0u][0u], value[1u]);
+    ASSERT_EQ(pool.raw()[0u][1u], value[0u]);
+    ASSERT_EQ(pool.raw()[0u][2u], value[2u]);
 
     ASSERT_EQ(pool.data()[0u], entity[1u]);
     ASSERT_EQ(pool.data()[1u], entity[0u]);
     ASSERT_EQ(pool.data()[2u], entity[2u]);
 
-    pool.sort_n(5u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); }); // NOLINT
+    const auto length = 5u;
+    pool.sort_n(length, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
     auto begin = pool.begin();
     auto end = pool.end();
 
-    ASSERT_EQ(*(begin++), values[2u]);
-    ASSERT_EQ(*(begin++), values[0u]);
-    ASSERT_EQ(*(begin++), values[1u]);
-    ASSERT_EQ(*(begin++), values[3u]);
-    ASSERT_EQ(*(begin++), values[4u]);
+    ASSERT_EQ(*(begin++), value[2u]);
+    ASSERT_EQ(*(begin++), value[0u]);
+    ASSERT_EQ(*(begin++), value[1u]);
+    ASSERT_EQ(*(begin++), value[3u]);
+    ASSERT_EQ(*(begin++), value[4u]);
     ASSERT_EQ(begin, end);
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
@@ -1405,18 +1406,18 @@ TYPED_TEST(Storage, SortAsDisjoint) {
     entt::storage<value_type> lhs;
     const entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
-    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};           // NOLINT
+    const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
+    const std::array value{value_type{0}, value_type{1}, value_type{2}};
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
+    lhs.insert(entity.begin(), entity.end(), value.begin());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 
     lhs.sort_as(rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 }
 
 TYPED_TEST(Storage, SortAsOverlap) {
@@ -1424,30 +1425,30 @@ TYPED_TEST(Storage, SortAsOverlap) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
-    value_type lhs_values[3u]{value_type{3}, value_type{6}, value_type{9}};           // NOLINT
+    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
+    const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}};
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
+    lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    entt::entity rhs_entity[1u]{entt::entity{12}}; // NOLINT
-    value_type rhs_values[1u]{value_type{6}};      // NOLINT
+    const std::array rhs_entity{entt::entity{2}};
+    const std::array rhs_value{value_type{1}};
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
+    rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
     lhs.sort_as(rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end());
 
     auto begin = lhs.begin();
     auto end = lhs.end();
 
-    ASSERT_EQ(*(begin++), lhs_values[1u]);
-    ASSERT_EQ(*(begin++), lhs_values[2u]);
-    ASSERT_EQ(*(begin++), lhs_values[0u]);
+    ASSERT_EQ(*(begin++), lhs_value[1u]);
+    ASSERT_EQ(*(begin++), lhs_value[2u]);
+    ASSERT_EQ(*(begin++), lhs_value[0u]);
     ASSERT_EQ(begin, end);
 
     ASSERT_EQ(lhs.data()[0u], lhs_entity[0u]);
@@ -1460,26 +1461,26 @@ TYPED_TEST(Storage, SortAsOrdered) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
+    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
+    lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
-    value_type rhs_values[6u]{value_type{6}, value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};               // NOLINT
+    const std::array rhs_entity{entt::entity{32}, entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    const std::array rhs_value{value_type{16}, value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
+    rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
     rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 }
 
 TYPED_TEST(Storage, SortAsReverse) {
@@ -1487,33 +1488,33 @@ TYPED_TEST(Storage, SortAsReverse) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
+    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
+    lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}}; // NOLINT
-    value_type rhs_values[6u]{value_type{5}, value_type{4}, value_type{3}, value_type{2}, value_type{1}, value_type{6}};               // NOLINT
+    const std::array rhs_entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{32}};
+    const std::array rhs_value{value_type{8}, value_type{4}, value_type{2}, value_type{1}, value_type{0}, value_type{16}};
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
+    rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
     rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
 
-    ASSERT_EQ(*(begin++), rhs_values[0u]);
-    ASSERT_EQ(*(begin++), rhs_values[1u]);
-    ASSERT_EQ(*(begin++), rhs_values[2u]);
-    ASSERT_EQ(*(begin++), rhs_values[3u]);
-    ASSERT_EQ(*(begin++), rhs_values[4u]);
-    ASSERT_EQ(*(begin++), rhs_values[5u]);
+    ASSERT_EQ(*(begin++), rhs_value[0u]);
+    ASSERT_EQ(*(begin++), rhs_value[1u]);
+    ASSERT_EQ(*(begin++), rhs_value[2u]);
+    ASSERT_EQ(*(begin++), rhs_value[3u]);
+    ASSERT_EQ(*(begin++), rhs_value[4u]);
+    ASSERT_EQ(*(begin++), rhs_value[5u]);
     ASSERT_EQ(begin, end);
 
     ASSERT_EQ(rhs.data()[0u], rhs_entity[5u]);
@@ -1529,33 +1530,33 @@ TYPED_TEST(Storage, SortAsUnordered) {
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
-    value_type lhs_values[5u]{value_type{1}, value_type{2}, value_type{3}, value_type{4}, value_type{5}};             // NOLINT
+    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
-    lhs.insert(std::begin(lhs_entity), std::end(lhs_entity), lhs_values); // NOLINT
+    lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}}; // NOLINT
-    value_type rhs_values[6u]{value_type{3}, value_type{2}, value_type{6}, value_type{1}, value_type{4}, value_type{5}};               // NOLINT
+    const std::array rhs_entity{entt::entity{4}, entt::entity{2}, entt::entity{32}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
+    const std::array rhs_value{value_type{2}, value_type{1}, value_type{16}, value_type{0}, value_type{4}, value_type{8}};
 
-    rhs.insert(std::begin(rhs_entity), std::end(rhs_entity), rhs_values); // NOLINT
+    rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_values), std::rend(lhs_values), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_values), std::rend(rhs_values), rhs.begin(), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
     rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
 
-    ASSERT_EQ(*(begin++), rhs_values[5u]);
-    ASSERT_EQ(*(begin++), rhs_values[4u]);
-    ASSERT_EQ(*(begin++), rhs_values[0u]);
-    ASSERT_EQ(*(begin++), rhs_values[1u]);
-    ASSERT_EQ(*(begin++), rhs_values[3u]);
-    ASSERT_EQ(*(begin++), rhs_values[2u]);
+    ASSERT_EQ(*(begin++), rhs_value[5u]);
+    ASSERT_EQ(*(begin++), rhs_value[4u]);
+    ASSERT_EQ(*(begin++), rhs_value[0u]);
+    ASSERT_EQ(*(begin++), rhs_value[1u]);
+    ASSERT_EQ(*(begin++), rhs_value[3u]);
+    ASSERT_EQ(*(begin++), rhs_value[2u]);
     ASSERT_EQ(begin, end);
 
     ASSERT_EQ(rhs.data()[0u], rhs_entity[2u]);

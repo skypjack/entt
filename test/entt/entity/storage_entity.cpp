@@ -544,31 +544,31 @@ TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
 TEST(StorageEntity, SortOrdered) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}}; // NOLINT
+    const std::array entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}};
 
-    pool.push(std::begin(entity), std::end(entity));
+    pool.push(entity.begin(), entity.end());
     pool.sort(std::less{});
 
-    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(0), pool.end(0)));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(0), pool.end(0)));
 }
 
 TEST(StorageEntity, SortReverse) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
 
-    pool.push(std::begin(entity), std::end(entity));
+    pool.push(entity.begin(), entity.end());
     pool.sort(std::less{});
 
-    ASSERT_TRUE(std::equal(std::begin(entity), std::end(entity), pool.begin(0), pool.end(0)));
+    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.begin(0), pool.end(0)));
 }
 
 TEST(StorageEntity, SortUnordered) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    const std::array entity{entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
-    pool.push(std::begin(entity), std::end(entity));
+    pool.push(entity.begin(), entity.end());
     pool.sort(std::less{});
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
@@ -581,12 +581,12 @@ TEST(StorageEntity, SortUnordered) {
 TEST(StorageEntity, SortN) {
     entt::storage<entt::entity> pool;
 
-    entt::entity entity[5u]{entt::entity{7}, entt::entity{9}, entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    const std::array entity{entt::entity{2}, entt::entity{4}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
-    pool.push(std::begin(entity), std::end(entity));
+    pool.push(entity.begin(), entity.end());
     pool.sort_n(0u, std::less{});
 
-    ASSERT_TRUE(std::equal(std::rbegin(entity), std::rend(entity), pool.begin(0), pool.end(0)));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(0), pool.end(0)));
 
     pool.sort_n(2u, std::less{});
 
@@ -594,7 +594,8 @@ TEST(StorageEntity, SortN) {
     ASSERT_EQ(pool.data()[1u], entity[0u]);
     ASSERT_EQ(pool.data()[2u], entity[2u]);
 
-    pool.sort_n(5u, std::less{}); // NOLINT
+    const auto length = 5u;
+    pool.sort_n(length, std::less{});
 
     ASSERT_EQ(pool.data()[0u], entity[4u]);
     ASSERT_EQ(pool.data()[1u], entity[3u]);
@@ -607,29 +608,29 @@ TEST(StorageEntity, SortAsDisjoint) {
     entt::storage<entt::entity> lhs;
     const entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
+    std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
 
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
+    lhs.push(entity.begin(), entity.end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(0), lhs.end(0)));
 
     lhs.sort_as(rhs.begin(0), rhs.end(0));
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(0), lhs.end(0)));
 }
 
 TEST(StorageEntity, SortAsOverlap) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[3u]{entt::entity{3}, entt::entity{12}, entt::entity{42}}; // NOLINT
-    entt::entity rhs_entity[1u]{entt::entity{12}};                                    // NOLINT
+    std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
+    std::array rhs_entity{entt::entity{2}};
 
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+    lhs.push(lhs_entity.begin(), lhs_entity.end());
+    rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end(0)));
 
     lhs.sort_as(rhs.begin(0), rhs.end(0));
 
@@ -642,32 +643,32 @@ TEST(StorageEntity, SortAsOrdered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
-    entt::entity rhs_entity[6u]{entt::entity{6}, entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    std::array rhs_entity{entt::entity{32}, entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
 
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+    lhs.push(lhs_entity.begin(), lhs_entity.end());
+    rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end(0)));
 
     rhs.sort_as(lhs.begin(0), lhs.end(0));
 
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end(0)));
 }
 
 TEST(StorageEntity, SortAsReverse) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
-    entt::entity rhs_entity[6u]{entt::entity{5}, entt::entity{4}, entt::entity{3}, entt::entity{2}, entt::entity{1}, entt::entity{6}}; // NOLINT
+    std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    std::array rhs_entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{32}};
 
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+    lhs.push(lhs_entity.begin(), lhs_entity.end());
+    rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end(0)));
 
     rhs.sort_as(lhs.begin(0), lhs.end(0));
 
@@ -683,14 +684,14 @@ TEST(StorageEntity, SortAsUnordered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
 
-    entt::entity lhs_entity[5u]{entt::entity{1}, entt::entity{2}, entt::entity{3}, entt::entity{4}, entt::entity{5}};                  // NOLINT
-    entt::entity rhs_entity[6u]{entt::entity{3}, entt::entity{2}, entt::entity{6}, entt::entity{1}, entt::entity{4}, entt::entity{5}}; // NOLINT
+    std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    std::array rhs_entity{entt::entity{4}, entt::entity{2}, entt::entity{32}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
-    lhs.push(std::begin(lhs_entity), std::end(lhs_entity));
-    rhs.push(std::begin(rhs_entity), std::end(rhs_entity));
+    lhs.push(lhs_entity.begin(), lhs_entity.end());
+    rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(std::rbegin(lhs_entity), std::rend(lhs_entity), lhs.begin(0), lhs.end(0)));
-    ASSERT_TRUE(std::equal(std::rbegin(rhs_entity), std::rend(rhs_entity), rhs.begin(0), rhs.end(0)));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end(0)));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end(0)));
 
     rhs.sort_as(lhs.begin(0), lhs.end(0));
 
