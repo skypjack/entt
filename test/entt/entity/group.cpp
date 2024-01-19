@@ -1478,6 +1478,25 @@ TEST(OwningGroup, PreventEarlyOptOut) {
     });
 }
 
+TEST(OwningGroup, SwapElements) {
+    entt::registry registry;
+    std::array entity{registry.create(), registry.create(), registry.create()};
+
+    registry.emplace<int>(entity[1u]);
+    registry.emplace<int>(entity[0u]);
+
+    registry.emplace<char>(entity[2u]);
+    registry.emplace<char>(entity[0u]);
+
+    ASSERT_EQ(registry.storage<int>().index(entity[0u]), 1u);
+    ASSERT_EQ(registry.storage<char>().index(entity[0u]), 1u);
+
+    const auto group = registry.group<int>(entt::get<char>);
+
+    ASSERT_EQ(registry.storage<int>().index(entity[0u]), 0u);
+    ASSERT_EQ(registry.storage<char>().index(entity[0u]), 1u);
+}
+
 TEST(OwningGroup, SwappingValuesIsAllowed) {
     entt::registry registry;
     const auto group = registry.group<test::boxed_int>(entt::get<test::empty>);
