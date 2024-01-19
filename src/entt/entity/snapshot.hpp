@@ -164,7 +164,7 @@ public:
     basic_snapshot_loader(registry_type &source) noexcept
         : reg{&source} {
         // restoring a snapshot as a whole requires a clean registry
-        ENTT_ASSERT(reg->template storage<entity_type>().empty() && (reg->storage().begin() == reg->storage().end()), "Registry must be empty");
+        ENTT_ASSERT(reg->template storage<entity_type>().free_list() == 0u, "Registry must be empty");
     }
 
     /*! @brief Default move constructor. */
