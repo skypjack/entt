@@ -222,6 +222,11 @@ TEST(BasicSnapshotLoader, Constructors) {
     static_assert(std::is_move_assignable_v<entt::basic_snapshot_loader<entt::registry>>, "Move assignable type required");
 
     entt::registry registry;
+
+    // helps stress the check in the constructor
+    registry.emplace<int>(registry.create(), 0);
+    registry.clear();
+
     entt::basic_snapshot_loader loader{registry};
     entt::basic_snapshot_loader other{std::move(loader)};
 
