@@ -1516,7 +1516,7 @@ TEST(OwningGroup, SwapElements) {
     ASSERT_EQ(registry.storage<int>().index(entity[0u]), 1u);
     ASSERT_EQ(registry.storage<char>().index(entity[0u]), 1u);
 
-    const auto group = registry.group<int>(entt::get<char>);
+    registry.group<int>(entt::get<char>);
 
     ASSERT_EQ(registry.storage<int>().index(entity[0u]), 0u);
     ASSERT_EQ(registry.storage<char>().index(entity[0u]), 1u);
