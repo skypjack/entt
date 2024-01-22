@@ -1065,14 +1065,6 @@ public:
         }
     }
 
-    /**
-     * @copybrief sort_as
-     * @param other The sparse sets that imposes the order of the entities.
-     */
-    [[deprecated("use iterator based sort_as instead")]] void sort_as(const basic_sparse_set &other) {
-        sort_as(other.begin(), other.end());
-    }
-
     /*! @brief Clears a sparse set. */
     void clear() {
         pop_all();

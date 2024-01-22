@@ -1910,7 +1910,7 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs); // NOLINT
+        rhs.sort_as(lhs.begin(), lhs.end());
 
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
     }
