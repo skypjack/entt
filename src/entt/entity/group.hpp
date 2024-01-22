@@ -656,14 +656,6 @@ public:
         }
     }
 
-    /**
-     * @brief Sort entities according to their order in a range.
-     * @param other The storage to use to impose the order.
-     */
-    [[deprecated("use iterator based sort_as instead")]] void sort_as(const common_type &other) const {
-        sort_as(other.begin(), other.end());
-    }
-
 private:
     handler *descriptor;
 };
