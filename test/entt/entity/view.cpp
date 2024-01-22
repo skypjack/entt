@@ -11,7 +11,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
-#include "../common/boxed_int.h"
+#include "../common/boxed_type.h"
 #include "../common/empty.h"
 #include "../common/pointer_stable.h"
 

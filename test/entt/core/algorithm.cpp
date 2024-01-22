@@ -3,7 +3,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/algorithm.hpp>
-#include "../common/boxed_int.h"
+#include "../common/boxed_type.h"
 
 TEST(Algorithm, StdSort) {
     // well, I'm pretty sure it works, it's std::sort!!
