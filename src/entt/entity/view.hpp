@@ -858,15 +858,6 @@ public:
     }
 
     /**
-     * @brief Returns the identifier that occupies the given position.
-     * @param pos Position of the element to return.
-     * @return The identifier that occupies the given position.
-     */
-    [[deprecated("use .begin()[pos] instead")]] [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return base_type::begin()[pos];
-    }
-
-    /**
      * @brief Returns the component assigned to the given entity.
      * @tparam Elem Type of the component to get.
      * @param entt A valid identifier.

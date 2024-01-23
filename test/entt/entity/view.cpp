@@ -175,11 +175,6 @@ TEST(SingleComponentView, ElementAccess) {
     const auto e1 = registry.create();
     registry.emplace<int>(e1, 1);
 
-    for(auto i = 0u; i < view.size(); ++i) {
-        ASSERT_EQ(view[i], i ? e0 : e1);  // NOLINT
-        ASSERT_EQ(cview[i], i ? e0 : e1); // NOLINT
-    }
-
     ASSERT_EQ(view[e0], 4);
     ASSERT_EQ(cview[e1], 1);
 }
