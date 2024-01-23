@@ -579,14 +579,18 @@ TEST(Registry, CreateClearCycle) {
     entt::registry registry;
     entt::entity pre{}, post{};
 
-    for(int i = 0; i < 10; ++i) { // NOLINT
+    const std::size_t first_iteration = 10u;
+    const std::size_t second_iteration = 7u;
+    const std::size_t third_iteration = 5u;
+
+    for(int i = 0; i < first_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<double>(entity);
     }
 
     registry.clear();
 
-    for(int i = 0; i < 7; ++i) { // NOLINT
+    for(int i = 0; i < second_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<int>(entity);
 
@@ -597,7 +601,7 @@ TEST(Registry, CreateClearCycle) {
 
     registry.clear();
 
-    for(int i = 0; i < 5; ++i) { // NOLINT
+    for(int i = 0; i < third_iteration; ++i) {
         const auto entity = registry.create();
 
         if(i == 3) {
@@ -878,7 +882,7 @@ TEST(Registry, View) {
     ASSERT_EQ(std::distance(fview.begin(), fview.end()), 1);
 
     mview.each([&entity, first = true](auto entt, auto &&...) mutable {
-        ASSERT_EQ(entt, entity[2u * first]); // NOLINT
+        ASSERT_EQ(entt, first ? entity[2u] : entity[0u]);
         first = false;
     });
 
