@@ -951,23 +951,12 @@ TYPED_TEST(SparseSet, Indexing) {
     for(const auto policy: this->deletion_policy) {
         sparse_set_type set{policy};
 
-        ASSERT_EQ(set.size(), 0u);
+        const std::array entity{entity_type{1}, entity_type{2}};
 
-        ASSERT_EQ(set.at(0u), static_cast<entity_type>(entt::null)); // NOLINT
-        ASSERT_EQ(set.at(3u), static_cast<entity_type>(entt::null)); // NOLINT
+        set.push(entity.begin(), entity.end());
 
-        const entity_type entity{1};
-        const entity_type other{2};
-
-        set.push(entity);
-        set.push(other);
-
-        ASSERT_EQ(set.size(), 2u);
-
-        ASSERT_EQ(set.at(0u), entity); // NOLINT
-        ASSERT_EQ(set.at(1u), other);  // NOLINT
-
-        ASSERT_EQ(set.at(2u), static_cast<entity_type>(entt::null)); // NOLINT
+        ASSERT_EQ(set[0u], entity[0u]);
+        ASSERT_EQ(set[1u], entity[1u]);
     }
 }
 

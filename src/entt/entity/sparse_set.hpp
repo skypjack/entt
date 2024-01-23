@@ -750,15 +750,6 @@ public:
     }
 
     /**
-     * @brief Returns the entity at specified location, with bounds checking.
-     * @param pos The position for which to return the entity.
-     * @return The entity at specified location if any, a null entity otherwise.
-     */
-    [[deprecated("use .begin()[pos] instead")]] [[nodiscard]] entity_type at(const size_type pos) const noexcept {
-        return pos < packed.size() ? packed[pos] : null;
-    }
-
-    /**
      * @brief Returns the entity at specified location, without bounds checking.
      * @param pos The position for which to return the entity.
      * @return The entity at specified location.
