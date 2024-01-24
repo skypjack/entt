@@ -290,23 +290,29 @@ TEST(StorageEntity, Pack) {
     ASSERT_EQ(it, pool.cend());
 }
 
-TEST(StorageEntity, InUse) {
+TEST(StorageEntity, FreeList) {
     entt::storage<entt::entity> pool;
 
     pool.emplace(entt::entity{0});
 
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
     ASSERT_EQ(pool.free_list(), 1u);
+    ASSERT_EQ(pool.begin(), pool.begin(0));
+    ASSERT_EQ(pool.end(), pool.end(0));
+    ASSERT_EQ(pool.size(), 1u);
 
-    pool.in_use(0u); // NOLINT
+    pool.free_list(0u);
 
-    ASSERT_EQ(pool.in_use(), 0u); // NOLINT
     ASSERT_EQ(pool.free_list(), 0u);
+    ASSERT_NE(pool.begin(), pool.begin(0));
+    ASSERT_EQ(pool.end(), pool.end(0));
+    ASSERT_EQ(pool.size(), 1u);
 
-    pool.in_use(1u); // NOLINT
+    pool.free_list(1u);
 
-    ASSERT_EQ(pool.in_use(), 1u); // NOLINT
     ASSERT_EQ(pool.free_list(), 1u);
+    ASSERT_EQ(pool.begin(), pool.begin(0));
+    ASSERT_EQ(pool.end(), pool.end(0));
+    ASSERT_EQ(pool.size(), 1u);
 }
 
 ENTT_DEBUG_TEST(StorageEntityDeathTest, InUse) {

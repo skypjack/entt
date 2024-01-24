@@ -1137,22 +1137,6 @@ public:
     }
 
     /**
-     * @brief Returns the number of elements considered still in use.
-     * @return The number of elements considered still in use.
-     */
-    [[deprecated("use free_list() instead")]] [[nodiscard]] size_type in_use() const noexcept {
-        return base_type::free_list();
-    }
-
-    /**
-     * @brief Sets the number of elements considered still in use.
-     * @param len The number of elements considered still in use.
-     */
-    [[deprecated("use free_list(len) instead")]] void in_use(const size_type len) noexcept {
-        base_type::free_list(len);
-    }
-
-    /**
      * @brief Returns an iterable object to use to _visit_ a storage.
      *
      * The iterable object returns a tuple that contains the current entity.
