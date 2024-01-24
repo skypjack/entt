@@ -63,7 +63,6 @@ TEST_F(Any, SBO) {
     entt::any any{'c'};
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(any.type(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
@@ -75,7 +74,6 @@ TEST_F(Any, NoSBO) {
     entt::any any{instance};
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::any_policy::owner);
     ASSERT_EQ(any.type(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
