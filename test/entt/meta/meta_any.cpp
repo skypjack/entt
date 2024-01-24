@@ -121,7 +121,6 @@ TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<char>(), 'c');
@@ -135,7 +134,6 @@ TEST_F(MetaAny, NoSBO) {
     entt::meta_any any{instance};
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(any.owner()); // NOLINT
     ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<fat_t>(), instance);

@@ -605,11 +605,6 @@ public:
         return meta_any{*ctx, *this, storage.as_ref()};
     }
 
-    /*! @copydoc any::owner */
-    [[deprecated("use policy() and meta_any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
-        return (storage.policy() == any_policy::owner);
-    }
-
     /**
      * @brief Returns the current mode of a meta any object.
      * @return The current mode of the meta any object.
