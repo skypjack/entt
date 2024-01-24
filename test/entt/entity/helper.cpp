@@ -67,13 +67,10 @@ TYPED_TEST(ToEntity, Functionalities) {
     entt::registry registry;
     const entt::entity null = entt::null;
 
-    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
-
     auto &storage = registry.storage<value_type>();
     constexpr auto page_size = entt::storage_type_t<value_type>::traits_type::page_size;
-    const value_type value{42};
+    const value_type value{4};
 
-    ASSERT_EQ(entt::to_entity(registry, value_type{42}), null); // NOLINT
     ASSERT_EQ(entt::to_entity(storage, value), null);
 
     const auto entity = registry.create();
@@ -89,7 +86,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     registry.emplace<value_type>(other);
     registry.emplace<value_type>(next);
 
-    ASSERT_EQ(entt::to_entity(registry, registry.get<value_type>(entity)), entity); // NOLINT
+    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(entity)), entity);
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(other)), other);
     ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
 
@@ -102,7 +99,6 @@ TYPED_TEST(ToEntity, Functionalities) {
 
     ASSERT_EQ(&registry.get<value_type>(entity) + page_size - 1u, &registry.get<value_type>(next)); // NOLINT
 
-    ASSERT_EQ(entt::to_entity(storage, value_type{42}), null);
     ASSERT_EQ(entt::to_entity(storage, value), null);
 }
 

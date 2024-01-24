@@ -139,23 +139,6 @@ auto to_entity(const basic_storage<Args...> &storage, const typename basic_stora
     return null;
 }
 
-/**
- * @copybrief to_entity
- * @tparam Args Registry type template parameters.
- * @tparam Component Type of component.
- * @param reg A registry that contains the given entity and its components.
- * @param instance A valid component instance.
- * @return The entity associated with the given component.
- */
-template<typename... Args, typename Component>
-[[deprecated("use storage based to_entity instead")]] typename basic_registry<Args...>::entity_type to_entity(const basic_registry<Args...> &reg, const Component &instance) {
-    if(const auto *storage = reg.template storage<Component>(); storage) {
-        return to_entity(*storage, instance);
-    }
-
-    return null;
-}
-
 /*! @brief Primary template isn't defined on purpose. */
 template<typename...>
 struct sigh_helper;
