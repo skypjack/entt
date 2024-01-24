@@ -477,7 +477,6 @@ TEST(AssociativeContainer, StdMap) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_FALSE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
     ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
@@ -521,7 +520,6 @@ TEST(AssociativeContainer, StdSet) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
-    ASSERT_TRUE(view.key_only()); // NOLINT
     ASSERT_EQ(view.key_type(), entt::resolve<int>());
     ASSERT_EQ(view.mapped_type(), entt::meta_type{});
     ASSERT_EQ(view.value_type(), entt::resolve<int>());

@@ -143,7 +143,6 @@ public:
         data = &instance;
     }
 
-    [[nodiscard]] inline bool key_only() const noexcept;
     [[nodiscard]] inline meta_type key_type() const noexcept;
     [[nodiscard]] inline meta_type mapped_type() const noexcept;
     [[nodiscard]] inline meta_type value_type() const noexcept;
@@ -1888,14 +1887,6 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
  */
 [[nodiscard]] inline meta_sequence_container::operator bool() const noexcept {
     return (data != nullptr);
-}
-
-/**
- * @brief Returns true if a container is also key-only, false otherwise.
- * @return True if the associative container is also key-only, false otherwise.
- */
-[[deprecated("use mapped_type() instead")]] [[nodiscard]] inline bool meta_associative_container::key_only() const noexcept {
-    return (mapped_type_node == nullptr);
 }
 
 /**
