@@ -27,5 +27,5 @@ TODO:
 * review assure conflicts check, hash doesn't fit the purpose maybe
 * allow to zero-sized versions (with non-regression tests)
 * auto type info data from types if present
-* sparse set sort_as should return the length to be a proper drop-in replacement for pack (then review registry destroy)
 * group review: use handler as base with protected members and arrays of common type (see view for further details)
+* swap sets in swap-only mode, return scoped iterators by default, make ::free_list return an iterator if possible

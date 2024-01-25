@@ -1847,8 +1847,9 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
         ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(), lhs.end()));
 
-        lhs.sort_as(rhs.begin(), rhs.end());
+        const auto it = lhs.sort_as(rhs.begin(), rhs.end());
 
+        ASSERT_EQ(it, lhs.begin(0));
         ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(), lhs.end()));
     }
 }
@@ -1870,10 +1871,12 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        lhs.sort_as(rhs.begin(), rhs.end());
+        const auto it = lhs.sort_as(rhs.begin(), rhs.end());
+
+        ASSERT_EQ(it, lhs.begin(0) + rhs_entity.size());
 
         auto begin = lhs.begin();
-        auto end = lhs.end();
+        const auto end = lhs.end();
 
         ASSERT_EQ(*(begin++), lhs_entity[1u]);
         ASSERT_EQ(*(begin++), lhs_entity[2u]);
@@ -1899,8 +1902,9 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs.begin(), lhs.end());
+        const auto it = rhs.sort_as(lhs.begin(), lhs.end());
 
+        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
     }
 }
@@ -1922,10 +1926,12 @@ TYPED_TEST(SparseSet, SortAsReverse) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs.begin(), lhs.end());
+        const auto it = rhs.sort_as(lhs.begin(), lhs.end());
+
+        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
 
         auto begin = rhs.begin();
-        auto end = rhs.end();
+        const auto end = rhs.end();
 
         ASSERT_EQ(*(begin++), rhs_entity[0u]);
         ASSERT_EQ(*(begin++), rhs_entity[1u]);
@@ -1954,10 +1960,12 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs.begin(), lhs.end());
+        const auto it = rhs.sort_as(lhs.begin(), lhs.end());
+
+        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
 
         auto begin = rhs.begin();
-        auto end = rhs.end();
+        const auto end = rhs.end();
 
         ASSERT_EQ(*(begin++), rhs_entity[5u]);
         ASSERT_EQ(*(begin++), rhs_entity[4u]);
@@ -1987,10 +1995,12 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
         ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-        rhs.sort_as(lhs.begin(), lhs.end());
+        const auto it = rhs.sort_as(lhs.begin(), lhs.end());
+
+        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size() - 1u);
 
         auto begin = rhs.begin();
-        auto end = rhs.end();
+        const auto end = rhs.end();
 
         ASSERT_EQ(*(begin++), rhs_entity[0u]);
         ASSERT_EQ(*(begin++), rhs_entity[1u]);
