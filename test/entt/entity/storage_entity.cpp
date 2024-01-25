@@ -272,22 +272,21 @@ TEST(StorageEntity, Pack) {
     pool.push(entity.begin(), entity.end());
     std::swap(entity[0u], entity[1u]);
 
-    const auto len = pool.pack(entity.begin() + 1u, entity.end()); // NOLINT
-    auto it = pool.each().cbegin().base();
+    const auto to = pool.sort_as(entity.begin() + 1u, entity.end());
+    auto from = pool.each().cbegin().base();
 
-    ASSERT_NE(it, pool.cbegin());
-    ASSERT_NE(it, pool.cend());
+    ASSERT_NE(from, pool.cbegin());
+    ASSERT_NE(from, pool.cend());
 
-    ASSERT_EQ(len, 2u);
-    ASSERT_NE(it + len, pool.cend());
-    ASSERT_EQ(it + len + 1u, pool.cend());
+    ASSERT_NE(to, pool.cend());
+    ASSERT_EQ(to + 1u, pool.cend());
 
-    ASSERT_EQ(*it++, entity[1u]);
-    ASSERT_EQ(*it++, entity[2u]);
+    ASSERT_EQ(*from++, entity[1u]);
+    ASSERT_EQ(*from++, entity[2u]);
 
-    ASSERT_NE(it, pool.cend());
-    ASSERT_EQ(*it++, entity[0u]);
-    ASSERT_EQ(it, pool.cend());
+    ASSERT_NE(from, pool.cend());
+    ASSERT_EQ(*from++, entity[0u]);
+    ASSERT_EQ(from, pool.cend());
 }
 
 TEST(StorageEntity, FreeList) {
