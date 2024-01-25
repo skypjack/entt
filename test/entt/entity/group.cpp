@@ -979,10 +979,9 @@ TEST(OwningGroup, Each) {
 TEST(OwningGroup, SortOrdered) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int, char>();
-    constexpr auto number_of_entities = 5u;
 
-    std::array<entt::entity, number_of_entities> entity{};
-    const std::array<test::boxed_int, number_of_entities> value{16, 8, 4, 1, 2};
+    const std::array value{test::boxed_int{16}, test::boxed_int{8}, test::boxed_int{4}, test::boxed_int{1}, test::boxed_int{2}};
+    std::array<entt::entity, value.size()> entity{};
     const std::array other{'a', 'b', 'c'};
 
     registry.create(entity.begin(), entity.end());
@@ -1020,10 +1019,9 @@ TEST(OwningGroup, SortOrdered) {
 TEST(OwningGroup, SortReverse) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int, char>();
-    constexpr auto number_of_entities = 5u;
 
-    std::array<entt::entity, number_of_entities> entity{};
-    const std::array<test::boxed_int, number_of_entities> value{4, 8, 16, 1, 2};
+    const std::array value{test::boxed_int{4}, test::boxed_int{8}, test::boxed_int{16}, test::boxed_int{1}, test::boxed_int{2}};
+    std::array<entt::entity, value.size()> entity{};
     const std::array other{'a', 'b', 'c'};
 
     registry.create(entity.begin(), entity.end());
@@ -1061,10 +1059,9 @@ TEST(OwningGroup, SortReverse) {
 TEST(OwningGroup, SortUnordered) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int>(entt::get<char>);
-    constexpr auto number_of_entities = 7u;
 
-    std::array<entt::entity, number_of_entities> entity{};
-    const std::array<test::boxed_int, number_of_entities> value{16, 2, 1, 32, 64, 4, 8};
+    const std::array value{test::boxed_int{16}, test::boxed_int{2}, test::boxed_int{1}, test::boxed_int{32}, test::boxed_int{64}, test::boxed_int{4}, test::boxed_int{8}};
+    std::array<entt::entity, value.size()> entity{};
     const std::array other{'c', 'b', 'a', 'd', 'e'};
 
     registry.create(entity.begin(), entity.end());
@@ -1106,10 +1103,9 @@ TEST(OwningGroup, SortUnordered) {
 TEST(OwningGroup, SortWithExclusionList) {
     entt::registry registry;
     auto group = registry.group<test::boxed_int>(entt::get<>, entt::exclude<char>);
-    constexpr auto number_of_entities = 5u;
 
-    std::array<entt::entity, number_of_entities> entity{};
-    const std::array<test::boxed_int, number_of_entities> value{1, 2, 4, 8, 16};
+    const std::array value{test::boxed_int{1}, test::boxed_int{2}, test::boxed_int{4}, test::boxed_int{8}, test::boxed_int{16}};
+    std::array<entt::entity, value.size()> entity{};
 
     registry.create(entity.begin(), entity.end());
     registry.insert<test::boxed_int>(entity.begin(), entity.end(), value.begin());
