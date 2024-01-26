@@ -6,6 +6,7 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>
 #include "../common/config.h"
+#include "../common/linter.hpp"
 
 template<typename Base>
 struct common_type: Base {
@@ -223,9 +224,10 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_EQ(copy->get(), 3);
 
     poly_type move = std::move(copy);
+    test::is_initialized(copy);
 
     ASSERT_TRUE(move);
-    ASSERT_TRUE(copy); // NOLINT
+    ASSERT_TRUE(copy);
     ASSERT_EQ(move->get(), 3);
 
     move.reset();
@@ -390,32 +392,44 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 
 TYPED_TEST(Poly, SboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    typename TestFixture::template type<alignment, alignment> sbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
+    using poly_type = typename TestFixture::template type<alignment, alignment>;
+
+    poly_type sbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
     const auto *data = sbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u); // NOLINT
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u); // NOLINT
+    // NOLINTBEGIN(*-reinterpret-cast)
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
+    // NOLINTEND(*-reinterpret-cast)
 
     std::swap(sbo[0], sbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u); // NOLINT
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u); // NOLINT
+    // NOLINTBEGIN(*-reinterpret-cast)
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
+    // NOLINTEND(*-reinterpret-cast)
 
     ASSERT_NE(data, sbo[1].data());
 }
 
 TYPED_TEST(Poly, NoSboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    typename TestFixture::template type<alignment> nosbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
+    using poly_type = typename TestFixture::template type<alignment>;
+
+    poly_type nosbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
     const auto *data = nosbo[0].data();
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u); // NOLINT
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u); // NOLINT
+    // NOLINTBEGIN(*-reinterpret-cast)
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
+    // NOLINTEND(*-reinterpret-cast)
 
     std::swap(nosbo[0], nosbo[1]);
 
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u); // NOLINT
-    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u); // NOLINT
+    // NOLINTBEGIN(*-reinterpret-cast)
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
+    ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
+    // NOLINTEND(*-reinterpret-cast)
 
     ASSERT_EQ(data, nosbo[1].data());
 }
