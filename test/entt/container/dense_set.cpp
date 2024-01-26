@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -11,6 +12,7 @@
 #include <entt/container/dense_set.hpp>
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
+#include "../common/linter.hpp"
 #include "../common/throwing_allocator.hpp"
 #include "../common/tracked_memory_resource.hpp"
 #include "../common/transparent_equal_to.h"
@@ -111,58 +113,63 @@ TEST(DenseSet, Constructors) {
 
 TEST(DenseSet, Copy) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f);
+    const auto max_load_factor = set.max_load_factor() - .05f;
+    set.max_load_factor(max_load_factor);
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{set};
 
     ASSERT_TRUE(set.contains(3u));
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_EQ(set.max_load_factor(), other.max_load_factor());
+    ASSERT_EQ(other.max_load_factor(), max_load_factor);
 
-    set.emplace(1u);
-    set.emplace(11u); // NOLINT
-    other.emplace(0u);
+    set.emplace(0u);
+    set.emplace(8u);
+    other.emplace(1u);
     other = set;
 
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_TRUE(other.contains(1u));
-    ASSERT_TRUE(other.contains(11u));
-    ASSERT_FALSE(other.contains(0u));
+    ASSERT_TRUE(other.contains(0u));
+    ASSERT_TRUE(other.contains(8u));
+    ASSERT_FALSE(other.contains(1u));
 
-    ASSERT_EQ(other.bucket(3u), set.bucket(11u));
-    ASSERT_EQ(other.bucket(3u), other.bucket(11u));
-    ASSERT_EQ(*other.begin(3u), *set.begin(3u));
-    ASSERT_EQ(*other.begin(3u), 11u);
-    ASSERT_EQ((*++other.begin(3u)), 3u);
+    ASSERT_EQ(other.bucket(0u), set.bucket(8u));
+    ASSERT_EQ(other.bucket(0u), other.bucket(8u));
+    ASSERT_EQ(*other.begin(0u), *set.begin(0u));
+    ASSERT_EQ(*other.begin(0u), 8u);
+    ASSERT_EQ((*++other.begin(0u)), 0u);
 }
 
 TEST(DenseSet, Move) {
     entt::dense_set<std::size_t, entt::identity> set;
-    set.max_load_factor(set.max_load_factor() - .05f);
+    const auto max_load_factor = set.max_load_factor() - .05f;
+    set.max_load_factor(max_load_factor);
     set.emplace(3u);
 
     entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
 
-    ASSERT_EQ(set.size(), 0u); // NOLINT
+    test::is_initialized(set);
+
+    ASSERT_TRUE(set.empty());
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_EQ(set.max_load_factor(), other.max_load_factor());
+    ASSERT_EQ(other.max_load_factor(), max_load_factor);
 
     set = other;
-    set.emplace(1u);
-    set.emplace(11u); // NOLINT
-    other.emplace(0u);
+    set.emplace(0u);
+    set.emplace(8u);
+    other.emplace(1u);
     other = std::move(set);
+    test::is_initialized(set);
 
-    ASSERT_EQ(set.size(), 0u); // NOLINT
+    ASSERT_TRUE(set.empty());
     ASSERT_TRUE(other.contains(3u));
-    ASSERT_TRUE(other.contains(1u));
-    ASSERT_TRUE(other.contains(11u));
-    ASSERT_FALSE(other.contains(0u));
+    ASSERT_TRUE(other.contains(0u));
+    ASSERT_TRUE(other.contains(8u));
+    ASSERT_FALSE(other.contains(1u));
 
-    ASSERT_EQ(other.bucket(3u), other.bucket(11u));
-    ASSERT_EQ(*other.begin(3u), 11u);
-    ASSERT_EQ(*++other.begin(3u), 3u);
+    ASSERT_EQ(other.bucket(0u), other.bucket(8u));
+    ASSERT_EQ(*other.begin(0u), 8u);
+    ASSERT_EQ(*++other.begin(0u), 0u);
 }
 
 TEST(DenseSet, Iterator) {
@@ -445,12 +452,12 @@ TEST(DenseSet, Insert) {
     ASSERT_EQ(it, --set.end());
     ASSERT_EQ(*it, 3);
 
-    int range[2u]{7, 9}; // NOLINT
+    std::array range{2, 4};
     set.insert(std::begin(range), std::end(range));
 
     ASSERT_EQ(set.size(), 4u);
-    ASSERT_TRUE(set.contains(7));
-    ASSERT_NE(set.find(9), set.end());
+    ASSERT_TRUE(set.contains(2));
+    ASSERT_NE(set.find(4), set.end());
 }
 
 TEST(DenseSet, InsertRehash) {
@@ -895,13 +902,13 @@ TEST(DenseSet, Rehash) {
     ASSERT_TRUE(set.contains(32u));
     ASSERT_EQ(set.bucket(32u), 0u);
 
-    set.rehash(12u); // NOLINT
+    set.rehash(minimum_bucket_count + 1u);
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
     ASSERT_EQ(set.bucket(32u), 0u);
 
-    set.rehash(44u); // NOLINT
+    set.rehash(4u * minimum_bucket_count + 1u);
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
@@ -925,7 +932,7 @@ TEST(DenseSet, Rehash) {
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
 
-    set.rehash(55u); // NOLINT
+    set.rehash(4u * minimum_bucket_count + 4u);
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
