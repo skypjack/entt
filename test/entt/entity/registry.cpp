@@ -583,28 +583,28 @@ TEST(Registry, CreateClearCycle) {
     const std::size_t second_iteration = 7u;
     const std::size_t third_iteration = 5u;
 
-    for(int i = 0; i < first_iteration; ++i) {
+    for(std::size_t i{}; i < first_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<double>(entity);
     }
 
     registry.clear();
 
-    for(int i = 0; i < second_iteration; ++i) {
+    for(std::size_t i{}; i < second_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<int>(entity);
 
-        if(i == 3) {
+        if(i == 3u) {
             pre = entity;
         }
     }
 
     registry.clear();
 
-    for(int i = 0; i < third_iteration; ++i) {
+    for(std::size_t i{}; i < third_iteration; ++i) {
         const auto entity = registry.create();
 
-        if(i == 3) {
+        if(i == 3u) {
             post = entity;
         }
     }
