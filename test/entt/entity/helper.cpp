@@ -83,21 +83,23 @@ TYPED_TEST(ToEntity, Functionalities) {
     const auto other = registry.create();
     const auto next = registry.create();
 
-    registry.emplace<value_type>(other);
-    registry.emplace<value_type>(next);
+    storage.emplace(other);
+    storage.emplace(next);
 
-    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(entity)), entity);
-    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(other)), other);
-    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(entity)), entity);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(other)), other);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(next)), next);
 
-    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - (1u + traits_type::in_place_delete), &registry.get<value_type>(other)); // NOLINT
+    ASSERT_EQ(*storage.entt::sparse_set::rbegin(), entity);
+    ASSERT_EQ(&*(storage.rbegin() + page_size - (1u + traits_type::in_place_delete)), &storage.get(other));
 
     registry.destroy(other);
 
-    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(entity)), entity);
-    ASSERT_EQ(entt::to_entity(storage, registry.get<value_type>(next)), next);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(entity)), entity);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(next)), next);
 
-    ASSERT_EQ(&registry.get<value_type>(entity) + page_size - 1u, &registry.get<value_type>(next)); // NOLINT
+    ASSERT_EQ(*storage.entt::sparse_set::rbegin(), entity);
+    ASSERT_EQ(&*(storage.rbegin() + page_size - 1u), &storage.get(next));
 
     ASSERT_EQ(entt::to_entity(storage, value), null);
 }
