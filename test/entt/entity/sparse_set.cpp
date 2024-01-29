@@ -14,6 +14,7 @@
 #include <entt/entity/sparse_set.hpp>
 #include "../common/config.h"
 #include "../common/custom_entity.h"
+#include "../common/linter.hpp"
 #include "../common/throwing_allocator.hpp"
 
 struct custom_entity_traits {
@@ -94,46 +95,43 @@ TYPED_TEST(SparseSet, Move) {
 
         sparse_set_type other{std::move(set)};
 
-        ASSERT_TRUE(set.empty()); // NOLINT
+        test::is_initialized(set);
+
+        ASSERT_TRUE(set.empty());
         ASSERT_FALSE(other.empty());
 
-        ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
-
         ASSERT_EQ(other.index(entity_type{1}), 0u);
 
         sparse_set_type extended{std::move(other), allocator_type{}};
 
-        ASSERT_TRUE(other.empty()); // NOLINT
+        test::is_initialized(other);
+
+        ASSERT_TRUE(other.empty());
         ASSERT_FALSE(extended.empty());
 
-        ASSERT_EQ(other.policy(), policy); // NOLINT
         ASSERT_EQ(extended.policy(), policy);
-
         ASSERT_EQ(extended.index(entity_type{1}), 0u);
 
         set = std::move(extended);
+        test::is_initialized(extended);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());    // NOLINT
-        ASSERT_TRUE(extended.empty()); // NOLINT
+        ASSERT_TRUE(other.empty());
+        ASSERT_TRUE(extended.empty());
 
         ASSERT_EQ(set.policy(), policy);
-        ASSERT_EQ(other.policy(), policy);    // NOLINT
-        ASSERT_EQ(extended.policy(), policy); // NOLINT
-
         ASSERT_EQ(set.index(entity_type{1}), 0u);
 
         other = sparse_set_type{policy};
         other.push(entity_type{3});
         other = std::move(set);
+        test::is_initialized(set);
 
-        ASSERT_TRUE(set.empty()); // NOLINT
+        ASSERT_TRUE(set.empty());
         ASSERT_FALSE(other.empty());
 
-        ASSERT_EQ(set.policy(), policy); // NOLINT
         ASSERT_EQ(other.policy(), policy);
-
         ASSERT_EQ(other.index(entity_type{1}), 0u);
     }
 }
@@ -2085,26 +2083,27 @@ TYPED_TEST(SparseSet, CustomAllocator) {
 
         entt::basic_sparse_set<entity_type, test::throwing_allocator<entity_type>> other{std::move(set), allocator};
 
-        ASSERT_TRUE(set.empty()); // NOLINT
+        test::is_initialized(set);
+
+        ASSERT_TRUE(set.empty());
         ASSERT_FALSE(other.empty());
-        ASSERT_EQ(set.capacity(), 0u); // NOLINT
         ASSERT_EQ(other.capacity(), 2u);
         ASSERT_EQ(other.size(), 2u);
 
         set = std::move(other);
+        test::is_initialized(other);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());      // NOLINT
-        ASSERT_EQ(other.capacity(), 0u); // NOLINT
+        ASSERT_TRUE(other.empty());
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);
 
         set.swap(other);
         set = std::move(other);
+        test::is_initialized(other);
 
         ASSERT_FALSE(set.empty());
-        ASSERT_TRUE(other.empty());      // NOLINT
-        ASSERT_EQ(other.capacity(), 0u); // NOLINT
+        ASSERT_TRUE(other.empty());
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);
 

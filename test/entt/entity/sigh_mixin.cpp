@@ -13,6 +13,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
 #include "../common/custom_entity.h"
+#include "../common/linter.hpp"
 #include "../common/non_default_constructible.h"
 #include "../common/pointer_stable.h"
 #include "../common/throwing_allocator.hpp"
@@ -245,13 +246,16 @@ TEST(SighMixin, VoidType) {
 
     entt::sigh_mixin<entt::storage<void>> other{std::move(pool)};
 
-    ASSERT_FALSE(pool.contains(entt::entity{3})); // NOLINT
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
     ASSERT_TRUE(other.contains(entt::entity{3}));
 
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_TRUE(pool.contains(entt::entity{3}));
-    ASSERT_FALSE(other.contains(entt::entity{3})); // NOLINT
+    ASSERT_TRUE(other.empty());
 
     pool.clear();
 
@@ -344,7 +348,9 @@ TYPED_TEST(SighMixin, Move) {
 
     entt::sigh_mixin<entt::storage<value_type>> other{std::move(pool)};
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
@@ -353,9 +359,10 @@ TYPED_TEST(SighMixin, Move) {
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty()); // NOLINT
+    ASSERT_TRUE(other.empty());
 
     ASSERT_EQ(pool.index(entt::entity{3}), 0u);
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
@@ -365,8 +372,9 @@ TYPED_TEST(SighMixin, Move) {
 
     other.emplace(entt::entity{1}, 1);
     other = std::move(pool);
+    test::is_initialized(pool);
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.index(entt::entity{3}), 0u);
@@ -474,26 +482,27 @@ TYPED_TEST(SighMixin, CustomAllocator) {
 
     decltype(pool) other{std::move(pool), allocator};
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(pool.capacity(), 0u); // NOLINT
     ASSERT_NE(other.capacity(), 0u);
     ASSERT_EQ(other.size(), 2u);
 
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());      // NOLINT
-    ASSERT_EQ(other.capacity(), 0u); // NOLINT
+    ASSERT_TRUE(other.empty());
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
     pool.swap(other);
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());      // NOLINT
-    ASSERT_EQ(other.capacity(), 0u); // NOLINT
+    ASSERT_TRUE(other.empty());
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
