@@ -1,3 +1,4 @@
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
@@ -394,7 +395,7 @@ TYPED_TEST(Poly, SboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
     using poly_type = typename TestFixture::template type<alignment, alignment>;
 
-    poly_type sbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
+    std::array<poly_type, 2u> sbo = {over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
     // NOLINTBEGIN(*-reinterpret-cast)
@@ -416,7 +417,7 @@ TYPED_TEST(Poly, NoSboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
     using poly_type = typename TestFixture::template type<alignment>;
 
-    poly_type nosbo[2]{over_aligned{}, over_aligned{}}; // NOLINT
+    std::array<poly_type, 2u> nosbo = {over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 
     // NOLINTBEGIN(*-reinterpret-cast)
