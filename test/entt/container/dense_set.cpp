@@ -619,10 +619,15 @@ TEST(DenseSet, Erase) {
 
     for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
         ASSERT_TRUE(set.contains(next));
+        ASSERT_EQ(set.bucket(next), next);
+        ASSERT_EQ(set.bucket_size(next), 1u);
     }
 
     auto it = set.erase(++set.begin());
     it = set.erase(it, it + 1);
+
+    ASSERT_EQ(set.bucket_size(1u), 0u);
+    ASSERT_EQ(set.bucket_size(8u), 0u);
 
     ASSERT_EQ(*--set.end(), 6u);
     ASSERT_EQ(set.erase(6u), 1u);
@@ -634,17 +639,6 @@ TEST(DenseSet, Erase) {
     ASSERT_EQ(it, ++set.begin());
     ASSERT_EQ(*it, 7u);
     ASSERT_EQ(*--set.end(), 5u);
-
-    for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
-        if(next == 1u || next == 8u || next == 6u) { // NOLINT
-            ASSERT_FALSE(set.contains(next));
-            ASSERT_EQ(set.bucket_size(next), 0u);
-        } else {
-            ASSERT_TRUE(set.contains(next));
-            ASSERT_EQ(set.bucket(next), next);
-            ASSERT_EQ(set.bucket_size(next), 1u);
-        }
-    }
 
     set.erase(set.begin(), set.end());
 
