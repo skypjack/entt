@@ -82,8 +82,8 @@ struct multi_setter_t {
 };
 
 struct array_t {
-    inline static int global[3]; // NOLINT
-    int local[5];                // NOLINT
+    inline static int global[2]; // NOLINT
+    int local[4];                // NOLINT
 };
 
 enum class property_t : entt::id_type {
@@ -526,8 +526,10 @@ TEST_F(MetaData, ArrayStatic) {
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int[3]>());  // NOLINT
-    ASSERT_EQ(data.arg(0u), entt::resolve<int[3]>()); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_EQ(data.type(), entt::resolve<int[2]>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[2]>());
+    // NOLINTEND(*-avoid-c-arrays)
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
@@ -542,8 +544,10 @@ TEST_F(MetaData, Array) {
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int[5]>());  // NOLINT
-    ASSERT_EQ(data.arg(0u), entt::resolve<int[5]>()); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_EQ(data.type(), entt::resolve<int[4]>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int[4]>());
+    // NOLINTEND(*-avoid-c-arrays)
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_TRUE(data.type().is_array());

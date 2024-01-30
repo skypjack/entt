@@ -428,11 +428,15 @@ TEST(MetaPointerLike, DereferenceProxyPointer) {
 }
 
 TEST(MetaPointerLike, DereferenceArray) {
-    const entt::meta_any array{std::in_place_type<int[3]>};             // NOLINT
-    const entt::meta_any array_of_array{std::in_place_type<int[3][3]>}; // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    const entt::meta_any array{std::in_place_type<int[3]>};
+    const entt::meta_any array_of_array{std::in_place_type<int[3][3]>};
+    // NOLINTEND(*-avoid-c-arrays)
 
-    ASSERT_EQ(array.type(), entt::resolve<int[3]>());             // NOLINT
-    ASSERT_EQ(array_of_array.type(), entt::resolve<int[3][3]>()); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_EQ(array.type(), entt::resolve<int[3]>());
+    ASSERT_EQ(array_of_array.type(), entt::resolve<int[3][3]>());
+    // NOLINTEND(*-avoid-c-arrays)
 
     ASSERT_FALSE(*array);
     ASSERT_FALSE(*array_of_array);

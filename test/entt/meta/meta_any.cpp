@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -60,10 +61,10 @@ struct fat_t: empty_t {
     fat_t &operator=(const fat_t &) = default;
 
     bool operator==(const fat_t &other) const {
-        return std::equal(std::begin(value), std::end(value), std::begin(other.value), std::end(other.value));
+        return (value == other.value);
     }
 
-    double value[4]; // NOLINT
+    std::array<double, 4u> value{};
 };
 
 enum class enum_class : unsigned short int {
