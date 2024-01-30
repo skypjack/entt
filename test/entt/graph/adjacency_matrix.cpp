@@ -3,6 +3,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/graph/adjacency_matrix.hpp>
+#include "../common/linter.hpp"
 #include "../common/throwing_allocator.hpp"
 
 TEST(AdjacencyMatrix, Resize) {
@@ -26,17 +27,22 @@ TEST(AdjacencyMatrix, Constructors) {
     adjacency_matrix = entt::adjacency_matrix<entt::directed_tag>{std::allocator<bool>{}};
     adjacency_matrix = entt::adjacency_matrix<entt::directed_tag>{3u, std::allocator<bool>{}};
 
+    ASSERT_TRUE(adjacency_matrix.empty());
     ASSERT_EQ(adjacency_matrix.size(), 3u);
 
     adjacency_matrix.insert(0u, 1u);
 
+    ASSERT_FALSE(adjacency_matrix.empty());
+
     const entt::adjacency_matrix<entt::directed_tag> temp{adjacency_matrix, adjacency_matrix.get_allocator()};
     const entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix), adjacency_matrix.get_allocator()};
 
-    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
-    ASSERT_EQ(other.size(), 3u);
+    test::is_initialized(adjacency_matrix);
 
-    ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));
+    ASSERT_TRUE(adjacency_matrix.empty());
+
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(other.size(), 3u);
     ASSERT_TRUE(other.contains(0u, 1u));
 }
 
@@ -46,10 +52,10 @@ TEST(AdjacencyMatrix, Copy) {
 
     entt::adjacency_matrix<entt::directed_tag> other{adjacency_matrix};
 
-    ASSERT_EQ(adjacency_matrix.size(), 3u);
-    ASSERT_EQ(other.size(), 3u);
-
+    ASSERT_FALSE(adjacency_matrix.empty());
     ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
+
+    ASSERT_EQ(other.size(), 3u);
     ASSERT_TRUE(other.contains(0u, 1u));
 
     adjacency_matrix.resize(4u);
@@ -58,9 +64,10 @@ TEST(AdjacencyMatrix, Copy) {
 
     other = adjacency_matrix;
 
-    ASSERT_EQ(other.size(), 4u);
+    ASSERT_FALSE(adjacency_matrix.empty());
     ASSERT_EQ(adjacency_matrix.size(), 4u);
 
+    ASSERT_EQ(other.size(), 4u);
     ASSERT_TRUE(other.contains(0u, 1u));
     ASSERT_FALSE(other.contains(1u, 2u));
     ASSERT_TRUE(other.contains(0u, 2u));
@@ -72,10 +79,11 @@ TEST(AdjacencyMatrix, Move) {
 
     entt::adjacency_matrix<entt::directed_tag> other{std::move(adjacency_matrix)};
 
-    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
-    ASSERT_EQ(other.size(), 3u);
+    test::is_initialized(adjacency_matrix);
 
-    ASSERT_FALSE(adjacency_matrix.contains(0u, 1u)); // NOLINT
+    ASSERT_TRUE(adjacency_matrix.empty());
+
+    ASSERT_EQ(other.size(), 3u);
     ASSERT_TRUE(other.contains(0u, 1u));
 
     adjacency_matrix = {};
@@ -84,10 +92,11 @@ TEST(AdjacencyMatrix, Move) {
     other.insert(1u, 2u);
 
     other = std::move(adjacency_matrix);
+    test::is_initialized(adjacency_matrix);
+
+    ASSERT_TRUE(adjacency_matrix.empty());
 
     ASSERT_EQ(other.size(), 4u);
-    ASSERT_EQ(adjacency_matrix.size(), 0u); // NOLINT
-
     ASSERT_FALSE(other.contains(0u, 1u));
     ASSERT_FALSE(other.contains(1u, 2u));
     ASSERT_TRUE(other.contains(0u, 2u));
@@ -104,7 +113,13 @@ TEST(AdjacencyMatrix, Swap) {
     ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
     ASSERT_FALSE(other.contains(0u, 1u));
 
+    ASSERT_FALSE(adjacency_matrix.empty());
+    ASSERT_TRUE(other.empty());
+
     adjacency_matrix.swap(other);
+
+    ASSERT_TRUE(adjacency_matrix.empty());
+    ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.size(), 3u);
     ASSERT_EQ(adjacency_matrix.size(), 0u);
@@ -190,12 +205,14 @@ TEST(AdjacencyMatrix, Clear) {
     adjacency_matrix.insert(0u, 1u);
     adjacency_matrix.insert(0u, 2u);
 
+    ASSERT_FALSE(adjacency_matrix.empty());
     ASSERT_TRUE(adjacency_matrix.contains(0u, 1u));
     ASSERT_TRUE(adjacency_matrix.contains(0u, 2u));
     ASSERT_EQ(adjacency_matrix.size(), 3u);
 
     adjacency_matrix.clear();
 
+    ASSERT_TRUE(adjacency_matrix.empty());
     ASSERT_FALSE(adjacency_matrix.contains(0u, 1u));
     ASSERT_FALSE(adjacency_matrix.contains(0u, 2u));
     ASSERT_EQ(adjacency_matrix.size(), 0u);
