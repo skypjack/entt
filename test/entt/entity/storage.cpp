@@ -15,6 +15,7 @@
 #include <entt/entity/storage.hpp>
 #include "../common/aggregate.h"
 #include "../common/config.h"
+#include "../common/linter.hpp"
 #include "../common/pointer_stable.h"
 #include "../common/throwing_allocator.hpp"
 #include "../common/throwing_type.hpp"
@@ -106,49 +107,46 @@ TYPED_TEST(Storage, Move) {
 
     entt::storage<value_type> other{std::move(pool)};
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
-
     ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 
     entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
 
-    ASSERT_TRUE(other.empty()); // NOLINT
+    test::is_initialized(other);
+
+    ASSERT_TRUE(other.empty());
     ASSERT_FALSE(extended.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(extended.type(), entt::type_id<value_type>());
-
     ASSERT_EQ(extended.index(entt::entity{3}), 0u);
     ASSERT_EQ(extended.get(entt::entity{3}), value_type{3});
 
     pool = std::move(extended);
+    test::is_initialized(extended);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());    // NOLINT
-    ASSERT_TRUE(extended.empty()); // NOLINT
+    ASSERT_TRUE(other.empty());
+    ASSERT_TRUE(extended.empty());
 
     ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());    // NOLINT
-    ASSERT_EQ(extended.type(), entt::type_id<value_type>()); // NOLINT
-
     ASSERT_EQ(pool.index(entt::entity{3}), 0u);
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
 
     other = entt::storage<value_type>{};
     other.emplace(entt::entity{2}, 2);
     other = std::move(pool);
+    test::is_initialized(pool);
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>()); // NOLINT
     ASSERT_EQ(other.type(), entt::type_id<value_type>());
-
     ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
 }
@@ -1700,26 +1698,27 @@ TYPED_TEST(Storage, CustomAllocator) {
 
     decltype(pool) other{std::move(pool), allocator};
 
-    ASSERT_TRUE(pool.empty()); // NOLINT
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(pool.capacity(), 0u); // NOLINT
     ASSERT_NE(other.capacity(), 0u);
     ASSERT_EQ(other.size(), 2u);
 
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());      // NOLINT
-    ASSERT_EQ(other.capacity(), 0u); // NOLINT
+    ASSERT_TRUE(other.empty());
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
     pool.swap(other);
     pool = std::move(other);
+    test::is_initialized(other);
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_TRUE(other.empty());      // NOLINT
-    ASSERT_EQ(other.capacity(), 0u); // NOLINT
+    ASSERT_TRUE(other.empty());
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
