@@ -47,14 +47,14 @@ TEST(CompressedPair, ConstructCopyMove) {
     entt::compressed_pair<test::empty, std::unique_ptr<int>> movable{test::empty{}, std::make_unique<int>(1)};
     auto by_move{std::move(movable)};
 
+    ASSERT_TRUE(by_move.second());
     ASSERT_EQ(*by_move.second(), 1);
-    ASSERT_EQ(movable.second(), nullptr); // NOLINT
 
     *by_move.second() = 3;
     movable = std::move(by_move);
 
+    ASSERT_TRUE(movable.second());
     ASSERT_EQ(*movable.second(), 3);
-    ASSERT_EQ(by_move.second(), nullptr); // NOLINT
 }
 
 TEST(CompressedPair, PiecewiseConstruct) {

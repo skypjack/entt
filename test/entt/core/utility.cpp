@@ -27,7 +27,8 @@ TEST(Overload, Functionalities) {
     ASSERT_EQ(entt::overload<void(int)>(&functions::bar), static_cast<void (functions::*)(int)>(&functions::bar));
     ASSERT_EQ(entt::overload<void()>(&functions::bar), static_cast<void (functions::*)()>(&functions::bar));
 
-    functions instance; // NOLINT
+    functions instance;
+    instance.bar(0); // makes the linter happy
 
     ASSERT_NO_THROW(entt::overload<void(int)>(&functions::foo)(0));
     ASSERT_NO_THROW(entt::overload<void()>(&functions::foo)());
