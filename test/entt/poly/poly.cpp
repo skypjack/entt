@@ -12,27 +12,33 @@
 template<typename Base>
 struct common_type: Base {
     void incr() {
-        entt::poly_call<0>(*this);
+        constexpr auto member_index = 0u;
+        entt::poly_call<member_index>(*this);
     }
 
     void set(int v) {
-        entt::poly_call<1>(*this, v);
+        constexpr auto member_index = 1u;
+        entt::poly_call<member_index>(*this, v);
     }
 
     [[nodiscard]] int get() const {
-        return static_cast<int>(entt::poly_call<2>(*this));
+        constexpr auto member_index = 2u;
+        return static_cast<int>(entt::poly_call<member_index>(*this));
     }
 
     void decr() {
-        entt::poly_call<3>(*this);
+        constexpr auto member_index = 3u;
+        entt::poly_call<member_index>(*this);
     }
 
     [[nodiscard]] int mul(int v) const {
-        return static_cast<int>(entt::poly_call<4>(*this, v));
+        constexpr auto member_index = 4u;
+        return static_cast<int>(entt::poly_call<member_index>(*this, v));
     }
 
     [[nodiscard]] int rand() const {
-        return static_cast<int>(entt::poly_call<5>(*this)); // NOLINT
+        constexpr auto member_index = 5u;
+        return static_cast<int>(entt::poly_call<member_index>(*this));
     }
 };
 
