@@ -6,27 +6,33 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/graph/flow.hpp>
 #include "../common/config.h"
+#include "../common/linter.hpp"
 #include "../common/throwing_allocator.hpp"
 
 TEST(Flow, Constructors) {
     entt::flow flow{};
 
+    ASSERT_TRUE(flow.empty());
     ASSERT_EQ(flow.size(), 0u);
 
     flow = entt::flow{std::allocator<entt::id_type>{}};
 
+    ASSERT_TRUE(flow.empty());
     ASSERT_EQ(flow.size(), 0u);
 
     flow.bind(2);
     flow.bind(4);
     flow.bind(8);
 
+    ASSERT_FALSE(flow.empty());
     ASSERT_EQ(flow.size(), 3u);
 
     const entt::flow temp{flow, flow.get_allocator()};
     const entt::flow other{std::move(flow), flow.get_allocator()};
 
-    ASSERT_EQ(flow.size(), 0u); // NOLINT
+    test::is_initialized(flow);
+
+    ASSERT_TRUE(flow.empty());
     ASSERT_EQ(other.size(), 3u);
 
     ASSERT_EQ(other[0u], 2);
@@ -73,7 +79,9 @@ TEST(Flow, Move) {
 
     entt::flow other{std::move(flow)};
 
-    ASSERT_EQ(flow.size(), 0u); // NOLINT
+    test::is_initialized(flow);
+
+    ASSERT_TRUE(flow.empty());
     ASSERT_EQ(other.size(), 3u);
 
     ASSERT_EQ(other[0u], 2);
@@ -85,9 +93,10 @@ TEST(Flow, Move) {
     other.bind(3);
 
     other = std::move(flow);
+    test::is_initialized(flow);
 
+    ASSERT_TRUE(flow.empty());
     ASSERT_EQ(other.size(), 1u);
-    ASSERT_EQ(flow.size(), 0u); // NOLINT
 
     ASSERT_EQ(other[0u], 1);
 }

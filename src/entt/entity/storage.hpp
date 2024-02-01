@@ -1124,35 +1124,6 @@ public:
     }
 
     /**
-     * @brief Makes all elements in a range contiguous.
-     * @tparam It Type of forward iterator.
-     * @param first An iterator to the first element of the range to pack.
-     * @param last An iterator past the last element of the range to pack.
-     * @return The number of elements within the newly created range.
-     */
-    template<typename It>
-    [[deprecated("use sort_as instead")]] size_type pack(It first, It last) {
-        base_type::sort_as(first, last);
-        return static_cast<size_type>(std::distance(first, last));
-    }
-
-    /**
-     * @brief Returns the number of elements considered still in use.
-     * @return The number of elements considered still in use.
-     */
-    [[deprecated("use free_list() instead")]] [[nodiscard]] size_type in_use() const noexcept {
-        return base_type::free_list();
-    }
-
-    /**
-     * @brief Sets the number of elements considered still in use.
-     * @param len The number of elements considered still in use.
-     */
-    [[deprecated("use free_list(len) instead")]] void in_use(const size_type len) noexcept {
-        base_type::free_list(len);
-    }
-
-    /**
      * @brief Returns an iterable object to use to _visit_ a storage.
      *
      * The iterable object returns a tuple that contains the current entity.

@@ -262,6 +262,14 @@ public:
     }
 
     /**
+     * @brief Checks whether a view is initialized or not.
+     * @return True if the view is initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return !(pools.empty() && filter.empty());
+    }
+
+    /**
      * @brief Checks if a view contains an entity.
      * @param entt A valid identifier.
      * @return True if the view contains the given entity, false otherwise.

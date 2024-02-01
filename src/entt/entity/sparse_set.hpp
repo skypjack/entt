@@ -750,15 +750,6 @@ public:
     }
 
     /**
-     * @brief Returns the entity at specified location, with bounds checking.
-     * @param pos The position for which to return the entity.
-     * @return The entity at specified location if any, a null entity otherwise.
-     */
-    [[deprecated("use .begin()[pos] instead")]] [[nodiscard]] entity_type at(const size_type pos) const noexcept {
-        return pos < packed.size() ? packed[pos] : null;
-    }
-
-    /**
      * @brief Returns the entity at specified location, without bounds checking.
      * @param pos The position for which to return the entity.
      * @return The entity at specified location.
@@ -1048,12 +1039,14 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @return An iterator past the last of the elements actually shared.
      */
     template<typename It>
-    void sort_as(It first, It last) {
+    iterator sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
+        auto it = begin(0);
 
-        for(auto it = begin(0); it.index() && first != last; ++first) {
+        for(const auto other = end(0); (it != other) && (first != last); ++first) {
             if(const auto curr = *first; contains(curr)) {
                 if(const auto entt = *it; entt != curr) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
@@ -1063,14 +1056,8 @@ public:
                 ++it;
             }
         }
-    }
 
-    /**
-     * @copybrief sort_as
-     * @param other The sparse sets that imposes the order of the entities.
-     */
-    [[deprecated("use iterator based sort_as instead")]] void sort_as(const basic_sparse_set &other) {
-        sort_as(other.begin(), other.end());
+        return it;
     }
 
     /*! @brief Clears a sparse set. */

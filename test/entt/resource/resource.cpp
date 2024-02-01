@@ -86,6 +86,7 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 
     entt::resource<const derived> copy{resource};
     entt::resource<const derived> move{std::move(other)};
+
     test::is_initialized(other);
 
     ASSERT_TRUE(resource);

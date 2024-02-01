@@ -12,7 +12,7 @@ struct MetaRange: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<int>().type("int"_hs).data<42>("answer"_hs); // NOLINT
+        entt::meta<int>().type("int"_hs).data<2>("answer"_hs);
     }
 
     void TearDown() override {
@@ -91,6 +91,6 @@ TEST_F(MetaRange, DirectValue) {
 
     for(auto &&[id, data]: range) {
         ASSERT_EQ(id, "answer"_hs);
-        ASSERT_EQ(data.get({}).cast<int>(), 42);
+        ASSERT_EQ(data.get({}).cast<int>(), 2);
     }
 }

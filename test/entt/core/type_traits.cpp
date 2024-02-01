@@ -60,8 +60,10 @@ struct UnpackAsValue: ::testing::Test {
 TEST(SizeOf, Functionalities) {
     ASSERT_EQ(entt::size_of_v<void>, 0u);
     ASSERT_EQ(entt::size_of_v<char>, sizeof(char));
-    ASSERT_EQ(entt::size_of_v<int[]>, 0u);              // NOLINT
-    ASSERT_EQ(entt::size_of_v<int[3]>, sizeof(int[3])); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_EQ(entt::size_of_v<int[]>, 0u);
+    ASSERT_EQ(entt::size_of_v<int[3]>, sizeof(int[3]));
+    // NOLINTEND(*-avoid-c-arrays)
 }
 
 TEST_F(UnpackAsType, Functionalities) {
@@ -223,7 +225,8 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_TRUE((entt::is_equality_comparable_v<std::optional<int>>));
     ASSERT_TRUE(entt::is_equality_comparable_v<nlohmann_json_like>);
 
-    ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>); // NOLINT
+    // NOLINTNEXTLINE(*-avoid-c-arrays)
+    ASSERT_FALSE(entt::is_equality_comparable_v<int[3u]>);
     ASSERT_FALSE(entt::is_equality_comparable_v<test::non_comparable>);
     ASSERT_FALSE(entt::is_equality_comparable_v<const test::non_comparable>);
     ASSERT_FALSE(entt::is_equality_comparable_v<std::vector<test::non_comparable>>);

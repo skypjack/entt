@@ -556,10 +556,8 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        entities.sort_as(first, last);
-
+        const auto to = entities.sort_as(first, last);
         const auto from = entities.cbegin(0);
-        const auto to = from + std::distance(first, last);
 
         for(auto &&curr: pools) {
             curr.second->remove(from, to);

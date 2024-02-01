@@ -218,6 +218,19 @@ public:
     }
 
     /**
+     * @brief Returns true if an adjacency matrix is empty, false otherwise.
+     *
+     * @warning
+     * Potentially expensive, try to avoid it on hot paths.
+     *
+     * @return True if the adjacency matrix is empty, false otherwise.
+     */
+    [[nodiscard]] bool empty() const noexcept {
+        const auto iterable = edges();
+        return (iterable.begin() == iterable.end());
+    }
+
+    /**
      * @brief Returns the number of vertices.
      * @return The number of vertices.
      */

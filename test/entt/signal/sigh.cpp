@@ -305,6 +305,7 @@ TEST(SigH, ScopedConnectionMove) {
 
     {
         const entt::scoped_connection inner{std::move(outer)};
+
         test::is_initialized(outer);
 
         ASSERT_FALSE(listener.val);
@@ -484,6 +485,7 @@ TEST(SigH, CustomAllocator) {
     ASSERT_FALSE(copy.empty());
 
     decltype(sigh) move{std::move(copy), allocator};
+
     test::is_initialized(copy);
 
     ASSERT_TRUE(copy.empty());

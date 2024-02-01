@@ -216,6 +216,14 @@ public:
     }
 
     /**
+     * @brief Returns true if a flow builder contains no tasks, false otherwise.
+     * @return True if the flow builder contains no tasks, false otherwise.
+     */
+    [[nodiscard]] bool empty() const noexcept {
+        return vertices.empty();
+    }
+
+    /**
      * @brief Returns the number of tasks.
      * @return The number of tasks.
      */

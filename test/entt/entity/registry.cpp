@@ -1,3 +1,4 @@
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -121,17 +122,17 @@ TEST(Registry, Context) {
     ASSERT_TRUE(ctx.erase<char>());
 
     ctx.emplace<char>('c');
-    ctx.emplace<int>(42); // NOLINT
+    ctx.emplace<int>(1);
 
     ASSERT_EQ(ctx.emplace<char>('a'), 'c');
     ASSERT_EQ(ctx.find<const char>(), cctx.find<char>());
     ASSERT_EQ(ctx.get<char>(), cctx.get<const char>());
     ASSERT_EQ(ctx.get<char>(), 'c');
 
-    ASSERT_EQ(ctx.emplace<const int>(0), 42);
+    ASSERT_EQ(ctx.emplace<const int>(0), 1);
     ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
     ASSERT_EQ(ctx.get<int>(), cctx.get<const int>());
-    ASSERT_EQ(ctx.get<int>(), 42);
+    ASSERT_EQ(ctx.get<int>(), 1);
 
     ASSERT_EQ(ctx.find<double>(), nullptr);
     ASSERT_EQ(cctx.find<double>(), nullptr);
@@ -154,7 +155,7 @@ TEST(Registry, ContextHint) {
     auto &ctx = registry.ctx();
     const auto &cctx = std::as_const(registry).ctx();
 
-    ctx.emplace<int>(42); // NOLINT
+    ctx.emplace<int>(1);
     ctx.emplace_as<int>("other"_hs, 3);
 
     ASSERT_TRUE(ctx.contains<int>());
@@ -165,20 +166,20 @@ TEST(Registry, ContextHint) {
     ASSERT_NE(ctx.find<int>("other"_hs), nullptr);
     ASSERT_EQ(cctx.find<const char>("other"_hs), nullptr);
 
-    ASSERT_EQ(ctx.get<int>(), 42);
+    ASSERT_EQ(ctx.get<int>(), 1);
     ASSERT_EQ(cctx.get<const int>("other"_hs), 3);
 
     ctx.insert_or_assign(3);
-    ctx.insert_or_assign("other"_hs, 42); // NOLINT
+    ctx.insert_or_assign("other"_hs, 1);
 
     ASSERT_EQ(ctx.get<const int>(), 3);
-    ASSERT_EQ(cctx.get<int>("other"_hs), 42);
+    ASSERT_EQ(cctx.get<int>("other"_hs), 1);
 
     ASSERT_FALSE(ctx.erase<char>("other"_hs));
     ASSERT_TRUE(ctx.erase<int>());
 
     ASSERT_TRUE(cctx.contains<int>("other"_hs));
-    ASSERT_EQ(ctx.get<int>("other"_hs), 42);
+    ASSERT_EQ(ctx.get<int>("other"_hs), 1);
 
     ASSERT_TRUE(ctx.erase<int>("other"_hs));
 
@@ -195,17 +196,17 @@ TEST(Registry, ContextAsRef) {
     ASSERT_NE(registry.ctx().find<int>(), nullptr);
     ASSERT_NE(registry.ctx().find<const int>(), nullptr);
     ASSERT_NE(std::as_const(registry).ctx().find<const int>(), nullptr);
-    ASSERT_EQ(registry.ctx().get<const int>(), 3);
-    ASSERT_EQ(registry.ctx().get<int>(), 3);
+    ASSERT_EQ(registry.ctx().get<const int>(), value);
+    ASSERT_EQ(registry.ctx().get<int>(), value);
 
-    registry.ctx().get<int>() = 42; // NOLINT
+    registry.ctx().get<int>() = 2;
 
-    ASSERT_EQ(registry.ctx().get<int>(), 42);
-    ASSERT_EQ(value, 42);
+    ASSERT_EQ(value, 2);
+    ASSERT_EQ(registry.ctx().get<int>(), value);
 
-    value = 3; // NOLINT
+    value = 1;
 
-    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 3);
+    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), value);
 }
 
 TEST(Registry, ContextAsConstRef) {
@@ -217,11 +218,11 @@ TEST(Registry, ContextAsConstRef) {
     ASSERT_EQ(registry.ctx().find<int>(), nullptr);
     ASSERT_NE(registry.ctx().find<const int>(), nullptr);
     ASSERT_NE(std::as_const(registry).ctx().find<const int>(), nullptr);
-    ASSERT_EQ(registry.ctx().get<const int>(), 3);
+    ASSERT_EQ(registry.ctx().get<const int>(), value);
 
-    value = 42; // NOLINT
+    value = 1;
 
-    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), 42);
+    ASSERT_EQ(std::as_const(registry).ctx().get<const int>(), value);
 }
 
 TEST(Registry, Functionalities) {
@@ -377,7 +378,7 @@ TEST(Registry, Functionalities) {
 
 TEST(Registry, Constructors) {
     entt::registry registry;
-    entt::registry other{42u}; // NOLINT
+    entt::registry other{64u};
 
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
     ASSERT_TRUE(other.storage<entt::entity>().empty());
@@ -450,17 +451,17 @@ TEST(Registry, ReplaceAggregate) {
     const auto entity = registry.create();
 
     registry.emplace<test::aggregate>(entity, 0);
-    auto &instance = registry.replace<test::aggregate>(entity, 42); // NOLINT
+    auto &instance = registry.replace<test::aggregate>(entity, 1);
 
-    ASSERT_EQ(instance.value, 42);
+    ASSERT_EQ(instance.value, 1);
 }
 
 TEST(Registry, EmplaceOrReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto &instance = registry.emplace_or_replace<test::aggregate>(entity, 42); // NOLINT
+    auto &instance = registry.emplace_or_replace<test::aggregate>(entity, 1);
 
-    ASSERT_EQ(instance.value, 42);
+    ASSERT_EQ(instance.value, 1);
 }
 
 TEST(Registry, Identifiers) {
@@ -490,14 +491,14 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::entity entity[3]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
     const auto entt = registry.create();
     registry.destroy(registry.create());
     registry.destroy(entt);
     registry.destroy(registry.create());
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     ASSERT_TRUE(registry.valid(entity[0]));
     ASSERT_TRUE(registry.valid(entity[1]));
@@ -515,23 +516,23 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
 
 TEST(Registry, CreateManyEntitiesAtOnceWithListener) {
     entt::registry registry;
-    entt::entity entity[3]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
     listener listener;
 
     registry.on_construct<int>().connect<&listener::incr>(listener);
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert(std::begin(entity), std::end(entity), 42); // NOLINT
-    registry.insert(std::begin(entity), std::end(entity), 'c');
+    registry.create(entity.begin(), entity.end());
+    registry.insert(entity.begin(), entity.end(), 1);
+    registry.insert(entity.begin(), entity.end(), 'c');
 
-    ASSERT_EQ(registry.get<int>(entity[0]), 42);
+    ASSERT_EQ(registry.get<int>(entity[0]), 1);
     ASSERT_EQ(registry.get<char>(entity[1]), 'c');
     ASSERT_EQ(listener.counter, 3);
 
     registry.on_construct<int>().disconnect<&listener::incr>(listener);
     registry.on_construct<test::empty>().connect<&listener::incr>(listener);
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert(std::begin(entity), std::end(entity), 'a');
-    registry.insert<test::empty>(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
+    registry.insert(entity.begin(), entity.end(), 'a');
+    registry.insert<test::empty>(entity.begin(), entity.end());
 
     ASSERT_TRUE(registry.all_of<test::empty>(entity[0]));
     ASSERT_EQ(registry.get<char>(entity[2]), 'a');
@@ -578,28 +579,32 @@ TEST(Registry, CreateClearCycle) {
     entt::registry registry;
     entt::entity pre{}, post{};
 
-    for(int i = 0; i < 10; ++i) { // NOLINT
+    const std::size_t first_iteration = 10u;
+    const std::size_t second_iteration = 7u;
+    const std::size_t third_iteration = 5u;
+
+    for(std::size_t i{}; i < first_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<double>(entity);
     }
 
     registry.clear();
 
-    for(int i = 0; i < 7; ++i) { // NOLINT
+    for(std::size_t i{}; i < second_iteration; ++i) {
         const auto entity = registry.create();
         registry.emplace<int>(entity);
 
-        if(i == 3) {
+        if(i == 3u) {
             pre = entity;
         }
     }
 
     registry.clear();
 
-    for(int i = 0; i < 5; ++i) { // NOLINT
+    for(std::size_t i{}; i < third_iteration; ++i) {
         const auto entity = registry.create();
 
-        if(i == 3) {
+        if(i == 3u) {
             post = entity;
         }
     }
@@ -664,9 +669,9 @@ TEST(Registry, DestroyRange) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, char>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<char>(entity[0u]);
@@ -702,15 +707,15 @@ TEST(Registry, DestroyRange) {
     ASSERT_EQ(registry.storage<char>().size(), 0u);
     ASSERT_EQ(registry.storage<double>().size(), 0u);
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end());
 
     ASSERT_TRUE(registry.valid(entity[0u]));
     ASSERT_TRUE(registry.valid(entity[1u]));
     ASSERT_TRUE(registry.valid(entity[2u]));
     ASSERT_EQ(registry.storage<int>().size(), 3u);
 
-    registry.destroy(std::begin(entity), std::end(entity));
+    registry.destroy(entity.begin(), entity.end());
 
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
@@ -719,8 +724,8 @@ TEST(Registry, DestroyRange) {
 
     entt::sparse_set managed{};
 
-    registry.create(std::begin(entity), std::end(entity));
-    managed.push(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
+    managed.push(entity.begin(), entity.end());
     registry.insert<int>(managed.begin(), managed.end());
 
     ASSERT_TRUE(registry.valid(managed[0u]));
@@ -740,9 +745,9 @@ TEST(Registry, StableDestroy) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, test::pointer_stable>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<test::pointer_stable>(entity[0u]);
@@ -822,9 +827,9 @@ TEST(Registry, TombstoneVersion) {
 
 TEST(Registry, Orphans) {
     entt::registry registry;
-    entt::entity entity[3u]{}; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
     registry.emplace<int>(entity[0u]);
     registry.emplace<int>(entity[2u]);
 
@@ -842,14 +847,14 @@ TEST(Registry, Orphans) {
 
 TEST(Registry, View) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
     auto iview = registry.view<int>();
     auto cview = registry.view<char>();
     auto mview = registry.view<int, char>();
     auto fview = registry.view<int>(entt::exclude<char>);
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<char>(entity[0u], 'c');
@@ -876,23 +881,23 @@ TEST(Registry, View) {
     ASSERT_EQ(std::distance(mview.begin(), mview.end()), 2);
     ASSERT_EQ(std::distance(fview.begin(), fview.end()), 1);
 
-    mview.each([&entity, first = true](auto entt, auto &&...) mutable { // NOLINT
-        ASSERT_EQ(entt, entity[2u * first]);                            // NOLINT
+    mview.each([&entity, first = true](auto entt, auto &&...) mutable {
+        ASSERT_EQ(entt, first ? entity[2u] : entity[0u]);
         first = false;
     });
 
-    fview.each([&entity](auto entt, auto &&...) { // NOLINT
+    fview.each([&entity](auto entt, auto &&...) {
         ASSERT_EQ(entt, entity[1u]);
     });
 }
 
 TEST(Registry, ExcludeOnlyView) {
     entt::registry registry;
-    entt::entity entity[4u]; // NOLINT
+    std::array<entt::entity, 4u> entity{};
 
     auto view = registry.view<entt::entity>(entt::exclude<int>);
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u], 0);
     registry.emplace<int>(entity[2u], 0);
@@ -910,17 +915,17 @@ TEST(Registry, ExcludeOnlyView) {
         ASSERT_EQ(entt, entity[1u]);
     }
 
-    view.each([&entity](auto entt) { // NOLINT
+    view.each([&entity](auto entt) {
         ASSERT_EQ(entt, entity[1u]);
     });
 }
 
 TEST(Registry, NonOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -934,11 +939,11 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
 
 TEST(Registry, NonOwningGroupInitOnEmplace) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
     auto group = registry.group(entt::get<int, char>);
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -951,10 +956,10 @@ TEST(Registry, NonOwningGroupInitOnEmplace) {
 
 TEST(Registry, FullOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -970,11 +975,11 @@ TEST(Registry, FullOwningGroupInitOnFirstUse) {
 
 TEST(Registry, FullOwningGroupInitOnEmplace) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
     auto group = registry.group<int, char>();
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -989,10 +994,10 @@ TEST(Registry, FullOwningGroupInitOnEmplace) {
 
 TEST(Registry, PartialOwningGroupInitOnFirstUse) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -1008,11 +1013,11 @@ TEST(Registry, PartialOwningGroupInitOnFirstUse) {
 
 TEST(Registry, PartialOwningGroupInitOnEmplace) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
     auto group = registry.group<int>(entt::get<char>);
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), 0);
+    registry.create(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end(), 0);
     registry.emplace<char>(entity[0u], 'c');
     registry.emplace<char>(entity[2u], 'c');
 
@@ -1238,7 +1243,7 @@ TEST(Registry, ComponentsWithTypesFromStandardTemplateLibrary) {
     // see #37 - the test shouldn't crash, that's all
     entt::registry registry;
     const auto entity = registry.create();
-    registry.emplace<std::unordered_set<int>>(entity).insert(42); // NOLINT
+    registry.emplace<std::unordered_set<int>>(entity).insert(1);
     registry.destroy(entity);
 }
 
@@ -1251,7 +1256,7 @@ TEST(Registry, ConstructWithComponents) {
 
 TEST(Registry, Signals) {
     entt::registry registry;
-    entt::entity entity[2u]; // NOLINT
+    std::array<entt::entity, 2u> entity{};
     listener listener;
 
     registry.on_construct<test::empty>().connect<&listener::incr>(listener);
@@ -1259,13 +1264,13 @@ TEST(Registry, Signals) {
     registry.on_construct<int>().connect<&listener::incr>(listener);
     registry.on_destroy<int>().connect<&listener::decr>(listener);
 
-    registry.create(std::begin(entity), std::end(entity));
-    registry.insert<test::empty>(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
+    registry.insert<test::empty>(entity.begin(), entity.end());
 
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, entity[1u]);
 
-    registry.insert<int>(std::rbegin(entity), std::rend(entity));
+    registry.insert<int>(entity.rbegin(), entity.rend());
 
     ASSERT_EQ(listener.counter, 4);
     ASSERT_EQ(listener.last, entity[0u]);
@@ -1315,8 +1320,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 0);
     ASSERT_EQ(listener.last, entity[0u]);
 
-    registry.insert<test::empty>(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity));
+    registry.insert<test::empty>(entity.begin(), entity.end());
+    registry.insert<int>(entity.begin(), entity.end());
     registry.destroy(entity[1u]);
 
     ASSERT_EQ(listener.counter, 2);
@@ -1453,9 +1458,9 @@ TEST(Registry, SignalWhenDestroying) {
 
 TEST(Registry, Insert) {
     entt::registry registry;
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<char>(entity[0u]);
@@ -1478,10 +1483,10 @@ TEST(Registry, Insert) {
     ASSERT_FALSE(registry.all_of<float>(entity[2u]));
 
     registry.clear<float>();
-    float value[3]{0.f, 1.f, 2.f}; // NOLINT
+    std::array value{0.f, 1.f, 2.f};
 
     const auto iview = registry.view<int>();
-    registry.insert<float>(iview.rbegin(), iview.rend(), value); // NOLINT
+    registry.insert<float>(iview.rbegin(), iview.rend(), value.begin());
 
     ASSERT_EQ(registry.get<float>(entity[0u]), 0.f);
     ASSERT_EQ(registry.get<float>(entity[1u]), 1.f);
@@ -1492,9 +1497,9 @@ TEST(Registry, Erase) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, char>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<char>(entity[0u]);
@@ -1529,8 +1534,8 @@ TEST(Registry, Erase) {
     ASSERT_EQ(registry.storage<char>().size(), 0u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
-    registry.insert<int>(std::begin(entity) + 1, std::end(entity) - 1u);  // NOLINT
-    registry.insert<char>(std::begin(entity) + 1, std::end(entity) - 1u); // NOLINT
+    registry.insert<int>(entity.begin() + 1u, entity.end() - 1u);
+    registry.insert<char>(entity.begin() + 1u, entity.end() - 1u);
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
@@ -1540,13 +1545,13 @@ TEST(Registry, Erase) {
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
 
-    registry.insert<int>(std::begin(entity), std::end(entity));
-    registry.insert<char>(std::begin(entity), std::end(entity));
+    registry.insert<int>(entity.begin(), entity.end());
+    registry.insert<char>(entity.begin(), entity.end());
 
     ASSERT_EQ(registry.storage<int>().size(), 3u);
     ASSERT_EQ(registry.storage<char>().size(), 3u);
 
-    registry.erase<int, char>(std::begin(entity), std::end(entity));
+    registry.erase<int, char>(entity.begin(), entity.end());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
@@ -1558,10 +1563,10 @@ TEST(Registry, Erase) {
 
 ENTT_DEBUG_TEST(RegistryDeathTest, Erase) {
     entt::registry registry;
-    const entt::entity entity[1u]{registry.create()}; // NOLINT
+    const std::array entity{registry.create()};
 
     ASSERT_FALSE((registry.any_of<int>(entity[0u])));
-    ASSERT_DEATH((registry.erase<int>(std::begin(entity), std::end(entity))), "");
+    ASSERT_DEATH((registry.erase<int>(entity.begin(), entity.end())), "");
     ASSERT_DEATH(registry.erase<int>(entity[0u]), "");
 }
 
@@ -1569,9 +1574,9 @@ TEST(Registry, StableErase) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, test::pointer_stable>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<test::pointer_stable>(entity[0u]);
@@ -1644,9 +1649,9 @@ TEST(Registry, Remove) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, char>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<char>(entity[0u]);
@@ -1686,8 +1691,8 @@ TEST(Registry, Remove) {
     ASSERT_EQ(registry.storage<char>().size(), 0u);
     ASSERT_EQ(registry.storage<double>().size(), 1u);
 
-    registry.insert<int>(std::begin(entity) + 1, std::end(entity) - 1u);  // NOLINT
-    registry.insert<char>(std::begin(entity) + 1, std::end(entity) - 1u); // NOLINT
+    registry.insert<int>(entity.begin() + 1u, entity.end() - 1u);
+    registry.insert<char>(entity.begin() + 1u, entity.end() - 1u);
 
     ASSERT_EQ(registry.storage<int>().size(), 1u);
     ASSERT_EQ(registry.storage<char>().size(), 1u);
@@ -1698,14 +1703,14 @@ TEST(Registry, Remove) {
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
 
-    registry.insert<int>(std::begin(entity), std::end(entity));
-    registry.insert<char>(std::begin(entity), std::end(entity));
+    registry.insert<int>(entity.begin(), entity.end());
+    registry.insert<char>(entity.begin(), entity.end());
 
     ASSERT_EQ(registry.storage<int>().size(), 3u);
     ASSERT_EQ(registry.storage<char>().size(), 3u);
 
-    registry.remove<int, char>(std::begin(entity), std::end(entity));
-    registry.remove<int, char>(std::begin(entity), std::end(entity));
+    registry.remove<int, char>(entity.begin(), entity.end());
+    registry.remove<int, char>(entity.begin(), entity.end());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<char>().size(), 0u);
@@ -1719,9 +1724,9 @@ TEST(Registry, StableRemove) {
     entt::registry registry;
     const auto iview = registry.view<int>();
     const auto icview = registry.view<int, test::pointer_stable>();
-    entt::entity entity[3u]; // NOLINT
+    std::array<entt::entity, 3u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<test::pointer_stable>(entity[0u]);
@@ -1763,9 +1768,9 @@ TEST(Registry, StableRemove) {
 
 TEST(Registry, Compact) {
     entt::registry registry;
-    entt::entity entity[2u]; // NOLINT
+    std::array<entt::entity, 2u> entity{};
 
-    registry.create(std::begin(entity), std::end(entity));
+    registry.create(entity.begin(), entity.end());
 
     registry.emplace<int>(entity[0u]);
     registry.emplace<test::pointer_stable>(entity[0u]);
@@ -1776,7 +1781,7 @@ TEST(Registry, Compact) {
     ASSERT_EQ(registry.storage<int>().size(), 2u);
     ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
 
-    registry.destroy(std::begin(entity), std::end(entity));
+    registry.destroy(entity.begin(), entity.end());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
     ASSERT_EQ(registry.storage<test::pointer_stable>().size(), 2u);
@@ -1915,38 +1920,36 @@ TEST(Registry, TryGet) {
 }
 
 TEST(Registry, Constness) {
-    entt::registry registry; // NOLINT
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().emplace<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().emplace<test::empty>({})), void>();
 
-    testing::StaticAssertTypeEq<decltype(registry.emplace<int>({})), int &>();
-    testing::StaticAssertTypeEq<decltype(registry.emplace<test::empty>({})), void>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().get<int>({})), int &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().get<int, const char>({})), std::tuple<int &, const char &>>();
 
-    testing::StaticAssertTypeEq<decltype(registry.get<>({})), std::tuple<>>();
-    testing::StaticAssertTypeEq<decltype(registry.get<int>({})), int &>();
-    testing::StaticAssertTypeEq<decltype(registry.get<int, const char>({})), std::tuple<int &, const char &>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().try_get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().try_get<int>({})), int *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().try_get<int, const char>({})), std::tuple<int *, const char *>>();
 
-    testing::StaticAssertTypeEq<decltype(registry.try_get<>({})), std::tuple<>>();
-    testing::StaticAssertTypeEq<decltype(registry.try_get<int>({})), int *>();
-    testing::StaticAssertTypeEq<decltype(registry.try_get<int, const char>({})), std::tuple<int *, const char *>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().ctx().get<int>()), int &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().ctx().get<const char>()), const char &>();
 
-    testing::StaticAssertTypeEq<decltype(registry.ctx().get<int>()), int &>();
-    testing::StaticAssertTypeEq<decltype(registry.ctx().get<const char>()), const char &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().ctx().find<int>()), int *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().ctx().find<const char>()), const char *>();
 
-    testing::StaticAssertTypeEq<decltype(registry.ctx().find<int>()), int *>();
-    testing::StaticAssertTypeEq<decltype(registry.ctx().find<const char>()), const char *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().get<int>({})), const int &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().get<int, const char>({})), std::tuple<const int &, const char &>>();
 
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<>({})), std::tuple<>>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<int>({})), const int &>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).get<int, const char>({})), std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().try_get<>({})), std::tuple<>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().try_get<int>({})), const int *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().try_get<int, const char>({})), std::tuple<const int *, const char *>>();
 
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<>({})), std::tuple<>>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<int>({})), const int *>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).try_get<int, const char>({})), std::tuple<const int *, const char *>>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().ctx().get<int>()), const int &>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().ctx().get<const char>()), const char &>();
 
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().get<int>()), const int &>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().get<const char>()), const char &>();
-
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().find<int>()), const int *>();
-    testing::StaticAssertTypeEq<decltype(std::as_const(registry).ctx().find<const char>()), const char *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().ctx().find<int>()), const int *>();
+    testing::StaticAssertTypeEq<decltype(std::declval<const entt::registry>().ctx().find<const char>()), const char *>();
 }
 
 TEST(Registry, MoveOnlyComponent) {
@@ -1958,7 +1961,7 @@ TEST(Registry, MoveOnlyComponent) {
 TEST(Registry, NonDefaultConstructibleComponent) {
     entt::registry registry;
     // the purpose is to ensure that non default constructible type are always accepted
-    registry.emplace<test::non_default_constructible>(registry.create(), 42); // NOLINT
+    registry.emplace<test::non_default_constructible>(registry.create(), 1);
 }
 
 TEST(Registry, Dependencies) {
@@ -2005,8 +2008,8 @@ TEST(Registry, AssignEntities) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
-    entt::entity entity[3]; // NOLINT
-    registry.create(std::begin(entity), std::end(entity));
+    std::array<entt::entity, 3u> entity{};
+    registry.create(entity.begin(), entity.end());
     registry.destroy(entity[1]);
     registry.destroy(entity[2]);
 
@@ -2275,7 +2278,7 @@ TEST(Registry, NoEtoType) {
     const auto entity = registry.create();
 
     registry.emplace<no_eto_type>(entity);
-    registry.emplace<int>(entity, 42); // NOLINT
+    registry.emplace<int>(entity, 1);
 
     ASSERT_NE(registry.storage<no_eto_type>().raw(), nullptr);
     ASSERT_NE(registry.try_get<no_eto_type>(entity), nullptr);

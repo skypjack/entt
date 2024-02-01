@@ -62,7 +62,7 @@ struct MetaBase: ::testing::Test {
 
 TEST_F(MetaBase, Functionalities) {
     auto any = entt::resolve<derived_t>().construct();
-    any.cast<derived_t &>().value_1 = 42; // NOLINT
+    any.cast<derived_t &>().value_1 = 2;
     auto as_derived = any.as_ref();
 
     ASSERT_TRUE(any.allow_cast<base_1_t &>());
@@ -90,27 +90,27 @@ TEST_F(MetaBase, SetGetWithMutatingThis) {
     ASSERT_EQ(static_cast<const void *>(static_cast<const base_2_t *>(&instance)), static_cast<const void *>(static_cast<const base_3_t *>(&instance)));
     ASSERT_EQ(static_cast<const void *>(&instance), static_cast<const void *>(static_cast<const base_1_t *>(&instance)));
 
-    ASSERT_TRUE(any.set("value"_hs, 42));
+    ASSERT_TRUE(any.set("value"_hs, 0));
     ASSERT_TRUE(any.set("value_1"_hs, 1));
     ASSERT_TRUE(any.set("value_2"_hs, 2));
     ASSERT_TRUE(any.set("value_3"_hs, 3));
 
-    ASSERT_FALSE(as_cref.set("value"_hs, 0));
-    ASSERT_FALSE(as_cref.set("value_1"_hs, 0));
-    ASSERT_FALSE(as_cref.set("value_2"_hs, 0));
-    ASSERT_FALSE(as_cref.set("value_3"_hs, 0));
+    ASSERT_FALSE(as_cref.set("value"_hs, 4));
+    ASSERT_FALSE(as_cref.set("value_1"_hs, 4));
+    ASSERT_FALSE(as_cref.set("value_2"_hs, 4));
+    ASSERT_FALSE(as_cref.set("value_3"_hs, 4));
 
-    ASSERT_EQ(any.get("value"_hs).cast<int>(), 42);
+    ASSERT_EQ(any.get("value"_hs).cast<int>(), 0);
     ASSERT_EQ(any.get("value_1"_hs).cast<const int>(), 1);
     ASSERT_EQ(any.get("value_2"_hs).cast<int>(), 2);
     ASSERT_EQ(any.get("value_3"_hs).cast<const int>(), 3);
 
-    ASSERT_EQ(as_cref.get("value"_hs).cast<const int>(), 42);
+    ASSERT_EQ(as_cref.get("value"_hs).cast<const int>(), 0);
     ASSERT_EQ(as_cref.get("value_1"_hs).cast<int>(), 1);
     ASSERT_EQ(as_cref.get("value_2"_hs).cast<const int>(), 2);
     ASSERT_EQ(as_cref.get("value_3"_hs).cast<int>(), 3);
 
-    ASSERT_EQ(instance.value, 42);
+    ASSERT_EQ(instance.value, 0);
     ASSERT_EQ(instance.value_1, 1);
     ASSERT_EQ(instance.value_2, 2);
     ASSERT_EQ(instance.value_3, 3);
@@ -120,41 +120,41 @@ TEST_F(MetaBase, ConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
     auto &&ref = any.cast<derived_t &>();
     auto as_cref = std::as_const(any).as_ref();
-    ref.value_2 = 42; // NOLINT
+    ref.value_2 = 2;
 
     auto conv = std::as_const(any).allow_cast<int>();
     auto from_cref = std::as_const(as_cref).allow_cast<int>();
 
     ASSERT_TRUE(conv);
     ASSERT_TRUE(from_cref);
-    ASSERT_EQ(conv.cast<int>(), 42);
-    ASSERT_EQ(from_cref.cast<int>(), 42);
+    ASSERT_EQ(conv.cast<int>(), 2);
+    ASSERT_EQ(from_cref.cast<int>(), 2);
 
     ASSERT_TRUE(as_cref.allow_cast<int>());
     ASSERT_TRUE(any.allow_cast<int>());
 
-    ASSERT_EQ(as_cref.cast<int>(), 42);
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(as_cref.cast<int>(), 2);
+    ASSERT_EQ(any.cast<int>(), 2);
 }
 
 TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
     auto as_cref = std::as_const(any).as_ref();
-    any.cast<derived_t &>().value_2 = 42; // NOLINT
+    any.cast<derived_t &>().value_2 = 2;
 
     auto conv = std::as_const(any).allow_cast(entt::resolve<int>());
     auto from_cref = std::as_const(as_cref).allow_cast(entt::resolve<int>());
 
     ASSERT_TRUE(conv);
     ASSERT_TRUE(from_cref);
-    ASSERT_EQ(conv.cast<int>(), 42);
-    ASSERT_EQ(from_cref.cast<int>(), 42);
+    ASSERT_EQ(conv.cast<int>(), 2);
+    ASSERT_EQ(from_cref.cast<int>(), 2);
 
     ASSERT_TRUE(as_cref.allow_cast(entt::resolve<int>()));
     ASSERT_TRUE(any.allow_cast(entt::resolve<int>()));
 
-    ASSERT_EQ(as_cref.cast<int>(), 42);
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(as_cref.cast<int>(), 2);
+    ASSERT_EQ(any.cast<int>(), 2);
 }
 
 TEST_F(MetaBase, AssignWithMutatingThis) {
@@ -164,10 +164,10 @@ TEST_F(MetaBase, AssignWithMutatingThis) {
     entt::meta_any src{derived_t{}};
 
     dst.cast<base_2_t &>().value_2 = 0;
-    src.cast<derived_t &>().value_2 = 42; // NOLINT
+    src.cast<derived_t &>().value_2 = 1;
 
     ASSERT_TRUE(dst.assign(src));
-    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);
+    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 1);
 }
 
 TEST_F(MetaBase, TransferWithMutatingThis) {
@@ -177,10 +177,10 @@ TEST_F(MetaBase, TransferWithMutatingThis) {
     entt::meta_any src{derived_t{}};
 
     dst.cast<base_2_t &>().value_2 = 0;
-    src.cast<derived_t &>().value_2 = 42; // NOLINT
+    src.cast<derived_t &>().value_2 = 1;
 
     ASSERT_TRUE(dst.assign(std::move(src)));
-    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);
+    ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 1);
 }
 
 TEST_F(MetaBase, ReRegistration) {

@@ -172,7 +172,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
+            .prop(static_cast<entt::id_type>(property_t::value), 3)
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
@@ -222,7 +222,7 @@ TEST_F(MetaType, Functionalities) {
 
     for(auto &&curr: type.prop()) {
         ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
-        ASSERT_EQ(curr.second.value(), 42);
+        ASSERT_EQ(curr.second.value(), 3);
     }
 
     ASSERT_FALSE(type.prop(static_cast<entt::id_type>(property_t::key_only)));
@@ -231,7 +231,7 @@ TEST_F(MetaType, Functionalities) {
     auto prop = type.prop(static_cast<entt::id_type>(property_t::value));
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 42);
+    ASSERT_EQ(prop.value(), 3);
 }
 
 TEST_F(MetaType, SizeOf) {
@@ -342,8 +342,8 @@ TEST_F(MetaType, Ctor) {
     base_t &base = derived;
     auto type = entt::resolve<clazz_t>();
 
-    ASSERT_TRUE((type.construct(entt::forward_as_meta(derived), 42)));
-    ASSERT_TRUE((type.construct(entt::forward_as_meta(base), 42)));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(derived), 3)));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(base), 3)));
 
     // use the implicitly generated default constructor
     auto any = type.construct();
@@ -413,7 +413,7 @@ TEST_F(MetaType, InvokeFromBase) {
     auto type = entt::resolve<concrete_t>();
     concrete_t instance{};
 
-    ASSERT_TRUE(type.invoke("base_only"_hs, instance, 42));
+    ASSERT_TRUE(type.invoke("base_only"_hs, instance, 3));
     ASSERT_FALSE(type.invoke("ylno_esab"_hs, {}, 'c'));
 }
 
@@ -475,10 +475,10 @@ TEST_F(MetaType, OverloadedFunc) {
 }
 
 TEST_F(MetaType, Construct) {
-    auto any = entt::resolve<clazz_t>().construct(base_t{}, 42); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(base_t{}, 2);
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 42);
+    ASSERT_EQ(any.cast<clazz_t>().value, 2);
 }
 
 TEST_F(MetaType, ConstructNoArgs) {
@@ -489,10 +489,10 @@ TEST_F(MetaType, ConstructNoArgs) {
 }
 
 TEST_F(MetaType, ConstructMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{3});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 42);
+    ASSERT_EQ(any.cast<clazz_t>().value, 3);
 }
 
 TEST_F(MetaType, ConstructInvalidArgs) {
@@ -504,10 +504,10 @@ TEST_F(MetaType, LessArgs) {
 }
 
 TEST_F(MetaType, ConstructCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 3});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 42);
+    ASSERT_EQ(any.cast<clazz_t>().value, 3);
 }
 
 TEST_F(MetaType, ConstructArithmeticConversion) {
@@ -610,10 +610,10 @@ TEST_F(MetaType, AbstractClass) {
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
-    type.func("func"_hs).invoke(instance, 42); // NOLINT
+    type.func("func"_hs).invoke(instance, 2);
 
     ASSERT_EQ(instance.base_t::value, 'c');
-    ASSERT_EQ(instance.value, 42);
+    ASSERT_EQ(instance.value, 2);
 }
 
 TEST_F(MetaType, EnumAndNamedConstants) {
@@ -662,12 +662,12 @@ TEST_F(MetaType, Variables) {
     double d = 3.;
 
     p_data.set(prop, property_t::random);
-    d_data.set(d, 42.);
+    d_data.set(d, 3.);
 
     ASSERT_EQ(p_data.get(prop).cast<property_t>(), property_t::random);
-    ASSERT_EQ(d_data.get(d).cast<double>(), 42.);
+    ASSERT_EQ(d_data.get(d).cast<double>(), 3.);
     ASSERT_EQ(prop, property_t::random);
-    ASSERT_EQ(d, 42.);
+    ASSERT_EQ(d, 3.);
 }
 
 TEST_F(MetaType, PropertiesAndCornerCases) {
@@ -727,7 +727,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 
     entt::meta<double>().type("double"_hs);
-    entt::meta_any any{42.};
+    entt::meta_any any{3.};
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.allow_cast<int>());
@@ -739,7 +739,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-        .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
+        .prop(static_cast<entt::id_type>(property_t::value), 3)
         .prop(static_cast<entt::id_type>(property_t::random), 3);
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::value)));

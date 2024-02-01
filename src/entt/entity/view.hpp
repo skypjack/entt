@@ -240,9 +240,11 @@ protected:
     void unchecked_refresh() noexcept {
         index = 0u;
 
-        for(size_type pos{1u}; pos < Get; ++pos) {
-            if(pools[pos]->size() < pools[index]->size()) {
-                index = pos;
+        if constexpr(Get > 1u) {
+            for(size_type pos{1u}; pos < Get; ++pos) {
+                if(pools[pos]->size() < pools[index]->size()) {
+                    index = pos;
+                }
             }
         }
 
@@ -853,15 +855,6 @@ public:
      */
     [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
         return storage()->get(entt);
-    }
-
-    /**
-     * @brief Returns the identifier that occupies the given position.
-     * @param pos Position of the element to return.
-     * @return The identifier that occupies the given position.
-     */
-    [[deprecated("use .begin()[pos] instead")]] [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return base_type::begin()[pos];
     }
 
     /**

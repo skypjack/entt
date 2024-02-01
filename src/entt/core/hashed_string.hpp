@@ -131,7 +131,7 @@ public:
 
     /*! @brief Constructs an empty hashed string. */
     constexpr basic_hashed_string() noexcept
-        : base_type{} {}
+        : basic_hashed_string{nullptr, 0u} {}
 
     /**
      * @brief Constructs a hashed string from a string view.
@@ -167,7 +167,7 @@ public:
      * @return The size of the hashed string.
      */
     [[nodiscard]] constexpr size_type size() const noexcept {
-        return base_type::length; // NOLINT
+        return base_type::length;
     }
 
     /**

@@ -397,14 +397,6 @@ public:
     }
 
     /**
-     * @brief Returns true if a wrapper owns its object, false otherwise.
-     * @return True if the wrapper owns its object, false otherwise.
-     */
-    [[deprecated("use policy() and any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
-        return (mode == any_policy::owner);
-    }
-
-    /**
      * @brief Returns the current mode of an any object.
      * @return The current mode of the any object.
      */

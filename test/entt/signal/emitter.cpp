@@ -24,6 +24,7 @@ TEST(Emitter, Move) {
     ASSERT_TRUE(emitter.contains<foo_event>());
 
     test_emitter other{std::move(emitter)};
+
     test::is_initialized(emitter);
 
     ASSERT_FALSE(other.empty());
@@ -168,6 +169,7 @@ TEST(Emitter, CustomAllocator) {
 
     emitter.on<foo_event>([](auto &, const auto &) {});
     const decltype(emitter) other{std::move(emitter), allocator};
+
     test::is_initialized(emitter);
 
     ASSERT_TRUE(emitter.empty());

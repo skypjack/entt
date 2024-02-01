@@ -19,7 +19,7 @@ struct MetaProp: ::testing::Test {
 
         entt::meta<base_1_t>()
             .type("base_1"_hs)
-            .prop("int"_hs, 42); // NOLINT
+            .prop("int"_hs, 2);
 
         entt::meta<base_2_t>()
             .type("base_2"_hs)
@@ -29,7 +29,7 @@ struct MetaProp: ::testing::Test {
         entt::meta<base_3_t>()
             .type("base_3"_hs)
             .prop("key_only"_hs)
-            .prop("key"_hs, 42); // NOLINT
+            .prop("key"_hs, 2);
 
         entt::meta<derived_t>()
             .type("derived"_hs)
@@ -64,8 +64,8 @@ TEST_F(MetaProp, Functionalities) {
     ASSERT_NE(value.try_cast<const int>(), nullptr);
     ASSERT_NE(cvalue.try_cast<const int>(), nullptr);
 
-    ASSERT_EQ(value, 42);
-    ASSERT_EQ(cvalue, 42);
+    ASSERT_EQ(value, 2);
+    ASSERT_EQ(cvalue, 2);
 }
 
 TEST_F(MetaProp, FromBase) {
@@ -83,9 +83,9 @@ TEST_F(MetaProp, FromBase) {
     ASSERT_TRUE(key_value);
 
     ASSERT_FALSE(prop_bool.value().cast<bool>());
-    ASSERT_EQ(prop_int.value().cast<int>(), 42);
+    ASSERT_EQ(prop_int.value().cast<int>(), 2);
     ASSERT_FALSE(key_only.value());
-    ASSERT_EQ(key_value.value().cast<int>(), 42);
+    ASSERT_EQ(key_value.value().cast<int>(), 2);
 }
 
 TEST_F(MetaProp, DeducedArrayType) {
@@ -111,7 +111,7 @@ TEST_F(MetaProp, ReRegistration) {
     ASSERT_EQ(node.details->prop.size(), 1u);
 
     ASSERT_TRUE(type.prop("int"_hs));
-    ASSERT_EQ(type.prop("int"_hs).value().cast<int>(), 42);
+    ASSERT_EQ(type.prop("int"_hs).value().cast<int>(), 2);
 
     entt::meta<base_1_t>().prop("int"_hs, 0);
     entt::meta<base_1_t>().prop("double"_hs, 3.);

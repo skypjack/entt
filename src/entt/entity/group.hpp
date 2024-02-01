@@ -109,27 +109,28 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
     using entity_type = typename base_type::entity_type;
 
-    void swap_elements(const std::size_t pos, const entity_type entt) {
-        std::apply([pos, entt](auto *...cpool) { (cpool->swap_elements(cpool->data()[pos], entt), ...); }, pools);
+    template<std::size_t... Index>
+    void swap_elements(const std::size_t pos, const entity_type entt, std::index_sequence<Index...>) {
+        (std::get<Index>(pools)->swap_elements(std::get<Index>(pools)->data()[pos], entt), ...);
     }
 
     void push_on_construct(const entity_type entt) {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
-            swap_elements(len++, entt);
+            swap_elements(len++, entt, std::index_sequence_for<Owned...>{});
         }
     }
 
     void push_on_destroy(const entity_type entt) {
         if(std::apply([entt, len = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < len) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
-            swap_elements(len++, entt);
+            swap_elements(len++, entt, std::index_sequence_for<Owned...>{});
         }
     }
 
     void remove_if(const entity_type entt) {
         if(std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < len)) {
-            swap_elements(--len, entt);
+            swap_elements(--len, entt, std::index_sequence_for<Owned...>{});
         }
     }
 
@@ -163,13 +164,11 @@ public:
         return len;
     }
 
-    template<typename Type>
-    Type pools_as() const noexcept {
+    auto pools_as_tuple() const noexcept {
         return pools;
     }
 
-    template<typename Type>
-    Type filter_as() const noexcept {
+    auto filter_as_tuple() const noexcept {
         return filter;
     }
 
@@ -231,13 +230,11 @@ public:
         return elem;
     }
 
-    template<typename Type>
-    Type pools_as() const noexcept {
+    auto pools_as_tuple() const noexcept {
         return pools;
     }
 
-    template<typename Type>
-    Type filter_as() const noexcept {
+    auto filter_as_tuple() const noexcept {
         return filter;
     }
 
@@ -291,12 +288,12 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
 
     auto pools() const noexcept {
         using return_type = std::tuple<Get *...>;
-        return descriptor ? descriptor->template pools_as<return_type>() : return_type{};
+        return descriptor ? descriptor->pools_as_tuple() : return_type{};
     }
 
     auto filter() const noexcept {
         using return_type = std::tuple<Exclude *...>;
-        return descriptor ? descriptor->template filter_as<return_type>() : return_type{};
+        return descriptor ? descriptor->filter_as_tuple() : return_type{};
     }
 
 public:
@@ -659,14 +656,6 @@ public:
         }
     }
 
-    /**
-     * @brief Sort entities according to their order in a range.
-     * @param other The storage to use to impose the order.
-     */
-    [[deprecated("use iterator based sort_as instead")]] void sort_as(const common_type &other) const {
-        sort_as(other.begin(), other.end());
-    }
-
 private:
     handler *descriptor;
 };
@@ -712,12 +701,12 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
 
     auto pools() const noexcept {
         using return_type = std::tuple<Owned *..., Get *...>;
-        return descriptor ? descriptor->template pools_as<return_type>() : return_type{};
+        return descriptor ? descriptor->pools_as_tuple() : return_type{};
     }
 
     auto filter() const noexcept {
         using return_type = std::tuple<Exclude *...>;
-        return descriptor ? descriptor->template filter_as<return_type>() : return_type{};
+        return descriptor ? descriptor->filter_as_tuple() : return_type{};
     }
 
 public:

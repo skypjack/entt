@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <limits>
@@ -214,10 +215,11 @@ TEST(MakeObjUsingAllocator, Functionalities) {
 }
 
 TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
-    alignas(int) std::byte storage[sizeof(int)]; // NOLINT
+    alignas(int) std::array<std::byte, sizeof(int)> storage{};
     const std::allocator<int> allocator{};
 
-    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(&storage), allocator, 1); // NOLINT
+    // NOLINTNEXTLINE(*-reinterpret-cast)
+    int *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<int *>(storage.data()), allocator, 1);
 
     ASSERT_EQ(*value, 1);
 }
@@ -230,9 +232,10 @@ TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     const std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
-    alignas(string_type) std::byte storage[sizeof(string_type)]; // NOLINT
+    alignas(string_type) std::array<std::byte, sizeof(string_type)> storage{};
 
-    string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(&storage), allocator, test::tracked_memory_resource::default_value); // NOLINT
+    // NOLINTNEXTLINE(*-reinterpret-cast)
+    string_type *value = entt::uninitialized_construct_using_allocator(reinterpret_cast<string_type *>(storage.data()), allocator, test::tracked_memory_resource::default_value);
 
     ASSERT_GT(memory_resource.do_allocate_counter(), 0u);
     ASSERT_EQ(memory_resource.do_deallocate_counter(), 0u);
