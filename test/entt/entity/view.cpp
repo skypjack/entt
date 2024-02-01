@@ -544,7 +544,7 @@ TEST(SingleComponentView, SwapStorage) {
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(cview.storage<const int>(), nullptr);
 
-    const entt::entity entity{4u};
+    const entt::entity entity{registry.create()};
     registry.emplace<int>(entity);
 
     view.storage(registry.storage<int>());
@@ -1509,7 +1509,7 @@ TEST(MultiComponentView, SwapStorage) {
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(view.storage<const char>(), nullptr);
 
-    const entt::entity entity{4u};
+    const entt::entity entity{registry.create()};
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
 
