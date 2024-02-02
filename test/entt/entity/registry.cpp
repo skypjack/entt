@@ -446,6 +446,20 @@ TEST(Registry, Swap) {
     ASSERT_EQ(test.parent, &registry);
 }
 
+TEST(RegistryDeathTest, EmplaceInvalidEntity) {
+    entt::registry registry;
+    const std::array entity{registry.create()};
+    const std::array value{0};
+
+    registry.destroy(entity[0]);
+
+    ASSERT_DEATH(registry.emplace<int>(entity[0u]), "");
+    ASSERT_DEATH(registry.insert<int>(entity.begin(), entity.end(), value[0]), "");
+    ASSERT_DEATH(registry.insert<int>(entity.begin(), entity.end(), value.begin()), "");
+    ASSERT_DEATH(registry.emplace_or_replace<int>(entity[0u]), "");
+    ASSERT_DEATH([[maybe_unused]] const auto value = registry.get_or_emplace<int>(entity[0u]), "");
+}
+
 TEST(Registry, ReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -1894,6 +1908,7 @@ TEST(Registry, GetOrEmplace) {
     entt::registry registry;
     const auto entity = registry.create();
     const auto value = registry.get_or_emplace<int>(entity, 3);
+
     // get_or_emplace must work for empty types
     static_cast<void>(registry.get_or_emplace<test::empty>(entity));
 
