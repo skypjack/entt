@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>

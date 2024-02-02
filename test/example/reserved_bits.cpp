@@ -1,6 +1,10 @@
+#include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
 #include <entt/core/enum.hpp>
+#include <entt/core/fwd.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 

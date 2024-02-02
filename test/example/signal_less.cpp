@@ -1,5 +1,4 @@
 #include <array>
-#include <iterator>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>

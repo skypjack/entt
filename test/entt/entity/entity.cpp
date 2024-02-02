@@ -1,4 +1,7 @@
+#include <cstddef>
+#include <cstdint>
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
 #include <entt/entity/entity.hpp>
 #include "../common/custom_entity.h"
 
