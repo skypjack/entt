@@ -2,7 +2,6 @@
 #include <entt/core/attribute.h>
 #include <entt/core/utility.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include <entt/signal/sigh.hpp>
 #include "../common/types.h"
 
 ENTT_API void trigger(entt::dispatcher &);

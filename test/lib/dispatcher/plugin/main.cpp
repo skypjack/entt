@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
-#include <entt/signal/sigh.hpp>
 #include "../common/types.h"
 
 struct listener {
