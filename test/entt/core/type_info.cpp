@@ -87,10 +87,10 @@ TEST(TypeInfo, Order) {
 }
 
 TEST(TypeId, Functionalities) {
-    const int value = 42;
+    const int value = 4;
 
     ASSERT_EQ(entt::type_id(value), entt::type_id<int>());
-    ASSERT_EQ(entt::type_id(42), entt::type_id<int>());
+    ASSERT_EQ(entt::type_id(4), entt::type_id<int>());
 
     ASSERT_EQ(entt::type_id<int>(), entt::type_id<int>());
     ASSERT_EQ(entt::type_id<int &>(), entt::type_id<int &&>());

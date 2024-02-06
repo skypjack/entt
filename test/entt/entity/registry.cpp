@@ -101,8 +101,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.storage<entt::entity>().size(), 0u);
     ASSERT_EQ(registry.storage<entt::entity>().free_list(), 0u);
-    ASSERT_NO_THROW(registry.storage<entt::entity>().reserve(42));
-    ASSERT_EQ(registry.storage<entt::entity>().capacity(), 42u);
+    ASSERT_NO_THROW(registry.storage<entt::entity>().reserve(4));
+    ASSERT_EQ(registry.storage<entt::entity>().capacity(), 4u);
     ASSERT_TRUE(registry.storage<entt::entity>().empty());
 
     ASSERT_EQ(registry.storage<int>().size(), 0u);
@@ -138,7 +138,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.try_get<double>(e0), nullptr);
     ASSERT_EQ(registry.try_get<double>(e1), nullptr);
 
-    ASSERT_EQ(registry.emplace<int>(e0, 42), 42);
+    ASSERT_EQ(registry.emplace<int>(e0, 4), 4);
     ASSERT_EQ(registry.emplace<char>(e0, 'c'), 'c');
     ASSERT_NO_THROW(registry.erase<int>(e1));
     ASSERT_NO_THROW(registry.erase<char>(e1));
@@ -154,17 +154,17 @@ TEST(Registry, Functionalities) {
     registry.emplace_or_replace<char>(e2, registry.get<char>(e0));
 
     ASSERT_TRUE((registry.all_of<int, char>(e2)));
-    ASSERT_EQ(registry.get<int>(e0), 42);
+    ASSERT_EQ(registry.get<int>(e0), 4);
     ASSERT_EQ(registry.get<char>(e0), 'c');
 
     ASSERT_NE(registry.try_get<int>(e0), nullptr);
     ASSERT_NE(registry.try_get<char>(e0), nullptr);
     ASSERT_EQ(registry.try_get<double>(e0), nullptr);
-    ASSERT_EQ(*registry.try_get<int>(e0), 42);
+    ASSERT_EQ(*registry.try_get<int>(e0), 4);
     ASSERT_EQ(*registry.try_get<char>(e0), 'c');
 
-    ASSERT_EQ(std::get<0>(registry.get<int, char>(e0)), 42);
-    ASSERT_EQ(*std::get<0>(registry.try_get<int, char, double>(e0)), 42);
+    ASSERT_EQ(std::get<0>(registry.get<int, char>(e0)), 4);
+    ASSERT_EQ(*std::get<0>(registry.try_get<int, char, double>(e0)), 4);
     ASSERT_EQ(std::get<1>(static_cast<const entt::registry &>(registry).get<int, char>(e0)), 'c');
     ASSERT_EQ(*std::get<1>(static_cast<const entt::registry &>(registry).try_get<int, char, double>(e0)), 'c');
 

@@ -28,14 +28,14 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(entt::resolve("position"_hs));
     ASSERT_TRUE(entt::resolve("velocity"_hs));
 
-    auto pos = entt::resolve("position"_hs).construct(42., 3.);
+    auto pos = entt::resolve("position"_hs).construct(4., 3.);
     auto vel = entt::resolve("velocity"_hs).construct();
 
     ASSERT_TRUE(pos && vel);
 
     ASSERT_EQ(pos.type().data("x"_hs).type(), entt::resolve<int>());
     ASSERT_NE(pos.type().data("y"_hs).get(pos).try_cast<int>(), nullptr);
-    ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 42);
+    ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 4);
     ASSERT_EQ(pos.type().data("y"_hs).get(pos).cast<int>(), 3);
 
     ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
@@ -44,7 +44,7 @@ TEST(Lib, Meta) {
     ASSERT_EQ(vel.type().data("dy"_hs).get(vel).cast<double>(), 0.);
 
     ASSERT_EQ(ud.any.type(), entt::resolve<int>());
-    ASSERT_EQ(ud.any.cast<int>(), 42);
+    ASSERT_EQ(ud.any.cast<int>(), 4);
 
     // these objects have been initialized from a different context
     pos.emplace<void>();

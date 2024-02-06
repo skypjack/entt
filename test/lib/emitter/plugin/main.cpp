@@ -21,7 +21,7 @@ TEST(Lib, Emitter) {
     ctx.userdata = &emitter;
     cr_plugin_update(ctx);
 
-    ASSERT_EQ(value, 42);
+    ASSERT_EQ(value, 4);
 
     emitter = {};
     cr_plugin_close(ctx);

@@ -287,8 +287,8 @@ TEST(Flow, Sync) {
 ENTT_DEBUG_TEST(FlowDeathTest, NoBind) {
     entt::flow flow{};
 
-    ASSERT_DEATH(flow.ro(42), "");
-    ASSERT_DEATH(flow.rw(42), "");
+    ASSERT_DEATH(flow.ro(4), "");
+    ASSERT_DEATH(flow.rw(4), "");
 
     flow.bind(0);
 

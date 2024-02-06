@@ -7,9 +7,9 @@ ENTT_API void set_up(const entt::locator<service>::node_type &);
 ENTT_API void use_service(int);
 
 TEST(Lib, Locator) {
-    entt::locator<service>::emplace().value = 42;
+    entt::locator<service>::emplace().value = 4;
 
-    ASSERT_EQ(entt::locator<service>::value().value, 42);
+    ASSERT_EQ(entt::locator<service>::value().value, 4);
 
     set_up(entt::locator<service>::handle());
     use_service(3);
@@ -17,8 +17,8 @@ TEST(Lib, Locator) {
     ASSERT_EQ(entt::locator<service>::value().value, 3);
 
     // service updates do not propagate across boundaries
-    entt::locator<service>::emplace().value = 42;
+    entt::locator<service>::emplace().value = 4;
     use_service(3);
 
-    ASSERT_EQ(entt::locator<service>::value().value, 42);
+    ASSERT_EQ(entt::locator<service>::value().value, 4);
 }

@@ -144,8 +144,8 @@ public:
 
 protected:
     static constexpr int global_marker = 1;
-    static constexpr int local_marker = 42;
-    static constexpr int bucket_value = 99;
+    static constexpr int local_marker = 4;
+    static constexpr int bucket_value = 2;
     static constexpr int prop_value = 3;
 
 private:

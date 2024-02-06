@@ -28,7 +28,7 @@ TEST(Lib, Dispatcher) {
     ctx.userdata = &dispatcher;
     cr_plugin_update(ctx);
 
-    ASSERT_EQ(listener.value, 42);
+    ASSERT_EQ(listener.value, 4);
 
     dispatcher = {};
     cr_plugin_close(ctx);

@@ -34,14 +34,14 @@ TYPED_TEST(Entity, Traits) {
     constexpr entity_type tombstone{entt::tombstone};
     constexpr entity_type null{entt::null};
 
-    const entity_type entity = traits_type::construct(42u, 1u);
+    const entity_type entity = traits_type::construct(4u, 1u);
     const entity_type other = traits_type::construct(3u, 0u);
 
     ASSERT_EQ(entt::to_integral(entity), entt::to_integral(entity));
     ASSERT_NE(entt::to_integral(entity), entt::to_integral<entity_type>(entt::null));
     ASSERT_NE(entt::to_integral(entity), entt::to_integral(entity_type{}));
 
-    ASSERT_EQ(entt::to_entity(entity), 42u);
+    ASSERT_EQ(entt::to_entity(entity), 4u);
     ASSERT_EQ(entt::to_version(entity), 1u);
     ASSERT_EQ(entt::to_entity(other), 3u);
     ASSERT_EQ(entt::to_version(other), 0u);
@@ -107,7 +107,7 @@ TYPED_TEST(Entity, Null) {
     ASSERT_TRUE(entt::null == entt::null);
     ASSERT_FALSE(entt::null != entt::null);
 
-    const entity_type entity{42u};
+    const entity_type entity{4u};
 
     ASSERT_EQ(traits_type::combine(entt::null, entt::to_integral(entity)), (traits_type::construct(entt::to_entity(null), entt::to_version(entity))));
     ASSERT_EQ(traits_type::combine(entt::null, entt::to_integral(null)), null);
@@ -130,7 +130,7 @@ TYPED_TEST(Entity, Tombstone) {
     ASSERT_TRUE(entt::tombstone == entt::tombstone);
     ASSERT_FALSE(entt::tombstone != entt::tombstone);
 
-    const entity_type entity{42u};
+    const entity_type entity{4u};
 
     ASSERT_EQ(traits_type::combine(entt::to_integral(entity), entt::tombstone), (traits_type::construct(entt::to_entity(entity), entt::to_version(tombstone))));
     ASSERT_EQ(traits_type::combine(entt::tombstone, entt::to_integral(tombstone)), tombstone);

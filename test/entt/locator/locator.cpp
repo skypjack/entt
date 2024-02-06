@@ -86,5 +86,5 @@ ENTT_DEBUG_TEST_F(ServiceLocatorDeathTest, UninitializedValue) {
 
     entt::locator<base_service>::reset();
 
-    ASSERT_DEATH(entt::locator<base_service>::value().invoke(42), "");
+    ASSERT_DEATH(entt::locator<base_service>::value().invoke(4), "");
 }

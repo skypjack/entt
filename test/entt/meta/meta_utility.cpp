@@ -127,10 +127,10 @@ TEST_F(MetaUtility, MetaSetter) {
     clazz instance{};
 
     ASSERT_FALSE((entt::meta_setter<clazz, &clazz::static_setter>(instance, instance)));
-    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::static_setter>(std::as_const(instance), 42)));
-    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::static_setter>(invalid, 42)));
-    ASSERT_TRUE((entt::meta_setter<clazz, &clazz::static_setter>(instance, 42)));
-    ASSERT_EQ(instance.member, 42);
+    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::static_setter>(std::as_const(instance), 4)));
+    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::static_setter>(invalid, 4)));
+    ASSERT_TRUE((entt::meta_setter<clazz, &clazz::static_setter>(instance, 4)));
+    ASSERT_EQ(instance.member, 4);
 
     ASSERT_FALSE((entt::meta_setter<clazz, &clazz::setter>(instance, instance)));
     ASSERT_FALSE((entt::meta_setter<clazz, &clazz::setter>(std::as_const(instance), 3)));
@@ -139,12 +139,12 @@ TEST_F(MetaUtility, MetaSetter) {
     ASSERT_EQ(instance.member, 3);
 
     ASSERT_FALSE((entt::meta_setter<clazz, &clazz::member>(instance, instance)));
-    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::member>(invalid, 99)));
-    ASSERT_TRUE((entt::meta_setter<clazz, &clazz::member>(instance, 99)));
-    ASSERT_EQ(instance.member, 99);
+    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::member>(invalid, 8)));
+    ASSERT_TRUE((entt::meta_setter<clazz, &clazz::member>(instance, 8)));
+    ASSERT_EQ(instance.member, 8);
 
-    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::cmember>(instance, 99)));
-    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::cmember>(invalid, 99)));
+    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::cmember>(instance, 8)));
+    ASSERT_FALSE((entt::meta_setter<clazz, &clazz::cmember>(invalid, 8)));
     ASSERT_EQ(instance.cmember, 0);
 
     ASSERT_FALSE((entt::meta_setter<clazz, &clazz::value>(instance, instance)));
@@ -184,8 +184,8 @@ TEST_F(MetaUtility, MetaGetter) {
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(invalid)).cast<int>(), 0);
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(instance)).cast<int>(), 0);
 
-    ASSERT_EQ((entt::meta_getter<clazz, 42>(invalid)).cast<int>(), 42);
-    ASSERT_EQ((entt::meta_getter<clazz, 42>(instance)).cast<int>(), 42);
+    ASSERT_EQ((entt::meta_getter<clazz, 4>(invalid)).cast<int>(), 4);
+    ASSERT_EQ((entt::meta_getter<clazz, 4>(instance)).cast<int>(), 4);
 }
 
 TEST_F(MetaUtility, MetaInvokeWithCandidate) {

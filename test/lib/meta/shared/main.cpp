@@ -29,14 +29,14 @@ TEST(Lib, Meta) {
     ASSERT_EQ(entt::resolve<position>(), entt::resolve("position"_hs));
     ASSERT_EQ(entt::resolve<velocity>(), entt::resolve("velocity"_hs));
 
-    auto pos = entt::resolve("position"_hs).construct(42., 3.);
+    auto pos = entt::resolve("position"_hs).construct(4., 3.);
     auto vel = entt::resolve("velocity"_hs).construct();
 
     ASSERT_TRUE(pos && vel);
 
     ASSERT_EQ(pos.type().data("x"_hs).type(), entt::resolve<int>());
     ASSERT_NE(pos.type().data("y"_hs).get(pos).try_cast<int>(), nullptr);
-    ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 42);
+    ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 4);
     ASSERT_EQ(pos.type().data("y"_hs).get(pos).cast<int>(), 3);
 
     ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
@@ -47,8 +47,8 @@ TEST(Lib, Meta) {
     pos.reset();
     vel.reset();
 
-    ASSERT_EQ(wrap_int(42).type(), entt::resolve<int>());
-    ASSERT_EQ(wrap_int(42).cast<int>(), 42);
+    ASSERT_EQ(wrap_int(4).type(), entt::resolve<int>());
+    ASSERT_EQ(wrap_int(4).cast<int>(), 4);
 
     tear_down();
 

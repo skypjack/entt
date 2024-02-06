@@ -7,9 +7,9 @@
 #include "types.h"
 
 TEST(Lib, Locator) {
-    entt::locator<service>::emplace().value = 42;
+    entt::locator<service>::emplace().value = 4;
 
-    ASSERT_EQ(entt::locator<service>::value().value, 42);
+    ASSERT_EQ(entt::locator<service>::value().value, 4);
 
     userdata ud{entt::locator<service>::handle(), 3};
 
@@ -22,7 +22,7 @@ TEST(Lib, Locator) {
     ASSERT_EQ(entt::locator<service>::value().value, ud.value);
 
     // service updates do not propagate across boundaries
-    entt::locator<service>::emplace().value = 42;
+    entt::locator<service>::emplace().value = 4;
     cr_plugin_update(ctx);
 
     ASSERT_NE(entt::locator<service>::value().value, ud.value);
