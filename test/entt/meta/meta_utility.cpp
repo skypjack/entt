@@ -184,8 +184,8 @@ TEST_F(MetaUtility, MetaGetter) {
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(invalid)).cast<int>(), 0);
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(instance)).cast<int>(), 0);
 
-    ASSERT_EQ((entt::meta_getter<clazz, 4>(invalid)).cast<int>(), 4);
-    ASSERT_EQ((entt::meta_getter<clazz, 4>(instance)).cast<int>(), 4);
+    ASSERT_EQ((entt::meta_getter<clazz, 1>(invalid)).cast<int>(), 1);
+    ASSERT_EQ((entt::meta_getter<clazz, 1>(instance)).cast<int>(), 1);
 }
 
 TEST_F(MetaUtility, MetaInvokeWithCandidate) {
