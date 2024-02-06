@@ -819,7 +819,7 @@ TEST(DenseMap, EraseFromBucket) {
     for(std::size_t next{}; next < 4u; ++next) {
         ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next, 2u * minimum_bucket_count * next).second);
         ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next + 2u, 2u * minimum_bucket_count * next + 2u).second);
-        ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * (next + 1u) - 1u, 2u * minimum_bucket_count * (next + 1u) - 1u).second);
+        ASSERT_TRUE(map.emplace(2u * minimum_bucket_count * next + 3u, 2u * minimum_bucket_count * next + 3u).second);
     }
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
@@ -827,7 +827,7 @@ TEST(DenseMap, EraseFromBucket) {
 
     ASSERT_EQ(map.bucket_size(0u), 4u);
     ASSERT_EQ(map.bucket_size(2u), 4u);
-    ASSERT_EQ(map.bucket_size(15u), 4u);
+    ASSERT_EQ(map.bucket_size(3u), 4u);
 
     map.erase(map.end() - 3, map.end());
 
@@ -836,7 +836,7 @@ TEST(DenseMap, EraseFromBucket) {
 
     ASSERT_EQ(map.bucket_size(0u), 3u);
     ASSERT_EQ(map.bucket_size(2u), 3u);
-    ASSERT_EQ(map.bucket_size(15u), 3u);
+    ASSERT_EQ(map.bucket_size(3u), 3u);
 
     for(std::size_t next{}; next < 3u; ++next) {
         ASSERT_TRUE(map.contains(2u * minimum_bucket_count * next));
@@ -845,31 +845,31 @@ TEST(DenseMap, EraseFromBucket) {
         ASSERT_TRUE(map.contains(2u * minimum_bucket_count * next + 2u));
         ASSERT_EQ(map.bucket(2u * minimum_bucket_count * next + 2u), 2u);
 
-        ASSERT_TRUE(map.contains(2u * minimum_bucket_count * (next + 1u) - 1u));
-        ASSERT_EQ(map.bucket(2u * minimum_bucket_count * (next + 1u) - 1u), 15u);
+        ASSERT_TRUE(map.contains(2u * minimum_bucket_count * next + 3u));
+        ASSERT_EQ(map.bucket(2u * minimum_bucket_count * next + 3u), 3u);
     }
 
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 3u));
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 3u + 2u));
-    ASSERT_FALSE(map.contains(2u * minimum_bucket_count * (3u + 1u) - 1u));
+    ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 3u + 3u));
 
     map.erase((++map.begin(0u))->first);
     map.erase((++map.begin(2u))->first);
-    map.erase((++map.begin(15u))->first); // NOLINT
+    map.erase((++map.begin(3u))->first);
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_EQ(map.size(), 6u);
 
     ASSERT_EQ(map.bucket_size(0u), 2u);
     ASSERT_EQ(map.bucket_size(2u), 2u);
-    ASSERT_EQ(map.bucket_size(15u), 2u);
+    ASSERT_EQ(map.bucket_size(3u), 2u);
 
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 1u));
     ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 1u + 2u));
-    ASSERT_FALSE(map.contains(2u * minimum_bucket_count * (1u + 1u) - 1u));
+    ASSERT_FALSE(map.contains(2u * minimum_bucket_count * 1u + 3u));
 
-    while(map.begin(15) != map.end(15u)) { // NOLINT
-        map.erase(map.begin(15)->first);   // NOLINT
+    while(map.begin(3) != map.end(3u)) {
+        map.erase(map.begin(3)->first);
     }
 
     ASSERT_EQ(map.bucket_count(), 2u * minimum_bucket_count);
@@ -877,7 +877,7 @@ TEST(DenseMap, EraseFromBucket) {
 
     ASSERT_EQ(map.bucket_size(0u), 2u);
     ASSERT_EQ(map.bucket_size(2u), 2u);
-    ASSERT_EQ(map.bucket_size(15u), 0u);
+    ASSERT_EQ(map.bucket_size(3u), 0u);
 
     ASSERT_TRUE(map.contains(0u * minimum_bucket_count));
     ASSERT_TRUE(map.contains(0u * minimum_bucket_count + 2u));
@@ -892,7 +892,7 @@ TEST(DenseMap, EraseFromBucket) {
 
     ASSERT_EQ(map.bucket_size(0u), 1u);
     ASSERT_EQ(map.bucket_size(2u), 1u);
-    ASSERT_EQ(map.bucket_size(15u), 0u);
+    ASSERT_EQ(map.bucket_size(3u), 0u);
 
     ASSERT_FALSE(map.contains(0u * minimum_bucket_count));
     ASSERT_TRUE(map.contains(0u * minimum_bucket_count + 2u));
