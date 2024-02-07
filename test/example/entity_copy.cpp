@@ -11,7 +11,8 @@
 enum class my_entity : entt::id_type {};
 
 template<typename Type>
-struct meta_mixin: Type { // NOLINT
+// NOLINTNEXTLINE(*-exception-escape)
+struct meta_mixin: Type {
     using allocator_type = typename Type::allocator_type;
     using value_type = typename Type::value_type;
 
