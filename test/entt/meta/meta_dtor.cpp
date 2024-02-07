@@ -9,19 +9,20 @@
 #include <entt/meta/resolve.hpp>
 
 struct clazz_t {
-    clazz_t() {
-        ++counter;
+    clazz_t(int &cnt)
+        : counter{&cnt} {
+        ++(*counter);
     }
 
-    static void destroy_decr(clazz_t &) {
-        --counter;
+    static void destroy_decr(clazz_t &instance) {
+        --(*instance.counter);
     }
 
     void destroy_incr() const {
-        ++counter;
+        ++(*counter);
     }
 
-    inline static int counter = 0; // NOLINT
+    int *counter;
 };
 
 struct MetaDtor: ::testing::Test {
@@ -30,9 +31,8 @@ struct MetaDtor: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
+            .ctor<int &>()
             .dtor<clazz_t::destroy_decr>();
-
-        clazz_t::counter = 0;
     }
 
     void TearDown() override {
@@ -41,9 +41,9 @@ struct MetaDtor: ::testing::Test {
 };
 
 TEST_F(MetaDtor, Functionalities) {
-    ASSERT_EQ(clazz_t::counter, 0);
+    int counter{};
 
-    auto any = entt::resolve<clazz_t>().construct();
+    auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(counter));
     auto cref = std::as_const(any).as_ref();
     auto ref = any.as_ref();
 
@@ -51,7 +51,7 @@ TEST_F(MetaDtor, Functionalities) {
     ASSERT_TRUE(cref);
     ASSERT_TRUE(ref);
 
-    ASSERT_EQ(clazz_t::counter, 1);
+    ASSERT_EQ(counter, 1);
 
     cref.reset();
     ref.reset();
@@ -60,7 +60,7 @@ TEST_F(MetaDtor, Functionalities) {
     ASSERT_FALSE(cref);
     ASSERT_FALSE(ref);
 
-    ASSERT_EQ(clazz_t::counter, 1);
+    ASSERT_EQ(counter, 1);
 
     any.reset();
 
@@ -68,13 +68,13 @@ TEST_F(MetaDtor, Functionalities) {
     ASSERT_FALSE(cref);
     ASSERT_FALSE(ref);
 
-    ASSERT_EQ(clazz_t::counter, 0);
+    ASSERT_EQ(counter, 0);
 }
 
 TEST_F(MetaDtor, AsRefConstruction) {
-    ASSERT_EQ(clazz_t::counter, 0);
+    int counter{};
 
-    clazz_t instance{};
+    clazz_t instance{counter};
     auto any = entt::forward_as_meta(instance);
     auto cany = entt::forward_as_meta(std::as_const(instance));
     auto cref = cany.as_ref();
@@ -85,7 +85,7 @@ TEST_F(MetaDtor, AsRefConstruction) {
     ASSERT_TRUE(cref);
     ASSERT_TRUE(ref);
 
-    ASSERT_EQ(clazz_t::counter, 1);
+    ASSERT_EQ(counter, 1);
 
     any.reset();
     cany.reset();
@@ -97,18 +97,19 @@ TEST_F(MetaDtor, AsRefConstruction) {
     ASSERT_FALSE(cref);
     ASSERT_FALSE(ref);
 
-    ASSERT_EQ(clazz_t::counter, 1);
+    ASSERT_EQ(counter, 1);
 }
 
 TEST_F(MetaDtor, ReRegistration) {
     SetUp();
 
+    int counter{};
     auto &&node = entt::internal::resolve<clazz_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
     ASSERT_NE(node.dtor.dtor, nullptr);
 
     entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
-    entt::resolve<clazz_t>().construct().reset();
+    entt::resolve<clazz_t>().construct(entt::forward_as_meta(counter)).reset();
 
-    ASSERT_EQ(clazz_t::counter, 2);
+    ASSERT_EQ(counter, 2);
 }

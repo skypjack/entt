@@ -53,7 +53,7 @@ struct func_t {
         return f(a, b);
     }
 
-    [[nodiscard]] int f(int a, int b) { // NOLINT
+    [[nodiscard]] int f(int a, const int b) {
         value = a;
         return b * b;
     }

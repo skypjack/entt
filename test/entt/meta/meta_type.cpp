@@ -79,7 +79,7 @@ struct overloaded_func_t {
         return f(a, b);
     }
 
-    [[nodiscard]] int f(int a, int b) { // NOLINT
+    [[nodiscard]] int f(int a, const int b) {
         value = a;
         return g(b);
     }
@@ -92,7 +92,7 @@ struct overloaded_func_t {
         return g(v);
     }
 
-    [[nodiscard]] float f(int a, float b) { // NOLINT
+    [[nodiscard]] float f(int a, const float b) {
         value = a;
         return static_cast<float>(e(static_cast<int>(b)));
     }
@@ -122,7 +122,7 @@ struct MetaType: ::testing::Test {
         entt::meta<unsigned int>()
             .type("unsigned int"_hs)
             .data<0u>("min"_hs)
-            .data<100u>("max"_hs); // NOLINT
+            .data<128u>("max"_hs);
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -237,8 +237,10 @@ TEST_F(MetaType, Functionalities) {
 TEST_F(MetaType, SizeOf) {
     ASSERT_EQ(entt::resolve<void>().size_of(), 0u);
     ASSERT_EQ(entt::resolve<int>().size_of(), sizeof(int));
-    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);              // NOLINT
-    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3])); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);
+    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3]));
+    // NOLINTEND(*-avoid-c-arrays)
 }
 
 TEST_F(MetaType, Traits) {
@@ -254,8 +256,10 @@ TEST_F(MetaType, Traits) {
     ASSERT_FALSE(entt::resolve<unsigned int>().is_signed());
     ASSERT_FALSE(entt::resolve<clazz_t>().is_signed());
 
-    ASSERT_TRUE(entt::resolve<int[5]>().is_array());    // NOLINT
-    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array()); // NOLINT
+    // NOLINTBEGIN(*-avoid-c-arrays)
+    ASSERT_TRUE(entt::resolve<int[5]>().is_array());
+    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
+    // NOLINTEND(*-avoid-c-arrays)
     ASSERT_FALSE(entt::resolve<int>().is_array());
 
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
@@ -442,36 +446,36 @@ TEST_F(MetaType, OverloadedFunc) {
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 16);
 
-    res = type.invoke("f"_hs, instance, 5); // NOLINT
+    res = type.invoke("f"_hs, instance, 2);
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
-    ASSERT_EQ(res.cast<int>(), 50);
+    ASSERT_EQ(res.cast<int>(), 8);
 
-    res = type.invoke("f"_hs, std::as_const(instance), 5); // NOLINT
+    res = type.invoke("f"_hs, std::as_const(instance), 2);
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
-    ASSERT_EQ(res.cast<int>(), 25);
+    ASSERT_EQ(res.cast<int>(), 4);
 
-    res = type.invoke("f"_hs, instance, 6, 7.f); // NOLINT
-
-    ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 6);
-    ASSERT_NE(res.try_cast<float>(), nullptr);
-    ASSERT_EQ(res.cast<float>(), 14.f);
-
-    res = type.invoke("f"_hs, instance, 8, 9.f);
+    res = type.invoke("f"_hs, instance, 0, 1.f);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 8);
+    ASSERT_EQ(instance.value, 0);
     ASSERT_NE(res.try_cast<float>(), nullptr);
-    ASSERT_EQ(res.cast<float>(), 18.f);
+    ASSERT_EQ(res.cast<float>(), 2.f);
+
+    res = type.invoke("f"_hs, instance, 4, 8.f);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(instance.value, 4);
+    ASSERT_NE(res.try_cast<float>(), nullptr);
+    ASSERT_EQ(res.cast<float>(), 16.f);
 
     // it fails as an ambiguous call
-    ASSERT_FALSE(type.invoke("f"_hs, instance, 8, 9.));
+    ASSERT_FALSE(type.invoke("f"_hs, instance, 4, 8.));
 }
 
 TEST_F(MetaType, Construct) {
@@ -645,11 +649,11 @@ TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
     ASSERT_EQ(type.data("min"_hs).type(), type);
     ASSERT_EQ(type.data("max"_hs).type(), type);
 
-    ASSERT_FALSE(type.data("min"_hs).set({}, 100u));
+    ASSERT_FALSE(type.data("min"_hs).set({}, 128u));
     ASSERT_FALSE(type.data("max"_hs).set({}, 0u));
 
     ASSERT_EQ(type.data("min"_hs).get({}).cast<unsigned int>(), 0u);
-    ASSERT_EQ(type.data("max"_hs).get({}).cast<unsigned int>(), 100u);
+    ASSERT_EQ(type.data("max"_hs).get({}).cast<unsigned int>(), 128u);
 }
 
 TEST_F(MetaType, Variables) {
