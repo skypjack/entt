@@ -34,7 +34,8 @@ struct delegate_functor {
     }
 
     static const int static_value = 3;
-    const int data_member = 42; // NOLINT
+    // NOLINTNEXTLINE(*-avoid-const-or-ref-data-members)
+    const int data_member = 4;
 };
 
 struct const_nonconst_noexcept {
@@ -55,7 +56,8 @@ struct const_nonconst_noexcept {
     }
 
     int u{};
-    const int v{}; // NOLINT
+    // NOLINTNEXTLINE(*-avoid-const-or-ref-data-members)
+    const int v{};
     mutable int cnt{0};
 };
 
@@ -112,8 +114,8 @@ ENTT_DEBUG_TEST(DelegateDeathTest, InvokeEmpty) {
     entt::delegate<int(int)> del;
 
     ASSERT_FALSE(del);
-    ASSERT_DEATH(del(42), "");
-    ASSERT_DEATH(std::as_const(del)(42), "");
+    ASSERT_DEATH(del(4), "");
+    ASSERT_DEATH(std::as_const(del)(4), "");
 }
 
 TEST(Delegate, DataMembers) {
@@ -122,7 +124,7 @@ TEST(Delegate, DataMembers) {
 
     delegate.connect<&delegate_functor::data_member>(functor);
 
-    ASSERT_EQ(delegate(), 42);
+    ASSERT_EQ(delegate(), 4);
 }
 
 TEST(Delegate, Comparison) {
@@ -345,7 +347,7 @@ TEST(Delegate, MoveOnlyType) {
 TEST(Delegate, DiscardLast) {
     entt::delegate<int(int, const std::unique_ptr<int> &)> delegate;
     const auto value = 3;
-    const auto other = std::make_unique<int>(42);
+    const auto other = std::make_unique<int>(4);
 
     delegate.connect<&power_of_two>();
 
@@ -366,7 +368,7 @@ TEST(Delegate, DiscardLast) {
 TEST(Delegate, SkipFirst) {
     entt::delegate<int(const std::unique_ptr<int> &, int)> delegate;
     const auto value = 3;
-    const auto other = std::make_unique<int>(42);
+    const auto other = std::make_unique<int>(4);
 
     delegate.connect<&power_of_two>();
 
@@ -426,7 +428,7 @@ TEST(Delegate, UnboundDataMember) {
     delegate.connect<&delegate_functor::data_member>();
     const delegate_functor functor;
 
-    ASSERT_EQ(delegate(functor), 42);
+    ASSERT_EQ(delegate(functor), 4);
 }
 
 TEST(Delegate, UnboundMemberFunction) {
