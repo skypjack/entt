@@ -422,7 +422,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
 
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
-        ((storage<Index>() == base_type::handle() ? each<Index>(func, seq) : void()), ...);
+        ((Index == this->index ? each<Index>(func, seq) : void()), ...);
     }
 
 public:
