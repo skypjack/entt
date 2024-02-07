@@ -8,7 +8,7 @@
 		<Intrinsic Name="first" Optional="true" Expression="*(first_base::base_type*)this"/>
 		<Intrinsic Name="second" Optional="true" Expression="((second_base*)this)->value"/>
 		<Intrinsic Name="second" Optional="true" Expression="*(second_base::base_type*)this"/>
-		<DisplayString >({ first() }, { second() })</DisplayString>
+		<DisplayString>({ first() }, { second() })</DisplayString>
 		<Expand>
 			<Item Name="[first]">first()</Item>
 			<Item Name="[second]">second()</Item>
