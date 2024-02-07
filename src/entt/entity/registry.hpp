@@ -460,7 +460,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     [[nodiscard]] bool valid(const entity_type entt) const {
-        return entities.contains(entt) && (entities.index(entt) < entities.free_list());
+        return static_cast<size_type>(entities.find(entt).index()) < entities.free_list();
     }
 
     /**
