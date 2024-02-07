@@ -856,11 +856,6 @@ public:
 
     /**
      * @brief Returns an empty tuple.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the storage results in
-     * undefined behavior.
-     *
      * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */
@@ -1043,11 +1038,6 @@ public:
 
     /**
      * @brief Returns an empty tuple.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the storage results in
-     * undefined behavior.
-     *
      * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */

@@ -1865,8 +1865,7 @@ inline meta_sequence_container::iterator meta_sequence_container::erase(iterator
 }
 
 /**
- * @brief Returns a reference to the element at a given location of a container
- * (no bounds checking is performed).
+ * @brief Returns a reference to the element at a given location of a container.
  * @param pos The position of the element to return.
  * @return A reference to the requested element properly wrapped.
  */

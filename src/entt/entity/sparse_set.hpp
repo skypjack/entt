@@ -750,7 +750,7 @@ public:
     }
 
     /**
-     * @brief Returns the entity at specified location, without bounds checking.
+     * @brief Returns the entity at specified location.
      * @param pos The position for which to return the entity.
      * @return The entity at specified location.
      */
