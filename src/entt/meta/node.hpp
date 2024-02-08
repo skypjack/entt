@@ -35,9 +35,10 @@ enum class meta_traits : std::uint32_t {
     is_array = 0x0020,
     is_enum = 0x0040,
     is_class = 0x0080,
-    is_meta_pointer_like = 0x0100,
-    is_meta_sequence_container = 0x0200,
-    is_meta_associative_container = 0x0400,
+    is_pointer = 0x0100,
+    is_meta_pointer_like = 0x0200,
+    is_meta_sequence_container = 0x0400,
+    is_meta_associative_container = 0x0800,
     _entt_enum_as_bitmask
 };
 
@@ -219,6 +220,7 @@ template<typename Type>
             | (std::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
             | (std::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
             | (std::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
+            | (std::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
             | (is_meta_pointer_like_v<Type> ? meta_traits::is_meta_pointer_like : meta_traits::is_none)
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_meta_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_meta_associative_container : meta_traits::is_none),
