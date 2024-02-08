@@ -1248,7 +1248,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return {*ctx, node.remove_pointer(internal::meta_context::from(*ctx))}; // NOLINT
+        return {*ctx, node.remove_pointer(internal::meta_context::from(*ctx))};
     }
 
     /**
