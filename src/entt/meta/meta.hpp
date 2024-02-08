@@ -1239,7 +1239,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const noexcept {
-        return node.info && (node.info->hash() != remove_pointer().info().hash());
+        return static_cast<bool>(node.traits & internal::meta_traits::is_pointer);
     }
 
     /**
