@@ -5,6 +5,12 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/custom_entity.h>
+#include <common/linter.hpp>
+#include <common/non_default_constructible.h>
+#include <common/pointer_stable.h>
+#include <common/throwing_allocator.hpp>
+#include <common/throwing_type.hpp>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/component.hpp>
@@ -12,12 +18,6 @@
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
-#include "../common/custom_entity.h"
-#include "../common/linter.hpp"
-#include "../common/non_default_constructible.h"
-#include "../common/pointer_stable.h"
-#include "../common/throwing_allocator.hpp"
-#include "../common/throwing_type.hpp"
 
 template<typename Registry>
 void listener(std::size_t &counter, Registry &, typename Registry::entity_type) {

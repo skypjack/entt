@@ -7,18 +7,18 @@
 #include <unordered_set>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/aggregate.h>
+#include <common/config.h>
+#include <common/linter.hpp>
+#include <common/pointer_stable.h>
+#include <common/throwing_allocator.hpp>
+#include <common/throwing_type.hpp>
+#include <common/tracked_memory_resource.hpp>
 #include <entt/core/iterator.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
-#include "../common/aggregate.h"
-#include "../common/config.h"
-#include "../common/linter.hpp"
-#include "../common/pointer_stable.h"
-#include "../common/throwing_allocator.hpp"
-#include "../common/throwing_type.hpp"
-#include "../common/tracked_memory_resource.hpp"
 
 struct update_from_destructor {
     update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)

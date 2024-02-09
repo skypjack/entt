@@ -7,11 +7,11 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
+#include <common/config.h>
+#include <common/empty.h>
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
-#include "../common/boxed_type.h"
-#include "../common/config.h"
-#include "../common/empty.h"
 
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;

@@ -8,12 +8,12 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
+#include <common/basic_test_allocator.hpp>
+#include <common/config.h>
+#include <common/throwing_allocator.hpp>
+#include <common/throwing_type.hpp>
+#include <common/tracked_memory_resource.hpp>
 #include <entt/core/memory.hpp>
-#include "../common/basic_test_allocator.hpp"
-#include "../common/config.h"
-#include "../common/throwing_allocator.hpp"
-#include "../common/throwing_type.hpp"
-#include "../common/tracked_memory_resource.hpp"
 
 TEST(ToAddress, Functionalities) {
     const std::shared_ptr<int> shared = std::make_shared<int>();

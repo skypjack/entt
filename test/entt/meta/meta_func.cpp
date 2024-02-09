@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
@@ -9,7 +10,6 @@
 #include <entt/meta/policy.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
-#include "../common/config.h"
 
 struct base_t {
     base_t() = default;

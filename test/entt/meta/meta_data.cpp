@@ -2,6 +2,7 @@
 #include <string>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/locator/locator.hpp>
@@ -12,7 +13,6 @@
 #include <entt/meta/policy.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
-#include "../common/config.h"
 
 struct base_t {
     virtual ~base_t() = default;

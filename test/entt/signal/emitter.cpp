@@ -2,8 +2,8 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/linter.hpp>
 #include <entt/signal/emitter.hpp>
-#include "../common/linter.hpp"
 
 struct test_emitter: entt::emitter<test_emitter> {
     using entt::emitter<test_emitter>::emitter;

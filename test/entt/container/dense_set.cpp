@@ -9,13 +9,13 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
+#include <common/linter.hpp>
+#include <common/throwing_allocator.hpp>
+#include <common/tracked_memory_resource.hpp>
+#include <common/transparent_equal_to.h>
 #include <entt/container/dense_set.hpp>
 #include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
-#include "../common/linter.hpp"
-#include "../common/throwing_allocator.hpp"
-#include "../common/tracked_memory_resource.hpp"
-#include "../common/transparent_equal_to.h"
 
 TEST(DenseSet, Functionalities) {
     entt::dense_set<int, entt::identity, test::transparent_equal_to> set;

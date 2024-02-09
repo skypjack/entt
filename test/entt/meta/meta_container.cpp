@@ -6,15 +6,15 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
+#include <common/config.h>
+#include <common/empty.h>
+#include <common/non_default_constructible.h>
 #include <entt/container/dense_map.hpp>
 #include <entt/container/dense_set.hpp>
 #include <entt/meta/container.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
-#include "../common/config.h"
-#include "../common/empty.h"
-#include "../common/non_default_constructible.h"
 
 TEST(MetaContainer, Invalid) {
     ASSERT_FALSE(entt::meta_any{0}.as_sequence_container());

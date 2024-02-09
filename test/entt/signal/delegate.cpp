@@ -1,8 +1,8 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
+#include <common/config.h>
 #include <entt/signal/delegate.hpp>
-#include "../common/config.h"
 
 int power_of_two(const int &i) {
     return i * i;
