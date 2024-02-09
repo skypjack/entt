@@ -28,5 +28,4 @@ TODO:
 * auto type info data from types if present
 * group review: use handler as base with protected members and arrays of common type (see view for further details)
 * swap sets in swap-only mode, return scoped iterators by default, make ::free_list return an iterator if possible
-* review names of test classes (_t vs non-_t)
-* test: bind common from cmake, move it under test and rename, then share it with all tests
+* test: review names of test classes (_t vs non-_t), push sharing types further
