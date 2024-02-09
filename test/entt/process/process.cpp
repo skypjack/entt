@@ -1,8 +1,7 @@
 #include <cstdint>
 #include <gtest/gtest.h>
+#include <common/empty.h>
 #include <entt/process/process.hpp>
-
-struct fake_delta {};
 
 template<typename Delta>
 struct fake_process: entt::process<fake_process<Delta>, Delta> {
@@ -112,7 +111,7 @@ TEST(Process, Basics) {
 }
 
 TEST(Process, Succeeded) {
-    fake_process<fake_delta> process{};
+    fake_process<test::empty> process{};
 
     process.tick({});
     process.tick({});
@@ -152,7 +151,7 @@ TEST(Process, Fail) {
 }
 
 TEST(Process, Data) {
-    fake_process<fake_delta> process{};
+    fake_process<test::empty> process{};
     int value = 0;
 
     process.tick({});
@@ -193,7 +192,7 @@ TEST(Process, AbortNextTick) {
 }
 
 TEST(Process, AbortImmediately) {
-    fake_process<fake_delta> process{};
+    fake_process<test::empty> process{};
 
     process.tick({});
     process.abort(true);
