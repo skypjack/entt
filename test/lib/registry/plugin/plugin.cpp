@@ -17,8 +17,8 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         const auto view = registry.view<test::boxed_int>();
         registry.insert(view.begin(), view.end(), test::empty{});
 
-        registry.view<test::boxed_int, test::empty>().each([count](test::boxed_int &elem) {
-            elem.value += count;
+        registry.view<test::boxed_int, test::empty>().each([cnt = count](test::boxed_int &elem) {
+            elem.value += cnt;
         });
     } break;
     case CR_CLOSE:
