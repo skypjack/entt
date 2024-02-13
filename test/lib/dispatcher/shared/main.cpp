@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
 #include <entt/core/attribute.h>
 #include <entt/core/utility.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include "../common/types.h"
 
 ENTT_API void trigger(entt::dispatcher &);
 
 struct listener {
-    void on(message msg) {
-        value = msg.payload;
+    void on(test::boxed_int msg) {
+        value = msg.value;
     }
 
     int value{};
@@ -20,7 +20,7 @@ TEST(Lib, Dispatcher) {
 
     ASSERT_EQ(listener.value, 0);
 
-    dispatcher.sink<message>().connect<entt::overload<void(message)>(&listener::on)>(listener);
+    dispatcher.sink<test::boxed_int>().connect<entt::overload<void(test::boxed_int)>(&listener::on)>(listener);
     trigger(dispatcher);
 
     ASSERT_EQ(listener.value, 2);

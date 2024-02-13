@@ -1,8 +1,9 @@
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <entt/core/attribute.h>
 #include <entt/signal/dispatcher.hpp>
-#include "../common/types.h"
 
 ENTT_API void trigger(entt::dispatcher &dispatcher) {
-    dispatcher.trigger<event>();
-    dispatcher.trigger(message{2});
+    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::boxed_int{2});
 }

@@ -1,13 +1,13 @@
 #define CR_HOST
 
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
-#include "../common/types.h"
 
 struct listener {
-    void on(message msg) {
-        value = msg.payload;
+    void on(test::boxed_int msg) {
+        value = msg.value;
     }
 
     int value{};
@@ -19,7 +19,7 @@ TEST(Lib, Dispatcher) {
 
     ASSERT_EQ(listener.value, 0);
 
-    dispatcher.sink<message>().connect<&listener::on>(listener);
+    dispatcher.sink<test::boxed_int>().connect<&listener::on>(listener);
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
