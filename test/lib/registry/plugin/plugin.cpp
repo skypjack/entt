@@ -1,22 +1,24 @@
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <cr.h>
 #include <entt/entity/registry.hpp>
-#include "../common/types.h"
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
+    constexpr auto count = 3;
+
     switch(operation) {
     case CR_STEP: {
         // forces things to break
         auto &registry = *static_cast<entt::registry *>(ctx->userdata);
 
-        // forces the creation of the pool for the velocity component
-        static_cast<void>(registry.storage<velocity>());
+        // forces the creation of the pool for the empty component
+        static_cast<void>(registry.storage<test::empty>());
 
-        const auto view = registry.view<position>();
-        registry.insert(view.begin(), view.end(), velocity{1., 1.});
+        const auto view = registry.view<test::boxed_int>();
+        registry.insert(view.begin(), view.end(), test::empty{});
 
-        registry.view<position, velocity>().each([](position &pos, velocity &vel) {
-            pos.x += static_cast<int>(16 * vel.dx);
-            pos.y += static_cast<int>(16 * vel.dy);
+        registry.view<test::boxed_int, test::empty>().each([count](test::boxed_int &elem) {
+            elem.value += count;
         });
     } break;
     case CR_CLOSE:

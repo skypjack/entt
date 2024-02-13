@@ -1,21 +1,20 @@
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <entt/core/attribute.h>
 #include <entt/entity/registry.hpp>
-#include "../common/types.h"
 
 template class entt::basic_registry<entt::entity>;
 
-ENTT_API void update_position(entt::registry &registry) {
-    registry.view<position, velocity>().each([](auto &pos, auto &vel) {
-        pos.x += static_cast<int>(16 * vel.dx);
-        pos.y += static_cast<int>(16 * vel.dy);
+ENTT_API void update(entt::registry &registry, int value) {
+    registry.view<test::boxed_int, test::empty>().each([value](auto &elem) {
+        elem.value += value;
     });
 }
 
-ENTT_API void emplace_velocity(entt::registry &registry) {
-    // forces the creation of the pool for the velocity component
-    static_cast<void>(registry.storage<velocity>());
+ENTT_API void insert(entt::registry &registry) {
+    // forces the creation of the pool for the empty type
+    static_cast<void>(registry.storage<test::empty>());
 
-    for(auto entity: registry.view<position>()) {
-        registry.emplace<velocity>(entity, 1., 1.);
-    }
+    const auto view = registry.view<test::boxed_int>();
+    registry.insert<test::empty>(view.begin(), view.end());
 }

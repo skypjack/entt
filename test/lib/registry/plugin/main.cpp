@@ -1,16 +1,19 @@
 #define CR_HOST
 
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <cr.h>
 #include <entt/entity/registry.hpp>
-#include "../common/types.h"
 
 TEST(Lib, Registry) {
+    constexpr auto count = 3;
     entt::registry registry;
 
-    registry.emplace<position>(registry.create(), 0, 0);
-    registry.emplace<position>(registry.create(), 1, 1);
-    registry.emplace<position>(registry.create(), 2, 2);
+    for(auto i = 0; i < count; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<test::boxed_int>(entity, i);
+    }
 
     cr_plugin ctx;
     cr_plugin_load(ctx, PLUGIN);
@@ -18,12 +21,11 @@ TEST(Lib, Registry) {
     ctx.userdata = &registry;
     cr_plugin_update(ctx);
 
-    ASSERT_EQ(registry.storage<position>().size(), registry.storage<velocity>().size());
-    ASSERT_EQ(registry.storage<position>().size(), registry.storage<entt::entity>().size());
+    ASSERT_EQ(registry.storage<test::boxed_int>().size(), registry.storage<test::empty>().size());
+    ASSERT_EQ(registry.storage<test::boxed_int>().size(), registry.storage<entt::entity>().size());
 
-    registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16u));
-        ASSERT_EQ(position.y, static_cast<int>(entt::to_integral(entity) + 16u));
+    registry.view<test::boxed_int>().each([count](auto entity, auto &elem) {
+        ASSERT_EQ(elem.value, entt::to_integral(entity) + count);
     });
 
     registry = {};

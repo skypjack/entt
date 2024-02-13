@@ -1,27 +1,28 @@
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <entt/core/attribute.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
-#include "../common/types.h"
 
-ENTT_API void update_position(entt::registry &);
-ENTT_API void emplace_velocity(entt::registry &);
+ENTT_API void update(entt::registry &, int);
+ENTT_API void insert(entt::registry &);
 
 TEST(Lib, Registry) {
+    constexpr auto count = 3;
     entt::registry registry;
 
-    for(auto i = 0; i < 3; ++i) {
+    for(auto i = 0; i < count; ++i) {
         const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
+        registry.emplace<test::boxed_int>(entity, i);
     }
 
-    emplace_velocity(registry);
-    update_position(registry);
+    insert(registry);
+    update(registry, count);
 
-    ASSERT_EQ(registry.storage<position>().size(), registry.storage<velocity>().size());
+    ASSERT_EQ(registry.storage<test::boxed_int>().size(), registry.storage<test::empty>().size());
 
-    registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16));
-        ASSERT_EQ(position.y, static_cast<int>(entt::to_integral(entity) + 16));
+    registry.view<test::boxed_int>().each([count](auto entity, auto &elem) {
+        ASSERT_EQ(elem.value, static_cast<int>(entt::to_integral(entity) + count));
     });
 }
