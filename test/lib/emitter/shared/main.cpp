@@ -1,18 +1,19 @@
 #include <gtest/gtest.h>
+#include <common/boxed_type.h>
+#include <common/emitter.h>
 #include <entt/core/attribute.h>
-#include "../common/types.h"
 
-ENTT_API void emit(test_emitter &);
+ENTT_API void emit(test::emitter &);
 
 TEST(Lib, Emitter) {
-    test_emitter emitter;
+    test::emitter emitter;
     int value{};
 
     ASSERT_EQ(value, 0);
 
-    emitter.on<message>([&](message msg, test_emitter &owner) {
-        value = msg.payload;
-        owner.erase<message>();
+    emitter.on<test::boxed_int>([&](test::boxed_int msg, test::emitter &owner) {
+        value = msg.value;
+        owner.erase<test::boxed_int>();
     });
 
     emit(emitter);
