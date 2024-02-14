@@ -1,5 +1,5 @@
-#ifndef ENTT_LIB_META_PLUGIN_TYPES_H
-#define ENTT_LIB_META_PLUGIN_TYPES_H
+#ifndef ENTT_LIB_META_PLUGIN_USERDATA_H
+#define ENTT_LIB_META_PLUGIN_USERDATA_H
 
 #include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>

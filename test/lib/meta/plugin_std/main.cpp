@@ -8,12 +8,12 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
-#include "types.h"
+#include "userdata.h"
 
 TEST(Lib, Meta) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::resolve("position"_hs));
+    ASSERT_FALSE(entt::resolve("boxed_int"_hs));
 
     userdata ud{};
     ud.ctx = entt::locator<entt::meta_ctx>::handle();
@@ -24,36 +24,29 @@ TEST(Lib, Meta) {
     cr_plugin_load(ctx, PLUGIN);
     cr_plugin_update(ctx);
 
-    entt::meta<double>().conv<int>();
+    ASSERT_TRUE(entt::resolve("boxed_int"_hs));
+    ASSERT_TRUE(entt::resolve("empty"_hs));
 
-    ASSERT_TRUE(entt::resolve("position"_hs));
-    ASSERT_TRUE(entt::resolve("velocity"_hs));
+    auto boxed_int = entt::resolve("boxed_int"_hs).construct(4.);
+    auto empty = entt::resolve("empty"_hs).construct();
 
-    auto pos = entt::resolve("position"_hs).construct(4., 3.);
-    auto vel = entt::resolve("velocity"_hs).construct();
+    ASSERT_TRUE(boxed_int);
+    ASSERT_TRUE(empty);
 
-    ASSERT_TRUE(pos && vel);
-
-    ASSERT_EQ(pos.type().data("x"_hs).type(), entt::resolve<int>());
-    ASSERT_NE(pos.type().data("y"_hs).get(pos).try_cast<int>(), nullptr);
-    ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 4);
-    ASSERT_EQ(pos.type().data("y"_hs).get(pos).cast<int>(), 3);
-
-    ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
-    ASSERT_TRUE(vel.type().data("dy"_hs).get(vel).allow_cast<double>());
-    ASSERT_EQ(vel.type().data("dx"_hs).get(vel).cast<double>(), 0.);
-    ASSERT_EQ(vel.type().data("dy"_hs).get(vel).cast<double>(), 0.);
+    ASSERT_EQ(boxed_int.type().data("value"_hs).type(), entt::resolve<int>());
+    ASSERT_NE(boxed_int.get("value"_hs).try_cast<int>(), nullptr);
+    ASSERT_EQ(boxed_int.get("value"_hs).cast<int>(), 4);
 
     ASSERT_EQ(ud.any.type(), entt::resolve<int>());
     ASSERT_EQ(ud.any.cast<int>(), 4);
 
     // these objects have been initialized from a different context
-    pos.emplace<void>();
-    vel.emplace<void>();
+    boxed_int.emplace<void>();
+    empty.emplace<void>();
     ud.any.emplace<void>();
 
     cr_plugin_close(ctx);
 
-    ASSERT_FALSE(entt::resolve("position"_hs));
-    ASSERT_FALSE(entt::resolve("velocity"_hs));
+    ASSERT_FALSE(entt::resolve("boxed_int"_hs));
+    ASSERT_FALSE(entt::resolve("empty"_hs));
 }

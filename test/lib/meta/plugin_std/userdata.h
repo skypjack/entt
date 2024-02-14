@@ -1,14 +1,13 @@
-#ifndef ENTT_LIB_META_PLUGIN_STD_TYPES_H
-#define ENTT_LIB_META_PLUGIN_STD_TYPES_H
+#ifndef ENTT_LIB_META_PLUGIN_STD_USERDATA_H
+#define ENTT_LIB_META_PLUGIN_STD_USERDATA_H
 
 #include <type_traits>
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/meta.hpp>
-
-template<typename>
-struct custom_type_hash;
 
 #define ASSIGN_TYPE_ID(clazz) \
     template<> \
@@ -18,9 +17,6 @@ struct custom_type_hash;
         } \
     }
 
-struct position;
-struct velocity;
-
 struct userdata {
     entt::locator<entt::meta_ctx>::node_type ctx;
     entt::meta_any any;
@@ -28,8 +24,8 @@ struct userdata {
 
 ASSIGN_TYPE_ID(void);
 ASSIGN_TYPE_ID(std::size_t);
-ASSIGN_TYPE_ID(position);
-ASSIGN_TYPE_ID(velocity);
+ASSIGN_TYPE_ID(test::boxed_int);
+ASSIGN_TYPE_ID(test::empty);
 ASSIGN_TYPE_ID(double);
 ASSIGN_TYPE_ID(int);
 

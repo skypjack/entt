@@ -1,35 +1,33 @@
+#include <common/boxed_type.h>
+#include <common/empty.h>
 #include <cr.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include "../common/types.h"
-#include "types.h"
+#include "userdata.h"
 
-position create_position(int x, int y) {
-    return position{x, y};
+test::boxed_int create_boxed_int(int value) {
+    return test::boxed_int{value};
 }
 
 void set_up() {
     using namespace entt::literals;
 
-    entt::meta<position>()
-        .type("position"_hs)
-        .ctor<&create_position>()
-        .data<&position::x>("x"_hs)
-        .data<&position::y>("y"_hs);
+    entt::meta<test::boxed_int>()
+        .type("boxed_int"_hs)
+        .ctor<&create_boxed_int>()
+        .data<&test::boxed_int::value>("value"_hs);
 
-    entt::meta<velocity>()
-        .type("velocity"_hs)
-        .ctor<>()
-        .data<&velocity::dx>("dx"_hs)
-        .data<&velocity::dy>("dy"_hs);
+    entt::meta<test::empty>()
+        .type("empty"_hs)
+        .ctor<>();
 }
 
 void tear_down() {
-    entt::meta_reset<position>();
-    entt::meta_reset<velocity>();
+    entt::meta_reset<test::boxed_int>();
+    entt::meta_reset<test::empty>();
 }
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
