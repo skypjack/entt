@@ -15,6 +15,20 @@ using id_type = ENTT_ID_TYPE;
 /*! @brief Alias declaration for the most common use case. */
 using any = basic_any<>;
 
+template<typename, typename>
+class compressed_pair;
+
+template<typename>
+class basic_hashed_string;
+
+/*! @brief Aliases for common character types. */
+using hashed_string = basic_hashed_string<char>;
+
+/*! @brief Aliases for common character types. */
+using hashed_wstring = basic_hashed_string<wchar_t>;
+
+struct type_info;
+
 } // namespace entt
 
 #endif

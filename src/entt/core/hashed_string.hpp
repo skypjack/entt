@@ -293,12 +293,6 @@ template<typename Char>
     return !(lhs < rhs);
 }
 
-/*! @brief Aliases for common character types. */
-using hashed_string = basic_hashed_string<char>;
-
-/*! @brief Aliases for common character types. */
-using hashed_wstring = basic_hashed_string<wchar_t>;
-
 inline namespace literals {
 
 /**

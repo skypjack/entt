@@ -5,6 +5,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "fwd.hpp"
 #include "type_traits.hpp"
 
 namespace entt {
