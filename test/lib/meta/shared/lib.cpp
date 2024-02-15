@@ -8,8 +8,6 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 
-template const entt::type_info &entt::type_id<double>() noexcept;
-
 test::boxed_int create_boxed_int(int value) {
     return test::boxed_int{value};
 }
@@ -29,6 +27,8 @@ ENTT_API void set_up() {
     entt::meta<test::empty>()
         .type("empty"_hs)
         .ctor<>();
+
+    static_cast<void>(entt::meta<double>());
 }
 
 ENTT_API void tear_down() {
