@@ -171,7 +171,7 @@ struct MetaType: ::testing::Test {
             .data<set<property_type>, get<property_type>>("var"_hs);
 
         entt::meta<clazz>()
-            .type("clazz"_hs)
+            .type("class"_hs)
             .prop(static_cast<entt::id_type>(property_type::value), 3)
             .ctor<const base &, int>()
             .data<&clazz::value>("value"_hs)
@@ -196,7 +196,7 @@ TEST_F(MetaType, Resolve) {
 
     auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
-    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == entt::hashed_string::value("clazz"); });
+    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == entt::hashed_string::value("class"); });
 
     ASSERT_NE(it, range.end());
     ASSERT_EQ(it->second, entt::resolve<clazz>());
@@ -217,7 +217,7 @@ TEST_F(MetaType, Functionalities) {
 
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
-    ASSERT_EQ(type.id(), "clazz"_hs);
+    ASSERT_EQ(type.id(), "class"_hs);
     ASSERT_EQ(type.info(), entt::type_id<clazz>());
 
     for(auto &&curr: type.prop()) {
@@ -553,27 +553,27 @@ TEST_F(MetaType, FromVoid) {
 TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
-    ASSERT_TRUE(entt::resolve("clazz"_hs));
-    ASSERT_EQ(entt::resolve<clazz>().id(), "clazz"_hs);
+    ASSERT_TRUE(entt::resolve("class"_hs));
+    ASSERT_EQ(entt::resolve<clazz>().id(), "class"_hs);
     ASSERT_TRUE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     ASSERT_TRUE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_TRUE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor
     ASSERT_TRUE(entt::resolve<clazz>().construct());
 
-    entt::meta_reset("clazz"_hs);
+    entt::meta_reset("class"_hs);
 
-    ASSERT_FALSE(entt::resolve("clazz"_hs));
-    ASSERT_NE(entt::resolve<clazz>().id(), "clazz"_hs);
+    ASSERT_FALSE(entt::resolve("class"_hs));
+    ASSERT_NE(entt::resolve<clazz>().id(), "class"_hs);
     ASSERT_FALSE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_FALSE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz>().construct());
 
-    entt::meta<clazz>().type("clazz"_hs);
+    entt::meta<clazz>().type("class"_hs);
 
-    ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("class"_hs));
 }
 
 TEST_F(MetaType, ResetLast) {
@@ -591,13 +591,13 @@ TEST_F(MetaType, ResetAll) {
 
     ASSERT_NE(entt::resolve().begin(), entt::resolve().end());
 
-    ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("class"_hs));
     ASSERT_TRUE(entt::resolve("overloaded_func"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
     entt::meta_reset();
 
-    ASSERT_FALSE(entt::resolve("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("class"_hs));
     ASSERT_FALSE(entt::resolve("overloaded_func"_hs));
     ASSERT_FALSE(entt::resolve("double"_hs));
 
@@ -720,7 +720,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));
     ASSERT_FALSE(entt::resolve("derived"_hs));
-    ASSERT_FALSE(entt::resolve("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("class"_hs));
 
     ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
 
@@ -778,11 +778,11 @@ TEST_F(MetaType, ReRegistration) {
 TEST_F(MetaType, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_NO_THROW(entt::meta<clazz>().type("clazz"_hs));
-    ASSERT_TRUE(entt::resolve("clazz"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz>().type("class"_hs));
+    ASSERT_TRUE(entt::resolve("class"_hs));
 
     ASSERT_NO_THROW(entt::meta<clazz>().type("quux"_hs));
-    ASSERT_FALSE(entt::resolve("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("class"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }
 
