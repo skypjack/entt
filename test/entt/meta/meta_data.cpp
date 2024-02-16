@@ -14,10 +14,10 @@
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_t {
-    virtual ~base_t() = default;
+struct base {
+    virtual ~base() = default;
 
-    static void destroy(base_t &) {
+    static void destroy(base &) {
         ++counter;
     }
 
@@ -25,23 +25,23 @@ struct base_t {
     int value{3};
 };
 
-struct derived_t: base_t {
-    derived_t() = default;
+struct derived: base {
+    derived() = default;
 };
 
-struct clazz_t {
+struct clazz {
     operator int() const {
         return h;
     }
 
     int i{0};
     const int j{1}; // NOLINT
-    base_t base{};
+    base base{};
     inline static int h{2};       // NOLINT
     inline static const int k{3}; // NOLINT
 };
 
-struct setter_getter_t {
+struct setter_getter {
     int setter(double val) {
         return value = static_cast<int>(val);
     }
@@ -58,18 +58,18 @@ struct setter_getter_t {
         return value;
     }
 
-    static int static_setter(setter_getter_t &type, int value) {
+    static int static_setter(setter_getter &type, int value) {
         return type.value = value;
     }
 
-    static int static_getter(const setter_getter_t &type) {
+    static int static_getter(const setter_getter &type) {
         return type.value;
     }
 
     int value{0};
 };
 
-struct multi_setter_t {
+struct multi_setter {
     void from_double(double val) {
         value = static_cast<int>(val);
     }
@@ -81,12 +81,12 @@ struct multi_setter_t {
     int value{0};
 };
 
-struct array_t {
+struct array {
     inline static int global[2]; // NOLINT
     int local[4];                // NOLINT
 };
 
-enum class property_t : entt::id_type {
+enum class property_type : entt::id_type {
     random,
     value
 };
@@ -95,51 +95,51 @@ struct MetaData: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<base_t>()
+        entt::meta<base>()
             .type("base"_hs)
-            .dtor<base_t::destroy>()
-            .data<&base_t::value>("value"_hs);
+            .dtor<base::destroy>()
+            .data<&base::value>("value"_hs);
 
-        entt::meta<derived_t>()
+        entt::meta<derived>()
             .type("derived"_hs)
-            .base<base_t>()
-            .dtor<derived_t::destroy>()
-            .data<&base_t::value>("value_from_base"_hs);
+            .base<base>()
+            .dtor<derived::destroy>()
+            .data<&base::value>("value_from_base"_hs);
 
-        entt::meta<clazz_t>()
+        entt::meta<clazz>()
             .type("clazz"_hs)
-            .data<&clazz_t::i, entt::as_ref_t>("i"_hs)
+            .data<&clazz::i, entt::as_ref_t>("i"_hs)
             .prop(3u, 0)
-            .data<&clazz_t::i, entt::as_cref_t>("ci"_hs)
-            .data<&clazz_t::j>("j"_hs)
+            .data<&clazz::i, entt::as_cref_t>("ci"_hs)
+            .data<&clazz::j>("j"_hs)
             .prop("true"_hs, 1)
-            .data<&clazz_t::h>("h"_hs)
-            .prop(static_cast<entt::id_type>(property_t::random), 2)
-            .data<&clazz_t::k>("k"_hs)
-            .prop(static_cast<entt::id_type>(property_t::value), 3)
-            .data<&clazz_t::base>("base"_hs)
-            .data<&clazz_t::i, entt::as_void_t>("void"_hs)
+            .data<&clazz::h>("h"_hs)
+            .prop(static_cast<entt::id_type>(property_type::random), 2)
+            .data<&clazz::k>("k"_hs)
+            .prop(static_cast<entt::id_type>(property_type::value), 3)
+            .data<&clazz::base>("base"_hs)
+            .data<&clazz::i, entt::as_void_t>("void"_hs)
             .conv<int>();
 
-        entt::meta<setter_getter_t>()
+        entt::meta<setter_getter>()
             .type("setter_getter"_hs)
-            .data<&setter_getter_t::static_setter, &setter_getter_t::static_getter>("x"_hs)
-            .data<&setter_getter_t::setter, &setter_getter_t::getter>("y"_hs)
-            .data<&setter_getter_t::static_setter, &setter_getter_t::getter>("z"_hs)
-            .data<&setter_getter_t::setter_with_ref, &setter_getter_t::getter_with_ref>("w"_hs)
-            .data<nullptr, &setter_getter_t::getter>("z_ro"_hs)
-            .data<nullptr, &setter_getter_t::value>("value"_hs);
+            .data<&setter_getter::static_setter, &setter_getter::static_getter>("x"_hs)
+            .data<&setter_getter::setter, &setter_getter::getter>("y"_hs)
+            .data<&setter_getter::static_setter, &setter_getter::getter>("z"_hs)
+            .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("w"_hs)
+            .data<nullptr, &setter_getter::getter>("z_ro"_hs)
+            .data<nullptr, &setter_getter::value>("value"_hs);
 
-        entt::meta<multi_setter_t>()
+        entt::meta<multi_setter>()
             .type("multi_setter"_hs)
-            .data<entt::value_list<&multi_setter_t::from_double, &multi_setter_t::from_string>, &multi_setter_t::value>("value"_hs);
+            .data<entt::value_list<&multi_setter::from_double, &multi_setter::from_string>, &multi_setter::value>("value"_hs);
 
-        entt::meta<array_t>()
+        entt::meta<array>()
             .type("array"_hs)
-            .data<&array_t::global>("global"_hs)
-            .data<&array_t::local>("local"_hs);
+            .data<&array::global>("global"_hs)
+            .data<&array::local>("local"_hs);
 
-        base_t::counter = 0;
+        base::counter = 0;
     }
 
     void TearDown() override {
@@ -152,8 +152,8 @@ using MetaDataDeathTest = MetaData;
 TEST_F(MetaData, Functionalities) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<clazz_t>().data("i"_hs);
-    clazz_t instance{};
+    auto data = entt::resolve<clazz>().data("i"_hs);
+    clazz instance{};
 
     ASSERT_TRUE(data);
 
@@ -188,8 +188,8 @@ TEST_F(MetaData, Functionalities) {
 TEST_F(MetaData, Const) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<clazz_t>().data("j"_hs);
-    clazz_t instance{};
+    auto data = entt::resolve<clazz>().data("j"_hs);
+    clazz instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -218,7 +218,7 @@ TEST_F(MetaData, Const) {
 TEST_F(MetaData, Static) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<clazz_t>().data("h"_hs);
+    auto data = entt::resolve<clazz>().data("h"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -231,14 +231,14 @@ TEST_F(MetaData, Static) {
     ASSERT_EQ(data.get({}).cast<int>(), 1);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::random));
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::random));
         ASSERT_EQ(curr.second.value(), 2);
     }
 
-    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_t::value)));
+    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_type::value)));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(static_cast<entt::id_type>(property_t::random));
+    auto prop = data.prop(static_cast<entt::id_type>(property_type::random));
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.value(), 2);
@@ -247,7 +247,7 @@ TEST_F(MetaData, Static) {
 TEST_F(MetaData, ConstStatic) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<clazz_t>().data("k"_hs);
+    auto data = entt::resolve<clazz>().data("k"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -260,14 +260,14 @@ TEST_F(MetaData, ConstStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 3);
 
     for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::value));
         ASSERT_EQ(curr.second.value(), 3);
     }
 
-    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_t::random)));
+    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_type::random)));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(static_cast<entt::id_type>(property_t::value));
+    auto prop = data.prop(static_cast<entt::id_type>(property_type::value));
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.value(), 3);
@@ -276,9 +276,9 @@ TEST_F(MetaData, ConstStatic) {
 TEST_F(MetaData, GetMetaAnyArg) {
     using namespace entt::literals;
 
-    entt::meta_any any{clazz_t{}};
-    any.cast<clazz_t &>().i = 3;
-    const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
+    entt::meta_any any{clazz{}};
+    any.cast<clazz &>().i = 3;
+    const auto value = entt::resolve<clazz>().data("i"_hs).get(any);
 
     ASSERT_TRUE(value);
     ASSERT_TRUE(static_cast<bool>(value.cast<int>()));
@@ -289,86 +289,86 @@ TEST_F(MetaData, GetInvalidArg) {
     using namespace entt::literals;
 
     auto instance = 0;
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
+    ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).get(instance));
 }
 
 TEST_F(MetaData, SetMetaAnyArg) {
     using namespace entt::literals;
 
-    entt::meta_any any{clazz_t{}};
+    entt::meta_any any{clazz{}};
     const entt::meta_any value{1};
 
-    ASSERT_EQ(any.cast<clazz_t>().i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, value));
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, value));
+    ASSERT_EQ(any.cast<clazz>().i, 1);
 }
 
 TEST_F(MetaData, SetInvalidArg) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set({}, 'c'));
+    ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).set({}, 'c'));
 }
 
 TEST_F(MetaData, SetCast) {
     using namespace entt::literals;
 
-    clazz_t instance{};
+    clazz instance{};
 
-    ASSERT_EQ(base_t::counter, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("base"_hs).set(instance, derived_t{}));
-    ASSERT_EQ(base_t::counter, 1);
+    ASSERT_EQ(base::counter, 0);
+    ASSERT_TRUE(entt::resolve<clazz>().data("base"_hs).set(instance, derived{}));
+    ASSERT_EQ(base::counter, 1);
 }
 
 TEST_F(MetaData, SetConvert) {
     using namespace entt::literals;
 
-    clazz_t instance{};
+    clazz instance{};
     instance.h = 1;
 
     ASSERT_EQ(instance.i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, instance));
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(instance, instance));
     ASSERT_EQ(instance.i, 1);
 }
 
 TEST_F(MetaData, SetByRef) {
     using namespace entt::literals;
 
-    entt::meta_any any{clazz_t{}};
+    entt::meta_any any{clazz{}};
     int value{1};
 
-    ASSERT_EQ(any.cast<clazz_t>().i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(value)));
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, entt::forward_as_meta(value)));
+    ASSERT_EQ(any.cast<clazz>().i, 1);
 
     value = 3;
     auto wrapper = entt::forward_as_meta(value);
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
-    ASSERT_EQ(any.cast<clazz_t>().i, 3);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, wrapper.as_ref()));
+    ASSERT_EQ(any.cast<clazz>().i, 3);
 }
 
 TEST_F(MetaData, SetByConstRef) {
     using namespace entt::literals;
 
-    entt::meta_any any{clazz_t{}};
+    entt::meta_any any{clazz{}};
     int value{1};
 
-    ASSERT_EQ(any.cast<clazz_t>().i, 0);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, entt::forward_as_meta(std::as_const(value))));
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, entt::forward_as_meta(std::as_const(value))));
+    ASSERT_EQ(any.cast<clazz>().i, 1);
 
     value = 3;
     auto wrapper = entt::forward_as_meta(std::as_const(value));
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(any, wrapper.as_ref()));
-    ASSERT_EQ(any.cast<clazz_t>().i, 3);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, wrapper.as_ref()));
+    ASSERT_EQ(any.cast<clazz>().i, 3);
 }
 
 TEST_F(MetaData, SetterGetterAsFreeFunctions) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("x"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("x"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -384,8 +384,8 @@ TEST_F(MetaData, SetterGetterAsFreeFunctions) {
 TEST_F(MetaData, SetterGetterAsMemberFunctions) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("y"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("y"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -403,8 +403,8 @@ TEST_F(MetaData, SetterGetterAsMemberFunctions) {
 TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("w"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("w"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -420,8 +420,8 @@ TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
 TEST_F(MetaData, SetterGetterMixed) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("z"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("z"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -437,8 +437,8 @@ TEST_F(MetaData, SetterGetterMixed) {
 TEST_F(MetaData, SetterGetterReadOnly) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("z_ro"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("z_ro"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 0u);
@@ -454,8 +454,8 @@ TEST_F(MetaData, SetterGetterReadOnly) {
 TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<setter_getter_t>().data("value"_hs);
-    setter_getter_t instance{};
+    auto data = entt::resolve<setter_getter>().data("value"_hs);
+    setter_getter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 0u);
@@ -471,8 +471,8 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
 TEST_F(MetaData, MultiSetter) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<multi_setter_t>().data("value"_hs);
-    multi_setter_t instance{};
+    auto data = entt::resolve<multi_setter>().data("value"_hs);
+    multi_setter instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 2u);
@@ -495,34 +495,34 @@ TEST_F(MetaData, MultiSetter) {
 TEST_F(MetaData, ConstInstance) {
     using namespace entt::literals;
 
-    clazz_t instance{};
+    clazz instance{};
 
-    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(instance).try_cast<int>(), nullptr);
-    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(instance).try_cast<const int>(), nullptr);
-    ASSERT_EQ(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)).try_cast<int>(), nullptr);
+    ASSERT_NE(entt::resolve<clazz>().data("i"_hs).get(instance).try_cast<int>(), nullptr);
+    ASSERT_NE(entt::resolve<clazz>().data("i"_hs).get(instance).try_cast<const int>(), nullptr);
+    ASSERT_EQ(entt::resolve<clazz>().data("i"_hs).get(std::as_const(instance)).try_cast<int>(), nullptr);
     // as_ref_t adapts to the constness of the passed object and returns const references in case
-    ASSERT_NE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)).try_cast<const int>(), nullptr);
+    ASSERT_NE(entt::resolve<clazz>().data("i"_hs).get(std::as_const(instance)).try_cast<const int>(), nullptr);
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).set(instance, 3));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("i"_hs).get(std::as_const(instance)));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set(std::as_const(instance), 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).get(instance));
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(instance, 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).set(std::as_const(instance), 3));
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).get(instance));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).set(instance, 3));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("ci"_hs).get(std::as_const(instance)));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("ci"_hs).set(std::as_const(instance), 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("ci"_hs).get(instance));
+    ASSERT_TRUE(entt::resolve<clazz>().data("ci"_hs).set(instance, 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("ci"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz>().data("ci"_hs).set(std::as_const(instance), 3));
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).get(instance));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(instance, 3));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).get(std::as_const(instance)));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).set(std::as_const(instance), 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs).get(instance));
+    ASSERT_FALSE(entt::resolve<clazz>().data("j"_hs).set(instance, 3));
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs).get(std::as_const(instance)));
+    ASSERT_FALSE(entt::resolve<clazz>().data("j"_hs).set(std::as_const(instance), 3));
 }
 
 TEST_F(MetaData, ArrayStatic) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<array_t>().data("global"_hs);
+    auto data = entt::resolve<array>().data("global"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -539,8 +539,8 @@ TEST_F(MetaData, ArrayStatic) {
 TEST_F(MetaData, Array) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<array_t>().data("local"_hs);
-    array_t instance{};
+    auto data = entt::resolve<array>().data("local"_hs);
+    array instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -557,8 +557,8 @@ TEST_F(MetaData, Array) {
 TEST_F(MetaData, AsVoid) {
     using namespace entt::literals;
 
-    auto data = entt::resolve<clazz_t>().data("void"_hs);
-    clazz_t instance{};
+    auto data = entt::resolve<clazz>().data("void"_hs);
+    clazz instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -572,8 +572,8 @@ TEST_F(MetaData, AsVoid) {
 TEST_F(MetaData, AsRef) {
     using namespace entt::literals;
 
-    clazz_t instance{};
-    auto data = entt::resolve<clazz_t>().data("i"_hs);
+    clazz instance{};
+    auto data = entt::resolve<clazz>().data("i"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
@@ -590,8 +590,8 @@ TEST_F(MetaData, AsRef) {
 TEST_F(MetaData, AsConstRef) {
     using namespace entt::literals;
 
-    clazz_t instance{};
-    auto data = entt::resolve<clazz_t>().data("ci"_hs);
+    clazz instance{};
+    auto data = entt::resolve<clazz>().data("ci"_hs);
 
     ASSERT_EQ(instance.i, 0);
     ASSERT_EQ(data.arity(), 1u);
@@ -606,8 +606,8 @@ TEST_F(MetaData, AsConstRef) {
 ENTT_DEBUG_TEST_F(MetaDataDeathTest, AsConstRef) {
     using namespace entt::literals;
 
-    clazz_t instance{};
-    auto data = entt::resolve<clazz_t>().data("ci"_hs);
+    clazz instance{};
+    auto data = entt::resolve<clazz>().data("ci"_hs);
 
     ASSERT_DEATH(data.get(instance).cast<int &>() = 3, "");
 }
@@ -615,8 +615,8 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, AsConstRef) {
 TEST_F(MetaData, SetGetBaseData) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<derived_t>();
-    derived_t instance{};
+    auto type = entt::resolve<derived>();
+    derived instance{};
 
     ASSERT_TRUE(type.data("value"_hs));
 
@@ -629,8 +629,8 @@ TEST_F(MetaData, SetGetBaseData) {
 TEST_F(MetaData, SetGetFromBase) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<derived_t>();
-    derived_t instance{};
+    auto type = entt::resolve<derived>();
+    derived instance{};
 
     ASSERT_TRUE(type.data("value_from_base"_hs));
 
@@ -645,15 +645,15 @@ TEST_F(MetaData, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve<base_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
-    auto type = entt::resolve<base_t>();
+    auto &&node = entt::internal::resolve<base>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
+    auto type = entt::resolve<base>();
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->data.empty());
     ASSERT_EQ(node.details->data.size(), 1u);
     ASSERT_TRUE(type.data("value"_hs));
 
-    entt::meta<base_t>().data<&base_t::value>("field"_hs);
+    entt::meta<base>().data<&base::value>("field"_hs);
 
     ASSERT_TRUE(node.details);
     ASSERT_EQ(node.details->data.size(), 2u);
@@ -664,14 +664,14 @@ TEST_F(MetaData, ReRegistration) {
 TEST_F(MetaData, CollisionAndReuse) {
     using namespace entt::literals;
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("cj"_hs));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs).is_const());
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs));
+    ASSERT_FALSE(entt::resolve<clazz>().data("cj"_hs));
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs).is_const());
 
-    ASSERT_NO_THROW(entt::meta<clazz_t>().data<&clazz_t::i>("j"_hs));
-    ASSERT_NO_THROW(entt::meta<clazz_t>().data<&clazz_t::j>("cj"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz>().data<&clazz::i>("j"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz>().data<&clazz::j>("cj"_hs));
 
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("j"_hs));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("cj"_hs));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("j"_hs).is_const());
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs));
+    ASSERT_TRUE(entt::resolve<clazz>().data("cj"_hs));
+    ASSERT_FALSE(entt::resolve<clazz>().data("j"_hs).is_const());
 }

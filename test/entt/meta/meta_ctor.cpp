@@ -10,31 +10,31 @@
 #include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_t {
+struct base {
     char value{'c'};
 };
 
-struct derived_t: base_t {
-    derived_t()
-        : base_t{} {}
+struct derived: base {
+    derived()
+        : base{} {}
 };
 
-struct clazz_t {
-    clazz_t(const base_t &other, int &iv)
-        : clazz_t{iv, other.value} {}
+struct clazz {
+    clazz(const base &other, int &iv)
+        : clazz{iv, other.value} {}
 
-    clazz_t(const int &iv, char cv)
+    clazz(const int &iv, char cv)
         : i{iv}, c{cv} {}
 
     operator int() const {
         return i;
     }
 
-    static clazz_t factory(int value) {
+    static clazz factory(int value) {
         return {value, 'c'};
     }
 
-    static clazz_t factory(base_t other, int value, int mul) {
+    static clazz factory(base other, int value, int mul) {
         return {value * mul, other.value};
     }
 
@@ -54,17 +54,17 @@ struct MetaCtor: ::testing::Test {
             .type("double"_hs)
             .ctor<double_factory>();
 
-        entt::meta<derived_t>()
+        entt::meta<derived>()
             .type("derived"_hs)
-            .base<base_t>();
+            .base<base>();
 
-        entt::meta<clazz_t>()
+        entt::meta<clazz>()
             .type("clazz"_hs)
-            .ctor<&entt::registry::emplace_or_replace<clazz_t, const int &, const char &>, entt::as_ref_t>()
-            .ctor<const base_t &, int &>()
+            .ctor<&entt::registry::emplace_or_replace<clazz, const int &, const char &>, entt::as_ref_t>()
+            .ctor<const base &, int &>()
             .ctor<const int &, char>()
-            .ctor<entt::overload<clazz_t(int)>(clazz_t::factory)>()
-            .ctor<entt::overload<clazz_t(base_t, int, int)>(clazz_t::factory)>()
+            .ctor<entt::overload<clazz(int)>(clazz::factory)>()
+            .ctor<entt::overload<clazz(base, int, int)>(clazz::factory)>()
             .conv<int>();
     }
 
@@ -74,117 +74,117 @@ struct MetaCtor: ::testing::Test {
 };
 
 TEST_F(MetaCtor, Functionalities) {
-    auto any = entt::resolve<clazz_t>().construct(1, 'c');
+    auto any = entt::resolve<clazz>().construct(1, 'c');
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, Func) {
-    auto any = entt::resolve<clazz_t>().construct(1);
+    auto any = entt::resolve<clazz>().construct(1);
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, MetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{1}, entt::meta_any{'c'});
+    auto any = entt::resolve<clazz>().construct(entt::meta_any{1}, entt::meta_any{'c'});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, InvalidArgs) {
-    ASSERT_FALSE(entt::resolve<clazz_t>().construct(entt::meta_any{}, derived_t{}));
+    ASSERT_FALSE(entt::resolve<clazz>().construct(entt::meta_any{}, derived{}));
 }
 
 TEST_F(MetaCtor, CastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{1, 'd'});
+    auto any = entt::resolve<clazz>().construct(derived{}, clazz{1, 'd'});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, ArithmeticConversion) {
-    auto any = entt::resolve<clazz_t>().construct(true, 4.2);
+    auto any = entt::resolve<clazz>().construct(true, 4.2);
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, char{4});
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, char{4});
 }
 
 TEST_F(MetaCtor, ConstNonConstRefArgs) {
     int ivalue = 1;
     const char cvalue = 'c';
-    auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue), entt::forward_as_meta(cvalue));
+    auto any = entt::resolve<clazz>().construct(entt::forward_as_meta(ivalue), entt::forward_as_meta(cvalue));
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, WrongConstness) {
     int value = 1;
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(value));
-    auto other = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(std::as_const(value)));
+    auto any = entt::resolve<clazz>().construct(derived{}, entt::forward_as_meta(value));
+    auto other = entt::resolve<clazz>().construct(derived{}, entt::forward_as_meta(std::as_const(value)));
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(other);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, FuncMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{1});
+    auto any = entt::resolve<clazz>().construct(entt::meta_any{1});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, FuncCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, 3., clazz_t{3, 'd'});
+    auto any = entt::resolve<clazz>().construct(derived{}, 3., clazz{3, 'd'});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 9);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 9);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, FuncArithmeticConversion) {
-    auto any = entt::resolve<clazz_t>().construct(4.2);
+    auto any = entt::resolve<clazz>().construct(4.2);
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().i, 4);
-    ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+    ASSERT_EQ(any.cast<clazz>().i, 4);
+    ASSERT_EQ(any.cast<clazz>().c, 'c');
 }
 
 TEST_F(MetaCtor, FuncConstNonConstRefArgs) {
     int ivalue = 1;
-    auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue));
-    auto other = entt::resolve<clazz_t>().construct(entt::forward_as_meta(std::as_const(ivalue)));
+    auto any = entt::resolve<clazz>().construct(entt::forward_as_meta(ivalue));
+    auto other = entt::resolve<clazz>().construct(entt::forward_as_meta(std::as_const(ivalue)));
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
-    ASSERT_EQ(any.cast<clazz_t>().i, 1);
-    ASSERT_EQ(other.cast<clazz_t>().i, 1);
+    ASSERT_EQ(any.cast<clazz>().i, 1);
+    ASSERT_EQ(other.cast<clazz>().i, 1);
 }
 
 TEST_F(MetaCtor, ExternalMemberFunction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    ASSERT_FALSE(registry.all_of<clazz_t>(entity));
+    ASSERT_FALSE(registry.all_of<clazz>(entity));
 
-    const auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(registry), entity, 3, 'c');
+    const auto any = entt::resolve<clazz>().construct(entt::forward_as_meta(registry), entity, 3, 'c');
 
     ASSERT_TRUE(any);
-    ASSERT_TRUE(registry.all_of<clazz_t>(entity));
-    ASSERT_EQ(registry.get<clazz_t>(entity).i, 3);
-    ASSERT_EQ(registry.get<clazz_t>(entity).c, 'c');
+    ASSERT_TRUE(registry.all_of<clazz>(entity));
+    ASSERT_EQ(registry.get<clazz>(entity).i, 3);
+    ASSERT_EQ(registry.get<clazz>(entity).c, 'c');
 }
 
 TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
@@ -197,7 +197,7 @@ TEST_F(MetaCtor, OverrideImplicitlyGeneratedDefaultConstructor) {
 }
 
 TEST_F(MetaCtor, NonDefaultConstructibleType) {
-    auto type = entt::resolve<clazz_t>();
+    auto type = entt::resolve<clazz>();
     // no implicitly generated default constructor
     ASSERT_FALSE(type.construct());
 }

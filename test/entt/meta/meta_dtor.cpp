@@ -8,13 +8,13 @@
 #include <entt/meta/node.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct clazz_t {
-    clazz_t(int &cnt)
+struct clazz {
+    clazz(int &cnt)
         : counter{&cnt} {
         ++(*counter);
     }
 
-    static void destroy_decr(clazz_t &instance) {
+    static void destroy_decr(clazz &instance) {
         --(*instance.counter);
     }
 
@@ -29,10 +29,10 @@ struct MetaDtor: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<clazz_t>()
+        entt::meta<clazz>()
             .type("clazz"_hs)
             .ctor<int &>()
-            .dtor<clazz_t::destroy_decr>();
+            .dtor<clazz::destroy_decr>();
     }
 
     void TearDown() override {
@@ -43,7 +43,7 @@ struct MetaDtor: ::testing::Test {
 TEST_F(MetaDtor, Functionalities) {
     int counter{};
 
-    auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(counter));
+    auto any = entt::resolve<clazz>().construct(entt::forward_as_meta(counter));
     auto cref = std::as_const(any).as_ref();
     auto ref = any.as_ref();
 
@@ -74,7 +74,7 @@ TEST_F(MetaDtor, Functionalities) {
 TEST_F(MetaDtor, AsRefConstruction) {
     int counter{};
 
-    clazz_t instance{counter};
+    clazz instance{counter};
     auto any = entt::forward_as_meta(instance);
     auto cany = entt::forward_as_meta(std::as_const(instance));
     auto cref = cany.as_ref();
@@ -104,12 +104,12 @@ TEST_F(MetaDtor, ReRegistration) {
     SetUp();
 
     int counter{};
-    auto &&node = entt::internal::resolve<clazz_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
+    auto &&node = entt::internal::resolve<clazz>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
 
     ASSERT_NE(node.dtor.dtor, nullptr);
 
-    entt::meta<clazz_t>().dtor<&clazz_t::destroy_incr>();
-    entt::resolve<clazz_t>().construct(entt::forward_as_meta(counter)).reset();
+    entt::meta<clazz>().dtor<&clazz::destroy_incr>();
+    entt::resolve<clazz>().construct(entt::forward_as_meta(counter)).reset();
 
     ASSERT_EQ(counter, 2);
 }

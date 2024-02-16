@@ -8,34 +8,34 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base_1_t {};
-struct base_2_t {};
-struct base_3_t {};
-struct derived_t: base_1_t, base_2_t, base_3_t {};
+struct base_1 {};
+struct base_2 {};
+struct base_3 {};
+struct derived: base_1, base_2, base_3 {};
 
 struct MetaProp: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<base_1_t>()
+        entt::meta<base_1>()
             .type("base_1"_hs)
             .prop("int"_hs, 2);
 
-        entt::meta<base_2_t>()
+        entt::meta<base_2>()
             .type("base_2"_hs)
             .prop("bool"_hs, false)
             .prop("char[]"_hs, "char[]");
 
-        entt::meta<base_3_t>()
+        entt::meta<base_3>()
             .type("base_3"_hs)
             .prop("key_only"_hs)
             .prop("key"_hs, 2);
 
-        entt::meta<derived_t>()
+        entt::meta<derived>()
             .type("derived"_hs)
-            .base<base_1_t>()
-            .base<base_2_t>()
-            .base<base_3_t>();
+            .base<base_1>()
+            .base<base_2>()
+            .base<base_3>();
     }
 
     void TearDown() override {
@@ -46,7 +46,7 @@ struct MetaProp: ::testing::Test {
 TEST_F(MetaProp, Functionalities) {
     using namespace entt::literals;
 
-    auto prop = entt::resolve<base_1_t>().prop("int"_hs);
+    auto prop = entt::resolve<base_1>().prop("int"_hs);
 
     ASSERT_TRUE(prop);
 
@@ -71,7 +71,7 @@ TEST_F(MetaProp, Functionalities) {
 TEST_F(MetaProp, FromBase) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<derived_t>();
+    auto type = entt::resolve<derived>();
     auto prop_bool = type.prop("bool"_hs);
     auto prop_int = type.prop("int"_hs);
     auto key_only = type.prop("key_only"_hs);
@@ -91,7 +91,7 @@ TEST_F(MetaProp, FromBase) {
 TEST_F(MetaProp, DeducedArrayType) {
     using namespace entt::literals;
 
-    auto prop = entt::resolve<base_2_t>().prop("char[]"_hs);
+    auto prop = entt::resolve<base_2>().prop("char[]"_hs);
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.value().type(), entt::resolve<const char *>());
@@ -103,8 +103,8 @@ TEST_F(MetaProp, ReRegistration) {
 
     SetUp();
 
-    auto &&node = entt::internal::resolve<base_1_t>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
-    auto type = entt::resolve<base_1_t>();
+    auto &&node = entt::internal::resolve<base_1>(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()));
+    auto type = entt::resolve<base_1>();
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->prop.empty());
@@ -113,8 +113,8 @@ TEST_F(MetaProp, ReRegistration) {
     ASSERT_TRUE(type.prop("int"_hs));
     ASSERT_EQ(type.prop("int"_hs).value().cast<int>(), 2);
 
-    entt::meta<base_1_t>().prop("int"_hs, 0);
-    entt::meta<base_1_t>().prop("double"_hs, 3.);
+    entt::meta<base_1>().prop("int"_hs, 0);
+    entt::meta<base_1>().prop("double"_hs, 3.);
 
     ASSERT_TRUE(node.details);
     ASSERT_FALSE(node.details->prop.empty());

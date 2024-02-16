@@ -29,35 +29,35 @@ Type get(Type &prop) {
     return prop;
 }
 
-struct base_t {
+struct base {
     char value{'c'};
 };
 
-struct derived_t: base_t {
-    derived_t()
-        : base_t{} {}
+struct derived: base {
+    derived()
+        : base{} {}
 };
 
-struct abstract_t {
-    virtual ~abstract_t() = default;
+struct abstract {
+    virtual ~abstract() = default;
 
     virtual void func(int) {}
     void base_only(int) {}
 };
 
-struct concrete_t: base_t, abstract_t {
+struct concrete: base, abstract {
     void func(int v) override {
-        abstract_t::func(v);
+        abstract::func(v);
         value = v;
     }
 
     int value{3};
 };
 
-struct clazz_t {
-    clazz_t() = default;
+struct clazz {
+    clazz() = default;
 
-    clazz_t(const base_t &, int v)
+    clazz(const base &, int v)
         : value{v} {}
 
     void member() {}
@@ -70,12 +70,12 @@ struct clazz_t {
     int value{};
 };
 
-struct overloaded_func_t {
+struct overloaded_func {
     [[nodiscard]] int e(int v) const {
         return v + v;
     }
 
-    [[nodiscard]] int f(const base_t &, int a, int b) {
+    [[nodiscard]] int f(const base &, int a, int b) {
         return f(a, b);
     }
 
@@ -104,7 +104,7 @@ struct overloaded_func_t {
     int value{};
 };
 
-enum class property_t : entt::id_type {
+enum class property_type : entt::id_type {
     random,
     value,
     key_only,
@@ -124,59 +124,59 @@ struct MetaType: ::testing::Test {
             .data<0u>("min"_hs)
             .data<128u>("max"_hs);
 
-        entt::meta<base_t>()
+        entt::meta<base>()
             .type("base"_hs)
-            .data<&base_t::value>("value"_hs);
+            .data<&base::value>("value"_hs);
 
-        entt::meta<derived_t>()
+        entt::meta<derived>()
             .type("derived"_hs)
-            .base<base_t>();
+            .base<base>();
 
-        entt::meta<abstract_t>()
+        entt::meta<abstract>()
             .type("abstract"_hs)
-            .func<&abstract_t::func>("func"_hs)
-            .func<&abstract_t::base_only>("base_only"_hs);
+            .func<&abstract::func>("func"_hs)
+            .func<&abstract::base_only>("base_only"_hs);
 
-        entt::meta<concrete_t>()
+        entt::meta<concrete>()
             .type("concrete"_hs)
-            .base<base_t>()
-            .base<abstract_t>();
+            .base<base>()
+            .base<abstract>();
 
-        entt::meta<overloaded_func_t>()
+        entt::meta<overloaded_func>()
             .type("overloaded_func"_hs)
-            .func<&overloaded_func_t::e>("e"_hs)
-            .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
-            .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
-            .func<entt::overload<int(int)>(&overloaded_func_t::f)>("f"_hs)
-            .func<entt::overload<int(int) const>(&overloaded_func_t::f)>("f"_hs)
-            .func<entt::overload<float(int, float)>(&overloaded_func_t::f)>("f"_hs)
-            .func<&overloaded_func_t::g>("g"_hs);
+            .func<&overloaded_func::e>("e"_hs)
+            .func<entt::overload<int(const base &, int, int)>(&overloaded_func::f)>("f"_hs)
+            .func<entt::overload<int(int, int)>(&overloaded_func::f)>("f"_hs)
+            .func<entt::overload<int(int)>(&overloaded_func::f)>("f"_hs)
+            .func<entt::overload<int(int) const>(&overloaded_func::f)>("f"_hs)
+            .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs)
+            .func<&overloaded_func::g>("g"_hs);
 
-        entt::meta<property_t>()
+        entt::meta<property_type>()
             .type("property"_hs)
-            .data<property_t::random>("random"_hs)
-            .prop(static_cast<entt::id_type>(property_t::random), 0)
-            .prop(static_cast<entt::id_type>(property_t::value), 3)
-            .data<property_t::value>("value"_hs)
-            .prop(static_cast<entt::id_type>(property_t::random), true)
-            .prop(static_cast<entt::id_type>(property_t::value), 0)
-            .prop(static_cast<entt::id_type>(property_t::key_only))
-            .prop(static_cast<entt::id_type>(property_t::list))
-            .data<property_t::key_only>("key_only"_hs)
-            .prop(static_cast<entt::id_type>(property_t::key_only))
-            .data<property_t::list>("list"_hs)
-            .prop(static_cast<entt::id_type>(property_t::random), false)
-            .prop(static_cast<entt::id_type>(property_t::value), 0)
-            .prop(static_cast<entt::id_type>(property_t::key_only))
-            .data<set<property_t>, get<property_t>>("var"_hs);
+            .data<property_type::random>("random"_hs)
+            .prop(static_cast<entt::id_type>(property_type::random), 0)
+            .prop(static_cast<entt::id_type>(property_type::value), 3)
+            .data<property_type::value>("value"_hs)
+            .prop(static_cast<entt::id_type>(property_type::random), true)
+            .prop(static_cast<entt::id_type>(property_type::value), 0)
+            .prop(static_cast<entt::id_type>(property_type::key_only))
+            .prop(static_cast<entt::id_type>(property_type::list))
+            .data<property_type::key_only>("key_only"_hs)
+            .prop(static_cast<entt::id_type>(property_type::key_only))
+            .data<property_type::list>("list"_hs)
+            .prop(static_cast<entt::id_type>(property_type::random), false)
+            .prop(static_cast<entt::id_type>(property_type::value), 0)
+            .prop(static_cast<entt::id_type>(property_type::key_only))
+            .data<set<property_type>, get<property_type>>("var"_hs);
 
-        entt::meta<clazz_t>()
+        entt::meta<clazz>()
             .type("clazz"_hs)
-            .prop(static_cast<entt::id_type>(property_t::value), 3)
-            .ctor<const base_t &, int>()
-            .data<&clazz_t::value>("value"_hs)
-            .func<&clazz_t::member>("member"_hs)
-            .func<clazz_t::func>("func"_hs)
+            .prop(static_cast<entt::id_type>(property_type::value), 3)
+            .ctor<const base &, int>()
+            .data<&clazz::value>("value"_hs)
+            .func<&clazz::member>("member"_hs)
+            .func<clazz::func>("func"_hs)
             .conv<int>();
     }
 
@@ -199,7 +199,7 @@ TEST_F(MetaType, Resolve) {
     const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == entt::hashed_string::value("clazz"); });
 
     ASSERT_NE(it, range.end());
-    ASSERT_EQ(it->second, entt::resolve<clazz_t>());
+    ASSERT_EQ(it->second, entt::resolve<clazz>());
 
     bool found = false;
 
@@ -213,22 +213,22 @@ TEST_F(MetaType, Resolve) {
 TEST_F(MetaType, Functionalities) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<clazz_t>();
+    auto type = entt::resolve<clazz>();
 
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
     ASSERT_EQ(type.id(), "clazz"_hs);
-    ASSERT_EQ(type.info(), entt::type_id<clazz_t>());
+    ASSERT_EQ(type.info(), entt::type_id<clazz>());
 
     for(auto &&curr: type.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
+        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::value));
         ASSERT_EQ(curr.second.value(), 3);
     }
 
-    ASSERT_FALSE(type.prop(static_cast<entt::id_type>(property_t::key_only)));
+    ASSERT_FALSE(type.prop(static_cast<entt::id_type>(property_type::key_only)));
     ASSERT_FALSE(type.prop("property"_hs));
 
-    auto prop = type.prop(static_cast<entt::id_type>(property_t::value));
+    auto prop = type.prop(static_cast<entt::id_type>(property_type::value));
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.value(), 3);
@@ -246,15 +246,15 @@ TEST_F(MetaType, SizeOf) {
 TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<bool>().is_arithmetic());
     ASSERT_TRUE(entt::resolve<double>().is_arithmetic());
-    ASSERT_FALSE(entt::resolve<clazz_t>().is_arithmetic());
+    ASSERT_FALSE(entt::resolve<clazz>().is_arithmetic());
 
     ASSERT_TRUE(entt::resolve<int>().is_integral());
     ASSERT_FALSE(entt::resolve<double>().is_integral());
-    ASSERT_FALSE(entt::resolve<clazz_t>().is_integral());
+    ASSERT_FALSE(entt::resolve<clazz>().is_integral());
 
     ASSERT_TRUE(entt::resolve<long>().is_signed());
     ASSERT_FALSE(entt::resolve<unsigned int>().is_signed());
-    ASSERT_FALSE(entt::resolve<clazz_t>().is_signed());
+    ASSERT_FALSE(entt::resolve<clazz>().is_signed());
 
     // NOLINTBEGIN(*-avoid-c-arrays)
     ASSERT_TRUE(entt::resolve<int[5]>().is_array());
@@ -262,10 +262,10 @@ TEST_F(MetaType, Traits) {
     // NOLINTEND(*-avoid-c-arrays)
     ASSERT_FALSE(entt::resolve<int>().is_array());
 
-    ASSERT_TRUE(entt::resolve<property_t>().is_enum());
+    ASSERT_TRUE(entt::resolve<property_type>().is_enum());
     ASSERT_FALSE(entt::resolve<char>().is_enum());
 
-    ASSERT_TRUE(entt::resolve<derived_t>().is_class());
+    ASSERT_TRUE(entt::resolve<derived>().is_class());
     ASSERT_FALSE(entt::resolve<double>().is_class());
 
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
@@ -288,7 +288,7 @@ TEST_F(MetaType, RemovePointer) {
     ASSERT_EQ(entt::resolve<void *>().remove_pointer(), entt::resolve<void>());
     ASSERT_EQ(entt::resolve<char **>().remove_pointer(), entt::resolve<char *>());
     ASSERT_EQ(entt::resolve<int (*)(char, double)>().remove_pointer(), entt::resolve<int(char, double)>());
-    ASSERT_EQ(entt::resolve<derived_t>().remove_pointer(), entt::resolve<derived_t>());
+    ASSERT_EQ(entt::resolve<derived>().remove_pointer(), entt::resolve<derived>());
 }
 
 TEST_F(MetaType, TemplateInfo) {
@@ -305,61 +305,61 @@ TEST_F(MetaType, TemplateInfo) {
 }
 
 TEST_F(MetaType, CanCast) {
-    auto type = entt::resolve<derived_t>();
+    auto type = entt::resolve<derived>();
 
     ASSERT_FALSE(type.can_cast(entt::resolve<void>()));
-    ASSERT_TRUE(type.can_cast(entt::resolve<base_t>()));
-    ASSERT_TRUE(type.can_cast(entt::resolve<derived_t>()));
+    ASSERT_TRUE(type.can_cast(entt::resolve<base>()));
+    ASSERT_TRUE(type.can_cast(entt::resolve<derived>()));
 }
 
 TEST_F(MetaType, CanConvert) {
-    auto clazz = entt::resolve<clazz_t>();
-    auto derived = entt::resolve<derived_t>();
+    auto instance = entt::resolve<clazz>();
+    auto other = entt::resolve<derived>();
     auto arithmetic = entt::resolve<int>();
 
-    ASSERT_TRUE(clazz.can_convert(entt::resolve<clazz_t>()));
-    ASSERT_TRUE(clazz.can_convert(entt::resolve<int>()));
+    ASSERT_TRUE(instance.can_convert(entt::resolve<clazz>()));
+    ASSERT_TRUE(instance.can_convert(entt::resolve<int>()));
 
-    ASSERT_TRUE(derived.can_convert(entt::resolve<derived_t>()));
-    ASSERT_TRUE(derived.can_convert(entt::resolve<base_t>()));
-    ASSERT_FALSE(derived.can_convert(entt::resolve<int>()));
+    ASSERT_TRUE(other.can_convert(entt::resolve<derived>()));
+    ASSERT_TRUE(other.can_convert(entt::resolve<base>()));
+    ASSERT_FALSE(other.can_convert(entt::resolve<int>()));
 
     ASSERT_TRUE(arithmetic.can_convert(entt::resolve<int>()));
-    ASSERT_FALSE(arithmetic.can_convert(entt::resolve<clazz_t>()));
+    ASSERT_FALSE(arithmetic.can_convert(entt::resolve<clazz>()));
     ASSERT_TRUE(arithmetic.can_convert(entt::resolve<double>()));
     ASSERT_TRUE(arithmetic.can_convert(entt::resolve<float>()));
 }
 
 TEST_F(MetaType, Base) {
-    auto type = entt::resolve<derived_t>();
+    auto type = entt::resolve<derived>();
 
     ASSERT_NE(type.base().cbegin(), type.base().cend());
 
     for(auto curr: type.base()) {
-        ASSERT_EQ(curr.first, entt::type_id<base_t>().hash());
-        ASSERT_EQ(curr.second, entt::resolve<base_t>());
+        ASSERT_EQ(curr.first, entt::type_id<base>().hash());
+        ASSERT_EQ(curr.second, entt::resolve<base>());
     }
 }
 
 TEST_F(MetaType, Ctor) {
-    derived_t derived;
-    base_t &base = derived;
-    auto type = entt::resolve<clazz_t>();
+    derived instance;
+    base &as_base = instance;
+    auto type = entt::resolve<clazz>();
 
-    ASSERT_TRUE((type.construct(entt::forward_as_meta(derived), 3)));
-    ASSERT_TRUE((type.construct(entt::forward_as_meta(base), 3)));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(instance), 3)));
+    ASSERT_TRUE((type.construct(entt::forward_as_meta(as_base), 3)));
 
     // use the implicitly generated default constructor
     auto any = type.construct();
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.type(), entt::resolve<clazz_t>());
+    ASSERT_EQ(any.type(), entt::resolve<clazz>());
 }
 
 TEST_F(MetaType, Data) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<clazz_t>();
+    auto type = entt::resolve<clazz>();
     int counter{};
 
     for([[maybe_unused]] auto &&curr: type.data()) {
@@ -378,8 +378,8 @@ TEST_F(MetaType, Data) {
 TEST_F(MetaType, Func) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<clazz_t>();
-    clazz_t instance{};
+    auto type = entt::resolve<clazz>();
+    clazz instance{};
     int counter{};
 
     for([[maybe_unused]] auto &&curr: type.func()) {
@@ -401,8 +401,8 @@ TEST_F(MetaType, Func) {
 TEST_F(MetaType, Invoke) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<clazz_t>();
-    clazz_t instance{};
+    auto type = entt::resolve<clazz>();
+    clazz instance{};
 
     ASSERT_TRUE(type.invoke("member"_hs, instance));
     ASSERT_FALSE(type.invoke("rebmem"_hs, instance));
@@ -414,8 +414,8 @@ TEST_F(MetaType, Invoke) {
 TEST_F(MetaType, InvokeFromBase) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<concrete_t>();
-    concrete_t instance{};
+    auto type = entt::resolve<concrete>();
+    concrete instance{};
 
     ASSERT_TRUE(type.invoke("base_only"_hs, instance, 3));
     ASSERT_FALSE(type.invoke("ylno_esab"_hs, {}, 'c'));
@@ -424,15 +424,15 @@ TEST_F(MetaType, InvokeFromBase) {
 TEST_F(MetaType, OverloadedFunc) {
     using namespace entt::literals;
 
-    const auto type = entt::resolve<overloaded_func_t>();
-    overloaded_func_t instance{};
+    const auto type = entt::resolve<overloaded_func>();
+    overloaded_func instance{};
     entt::meta_any res{};
 
     ASSERT_TRUE(type.func("f"_hs));
     ASSERT_TRUE(type.func("e"_hs));
     ASSERT_TRUE(type.func("g"_hs));
 
-    res = type.invoke("f"_hs, instance, base_t{}, 1, 2);
+    res = type.invoke("f"_hs, instance, base{}, 1, 2);
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 1);
@@ -479,46 +479,46 @@ TEST_F(MetaType, OverloadedFunc) {
 }
 
 TEST_F(MetaType, Construct) {
-    auto any = entt::resolve<clazz_t>().construct(base_t{}, 2);
+    auto any = entt::resolve<clazz>().construct(base{}, 2);
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 2);
+    ASSERT_EQ(any.cast<clazz>().value, 2);
 }
 
 TEST_F(MetaType, ConstructNoArgs) {
     // this should work, no other tests required
-    auto any = entt::resolve<clazz_t>().construct();
+    auto any = entt::resolve<clazz>().construct();
 
     ASSERT_TRUE(any);
 }
 
 TEST_F(MetaType, ConstructMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{3});
+    auto any = entt::resolve<clazz>().construct(entt::meta_any{base{}}, entt::meta_any{3});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 3);
+    ASSERT_EQ(any.cast<clazz>().value, 3);
 }
 
 TEST_F(MetaType, ConstructInvalidArgs) {
-    ASSERT_FALSE(entt::resolve<clazz_t>().construct('c', base_t{}));
+    ASSERT_FALSE(entt::resolve<clazz>().construct('c', base{}));
 }
 
 TEST_F(MetaType, LessArgs) {
-    ASSERT_FALSE(entt::resolve<clazz_t>().construct(base_t{}));
+    ASSERT_FALSE(entt::resolve<clazz>().construct(base{}));
 }
 
 TEST_F(MetaType, ConstructCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 3});
+    auto any = entt::resolve<clazz>().construct(derived{}, clazz{derived{}, 3});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 3);
+    ASSERT_EQ(any.cast<clazz>().value, 3);
 }
 
 TEST_F(MetaType, ConstructArithmeticConversion) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, true});
+    auto any = entt::resolve<clazz>().construct(derived{}, clazz{derived{}, true});
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.cast<clazz_t>().value, 1);
+    ASSERT_EQ(any.cast<clazz>().value, 1);
 }
 
 TEST_F(MetaType, FromVoid) {
@@ -554,24 +554,24 @@ TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
-    ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
-    ASSERT_TRUE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_TRUE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
+    ASSERT_EQ(entt::resolve<clazz>().id(), "clazz"_hs);
+    ASSERT_TRUE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
+    ASSERT_TRUE(entt::resolve<clazz>().data("value"_hs));
+    ASSERT_TRUE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor
-    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
+    ASSERT_TRUE(entt::resolve<clazz>().construct());
 
     entt::meta_reset("clazz"_hs);
 
     ASSERT_FALSE(entt::resolve("clazz"_hs));
-    ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
-    ASSERT_FALSE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_FALSE((entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{})));
+    ASSERT_NE(entt::resolve<clazz>().id(), "clazz"_hs);
+    ASSERT_FALSE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
+    ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
+    ASSERT_FALSE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor is not cleared
-    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
+    ASSERT_TRUE(entt::resolve<clazz>().construct());
 
-    entt::meta<clazz_t>().type("clazz"_hs);
+    entt::meta<clazz>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve("clazz"_hs));
 }
@@ -607,23 +607,23 @@ TEST_F(MetaType, ResetAll) {
 TEST_F(MetaType, AbstractClass) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<abstract_t>();
-    concrete_t instance;
+    auto type = entt::resolve<abstract>();
+    concrete instance;
 
-    ASSERT_EQ(type.info(), entt::type_id<abstract_t>());
-    ASSERT_EQ(instance.base_t::value, 'c');
+    ASSERT_EQ(type.info(), entt::type_id<abstract>());
+    ASSERT_EQ(instance.base::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
     type.func("func"_hs).invoke(instance, 2);
 
-    ASSERT_EQ(instance.base_t::value, 'c');
+    ASSERT_EQ(instance.base::value, 'c');
     ASSERT_EQ(instance.value, 2);
 }
 
 TEST_F(MetaType, EnumAndNamedConstants) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<property_t>();
+    auto type = entt::resolve<property_type>();
 
     ASSERT_TRUE(type.data("random"_hs));
     ASSERT_TRUE(type.data("value"_hs));
@@ -631,11 +631,11 @@ TEST_F(MetaType, EnumAndNamedConstants) {
     ASSERT_EQ(type.data("random"_hs).type(), type);
     ASSERT_EQ(type.data("value"_hs).type(), type);
 
-    ASSERT_FALSE(type.data("random"_hs).set({}, property_t::value));
-    ASSERT_FALSE(type.data("value"_hs).set({}, property_t::random));
+    ASSERT_FALSE(type.data("random"_hs).set({}, property_type::value));
+    ASSERT_FALSE(type.data("value"_hs).set({}, property_type::random));
 
-    ASSERT_EQ(type.data("random"_hs).get({}).cast<property_t>(), property_t::random);
-    ASSERT_EQ(type.data("value"_hs).get({}).cast<property_t>(), property_t::value);
+    ASSERT_EQ(type.data("random"_hs).get({}).cast<property_type>(), property_type::random);
+    ASSERT_EQ(type.data("value"_hs).get({}).cast<property_type>(), property_type::value);
 }
 
 TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
@@ -659,43 +659,43 @@ TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
 TEST_F(MetaType, Variables) {
     using namespace entt::literals;
 
-    auto p_data = entt::resolve<property_t>().data("var"_hs);
+    auto p_data = entt::resolve<property_type>().data("var"_hs);
     auto d_data = entt::resolve("double"_hs).data("var"_hs);
 
-    property_t prop{property_t::key_only};
+    property_type prop{property_type::key_only};
     double d = 3.;
 
-    p_data.set(prop, property_t::random);
+    p_data.set(prop, property_type::random);
     d_data.set(d, 3.);
 
-    ASSERT_EQ(p_data.get(prop).cast<property_t>(), property_t::random);
+    ASSERT_EQ(p_data.get(prop).cast<property_type>(), property_type::random);
     ASSERT_EQ(d_data.get(d).cast<double>(), 3.);
-    ASSERT_EQ(prop, property_t::random);
+    ASSERT_EQ(prop, property_type::random);
     ASSERT_EQ(d, 3.);
 }
 
 TEST_F(MetaType, PropertiesAndCornerCases) {
     using namespace entt::literals;
 
-    auto type = entt::resolve<property_t>();
+    auto type = entt::resolve<property_type>();
 
     ASSERT_EQ(type.prop().cbegin(), type.prop().cend());
 
-    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<int>(), 0);
-    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 3);
+    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 3);
 
-    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<bool>(), true);
-    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
-    ASSERT_FALSE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
+    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<bool>(), true);
+    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
+    ASSERT_FALSE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
 
-    ASSERT_TRUE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
-    ASSERT_FALSE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
+    ASSERT_TRUE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
+    ASSERT_FALSE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
 
-    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::random)).value().cast<bool>(), false);
-    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::value)).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)));
-    ASSERT_FALSE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_t::key_only)).value());
+    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<bool>(), false);
+    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
+    ASSERT_FALSE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
 
     type = entt::resolve<void>();
 
@@ -709,13 +709,13 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     entt::meta_reset<double>();
     entt::meta_reset<unsigned int>();
-    entt::meta_reset<base_t>();
-    entt::meta_reset<derived_t>();
-    entt::meta_reset<abstract_t>();
-    entt::meta_reset<concrete_t>();
-    entt::meta_reset<overloaded_func_t>();
-    entt::meta_reset<property_t>();
-    entt::meta_reset<clazz_t>();
+    entt::meta_reset<base>();
+    entt::meta_reset<derived>();
+    entt::meta_reset<abstract>();
+    entt::meta_reset<concrete>();
+    entt::meta_reset<overloaded_func>();
+    entt::meta_reset<property_type>();
+    entt::meta_reset<clazz>();
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));
@@ -724,11 +724,11 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
 
-    ASSERT_FALSE(entt::resolve<clazz_t>().prop(static_cast<entt::id_type>(property_t::value)));
+    ASSERT_FALSE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     // implicitly generated default constructor is not cleared
-    ASSERT_TRUE(entt::resolve<clazz_t>().construct());
-    ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
-    ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
+    ASSERT_TRUE(entt::resolve<clazz>().construct());
+    ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
+    ASSERT_FALSE(entt::resolve<clazz>().func("member"_hs));
 
     entt::meta<double>().type("double"_hs);
     entt::meta_any any{3.};
@@ -740,14 +740,14 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    entt::meta<property_t>()
+    entt::meta<property_type>()
         .type("property"_hs)
-        .data<property_t::random>("rand"_hs)
-        .prop(static_cast<entt::id_type>(property_t::value), 3)
-        .prop(static_cast<entt::id_type>(property_t::random), 3);
+        .data<property_type::random>("rand"_hs)
+        .prop(static_cast<entt::id_type>(property_type::value), 3)
+        .prop(static_cast<entt::id_type>(property_type::random), 3);
 
-    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::value)));
-    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::random)));
+    ASSERT_TRUE(entt::resolve<property_type>().data("rand"_hs).prop(static_cast<entt::id_type>(property_type::value)));
+    ASSERT_TRUE(entt::resolve<property_type>().data("rand"_hs).prop(static_cast<entt::id_type>(property_type::random)));
 }
 
 TEST_F(MetaType, ReRegistration) {
@@ -778,10 +778,10 @@ TEST_F(MetaType, ReRegistration) {
 TEST_F(MetaType, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_NO_THROW(entt::meta<clazz_t>().type("clazz"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz>().type("clazz"_hs));
     ASSERT_TRUE(entt::resolve("clazz"_hs));
 
-    ASSERT_NO_THROW(entt::meta<clazz_t>().type("quux"_hs));
+    ASSERT_NO_THROW(entt::meta<clazz>().type("quux"_hs));
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }
@@ -789,5 +789,5 @@ TEST_F(MetaType, NameCollision) {
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_DEATH(entt::meta<clazz_t>().type("abstract"_hs), "");
+    ASSERT_DEATH(entt::meta<clazz>().type("abstract"_hs), "");
 }
