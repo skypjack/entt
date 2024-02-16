@@ -36,7 +36,7 @@ struct clazz {
 
     int i{0};
     const int j{1}; // NOLINT
-    base base{};
+    base instance{};
     inline static int h{2};       // NOLINT
     inline static const int k{3}; // NOLINT
 };
@@ -117,7 +117,7 @@ struct MetaData: ::testing::Test {
             .prop(static_cast<entt::id_type>(property_type::random), 2)
             .data<&clazz::k>("k"_hs)
             .prop(static_cast<entt::id_type>(property_type::value), 3)
-            .data<&clazz::base>("base"_hs)
+            .data<&clazz::instance>("base"_hs)
             .data<&clazz::i, entt::as_void_t>("void"_hs)
             .conv<int>();
 
