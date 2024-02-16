@@ -10,10 +10,15 @@
 #include <entt/core/compressed_pair.hpp>
 
 TEST(CompressedPair, Size) {
+    struct local {
+        int value;
+        test::empty empty;
+    };
+
     ASSERT_EQ(sizeof(entt::compressed_pair<int, int>), sizeof(int) * 2u);
     ASSERT_EQ(sizeof(entt::compressed_pair<test::empty, int>), sizeof(int));
     ASSERT_EQ(sizeof(entt::compressed_pair<int, test::empty>), sizeof(int));
-    ASSERT_LT(sizeof(entt::compressed_pair<int, test::empty>), sizeof(std::tuple<int, test::empty>));
+    ASSERT_LT(sizeof(entt::compressed_pair<int, test::empty>), sizeof(local));
     ASSERT_LT(sizeof(entt::compressed_pair<int, test::empty>), sizeof(std::pair<int, test::empty>));
 }
 
