@@ -29,3 +29,7 @@ TODO:
 * group review: use handler as base with protected members and arrays of common type (see view for further details)
 * swap sets in swap-only mode, return scoped iterators by default, make ::free_list return an iterator if possible
 * test: push sharing types further
+* after non-continuous generation for entity storage:
+  - stop using force-back in swap-only mode + review natvis
+  - reset placeholder to position after loading (avoid long lookup)
+  - dedicated tests to avoid regressions (also to check next after clear)
