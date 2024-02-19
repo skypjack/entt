@@ -996,14 +996,16 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<void>(), deletion_policy::swap_only, allocator} {}
+        : base_type{type_id<void>(), deletion_policy::swap_only, allocator},
+          next{} {}
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)} {}
+        : base_type{std::move(other)},
+          next{other.next} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -1011,7 +1013,8 @@ public:
      * @param allocator The allocator to use.
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
-        : base_type{std::move(other), allocator} {}
+        : base_type{std::move(other), allocator},
+          next{other.next} {}
 
     /**
      * @brief Move assignment operator.
@@ -1020,6 +1023,7 @@ public:
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
         base_type::operator=(std::move(other));
+        next = other.next;
         return *this;
     }
 
@@ -1052,7 +1056,7 @@ public:
      */
     entity_type emplace() {
         const auto len = base_type::free_list();
-        const auto entt = (len == base_type::size()) ? entity_at(len) : base_type::data()[len];
+        const auto entt = (len == next) ? entity_at(next++) : base_type::data()[len];
         return *base_type::try_emplace(entt, true);
     }
 
@@ -1072,10 +1076,11 @@ public:
             const auto pos = static_cast<size_type>(underlying_type::traits_type::to_entity(hint));
             const auto entt = *base_type::try_emplace(hint, true);
 
-            while(!(pos < base_type::size())) {
-                base_type::try_emplace(entity_at(base_type::size() - 1u), false);
+            for(; next != pos; ++next) {
+                base_type::try_emplace(entity_at(next), false);
             }
 
+            next = pos + 1u;
             return entt;
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
@@ -1104,12 +1109,12 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
+        for(; first != last && base_type::free_list() != next; ++first) {
             *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
         }
 
-        for(; first != last; ++first) {
-            *first = *base_type::try_emplace(entity_at(base_type::free_list()), true);
+        for(; first != last; ++first, ++next) {
+            *first = *base_type::try_emplace(entity_at(next), true);
         }
     }
 
@@ -1144,6 +1149,9 @@ public:
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
         return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crend(0)}};
     }
+
+private:
+    size_type next;
 };
 
 } // namespace entt
