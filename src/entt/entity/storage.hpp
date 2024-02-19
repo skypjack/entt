@@ -957,6 +957,12 @@ class basic_storage<Entity, Entity, Allocator>
     }
 
 protected:
+    /*! @brief Erases all entities of a storage. */
+    void pop_all() override {
+        base_type::pop_all();
+        next = {};
+    }
+
     /**
      * @brief Assigns an entity to a storage.
      * @param hint A valid identifier.
