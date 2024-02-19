@@ -312,7 +312,7 @@ TEST(StorageEntity, FreeList) {
     ASSERT_EQ(pool.size(), 1u);
 }
 
-ENTT_DEBUG_TEST(StorageEntityDeathTest, InUse) {
+ENTT_DEBUG_TEST(StorageEntityDeathTest, FreeList) {
     entt::storage<entt::entity> pool;
 
     pool.emplace(entt::entity{0});
