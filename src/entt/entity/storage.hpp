@@ -951,16 +951,16 @@ class basic_storage<Entity, Entity, Allocator>
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = typename underlying_type::basic_iterator;
 
-    auto entity_at(const std::size_t pos) const noexcept {
-        ENTT_ASSERT(pos < underlying_type::traits_type::to_entity(null), "Invalid element");
-        return underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(pos), {});
+    auto next() noexcept {
+        ENTT_ASSERT(placeholder < underlying_type::traits_type::to_entity(null), "Invalid element");
+        return underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(placeholder++), {});
     }
 
 protected:
     /*! @brief Erases all entities of a storage. */
     void pop_all() override {
         base_type::pop_all();
-        next = {};
+        placeholder = {};
     }
 
     /**
@@ -1003,7 +1003,7 @@ public:
      */
     explicit basic_storage(const allocator_type &allocator)
         : base_type{type_id<void>(), deletion_policy::swap_only, allocator},
-          next{} {}
+          placeholder{} {}
 
     /**
      * @brief Move constructor.
@@ -1011,7 +1011,7 @@ public:
      */
     basic_storage(basic_storage &&other) noexcept
         : base_type{std::move(other)},
-          next{other.next} {}
+          placeholder{other.placeholder} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -1020,7 +1020,7 @@ public:
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator},
-          next{other.next} {}
+          placeholder{other.placeholder} {}
 
     /**
      * @brief Move assignment operator.
@@ -1029,7 +1029,7 @@ public:
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
         base_type::operator=(std::move(other));
-        next = other.next;
+        placeholder = other.placeholder;
         return *this;
     }
 
@@ -1062,7 +1062,7 @@ public:
      */
     entity_type emplace() {
         const auto len = base_type::free_list();
-        const auto entt = (len == next) ? entity_at(next++) : base_type::data()[len];
+        const auto entt = (len == base_type::size()) ? next() : base_type::data()[len];
         return *base_type::try_emplace(entt, true);
     }
 
@@ -1082,11 +1082,11 @@ public:
             const auto pos = static_cast<size_type>(underlying_type::traits_type::to_entity(hint));
             const auto entt = *base_type::try_emplace(hint, true);
 
-            for(; next != pos; ++next) {
-                base_type::try_emplace(entity_at(next), false);
+            for(; placeholder != pos;) {
+                base_type::try_emplace(next(), false);
             }
 
-            next = pos + 1u;
+            placeholder = pos + 1u;
             return entt;
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
@@ -1115,12 +1115,12 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        for(; first != last && base_type::free_list() != next; ++first) {
+        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
             *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
         }
 
-        for(; first != last; ++first, ++next) {
-            *first = *base_type::try_emplace(entity_at(next), true);
+        for(; first != last; ++first) {
+            *first = *base_type::try_emplace(next(), true);
         }
     }
 
@@ -1157,7 +1157,7 @@ public:
     }
 
 private:
-    size_type next;
+    size_type placeholder;
 };
 
 } // namespace entt
