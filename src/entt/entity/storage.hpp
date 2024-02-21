@@ -952,8 +952,14 @@ class basic_storage<Entity, Entity, Allocator>
     using underlying_iterator = typename underlying_type::basic_iterator;
 
     auto next() noexcept {
-        ENTT_ASSERT(placeholder < underlying_type::traits_type::to_entity(null), "Invalid element");
-        return underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(placeholder++), {});
+        entity_type entt = null;
+
+        do {
+            ENTT_ASSERT(placeholder < underlying_type::traits_type::to_entity(null), "Invalid element");
+            entt = underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(placeholder++), {});
+        } while(base_type::current(entt) != underlying_type::traits_type::to_version(tombstone));
+
+        return entt;
     }
 
 protected:
@@ -1079,15 +1085,7 @@ public:
         if(hint == null || hint == tombstone) {
             return emplace();
         } else if(const auto curr = underlying_type::traits_type::construct(underlying_type::traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
-            const auto pos = static_cast<size_type>(underlying_type::traits_type::to_entity(hint));
-            const auto entt = *base_type::try_emplace(hint, true);
-
-            for(; placeholder != pos;) {
-                base_type::try_emplace(next(), false);
-            }
-
-            placeholder = pos + 1u;
-            return entt;
+            return *base_type::try_emplace(hint, true);
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
         } else {

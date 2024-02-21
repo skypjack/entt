@@ -91,16 +91,16 @@ TEST(StorageEntity, Swap) {
     other.emplace(entt::entity{1});
     other.erase(entt::entity{2});
 
-    ASSERT_EQ(pool.size(), 5u);
-    ASSERT_EQ(other.size(), 3u);
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 2u);
 
     pool.swap(other);
 
     ASSERT_EQ(pool.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
-    ASSERT_EQ(pool.size(), 3u);
-    ASSERT_EQ(other.size(), 5u);
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(other.size(), 1u);
 
     ASSERT_EQ(pool.index(entt::entity{1}), 0u);
     ASSERT_EQ(other.index(entt::entity{4}), 0u);
@@ -152,7 +152,7 @@ TEST(StorageEntity, Emplace) {
     ASSERT_LT(pool.index(entt::entity{2}), pool.free_list());
     ASSERT_LT(pool.index(entt::entity{3}), pool.free_list());
     ASSERT_LT(pool.index(entt::entity{4}), pool.free_list());
-    ASSERT_GE(pool.index(entt::entity{5}), pool.free_list());
+    ASSERT_EQ(pool.current(entt::entity{5}), traits_type::to_version(entt::tombstone));
     ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.free_list());
 
     ASSERT_EQ(pool.emplace(traits_type::construct(5, 2)), traits_type::construct(5, 2));
@@ -184,7 +184,7 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_LT(pool.index(entt::entity{1}), pool.free_list());
     ASSERT_LT(pool.index(entt::entity{2}), pool.free_list());
     ASSERT_LT(pool.index(entt::entity{3}), pool.free_list());
-    ASSERT_GE(pool.index(entt::entity{4}), pool.free_list());
+    ASSERT_EQ(pool.current(entt::entity{4}), traits_type::to_version(entt::tombstone));
     ASSERT_LT(pool.index(traits_type::construct(5, 3)), pool.free_list());
 
     ASSERT_EQ(*pool.push(traits_type::construct(4, 2)), traits_type::construct(4, 2));
@@ -265,9 +265,11 @@ TEST(StorageEntity, Insert) {
 
 TEST(StorageEntity, Pack) {
     entt::storage<entt::entity> pool;
-    std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{4}};
+    std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{4}, entt::entity{2}};
 
     pool.push(entity.begin(), entity.end());
+    pool.erase(entity[3u]);
+
     std::swap(entity[0u], entity[1u]);
 
     const auto to = pool.sort_as(entity.begin() + 1u, entity.end());

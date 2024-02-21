@@ -280,14 +280,14 @@ TEST(SighMixin, StorageEntity) {
 
     ASSERT_EQ(on_construct, 1u);
     ASSERT_EQ(on_destroy, 0u);
-    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(pool.free_list(), 1u);
 
     pool.erase(entt::entity{1});
 
     ASSERT_EQ(on_construct, 1u);
     ASSERT_EQ(on_destroy, 1u);
-    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(pool.free_list(), 0u);
 
     pool.push(traits_type::construct(0, 2));
