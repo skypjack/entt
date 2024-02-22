@@ -331,6 +331,7 @@ protected:
      * @return Iterator pointing to the emplaced element.
      */
     virtual basic_iterator try_emplace(const Entity entt, const bool force_back, const void * = nullptr) {
+        ENTT_ASSERT(entt != null && entt != tombstone, "Invalid element");
         auto &elem = assure_at_least(entt);
         auto pos = size();
 
@@ -358,8 +359,8 @@ protected:
                 bump(entt);
             }
 
-                pos = static_cast<size_type>(head++);
-                swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
+            pos = static_cast<size_type>(head++);
+            swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
             break;
         }
 
@@ -419,7 +420,9 @@ public:
           packed{allocator},
           info{&elem},
           mode{pol},
-          head{policy_to_head()} {}
+          head{policy_to_head()} {
+        ENTT_ASSERT(traits_type::version_mask || mode != deletion_policy::in_place, "Policy does not support zero-sized versions");
+    }
 
     /**
      * @brief Move constructor.
