@@ -169,6 +169,27 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(entity[1u], entt::entity{8});
 }
 
+TEST(StorageEntity, EmplaceInUse) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::storage<entt::entity> pool;
+    std::array<entt::entity, 2u> entity{};
+    const entt::entity other{1};
+
+    ASSERT_EQ(pool.emplace(other), other);
+    ASSERT_EQ(pool.emplace(), entt::entity{0});
+    ASSERT_EQ(pool.emplace(), entt::entity{2});
+
+    pool.clear();
+
+    ASSERT_EQ(pool.emplace(other), other);
+
+    pool.insert(entity.begin(), entity.end());
+
+    ASSERT_EQ(entity[0u], entt::entity{0});
+    ASSERT_EQ(entity[1u], entt::entity{2});
+}
+
 TEST(StorageEntity, TryEmplace) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -210,6 +231,27 @@ TEST(StorageEntity, TryEmplace) {
     ASSERT_EQ(*pool.push(traits_type::construct(1, 3)), traits_type::construct(1, 3));
     ASSERT_EQ(*pool.push(entt::null), traits_type::construct(5, 4));
     ASSERT_EQ(*pool.push(entt::null), entt::entity{7});
+}
+
+TEST(StorageEntity, TryEmplaceInUse) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::storage<entt::entity> pool;
+    std::array<entt::entity, 2u> entity{entt::entity{0}, entt::entity{0}};
+    const entt::entity other{1};
+
+    ASSERT_EQ(*pool.push(other), other);
+    ASSERT_EQ(*pool.push(other), entt::entity{0});
+    ASSERT_EQ(*pool.push(other), entt::entity{2});
+
+    pool.clear();
+
+    ASSERT_EQ(*pool.push(other), other);
+
+    auto it = pool.push(entity.begin(), entity.end());
+
+    ASSERT_EQ(*it, entt::entity{0});
+    ASSERT_EQ(*(--it), entt::entity{2});
 }
 
 TEST(StorageEntity, Patch) {
