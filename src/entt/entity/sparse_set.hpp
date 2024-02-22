@@ -358,11 +358,8 @@ protected:
                 bump(entt);
             }
 
-            if(force_back) {
                 pos = static_cast<size_type>(head++);
                 swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
-            }
-
             break;
         }
 
