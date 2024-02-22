@@ -827,10 +827,10 @@ public:
      * @return The version of the given identifier.
      */
     version_type bump(const entity_type entt) {
-        auto &entity = sparse_ref(entt);
-        ENTT_ASSERT(entt != tombstone && entity != null, "Cannot set the required version");
-        entity = traits_type::combine(traits_type::to_integral(entity), traits_type::to_integral(entt));
-        packed[static_cast<size_type>(traits_type::to_entity(entity))] = entt;
+        auto &elem = sparse_ref(entt);
+        ENTT_ASSERT(entt != null && elem != tombstone, "Cannot set the required version");
+        elem = traits_type::combine(traits_type::to_integral(elem), traits_type::to_integral(entt));
+        packed[static_cast<size_type>(traits_type::to_entity(elem))] = entt;
         return traits_type::to_version(entt);
     }
 
@@ -925,8 +925,8 @@ public:
                     swap_or_move(from, to);
 
                     packed[to] = packed[from];
-                    const auto entity = static_cast<typename traits_type::entity_type>(to);
-                    sparse_ref(packed[to]) = traits_type::combine(entity, traits_type::to_integral(packed[to]));
+                    const auto elem = static_cast<typename traits_type::entity_type>(to);
+                    sparse_ref(packed[to]) = traits_type::combine(elem, traits_type::to_integral(packed[to]));
 
                     for(; from && packed[from - 1u] == tombstone; --from) {}
                 }
@@ -1004,8 +1004,8 @@ public:
                 const auto entt = packed[curr];
 
                 swap_or_move(next, idx);
-                const auto entity = static_cast<typename traits_type::entity_type>(curr);
-                sparse_ref(entt) = traits_type::combine(entity, traits_type::to_integral(packed[curr]));
+                const auto elem = static_cast<typename traits_type::entity_type>(curr);
+                sparse_ref(entt) = traits_type::combine(elem, traits_type::to_integral(packed[curr]));
                 curr = std::exchange(next, idx);
             }
         }
