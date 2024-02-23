@@ -13,7 +13,7 @@ enum class my_entity : entt::id_type {
     _entt_enum_as_bitmask
 };
 
-struct custom_entity_traits {
+struct entity_traits {
     using value_type = my_entity;
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
@@ -22,7 +22,7 @@ struct custom_entity_traits {
 };
 
 template<>
-struct entt::entt_traits<my_entity>: entt::basic_entt_traits<custom_entity_traits> {
+struct entt::entt_traits<my_entity>: entt::basic_entt_traits<entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
