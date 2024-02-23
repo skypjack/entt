@@ -314,7 +314,7 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
-        return traits_type::to_version(entity) == traits_type::to_version(*this);
+        return traits_type::version_mask && (traits_type::to_version(entity) == traits_type::to_version(*this));
     }
 
     /**
