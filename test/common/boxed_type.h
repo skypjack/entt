@@ -6,6 +6,10 @@ namespace test {
 template<typename Type>
 struct boxed_type {
     Type value{};
+
+    operator Type() const noexcept {
+        return value;
+    }
 };
 
 template<typename Type>
