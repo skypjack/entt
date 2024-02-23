@@ -14,6 +14,7 @@ inline bool operator==(const boxed_type<Type> &lhs, const boxed_type<Type> &rhs)
 }
 
 using boxed_int = boxed_type<int>;
+using boxed_char = boxed_type<char>;
 
 } // namespace test
 
