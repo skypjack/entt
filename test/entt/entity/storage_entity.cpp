@@ -170,8 +170,6 @@ TEST(StorageEntity, Emplace) {
 }
 
 TEST(StorageEntity, EmplaceInUse) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
     std::array<entt::entity, 2u> entity{};
     const entt::entity other{1};
@@ -234,8 +232,6 @@ TEST(StorageEntity, TryEmplace) {
 }
 
 TEST(StorageEntity, TryEmplaceInUse) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
     std::array<entt::entity, 2u> entity{entt::entity{0}, entt::entity{0}};
     const entt::entity other{1};
