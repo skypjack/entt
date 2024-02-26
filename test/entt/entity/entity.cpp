@@ -1,12 +1,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <gtest/gtest.h>
-#include <common/custom_entity.h>
+#include <common/entity.h>
 #include <entt/config/config.h>
 #include <entt/entity/entity.hpp>
 
-struct custom_entity_traits {
-    using value_type = test::custom_entity;
+struct entity_traits {
+    using value_type = test::entity;
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
     static constexpr entity_type entity_mask = 0x3FFFF; // 18b
@@ -14,7 +14,7 @@ struct custom_entity_traits {
 };
 
 template<>
-struct entt::entt_traits<test::custom_entity>: entt::basic_entt_traits<custom_entity_traits> {
+struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
@@ -23,7 +23,7 @@ struct Entity: testing::Test {
     using type = Type;
 };
 
-using EntityTypes = ::testing::Types<entt::entity, test::custom_entity>;
+using EntityTypes = ::testing::Types<entt::entity, test::entity>;
 
 TYPED_TEST_SUITE(Entity, EntityTypes, );
 

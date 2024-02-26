@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/custom_entity.h>
+#include <common/entity.h>
 #include <common/linter.hpp>
 #include <common/non_default_constructible.h>
 #include <common/pointer_stable.h>
@@ -24,11 +24,11 @@ void listener(std::size_t &counter, Registry &, typename Registry::entity_type) 
     ++counter;
 }
 
-struct custom_registry: entt::basic_registry<test::custom_entity> {};
+struct custom_registry: entt::basic_registry<test::entity> {};
 
 template<typename Type>
-struct entt::storage_type<Type, test::custom_entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, test::custom_entity>>> {
-    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::custom_entity>, custom_registry>;
+struct entt::storage_type<Type, test::entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, test::entity>>> {
+    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::entity>, custom_registry>;
 };
 
 template<typename Type>
@@ -436,18 +436,18 @@ TYPED_TEST(SighMixin, Swap) {
 
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
-    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::custom_entity>, custom_registry> pool;
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, custom_registry> pool;
     custom_registry registry;
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(static_cast<entt::basic_registry<test::custom_entity> &>(registry)));
+    pool.bind(entt::forward_as_any(static_cast<entt::basic_registry<test::entity> &>(registry)));
     pool.on_construct().template connect<&listener<custom_registry>>(on_construct);
     pool.on_destroy().template connect<&listener<custom_registry>>(on_destroy);
 
-    pool.emplace(test::custom_entity{3});
-    pool.emplace(test::custom_entity{1});
+    pool.emplace(test::entity{3});
+    pool.emplace(test::entity{1});
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 0u);

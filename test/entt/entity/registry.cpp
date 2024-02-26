@@ -11,8 +11,8 @@
 #include <gtest/gtest.h>
 #include <common/aggregate.h>
 #include <common/config.h>
-#include <common/custom_entity.h>
 #include <common/empty.h>
+#include <common/entity.h>
 #include <common/non_default_constructible.h>
 #include <common/pointer_stable.h>
 #include <entt/config/config.h>
@@ -79,8 +79,8 @@ private:
     bool *ctx_check{};
 };
 
-struct custom_entity_traits {
-    using value_type = test::custom_entity;
+struct entity_traits {
+    using value_type = test::entity;
     using entity_type = uint32_t;
     using version_type = uint16_t;
     static constexpr entity_type entity_mask = 0xFF;
@@ -88,7 +88,7 @@ struct custom_entity_traits {
 };
 
 template<>
-struct entt::entt_traits<test::custom_entity>: entt::basic_entt_traits<custom_entity_traits> {
+struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
     static constexpr auto page_size = ENTT_SPARSE_PAGE;
 };
 
@@ -758,8 +758,8 @@ TEST(Registry, CreateDestroyReleaseCornerCase) {
 }
 
 ENTT_DEBUG_TEST(RegistryDeathTest, CreateTooManyEntities) {
-    entt::basic_registry<test::custom_entity> registry{};
-    std::vector<test::custom_entity> entity(entt::entt_traits<test::custom_entity>::to_entity(entt::null));
+    entt::basic_registry<test::entity> registry{};
+    std::vector<test::entity> entity(entt::entt_traits<test::entity>::to_entity(entt::null));
     registry.create(entity.begin(), entity.end());
 
     ASSERT_DEATH([[maybe_unused]] const auto entt = registry.create(), "");

@@ -7,7 +7,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <common/config.h>
-#include <common/custom_entity.h>
+#include <common/entity.h>
 #include <common/linter.hpp>
 #include <common/throwing_allocator.hpp>
 #include <entt/config/config.h>
@@ -16,8 +16,8 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
 
-struct custom_entity_traits {
-    using value_type = test::custom_entity;
+struct entity_traits {
+    using value_type = test::entity;
     using entity_type = std::uint32_t;
     using version_type = std::uint16_t;
     static constexpr entity_type entity_mask = 0x3FFFF; // 18b
@@ -25,7 +25,7 @@ struct custom_entity_traits {
 };
 
 template<>
-struct entt::entt_traits<test::custom_entity>: entt::basic_entt_traits<custom_entity_traits> {
+struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
@@ -43,7 +43,7 @@ struct SparseSet: testing::Test {
 template<typename Type>
 using SparseSetDeathTest = SparseSet<Type>;
 
-using SparseSetTypes = ::testing::Types<entt::entity, test::custom_entity>;
+using SparseSetTypes = ::testing::Types<entt::entity, test::entity>;
 
 TYPED_TEST_SUITE(SparseSet, SparseSetTypes, );
 TYPED_TEST_SUITE(SparseSetDeathTest, SparseSetTypes, );
