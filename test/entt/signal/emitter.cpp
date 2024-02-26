@@ -4,11 +4,9 @@
 #include <gtest/gtest.h>
 #include <common/boxed_type.h>
 #include <common/emitter.h>
+#include <common/empty.h>
 #include <common/linter.hpp>
 #include <entt/signal/emitter.hpp>
-
-struct bar_event {};
-struct quux_event {};
 
 TEST(Emitter, Move) {
     test::emitter emitter{};
@@ -63,40 +61,40 @@ TEST(Emitter, Clear) {
     ASSERT_TRUE(emitter.empty());
 
     emitter.on<test::boxed_int>([](auto &, const auto &) {});
-    emitter.on<quux_event>([](const auto &, const auto &) {});
+    emitter.on<test::boxed_char>([](const auto &, const auto &) {});
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_TRUE(emitter.contains<test::boxed_int>());
-    ASSERT_TRUE(emitter.contains<quux_event>());
-    ASSERT_FALSE(emitter.contains<bar_event>());
+    ASSERT_TRUE(emitter.contains<test::boxed_char>());
+    ASSERT_FALSE(emitter.contains<test::empty>());
 
-    emitter.erase<bar_event>();
+    emitter.erase<test::empty>();
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_TRUE(emitter.contains<test::boxed_int>());
-    ASSERT_TRUE(emitter.contains<quux_event>());
-    ASSERT_FALSE(emitter.contains<bar_event>());
+    ASSERT_TRUE(emitter.contains<test::boxed_char>());
+    ASSERT_FALSE(emitter.contains<test::empty>());
 
     emitter.erase<test::boxed_int>();
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_FALSE(emitter.contains<test::boxed_int>());
-    ASSERT_TRUE(emitter.contains<quux_event>());
-    ASSERT_FALSE(emitter.contains<bar_event>());
+    ASSERT_TRUE(emitter.contains<test::boxed_char>());
+    ASSERT_FALSE(emitter.contains<test::empty>());
 
     emitter.on<test::boxed_int>([](auto &, const auto &) {});
-    emitter.on<bar_event>([](const auto &, const auto &) {});
+    emitter.on<test::empty>([](const auto &, const auto &) {});
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_TRUE(emitter.contains<test::boxed_int>());
-    ASSERT_TRUE(emitter.contains<quux_event>());
-    ASSERT_TRUE(emitter.contains<bar_event>());
+    ASSERT_TRUE(emitter.contains<test::boxed_char>());
+    ASSERT_TRUE(emitter.contains<test::empty>());
 
     emitter.clear();
 
     ASSERT_TRUE(emitter.empty());
     ASSERT_FALSE(emitter.contains<test::boxed_int>());
-    ASSERT_FALSE(emitter.contains<bar_event>());
+    ASSERT_FALSE(emitter.contains<test::empty>());
 }
 
 TEST(Emitter, ClearFromCallback) {
@@ -109,15 +107,15 @@ TEST(Emitter, ClearFromCallback) {
         owner.template erase<test::boxed_int>();
     });
 
-    emitter.on<bar_event>([](const auto &, auto &owner) {
-        owner.template on<bar_event>([](const auto &, auto &) {});
-        owner.template erase<bar_event>();
+    emitter.on<test::empty>([](const auto &, auto &owner) {
+        owner.template on<test::empty>([](const auto &, auto &) {});
+        owner.template erase<test::empty>();
     });
 
     ASSERT_FALSE(emitter.empty());
 
     emitter.publish(test::boxed_int{});
-    emitter.publish(bar_event{});
+    emitter.publish(test::empty{});
 
     ASSERT_TRUE(emitter.empty());
 }
@@ -141,17 +139,17 @@ TEST(Emitter, On) {
 
 TEST(Emitter, OnAndErase) {
     test::emitter emitter{};
-    const std::function<void(bar_event &, test::emitter &)> func{};
+    const std::function<void(test::empty &, test::emitter &)> func{};
 
     emitter.on(func);
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_TRUE(emitter.contains<bar_event>());
+    ASSERT_TRUE(emitter.contains<test::empty>());
 
-    emitter.erase<bar_event>();
+    emitter.erase<test::empty>();
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_FALSE(emitter.contains<bar_event>());
+    ASSERT_FALSE(emitter.contains<test::empty>());
 }
 
 TEST(Emitter, CustomAllocator) {
