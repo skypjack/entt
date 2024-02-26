@@ -804,8 +804,7 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return Iterator pointing to the first element inserted in case of
-     * success, the `end()` iterator otherwise.
+     * @return Iterator pointing to the first element inserted, if any.
      */
     template<typename It>
     iterator push(It first, It last) {
