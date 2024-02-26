@@ -32,7 +32,6 @@ TODO:
 * range sparse_set::push should return a reverse iterator, it's kinda wrong now
 * after non-continuous generation for entity storage:
   - get/reset placeholder to position after saving/loading (avoid long lookup)
-  - basic_storage<...>::next never stops in release when it runs out of entities (well, not an issue probably but still)
   - documentation for reserved entities
 * no-version entities always return true when compared to tombstones (fixed but test needed)
 * storage entity: no emplace/insert, rename and add a fast range-push from above
