@@ -791,7 +791,7 @@ public:
      * `end()` iterator otherwise.
      */
     iterator push(const entity_type entt, const void *elem = nullptr) {
-        return try_emplace(entt, (mode == deletion_policy::swap_only), elem);
+        return try_emplace(entt, false, elem);
     }
 
     /**
