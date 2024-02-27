@@ -66,8 +66,8 @@ template<typename Traits>
 class basic_entt_traits {
     static constexpr auto length = internal::popcount(Traits::entity_mask);
 
-    static_assert(Traits::entity_mask && ((typename Traits::entity_type{1} << length) == (Traits::entity_mask + 1)), "Invalid entity mask");
-    static_assert((typename Traits::entity_type{1} << internal::popcount(Traits::version_mask)) == (Traits::version_mask + 1), "Invalid version mask");
+    static_assert(Traits::entity_mask && ((Traits::entity_mask & (Traits::entity_mask + 1)) == 0), "Invalid entity mask");
+    static_assert((Traits::version_mask & (Traits::version_mask + 1)) == 0, "Invalid version mask");
 
 public:
     /*! @brief Value type. */
