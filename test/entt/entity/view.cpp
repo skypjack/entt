@@ -1343,6 +1343,7 @@ TEST(MultiComponentView, StableType) {
 TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     entt::registry registry;
     auto view = registry.view<test::pointer_stable>(entt::exclude<int>);
+    const entt::entity tombstone = entt::tombstone;
 
     const auto entity = registry.create();
     const auto other = registry.create();
@@ -1362,20 +1363,17 @@ TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     ASSERT_TRUE(view.contains(other));
 
     for(auto entt: view) {
-        constexpr entt::entity tombstone = entt::tombstone;
         ASSERT_NE(entt, tombstone);
         ASSERT_EQ(entt, other);
     }
 
     for(auto [entt, comp]: view.each()) {
-        constexpr entt::entity tombstone = entt::tombstone;
         ASSERT_NE(entt, tombstone);
         ASSERT_EQ(entt, other);
         ASSERT_EQ(comp.value, 4);
     }
 
-    view.each([other](const auto entt, auto &&...) {
-        constexpr entt::entity tombstone = entt::tombstone;
+    view.each([other, tombstone](const auto entt, auto &&...) {
         ASSERT_NE(entt, tombstone);
         ASSERT_EQ(entt, other);
     });
