@@ -225,16 +225,12 @@ protected:
     basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
-          leading{},
           index{Get} {
         unchecked_refresh();
     }
 
     void use(const std::size_t pos) noexcept {
-        if(leading) {
-            index = pos;
-            leading = pools[index];
-        }
+        index = (index != Get) ? pos : Get;
     }
 
     void unchecked_refresh() noexcept {
@@ -247,8 +243,6 @@ protected:
                 }
             }
         }
-
-        leading = pools[index];
     }
     /*! @endcond */
 
@@ -264,7 +258,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        size_type pos = (leading != nullptr) * Get;
+        size_type pos = (index != Get) * Get;
         for(; pos < Get && pools[pos] != nullptr; ++pos) {}
 
         if(pos == Get) {
@@ -277,7 +271,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type *handle() const noexcept {
-        return leading;
+        return (index != Get) ? pools[index] : nullptr;
     }
 
     /**
@@ -285,7 +279,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return leading ? leading->size() : size_type{};
+        return (index != Get) ? pools[index]->size() : size_type{};
     }
 
     /**
@@ -296,7 +290,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return leading ? iterator{leading->begin(0), leading->end(0), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->begin(0), pools[index]->end(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -304,7 +298,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return leading ? iterator{leading->end(0), leading->end(0), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->end(0), pools[index]->end(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -323,9 +317,9 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        if(leading) {
-            auto it = leading->rbegin(0);
-            const auto last = leading->rend(0);
+        if(index != Get) {
+            auto it = pools[index]->rbegin(0);
+            const auto last = pools[index]->rend(0);
             for(; it != last && !contains(*it); ++it) {}
             return it == last ? null : *it;
         }
@@ -340,7 +334,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{leading->find(entt), leading->end(), pools, filter, index} : end();
+        return contains(entt) ? iterator{pools[index]->find(entt), pools[index]->end(0), pools, filter, index} : end();
     }
 
     /**
@@ -348,7 +342,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return leading && internal::fully_initialized(filter.data(), Exclude);
+        return (index != Get) && internal::fully_initialized(filter.data(), Exclude);
     }
 
     /**
@@ -357,9 +351,9 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        if(leading) {
-            const auto idx = leading->find(entt).index();
-            return (!(idx < 0 || idx > leading->begin(0).index())) && internal::all_of_but(index, pools.data(), Get, entt) && internal::none_of(filter.data(), Exclude, entt);
+        if(index != Get) {
+            const auto idx = pools[index]->find(entt).index();
+            return (!(idx < 0 || idx > pools[index]->begin(0).index())) && internal::all_of_but(index, pools.data(), Get, entt) && internal::none_of(filter.data(), Exclude, entt);
         }
 
         return false;
@@ -369,7 +363,6 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     std::array<const common_type *, Get> pools{};
     std::array<const common_type *, Exclude> filter{};
-    const common_type *leading{};
     size_type index{Get};
     /*! @endcond */
 };
