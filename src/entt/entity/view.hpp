@@ -75,9 +75,9 @@ public:
           filter{},
           index{} {}
 
-    view_iterator(iterator_type curr, iterator_type to, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
-        : it{curr},
-          last{to},
+    view_iterator(iterator_type first, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
+        : it{first},
+          last{value[idx]->end(0)},
           pools{value},
           filter{excl},
           index{idx} {
@@ -290,7 +290,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return (index != Get) ? iterator{pools[index]->begin(0), pools[index]->end(0), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->begin(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -298,7 +298,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end(0), pools[index]->end(0), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->end(0), pools, filter, index} : iterator{};
     }
 
     /**
@@ -334,7 +334,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{pools[index]->find(entt), pools[index]->end(0), pools, filter, index} : end();
+        return contains(entt) ? iterator{pools[index]->find(entt), pools, filter, index} : end();
     }
 
     /**
