@@ -48,6 +48,9 @@ template<typename Result, typename View, typename Other, std::size_t... VGet, st
 
 template<typename Type, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
+    template<typename, typename...>
+    friend struct extended_view_iterator;
+
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
@@ -131,12 +134,10 @@ struct extended_view_iterator final {
     using iterator_concept = std::forward_iterator_tag;
 
     constexpr extended_view_iterator()
-        : it{},
-          pools{} {}
+        : it{} {}
 
-    extended_view_iterator(iterator_type from, std::tuple<Type *...> value)
-        : it{from},
-          pools{value} {}
+    extended_view_iterator(iterator_type from)
+        : it{from} {}
 
     extended_view_iterator &operator++() noexcept {
         return ++it, *this;
@@ -148,7 +149,7 @@ struct extended_view_iterator final {
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return std::apply([entt = *it](auto *...curr) { return std::tuple_cat(std::make_tuple(entt), curr->get_as_tuple(entt)...); }, pools);
+        return std::apply([entt = *it](auto *...curr) { return std::tuple_cat(std::make_tuple(entt), static_cast<Type *>(const_cast<constness_as_t<typename Type::base_type, Type> *>(curr))->get_as_tuple(entt)...); }, it.pools);
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
@@ -164,7 +165,6 @@ struct extended_view_iterator final {
 
 private:
     It it;
-    std::tuple<Type *...> pools;
 };
 
 template<typename... Lhs, typename... Rhs>
@@ -379,11 +379,6 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
-    template<std::size_t... Index>
-    auto storage(std::index_sequence<Index...>) const noexcept {
-        return std::make_tuple(storage<Index>()...);
-    }
-
     template<std::size_t Curr, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const std::tuple<typename base_type::entity_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
@@ -546,7 +541,7 @@ public:
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, storage(std::index_sequence_for<Get...>{}));
+            return std::apply([entt](auto *...curr) { return std::tuple_cat(static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(curr))->get_as_tuple(entt)...); }, this->pools);
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
         } else {
@@ -586,8 +581,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto as_pools = storage(std::index_sequence_for<Get...>{});
-        return {internal::extended_view_iterator{base_type::begin(), as_pools}, internal::extended_view_iterator{base_type::end(), as_pools}};
+        return iterable{base_type::begin(), base_type::end()};
     }
 
     /**
