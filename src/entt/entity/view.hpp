@@ -17,23 +17,16 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename Type, typename Entity>
-[[nodiscard]] bool all_of_but(const std::size_t index, const Type *const *it, const std::size_t len, const Entity entt) noexcept {
-    std::size_t pos{};
-    for(; (pos != index) && it[pos]->contains(entt); ++pos) {}
-
-    if(pos == index) {
-        for(++pos; (pos != len) && it[pos]->contains(entt); ++pos) {}
-    }
-
-    return pos == len;
+template<typename It, typename Entity>
+[[nodiscard]] bool all_of(It first, const It last, const Entity entt) noexcept {
+    for(; (first != last) && (*first)->contains(entt); ++first) {}
+    return first == last;
 }
 
-template<typename Type, typename Entity>
-[[nodiscard]] bool none_of(const Type *const *it, const std::size_t len, const Entity entt) noexcept {
-    std::size_t pos{};
-    for(; (pos != len) && !(it[pos] && it[pos]->contains(entt)); ++pos) {}
-    return pos == len;
+template<typename It, typename Entity>
+[[nodiscard]] bool none_of(It first, const It last, const Entity entt) noexcept {
+    for(; (first != last) && !(*first && (*first)->contains(entt)); ++first) {}
+    return first == last;
 }
 
 template<typename Type>
@@ -58,7 +51,9 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
 
     [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
-        return ((Get != 1u) || (entt != tombstone)) && all_of_but(index, pools.data(), Get, entt) && none_of(filter.data(), Exclude, entt);
+        return ((Get != 1u) || (entt != tombstone))
+               && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
+               && internal::none_of(filter.begin(), filter.end(), entt);
     }
 
 public:
@@ -351,12 +346,10 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        if(index != Get) {
-            const auto idx = pools[index]->find(entt).index();
-            return (!(idx < 0 || idx > pools[index]->begin(0).index())) && internal::all_of_but(index, pools.data(), Get, entt) && internal::none_of(filter.data(), Exclude, entt);
-        }
-
-        return false;
+        return (index != Get)
+               && internal::all_of(pools.begin(), pools.end(), entt)
+               && !(pools[index]->index(entt) > static_cast<size_type>(pools[index]->begin(0).index()))
+               && internal::none_of(filter.begin(), filter.end(), entt);
     }
 
 protected:
@@ -403,7 +396,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && internal::all_of_but(this->index, this->pools.data(), sizeof...(Get), entt) && internal::none_of(this->filter.data(), sizeof...(Exclude), entt)) {
+            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->filter.begin(), this->filter.end(), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
