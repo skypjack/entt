@@ -379,6 +379,11 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
 
+    template<std::size_t... Index>
+    auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
+        return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
+    }
+
     template<std::size_t Curr, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const std::tuple<typename base_type::entity_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
@@ -541,7 +546,7 @@ public:
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(curr))->get_as_tuple(entt)...); }, this->pools);
+            return get(entt, std::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
         } else {
