@@ -5,10 +5,10 @@
 		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
-			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
-			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
+			<Item Name="[capacity]">packed.first_base::value.capacity()</Item>
+			<Item Name="[bucket_count]">bucket_count()</Item>
+			<Item Name="[load_factor]">(float)size() / (float)bucket_count()</Item>
+			<Item Name="[max_load_factor]">threshold</Item>
 			<IndexListItems>
 				<Size>size()</Size>
 				<ValueNode>packed.first_base::value[$i].element</ValueNode>
@@ -20,10 +20,10 @@
 		<Intrinsic Name="bucket_count" Expression="sparse.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
-			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
-			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
+			<Item Name="[capacity]">packed.first_base::value.capacity()</Item>
+			<Item Name="[bucket_count]">bucket_count()</Item>
+			<Item Name="[load_factor]">(float)size() / (float)bucket_count()</Item>
+			<Item Name="[max_load_factor]">threshold</Item>
 			<IndexListItems>
 				<Size>size()</Size>
 				<ValueNode>packed.first_base::value[$i].second</ValueNode>
