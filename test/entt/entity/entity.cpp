@@ -63,10 +63,10 @@ TYPED_TEST(Entity, Traits) {
     ASSERT_EQ(traits_type::construct(entt::to_entity(entity), entt::to_version(entity)), entity);
     ASSERT_EQ(traits_type::construct(entt::to_entity(other), entt::to_version(other)), other);
 
-    if constexpr(traits_type::version_mask) {
-        ASSERT_NE(traits_type::construct(entt::to_entity(entity), entt::to_version(other)), entity);
-    } else {
+    if constexpr(traits_type::version_mask == 0u) {
         ASSERT_EQ(traits_type::construct(entt::to_entity(entity), entt::to_version(other)), entity);
+    } else {
+        ASSERT_NE(traits_type::construct(entt::to_entity(entity), entt::to_version(other)), entity);
     }
 
     ASSERT_EQ(traits_type::construct(entt::to_entity(other), entt::to_version(entity)), traits_type::combine(entt::to_integral(other), entt::to_integral(entity)));
