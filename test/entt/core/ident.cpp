@@ -17,10 +17,13 @@ TEST(Ident, Uniqueness) {
 
     // test uses in constant expressions
     switch(id::value<test::boxed_int>) {
-    case id::value<test::empty>:
-        FAIL();
     case id::value<test::boxed_int>:
         SUCCEED();
+        break;
+    case id::value<test::empty>:
+    default:
+        FAIL();
+        break;
     }
 }
 

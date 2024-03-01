@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <string>
 #include <string_view>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
