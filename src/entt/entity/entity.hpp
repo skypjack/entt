@@ -106,7 +106,11 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
-        return (static_cast<version_type>(to_integral(value) >> length) & version_mask);
+        if constexpr(Traits::version_mask) {
+            return (static_cast<version_type>(to_integral(value) >> length) & version_mask);
+        } else {
+            return version_type{};
+        }
     }
 
     /**
@@ -130,7 +134,11 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) noexcept {
-        return value_type{(entity & entity_mask) | (static_cast<entity_type>(version & version_mask) << length)};
+        if constexpr(Traits::version_mask) {
+            return value_type{(entity & entity_mask) | (static_cast<entity_type>(version & version_mask) << length)};
+        } else {
+            return value_type{entity & entity_mask};
+        }
     }
 
     /**
@@ -144,7 +152,11 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) noexcept {
-        return value_type{(lhs & entity_mask) | (rhs & (version_mask << length))};
+        if constexpr(Traits::version_mask) {
+            return value_type{(lhs & entity_mask) | (rhs & (version_mask << length))};
+        } else {
+            return value_type{lhs & entity_mask};
+        }
     }
 };
 
@@ -314,7 +326,12 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
-        return traits_type::version_mask && (traits_type::to_version(entity) == traits_type::to_version(*this));
+
+        if constexpr(traits_type::version_mask) {
+            return (traits_type::to_version(entity) == traits_type::to_version(*this));
+        } else {
+            return false;
+        }
     }
 
     /**

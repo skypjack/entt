@@ -13,8 +13,21 @@ struct entity_traits {
     static constexpr entity_type version_mask = 0x0FFF; // 12b
 };
 
+struct other_entity_traits {
+    using value_type = test::other_entity;
+    using entity_type = std::uint32_t;
+    using version_type = std::uint16_t;
+    static constexpr entity_type entity_mask = 0xFFFFFFFF; // 32b
+    static constexpr entity_type version_mask = 0x00;      // 0b
+};
+
 template<>
 struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
+    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
+};
+
+template<>
+struct entt::entt_traits<test::other_entity>: entt::basic_entt_traits<other_entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
@@ -23,7 +36,7 @@ struct Entity: testing::Test {
     using type = Type;
 };
 
-using EntityTypes = ::testing::Types<entt::entity, test::entity>;
+using EntityTypes = ::testing::Types<entt::entity, test::entity, test::other_entity>;
 
 TYPED_TEST_SUITE(Entity, EntityTypes, );
 
@@ -42,13 +55,19 @@ TYPED_TEST(Entity, Traits) {
     ASSERT_NE(entt::to_integral(entity), entt::to_integral(entity_type{}));
 
     ASSERT_EQ(entt::to_entity(entity), 4u);
-    ASSERT_EQ(entt::to_version(entity), 1u);
+    ASSERT_EQ(entt::to_version(entity), !!traits_type::version_mask);
+
     ASSERT_EQ(entt::to_entity(other), 3u);
     ASSERT_EQ(entt::to_version(other), 0u);
 
     ASSERT_EQ(traits_type::construct(entt::to_entity(entity), entt::to_version(entity)), entity);
     ASSERT_EQ(traits_type::construct(entt::to_entity(other), entt::to_version(other)), other);
-    ASSERT_NE(traits_type::construct(entt::to_entity(entity), {}), entity);
+
+    if constexpr(traits_type::version_mask) {
+        ASSERT_NE(traits_type::construct(entt::to_entity(entity), entt::to_version(other)), entity);
+    } else {
+        ASSERT_EQ(traits_type::construct(entt::to_entity(entity), entt::to_version(other)), entity);
+    }
 
     ASSERT_EQ(traits_type::construct(entt::to_entity(other), entt::to_version(entity)), traits_type::combine(entt::to_integral(other), entt::to_integral(entity)));
 
