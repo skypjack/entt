@@ -106,10 +106,10 @@ public:
      * @return The integral representation of the version part.
      */
     [[nodiscard]] static constexpr version_type to_version(const value_type value) noexcept {
-        if constexpr(Traits::version_mask) {
-            return (static_cast<version_type>(to_integral(value) >> length) & version_mask);
-        } else {
+        if constexpr(Traits::version_mask == 0u) {
             return version_type{};
+        } else {
+            return (static_cast<version_type>(to_integral(value) >> length) & version_mask);
         }
     }
 
@@ -134,10 +134,10 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type construct(const entity_type entity, const version_type version) noexcept {
-        if constexpr(Traits::version_mask) {
-            return value_type{(entity & entity_mask) | (static_cast<entity_type>(version & version_mask) << length)};
-        } else {
+        if constexpr(Traits::version_mask == 0u) {
             return value_type{entity & entity_mask};
+        } else {
+            return value_type{(entity & entity_mask) | (static_cast<entity_type>(version & version_mask) << length)};
         }
     }
 
@@ -152,10 +152,10 @@ public:
      * @return A properly constructed identifier.
      */
     [[nodiscard]] static constexpr value_type combine(const entity_type lhs, const entity_type rhs) noexcept {
-        if constexpr(Traits::version_mask) {
-            return value_type{(lhs & entity_mask) | (rhs & (version_mask << length))};
-        } else {
+        if constexpr(Traits::version_mask == 0u) {
             return value_type{lhs & entity_mask};
+        } else {
+            return value_type{(lhs & entity_mask) | (rhs & (version_mask << length))};
         }
     }
 };
@@ -327,10 +327,10 @@ struct tombstone_t {
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
 
-        if constexpr(traits_type::version_mask) {
-            return (traits_type::to_version(entity) == traits_type::to_version(*this));
-        } else {
+        if constexpr(traits_type::version_mask == 0u) {
             return false;
+        } else {
+            return (traits_type::to_version(entity) == traits_type::to_version(*this));
         }
     }
 
