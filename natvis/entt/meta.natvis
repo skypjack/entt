@@ -25,7 +25,7 @@
 						<Size>prop.size()</Size>
 						<ValueNode>prop.packed.first_base::value[$i].element.first</ValueNode>
 					</IndexListItems>
-		</Expand>
+				</Expand>
 			</Synthetic>
 		</Expand>
 	</Type>
@@ -45,7 +45,7 @@
 						<Size>prop.size()</Size>
 						<ValueNode>prop.packed.first_base::value[$i].element.first</ValueNode>
 					</IndexListItems>
-		</Expand>
+				</Expand>
 			</Synthetic>
 		</Expand>
 	</Type>
