@@ -7,9 +7,20 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::resource_cache&lt;*&gt;">
-		<DisplayString>{ pool.first_base::value }</DisplayString>
+		<Intrinsic Name="size" Expression="pool.first_base::value.size()"/>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<ExpandedItem>pool.first_base::value</ExpandedItem>
+			<CustomListItems>
+				<Variable Name="pos" InitialValue="0" />
+				<Variable Name="last" InitialValue="size()"/>
+				<Loop>
+					<Break Condition="pos == last"/>
+					<Item Name="[{ pool.first_base::value.packed.first_base::value[pos].element.first }]">
+						*pool.first_base::value.packed.first_base::value[pos].element.second
+					</Item>
+					<Exec>++pos</Exec>
+				</Loop>
+			</CustomListItems>
 		</Expand>
 	</Type>
 </AutoVisualizer>
