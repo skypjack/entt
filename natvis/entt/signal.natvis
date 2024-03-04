@@ -11,15 +11,10 @@
 		<Intrinsic Name="size" Expression="pools.first_base::value.size()"/>
 		<DisplayString>{{ size={ size() } }}</DisplayString>
 		<Expand>
-			<Synthetic Name="[pools]">
-				<DisplayString>{ size() }</DisplayString>
-				<Expand>
-					<IndexListItems>
-						<Size>size()</Size>
-						<ValueNode>*pools.first_base::value.packed.first_base::value[$i].element.second</ValueNode>
-					</IndexListItems>
-				</Expand>
-			</Synthetic>
+			<IndexListItems>
+				<Size>size()</Size>
+				<ValueNode>*pools.first_base::value.packed.first_base::value[$i].element.second</ValueNode>
+			</IndexListItems>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::dispatcher_handler&lt;*&gt;">
@@ -29,7 +24,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::emitter&lt;*&gt;">
-		<DisplayString>{{ size={ handlers.first_base::value.packed.first_base::value.size() } }}</DisplayString>
+		<DisplayString>{{ size={ handlers.first_base::value.size() } }}</DisplayString>
 	</Type>
 	<Type Name="entt::connection">
 		<DisplayString>{{ bound={ signal != nullptr } }}</DisplayString>
