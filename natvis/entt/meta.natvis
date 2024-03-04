@@ -18,7 +18,15 @@
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[prop]">prop</Item>
+			<Synthetic Name="[prop]">
+				<DisplayString>{ prop.size() }</DisplayString>
+				<Expand>
+					<IndexListItems>
+						<Size>prop.size()</Size>
+						<ValueNode>prop.packed.first_base::value[$i].element.first</ValueNode>
+					</IndexListItems>
+		</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_func_node"	>
@@ -30,7 +38,15 @@
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
-			<Item Name="[prop]">prop</Item>
+			<Synthetic Name="[prop]">
+				<DisplayString>{ prop.size() }</DisplayString>
+				<Expand>
+					<IndexListItems>
+						<Size>prop.size()</Size>
+						<ValueNode>prop.packed.first_base::value[$i].element.first</ValueNode>
+					</IndexListItems>
+		</Expand>
+			</Synthetic>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_prop_node">
