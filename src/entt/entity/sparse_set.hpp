@@ -228,7 +228,7 @@ private:
     }
 
     virtual void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {
-        ENTT_ASSERT((mode != deletion_policy::swap_only) || (((lhs < free_list()) + (rhs < free_list())) != 1u), "Cross swapping is not supported");
+        ENTT_ASSERT((mode != deletion_policy::swap_only) || (((lhs < static_cast<const std::size_t>(head)) + (rhs < static_cast<const std::size_t>(head))) != 1u), "Cross swapping is not supported");
     }
 
 protected:
