@@ -1044,8 +1044,12 @@ TYPED_TEST(SparseSet, Push) {
             set.erase(entity.begin(), entity.end());
 
             ASSERT_EQ(set.size(), 0u);
-            ASSERT_EQ(*set.push(entity.begin(), entity.end()), entity[0u]);
+
+            auto it = set.push(entity.begin(), entity.end());
+
             ASSERT_EQ(set.size(), 2u);
+            ASSERT_EQ(*it, entity[1u]);
+            ASSERT_EQ(*(++it), entity[0u]);
 
             ASSERT_EQ(set.index(entity[0u]), 0u);
             ASSERT_EQ(set.index(entity[1u]), 1u);
@@ -1078,8 +1082,12 @@ TYPED_TEST(SparseSet, Push) {
             set.erase(entity.begin(), entity.end());
 
             ASSERT_EQ(set.size(), 2u);
-            ASSERT_EQ(*set.push(entity.begin(), entity.end()), entity[0u]);
+
+            auto it = set.push(entity.begin(), entity.end());
+
             ASSERT_EQ(set.size(), 4u);
+            ASSERT_EQ(*it, entity[1u]);
+            ASSERT_EQ(*(++it), entity[0u]);
 
             ASSERT_EQ(set.index(entity[0u]), 2u);
             ASSERT_EQ(set.index(entity[1u]), 3u);
@@ -1118,9 +1126,13 @@ TYPED_TEST(SparseSet, Push) {
 
             ASSERT_EQ(set.size(), 2u);
             ASSERT_EQ(set.free_list(), 0u);
-            ASSERT_EQ(*set.push(entity.begin(), entity.end()), entity[0u]);
+
+            auto it = set.push(entity.begin(), entity.end());
+
             ASSERT_EQ(set.free_list(), 2u);
             ASSERT_EQ(set.size(), 2u);
+            ASSERT_EQ(*it, entity[1u]);
+            ASSERT_EQ(*(++it), entity[0u]);
 
             ASSERT_EQ(set.index(entity[0u]), 0u);
             ASSERT_EQ(set.index(entity[1u]), 1u);

@@ -246,8 +246,8 @@ TEST(StorageEntity, TryEmplaceInUse) {
 
     auto it = pool.push(entity.begin(), entity.end());
 
-    ASSERT_EQ(*it, entt::entity{0});
-    ASSERT_EQ(*(--it), entt::entity{2});
+    ASSERT_EQ(*it, entt::entity{2});
+    ASSERT_EQ(*(++it), entt::entity{0});
 }
 
 TEST(StorageEntity, Patch) {

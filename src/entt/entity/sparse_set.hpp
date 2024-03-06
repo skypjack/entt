@@ -812,7 +812,7 @@ public:
             try_emplace(*it, true);
         }
 
-        return first == last ? end() : find(*first);
+        return first == last ? end() : begin(0);
     }
 
     /**
