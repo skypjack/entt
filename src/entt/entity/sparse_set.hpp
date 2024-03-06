@@ -132,6 +132,11 @@ template<typename Container>
     return !(lhs < rhs);
 }
 
+template<typename Type>
+auto policy_to_head(const Type mask, const deletion_policy mode) noexcept {
+    return mask * (mode != deletion_policy::swap_only);
+}
+
 } // namespace internal
 /*! @endcond */
 
@@ -216,10 +221,6 @@ class basic_sparse_set {
         sparse_ref(rhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
 
         std::swap(lhs, rhs);
-    }
-
-    underlying_type policy_to_head() const noexcept {
-        return traits_type::entity_mask * (mode != deletion_policy::swap_only);
     }
 
 private:
@@ -320,7 +321,7 @@ protected:
             break;
         }
 
-        head = policy_to_head();
+        head = internal::policy_to_head(traits_type::entity_mask, mode);
         packed.clear();
     }
 
@@ -420,7 +421,7 @@ public:
           packed{allocator},
           info{&elem},
           mode{pol},
-          head{policy_to_head()} {
+          head{internal::policy_to_head(traits_type::entity_mask, mode)} {
         ENTT_ASSERT(traits_type::version_mask || mode != deletion_policy::in_place, "Policy does not support zero-sized versions");
     }
 
@@ -433,7 +434,7 @@ public:
           packed{std::move(other.packed)},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, policy_to_head())} {}
+          head{std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode))} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -445,7 +446,7 @@ public:
           packed{std::move(other.packed), allocator},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, policy_to_head())} {
+          head{std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode))} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -467,7 +468,7 @@ public:
         packed = std::move(other.packed);
         info = other.info;
         mode = other.mode;
-        head = std::exchange(other.head, policy_to_head());
+        head = std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode));
         return *this;
     }
 
@@ -1064,7 +1065,7 @@ public:
         pop_all();
         // sanity check to avoid subtle issues due to storage classes
         ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
-        head = policy_to_head();
+        head = internal::policy_to_head(traits_type::entity_mask, mode);
         packed.clear();
     }
 
