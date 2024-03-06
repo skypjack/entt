@@ -218,7 +218,7 @@ class basic_sparse_set {
         std::swap(lhs, rhs);
     }
 
-    underlying_type policy_to_head() {
+    underlying_type policy_to_head() const noexcept {
         return traits_type::entity_mask * (mode != deletion_policy::swap_only);
     }
 
