@@ -503,20 +503,20 @@ public:
     }
 
     /**
-     * @brief Returns the head of the free list, if any.
-     * @return The head of the free list.
+     * @brief Returns data on the free list whose meaning depends on the mode.
+     * @return Free list information that is mode dependent.
      */
     [[nodiscard]] size_type free_list() const noexcept {
         return head;
     }
 
     /**
-     * @brief Sets the head of the free list, if possible.
-     * @param len The value to use as the new head of the free list.
+     * @brief Sets data on the free list whose meaning depends on the mode.
+     * @param value Free list information that is mode dependent.
      */
-    void free_list(const size_type len) noexcept {
-        ENTT_ASSERT((mode == deletion_policy::swap_only) && !(len > packed.size()), "Invalid value");
-        head = len;
+    void free_list(const size_type value) noexcept {
+        ENTT_ASSERT((mode == deletion_policy::swap_only) && !(value > packed.size()), "Invalid value");
+        head = value;
     }
 
     /**
