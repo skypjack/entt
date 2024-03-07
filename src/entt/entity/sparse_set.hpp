@@ -132,11 +132,6 @@ template<typename Container>
     return !(lhs < rhs);
 }
 
-template<typename Type>
-auto policy_to_head(const Type mask, const deletion_policy mode) noexcept {
-    return mask * (mode != deletion_policy::swap_only);
-}
-
 } // namespace internal
 /*! @endcond */
 
@@ -166,6 +161,12 @@ class basic_sparse_set {
     using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, Allocator>;
     using underlying_type = typename entt_traits<Entity>::entity_type;
+
+    static constexpr auto max_size = static_cast<std::size_t>(typename entt_traits<Entity>::to_entity(null));
+
+    [[nodiscard]] auto policy_to_head() const noexcept {
+        return static_cast<size_type>(max_size * (mode != deletion_policy::swap_only));
+    }
 
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
         const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
@@ -229,7 +230,7 @@ private:
     }
 
     virtual void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {
-        ENTT_ASSERT((mode != deletion_policy::swap_only) || ((lhs < static_cast<const std::size_t>(head)) == (rhs < static_cast<const std::size_t>(head))), "Cross swapping is not supported");
+        ENTT_ASSERT((mode != deletion_policy::swap_only) || ((lhs < head) == (rhs < head)), "Cross swapping is not supported");
     }
 
 protected:
@@ -242,9 +243,9 @@ protected:
      */
     void swap_only(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatch");
-        const auto pos = static_cast<underlying_type>(index(*it));
+        const auto pos = index(*it);
         bump(traits_type::next(*it));
-        swap_at(pos, static_cast<size_type>(head -= (pos < head)));
+        swap_at(pos, head -= (pos < head));
     }
 
     /**
@@ -270,8 +271,8 @@ protected:
      */
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
-        const auto entt = traits_type::to_entity(std::exchange(sparse_ref(*it), null));
-        packed[static_cast<size_type>(entt)] = traits_type::combine(std::exchange(head, entt), tombstone);
+        const auto pos = static_cast<size_type>(traits_type::to_entity(std::exchange(sparse_ref(*it), null)));
+        packed[pos] = traits_type::combine(static_cast<underlying_type>(std::exchange(head, pos)), tombstone);
     }
 
 protected:
@@ -304,7 +305,7 @@ protected:
     virtual void pop_all() {
         switch(mode) {
         case deletion_policy::in_place:
-            if(head != traits_type::to_entity(null)) {
+            if(head != max_size) {
                 for(auto first = begin(); !(first.index() < 0); ++first) {
                     if(*first != tombstone) {
                         sparse_ref(*first) = null;
@@ -321,7 +322,7 @@ protected:
             break;
         }
 
-        head = internal::policy_to_head(traits_type::entity_mask, mode);
+        head = policy_to_head();
         packed.clear();
     }
 
@@ -338,11 +339,11 @@ protected:
 
         switch(mode) {
         case deletion_policy::in_place:
-            if(head != traits_type::to_entity(null) && !force_back) {
-                pos = static_cast<size_type>(head);
+            if(head != max_size && !force_back) {
+                pos = head;
                 ENTT_ASSERT(elem == null, "Slot not available");
-                elem = traits_type::combine(head, traits_type::to_integral(entt));
-                head = traits_type::to_entity(std::exchange(packed[pos], entt));
+                elem = traits_type::combine(static_cast<underlying_type>(head), traits_type::to_integral(entt));
+                head = static_cast<size_type>(traits_type::to_entity(std::exchange(packed[pos], entt)));
                 break;
             }
             [[fallthrough]];
@@ -356,11 +357,11 @@ protected:
                 packed.push_back(entt);
                 elem = traits_type::combine(static_cast<underlying_type>(packed.size() - 1u), traits_type::to_integral(entt));
             } else {
-                ENTT_ASSERT(!(traits_type::to_entity(elem) < head), "Slot not available");
+                ENTT_ASSERT(!(static_cast<size_type>(traits_type::to_entity(elem)) < head), "Slot not available");
                 bump(entt);
             }
 
-            pos = static_cast<size_type>(head++);
+            pos = head++;
             swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
             break;
         }
@@ -421,7 +422,7 @@ public:
           packed{allocator},
           info{&elem},
           mode{pol},
-          head{internal::policy_to_head(traits_type::entity_mask, mode)} {
+          head{policy_to_head()} {
         ENTT_ASSERT(traits_type::version_mask || mode != deletion_policy::in_place, "Policy does not support zero-sized versions");
     }
 
@@ -434,7 +435,7 @@ public:
           packed{std::move(other.packed)},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode))} {}
+          head{std::exchange(other.head, policy_to_head())} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -446,7 +447,7 @@ public:
           packed{std::move(other.packed), allocator},
           info{other.info},
           mode{other.mode},
-          head{std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode))} {
+          head{std::exchange(other.head, policy_to_head())} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -468,7 +469,7 @@ public:
         packed = std::move(other.packed);
         info = other.info;
         mode = other.mode;
-        head = std::exchange(other.head, internal::policy_to_head(traits_type::entity_mask, mode));
+        head = std::exchange(other.head, policy_to_head());
         return *this;
     }
 
@@ -506,7 +507,7 @@ public:
      * @return The head of the free list.
      */
     [[nodiscard]] size_type free_list() const noexcept {
-        return static_cast<size_type>(head);
+        return head;
     }
 
     /**
@@ -515,7 +516,7 @@ public:
      */
     void free_list(const size_type len) noexcept {
         ENTT_ASSERT((mode == deletion_policy::swap_only) && !(len > packed.size()), "Invalid value");
-        head = static_cast<underlying_type>(len);
+        head = len;
     }
 
     /**
@@ -585,7 +586,7 @@ public:
      * @return True if the sparse set is fully packed, false otherwise.
      */
     [[nodiscard]] bool contiguous() const noexcept {
-        return (mode != deletion_policy::in_place) || (head == traits_type::to_entity(null));
+        return (mode != deletion_policy::in_place) || (head == max_size);
     }
 
     /**
@@ -916,11 +917,12 @@ public:
     void compact() {
         if(mode == deletion_policy::in_place) {
             size_type from = packed.size();
-            for(; from && packed[from - 1u] == tombstone; --from) {}
-            underlying_type pos = std::exchange(head, traits_type::entity_mask);
+            size_type pos = std::exchange(head, max_size);
 
-            while(pos != traits_type::to_entity(null)) {
-                if(const auto to = static_cast<size_type>(std::exchange(pos, traits_type::to_entity(packed[pos]))); to < from) {
+            for(; from && packed[from - 1u] == tombstone; --from) {}
+
+            while(pos != max_size) {
+                if(const auto to = std::exchange(pos, static_cast<size_type>(traits_type::to_entity(packed[pos]))); to < from) {
                     --from;
                     swap_or_move(from, to);
 
@@ -990,7 +992,7 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
 
         algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
@@ -1043,7 +1045,7 @@ public:
      */
     template<typename It>
     iterator sort_as(It first, It last) {
-        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == traits_type::to_entity(null)), "Sorting with tombstones not allowed");
+        ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         auto it = begin(0);
 
         for(const auto other = end(0); (it != other) && (first != last); ++first) {
@@ -1065,7 +1067,7 @@ public:
         pop_all();
         // sanity check to avoid subtle issues due to storage classes
         ENTT_ASSERT((compact(), size()) == 0u, "Non-empty set");
-        head = internal::policy_to_head(traits_type::entity_mask, mode);
+        head = policy_to_head();
         packed.clear();
     }
 
@@ -1085,7 +1087,7 @@ private:
     packed_container_type packed;
     const type_info *info;
     deletion_policy mode;
-    underlying_type head;
+    size_type head;
 };
 
 } // namespace entt
