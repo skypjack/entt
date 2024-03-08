@@ -162,7 +162,7 @@ class basic_sparse_set {
     using packed_container_type = std::vector<Entity, Allocator>;
     using underlying_type = typename entt_traits<Entity>::entity_type;
 
-    static constexpr auto max_size = static_cast<std::size_t>(typename entt_traits<Entity>::to_entity(null));
+    static constexpr auto max_size = static_cast<std::size_t>(entt_traits<Entity>::to_entity(null));
 
     [[nodiscard]] auto policy_to_head() const noexcept {
         return static_cast<size_type>(max_size * (mode != deletion_policy::swap_only));
