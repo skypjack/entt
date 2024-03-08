@@ -7,20 +7,34 @@
 			<Synthetic Name="[pools]">
 				<DisplayString>{ pools.size() }</DisplayString>
 				<Expand>
-					<IndexListItems>
-						<Size>pools.size()</Size>
-						<ValueNode>*pools.packed.first_base::value[$i].element.second</ValueNode>
-					</IndexListItems>
+					<CustomListItems>
+						<Variable Name="pos" InitialValue="0" />
+						<Variable Name="last" InitialValue="pools.size()"/>
+						<Loop>
+							<Break Condition="pos == last"/>
+							<Item Name="[{ pools.packed.first_base::value[pos].element.first }]">
+								*pools.packed.first_base::value[pos].element.second,view(simple)
+							</Item>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
 				</Expand>
 			</Synthetic>
 			<Item Name="[groups]">groups.size()</Item>
 			<Synthetic Name="[vars]">
 				<DisplayString>{ vars.ctx.size() }</DisplayString>
 				<Expand>
-					<IndexListItems>
-						<Size>vars.ctx.size()</Size>
-						<ValueNode>vars.ctx.packed.first_base::value[$i].element.second</ValueNode>
-					</IndexListItems>
+					<CustomListItems>
+						<Variable Name="pos" InitialValue="0" />
+						<Variable Name="last" InitialValue="vars.ctx.size()"/>
+						<Loop>
+							<Break Condition="pos == last"/>
+							<Item Name="[{ vars.ctx.packed.first_base::value[pos].element.first }]">
+								vars.ctx.packed.first_base::value[pos].element.second
+							</Item>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
 				</Expand>
 			</Synthetic>
 		</Expand>
@@ -31,13 +45,13 @@
 			<Parameter Name="offset" Type="traits_type::entity_type"/>
 		</Intrinsic>
 		<Intrinsic Name="is_valid_entity" Expression="!traits_type::version_mask || (*((traits_type::entity_type *)&amp;entity) &lt; (traits_type::version_mask &lt;&lt; traits_type::length))">
-			<Parameter Name="entity" Type="traits_type::value_type"/>
+			<Parameter Name="entity" Type="const traits_type::value_type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]">packed.capacity()</Item>
-			<Item Name="[policy]">mode,en</Item>
-			<Item Name="[free_list]">head</Item>
+			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
+			<Item Name="[policy]" ExcludeView="simple">mode,en</Item>
+			<Item Name="[free_list]" ExcludeView="simple">head</Item>
 			<Synthetic Name="[sparse]">
 				<DisplayString>{ sparse.size() * traits_type::page_size }</DisplayString>
 				<Expand>
@@ -63,8 +77,9 @@
 				<Expand>
 					<CustomListItems>
 						<Variable Name="pos" InitialValue="0"/>
+						<Variable Name="last" InitialValue="packed.size()"/>
 						<Loop>
-							<Break Condition="pos == packed.size()"/>
+							<Break Condition="pos == last"/>
 							<If Condition="is_valid_entity(packed[pos])">
 								<Item Name="[{ pos }]">packed[pos]</Item>
 							</If>
@@ -77,19 +92,20 @@
 	</Type>
 	<Type Name="entt::basic_storage&lt;*&gt;">
 		<Intrinsic Name="is_valid_entity" Expression="!base_type::traits_type::version_mask || (*((base_type::traits_type::entity_type *)&amp;entity) &lt; (base_type::traits_type::version_mask &lt;&lt; base_type::traits_type::length))">
-			<Parameter Name="entity" Type="base_type::traits_type::value_type"/>
+			<Parameter Name="entity" Type="const base_type::traits_type::value_type &amp;"/>
 		</Intrinsic>
 		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
 		<Expand>
-			<Item Name="[capacity]" Optional="true">payload.capacity() * traits_type::page_size</Item>
-			<Item Name="[page size]" Optional="true">traits_type::page_size</Item>
-			<Item Name="[placeholder]" Optional="true">placeholder</Item>
-			<Item Name="[base]">(base_type*)this,nand</Item>
-			<!-- having SFINAE-like techniques in natvis is priceless :) -->
+			<Item Name="[capacity]" Optional="true" ExcludeView="simple">payload.capacity() * traits_type::page_size</Item>
+			<Item Name="[page size]" Optional="true" ExcludeView="simple">traits_type::page_size</Item>
+			<Item Name="[placeholder]" Optional="true" ExcludeView="simple">placeholder</Item>
+			<Item Name="[base]" ExcludeView="simple">(base_type*)this,nand</Item>
+			<Item Name="[base]" IncludeView="simple">(base_type*)this,view(simple)nand</Item>
 			<CustomListItems Condition="payload.size() != 0" Optional="true">
 				<Variable Name="pos" InitialValue="0" />
+				<Variable Name="last" InitialValue="base_type::packed.size()"/>
 				<Loop>
-					<Break Condition="pos == base_type::packed.size()"/>
+					<Break Condition="pos == last"/>
 					<If Condition="is_valid_entity(base_type::packed[pos])">
 						<Item Name="[{ pos }:{ base_type::packed[pos] }]">payload[pos / traits_type::page_size][pos &amp; (traits_type::page_size - 1)]</Item>
 					</If>
