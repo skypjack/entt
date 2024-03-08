@@ -33,6 +33,3 @@ TODO:
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * view: review tombstone checks, no longer required with storage entity and Get 1
-* natvis: entity viewer for the registry
-* natvis: meta context?
-* restore view simple in natvis for containers and the others, add more, they make sense! :)
