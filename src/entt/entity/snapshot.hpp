@@ -46,7 +46,7 @@ void orphans(Registry &registry) {
 template<typename Registry>
 class basic_snapshot {
     static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
-    using traits_type = typename Registry::traits_type;
+    using traits_type = entt_traits<typename Registry::entity_type>;
 
 public:
     /*! Basic registry type. */
@@ -149,7 +149,7 @@ private:
 template<typename Registry>
 class basic_snapshot_loader {
     static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
-    using traits_type = typename Registry::traits_type;
+    using traits_type = entt_traits<typename Registry::entity_type>;
 
 public:
     /*! Basic registry type. */
@@ -261,7 +261,7 @@ private:
 template<typename Registry>
 class basic_continuous_loader {
     static_assert(!std::is_const_v<Registry>, "Non-const registry type required");
-    using traits_type = typename Registry::traits_type;
+    using traits_type = entt_traits<typename Registry::entity_type>;
 
     void restore(typename Registry::entity_type entt) {
         if(const auto entity = to_entity(entt); remloc.contains(entity) && remloc[entity].first == entt) {
