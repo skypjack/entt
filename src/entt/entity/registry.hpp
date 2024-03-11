@@ -232,13 +232,12 @@ private:
 template<typename Entity, typename Allocator>
 class basic_registry {
     using base_type = basic_sparse_set<Entity, Allocator>;
-
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
+    using traits_type = typename base_type::traits_type;;
 
     template<typename Type>
     [[nodiscard]] auto &assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) {
@@ -293,8 +292,6 @@ class basic_registry {
     }
 
 public:
-    /*! @brief Entity traits. */
-    using traits_type = typename base_type::traits_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
