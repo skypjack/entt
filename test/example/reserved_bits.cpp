@@ -38,8 +38,8 @@ TEST(Example, DisabledEntity) {
     entt::basic_registry<my_entity> registry{};
     auto view = registry.view<my_entity, int>();
 
-    const my_entity entity = registry.create(entt::basic_registry<my_entity>::traits_type::construct(4u, 1u));
-    const my_entity other = registry.create(entt::basic_registry<my_entity>::traits_type::construct(3u, 0u));
+    const my_entity entity = registry.create(entt::entt_traits<my_entity>::construct(4u, 1u));
+    const my_entity other = registry.create(entt::entt_traits<my_entity>::construct(3u, 0u));
 
     registry.emplace<int>(entity);
     registry.emplace<int>(other);
