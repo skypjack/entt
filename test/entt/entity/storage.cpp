@@ -1732,7 +1732,7 @@ TYPED_TEST(Storage, ThrowingAllocator) {
     entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>> pool{};
     typename std::decay_t<decltype(pool)>::base_type &base = pool;
 
-    constexpr auto packed_page_size = decltype(pool)::traits_type::page_size;
+    constexpr auto packed_page_size = entt::component_traits<value_type>::page_size;
     constexpr auto sparse_page_size = entt::entt_traits<entt::entity>::page_size;
 
     pool.get_allocator().template throw_counter<value_type>(0u);
