@@ -950,16 +950,16 @@ class basic_storage<Entity, Entity, Allocator>
     : public basic_sparse_set<Entity, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-    using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
-    using underlying_iterator = typename underlying_type::basic_iterator;
+    using underlying_iterator = typename basic_sparse_set<Entity, Allocator>::basic_iterator;
+    using traits_type = entt_traits<Entity>;
 
     auto next() noexcept {
         entity_type entt = null;
 
         do {
-            ENTT_ASSERT(placeholder < underlying_type::traits_type::to_entity(null), "Invalid element");
-            entt = underlying_type::traits_type::combine(static_cast<typename underlying_type::traits_type::entity_type>(placeholder++), {});
-        } while(base_type::current(entt) != underlying_type::traits_type::to_version(tombstone) && entt != null);
+            ENTT_ASSERT(placeholder < traits_type::to_entity(null), "Invalid element");
+            entt = traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder++), {});
+        } while(base_type::current(entt) != traits_type::to_version(tombstone) && entt != null);
 
         return entt;
     }
@@ -1086,7 +1086,7 @@ public:
     entity_type emplace(const entity_type hint) {
         if(hint == null || hint == tombstone) {
             return emplace();
-        } else if(const auto curr = underlying_type::traits_type::construct(underlying_type::traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
+        } else if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
             return *base_type::try_emplace(hint, true);
         } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
             return emplace();
