@@ -160,9 +160,9 @@ class basic_sparse_set {
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = std::vector<Entity, Allocator>;
-    using underlying_type = typename entt_traits<Entity>::entity_type;
+    using traits_type = entt_traits<Entity>;
 
-    static constexpr auto max_size = static_cast<std::size_t>(entt_traits<Entity>::to_entity(null));
+    static constexpr auto max_size = static_cast<std::size_t>(traits_type::to_entity(null));
 
     [[nodiscard]] auto policy_to_head() const noexcept {
         return static_cast<size_type>(max_size * (mode != deletion_policy::swap_only));
@@ -218,8 +218,8 @@ class basic_sparse_set {
         auto &lhs = packed[from];
         auto &rhs = packed[to];
 
-        sparse_ref(lhs) = traits_type::combine(static_cast<underlying_type>(to), traits_type::to_integral(lhs));
-        sparse_ref(rhs) = traits_type::combine(static_cast<underlying_type>(from), traits_type::to_integral(rhs));
+        sparse_ref(lhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(to), traits_type::to_integral(lhs));
+        sparse_ref(rhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
 
         std::swap(lhs, rhs);
     }
@@ -272,7 +272,7 @@ protected:
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
         const auto pos = static_cast<size_type>(traits_type::to_entity(std::exchange(sparse_ref(*it), null)));
-        packed[pos] = traits_type::combine(static_cast<underlying_type>(std::exchange(head, pos)), tombstone);
+        packed[pos] = traits_type::combine(static_cast<typename traits_type::entity_type>(std::exchange(head, pos)), tombstone);
     }
 
 protected:
@@ -342,7 +342,7 @@ protected:
             if(head != max_size && !force_back) {
                 pos = head;
                 ENTT_ASSERT(elem == null, "Slot not available");
-                elem = traits_type::combine(static_cast<underlying_type>(head), traits_type::to_integral(entt));
+                elem = traits_type::combine(static_cast<typename traits_type::entity_type>(head), traits_type::to_integral(entt));
                 head = static_cast<size_type>(traits_type::to_entity(std::exchange(packed[pos], entt)));
                 break;
             }
@@ -350,12 +350,12 @@ protected:
         case deletion_policy::swap_and_pop:
             packed.push_back(entt);
             ENTT_ASSERT(elem == null, "Slot not available");
-            elem = traits_type::combine(static_cast<underlying_type>(packed.size() - 1u), traits_type::to_integral(entt));
+            elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             break;
         case deletion_policy::swap_only:
             if(elem == null) {
                 packed.push_back(entt);
-                elem = traits_type::combine(static_cast<underlying_type>(packed.size() - 1u), traits_type::to_integral(entt));
+                elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             } else {
                 ENTT_ASSERT(!(static_cast<size_type>(traits_type::to_entity(elem)) < head), "Slot not available");
                 bump(entt);
@@ -370,8 +370,6 @@ protected:
     }
 
 public:
-    /*! @brief Entity traits. */
-    using traits_type = entt_traits<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::value_type;
     /*! @brief Underlying version type. */
@@ -927,7 +925,7 @@ public:
                     swap_or_move(from, to);
 
                     packed[to] = packed[from];
-                    const auto elem = static_cast<underlying_type>(to);
+                    const auto elem = static_cast<typename traits_type::entity_type>(to);
                     sparse_ref(packed[to]) = traits_type::combine(elem, traits_type::to_integral(packed[to]));
 
                     for(; from && packed[from - 1u] == tombstone; --from) {}
@@ -1006,7 +1004,7 @@ public:
                 const auto entt = packed[curr];
 
                 swap_or_move(next, idx);
-                const auto elem = static_cast<underlying_type>(curr);
+                const auto elem = static_cast<typename traits_type::entity_type>(curr);
                 sparse_ref(entt) = traits_type::combine(elem, traits_type::to_integral(packed[curr]));
                 curr = std::exchange(next, idx);
             }
