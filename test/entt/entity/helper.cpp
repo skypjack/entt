@@ -68,7 +68,6 @@ TYPED_TEST(ToEntity, Functionalities) {
     const entt::entity null = entt::null;
 
     auto &storage = registry.storage<value_type>();
-    constexpr auto page_size = entt::storage_type_t<value_type>::traits_type::page_size;
     const value_type value{4};
 
     ASSERT_EQ(entt::to_entity(storage, value), null);
@@ -76,7 +75,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     const auto entity = registry.create();
     storage.emplace(entity);
 
-    while(storage.size() < (page_size - (1u + traits_type::in_place_delete))) {
+    while(storage.size() < (traits_type::page_size - (1u + traits_type::in_place_delete))) {
         storage.emplace(registry.create(), value);
     }
 
@@ -91,7 +90,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(entt::to_entity(storage, storage.get(next)), next);
 
     ASSERT_EQ(*storage.entt::sparse_set::rbegin(), entity);
-    ASSERT_EQ(&*(storage.rbegin() + page_size - (1u + traits_type::in_place_delete)), &storage.get(other));
+    ASSERT_EQ(&*(storage.rbegin() + traits_type::page_size - (1u + traits_type::in_place_delete)), &storage.get(other));
 
     registry.destroy(other);
 
@@ -99,7 +98,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(entt::to_entity(storage, storage.get(next)), next);
 
     ASSERT_EQ(*storage.entt::sparse_set::rbegin(), entity);
-    ASSERT_EQ(&*(storage.rbegin() + page_size - 1u), &storage.get(next));
+    ASSERT_EQ(&*(storage.rbegin() + traits_type::page_size - 1u), &storage.get(next));
 
     ASSERT_EQ(entt::to_entity(storage, value), null);
 }
