@@ -42,6 +42,7 @@ TYPED_TEST_SUITE(SighMixin, SighMixinTypes, );
 TYPED_TEST(SighMixin, Functionalities) {
     using value_type = typename TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
+
     const std::array entity{entt::entity{1}, entt::entity{3}};
     entt::sigh_mixin<entt::storage<value_type>> pool;
     entt::registry registry;
@@ -212,6 +213,7 @@ TEST(SighMixin, VoidType) {
 
 TEST(SighMixin, StorageEntity) {
     using traits_type = entt::entt_traits<entt::entity>;
+
     entt::sigh_mixin<entt::storage<entt::entity>> pool;
     entt::registry registry;
 
@@ -275,6 +277,7 @@ TEST(SighMixin, StorageEntity) {
 
 TYPED_TEST(SighMixin, Move) {
     using value_type = typename TestFixture::type;
+
     entt::sigh_mixin<entt::storage<value_type>> pool;
     entt::registry registry;
 
@@ -335,6 +338,7 @@ TYPED_TEST(SighMixin, Move) {
 TYPED_TEST(SighMixin, Swap) {
     using value_type = typename TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
+
     entt::sigh_mixin<entt::storage<value_type>> pool;
     entt::sigh_mixin<entt::storage<value_type>> other;
     entt::registry registry;
@@ -382,6 +386,7 @@ TYPED_TEST(SighMixin, Swap) {
 
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
+
     entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, custom_registry> pool;
     custom_registry registry;
 
@@ -406,10 +411,11 @@ TYPED_TEST(SighMixin, CustomRegistry) {
 
 TYPED_TEST(SighMixin, CustomAllocator) {
     using value_type = typename TestFixture::type;
-    const test::throwing_allocator<entt::entity> allocator{};
-    entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>> pool{allocator};
+    using storage_type = entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
+    using registry_type = typename storage_type::registry_type;
 
-    using registry_type = typename decltype(pool)::registry_type;
+    const test::throwing_allocator<entt::entity> allocator{};
+    storage_type pool{allocator};
     registry_type registry;
 
     std::size_t on_construct{};
@@ -463,10 +469,11 @@ TYPED_TEST(SighMixin, CustomAllocator) {
 
 TYPED_TEST(SighMixin, ThrowingAllocator) {
     using value_type = typename TestFixture::type;
-    entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>> pool{};
-    typename std::decay_t<decltype(pool)>::base_type &base = pool;
+    using storage_type = entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
+    using registry_type = typename storage_type::registry_type;
 
-    using registry_type = typename decltype(pool)::registry_type;
+    storage_type pool{};
+    typename std::decay_t<decltype(pool)>::base_type &base = pool;
     registry_type registry;
 
     constexpr auto packed_page_size = entt::component_traits<typename decltype(pool)::value_type>::page_size;
@@ -534,8 +541,10 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
 }
 
 TEST(SighMixin, ThrowingComponent) {
-    entt::sigh_mixin<entt::storage<test::throwing_type>> pool;
-    using registry_type = typename decltype(pool)::registry_type;
+    using storage_type = entt::sigh_mixin<entt::storage<test::throwing_type>>;
+    using registry_type = typename storage_type::registry_type;
+
+    storage_type pool;
     registry_type registry;
 
     std::size_t on_construct{};
