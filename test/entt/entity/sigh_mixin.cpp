@@ -45,7 +45,7 @@ TYPED_TEST(SighMixin, Functionalities) {
 
     entt::registry registry;
     auto &pool = registry.storage<value_type>();
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    const std::array entity{registry.create(), registry.create()};
 
     testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<value_type>> &>();
 
@@ -118,7 +118,7 @@ TYPED_TEST(SighMixin, Functionalities) {
 TEST(SighMixin, NonDefaultConstructibleType) {
     entt::registry registry;
     auto &pool = registry.storage<test::non_default_constructible>();
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    const std::array entity{registry.create(), registry.create()};
 
     testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<test::non_default_constructible>> &>();
 
@@ -179,6 +179,7 @@ TEST(SighMixin, NonDefaultConstructibleType) {
 TEST(SighMixin, VoidType) {
     entt::registry registry;
     auto &pool = registry.storage<void>();
+    const auto entity = registry.create();
 
     testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<void>> &>();
 
@@ -188,22 +189,22 @@ TEST(SighMixin, VoidType) {
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
-    pool.emplace(entt::entity{3});
+    pool.emplace(entity);
 
     ASSERT_EQ(pool.type(), entt::type_id<void>());
-    ASSERT_TRUE(pool.contains(entt::entity{3}));
+    ASSERT_TRUE(pool.contains(entity));
 
     entt::sigh_mixin<entt::storage<void>> other{std::move(pool)};
 
     test::is_initialized(pool);
 
     ASSERT_TRUE(pool.empty());
-    ASSERT_TRUE(other.contains(entt::entity{3}));
+    ASSERT_TRUE(other.contains(entity));
 
     pool = std::move(other);
     test::is_initialized(other);
 
-    ASSERT_TRUE(pool.contains(entt::entity{3}));
+    ASSERT_TRUE(pool.contains(entity));
     ASSERT_TRUE(other.empty());
 
     pool.clear();
@@ -400,8 +401,8 @@ TYPED_TEST(SighMixin, CustomRegistry) {
     pool.on_construct().template connect<&listener<custom_registry>>(on_construct);
     pool.on_destroy().template connect<&listener<custom_registry>>(on_destroy);
 
-    pool.emplace(test::entity{3});
-    pool.emplace(test::entity{1});
+    pool.emplace(registry.create());
+    pool.emplace(registry.create());
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 0u);
