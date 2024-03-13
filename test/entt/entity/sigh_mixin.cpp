@@ -122,6 +122,17 @@ TEST(SighMixin, StableType) {
     std::size_t on_destroy{};
 
     pool.bind(entt::forward_as_any(registry));
+
+    ASSERT_EQ(pool.size(), 0u);
+
+    pool.insert(entity.begin(), entity.begin() + 1u);
+    pool.erase(entity[0u]);
+
+    ASSERT_EQ(pool.size(), 1u);
+
+    ASSERT_EQ(on_construct, 0u);
+    ASSERT_EQ(on_destroy, 0u);
+
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
