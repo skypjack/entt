@@ -2083,7 +2083,6 @@ TYPED_TEST(SparseSet, CanModifyDuringIteration) {
 
 TYPED_TEST(SparseSet, CustomAllocator) {
     using entity_type = typename TestFixture::type;
-    using sparse_set_type = entt::basic_sparse_set<entity_type>;
 
     for(const auto policy: this->deletion_policy) {
         const test::throwing_allocator<entity_type> allocator{};
@@ -2137,7 +2136,6 @@ TYPED_TEST(SparseSet, CustomAllocator) {
 
 TYPED_TEST(SparseSet, ThrowingAllocator) {
     using entity_type = typename TestFixture::type;
-    using sparse_set_type = entt::basic_sparse_set<entity_type>;
     using traits_type = entt::entt_traits<entity_type>;
 
     for(const auto policy: this->deletion_policy) {
