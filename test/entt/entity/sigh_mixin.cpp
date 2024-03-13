@@ -43,14 +43,14 @@ TYPED_TEST(SighMixin, Functionalities) {
     using value_type = typename TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
 
-    const std::array entity{entt::entity{1}, entt::entity{3}};
-    entt::sigh_mixin<entt::storage<value_type>> pool;
     entt::registry registry;
+    auto &pool = registry.storage<value_type>();
+    const std::array entity{entt::entity{1}, entt::entity{3}};
+
+    testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<value_type>> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
-
-    pool.bind(entt::forward_as_any(registry));
 
     ASSERT_EQ(pool.size(), 0u);
 
@@ -116,14 +116,14 @@ TYPED_TEST(SighMixin, Functionalities) {
 }
 
 TEST(SighMixin, NonDefaultConstructibleType) {
-    const std::array entity{entt::entity{1}, entt::entity{3}};
-    entt::sigh_mixin<entt::storage<test::non_default_constructible>> pool;
     entt::registry registry;
+    auto &pool = registry.storage<test::non_default_constructible>();
+    const std::array entity{entt::entity{1}, entt::entity{3}};
+
+    testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<test::non_default_constructible>> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
-
-    pool.bind(entt::forward_as_any(registry));
 
     ASSERT_EQ(pool.size(), 0u);
 
@@ -177,13 +177,14 @@ TEST(SighMixin, NonDefaultConstructibleType) {
 }
 
 TEST(SighMixin, VoidType) {
-    entt::sigh_mixin<entt::storage<void>> pool;
     entt::registry registry;
+    auto &pool = registry.storage<void>();
+
+    testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<void>> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
@@ -214,13 +215,14 @@ TEST(SighMixin, VoidType) {
 TEST(SighMixin, StorageEntity) {
     using traits_type = entt::entt_traits<entt::entity>;
 
-    entt::sigh_mixin<entt::storage<entt::entity>> pool;
     entt::registry registry;
+    auto &pool = registry.storage<entt::entity>();
+
+    testing::StaticAssertTypeEq<decltype(pool), entt::sigh_mixin<entt::storage<entt::entity>> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
     pool.on_construct().connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
 
@@ -387,13 +389,14 @@ TYPED_TEST(SighMixin, Swap) {
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
 
-    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, custom_registry> pool;
     custom_registry registry;
+    auto &pool = registry.storage<value_type>();
+
+    testing::StaticAssertTypeEq<decltype(pool), entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, custom_registry> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(static_cast<entt::basic_registry<test::entity> &>(registry)));
     pool.on_construct().template connect<&listener<custom_registry>>(on_construct);
     pool.on_destroy().template connect<&listener<custom_registry>>(on_destroy);
 
