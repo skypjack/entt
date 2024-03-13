@@ -27,7 +27,7 @@ _TESTS = [
     srcs = ["{}.cpp".format(test)],
     copts = COPTS,
     deps = [
-        "//entt/common",
+        "//common",
         "@entt",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
