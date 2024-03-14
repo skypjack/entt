@@ -2,7 +2,6 @@
 #include <array>
 #include <iterator>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <common/boxed_type.h>
