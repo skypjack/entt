@@ -175,6 +175,23 @@ TEST(SighMixin, StableType) {
     ASSERT_EQ(pool.size(), 0u);
 }
 
+TYPED_TEST(SighMixin, InsertWeakRange) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    auto &pool = registry.storage<value_type>();
+    const auto view = registry.view<entt::entity>(entt::exclude<value_type>);
+    [[maybe_unused]] const std::array entity{registry.create(), registry.create()};
+    std::size_t on_construct{};
+
+    ASSERT_EQ(on_construct, 0u);
+
+    pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
+    pool.insert(view.begin(), view.end());
+
+    ASSERT_EQ(on_construct, 2u);
+}
+
 TEST(SighMixin, NonDefaultConstructibleType) {
     entt::entity entity[2u]{entt::entity{3}, entt::entity{42}}; // NOLINT
     entt::sigh_mixin<entt::storage<test::non_default_constructible>> pool;
