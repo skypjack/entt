@@ -1,3 +1,5 @@
+// IWYU pragma: always_keep
+
 #ifndef ENTT_META_TEMPLATE_HPP
 #define ENTT_META_TEMPLATE_HPP
 
