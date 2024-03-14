@@ -271,11 +271,12 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...args) {
+        auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 
         if(auto &reg = owner_or_assert(); !construction.empty()) {
-            for(; first != last; ++first) {
-                construction.publish(reg, *first);
+            for(const auto to = underlying_type::size(); from != to; ++from) {
+                construction.publish(reg, underlying_type::operator[](from));
             }
         }
     }
