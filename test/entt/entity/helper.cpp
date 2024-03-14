@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <common/pointer_stable.h>
+#include "common/pointer_stable.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>

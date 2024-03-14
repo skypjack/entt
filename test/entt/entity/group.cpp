@@ -6,9 +6,9 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/config.h>
-#include <common/empty.h>
+#include "common/boxed_type.h"
+#include "common/config.h"
+#include "common/empty.h"
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
 

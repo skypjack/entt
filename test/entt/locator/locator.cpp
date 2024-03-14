@@ -1,6 +1,6 @@
 #include <memory>
 #include <gtest/gtest.h>
-#include <common/config.h>
+#include "common/config.h"
 #include <entt/locator/locator.hpp>
 
 struct base_service {

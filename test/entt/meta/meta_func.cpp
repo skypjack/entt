@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
+#include "common/config.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>

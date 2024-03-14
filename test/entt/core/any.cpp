@@ -7,11 +7,11 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/aggregate.h>
-#include <common/config.h>
-#include <common/linter.hpp>
-#include <common/non_comparable.h>
-#include <common/non_movable.h>
+#include "common/aggregate.h"
+#include "common/config.h"
+#include "common/linter.hpp"
+#include "common/non_comparable.h"
+#include "common/non_movable.h"
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
 

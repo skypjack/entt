@@ -1,5 +1,5 @@
-#include <common/boxed_type.h>
-#include <common/empty.h>
+#include "common/boxed_type.h"
+#include "common/empty.h"
 #include <entt/core/attribute.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
@@ -19,7 +19,7 @@ ENTT_API void set_up() {
     using namespace entt::literals;
 
     entt::meta<test::boxed_int>()
-        .type("boxed_int"_hs)
+        .type(mboxed_intm_hs)
         .ctor<&create_boxed_int>()
         .data<&test::boxed_int::value>("value"_hs);
 

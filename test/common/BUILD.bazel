@@ -7,5 +7,4 @@ cc_library(
     name = "common",
     copts = COPTS,
     hdrs = glob(["*.h", "*.hpp"]),
-    includes = ["."],
 )

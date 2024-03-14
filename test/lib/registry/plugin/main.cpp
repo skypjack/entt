@@ -1,8 +1,8 @@
 #define CR_HOST
 
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/empty.h>
+#include "common/boxed_type.h"
+#include "common/empty.h"
 #include <cr.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>

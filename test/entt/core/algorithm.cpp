@@ -1,7 +1,7 @@
 #include <array>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
+#include "common/boxed_type.h"
 #include <entt/core/algorithm.hpp>
 
 TEST(Algorithm, StdSort) {

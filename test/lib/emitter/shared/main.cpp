@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/emitter.h>
+#include "common/boxed_type.h"
+#include "common/emitter.h"
 #include <entt/core/attribute.h>
 
 ENTT_API void emit(test::emitter &);

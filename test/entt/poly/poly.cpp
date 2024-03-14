@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/linter.hpp>
+#include "common/config.h"
+#include "common/linter.hpp"
 #include <entt/core/type_info.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/poly/poly.hpp>

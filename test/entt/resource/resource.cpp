@@ -1,7 +1,7 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/linter.hpp>
+#include "common/linter.hpp"
 #include <entt/core/type_info.hpp>
 #include <entt/resource/resource.hpp>
 

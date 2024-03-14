@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/non_comparable.h>
+#include "common/non_comparable.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 

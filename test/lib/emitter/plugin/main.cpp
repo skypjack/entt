@@ -1,8 +1,8 @@
 #define CR_HOST
 
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/emitter.h>
+#include "common/boxed_type.h"
+#include "common/emitter.h"
 #include <cr.h>
 
 TEST(Lib, Emitter) {

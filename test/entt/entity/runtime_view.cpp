@@ -2,8 +2,8 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/linter.hpp>
-#include <common/pointer_stable.h>
+#include "common/linter.hpp"
+#include "common/pointer_stable.h"
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
