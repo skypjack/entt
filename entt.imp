@@ -38,7 +38,7 @@
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/delegate.hpp>", "public" ] },
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/dispatcher.hpp>", "public" ] },
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/emitter.hpp>", "public" ] },
-  { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/sigh.hpp>", "public" ] }
+  { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/sigh.hpp>", "public" ] },
   # entity
   { "include": [ "@[\"<].*/entity/sparse_set\\.hpp[\">]", "private", "<entt/entity/storage.hpp>", "public" ],
   { "include": [ "@[\"<].*/entity/group\\.hpp[\">]", "private", "<entt/entity/registry.hpp>", "public" ],
