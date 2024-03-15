@@ -5,14 +5,14 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/algorithm.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
-#include "sparse_set.hpp"
-#include "storage.hpp"
 
 namespace entt {
 
@@ -26,7 +26,7 @@ template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
     auto index_to_element([[maybe_unused]] Type &cpool) const {
-        if constexpr(Type::traits_type::page_size == 0u) {
+        if constexpr(component_traits<typename Type::value_type>::page_size == 0u) {
             return std::make_tuple();
         } else {
             return std::forward_as_tuple(cpool.rbegin()[it.index()]);
@@ -103,7 +103,7 @@ class group_handler;
 template<typename... Owned, typename... Get, typename... Exclude>
 class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
     // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-    static_assert(!std::disjunction_v<std::bool_constant<Owned::traits_type::in_place_delete>...>, "Groups do not support in-place delete");
+    static_assert(!std::disjunction_v<std::bool_constant<component_traits<typename Owned::value_type>::in_place_delete>...>, "Groups do not support in-place delete");
     static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
 
     using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
