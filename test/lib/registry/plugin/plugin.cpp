@@ -11,7 +11,7 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         // forces things to break
         auto &registry = *static_cast<entt::registry *>(ctx->userdata);
 
-        // forces the creation of the pool for the empty component
+        // forces the creation of the pool for the empty type
         static_cast<void>(registry.storage<test::empty>());
 
         const auto view = registry.view<test::boxed_int>();

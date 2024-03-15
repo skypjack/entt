@@ -430,10 +430,10 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type.
-     * @tparam Type Type of component of which to return the storage.
+     * @brief Returns the storage for a given element type.
+     * @tparam Type Type of element of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
-     * @return The storage for the given component type.
+     * @return The storage for the given element type.
      */
     template<typename Type>
     storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) {
@@ -441,10 +441,10 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type, if any.
-     * @tparam Type Type of component of which to return the storage.
+     * @brief Returns the storage for a given element type, if any.
+     * @tparam Type Type of element of which to return the storage.
      * @param id Optional name used to map the storage within the registry.
-     * @return The storage for the given component type.
+     * @return The storage for the given element type.
      */
     template<typename Type>
     const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
@@ -509,7 +509,7 @@ public:
      * @brief Destroys an entity and releases its identifier.
      *
      * @warning
-     * Adding or removing components to an entity that is being destroyed can
+     * Adding or removing elements to an entity that is being destroyed can
      * result in undefined behavior.
      *
      * @param entt A valid identifier.
@@ -564,19 +564,19 @@ public:
     }
 
     /**
-     * @brief Assigns the given component to an entity.
+     * @brief Assigns the given element to an entity.
      *
-     * The component must have a proper constructor or be of aggregate type.
+     * The element must have a proper constructor or be of aggregate type.
      *
      * @warning
-     * Attempting to assign a component to an entity that already owns it
-     * results in undefined behavior.
+     * Attempting to assign an element to an entity that already owns it results
+     * in undefined behavior.
      *
-     * @tparam Type Type of component to create.
-     * @tparam Args Types of arguments to use to construct the component.
+     * @tparam Type Type of element to create.
+     * @tparam Args Types of arguments to use to construct the element.
      * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the newly created element.
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace(const entity_type entt, Args &&...args) {
@@ -585,15 +585,15 @@ public:
     }
 
     /**
-     * @brief Assigns each entity in a range the given component.
+     * @brief Assigns each entity in a range the given element.
      *
      * @sa emplace
      *
-     * @tparam Type Type of component to create.
+     * @tparam Type Type of element to create.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param value An instance of the component to assign.
+     * @param value An instance of the element to assign.
      */
     template<typename Type, typename It>
     void insert(It first, It last, const Type &value = {}) {
@@ -602,16 +602,16 @@ public:
     }
 
     /**
-     * @brief Assigns each entity in a range the given components.
+     * @brief Assigns each entity in a range the given elements.
      *
      * @sa emplace
      *
-     * @tparam Type Type of component to create.
+     * @tparam Type Type of element to create.
      * @tparam EIt Type of input iterator.
      * @tparam CIt Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param from An iterator to the first element of the range of components.
+     * @param from An iterator to the first element of the range of elements.
      */
     template<typename Type, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Type>>>
     void insert(EIt first, EIt last, CIt from) {
@@ -620,16 +620,16 @@ public:
     }
 
     /**
-     * @brief Assigns or replaces the given component for an entity.
+     * @brief Assigns or replaces the given element for an entity.
      *
      * @sa emplace
      * @sa replace
      *
-     * @tparam Type Type of component to assign or replace.
-     * @tparam Args Types of arguments to use to construct the component.
+     * @tparam Type Type of element to assign or replace.
+     * @tparam Args Types of arguments to use to construct the element.
      * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the newly created element.
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(const entity_type entt, Args &&...args) {
@@ -642,7 +642,7 @@ public:
     }
 
     /**
-     * @brief Patches the given component for an entity.
+     * @brief Patches the given element for an entity.
      *
      * The signature of the function should be equivalent to the following:
      *
@@ -651,14 +651,14 @@ public:
      * @endcode
      *
      * @warning
-     * Attempting to patch a component of an entity that doesn't own it
-     * results in undefined behavior.
+     * Attempting to patch an element of an entity that doesn't own it results
+     * in undefined behavior.
      *
-     * @tparam Type Type of component to patch.
+     * @tparam Type Type of element to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entt A valid identifier.
      * @param func Valid function objects.
-     * @return A reference to the patched component.
+     * @return A reference to the patched element.
      */
     template<typename Type, typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
@@ -666,19 +666,19 @@ public:
     }
 
     /**
-     * @brief Replaces the given component for an entity.
+     * @brief Replaces the given element for an entity.
      *
-     * The component must have a proper constructor or be of aggregate type.
+     * The element must have a proper constructor or be of aggregate type.
      *
      * @warning
-     * Attempting to replace a component of an entity that doesn't own it
-     * results in undefined behavior.
+     * Attempting to replace an element of an entity that doesn't own it results
+     * in undefined behavior.
      *
-     * @tparam Type Type of component to replace.
-     * @tparam Args Types of arguments to use to construct the component.
+     * @tparam Type Type of element to replace.
+     * @tparam Args Types of arguments to use to construct the element.
      * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the component being replaced.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the element being replaced.
      */
     template<typename Type, typename... Args>
     decltype(auto) replace(const entity_type entt, Args &&...args) {
@@ -686,11 +686,11 @@ public:
     }
 
     /**
-     * @brief Removes the given components from an entity.
-     * @tparam Type Type of component to remove.
-     * @tparam Other Other types of components to remove.
+     * @brief Removes the given elements from an entity.
+     * @tparam Type Type of element to remove.
+     * @tparam Other Other types of elements to remove.
      * @param entt A valid identifier.
-     * @return The number of components actually removed.
+     * @return The number of elements actually removed.
      */
     template<typename Type, typename... Other>
     size_type remove(const entity_type entt) {
@@ -698,16 +698,16 @@ public:
     }
 
     /**
-     * @brief Removes the given components from all the entities in a range.
+     * @brief Removes the given elements from all the entities in a range.
      *
      * @sa remove
      *
-     * @tparam Type Type of component to remove.
-     * @tparam Other Other types of components to remove.
+     * @tparam Type Type of element to remove.
+     * @tparam Other Other types of elements to remove.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return The number of components actually removed.
+     * @return The number of elements actually removed.
      */
     template<typename Type, typename... Other, typename It>
     size_type remove(It first, It last) {
@@ -735,14 +735,14 @@ public:
     }
 
     /**
-     * @brief Erases the given components from an entity.
+     * @brief Erases the given elements from an entity.
      *
      * @warning
-     * Attempting to erase a component from an entity that doesn't own it
-     * results in undefined behavior.
+     * Attempting to erase an element from an entity that doesn't own it results
+     * in undefined behavior.
      *
-     * @tparam Type Types of components to erase.
-     * @tparam Other Other types of components to erase.
+     * @tparam Type Types of elements to erase.
+     * @tparam Other Other types of elements to erase.
      * @param entt A valid identifier.
      */
     template<typename Type, typename... Other>
@@ -751,12 +751,12 @@ public:
     }
 
     /**
-     * @brief Erases the given components from all the entities in a range.
+     * @brief Erases the given elements from all the entities in a range.
      *
      * @sa erase
      *
-     * @tparam Type Types of components to erase.
-     * @tparam Other Other types of components to erase.
+     * @tparam Type Types of elements to erase.
+     * @tparam Other Other types of elements to erase.
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
@@ -783,7 +783,7 @@ public:
     }
 
     /**
-     * @brief Erases components satisfying specific criteria from an entity.
+     * @brief Erases elements satisfying specific criteria from an entity.
      *
      * The function type is equivalent to:
      *
@@ -808,8 +808,8 @@ public:
 
     /**
      * @brief Removes all tombstones from a registry or only the pools for the
-     * given components.
-     * @tparam Type Types of components for which to clear all tombstones.
+     * given elements.
+     * @tparam Type Types of elements for which to clear all tombstones.
      */
     template<typename... Type>
     void compact() {
@@ -851,15 +851,15 @@ public:
     }
 
     /**
-     * @brief Returns references to the given components for an entity.
+     * @brief Returns references to the given elements for an entity.
      *
      * @warning
-     * Attempting to get a component from an entity that doesn't own it results
+     * Attempting to get an element from an entity that doesn't own it results
      * in undefined behavior.
      *
-     * @tparam Type Types of components to get.
+     * @tparam Type Types of elements to get.
      * @param entt A valid identifier.
-     * @return References to the components owned by the entity.
+     * @return References to the elements owned by the entity.
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
@@ -881,19 +881,19 @@ public:
     }
 
     /**
-     * @brief Returns a reference to the given component for an entity.
+     * @brief Returns a reference to the given element for an entity.
      *
-     * In case the entity doesn't own the component, the parameters provided are
+     * In case the entity doesn't own the element, the parameters provided are
      * used to construct it.
      *
      * @sa get
      * @sa emplace
      *
-     * @tparam Type Type of component to get.
-     * @tparam Args Types of arguments to use to construct the component.
+     * @tparam Type Type of element to get.
+     * @tparam Args Types of arguments to use to construct the element.
      * @param entt A valid identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return Reference to the component owned by the entity.
+     * @param args Parameters to use to initialize the element.
+     * @return Reference to the element owned by the entity.
      */
     template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entt, Args &&...args) {
@@ -906,14 +906,14 @@ public:
     }
 
     /**
-     * @brief Returns pointers to the given components for an entity.
+     * @brief Returns pointers to the given elements for an entity.
      *
      * @note
-     * The registry retains ownership of the pointed-to components.
+     * The registry retains ownership of the pointed-to elements.
      *
-     * @tparam Type Types of components to get.
+     * @tparam Type Types of elements to get.
      * @param entt A valid identifier.
-     * @return Pointers to the components owned by the entity.
+     * @return Pointers to the elements owned by the entity.
      */
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
@@ -936,8 +936,8 @@ public:
     }
 
     /**
-     * @brief Clears a whole registry or the pools for the given components.
-     * @tparam Type Types of components to remove from their entities.
+     * @brief Clears a whole registry or the pools for the given elements.
+     * @tparam Type Types of elements to remove from their entities.
      */
     template<typename... Type>
     void clear() {
@@ -954,30 +954,30 @@ public:
     }
 
     /**
-     * @brief Checks if an entity has components assigned.
+     * @brief Checks if an entity has elements assigned.
      * @param entt A valid identifier.
-     * @return True if the entity has no components assigned, false otherwise.
+     * @return True if the entity has no elements assigned, false otherwise.
      */
     [[nodiscard]] bool orphan(const entity_type entt) const {
         return std::none_of(pools.cbegin(), pools.cend(), [entt](auto &&curr) { return curr.second->contains(entt); });
     }
 
     /**
-     * @brief Returns a sink object for the given component.
+     * @brief Returns a sink object for the given element.
      *
      * Use this function to receive notifications whenever a new instance of the
-     * given component is created and assigned to an entity.<br/>
+     * given element is created and assigned to an entity.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **after** assigning the component to the entity.
+     * Listeners are invoked **after** assigning the element to the entity.
      *
      * @sa sink
      *
-     * @tparam Type Type of component of which to get the sink.
+     * @tparam Type Type of element of which to get the sink.
      * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
@@ -987,21 +987,21 @@ public:
     }
 
     /**
-     * @brief Returns a sink object for the given component.
+     * @brief Returns a sink object for the given element.
      *
      * Use this function to receive notifications whenever an instance of the
-     * given component is explicitly updated.<br/>
+     * given element is explicitly updated.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **after** updating the component.
+     * Listeners are invoked **after** updating the element.
      *
      * @sa sink
      *
-     * @tparam Type Type of component of which to get the sink.
+     * @tparam Type Type of element of which to get the sink.
      * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
@@ -1011,21 +1011,21 @@ public:
     }
 
     /**
-     * @brief Returns a sink object for the given component.
+     * @brief Returns a sink object for the given element.
      *
      * Use this function to receive notifications whenever an instance of the
-     * given component is removed from an entity and thus destroyed.<br/>
+     * given element is removed from an entity and thus destroyed.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
      * void(basic_registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **before** removing the component from the entity.
+     * Listeners are invoked **before** removing the element from the entity.
      *
      * @sa sink
      *
-     * @tparam Type Type of component of which to get the sink.
+     * @tparam Type Type of element of which to get the sink.
      * @param id Optional name used to map the storage within the registry.
      * @return A temporary sink object.
      */
@@ -1035,10 +1035,10 @@ public:
     }
 
     /**
-     * @brief Returns a view for the given components.
-     * @tparam Type Type of component used to construct the view.
-     * @tparam Other Other types of components used to construct the view.
-     * @tparam Exclude Types of components used to filter the view.
+     * @brief Returns a view for the given elements.
+     * @tparam Type Type of element used to construct the view.
+     * @tparam Other Other types of elements used to construct the view.
+     * @tparam Exclude Types of elements used to filter the view.
      * @return A newly created view.
      */
     template<typename Type, typename... Other, typename... Exclude>
@@ -1058,7 +1058,7 @@ public:
     }
 
     /**
-     * @brief Returns a group for the given components.
+     * @brief Returns a group for the given elements.
      * @tparam Owned Types of storage _owned_ by the group.
      * @tparam Get Types of storage _observed_ by the group, if any.
      * @tparam Exclude Types of storage used to filter the group, if any.
@@ -1101,10 +1101,10 @@ public:
     }
 
     /**
-     * @brief Checks whether the given components belong to any group.
-     * @tparam Type Type of component in which one is interested.
-     * @tparam Other Other types of components in which one is interested.
-     * @return True if the pools of the given components are _free_, false
+     * @brief Checks whether the given elements belong to any group.
+     * @tparam Type Type of element in which one is interested.
+     * @tparam Other Other types of elements in which one is interested.
+     * @return True if the pools of the given elements are _free_, false
      * otherwise.
      */
     template<typename Type, typename... Other>
@@ -1114,7 +1114,7 @@ public:
     }
 
     /**
-     * @brief Sorts the elements of a given component.
+     * @brief Sorts the elements of a given element.
      *
      * The comparison function object returns `true` if the first element is
      * _less_ than the second one, `false` otherwise. Its signature is also
@@ -1136,9 +1136,9 @@ public:
      * passed along with the other parameters to this member function.
      *
      * @warning
-     * Pools of components owned by a group cannot be sorted.
+     * Pools of elements owned by a group cannot be sorted.
      *
-     * @tparam Type Type of components to sort.
+     * @tparam Type Type of elements to sort.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -1160,17 +1160,17 @@ public:
     }
 
     /**
-     * @brief Sorts two pools of components in the same way.
+     * @brief Sorts two pools of elements in the same way.
      *
-     * Entities and components in `To` which are part of both storage are sorted
+     * Entities and elements in `To` which are part of both storage are sorted
      * internally with the order they have in `From`. The others follow in no
      * particular order.
      *
      * @warning
-     * Pools of components owned by a group cannot be sorted.
+     * Pools of elements owned by a group cannot be sorted.
      *
-     * @tparam To Type of components to sort.
-     * @tparam From Type of components to use to sort.
+     * @tparam To Type of elements to sort.
+     * @tparam From Type of elements to use to sort.
      */
     template<typename To, typename From>
     void sort() {

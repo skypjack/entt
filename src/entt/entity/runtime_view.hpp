@@ -98,15 +98,15 @@ private:
  *
  * Runtime views iterate over those entities that are at least in the given
  * storage. During initialization, a runtime view looks at the number of
- * entities available for each component and uses the smallest set in order to
- * get a performance boost when iterating.
+ * entities available for each element and uses the smallest set in order to get
+ * a performance boost when iterating.
  *
  * @b Important
  *
  * Iterators aren't invalidated if:
  *
  * * New elements are added to the storage.
- * * The entity currently pointed is modified (for example, components are added
+ * * The entity currently pointed is modified (for example, elements are added
  *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
@@ -241,11 +241,11 @@ public:
 
     /**
      * @brief Returns an iterator to the first entity that has the given
-     * components.
+     * elements.
      *
      * If the view is empty, the returned iterator will be equal to `end()`.
      *
-     * @return An iterator to the first entity that has the given components.
+     * @return An iterator to the first entity that has the given elements.
      */
     [[nodiscard]] iterator begin() const {
         return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->begin()};
@@ -253,9 +253,9 @@ public:
 
     /**
      * @brief Returns an iterator that is past the last entity that has the
-     * given components.
+     * given elements.
      * @return An iterator to the entity following the last entity that has the
-     * given components.
+     * given elements.
      */
     [[nodiscard]] iterator end() const {
         return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->end()};

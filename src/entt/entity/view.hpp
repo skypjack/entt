@@ -193,8 +193,8 @@ template<typename... Lhs, typename... Rhs>
  * View iterators aren't invalidated if:
  *
  * * New elements are added to the storage iterated by the view.
- * * The entity currently returned is modified (for example, components are
- *   added or removed from it).
+ * * The entity currently returned is modified (for example, elements are added
+ *   or removed from it).
  * * The entity currently returned is destroyed.
  *
  * In all other cases, modifying the storage iterated by a view in any way can
@@ -447,8 +447,8 @@ public:
         : basic_view{std::make_from_tuple<basic_view>(std::tuple_cat(value, excl))} {}
 
     /**
-     * @brief Forces a view to use a given component to drive iterations
-     * @tparam Type Type of component to use to drive iterations.
+     * @brief Forces a view to use a given element to drive iterations
+     * @tparam Type Type of element to use to drive iterations.
      */
     template<typename Type>
     void use() noexcept {
@@ -456,8 +456,8 @@ public:
     }
 
     /**
-     * @brief Forces a view to use a given component to drive iterations
-     * @tparam Index Index of the component to use to drive iterations.
+     * @brief Forces a view to use a given element to drive iterations
+     * @tparam Index Index of the element to use to drive iterations.
      */
     template<std::size_t Index>
     void use() noexcept {
@@ -465,9 +465,9 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type, if any.
-     * @tparam Type Type of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given element type, if any.
+     * @tparam Type Type of element of which to return the storage.
+     * @return The storage for the given element type.
      */
     template<typename Type>
     [[nodiscard]] auto *storage() const noexcept {
@@ -519,20 +519,20 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
+     * @brief Returns the elements assigned to the given entity.
      * @param entt A valid identifier.
-     * @return The components assigned to the given entity.
+     * @return The elements assigned to the given entity.
      */
     [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
         return get(entt);
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Type Type of the component to get.
-     * @tparam Other Other types of components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Type Type of the element to get.
+     * @tparam Other Other types of elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<typename Type, typename... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -540,10 +540,10 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Index Indexes of the components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Index Indexes of the elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -557,7 +557,7 @@ public:
     }
 
     /**
-     * @brief Iterates entities and components and applies the given function
+     * @brief Iterates entities and elements and applies the given function
      * object to them.
      *
      * The signature of the function must be equivalent to one of the following
@@ -582,8 +582,8 @@ public:
      * @brief Returns an iterable object to use to _visit_ a view.
      *
      * The iterable object returns a tuple that contains the current entity and
-     * a set of references to its non-empty components. The _constness_ of the
-     * components is as requested.
+     * a set of references to its non-empty elements. The _constness_ of the
+     * elements is as requested.
      *
      * @return An iterable object to use to _visit_ the view.
      */
@@ -593,7 +593,7 @@ public:
 
     /**
      * @brief Combines two views in a _more specific_ one.
-     * @tparam OGet Component list of the view to combine with.
+     * @tparam OGet Element list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
      * @param other The view to combine with.
      * @return A more specific view.
@@ -641,8 +641,8 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities that have the given component.
-     * @return Number of entities that have the given component.
+     * @brief Returns the number of entities that have the given element.
+     * @return Number of entities that have the given element.
      */
     [[nodiscard]] size_type size() const noexcept {
         return leading ? leading->size() : size_type{};
@@ -795,13 +795,13 @@ public:
         : basic_view{std::get<0>(value)} {}
 
     /**
-     * @brief Returns the storage for a given component type, if any.
-     * @tparam Type Type of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given element type, if any.
+     * @tparam Type Type of element of which to return the storage.
+     * @return The storage for the given element type.
      */
     template<typename Type = typename Get::element_type>
     [[nodiscard]] auto *storage() const noexcept {
-        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid component type");
+        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
         return storage<0>();
     }
 
@@ -836,31 +836,31 @@ public:
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
+     * @brief Returns the element assigned to the given entity.
      * @param entt A valid identifier.
-     * @return The component assigned to the given entity.
+     * @return The element assigned to the given entity.
      */
     [[nodiscard]] decltype(auto) operator[](const entity_type entt) const {
         return storage()->get(entt);
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
-     * @tparam Elem Type of the component to get.
+     * @brief Returns the element assigned to the given entity.
+     * @tparam Elem Type of the element to get.
      * @param entt A valid identifier.
-     * @return The component assigned to the entity.
+     * @return The element assigned to the entity.
      */
     template<typename Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid component type");
+        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid element type");
         return get<0>(entt);
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
-     * @tparam Index Index of the component to get.
+     * @brief Returns the element assigned to the given entity.
+     * @tparam Index Index of the element to get.
      * @param entt A valid identifier.
-     * @return The component assigned to the entity.
+     * @return The element assigned to the entity.
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -872,7 +872,7 @@ public:
     }
 
     /**
-     * @brief Iterates entities and components and applies the given function
+     * @brief Iterates entities and elements and applies the given function
      * object to them.
      *
      * The signature of the function must be equivalent to one of the following
@@ -894,8 +894,8 @@ public:
                     std::apply(func, pack);
                 }
             } else if constexpr(std::is_invocable_v<Func, decltype(*elem->begin())>) {
-                for(auto &&component: *elem) {
-                    func(component);
+                for(auto &&curr: *elem) {
+                    func(curr);
                 }
             } else {
                 for(size_type pos = elem->size(); pos; --pos) {
@@ -909,8 +909,8 @@ public:
      * @brief Returns an iterable object to use to _visit_ a view.
      *
      * The iterable object returns a tuple that contains the current entity and
-     * a reference to its component if it's a non-empty one. The _constness_ of
-     * the component is as requested.
+     * a reference to its element if it's a non-empty one. The _constness_ of
+     * the element is as requested.
      *
      * @return An iterable object to use to _visit_ the view.
      */
@@ -921,7 +921,7 @@ public:
 
     /**
      * @brief Combines two views in a _more specific_ one.
-     * @tparam OGet Component list of the view to combine with.
+     * @tparam OGet Element list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
      * @param other The view to combine with.
      * @return A more specific view.
@@ -943,8 +943,8 @@ basic_view(Type &...storage) -> basic_view<get_t<Type...>, exclude_t<>>;
 
 /**
  * @brief Deduction guide.
- * @tparam Get Types of components iterated by the view.
- * @tparam Exclude Types of components used to filter the view.
+ * @tparam Get Types of elements iterated by the view.
+ * @tparam Exclude Types of elements used to filter the view.
  */
 template<typename... Get, typename... Exclude>
 basic_view(std::tuple<Get &...>, std::tuple<Exclude &...> = {}) -> basic_view<get_t<Get...>, exclude_t<Exclude...>>;

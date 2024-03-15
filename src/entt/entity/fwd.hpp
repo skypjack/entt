@@ -66,7 +66,7 @@ using sparse_set = basic_sparse_set<>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Type Type of objects assigned to the entities.
+ * @tparam Type Element type.
  */
 template<typename Type>
 using storage = basic_storage<Type>;
@@ -140,7 +140,7 @@ template<typename... Type>
 inline constexpr exclude_t<Type...> exclude{};
 
 /**
- * @brief Alias for lists of observed components.
+ * @brief Alias for lists of observed elements.
  * @tparam Type List of types.
  */
 template<typename... Type>
@@ -150,14 +150,14 @@ struct get_t final: type_list<Type...> {
 };
 
 /**
- * @brief Variable template for lists of observed components.
+ * @brief Variable template for lists of observed elements.
  * @tparam Type List of types.
  */
 template<typename... Type>
 inline constexpr get_t<Type...> get{};
 
 /**
- * @brief Alias for lists of owned components.
+ * @brief Alias for lists of owned elements.
  * @tparam Type List of types.
  */
 template<typename... Type>
@@ -167,7 +167,7 @@ struct owned_t final: type_list<Type...> {
 };
 
 /**
- * @brief Variable template for lists of owned components.
+ * @brief Variable template for lists of owned elements.
  * @tparam Type List of types.
  */
 template<typename... Type>

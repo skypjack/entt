@@ -7,7 +7,7 @@
 
 template<typename Type, typename Entity>
 struct entt::storage_type<Type, Entity> {
-    // no signal regardless of component type ...
+    // no signal regardless of element type ...
     using type = basic_storage<Type, Entity>;
 };
 

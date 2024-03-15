@@ -268,7 +268,7 @@ class basic_group;
  * Iterators aren't invalidated if:
  *
  * * New elements are added to the storage.
- * * The entity currently pointed is modified (for example, components are added
+ * * The entity currently pointed is modified (for example, elements are added
  *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
@@ -332,9 +332,9 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type, if any.
-     * @tparam Type Type of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given element type, if any.
+     * @tparam Type Type of element of which to return the storage.
+     * @return The storage for the given element type.
      */
     template<typename Type>
     [[nodiscard]] auto *storage() const noexcept {
@@ -487,11 +487,11 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Type Type of the component to get.
-     * @tparam Other Other types of components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Type Type of the element to get.
+     * @tparam Other Other types of elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<typename Type, typename... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -499,10 +499,10 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Index Indexes of the components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Index Indexes of the elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -518,12 +518,12 @@ public:
     }
 
     /**
-     * @brief Iterates entities and components and applies the given function
+     * @brief Iterates entities and elements and applies the given function
      * object to them.
      *
      * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
+     * entity itself and a set of references to non-empty elements. The
+     * _constness_ of the elements is as requested.<br/>
      * The signature of the function must be equivalent to one of the following
      * forms:
      *
@@ -554,8 +554,8 @@ public:
      * @brief Returns an iterable object to use to _visit_ a group.
      *
      * The iterable object returns tuples that contain the current entity and a
-     * set of references to its non-empty components. The _constness_ of the
-     * components is as requested.
+     * set of references to its non-empty elements. The _constness_ of the
+     * elements is as requested.
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
@@ -592,8 +592,8 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Type Optional type of component to compare.
-     * @tparam Other Other optional types of components to compare.
+     * @tparam Type Optional type of element to compare.
+     * @tparam Other Other optional types of elements to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -611,7 +611,7 @@ public:
      *
      * @sa sort
      *
-     * @tparam Index Optional indexes of components to compare.
+     * @tparam Index Optional indexes of elements to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -668,7 +668,7 @@ private:
  *
  * * It's guaranteed that the entity list is tightly packed in memory for fast
  *   iterations.
- * * It's guaranteed that all components in the owned storage are tightly packed
+ * * It's guaranteed that all elements in the owned storage are tightly packed
  *   in memory for even faster iterations and to allow direct access.
  * * They stay true to the order of the owned storage and all instances have the
  *   same order in memory.
@@ -680,7 +680,7 @@ private:
  * Iterators aren't invalidated if:
  *
  * * New elements are added to the storage.
- * * The entity currently pointed is modified (for example, components are added
+ * * The entity currently pointed is modified (for example, elements are added
  *   or removed from it).
  * * The entity currently pointed is destroyed.
  *
@@ -745,9 +745,9 @@ public:
     }
 
     /**
-     * @brief Returns the storage for a given component type, if any.
-     * @tparam Type Type of component of which to return the storage.
-     * @return The storage for the given component type.
+     * @brief Returns the storage for a given element type, if any.
+     * @tparam Type Type of element of which to return the storage.
+     * @return The storage for the given element type.
      */
     template<typename Type>
     [[nodiscard]] auto *storage() const noexcept {
@@ -885,11 +885,11 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Type Type of the component to get.
-     * @tparam Other Other types of components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Type Type of the element to get.
+     * @tparam Other Other types of elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<typename Type, typename... Other>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -897,10 +897,10 @@ public:
     }
 
     /**
-     * @brief Returns the components assigned to the given entity.
-     * @tparam Index Indexes of the components to get.
+     * @brief Returns the elements assigned to the given entity.
+     * @tparam Index Indexes of the elements to get.
      * @param entt A valid identifier.
-     * @return The components assigned to the entity.
+     * @return The elements assigned to the entity.
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
@@ -916,12 +916,12 @@ public:
     }
 
     /**
-     * @brief Iterates entities and components and applies the given function
+     * @brief Iterates entities and elements and applies the given function
      * object to them.
      *
      * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
+     * entity itself and a set of references to non-empty elements. The
+     * _constness_ of the elements is as requested.<br/>
      * The signature of the function must be equivalent to one of the following
      * forms:
      *
@@ -952,8 +952,8 @@ public:
      * @brief Returns an iterable object to use to _visit_ a group.
      *
      * The iterable object returns tuples that contain the current entity and a
-     * set of references to its non-empty components. The _constness_ of the
-     * components is as requested.
+     * set of references to its non-empty elements. The _constness_ of the
+     * elements is as requested.
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
@@ -991,8 +991,8 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Type Optional type of component to compare.
-     * @tparam Other Other optional types of components to compare.
+     * @tparam Type Optional type of element to compare.
+     * @tparam Other Other optional types of elements to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -1010,7 +1010,7 @@ public:
      *
      * @sa sort
      *
-     * @tparam Index Optional indexes of components to compare.
+     * @tparam Index Optional indexes of elements to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.

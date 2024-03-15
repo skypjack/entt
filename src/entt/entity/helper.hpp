@@ -100,10 +100,10 @@ private:
 
 /**
  * @brief Helper to create a listener that directly invokes a member function.
- * @tparam Member Member function to invoke on a component of the given type.
+ * @tparam Member Member function to invoke on an element of the given type.
  * @tparam Registry Basic registry type.
- * @param reg A registry that contains the given entity and its components.
- * @param entt Entity from which to get the component.
+ * @param reg A registry that contains the given entity and its elements.
+ * @param entt Entity from which to get the element.
  */
 template<auto Member, typename Registry = std::decay_t<nth_argument_t<0u, decltype(Member)>>>
 void invoke(Registry &reg, const typename Registry::entity_type entt) {
@@ -114,16 +114,16 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
 }
 
 /**
- * @brief Returns the entity associated with a given component.
+ * @brief Returns the entity associated with a given element.
  *
  * @warning
  * Currently, this function only works correctly with the default storage as it
- * makes assumptions about how the components are laid out.
+ * makes assumptions about how the elements are laid out.
  *
  * @tparam Args Storage type template parameters.
- * @param storage A storage that contains the given component.
- * @param instance A valid component instance.
- * @return The entity associated with the given component.
+ * @param storage A storage that contains the given element.
+ * @param instance A valid element instance.
+ * @return The entity associated with the given element.
  */
 template<typename... Args>
 typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {

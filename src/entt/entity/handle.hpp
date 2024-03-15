@@ -203,137 +203,137 @@ struct basic_handle {
     }
 
     /**
-     * @brief Assigns the given component to a handle.
-     * @tparam Component Type of component to create.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @brief Assigns the given element to a handle.
+     * @tparam Type Type of element to create.
+     * @tparam Args Types of arguments to use to construct the element.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the newly created element.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Component, Scope>), "Invalid type");
-        return reg->template emplace<Component>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        return reg->template emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Assigns or replaces the given component for a handle.
-     * @tparam Component Type of component to assign or replace.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @brief Assigns or replaces the given element for a handle.
+     * @tparam Type Type of element to assign or replace.
+     * @tparam Args Types of arguments to use to construct the element.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the newly created element.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Component, Scope>), "Invalid type");
-        return reg->template emplace_or_replace<Component>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        return reg->template emplace_or_replace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Patches the given component for a handle.
-     * @tparam Component Type of component to patch.
+     * @brief Patches the given element for a handle.
+     * @tparam Type Type of element to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param func Valid function objects.
-     * @return A reference to the patched component.
+     * @return A reference to the patched element.
      */
-    template<typename Component, typename... Func>
+    template<typename Type, typename... Func>
     decltype(auto) patch(Func &&...func) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Component, Scope>), "Invalid type");
-        return reg->template patch<Component>(entt, std::forward<Func>(func)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        return reg->template patch<Type>(entt, std::forward<Func>(func)...);
     }
 
     /**
-     * @brief Replaces the given component for a handle.
-     * @tparam Component Type of component to replace.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the component being replaced.
+     * @brief Replaces the given element for a handle.
+     * @tparam Type Type of element to replace.
+     * @tparam Args Types of arguments to use to construct the element.
+     * @param args Parameters to use to initialize the element.
+     * @return A reference to the element being replaced.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     decltype(auto) replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Component, Scope>), "Invalid type");
-        return reg->template replace<Component>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        return reg->template replace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Removes the given components from a handle.
-     * @tparam Component Types of components to remove.
-     * @return The number of components actually removed.
+     * @brief Removes the given elements from a handle.
+     * @tparam Type Types of elements to remove.
+     * @return The number of elements actually removed.
      */
-    template<typename... Component>
+    template<typename... Type>
     size_type remove() const {
-        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Component> && ...), "Invalid type");
-        return reg->template remove<Component...>(entt);
+        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
+        return reg->template remove<Type...>(entt);
     }
 
     /**
-     * @brief Erases the given components from a handle.
-     * @tparam Component Types of components to erase.
+     * @brief Erases the given elements from a handle.
+     * @tparam Type Types of elements to erase.
      */
-    template<typename... Component>
+    template<typename... Type>
     void erase() const {
-        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Component> && ...), "Invalid type");
-        reg->template erase<Component...>(entt);
+        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
+        reg->template erase<Type...>(entt);
     }
 
     /**
-     * @brief Checks if a handle has all the given components.
-     * @tparam Component Components for which to perform the check.
-     * @return True if the handle has all the components, false otherwise.
+     * @brief Checks if a handle has all the given elements.
+     * @tparam Type Elements for which to perform the check.
+     * @return True if the handle has all the elements, false otherwise.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) all_of() const {
-        return reg->template all_of<Component...>(entt);
+        return reg->template all_of<Type...>(entt);
     }
 
     /**
-     * @brief Checks if a handle has at least one of the given components.
-     * @tparam Component Components for which to perform the check.
-     * @return True if the handle has at least one of the given components,
+     * @brief Checks if a handle has at least one of the given elements.
+     * @tparam Type Elements for which to perform the check.
+     * @return True if the handle has at least one of the given elements,
      * false otherwise.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) any_of() const {
-        return reg->template any_of<Component...>(entt);
+        return reg->template any_of<Type...>(entt);
     }
 
     /**
-     * @brief Returns references to the given components for a handle.
-     * @tparam Component Types of components to get.
-     * @return References to the components owned by the handle.
+     * @brief Returns references to the given elements for a handle.
+     * @tparam Type Types of elements to get.
+     * @return References to the elements owned by the handle.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] decltype(auto) get() const {
-        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Component> && ...), "Invalid type");
-        return reg->template get<Component...>(entt);
+        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
+        return reg->template get<Type...>(entt);
     }
 
     /**
-     * @brief Returns a reference to the given component for a handle.
-     * @tparam Component Type of component to get.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param args Parameters to use to initialize the component.
-     * @return Reference to the component owned by the handle.
+     * @brief Returns a reference to the given element for a handle.
+     * @tparam Type Type of element to get.
+     * @tparam Args Types of arguments to use to construct the element.
+     * @param args Parameters to use to initialize the element.
+     * @return Reference to the element owned by the handle.
      */
-    template<typename Component, typename... Args>
+    template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Component, Scope>), "Invalid type");
-        return reg->template get_or_emplace<Component>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        return reg->template get_or_emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Returns pointers to the given components for a handle.
-     * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the handle.
+     * @brief Returns pointers to the given elements for a handle.
+     * @tparam Type Types of elements to get.
+     * @return Pointers to the elements owned by the handle.
      */
-    template<typename... Component>
+    template<typename... Type>
     [[nodiscard]] auto try_get() const {
-        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Component> && ...), "Invalid type");
-        return reg->template try_get<Component...>(entt);
+        static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
+        return reg->template try_get<Type...>(entt);
     }
 
     /**
-     * @brief Checks if a handle has components assigned.
-     * @return True if the handle has no components assigned, false otherwise.
+     * @brief Checks if a handle has elements assigned.
+     * @return True if the handle has no elements assigned, false otherwise.
      */
     [[nodiscard]] bool orphan() const {
         return reg->orphan(entt);

@@ -223,7 +223,7 @@ template<typename... Lhs, typename... Rhs>
  * Empty types aren't explicitly instantiated. Therefore, many of the functions
  * normally available for non-empty types will not be available for empty ones.
  *
- * @tparam Type Type of objects assigned to the entities.
+ * @tparam Type Element type.
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
@@ -737,7 +737,7 @@ public:
      * @brief Returns an iterable object to use to _visit_ a storage.
      *
      * The iterable object returns a tuple that contains the current entity and
-     * a reference to its component.
+     * a reference to its element.
      *
      * @return An iterable object to use to _visit_ the storage.
      */

@@ -37,7 +37,7 @@ void orphans(Registry &registry) {
  * @brief Utility class to create snapshots from a registry.
  *
  * A _snapshot_ can be either a dump of the entire registry or a narrower
- * selection of components of interest.<br/>
+ * selection of elements of interest.<br/>
  * This type can be used in both cases if provided with a correctly configured
  * output archive.
  *
@@ -224,10 +224,10 @@ public:
     }
 
     /**
-     * @brief Destroys those entities that have no components.
+     * @brief Destroys those entities that have no elements.
      *
-     * In case all the entities were serialized but only part of the components
-     * was saved, it could happen that some of the entities have no components
+     * In case all the entities were serialized but only part of the elements
+     * was saved, it could happen that some of the entities have no elements
      * once restored.<br/>
      * This function helps to identify and destroy those entities.
      *
@@ -406,10 +406,10 @@ public:
     }
 
     /**
-     * @brief Destroys those entities that have no components.
+     * @brief Destroys those entities that have no elements.
      *
-     * In case all the entities were serialized but only part of the components
-     * was saved, it could happen that some of the entities have no components
+     * In case all the entities were serialized but only part of the elements
+     * was saved, it could happen that some of the entities have no elements
      * once restored.<br/>
      * This function helps to identify and destroy those entities.
      *

@@ -1568,14 +1568,14 @@ TEST(Storage, MoveOnlyComponent) {
     using value_type = std::unique_ptr<int>;
     static_assert(!std::is_copy_assignable_v<value_type>, "Copy assignable types not allowed");
     static_assert(std::is_move_assignable_v<value_type>, "Move assignable type required");
-    // the purpose is to ensure that move only components are always accepted
+    // the purpose is to ensure that move only types are always accepted
     [[maybe_unused]] const entt::storage<value_type> pool;
 }
 
 TEST(Storage, NonMovableComponent) {
     using value_type = std::pair<const int, const int>;
     static_assert(!std::is_move_assignable_v<value_type>, "Move assignable types not allowed");
-    // the purpose is to ensure that non-movable components are always accepted
+    // the purpose is to ensure that non-movable types are always accepted
     [[maybe_unused]] const entt::storage<value_type> pool;
 }
 
