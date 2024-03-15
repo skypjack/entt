@@ -7,6 +7,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/delegate.hpp"
+#include "component.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
 #include "storage.hpp"
@@ -126,12 +127,13 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  */
 template<typename... Args>
 typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
-    constexpr auto page_size = basic_storage<Args...>::traits_type::page_size;
+    using traits_type = component_traits<typename basic_storage<Args...>::value_type>;
+    static_assert(traits_type::page_size != 0u, "Unexpected page size");
     const typename basic_storage<Args...>::base_type &base = storage;
     const auto *addr = std::addressof(instance);
 
-    for(auto it = base.rbegin(), last = base.rend(); it < last; it += page_size) {
-        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(page_size)) {
+    for(auto it = base.rbegin(), last = base.rend(); it < last; it += traits_type::page_size) {
+        if(const auto dist = (addr - std::addressof(storage.get(*it))); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
             return *(it + dist);
         }
     }
