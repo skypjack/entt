@@ -33,5 +33,4 @@ TODO:
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * view: review tombstone checks, no longer required with storage entity and Get 1
-* drop storage traits_type as it ought to be (already done for all other types)
 * review the short-circuit model now that all storage are freely available
