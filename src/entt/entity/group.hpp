@@ -154,7 +154,7 @@ public:
         size_type cnt = 0u;
 
         for(auto pos = 0u; pos < length; ++pos) {
-            cnt += ((elem[pos] == entt::type_hash<typename Owned::value_type>::value()) || ...);
+            cnt += ((elem[pos] == entt::type_hash<typename Owned::element_type>::value()) || ...);
         }
 
         return cnt;
@@ -284,7 +284,7 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = typename base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     auto pools() const noexcept {
         using return_type = std::tuple<Get *...>;
@@ -697,7 +697,7 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = typename base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::value_type..., typename Get::value_type..., typename Exclude::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
     auto pools() const noexcept {
         using return_type = std::tuple<Owned *..., Get *...>;

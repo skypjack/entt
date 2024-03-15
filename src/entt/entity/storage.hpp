@@ -375,13 +375,13 @@ protected:
      */
     underlying_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
         if(value) {
-            if constexpr(std::is_copy_constructible_v<value_type>) {
-                return emplace_element(entt, force_back, *static_cast<const value_type *>(value));
+            if constexpr(std::is_copy_constructible_v<element_type>) {
+                return emplace_element(entt, force_back, *static_cast<const element_type *>(value));
             } else {
                 return base_type::end();
             }
         } else {
-            if constexpr(std::is_default_constructible_v<value_type>) {
+            if constexpr(std::is_default_constructible_v<element_type>) {
                 return emplace_element(entt, force_back);
             } else {
                 return base_type::end();
@@ -392,10 +392,12 @@ protected:
 public:
     /*! @brief Base type. */
     using base_type = underlying_type;
+    /*! @brief Element type. */
+    using element_type = Type;
     /*! @brief Type of the objects assigned to entities. */
-    using value_type = Type;
+    using value_type = element_type;
     /*! @brief Component traits. */
-    using traits_type = component_traits<value_type>;
+    using traits_type = component_traits<element_type>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -432,7 +434,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{traits_type::in_place_delete}, allocator},
+        : base_type{type_id<element_type>(), deletion_policy{traits_type::in_place_delete}, allocator},
           payload{allocator} {}
 
     /**
@@ -779,10 +781,10 @@ class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<T
 public:
     /*! @brief Base type. */
     using base_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
+    /*! @brief Element type. */
+    using element_type = Type;
     /*! @brief Type of the objects assigned to entities. */
-    using value_type = Type;
-    /*! @brief Component traits. */
-    using traits_type = component_traits<value_type>;
+    using value_type = element_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -807,7 +809,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<value_type>(), deletion_policy{traits_type::in_place_delete}, allocator} {}
+        : base_type{type_id<element_type>(), deletion_policy{traits_type::in_place_delete}, allocator} {}
 
     /**
      * @brief Move constructor.
@@ -836,7 +838,7 @@ public:
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
         // std::allocator<void> has no cross constructors (waiting for C++20)
-        if constexpr(std::is_void_v<value_type> && !std::is_constructible_v<allocator_type, typename base_type::allocator_type>) {
+        if constexpr(std::is_void_v<element_type> && !std::is_constructible_v<allocator_type, typename base_type::allocator_type>) {
             return allocator_type{};
         } else {
             return allocator_type{base_type::get_allocator()};
@@ -983,8 +985,8 @@ protected:
 public:
     /*! @brief Base type. */
     using base_type = basic_sparse_set<Entity, Allocator>;
-    /*! @brief Type of the objects assigned to entities. */
-    using value_type = Entity;
+    /*! @brief Element type. */
+    using element_type = Entity;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */

@@ -52,8 +52,8 @@ struct unpack_type<const basic_registry<Args...>, type_list<Override...>>
 
 template<typename... Get, typename... Exclude, typename... Override>
 struct unpack_type<basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {
-    using ro = type_list_cat_t<type_list<typename Exclude::value_type...>, typename unpack_type<constness_as_t<typename Get::value_type, Get>, type_list<Override...>>::ro...>;
-    using rw = type_list_cat_t<typename unpack_type<constness_as_t<typename Get::value_type, Get>, type_list<Override...>>::rw...>;
+    using ro = type_list_cat_t<type_list<typename Exclude::element_type...>, typename unpack_type<constness_as_t<typename Get::element_type, Get>, type_list<Override...>>::ro...>;
+    using rw = type_list_cat_t<typename unpack_type<constness_as_t<typename Get::element_type, Get>, type_list<Override...>>::rw...>;
 };
 
 template<typename... Get, typename... Exclude, typename... Override>

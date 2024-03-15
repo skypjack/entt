@@ -22,7 +22,7 @@ template<typename Registry>
 class as_view {
     template<typename... Get, typename... Exclude>
     auto dispatch(get_t<Get...>, exclude_t<Exclude...>) const {
-        return reg.template view<constness_as_t<typename Get::value_type, Get>...>(exclude_t<constness_as_t<typename Exclude::value_type, Exclude>...>{});
+        return reg.template view<constness_as_t<typename Get::element_type, Get>...>(exclude_t<constness_as_t<typename Exclude::element_type, Exclude>...>{});
     }
 
 public:
@@ -62,9 +62,9 @@ class as_group {
     template<typename... Owned, typename... Get, typename... Exclude>
     auto dispatch(owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>) const {
         if constexpr(std::is_const_v<registry_type>) {
-            return reg.template group_if_exists<typename Owned::value_type...>(get_t<typename Get::value_type...>{}, exclude_t<typename Exclude::value_type...>{});
+            return reg.template group_if_exists<typename Owned::element_type...>(get_t<typename Get::element_type...>{}, exclude_t<typename Exclude::element_type...>{});
         } else {
-            return reg.template group<constness_as_t<typename Owned::value_type, Owned>...>(get_t<constness_as_t<typename Get::value_type, Get>...>{}, exclude_t<constness_as_t<typename Exclude::value_type, Exclude>...>{});
+            return reg.template group<constness_as_t<typename Owned::element_type, Owned>...>(get_t<constness_as_t<typename Get::element_type, Get>...>{}, exclude_t<constness_as_t<typename Exclude::element_type, Exclude>...>{});
         }
     }
 
@@ -125,7 +125,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  * @return The entity associated with the given component.
  */
 template<typename... Args>
-auto to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) -> typename basic_storage<Args...>::entity_type {
+typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
     constexpr auto page_size = basic_storage<Args...>::traits_type::page_size;
     const typename basic_storage<Args...>::base_type &base = storage;
     const auto *addr = std::addressof(instance);

@@ -256,7 +256,7 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
 
     template<typename... Matcher, std::size_t... Index>
     void connect(Registry &reg, std::index_sequence<Index...>) {
-        static_assert(sizeof...(Matcher) < std::numeric_limits<typename base_type::value_type>::digits, "Too many matchers");
+        static_assert(sizeof...(Matcher) < std::numeric_limits<Mask>::digits, "Too many matchers");
         (matcher_handler<Matcher>::template connect<Index>(*this, reg), ...);
         release.template connect<&basic_observer::disconnect<Matcher...>>(reg);
     }

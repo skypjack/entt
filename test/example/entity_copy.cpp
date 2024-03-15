@@ -14,7 +14,7 @@ template<typename Type>
 // NOLINTNEXTLINE(*-exception-escape)
 struct meta_mixin: Type {
     using allocator_type = typename Type::allocator_type;
-    using value_type = typename Type::value_type;
+    using element_type = typename Type::element_type;
 
     explicit meta_mixin(const allocator_type &allocator);
 };
@@ -29,11 +29,11 @@ meta_mixin<Type>::meta_mixin(const allocator_type &allocator)
     : Type{allocator} {
     using namespace entt::literals;
 
-    entt::meta<value_type>()
+    entt::meta<element_type>()
         // cross registry, same type
-        .template func<entt::overload<entt::storage_for_t<value_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<value_type>), entt::as_ref_t>("storage"_hs)
+        .template func<entt::overload<entt::storage_for_t<element_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<element_type>), entt::as_ref_t>("storage"_hs)
         // cross registry, different types
-        .template func<entt::overload<entt::storage_for_t<value_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<value_type>), entt::as_ref_t>("storage"_hs);
+        .template func<entt::overload<entt::storage_for_t<element_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<element_type>), entt::as_ref_t>("storage"_hs);
 }
 
 template<typename Type>

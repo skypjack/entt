@@ -57,7 +57,7 @@ class basic_sigh_mixin final: public Type {
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
             for(auto it = underlying_type::base_type::begin(0), last = underlying_type::base_type::end(0); it != last; ++it) {
-                if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
+                if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
                     destruction.publish(reg, *it);
                 } else {
                     if constexpr(underlying_type::traits_type::in_place_delete) {
@@ -231,7 +231,7 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type hint, Args &&...args) {
-        if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
+        if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
             const auto entt = underlying_type::emplace(hint, std::forward<Args>(args)...);
             construction.publish(owner_or_assert(), entt);
             return entt;

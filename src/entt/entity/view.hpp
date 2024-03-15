@@ -377,7 +377,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::value_type..., typename Exclude::value_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index>
     auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
@@ -495,7 +495,7 @@ public:
      */
     template<typename Type>
     void storage(Type &elem) noexcept {
-        storage<index_of<typename Type::value_type>>(elem);
+        storage<index_of<typename Type::element_type>>(elem);
     }
 
     /**
@@ -797,9 +797,9 @@ public:
      * @tparam Type Type of component of which to return the storage.
      * @return The storage for the given component type.
      */
-    template<typename Type = typename Get::value_type>
+    template<typename Type = typename Get::element_type>
     [[nodiscard]] auto *storage() const noexcept {
-        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::value_type>, "Invalid component type");
+        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid component type");
         return storage<0>();
     }
 
@@ -850,7 +850,7 @@ public:
      */
     template<typename Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::value_type>, "Invalid component type");
+        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid component type");
         return get<0>(entt);
     }
 
