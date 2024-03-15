@@ -6,6 +6,7 @@
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../signal/sigh.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -60,7 +61,7 @@ class basic_sigh_mixin final: public Type {
                 if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
                     destruction.publish(reg, *it);
                 } else {
-                    if constexpr(underlying_type::traits_type::in_place_delete) {
+                    if constexpr(component_traits<typename underlying_type::element_type>::in_place_delete) {
                         if(const auto entt = *it; entt != tombstone) {
                             destruction.publish(reg, entt);
                         }
