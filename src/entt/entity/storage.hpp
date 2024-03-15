@@ -234,6 +234,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = typename underlying_type::basic_iterator;
+    using traits_type = component_traits<Type>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
         return payload[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
@@ -396,8 +397,6 @@ public:
     using element_type = Type;
     /*! @brief Type of the objects assigned to entities. */
     using value_type = element_type;
-    /*! @brief Component traits. */
-    using traits_type = component_traits<element_type>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -777,6 +776,7 @@ class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<T
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    using traits_type = component_traits<Type>;
 
 public:
     /*! @brief Base type. */
