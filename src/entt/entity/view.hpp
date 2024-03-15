@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_VIEW_HPP
 
 #include <array>
+#include <cstddef>
 #include <iterator>
 #include <tuple>
 #include <type_traits>
@@ -9,6 +10,7 @@
 #include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -756,7 +758,7 @@ protected:
  * @tparam Get Type of storage iterated by the view.
  */
 template<typename Get>
-class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<!Get::traits_type::in_place_delete>>>: public basic_storage_view<typename Get::base_type> {
+class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<!component_traits<typename Get::value_type>::in_place_delete>>>: public basic_storage_view<typename Get::base_type> {
     using base_type = basic_storage_view<typename Get::base_type>;
 
 public:
