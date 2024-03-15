@@ -919,7 +919,7 @@ accessible by both type and _name_ for convenience. The _name_ isn't really a
 name though. In fact, it's a numeric id of type `id_type` used as a key for the
 variable. Any value is accepted, even runtime ones.<br/>
 The context is returned via the `ctx` functions and offers a minimal set of
-feature including the following:
+features including the following:
 
 ```cpp
 // creates a new context variable by type and returns it
@@ -947,7 +947,7 @@ registry.ctx().erase<my_type>();
 registry.ctx().erase<my_type>("my_variable"_hs);
 ```
 
-Context variable must be both default constructible and movable. If the supplied
+A context variable must be both default constructible and movable. If the supplied
 type doesn't match that of the variable when using a _name_, the operation
 fails.<br/>
 For all users who want to use the context but don't want to create elements, the
