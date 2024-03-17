@@ -947,9 +947,9 @@ registry.ctx().erase<my_type>();
 registry.ctx().erase<my_type>("my_variable"_hs);
 ```
 
-A context variable must be both default constructible and movable. If the supplied
-type doesn't match that of the variable when using a _name_, the operation
-fails.<br/>
+A context variable must be both default constructible and movable. If the
+supplied type doesn't match that of the variable when using a _name_, the
+operation fails.<br/>
 For all users who want to use the context but don't want to create elements, the
 `contains` and `find` functions are also available:
 
