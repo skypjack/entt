@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <functional>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <common/boxed_type.h>
