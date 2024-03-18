@@ -39,4 +39,11 @@
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/dispatcher.hpp>", "public" ] },
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/emitter.hpp>", "public" ] },
   { "include": [ "@[\"<].*/signal/fwd\\.hpp[\">]", "private", "<entt/signal/sigh.hpp>", "public" ] },
+  # symbols
+  { symbol: [ "std::allocator", private, "<entt/container/fwd.hpp>", public ] },
+  { symbol: [ "std::allocator", private, "<entt/entity/fwd.hpp>", public ] },
+  { symbol: [ "std::allocator", private, "<entt/graph/fwd.hpp>", public ] },
+  { symbol: [ "std::allocator", private, "<entt/process/fwd.hpp>", public ] },
+  { symbol: [ "std::allocator", private, "<entt/resource/fwd.hpp>", public ] },
+  { symbol: [ "std::allocator", private, "<entt/signal/fwd.hpp>", public ] }
 ]
