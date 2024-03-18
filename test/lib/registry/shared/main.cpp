@@ -4,6 +4,7 @@
 #include <entt/core/attribute.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 
 ENTT_API void update(entt::registry &, int);
 ENTT_API void insert(entt::registry &);

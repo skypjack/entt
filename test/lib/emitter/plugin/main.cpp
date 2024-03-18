@@ -1,5 +1,6 @@
 #define CR_HOST
 
+#include <functional>
 #include <gtest/gtest.h>
 #include <common/boxed_type.h>
 #include <common/emitter.h>

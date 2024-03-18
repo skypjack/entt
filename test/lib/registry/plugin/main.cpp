@@ -6,6 +6,7 @@
 #include <cr.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 
 TEST(Lib, Registry) {
     constexpr auto count = 3;
