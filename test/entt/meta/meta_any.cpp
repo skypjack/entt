@@ -249,7 +249,7 @@ ENTT_DEBUG_TEST_F(MetaAnyDeathTest, SBOAsConstRefConstruction) {
     auto any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
-    ASSERT_DEATH(any.cast<int &>() = 1, "");
+    ASSERT_DEATH([[maybe_unused]] auto &elem = any.cast<int &>(), "");
 }
 
 TEST_F(MetaAny, SBOCopyConstruction) {
@@ -517,7 +517,7 @@ ENTT_DEBUG_TEST_F(MetaAnyDeathTest, NoSBOAsConstRefConstruction) {
     auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
-    ASSERT_DEATH(any.cast<fat &>() = {}, "");
+    ASSERT_DEATH([[maybe_unused]] auto &elem = any.cast<fat &>(), "");
 }
 
 TEST_F(MetaAny, NoSBOCopyConstruction) {
@@ -1061,7 +1061,7 @@ ENTT_DEBUG_TEST_F(MetaAnyDeathTest, AsRef) {
     auto cref = std::as_const(any).as_ref();
 
     ASSERT_TRUE(any);
-    ASSERT_DEATH(cref.cast<int &>() = 3, "");
+    ASSERT_DEATH([[maybe_unused]] auto &elem = cref.cast<int &>(), "");
 }
 
 TEST_F(MetaAny, Comparable) {
