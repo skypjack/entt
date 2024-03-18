@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/empty.h>
-#include <common/non_movable.h>
+#include "common/boxed_type.h"
+#include "common/empty.h"
+#include "common/non_movable.h"
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
 

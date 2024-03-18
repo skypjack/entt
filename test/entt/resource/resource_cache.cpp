@@ -3,8 +3,8 @@
 #include <tuple>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/linter.hpp>
-#include <common/throwing_allocator.hpp>
+#include "common/linter.hpp"
+#include "common/throwing_allocator.hpp"
 #include <entt/container/dense_map.hpp>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/iterator.hpp>

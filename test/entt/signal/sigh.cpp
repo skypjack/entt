@@ -1,7 +1,7 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/linter.hpp>
+#include "common/linter.hpp"
 #include <entt/signal/sigh.hpp>
 
 struct sigh_listener {

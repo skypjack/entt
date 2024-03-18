@@ -4,7 +4,7 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/config.h>
+#include "common/config.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/core/utility.hpp>

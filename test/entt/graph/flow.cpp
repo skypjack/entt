@@ -3,9 +3,9 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/linter.hpp>
-#include <common/throwing_allocator.hpp>
+#include "common/config.h"
+#include "common/linter.hpp"
+#include "common/throwing_allocator.hpp"
 #include <entt/core/hashed_string.hpp>
 #include <entt/graph/flow.hpp>
 

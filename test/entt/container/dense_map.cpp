@@ -9,11 +9,11 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/linter.hpp>
-#include <common/throwing_allocator.hpp>
-#include <common/tracked_memory_resource.hpp>
-#include <common/transparent_equal_to.h>
+#include "common/config.h"
+#include "common/linter.hpp"
+#include "common/throwing_allocator.hpp"
+#include "common/tracked_memory_resource.hpp"
+#include "common/transparent_equal_to.h"
 #include <entt/container/dense_map.hpp>
 #include <entt/core/iterator.hpp>
 #include <entt/core/memory.hpp>

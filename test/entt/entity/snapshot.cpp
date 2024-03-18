@@ -4,8 +4,8 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/empty.h>
+#include "common/config.h"
+#include "common/empty.h"
 #include <entt/core/any.hpp>
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>

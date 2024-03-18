@@ -6,10 +6,10 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/entity.h>
-#include <common/linter.hpp>
-#include <common/throwing_allocator.hpp>
+#include "common/config.h"
+#include "common/entity.h"
+#include "common/linter.hpp"
+#include "common/throwing_allocator.hpp"
 #include <entt/config/config.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>

@@ -1,7 +1,7 @@
 #include <type_traits>
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/empty.h>
+#include "common/boxed_type.h"
+#include "common/empty.h"
 #include <entt/core/ident.hpp>
 
 TEST(Ident, Uniqueness) {

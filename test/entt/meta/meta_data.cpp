@@ -2,7 +2,7 @@
 #include <string>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
+#include "common/config.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 #include <entt/locator/locator.hpp>

@@ -2,8 +2,8 @@
 #include <iterator>
 #include <utility>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/empty.h>
+#include "common/config.h"
+#include "common/empty.h"
 #include <entt/core/type_traits.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/policy.hpp>

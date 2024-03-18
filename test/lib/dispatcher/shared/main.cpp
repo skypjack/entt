@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <common/boxed_type.h>
-#include <common/listener.h>
+#include "common/boxed_type.h"
+#include "common/listener.h"
 #include <entt/core/attribute.h>
 #include <entt/core/utility.hpp>
 #include <entt/signal/dispatcher.hpp>

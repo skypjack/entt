@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include <common/config.h>
-#include <common/empty.h>
-#include <common/non_default_constructible.h>
+#include "common/config.h"
+#include "common/empty.h"
+#include "common/non_default_constructible.h"
 #include <entt/container/dense_map.hpp>
 #include <entt/container/dense_set.hpp>
 #include <entt/meta/container.hpp>
