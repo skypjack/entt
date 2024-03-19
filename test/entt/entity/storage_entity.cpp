@@ -7,12 +7,12 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/config.h"
-#include "common/linter.hpp"
 #include <entt/core/iterator.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
+#include "../../common/config.h"
+#include "../../common/linter.hpp"
 
 TEST(StorageEntity, Constructors) {
     entt::storage<entt::entity> pool;

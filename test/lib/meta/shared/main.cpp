@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/empty.h"
 #include <entt/core/attribute.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../../../common/boxed_type.h"
+#include "../../../common/empty.h"
 
 ENTT_API void share(const entt::locator<entt::meta_ctx>::node_type &);
 ENTT_API void set_up();
@@ -16,7 +16,7 @@ ENTT_API entt::meta_any wrap_int(int);
 TEST(Lib, Meta) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::resolve(mboxed_int"_hs));
+    ASSERT_FALSE(entt::resolve("boxed_int"_hs));
     ASSERT_FALSE(entt::resolve("empty"_hs));
 
     share(entt::locator<entt::meta_ctx>::handle());

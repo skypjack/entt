@@ -1,7 +1,7 @@
 #include <memory>
 #include <gtest/gtest.h>
-#include "common/config.h"
 #include <entt/locator/locator.hpp>
+#include "../../common/config.h"
 
 struct base_service {
     virtual ~base_service() = default;

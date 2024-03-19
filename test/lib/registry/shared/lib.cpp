@@ -1,7 +1,7 @@
-#include "common/boxed_type.h"
-#include "common/empty.h"
 #include <entt/core/attribute.h>
 #include <entt/entity/registry.hpp>
+#include "../../../common/boxed_type.h"
+#include "../../../common/empty.h"
 
 template class entt::basic_registry<entt::entity>;
 

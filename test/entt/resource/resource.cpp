@@ -1,9 +1,9 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/linter.hpp"
 #include <entt/core/type_info.hpp>
 #include <entt/resource/resource.hpp>
+#include "../../common/linter.hpp"
 
 struct base {
     virtual ~base() = default;

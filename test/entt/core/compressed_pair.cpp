@@ -5,9 +5,9 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include "common/empty.h"
-#include "common/non_default_constructible.h"
 #include <entt/core/compressed_pair.hpp>
+#include "../../common/empty.h"
+#include "../../common/non_default_constructible.h"
 
 TEST(CompressedPair, Size) {
     struct local {

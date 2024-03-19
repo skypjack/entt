@@ -2,9 +2,9 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/linter.hpp"
-#include "common/throwing_allocator.hpp"
 #include <entt/graph/adjacency_matrix.hpp>
+#include "../../common/linter.hpp"
+#include "../../common/throwing_allocator.hpp"
 
 TEST(AdjacencyMatrix, Resize) {
     entt::adjacency_matrix<entt::directed_tag> adjacency_matrix{2};

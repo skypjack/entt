@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include "common/pointer_stable.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
+#include "../../common/pointer_stable.h"
 
 struct clazz {
     void func(entt::registry &, entt::entity curr) {

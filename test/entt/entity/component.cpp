@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/empty.h"
-#include "common/non_movable.h"
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
+#include "../../common/boxed_type.h"
+#include "../../common/empty.h"
+#include "../../common/non_movable.h"
 
 struct self_contained {
     static constexpr auto in_place_delete = true;

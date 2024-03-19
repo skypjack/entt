@@ -9,18 +9,18 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include "common/aggregate.h"
-#include "common/config.h"
-#include "common/empty.h"
-#include "common/entity.h"
-#include "common/non_default_constructible.h"
-#include "common/pointer_stable.h"
 #include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../../common/aggregate.h"
+#include "../../common/config.h"
+#include "../../common/empty.h"
+#include "../../common/entity.h"
+#include "../../common/non_default_constructible.h"
+#include "../../common/pointer_stable.h"
 
 struct no_eto_type {
     static constexpr std::size_t page_size = 1024u;

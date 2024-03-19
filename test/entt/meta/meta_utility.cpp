@@ -2,13 +2,13 @@
 #include <iterator>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/config.h"
-#include "common/empty.h"
 #include <entt/core/type_traits.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
+#include "../../common/config.h"
+#include "../../common/empty.h"
 
 struct clazz {
     void setter(int v) {

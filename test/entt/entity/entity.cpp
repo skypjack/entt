@@ -1,9 +1,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <gtest/gtest.h>
-#include "common/entity.h"
 #include <entt/config/config.h>
 #include <entt/entity/entity.hpp>
+#include "../../common/entity.h"
 
 struct entity_traits {
     using value_type = test::entity;

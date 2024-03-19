@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/empty.h"
 #include <entt/core/attribute.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../../../common/boxed_type.h"
+#include "../../../common/empty.h"
 
 ENTT_API void update(entt::registry &, int);
 ENTT_API void insert(entt::registry &);

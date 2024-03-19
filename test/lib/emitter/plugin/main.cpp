@@ -2,9 +2,9 @@
 
 #include <functional>
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/emitter.h"
 #include <cr.h>
+#include "../../../common/boxed_type.h"
+#include "../../../common/emitter.h"
 
 TEST(Lib, Emitter) {
     test::emitter emitter;

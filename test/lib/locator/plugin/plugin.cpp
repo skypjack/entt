@@ -1,6 +1,6 @@
-#include "common/boxed_type.h"
 #include <cr.h>
 #include <entt/locator/locator.hpp>
+#include "../../../common/boxed_type.h"
 #include "userdata.h"
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {

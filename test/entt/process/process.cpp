@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <gtest/gtest.h>
-#include "common/empty.h"
 #include <entt/process/process.hpp>
+#include "../../common/empty.h"
 
 template<typename Delta>
 struct fake_process: entt::process<fake_process<Delta>, Delta> {

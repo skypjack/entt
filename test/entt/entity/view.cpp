@@ -4,15 +4,15 @@
 #include <tuple>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/empty.h"
-#include "common/pointer_stable.h"
 #include <entt/core/any.hpp>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
+#include "../../common/boxed_type.h"
+#include "../../common/empty.h"
+#include "../../common/pointer_stable.h"
 
 TEST(SingleComponentView, Functionalities) {
     entt::registry registry;

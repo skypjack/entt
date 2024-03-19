@@ -6,15 +6,15 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/config.h"
-#include "common/entity.h"
-#include "common/linter.hpp"
-#include "common/throwing_allocator.hpp"
 #include <entt/config/config.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
+#include "../../common/config.h"
+#include "../../common/entity.h"
+#include "../../common/linter.hpp"
+#include "../../common/throwing_allocator.hpp"
 
 struct entity_traits {
     using value_type = test::entity;

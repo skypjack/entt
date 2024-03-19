@@ -1,8 +1,8 @@
 #include <type_traits>
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/empty.h"
 #include <entt/core/ident.hpp>
+#include "../../common/boxed_type.h"
+#include "../../common/empty.h"
 
 TEST(Ident, Uniqueness) {
     using id = entt::ident<test::empty, test::boxed_int>;

@@ -4,13 +4,13 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/config.h"
-#include "common/linter.hpp"
-#include "common/non_comparable.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../../common/config.h"
+#include "../../common/linter.hpp"
+#include "../../common/non_comparable.h"
 
 struct clazz {
     void member(int i) {

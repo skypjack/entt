@@ -1,10 +1,10 @@
 #define CR_HOST
 
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/listener.h"
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
+#include "../../../common/boxed_type.h"
+#include "../../../common/listener.h"
 
 struct listener {
     void on(test::boxed_int msg) {

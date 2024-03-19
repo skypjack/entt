@@ -2,8 +2,8 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
 #include <entt/core/iterator.hpp>
+#include "../../common/boxed_type.h"
 
 TEST(InputIteratorPointer, Functionalities) {
     entt::input_iterator_pointer ptr{test::boxed_int{0}};

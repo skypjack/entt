@@ -2,11 +2,11 @@
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
-#include "common/boxed_type.h"
-#include "common/emitter.h"
-#include "common/empty.h"
-#include "common/linter.hpp"
 #include <entt/signal/emitter.hpp>
+#include "../../common/boxed_type.h"
+#include "../../common/emitter.h"
+#include "../../common/empty.h"
+#include "../../common/linter.hpp"
 
 TEST(Emitter, Move) {
     test::emitter emitter{};
