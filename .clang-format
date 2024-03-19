@@ -23,6 +23,7 @@ IncludeCategories:
     Priority: 4
   - Regex: '.*'
     Priority: 5
+IncludeIsMainRegex: "^$"
 IndentPPDirectives: AfterHash
 IndentWidth: 4
 KeepEmptyLinesAtTheStartOfBlocks: false
