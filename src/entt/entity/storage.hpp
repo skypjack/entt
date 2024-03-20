@@ -1139,7 +1139,8 @@ public:
 
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
-        return {internal::extended_storage_iterator{base_type::cbegin(0)}, internal::extended_storage_iterator{base_type::cend(0)}};
+        const auto it = base_type::cend();
+        return const_iterable{it - base_type::free_list(), it};
     }
 
     /**
@@ -1155,7 +1156,8 @@ public:
 
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
-        return {internal::extended_storage_iterator{base_type::crbegin(0)}, internal::extended_storage_iterator{base_type::crend(0)}};
+        const auto it = base_type::crbegin();
+        return const_reverse_iterable{it, it + base_type::free_list()};
     }
 
 private:
