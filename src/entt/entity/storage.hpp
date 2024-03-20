@@ -1134,7 +1134,7 @@ public:
      * @return An iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] iterable each() noexcept {
-        return {internal::extended_storage_iterator{base_type::begin(0)}, internal::extended_storage_iterator{base_type::end(0)}};
+        return std::as_const(*this).each();
     }
 
     /*! @copydoc each */
@@ -1150,12 +1150,12 @@ public:
      * @return A reverse iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] reverse_iterable reach() noexcept {
-        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rend(0)}};
+        return std::as_const(*this).reach();
     }
 
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
-        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crend(0)}};
+        return {internal::extended_storage_iterator{base_type::crbegin(0)}, internal::extended_storage_iterator{base_type::crend(0)}};
     }
 
 private:
