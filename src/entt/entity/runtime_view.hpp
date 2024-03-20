@@ -17,6 +17,7 @@ namespace internal {
 template<typename Set>
 class runtime_view_iterator final {
     using iterator_type = typename Set::iterator;
+    using iterator_traits = std::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid() const {
         return (!tombstone_check || *it != tombstone)
@@ -25,10 +26,10 @@ class runtime_view_iterator final {
     }
 
 public:
-    using difference_type = typename iterator_type::difference_type;
-    using value_type = typename iterator_type::value_type;
-    using pointer = typename iterator_type::pointer;
-    using reference = typename iterator_type::reference;
+    using value_type = typename iterator_traits::value_type;
+    using pointer = typename iterator_traits::pointer;
+    using reference = typename iterator_traits::reference;
+    using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::bidirectional_iterator_tag;
 
     constexpr runtime_view_iterator() noexcept
