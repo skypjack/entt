@@ -265,6 +265,11 @@ TEST(NthArgument, Functionalities) {
     testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(&clazz::quux)>, bool>();
 
     ASSERT_EQ(free_function(entt::nth_argument_t<0u, decltype(&free_function)>{}, entt::nth_argument_t<1u, decltype(&free_function)>{}), 64);
+
+    [[maybe_unused]] auto lambda = [value = 0u](int, float &) { return value; };
+
+    testing::StaticAssertTypeEq<entt::nth_argument_t<0u, decltype(lambda)>, int>();
+    testing::StaticAssertTypeEq<entt::nth_argument_t<1u, decltype(lambda)>, float &>();
 }
 
 TEST(Tag, Functionalities) {

@@ -873,9 +873,9 @@ template<typename Member>
 using member_class_t = typename member_class<Member>::type;
 
 /**
- * @brief Extracts the n-th argument of a given function or member function.
+ * @brief Extracts the n-th argument of a _callable_ type.
  * @tparam Index The index of the argument to extract.
- * @tparam Candidate A valid function, member function or data member type.
+ * @tparam Candidate A valid _callable_ type.
  */
 template<std::size_t Index, typename Candidate>
 class nth_argument {
@@ -891,8 +891,11 @@ class nth_argument {
     template<typename Type, typename Class>
     static constexpr type_list<Type> pick_up(Type Class ::*);
 
+    template<typename Type>
+    static constexpr decltype(pick_up(&Type::operator())) pick_up(Type &&);
+
 public:
-    /*! @brief N-th argument of the given function or member function. */
+    /*! @brief N-th argument of the _callable_ type. */
     using type = type_list_element_t<Index, decltype(pick_up(std::declval<Candidate>()))>;
 };
 
