@@ -54,18 +54,19 @@ class view_iterator final {
     friend struct extended_view_iterator;
 
     using iterator_type = typename Type::const_iterator;
+    using iterator_traits = std::iterator_traits<iterator_type>;
 
-    [[nodiscard]] bool valid(const typename iterator_type::value_type entt) const noexcept {
+    [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
         return ((Get != 1u) || (entt != tombstone))
                && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
                && internal::none_of(filter.begin(), filter.end(), entt);
     }
 
 public:
-    using value_type = typename iterator_type::value_type;
-    using pointer = typename iterator_type::pointer;
-    using reference = typename iterator_type::reference;
-    using difference_type = typename iterator_type::difference_type;
+    using value_type = typename iterator_traits::value_type;
+    using pointer = typename iterator_traits::pointer;
+    using reference = typename iterator_traits::reference;
+    using difference_type = typename iterator_traits::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
     constexpr view_iterator() noexcept
