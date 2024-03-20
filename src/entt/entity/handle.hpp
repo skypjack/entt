@@ -159,7 +159,8 @@ struct basic_handle {
 
     /**
      * @brief Checks if a handle refers to non-null registry pointer and entity.
-     * @return True if the handle refers to non-null registry and entity, false otherwise.
+     * @return True if the handle refers to non-null registry and entity, false
+     * otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
         return reg && reg->valid(entt);
