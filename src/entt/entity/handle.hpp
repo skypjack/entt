@@ -94,7 +94,8 @@ template<typename ILhs, typename IRhs>
  * @tparam Scope Types to which to restrict the scope of a handle.
  */
 template<typename Registry, typename... Scope>
-struct basic_handle {
+class basic_handle {
+public:
     /*! @brief Type of registry accepted by the handle. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */

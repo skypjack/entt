@@ -50,7 +50,7 @@ template<typename>
 class basic_organizer;
 
 template<typename, typename...>
-struct basic_handle;
+class basic_handle;
 
 template<typename>
 class basic_snapshot;
