@@ -104,6 +104,8 @@ public:
     using version_type = typename registry_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename registry_type::size_type;
+    /*! @brief Iterable handle type. */
+    using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(std::declval<registry_type>().storage())::iterator>>;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() noexcept
@@ -129,10 +131,9 @@ public:
      *
      * @return An iterable object to use to _visit_ the handle.
      */
-    [[nodiscard]] auto storage() const noexcept {
-        auto iterable = owner->storage();
-        using iterator_type = internal::handle_storage_iterator<typename decltype(iterable)::iterator>;
-        return iterable_adaptor{iterator_type{entt, iterable.begin(), iterable.end()}, iterator_type{entt, iterable.end(), iterable.end()}};
+    [[nodiscard]] iterable storage() const noexcept {
+        auto underlying = owner->storage();
+        return iterable{{entt, underlying.begin(), underlying.end()}, {entt, underlying.end(), underlying.end()}};
     }
 
     /**
