@@ -299,3 +299,36 @@ TYPED_TEST(BasicHandle, HandleStorageIterator) {
     ASSERT_EQ(begin++, iterable.begin());
     ASSERT_EQ(++begin, iterable.end());
 }
+
+TYPED_TEST(BasicHandle, Null) {
+    using handle_type = typename TestFixture::type;
+
+    handle_type handle{};
+
+    ASSERT_TRUE(handle == entt::null);
+    ASSERT_TRUE(entt::null == handle);
+
+    ASSERT_FALSE(handle != entt::null);
+    ASSERT_FALSE(entt::null != handle);
+
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    handle = handle_type{registry, entity};
+
+    ASSERT_FALSE(handle == entt::null);
+    ASSERT_FALSE(entt::null == handle);
+
+    ASSERT_TRUE(handle != entt::null);
+    ASSERT_TRUE(entt::null != handle);
+
+    if constexpr(!std::is_const_v<typename handle_type::registry_type>) {
+        handle.destroy();
+
+        ASSERT_TRUE(handle == entt::null);
+        ASSERT_TRUE(entt::null == handle);
+
+        ASSERT_FALSE(handle != entt::null);
+        ASSERT_FALSE(entt::null != handle);
+    }
+}

@@ -145,7 +145,6 @@ struct basic_handle {
     operator basic_handle<Other, Args...>() const noexcept {
         static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
-
         return reg ? basic_handle<Other, Args...>{*reg, entt} : basic_handle<Other, Args...>{};
     }
 
@@ -371,6 +370,54 @@ template<typename... Args, typename... Other>
 template<typename... Args, typename... Other>
 [[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
     return !(lhs == rhs);
+}
+
+/**
+ * @brief Compares a handle with the null object.
+ * @tparam Args Scope of the handle.
+ * @param lhs A valid handle.
+ * @param rhs A null object yet to be converted.
+ * @return False if the two elements differ, true otherwise.
+ */
+template<typename... Args>
+[[nodiscard]] constexpr bool operator==(const basic_handle<Args...> &lhs, const null_t rhs) noexcept {
+    return (lhs.entity() == rhs);
+}
+
+/**
+ * @brief Compares a handle with the null object.
+ * @tparam Args Scope of the handle.
+ * @param lhs A null object yet to be converted.
+ * @param rhs A valid handle.
+ * @return False if the two elements differ, true otherwise.
+ */
+template<typename... Args>
+[[nodiscard]] constexpr bool operator==(const null_t lhs, const basic_handle<Args...> &rhs) noexcept {
+    return (rhs == lhs);
+}
+
+/**
+ * @brief Compares a handle with the null object.
+ * @tparam Args Scope of the handle.
+ * @param lhs A valid handle.
+ * @param rhs A null object yet to be converted.
+ * @return True if the two elements differ, false otherwise.
+ */
+template<typename... Args>
+[[nodiscard]] constexpr bool operator!=(const basic_handle<Args...> &lhs, const null_t rhs) noexcept {
+    return (lhs.entity() != rhs);
+}
+
+/**
+ * @brief Compares a handle with the null object.
+ * @tparam Args Scope of the handle.
+ * @param lhs A null object yet to be converted.
+ * @param rhs A valid handle.
+ * @return True if the two elements differ, false otherwise.
+ */
+template<typename... Args>
+[[nodiscard]] constexpr bool operator!=(const null_t lhs, const basic_handle<Args...> &rhs) noexcept {
+    return (rhs != lhs);
 }
 
 } // namespace entt
