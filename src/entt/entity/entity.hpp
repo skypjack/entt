@@ -264,25 +264,25 @@ struct null_t {
 /**
  * @brief Compares a null object and an identifier of any type.
  * @tparam Entity Type of identifier.
- * @param entity Identifier with which to compare.
- * @param other A null object yet to be converted.
+ * @param lhs Identifier with which to compare.
+ * @param rhs A null object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, const null_t other) noexcept {
-    return other.operator==(entity);
+[[nodiscard]] constexpr bool operator==(const Entity lhs, const null_t rhs) noexcept {
+    return rhs.operator==(lhs);
 }
 
 /**
  * @brief Compares a null object and an identifier of any type.
  * @tparam Entity Type of identifier.
- * @param entity Identifier with which to compare.
- * @param other A null object yet to be converted.
+ * @param lhs Identifier with which to compare.
+ * @param rhs A null object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, const null_t other) noexcept {
-    return !(other == entity);
+[[nodiscard]] constexpr bool operator!=(const Entity lhs, const null_t rhs) noexcept {
+    return !(rhs == lhs);
 }
 
 /*! @brief Tombstone object for all identifiers.  */
@@ -349,25 +349,25 @@ struct tombstone_t {
 /**
  * @brief Compares a tombstone object and an identifier of any type.
  * @tparam Entity Type of identifier.
- * @param entity Identifier with which to compare.
- * @param other A tombstone object yet to be converted.
+ * @param lhs Identifier with which to compare.
+ * @param rhs A tombstone object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, const tombstone_t other) noexcept {
-    return other.operator==(entity);
+[[nodiscard]] constexpr bool operator==(const Entity lhs, const tombstone_t rhs) noexcept {
+    return rhs.operator==(lhs);
 }
 
 /**
  * @brief Compares a tombstone object and an identifier of any type.
  * @tparam Entity Type of identifier.
- * @param entity Identifier with which to compare.
- * @param other A tombstone object yet to be converted.
+ * @param lhs Identifier with which to compare.
+ * @param rhs A tombstone object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, const tombstone_t other) noexcept {
-    return !(other == entity);
+[[nodiscard]] constexpr bool operator!=(const Entity lhs, const tombstone_t rhs) noexcept {
+    return !(rhs == lhs);
 }
 
 /**
