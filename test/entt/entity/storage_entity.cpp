@@ -334,21 +334,18 @@ TEST(StorageEntity, FreeList) {
 
     ASSERT_EQ(pool.free_list(), 1u);
     ASSERT_EQ(pool.begin(), pool.begin(0));
-    ASSERT_EQ(pool.end(), pool.end());
     ASSERT_EQ(pool.size(), 1u);
 
     pool.free_list(0u);
 
     ASSERT_EQ(pool.free_list(), 0u);
     ASSERT_NE(pool.begin(), pool.begin(0));
-    ASSERT_EQ(pool.end(), pool.end());
     ASSERT_EQ(pool.size(), 1u);
 
     pool.free_list(1u);
 
     ASSERT_EQ(pool.free_list(), 1u);
     ASSERT_EQ(pool.begin(), pool.begin(0));
-    ASSERT_EQ(pool.end(), pool.end());
     ASSERT_EQ(pool.size(), 1u);
 }
 

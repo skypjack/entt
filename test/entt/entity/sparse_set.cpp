@@ -607,27 +607,23 @@ TYPED_TEST(SparseSet, ScopedIterator) {
         switch(policy) {
         case entt::deletion_policy::swap_and_pop:
         case entt::deletion_policy::in_place: {
-            ASSERT_EQ(set.begin(), set.begin());
-            ASSERT_EQ(set.end(), set.end());
+            ASSERT_NE(set.begin(), set.end());
             ASSERT_NE(set.cbegin(), set.cend());
         } break;
         case entt::deletion_policy::swap_only: {
             ASSERT_NE(set.begin(), set.begin(0));
             ASSERT_EQ(set.begin() + 1, set.begin(0));
-            ASSERT_EQ(set.end(), set.end());
             ASSERT_NE(set.cbegin(0), set.cend());
 
             set.free_list(0);
 
             ASSERT_NE(set.begin(), set.begin(0));
             ASSERT_EQ(set.begin() + 2, set.begin(0));
-            ASSERT_EQ(set.end(), set.end());
             ASSERT_EQ(set.cbegin(0), set.cend());
 
             set.free_list(2);
 
             ASSERT_EQ(set.begin(), set.begin(0));
-            ASSERT_EQ(set.end(), set.end());
             ASSERT_NE(set.cbegin(0), set.cend());
         } break;
         }
@@ -651,26 +647,22 @@ TYPED_TEST(SparseSet, ScopedReverseIterator) {
         switch(policy) {
         case entt::deletion_policy::swap_and_pop:
         case entt::deletion_policy::in_place: {
-            ASSERT_EQ(set.rbegin(), set.rbegin());
-            ASSERT_EQ(set.rend(), set.rend(0));
-            ASSERT_NE(set.crbegin(), set.crend(0));
+            ASSERT_NE(set.rbegin(), set.rend());
+            ASSERT_NE(set.crbegin(), set.crend());
         } break;
         case entt::deletion_policy::swap_only: {
-            ASSERT_EQ(set.rbegin(), set.rbegin());
             ASSERT_NE(set.rend(), set.rend(0));
             ASSERT_EQ(set.rend() - 1, set.rend(0));
             ASSERT_NE(set.crbegin(), set.crend(0));
 
             set.free_list(0);
 
-            ASSERT_EQ(set.rbegin(), set.rbegin());
             ASSERT_NE(set.rend(), set.rend(0));
             ASSERT_EQ(set.rend() - 2, set.rend(0));
             ASSERT_EQ(set.crbegin(), set.crend(0));
 
             set.free_list(2);
 
-            ASSERT_EQ(set.rbegin(), set.rbegin());
             ASSERT_EQ(set.rend(), set.rend(0));
             ASSERT_NE(set.crbegin(), set.crend(0));
         } break;
