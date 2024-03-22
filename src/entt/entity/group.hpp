@@ -963,7 +963,7 @@ public:
      */
     [[nodiscard]] iterable each() const noexcept {
         const auto cpools = pools();
-        return {{begin(), cpools}, {end(), cpools}};
+        return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
     /**

@@ -402,12 +402,12 @@ public:
      * @return An iterable object to use to _visit_ the registry.
      */
     [[nodiscard]] iterable storage() noexcept {
-        return iterable_adaptor{internal::registry_storage_iterator{pools.begin()}, internal::registry_storage_iterator{pools.end()}};
+        return iterable{pools.begin(), pools.end()};
     }
 
     /*! @copydoc storage */
     [[nodiscard]] const_iterable storage() const noexcept {
-        return iterable_adaptor{internal::registry_storage_iterator{pools.cbegin()}, internal::registry_storage_iterator{pools.cend()}};
+        return const_iterable{pools.cbegin(), pools.cend()};
     }
 
     /**

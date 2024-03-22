@@ -742,12 +742,12 @@ public:
      * @return An iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] iterable each() noexcept {
-        return {internal::extended_storage_iterator{base_type::begin(), begin()}, internal::extended_storage_iterator{base_type::end(), end()}};
+        return iterable{{base_type::begin(), begin()}, {base_type::end(), end()}};
     }
 
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
-        return {internal::extended_storage_iterator{base_type::cbegin(), cbegin()}, internal::extended_storage_iterator{base_type::cend(), cend()}};
+        return const_iterable{{base_type::cbegin(), cbegin()}, {base_type::cend(), cend()}};
     }
 
     /**
@@ -758,12 +758,12 @@ public:
      * @return A reverse iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] reverse_iterable reach() noexcept {
-        return {internal::extended_storage_iterator{base_type::rbegin(), rbegin()}, internal::extended_storage_iterator{base_type::rend(), rend()}};
+        return reverse_iterable{{base_type::rbegin(), rbegin()}, {base_type::rend(), rend()}};
     }
 
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
-        return {internal::extended_storage_iterator{base_type::crbegin(), crbegin()}, internal::extended_storage_iterator{base_type::crend(), crend()}};
+        return const_reverse_iterable{{base_type::crbegin(), crbegin()}, {base_type::crend(), crend()}};
     }
 
 private:
@@ -917,12 +917,12 @@ public:
      * @return An iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] iterable each() noexcept {
-        return {internal::extended_storage_iterator{base_type::begin()}, internal::extended_storage_iterator{base_type::end()}};
+        return iterable{base_type::begin(), base_type::end()};
     }
 
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
-        return {internal::extended_storage_iterator{base_type::cbegin()}, internal::extended_storage_iterator{base_type::cend()}};
+        return const_iterable{base_type::cbegin(), base_type::cend()};
     }
 
     /**
@@ -933,12 +933,12 @@ public:
      * @return A reverse iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] reverse_iterable reach() noexcept {
-        return {internal::extended_storage_iterator{base_type::rbegin()}, internal::extended_storage_iterator{base_type::rend()}};
+        return reverse_iterable{{base_type::rbegin()}, {base_type::rend()}};
     }
 
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
-        return {internal::extended_storage_iterator{base_type::crbegin()}, internal::extended_storage_iterator{base_type::crend()}};
+        return const_reverse_iterable{{base_type::crbegin()}, {base_type::crend()}};
     }
 };
 
