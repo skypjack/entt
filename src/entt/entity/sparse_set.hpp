@@ -676,17 +676,17 @@ public:
 
     /*! @copydoc cend Useful only in case of swap-only policy. */
     [[nodiscard]] const_iterator cend(int) const noexcept {
-        return end(0);
+        return end();
     }
 
     /*! @copydoc rbegin Useful only in case of swap-only policy. */
     [[nodiscard]] reverse_iterator rbegin(int) const noexcept {
-        return std::make_reverse_iterator(end(0));
+        return std::make_reverse_iterator(end());
     }
 
     /*! @copydoc rbegin Useful only in case of swap-only policy. */
     [[nodiscard]] const_reverse_iterator crbegin(int) const noexcept {
-        return rbegin(0);
+        return rbegin();
     }
 
     /*! @copydoc rbegin Useful only in case of swap-only policy. */
@@ -1025,7 +1025,7 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        sort_n(static_cast<size_type>(end(0) - begin(0)), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        sort_n(static_cast<size_type>(end() - begin(0)), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**
@@ -1046,7 +1046,7 @@ public:
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         auto it = begin(0);
 
-        for(const auto other = end(0); (it != other) && (first != last); ++first) {
+        for(const auto other = end(); (it != other) && (first != last); ++first) {
             if(const auto curr = *first; contains(curr)) {
                 if(const auto entt = *it; entt != curr) {
                     // basic no-leak guarantee (with invalid state) if swapping throws
