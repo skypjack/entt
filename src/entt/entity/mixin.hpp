@@ -37,11 +37,12 @@ class basic_sigh_mixin final: public Type {
 
     static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
 
-    owner_type &owner_or_assert() const noexcept {
+    auto &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         return static_cast<owner_type &>(*owner);
     }
 
+private:
     void pop(underlying_iterator first, underlying_iterator last) final {
         if(auto &reg = owner_or_assert(); destruction.empty()) {
             underlying_type::pop(first, last);
