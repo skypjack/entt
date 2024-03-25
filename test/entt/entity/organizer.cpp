@@ -64,15 +64,30 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 2u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 2u);
+    ASSERT_EQ(graph[1u].successors().size(), 1u);
+    ASSERT_EQ(graph[2u].successors().size(), 1u);
+    ASSERT_EQ(graph[3u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[0u].children()[1u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 3u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[0u].successors()[0u], 1u);
+    ASSERT_EQ(graph[0u].successors()[1u], 2u);
+    ASSERT_EQ(graph[1u].successors()[0u], 3u);
+    ASSERT_EQ(graph[2u].successors()[0u], 3u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+    ASSERT_EQ(graph[3u].successors(), graph[3u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[3u].predecessors().size(), 2u);
+
+    ASSERT_EQ(graph[1u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[2u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[3u].predecessors()[0u], 1u);
+    ASSERT_EQ(graph[3u].predecessors()[1u], 2u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -122,14 +137,28 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 1u);
+    ASSERT_EQ(graph[1u].successors().size(), 1u);
+    ASSERT_EQ(graph[2u].successors().size(), 1u);
+    ASSERT_EQ(graph[3u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[0u].successors()[0u], 1u);
+    ASSERT_EQ(graph[1u].successors()[0u], 2u);
+    ASSERT_EQ(graph[2u].successors()[0u], 3u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+    ASSERT_EQ(graph[3u].successors(), graph[3u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[3u].predecessors().size(), 1u);
+
+    ASSERT_EQ(graph[1u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[2u].predecessors()[0u], 1u);
+    ASSERT_EQ(graph[3u].predecessors()[0u], 2u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -185,16 +214,33 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_FALSE(graph[3u].top_level());
     ASSERT_FALSE(graph[4u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 1u);
-    ASSERT_EQ(graph[4u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 1u);
+    ASSERT_EQ(graph[1u].successors().size(), 1u);
+    ASSERT_EQ(graph[2u].successors().size(), 1u);
+    ASSERT_EQ(graph[3u].successors().size(), 1u);
+    ASSERT_EQ(graph[4u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 4u);
-    ASSERT_EQ(graph[1u].children()[0u], 4u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
-    ASSERT_EQ(graph[3u].children()[0u], 4u);
+    ASSERT_EQ(graph[0u].successors()[0u], 4u);
+    ASSERT_EQ(graph[1u].successors()[0u], 4u);
+    ASSERT_EQ(graph[2u].successors()[0u], 3u);
+    ASSERT_EQ(graph[3u].successors()[0u], 4u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+    ASSERT_EQ(graph[3u].successors(), graph[3u].children());
+    ASSERT_EQ(graph[4u].successors(), graph[4u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[3u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[4u].predecessors().size(), 3u);
+
+    ASSERT_EQ(graph[4u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[4u].predecessors()[1u], 1u);
+    ASSERT_EQ(graph[3u].predecessors()[0u], 2u);
+    ASSERT_EQ(graph[4u].predecessors()[2u], 3u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -261,14 +307,28 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 1u);
+    ASSERT_EQ(graph[1u].successors().size(), 1u);
+    ASSERT_EQ(graph[2u].successors().size(), 1u);
+    ASSERT_EQ(graph[3u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[0u].successors()[0u], 1u);
+    ASSERT_EQ(graph[1u].successors()[0u], 2u);
+    ASSERT_EQ(graph[2u].successors()[0u], 3u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+    ASSERT_EQ(graph[3u].successors(), graph[3u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[3u].predecessors().size(), 1u);
+
+    ASSERT_EQ(graph[1u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[2u].predecessors()[0u], 1u);
+    ASSERT_EQ(graph[3u].predecessors()[0u], 2u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -310,19 +370,40 @@ TEST(Organizer, SyncPoint) {
     ASSERT_FALSE(graph[4u].top_level());
     ASSERT_FALSE(graph[5u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 2u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 1u);
-    ASSERT_EQ(graph[4u].children().size(), 1u);
-    ASSERT_EQ(graph[5u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 1u);
+    ASSERT_EQ(graph[1u].successors().size(), 2u);
+    ASSERT_EQ(graph[2u].successors().size(), 1u);
+    ASSERT_EQ(graph[3u].successors().size(), 1u);
+    ASSERT_EQ(graph[4u].successors().size(), 1u);
+    ASSERT_EQ(graph[5u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[1u].children()[1u], 3u);
-    ASSERT_EQ(graph[2u].children()[0u], 4u);
-    ASSERT_EQ(graph[3u].children()[0u], 4u);
-    ASSERT_EQ(graph[4u].children()[0u], 5u);
+    ASSERT_EQ(graph[0u].successors()[0u], 1u);
+    ASSERT_EQ(graph[1u].successors()[0u], 2u);
+    ASSERT_EQ(graph[1u].successors()[1u], 3u);
+    ASSERT_EQ(graph[2u].successors()[0u], 4u);
+    ASSERT_EQ(graph[3u].successors()[0u], 4u);
+    ASSERT_EQ(graph[4u].successors()[0u], 5u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+    ASSERT_EQ(graph[3u].successors(), graph[3u].children());
+    ASSERT_EQ(graph[4u].successors(), graph[4u].children());
+    ASSERT_EQ(graph[5u].successors(), graph[5u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[3u].predecessors().size(), 1u);
+    ASSERT_EQ(graph[4u].predecessors().size(), 2u);
+    ASSERT_EQ(graph[5u].predecessors().size(), 1u);
+
+    ASSERT_EQ(graph[1u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[2u].predecessors()[0u], 1u);
+    ASSERT_EQ(graph[3u].predecessors()[0u], 1u);
+    ASSERT_EQ(graph[4u].predecessors()[0u], 2u);
+    ASSERT_EQ(graph[4u].predecessors()[1u], 3u);
+    ASSERT_EQ(graph[5u].predecessors()[0u], 4u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -349,12 +430,23 @@ TEST(Organizer, Override) {
     ASSERT_TRUE(graph[1u].top_level());
     ASSERT_FALSE(graph[2u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].successors().size(), 1u);
+    ASSERT_EQ(graph[1u].successors().size(), 1u);
+    ASSERT_EQ(graph[2u].successors().size(), 0u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
+    ASSERT_EQ(graph[0u].successors()[0u], 2u);
+    ASSERT_EQ(graph[1u].successors()[0u], 2u);
+
+    ASSERT_EQ(graph[0u].successors(), graph[0u].children());
+    ASSERT_EQ(graph[1u].successors(), graph[1u].children());
+    ASSERT_EQ(graph[2u].successors(), graph[2u].children());
+
+    ASSERT_EQ(graph[0u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[1u].predecessors().size(), 0u);
+    ASSERT_EQ(graph[2u].predecessors().size(), 2u);
+
+    ASSERT_EQ(graph[2u].predecessors()[0u], 0u);
+    ASSERT_EQ(graph[2u].predecessors()[1u], 1u);
 }
 
 TEST(Organizer, Prepare) {
