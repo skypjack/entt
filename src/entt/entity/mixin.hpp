@@ -58,16 +58,18 @@ private:
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            for(auto it = underlying_type::base_type::begin(0), last = underlying_type::base_type::end(0); it != last; ++it) {
-                if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
-                    destruction.publish(reg, *it);
-                } else {
+            if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
+                for(typename Type::size_type pos{}, last = Type::free_list(); pos < last; ++pos) {
+                    destruction.publish(reg, underlying_type::base_type::operator[](pos));
+                }
+            } else {
+                for(auto entt: static_cast<typename underlying_type::base_type &>(*this)) {
                     if constexpr(component_traits<typename underlying_type::element_type>::in_place_delete) {
-                        if(const auto entt = *it; entt != tombstone) {
+                        if(entt != tombstone) {
                             destruction.publish(reg, entt);
                         }
                     } else {
-                        destruction.publish(reg, *it);
+                        destruction.publish(reg, entt);
                     }
                 }
             }
