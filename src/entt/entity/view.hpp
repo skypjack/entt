@@ -288,7 +288,12 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return (index != Get) ? iterator{pools[index]->begin(0), pools, filter, index} : iterator{};
+        if(index != Get) {
+            const auto it = (pools[index]->policy() == deletion_policy::swap_only) ? (pools[index]->end() - pools[index]->free_list()) : pools[index]->begin();
+            return iterator{it, pools, filter, index};
+        }
+
+        return iterator{};
     }
 
     /**
@@ -316,10 +321,10 @@ public:
      */
     [[nodiscard]] entity_type back() const noexcept {
         if(index != Get) {
-            auto it = pools[index]->rbegin();
-            const auto last = pools[index]->rend(0);
-            for(; it != last && !contains(*it); ++it) {}
-            return it == last ? null : *it;
+            size_type pos{};
+            const size_type last = (pools[index]->policy() == deletion_policy::swap_only) ? pools[index]->free_list() : pools[index]->size();
+            for(; pos != last && !contains((*pools[index])[pos]); ++pos) {}
+            return pos == last ? null : (*pools[index])[pos];
         }
 
         return null;
@@ -351,7 +356,7 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         return (index != Get)
                && internal::all_of(pools.begin(), pools.end(), entt)
-               && !(pools[index]->index(entt) > static_cast<size_type>(pools[index]->begin(0).index()))
+               && ((pools[index]->policy() != deletion_policy::swap_only) || (pools[index]->index(entt) < pools[index]->free_list()))
                && internal::none_of(filter.begin(), filter.end(), entt);
     }
 
