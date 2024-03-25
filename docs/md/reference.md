@@ -59,6 +59,8 @@ details.
     an archetype ECS with focus on performance, cache locality and DX.
   * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
     Component System framework.
+  * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
+    featuring rollbacks.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
     platform agnostic and table based ECS framework.
 
@@ -81,7 +83,6 @@ details.
     entity registry for ECS designs inspired by `EnTT`.
 
 * Rust:
-  * [Legion](https://github.com/TomGillen/legion): a chunk based archetype ECS.
   * [Shipyard](https://github.com/leudz/shipyard): it borrows some ideas from
     `EnTT` and offers a sparse sets based ECS with grouping functionalities.
   * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set based ECS
