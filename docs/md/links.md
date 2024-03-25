@@ -137,6 +137,8 @@ I hope the following lists can grow much more in the future.
     Interstellar Observation Network (a space shooter game).
   * [EnTT Boids](https://github.com/DanielEliasib/entt_boids): a simple boids
     implementation using `EnTT` and `Raylib`.
+  * [PalmRide: After Flight](https://store.steampowered.com/app/2812540/PalmRide_After_Flight/):
+    an on-rails shooter with retro outrun aesthetics.
 
 ## Engines and the like:
 
