@@ -332,21 +332,18 @@ TEST(StorageEntity, FreeList) {
 
     pool.emplace(entt::entity{0});
 
-    ASSERT_EQ(pool.free_list(), 1u);
-    ASSERT_EQ(pool.begin(), pool.begin(0));
     ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(pool.free_list(), 1u);
 
     pool.free_list(0u);
 
-    ASSERT_EQ(pool.free_list(), 0u);
-    ASSERT_NE(pool.begin(), pool.begin(0));
     ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(pool.free_list(), 0u);
 
     pool.free_list(1u);
 
-    ASSERT_EQ(pool.free_list(), 1u);
-    ASSERT_EQ(pool.begin(), pool.begin(0));
     ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 ENTT_DEBUG_TEST(StorageEntityDeathTest, FreeList) {
@@ -589,7 +586,7 @@ TEST(StorageEntity, SortOrdered) {
     pool.push(entity.begin(), entity.end());
     pool.sort(std::less{});
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(0), pool.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(), pool.end()));
 }
 
 TEST(StorageEntity, SortReverse) {
@@ -600,7 +597,7 @@ TEST(StorageEntity, SortReverse) {
     pool.push(entity.begin(), entity.end());
     pool.sort(std::less{});
 
-    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.begin(0), pool.end()));
+    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.begin(), pool.end()));
 }
 
 TEST(StorageEntity, SortUnordered) {
@@ -626,7 +623,7 @@ TEST(StorageEntity, SortN) {
     pool.push(entity.begin(), entity.end());
     pool.sort_n(0u, std::less{});
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(0), pool.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.begin(), pool.end()));
 
     pool.sort_n(2u, std::less{});
 
@@ -652,11 +649,11 @@ TEST(StorageEntity, SortAsDisjoint) {
 
     lhs.push(entity.begin(), entity.end());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(0), lhs.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(), lhs.end()));
 
-    lhs.sort_as(rhs.begin(0), rhs.end());
+    lhs.sort_as(rhs.begin(), rhs.end());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(0), lhs.end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(), lhs.end()));
 }
 
 TEST(StorageEntity, SortAsOverlap) {
@@ -669,10 +666,10 @@ TEST(StorageEntity, SortAsOverlap) {
     lhs.push(lhs_entity.begin(), lhs_entity.end());
     rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end()));
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-    lhs.sort_as(rhs.begin(0), rhs.end());
+    lhs.sort_as(rhs.begin(), rhs.end());
 
     ASSERT_EQ(lhs.data()[0u], lhs_entity[0u]);
     ASSERT_EQ(lhs.data()[1u], lhs_entity[2u]);
@@ -689,12 +686,12 @@ TEST(StorageEntity, SortAsOrdered) {
     lhs.push(lhs_entity.begin(), lhs_entity.end());
     rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end()));
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.begin(0), lhs.end());
+    rhs.sort_as(lhs.begin(), lhs.end());
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 }
 
 TEST(StorageEntity, SortAsReverse) {
@@ -707,10 +704,10 @@ TEST(StorageEntity, SortAsReverse) {
     lhs.push(lhs_entity.begin(), lhs_entity.end());
     rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end()));
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.begin(0), lhs.end());
+    rhs.sort_as(lhs.begin(), lhs.end());
 
     ASSERT_EQ(rhs.data()[0u], rhs_entity[5u]);
     ASSERT_EQ(rhs.data()[1u], rhs_entity[4u]);
@@ -730,10 +727,10 @@ TEST(StorageEntity, SortAsUnordered) {
     lhs.push(lhs_entity.begin(), lhs_entity.end());
     rhs.push(rhs_entity.begin(), rhs_entity.end());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(0), lhs.end()));
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(0), rhs.end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.begin(), lhs.end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.begin(0), lhs.end());
+    rhs.sort_as(lhs.begin(), lhs.end());
 
     ASSERT_EQ(rhs.data()[0u], rhs_entity[2u]);
     ASSERT_EQ(rhs.data()[1u], rhs_entity[3u]);
