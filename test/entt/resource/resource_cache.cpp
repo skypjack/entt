@@ -30,7 +30,7 @@ struct loader {
     }
 
     template<typename... Args>
-    result_type operator()(broken_tag, Args &&...) const {
+    result_type operator()(broken_tag) const {
         return {};
     }
 };
