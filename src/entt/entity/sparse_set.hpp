@@ -366,7 +366,7 @@ protected:
             break;
         }
 
-        return --(end() - pos);
+        return --(end() - static_cast<typename iterator::difference_type>(pos));
     }
 
 public:
