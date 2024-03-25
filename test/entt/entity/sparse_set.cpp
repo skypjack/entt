@@ -1856,7 +1856,7 @@ TYPED_TEST(SparseSet, SortAsDisjoint) {
 
         const auto it = lhs.sort_as(rhs.begin(), rhs.end());
 
-        ASSERT_EQ(it, lhs.begin(0));
+        ASSERT_EQ(it, lhs.begin());
         ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.begin(), lhs.end()));
     }
 }
@@ -1880,7 +1880,7 @@ TYPED_TEST(SparseSet, SortAsOverlap) {
 
         const auto it = lhs.sort_as(rhs.begin(), rhs.end());
 
-        ASSERT_EQ(it, lhs.begin(0) + rhs_entity.size());
+        ASSERT_EQ(it, lhs.begin() + rhs_entity.size());
 
         auto begin = lhs.begin();
         const auto end = lhs.end();
@@ -1911,7 +1911,7 @@ TYPED_TEST(SparseSet, SortAsOrdered) {
 
         const auto it = rhs.sort_as(lhs.begin(), lhs.end());
 
-        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
+        ASSERT_EQ(it, rhs.begin() + lhs_entity.size());
         ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.begin(), rhs.end()));
     }
 }
@@ -1935,7 +1935,7 @@ TYPED_TEST(SparseSet, SortAsReverse) {
 
         const auto it = rhs.sort_as(lhs.begin(), lhs.end());
 
-        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
+        ASSERT_EQ(it, rhs.begin() + lhs_entity.size());
 
         auto begin = rhs.begin();
         const auto end = rhs.end();
@@ -1969,7 +1969,7 @@ TYPED_TEST(SparseSet, SortAsUnordered) {
 
         const auto it = rhs.sort_as(lhs.begin(), lhs.end());
 
-        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size());
+        ASSERT_EQ(it, rhs.begin() + lhs_entity.size());
 
         auto begin = rhs.begin();
         const auto end = rhs.end();
@@ -2004,7 +2004,7 @@ TYPED_TEST(SparseSet, SortAsInvalid) {
 
         const auto it = rhs.sort_as(lhs.begin(), lhs.end());
 
-        ASSERT_EQ(it, rhs.begin(0) + lhs_entity.size() - 1u);
+        ASSERT_EQ(it, rhs.begin() + lhs_entity.size() - 1u);
 
         auto begin = rhs.begin();
         const auto end = rhs.end();
