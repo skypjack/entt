@@ -659,46 +659,6 @@ public:
         return rend();
     }
 
-    /*! @copydoc begin Useful only in case of swap-only policy. */
-    [[nodiscard]] iterator begin(int) const noexcept {
-        return (mode == deletion_policy::swap_only) ? (end() - static_cast<typename iterator::difference_type>(head)) : begin();
-    }
-
-    /*! @copydoc cbegin Useful only in case of swap-only policy. */
-    [[nodiscard]] const_iterator cbegin(int) const noexcept {
-        return begin(0);
-    }
-
-    /*! @copydoc end Useful only in case of swap-only policy. */
-    [[nodiscard]] iterator end(int) const noexcept {
-        return end();
-    }
-
-    /*! @copydoc cend Useful only in case of swap-only policy. */
-    [[nodiscard]] const_iterator cend(int) const noexcept {
-        return end();
-    }
-
-    /*! @copydoc rbegin Useful only in case of swap-only policy. */
-    [[nodiscard]] reverse_iterator rbegin(int) const noexcept {
-        return std::make_reverse_iterator(end());
-    }
-
-    /*! @copydoc rbegin Useful only in case of swap-only policy. */
-    [[nodiscard]] const_reverse_iterator crbegin(int) const noexcept {
-        return rbegin();
-    }
-
-    /*! @copydoc rbegin Useful only in case of swap-only policy. */
-    [[nodiscard]] reverse_iterator rend(int) const noexcept {
-        return std::make_reverse_iterator(begin(0));
-    }
-
-    /*! @copydoc rbegin Useful only in case of swap-only policy. */
-    [[nodiscard]] const_reverse_iterator crend(int) const noexcept {
-        return rend(0);
-    }
-
     /**
      * @brief Finds an entity.
      * @param entt A valid identifier.
