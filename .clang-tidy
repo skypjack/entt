@@ -3,6 +3,7 @@ Checks: >
     concurrency-*,
     cppcoreguidelines-*,
     misc-*,
+    -misc-include-cleaner,
     -misc-no-recursion,
     modernize-*,
     -modernize-use-trailing-return-type,
