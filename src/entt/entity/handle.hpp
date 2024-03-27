@@ -5,6 +5,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
@@ -95,6 +96,11 @@ template<typename ILhs, typename IRhs>
  */
 template<typename Registry, typename... Scope>
 class basic_handle {
+    auto &owner_or_assert() const noexcept {
+        ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
+        return static_cast<Registry &>(*owner);
+    }
+
 public:
     /*! @brief Type of registry accepted by the handle. */
     using registry_type = Registry;
@@ -132,30 +138,13 @@ public:
      * @return An iterable object to use to _visit_ the handle.
      */
     [[nodiscard]] iterable storage() const noexcept {
-        auto underlying = owner->storage();
+        auto underlying = owner_or_assert().storage();
         return iterable{{entt, underlying.begin(), underlying.end()}, {entt, underlying.end(), underlying.end()}};
     }
 
-    /**
-     * @brief Constructs a const handle from a non-const one.
-     * @tparam Other A valid entity type.
-     * @tparam Args Scope of the handle to construct.
-     * @return A const handle referring to the same registry and the same
-     * entity.
-     */
-    template<typename Other, typename... Args>
-    operator basic_handle<Other, Args...>() const noexcept {
-        static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
-        static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
-        return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
-    }
-
-    /**
-     * @brief Converts a handle to its underlying entity.
-     * @return The contained identifier.
-     */
-    [[nodiscard]] operator entity_type() const noexcept {
-        return entity();
+    /*! @copydoc valid */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return owner && owner->valid(entt);
     }
 
     /**
@@ -163,16 +152,8 @@ public:
      * @return True if the handle refers to non-null registry and entity, false
      * otherwise.
      */
-    [[nodiscard]] explicit operator bool() const noexcept {
-        return owner && owner->valid(entt);
-    }
-
-    /**
-     * @brief Checks if a handle refers to a valid entity or not.
-     * @return True if the handle refers to a valid entity, false otherwise.
-     */
     [[nodiscard]] bool valid() const {
-        return owner->valid(entt);
+        return static_cast<bool>(*this);
     }
 
     /**
@@ -191,9 +172,14 @@ public:
         return entt;
     }
 
+    /*! @copydoc entity */
+    [[nodiscard]] operator entity_type() const noexcept {
+        return entity();
+    }
+
     /*! @brief Destroys the entity associated with a handle. */
     void destroy() {
-        owner->destroy(std::exchange(entt, null));
+        owner_or_assert().destroy(std::exchange(entt, null));
     }
 
     /**
@@ -201,7 +187,7 @@ public:
      * @param version A desired version upon destruction.
      */
     void destroy(const version_type version) {
-        owner->destroy(std::exchange(entt, null), version);
+        owner_or_assert().destroy(std::exchange(entt, null), version);
     }
 
     /**
@@ -214,7 +200,7 @@ public:
     template<typename Type, typename... Args>
     decltype(auto) emplace(Args &&...args) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner->template emplace<Type>(entt, std::forward<Args>(args)...);
+        return owner_or_assert().template emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -227,7 +213,7 @@ public:
     template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(Args &&...args) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner->template emplace_or_replace<Type>(entt, std::forward<Args>(args)...);
+        return owner_or_assert().template emplace_or_replace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -240,7 +226,7 @@ public:
     template<typename Type, typename... Func>
     decltype(auto) patch(Func &&...func) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner->template patch<Type>(entt, std::forward<Func>(func)...);
+        return owner_or_assert().template patch<Type>(entt, std::forward<Func>(func)...);
     }
 
     /**
@@ -253,7 +239,7 @@ public:
     template<typename Type, typename... Args>
     decltype(auto) replace(Args &&...args) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner->template replace<Type>(entt, std::forward<Args>(args)...);
+        return owner_or_assert().template replace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -264,7 +250,7 @@ public:
     template<typename... Type>
     size_type remove() const {
         static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
-        return owner->template remove<Type...>(entt);
+        return owner_or_assert().template remove<Type...>(entt);
     }
 
     /**
@@ -274,7 +260,7 @@ public:
     template<typename... Type>
     void erase() const {
         static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
-        owner->template erase<Type...>(entt);
+        owner_or_assert().template erase<Type...>(entt);
     }
 
     /**
@@ -284,7 +270,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) all_of() const {
-        return owner->template all_of<Type...>(entt);
+        return owner_or_assert().template all_of<Type...>(entt);
     }
 
     /**
@@ -295,7 +281,7 @@ public:
      */
     template<typename... Type>
     [[nodiscard]] decltype(auto) any_of() const {
-        return owner->template any_of<Type...>(entt);
+        return owner_or_assert().template any_of<Type...>(entt);
     }
 
     /**
@@ -306,7 +292,7 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get() const {
         static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
-        return owner->template get<Type...>(entt);
+        return owner_or_assert().template get<Type...>(entt);
     }
 
     /**
@@ -319,7 +305,7 @@ public:
     template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(Args &&...args) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner->template get_or_emplace<Type>(entt, std::forward<Args>(args)...);
+        return owner_or_assert().template get_or_emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -330,7 +316,7 @@ public:
     template<typename... Type>
     [[nodiscard]] auto try_get() const {
         static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
-        return owner->template try_get<Type...>(entt);
+        return owner_or_assert().template try_get<Type...>(entt);
     }
 
     /**
@@ -338,7 +324,21 @@ public:
      * @return True if the handle has no elements assigned, false otherwise.
      */
     [[nodiscard]] bool orphan() const {
-        return owner->orphan(entt);
+        return owner_or_assert().orphan(entt);
+    }
+
+    /**
+     * @brief Returns a const handle from a non-const one.
+     * @tparam Other A valid entity type.
+     * @tparam Args Scope of the handle to construct.
+     * @return A const handle referring to the same registry and the same
+     * entity.
+     */
+    template<typename Other, typename... Args>
+    [[nodiscard]] operator basic_handle<Other, Args...>() const noexcept {
+        static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
+        static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
+        return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
     }
 
 private:
