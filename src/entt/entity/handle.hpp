@@ -335,7 +335,7 @@ public:
      * entity.
      */
     template<typename Other, typename... Args>
-    [[nodiscard]] operator basic_handle<Other, Args...>() const noexcept {
+    operator basic_handle<Other, Args...>() const noexcept {
         static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
         return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
