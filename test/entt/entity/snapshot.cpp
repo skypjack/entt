@@ -11,6 +11,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../common/config.h"
 #include "../common/empty.h"
+#include "../common/pointer_stable.h"
 
 struct shadow {
     entt::entity target{entt::null};
@@ -88,12 +89,13 @@ TEST(BasicSnapshot, GetType) {
     entt::registry registry;
     const entt::basic_snapshot snapshot{registry};
     const auto &storage = registry.storage<int>();
+    constexpr auto number_of_entities = 3u;
 
-    entt::entity entity[3u];       // NOLINT
-    const int values[3u]{1, 2, 3}; // NOLINT
+    std::array<entt::entity, number_of_entities> entity{};
+    const std::array value{1, 2, 3};
 
     registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(values));
+    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(value));
     registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
@@ -118,13 +120,63 @@ TEST(BasicSnapshot, GetType) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
-    ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
+    ASSERT_EQ(entt::any_cast<int>(data[2u]), value[0u]);
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), entity[2u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[4u]), nullptr);
-    ASSERT_EQ(entt::any_cast<int>(data[4u]), values[2u]);
+    ASSERT_EQ(entt::any_cast<int>(data[4u]), value[2u]);
+}
+
+TEST(BasicSnapshot, GetPointerStableType) {
+    using namespace entt::literals;
+    using traits_type = entt::entt_traits<entt::entity>;
+
+    entt::registry registry;
+    const entt::basic_snapshot snapshot{registry};
+    const auto &storage = registry.storage<test::pointer_stable>();
+    constexpr auto number_of_entities = 3u;
+
+    std::array<entt::entity, number_of_entities> entity{};
+    const std::array<test::pointer_stable, number_of_entities> value{1, 2, 3};
+
+    registry.create(entity.begin(), entity.end());
+    registry.insert<test::pointer_stable>(entity.begin(), entity.end(), value.begin());
+    registry.destroy(entity[1u]);
+
+    std::vector<entt::any> data{};
+    auto archive = [&data](auto &&elem) { data.emplace_back(std::forward<decltype(elem)>(elem)); };
+
+    snapshot.get<test::pointer_stable>(archive, "other"_hs);
+
+    ASSERT_EQ(data.size(), 1u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+
+    data.clear();
+    snapshot.get<test::pointer_stable>(archive);
+
+    ASSERT_EQ(data.size(), 6u);
+
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
+
+    ASSERT_NE(entt::any_cast<test::pointer_stable>(&data[2u]), nullptr);
+    ASSERT_EQ(entt::any_cast<test::pointer_stable>(data[2u]), value[0u]);
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), static_cast<entt::entity>(entt::null));
+
+    ASSERT_NE(entt::any_cast<entt::entity>(&data[4u]), nullptr);
+    ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), entity[2u]);
+
+    ASSERT_NE(entt::any_cast<test::pointer_stable>(&data[5u]), nullptr);
+    ASSERT_EQ(entt::any_cast<test::pointer_stable>(data[5u]), value[2u]);
 }
 
 TEST(BasicSnapshot, GetEmptyType) {
@@ -172,12 +224,13 @@ TEST(BasicSnapshot, GetTypeSparse) {
 
     entt::registry registry;
     const entt::basic_snapshot snapshot{registry};
+    constexpr auto number_of_entities = 3u;
 
-    entt::entity entity[3u];       // NOLINT
-    const int values[3u]{1, 2, 3}; // NOLINT
+    std::array<entt::entity, number_of_entities> entity{};
+    const std::array value{1, 2, 3};
 
     registry.create(std::begin(entity), std::end(entity));
-    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(values));
+    registry.insert<int>(std::begin(entity), std::end(entity), std::begin(value));
     registry.destroy(entity[1u]);
 
     std::vector<entt::any> data{};
@@ -202,7 +255,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[2u]), nullptr);
-    ASSERT_EQ(entt::any_cast<int>(data[2u]), values[0u]);
+    ASSERT_EQ(entt::any_cast<int>(data[2u]), value[0u]);
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[3u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[3u]), static_cast<entt::entity>(entt::null));
@@ -211,7 +264,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), entity[2u]);
 
     ASSERT_NE(entt::any_cast<int>(&data[5u]), nullptr);
-    ASSERT_EQ(entt::any_cast<int>(data[5u]), values[2u]);
+    ASSERT_EQ(entt::any_cast<int>(data[5u]), value[2u]);
 }
 
 TEST(BasicSnapshotLoader, Constructors) {
