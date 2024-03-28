@@ -86,6 +86,17 @@ public:
                 for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
                     archive(*first);
                 }
+            } else if constexpr(component_traits<Type>::in_place_delete) {
+                using common_type = typename registry_type::common_type;
+
+                for(auto it = storage->common_type::rbegin(), last = storage->common_type::rend(); it != last; ++it) {
+                    if(const auto entt = *it; entt == tombstone) {
+                        archive(static_cast<entity_type>(null));
+                    } else {
+                        archive(entt);
+                        std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                    }
+                }
             } else {
                 for(auto elem: storage->reach()) {
                     std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
