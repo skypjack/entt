@@ -21,12 +21,10 @@ TODO:
 * view: update natvis as needed after the last rework, merge pools/filter in the same array, drop check (?) and turn view into a position
 * view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
-* maybe drop begin(v)/end(v) from sparse set and only use non-scoped begin/end at call sites
 * review all // NOLINT + linter workflow + review clang-tidy file
 * self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
 * group review: use handler as base with protected members and arrays of common type (see view for further details)
-* swap sets in swap-only mode, return scoped iterators by default, make ::free_list return an iterator if possible
 * test: push sharing types further
 * after non-continuous generation for entity storage:
   - get/reset placeholder to position after saving/loading (avoid long lookup)
@@ -34,3 +32,5 @@ TODO:
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * view: review tombstone checks, no longer required with storage entity and Get 1
 * review the short-circuit model now that all storage are freely available
+* more test around views and storage entity - ie view ::back
+* drop swap-only mode, too ambiguous for my tastes
