@@ -988,7 +988,8 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        sort_n((mode == deletion_policy::swap_only) ? head : packed.size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        const size_type len[]{packed.size(), head};
+        sort_n(len[mode == deletion_policy::swap_only], std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**
@@ -1007,7 +1008,8 @@ public:
     template<typename It>
     iterator sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
-        auto it = (mode == deletion_policy::swap_only) ? (end() - static_cast<typename iterator::difference_type>(head)) : begin();
+        const size_type len[]{packed.size(), head};
+        auto it = end() - static_cast<typename iterator::difference_type>(len[mode == deletion_policy::swap_only]);
 
         for(const auto other = end(); (it != other) && (first != last); ++first) {
             if(const auto curr = *first; contains(curr)) {
