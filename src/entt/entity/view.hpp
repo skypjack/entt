@@ -216,6 +216,13 @@ class basic_common_view {
     template<typename Return, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
 
+    auto offset() const noexcept {
+        ENTT_ASSERT(index != Get, "Invalid view");
+        const auto *view = pools[index];
+        const size_type len[]{view->size(), view->free_list()};
+        return len[view->policy() == deletion_policy::swap_only];
+    }
+
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept = default;
@@ -288,12 +295,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        if(index != Get) {
-            const auto it = (pools[index]->policy() == deletion_policy::swap_only) ? (pools[index]->end() - pools[index]->free_list()) : pools[index]->begin();
-            return iterator{it, pools, filter, index};
-        }
-
-        return iterator{};
+        return (index != Get) ? iterator{pools[index]->end() - static_cast<typename iterator::difference_type>(offset()), pools, filter, index} : iterator{};
     }
 
     /**
@@ -321,10 +323,10 @@ public:
      */
     [[nodiscard]] entity_type back() const noexcept {
         if(index != Get) {
-            size_type pos{};
-            const size_type last = (pools[index]->policy() == deletion_policy::swap_only) ? pools[index]->free_list() : pools[index]->size();
-            for(; pos != last && !contains((*pools[index])[pos]); ++pos) {}
-            return pos == last ? null : (*pools[index])[pos];
+            auto it = pools[index]->rbegin();
+            const auto last = it + static_cast<typename iterator::difference_type>(offset());
+            for(; it != last && !contains(*it); ++it) {}
+            return it == last ? null : *it;
         }
 
         return null;
@@ -356,8 +358,8 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         return (index != Get)
                && internal::all_of(pools.begin(), pools.end(), entt)
-               && ((pools[index]->policy() != deletion_policy::swap_only) || (pools[index]->index(entt) < pools[index]->free_list()))
-               && internal::none_of(filter.begin(), filter.end(), entt);
+               && internal::none_of(filter.begin(), filter.end(), entt)
+               && pools[index]->index(entt) < offset();
     }
 
 protected:
