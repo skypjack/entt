@@ -144,6 +144,34 @@
 			<Item Name="[filter]">filter,na</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::basic_handle&lt;*&gt;">
+		<Intrinsic Name="pool_at" Expression="owner->pools.packed.first_base::value[index].element.second._Ptr">
+			<Parameter Name="index" Type="unsigned int"/>
+		</Intrinsic>
+		<DisplayString>{{ entity={ entt } }}</DisplayString>
+		<Expand>
+			<Item Name="[entity]">entt</Item>
+			<Item Name="[registry]" Condition="owner != nullptr">owner,na</Item>
+			<Synthetic Name="[components]" Condition="owner != nullptr">
+				<Expand>
+					<CustomListItems>
+						<Variable Name="entity_mask" InitialValue="traits_type::entity_mask"/>
+						<Variable Name="page" InitialValue="((*((traits_type::entity_type *)&amp;entt)) &amp; entity_mask) / traits_type::page_size"/>
+						<Variable Name="offset" InitialValue="(*((traits_type::entity_type *)&amp;entt)) &amp; (traits_type::page_size - 1u)"/>
+						<Variable Name="last" InitialValue="owner->pools.packed.first_base::value.size()"/>
+						<Variable Name="pos" InitialValue="0u"/>
+						<Loop>
+							<Break Condition="pos == last"/>
+							<If Condition="pool_at(pos)->sparse.size() &gt; page &amp;&amp; pool_at(pos)->sparse[page] != nullptr &amp;&amp; ((*((traits_type::entity_type *)&amp;pool_at(pos)->sparse[page][offset])) &amp; entity_mask) != entity_mask">
+								<Item Name="[{ pool_at(pos)->info->alias,na }:{ ((*((traits_type::entity_type *)&amp;pool_at(pos)->sparse[page][offset])) &amp; entity_mask) != entity_mask }]">pool_at(pos),view(simple)nanr</Item>
+							</If>
+							<Exec>++pos</Exec>
+						</Loop>
+					</CustomListItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
 	<Type Name="entt::null_t">
 		<DisplayString>&lt;null&gt;</DisplayString>
 	</Type>
