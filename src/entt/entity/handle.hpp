@@ -96,6 +96,8 @@ template<typename ILhs, typename IRhs>
  */
 template<typename Registry, typename... Scope>
 class basic_handle {
+    using traits_type = entt_traits<typename Registry::entity_type>;
+
     auto &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         return static_cast<Registry &>(*owner);
@@ -105,11 +107,11 @@ public:
     /*! @brief Type of registry accepted by the handle. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename registry_type::entity_type;
+    using entity_type = typename traits_type::value_type;
     /*! @brief Underlying version type. */
-    using version_type = typename registry_type::version_type;
+    using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename registry_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Iterable handle type. */
     using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(std::declval<registry_type>().storage())::iterator>>;
 
