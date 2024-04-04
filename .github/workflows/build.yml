@@ -17,6 +17,7 @@ jobs:
           - { pkg: g++, exe: 'g++', version: 10 }
           - { pkg: g++, exe: 'g++', version: 11 }
           - { pkg: g++, exe: 'g++', version: 12 }
+          - { pkg: g++, exe: 'g++', version: 13 }
           - { pkg: clang, exe: 'clang++', version: 8 }
           - { pkg: clang, exe: 'clang++', version: 9 }
           - { pkg: clang, exe: 'clang++', version: 10 }
@@ -24,6 +25,7 @@ jobs:
           - { pkg: clang, exe: 'clang++', version: 12 }
           - { pkg: clang, exe: 'clang++', version: 13 }
           - { pkg: clang, exe: 'clang++', version: 14 }
+          - { pkg: clang, exe: 'clang++', version: 15 }
         exclude:
           - os: ubuntu-latest
             compiler: { pkg: g++, exe: 'g++', version: 7 }
@@ -46,11 +48,15 @@ jobs:
           - os: ubuntu-20.04
             compiler: { pkg: g++, exe: 'g++', version: 12 }
           - os: ubuntu-20.04
+            compiler: { pkg: g++, exe: 'g++', version: 13 }
+          - os: ubuntu-20.04
             compiler: { pkg: clang, exe: 'clang++', version: 12 }
           - os: ubuntu-20.04
             compiler: { pkg: clang, exe: 'clang++', version: 13 }
           - os: ubuntu-20.04
             compiler: { pkg: clang, exe: 'clang++', version: 14 }
+          - os: ubuntu-20.04
+            compiler: { pkg: clang, exe: 'clang++', version: 15 }
 
     runs-on: ${{ matrix.os }}
 
