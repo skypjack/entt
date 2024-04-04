@@ -141,7 +141,7 @@ TEST(BasicSnapshot, GetPointerStableType) {
     constexpr auto number_of_entities = 3u;
 
     std::array<entt::entity, number_of_entities> entity{};
-    const std::array<test::pointer_stable, number_of_entities> value{1, 2, 3};
+    const std::array value{test::pointer_stable{1}, test::pointer_stable{2}, test::pointer_stable{3}};
 
     registry.create(entity.begin(), entity.end());
     registry.insert<test::pointer_stable>(entity.begin(), entity.end(), value.begin());
