@@ -183,8 +183,6 @@ TEST(BasicHandle, Destruction) {
 }
 
 ENTT_DEBUG_TEST(BasicHandleDeathTest, Destruction) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::handle handle{};
 
     ASSERT_DEATH(handle.destroy(0u);, "");
