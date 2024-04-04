@@ -16,6 +16,8 @@
 
 template<typename Type>
 struct StorageNoInstance: testing::Test {
+    static_assert(entt::component_traits<Type>::page_size == 0u, "Non-empty type not allowed");
+
     using type = Type;
 
     static auto emplace_instance(entt::storage<type> &pool, const entt::entity entt) {

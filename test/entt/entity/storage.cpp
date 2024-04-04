@@ -68,6 +68,8 @@ struct entt::component_traits<std::unordered_set<char>> {
 
 template<typename Type>
 struct Storage: testing::Test {
+    static_assert(entt::component_traits<Type>::page_size != 0u, "Empty type not allowed");
+
     using type = Type;
 };
 
