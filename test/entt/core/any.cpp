@@ -12,6 +12,7 @@
 #include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
+#include "../../common/new_delete.h"
 #include "../../common/non_comparable.h"
 #include "../../common/non_movable.h"
 
@@ -1537,4 +1538,15 @@ TEST(Any, DeducedArrayType) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<const char *>());
     ASSERT_EQ((std::strcmp("another array of char", entt::any_cast<const char *>(any))), 0);
+}
+
+TEST(Any, ClassLevelNewDelete) {
+    // yeah, that's for code coverage purposes only :)
+    entt::any any{std::in_place_type<test::new_delete>, *std::make_unique<test::new_delete>(test::new_delete{3})};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::type_id<test::new_delete>());
+    ASSERT_EQ(entt::any_cast<const test::new_delete &>(any).value, 3);
+
+    // TODO
 }
