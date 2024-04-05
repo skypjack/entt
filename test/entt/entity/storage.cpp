@@ -15,6 +15,7 @@
 #include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
+#include "../../common/new_delete.h"
 #include "../../common/pointer_stable.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
@@ -1683,6 +1684,16 @@ TEST(Storage, CreateFromConstructor) {
 
     ASSERT_EQ(pool.get(entity).child, other);
     ASSERT_EQ(pool.get(other).child, static_cast<entt::entity>(entt::null));
+}
+
+TEST(Storage, ClassLevelNewDelete) {
+    entt::storage<test::new_delete> pool;
+    const entt::entity entity{0u};
+
+    // yeah, that's for code coverage purposes only :)
+    pool.emplace(entity, *std::make_unique<test::new_delete>(test::new_delete{3}));
+
+    ASSERT_EQ(pool.get(entity).value, 3);
 }
 
 TYPED_TEST(Storage, CustomAllocator) {

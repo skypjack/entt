@@ -275,7 +275,7 @@ constexpr Type make_obj_using_allocator(const Allocator &allocator, Args &&...ar
  */
 template<typename Type, typename Allocator, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const Allocator &allocator, Args &&...args) {
-    return std::apply([value](auto &&...curr) { return new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
+    return std::apply([value](auto &&...curr) { return ::new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt
