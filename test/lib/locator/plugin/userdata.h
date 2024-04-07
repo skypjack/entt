@@ -5,7 +5,7 @@
 #include "../../../common/boxed_type.h"
 
 struct userdata {
-    typename entt::locator<test::boxed_int>::node_type handle{};
+    entt::locator<test::boxed_int>::node_type handle{};
     int value{};
 };
 

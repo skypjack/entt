@@ -18,8 +18,8 @@
     }
 
 struct userdata {
-    entt::locator<entt::meta_ctx>::node_type ctx;
-    entt::meta_any any;
+    entt::locator<entt::meta_ctx>::node_type ctx{};
+    entt::meta_any any{};
 };
 
 ASSIGN_TYPE_ID(void);
