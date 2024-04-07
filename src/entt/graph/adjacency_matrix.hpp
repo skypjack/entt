@@ -111,9 +111,9 @@ public:
     using vertex_iterator = iota_iterator<vertex_type>;
     /*! @brief Edge iterator type. */
     using edge_iterator = internal::edge_iterator<typename container_type::const_iterator>;
-    /*! @brief Out edge iterator type. */
+    /*! @brief Out-edge iterator type. */
     using out_edge_iterator = edge_iterator;
-    /*! @brief In edge iterator type. */
+    /*! @brief In-edge iterator type. */
     using in_edge_iterator = edge_iterator;
     /*! @brief Graph category tag. */
     using graph_category = Category;
@@ -257,9 +257,9 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to visit all out edges of a vertex.
-     * @param vertex The vertex of which to return all out edges.
-     * @return An iterable object to visit all out edges of a vertex.
+     * @brief Returns an iterable object to visit all out-edges of a vertex.
+     * @param vertex The vertex of which to return all out-edges.
+     * @return An iterable object to visit all out-edges of a vertex.
      */
     [[nodiscard]] iterable_adaptor<out_edge_iterator> out_edges(const vertex_type vertex) const noexcept {
         const auto it = matrix.cbegin();
@@ -269,9 +269,9 @@ public:
     }
 
     /**
-     * @brief Returns an iterable object to visit all in edges of a vertex.
-     * @param vertex The vertex of which to return all in edges.
-     * @return An iterable object to visit all in edges of a vertex.
+     * @brief Returns an iterable object to visit all in-edges of a vertex.
+     * @param vertex The vertex of which to return all in-edges.
+     * @return An iterable object to visit all in-edges of a vertex.
      */
     [[nodiscard]] iterable_adaptor<in_edge_iterator> in_edges(const vertex_type vertex) const noexcept {
         const auto it = matrix.cbegin();

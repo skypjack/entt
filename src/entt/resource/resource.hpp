@@ -37,8 +37,8 @@ public:
         : value{} {}
 
     /**
-     * @brief Creates a handle from a weak pointer, namely a resource.
-     * @param res A weak pointer to a resource.
+     * @brief Creates a new resource handle.
+     * @param res A handle to a resource.
      */
     explicit resource(handle_type res) noexcept
         : value{std::move(res)} {}
