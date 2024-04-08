@@ -141,8 +141,9 @@ public:
         : pools{&opool..., &gpool...},
           filter{&epool...},
           len{} {
-        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
-        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
+        ((opool.on_construct().template connect<&group_handler::push_on_construct>(*this), opool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
+        ((gpool.on_construct().template connect<&group_handler::push_on_construct>(*this), gpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
+        ((epool.on_construct().template connect<&group_handler::remove_if>(*this), epool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...);
 
         // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
         for(auto *first = std::get<0>(pools)->data(), *last = first + std::get<0>(pools)->size(); first != last; ++first) {
@@ -214,8 +215,8 @@ public:
         : pools{&gpool...},
           filter{&epool...},
           elem{alloc} {
-        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::push_on_construct>(*this), cpool->on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, pools);
-        std::apply([this](auto *...cpool) { ((cpool->on_construct().template connect<&group_handler::remove_if>(*this), cpool->on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, filter);
+        ((gpool.on_construct().template connect<&group_handler::push_on_construct>(*this), gpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
+        ((epool.on_construct().template connect<&group_handler::remove_if>(*this), epool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...);
 
         for(const auto entity: static_cast<base_type &>(*std::get<0>(pools))) {
             push_on_construct(entity);
