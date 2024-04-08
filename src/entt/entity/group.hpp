@@ -165,12 +165,13 @@ public:
         return len;
     }
 
-    auto pools_as_tuple() const noexcept {
-        return pools;
-    }
-
-    auto filter_as_tuple() const noexcept {
-        return filter;
+    template<std::size_t Index>
+    [[nodiscard]] auto *storage() const noexcept {
+        if constexpr(Index < (sizeof...(Owned) + sizeof...(Get))) {
+            return std::get<Index>(pools);
+        } else {
+            return std::get<Index - (sizeof...(Owned) + sizeof...(Get))>(filter);
+        }
     }
 
 private:
@@ -231,12 +232,13 @@ public:
         return elem;
     }
 
-    auto pools_as_tuple() const noexcept {
-        return pools;
-    }
-
-    auto filter_as_tuple() const noexcept {
-        return filter;
+    template<std::size_t Index>
+    [[nodiscard]] auto *storage() const noexcept {
+        if constexpr(Index < sizeof...(Get)) {
+            return std::get<Index>(pools);
+        } else {
+            return std::get<Index - sizeof...(Get)>(filter);
+        }
     }
 
 private:
@@ -287,14 +289,10 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
-    auto pools() const noexcept {
+    template<std::size_t... Index>
+    auto pools_for(std::index_sequence<Index...>) const noexcept {
         using return_type = std::tuple<Get *...>;
-        return descriptor ? descriptor->pools_as_tuple() : return_type{};
-    }
-
-    auto filter() const noexcept {
-        using return_type = std::tuple<Exclude *...>;
-        return descriptor ? descriptor->filter_as_tuple() : return_type{};
+        return descriptor ? return_type{descriptor->storage<Index>()...} : return_type{};
     }
 
 public:
@@ -349,13 +347,8 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        constexpr auto offset = sizeof...(Get);
-
-        if constexpr(Index < offset) {
-            return std::get<Index>(pools());
-        } else {
-            return std::get<Index - offset>(filter());
-        }
+        using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
+        return *this ? static_cast<type *>(descriptor->storage<Index>()) : nullptr;
     }
 
     /**
@@ -507,7 +500,7 @@ public:
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools();
+        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
@@ -565,7 +558,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools();
+        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -627,7 +620,7 @@ public:
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 descriptor->handle().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
             } else {
-                auto comp = [&compare, cpools = pools()](const entity_type lhs, const entity_type rhs) {
+                auto comp = [&compare, cpools = pools_for(std::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
                         return compare((std::get<Index>(cpools)->get(lhs), ...), (std::get<Index>(cpools)->get(rhs), ...));
                     } else {
@@ -700,14 +693,10 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
-    auto pools() const noexcept {
+    template<std::size_t... Index>
+    auto pools_for(std::index_sequence<Index...>) const noexcept {
         using return_type = std::tuple<Owned *..., Get *...>;
-        return descriptor ? descriptor->pools_as_tuple() : return_type{};
-    }
-
-    auto filter() const noexcept {
-        using return_type = std::tuple<Exclude *...>;
-        return descriptor ? descriptor->filter_as_tuple() : return_type{};
+        return descriptor ? return_type{descriptor->storage<Index>()...} : return_type{};
     }
 
 public:
@@ -762,13 +751,8 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        constexpr auto offset = sizeof...(Owned) + sizeof...(Get);
-
-        if constexpr(Index < offset) {
-            return std::get<Index>(pools());
-        } else {
-            return std::get<Index - offset>(filter());
-        }
+        using type = type_list_element_t<Index, type_list<Owned..., Get..., Exclude...>>;
+        return *this ? static_cast<type *>(descriptor->storage<Index>()) : nullptr;
     }
 
     /**
@@ -905,7 +889,7 @@ public:
      */
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools();
+        const auto cpools = pools_for(std::index_sequence_for<Owned..., Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
@@ -963,7 +947,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools();
+        const auto cpools = pools_for(std::index_sequence_for<Owned..., Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -1021,7 +1005,7 @@ public:
      */
     template<std::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        const auto cpools = pools();
+        const auto cpools = pools_for(std::index_sequence_for<Owned..., Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
