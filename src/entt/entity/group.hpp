@@ -98,16 +98,12 @@ struct group_descriptor {
     }
 };
 
-template<typename, typename, typename>
+template<typename, typename, typename, typename>
 class group_handler;
 
-template<typename... Owned, typename... Get, typename... Exclude>
-class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
-    // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-    static_assert(!std::disjunction_v<std::is_const<Owned>..., std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
-
-    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
-    using entity_type = typename base_type::entity_type;
+template<typename Type, typename... Owned, typename... Get, typename... Exclude>
+class group_handler<Type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
+    using entity_type = typename Type::entity_type;
 
     template<std::size_t... Index>
     void swap_elements(const std::size_t pos, const entity_type entt, std::index_sequence<Index...>) {
@@ -135,8 +131,8 @@ class group_handler<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> fin
     }
 
 public:
-    using common_type = base_type;
-    using size_type = typename base_type::size_type;
+    using common_type = Type;
+    using size_type = typename Type::size_type;
 
     group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
         : pools{&opool..., &gpool...},
@@ -181,13 +177,9 @@ private:
     std::size_t len;
 };
 
-template<typename... Get, typename... Exclude>
-class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
-    // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-    static_assert(!std::disjunction_v<std::is_const<Get>..., std::is_const<Exclude>...>, "Const storage type not allowed");
-
-    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
-    using entity_type = typename base_type::entity_type;
+template<typename Type, typename... Get, typename... Exclude>
+class group_handler<Type, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
+    using entity_type = typename Type::entity_type;
 
     void push_on_construct(const entity_type entt) {
         if(!elem.contains(entt)
@@ -210,7 +202,7 @@ class group_handler<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: publ
     }
 
 public:
-    using common_type = base_type;
+    using common_type = Type;
 
     template<typename Alloc>
     group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
@@ -245,7 +237,7 @@ public:
 private:
     std::array<common_type *, sizeof...(Get)> pools;
     std::array<common_type *, sizeof...(Exclude)> filter;
-    base_type elem;
+    common_type elem;
 };
 
 } // namespace internal
@@ -310,7 +302,7 @@ public:
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
     /*! @brief Group handler type. */
-    using handler = internal::group_handler<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
+    using handler = internal::group_handler<common_type, owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -717,7 +709,7 @@ public:
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
     /*! @brief Group handler type. */
-    using handler = internal::group_handler<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
+    using handler = internal::group_handler<common_type, owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
