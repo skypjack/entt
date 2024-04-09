@@ -62,13 +62,13 @@ template<typename Type>
 struct basic_meta_sequence_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    /*! @brief True in case of key-only containers, false otherwise. */
-    static constexpr bool fixed_size = internal::fixed_size_sequence_container_v<Type>;
-
     /*! @brief Unsigned integer type. */
     using size_type = typename meta_sequence_container::size_type;
     /*! @brief Meta iterator type. */
     using iterator = typename meta_sequence_container::iterator;
+
+    /*! @brief True in case of key-only containers, false otherwise. */
+    static constexpr bool fixed_size = internal::fixed_size_sequence_container_v<Type>;
 
     /**
      * @brief Returns the number of elements in a container.
@@ -195,13 +195,13 @@ template<typename Type>
 struct basic_meta_associative_container_traits {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Unexpected type");
 
-    /*! @brief True in case of key-only containers, false otherwise. */
-    static constexpr bool key_only = internal::key_only_associative_container_v<Type>;
-
     /*! @brief Unsigned integer type. */
     using size_type = typename meta_associative_container::size_type;
     /*! @brief Meta iterator type. */
     using iterator = typename meta_associative_container::iterator;
+
+    /*! @brief True in case of key-only containers, false otherwise. */
+    static constexpr bool key_only = internal::key_only_associative_container_v<Type>;
 
     /**
      * @brief Returns the number of elements in a container.
