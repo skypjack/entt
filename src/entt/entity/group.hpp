@@ -2,6 +2,8 @@
 #define ENTT_ENTITY_GROUP_HPP
 
 #include <array>
+#include <cstddef>
+#include <iterator>
 #include <tuple>
 #include <type_traits>
 #include <utility>
