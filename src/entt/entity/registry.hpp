@@ -1077,9 +1077,9 @@ public:
         std::shared_ptr<handler_type> handler{};
 
         if constexpr(sizeof...(Owned) == 0u) {
-            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
         } else {
-            handler = std::allocate_shared<handler_type>(get_allocator(), assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()..., assure<std::remove_const_t<Exclude>>()...);
+            handler = std::allocate_shared<handler_type>(get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
             [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
             ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
         }
