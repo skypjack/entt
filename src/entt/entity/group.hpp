@@ -153,7 +153,9 @@ public:
         size_type cnt = 0u;
 
         for(auto pos = 0u; pos < length; ++pos) {
-            cnt += ((elem[pos] == entt::type_hash<typename Owned::element_type>::value()) || ...);
+            for(auto next = 0u; next < sizeof...(Owned); ++next) {
+                cnt += (elem[pos] == pools[next]->type().hash());
+            }
         }
 
         return cnt;
