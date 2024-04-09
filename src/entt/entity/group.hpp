@@ -134,13 +134,13 @@ public:
     using common_type = Type;
     using size_type = typename Type::size_type;
 
-    group_handler(Owned &...opool, Get &...gpool, Exclude &...epool)
-        : pools{&opool..., &gpool...},
-          filter{&epool...},
+    template<typename... OGType, typename... EType>
+    group_handler(std::tuple<OGType &...> ogpool, std::tuple<EType &...> epool)
+        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Owned) + sizeof...(Get)>{&cpool...}; }, ogpool)},
+          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Exclude)>{&cpool...}; }, epool)},
           len{} {
-        ((opool.on_construct().template connect<&group_handler::push_on_construct>(*this), opool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
-        ((gpool.on_construct().template connect<&group_handler::push_on_construct>(*this), gpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
-        ((epool.on_construct().template connect<&group_handler::remove_if>(*this), epool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...);
+        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
+        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
 
         // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
         for(auto *first = pools[0u]->data(), *last = first + pools[0u]->size(); first != last; ++first) {
@@ -204,13 +204,13 @@ class group_handler<Type, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final
 public:
     using common_type = Type;
 
-    template<typename Alloc>
-    group_handler(const Alloc &alloc, Get &...gpool, Exclude &...epool)
-        : pools{&gpool...},
-          filter{&epool...},
+    template<typename Alloc, typename... GType, typename... EType>
+    group_handler(const Alloc &alloc, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
+        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Get)>{&cpool...}; }, gpool)},
+          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Exclude)>{&cpool...}; }, epool)},
           elem{alloc} {
-        ((gpool.on_construct().template connect<&group_handler::push_on_construct>(*this), gpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...);
-        ((epool.on_construct().template connect<&group_handler::remove_if>(*this), epool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...);
+        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
+        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
 
         for(const auto entity: *pools[0u]) {
             push_on_construct(entity);
