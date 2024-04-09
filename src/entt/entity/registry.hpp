@@ -1067,9 +1067,10 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) {
-        using handler_type = typename basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>::handler;
+        using group_type = basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>;
+        using handler_type = typename group_type::handler;
 
-        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+        if(auto it = groups.find(group_type::group_id); it != groups.cend()) {
             return {*std::static_pointer_cast<handler_type>(it->second)};
         }
 
@@ -1083,7 +1084,7 @@ public:
             ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
         }
 
-        groups.emplace(type_hash<handler_type>::value(), handler);
+        groups.emplace(group_type::group_id, handler);
         return {*handler};
     }
 
@@ -1091,9 +1092,10 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
     group_if_exists(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) const {
-        using handler_type = typename basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>::handler;
+        using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
+        using handler_type = typename group_type::handler;
 
-        if(auto it = groups.find(type_hash<handler_type>::value()); it != groups.cend()) {
+        if(auto it = groups.find(group_type::group_id); it != groups.cend()) {
             return {*std::static_pointer_cast<handler_type>(it->second)};
         }
 

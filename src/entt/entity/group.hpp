@@ -309,6 +309,9 @@ public:
     /*! @brief Group handler type. */
     using handler = internal::group_handler<common_type, owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
 
+    /*! @brief Group opaque marker. */
+    static constexpr id_type group_id = type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
         : descriptor{} {}
@@ -715,6 +718,9 @@ public:
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
     /*! @brief Group handler type. */
     using handler = internal::group_handler<common_type, owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
+
+    /*! @brief Group opaque marker. */
+    static constexpr id_type group_id = type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
