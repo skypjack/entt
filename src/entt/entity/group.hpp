@@ -100,15 +100,12 @@ struct group_descriptor {
     }
 };
 
-template<typename, typename, typename, typename>
-class group_handler;
-
-template<typename Type, typename... Owned, typename... Get, typename... Exclude>
-class group_handler<Type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
+template<typename Type, std::size_t Owned, std::size_t Get, std::size_t Exclude>
+class group_handler final: public group_descriptor {
     using entity_type = typename Type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
-        for(std::size_t next{}; next < sizeof...(Owned); ++next) {
+        for(std::size_t next{}; next < Owned; ++next) {
             pools[next]->swap_elements(pools[next]->data()[pos], entt);
         }
     }
@@ -139,8 +136,8 @@ public:
 
     template<typename... OGType, typename... EType>
     group_handler(std::tuple<OGType &...> ogpool, std::tuple<EType &...> epool)
-        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Owned) + sizeof...(Get)>{&cpool...}; }, ogpool)},
-          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Exclude)>{&cpool...}; }, epool)},
+        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
+          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
           len{} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
@@ -155,7 +152,7 @@ public:
         size_type cnt = 0u;
 
         for(auto pos = 0u; pos < length; ++pos) {
-            for(auto next = 0u; next < sizeof...(Owned); ++next) {
+            for(auto next = 0u; next < Owned; ++next) {
                 cnt += (elem[pos] == pools[next]->type().hash());
             }
         }
@@ -169,21 +166,21 @@ public:
 
     template<std::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
-        if constexpr(Index < (sizeof...(Owned) + sizeof...(Get))) {
+        if constexpr(Index < (Owned + Get)) {
             return pools[Index];
         } else {
-            return filter[Index - (sizeof...(Owned) + sizeof...(Get))];
+            return filter[Index - (Owned + Get)];
         }
     }
 
 private:
-    std::array<common_type *, sizeof...(Owned) + sizeof...(Get)> pools;
-    std::array<common_type *, sizeof...(Exclude)> filter;
+    std::array<common_type *, (Owned + Get)> pools;
+    std::array<common_type *, Exclude> filter;
     std::size_t len;
 };
 
-template<typename Type, typename... Get, typename... Exclude>
-class group_handler<Type, owned_t<>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
+template<typename Type, std::size_t Get, std::size_t Exclude>
+class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
     using entity_type = typename Type::entity_type;
 
     void push_on_construct(const entity_type entt) {
@@ -211,8 +208,8 @@ public:
 
     template<typename Alloc, typename... GType, typename... EType>
     group_handler(const Alloc &alloc, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
-        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Get)>{&cpool...}; }, gpool)},
-          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, sizeof...(Exclude)>{&cpool...}; }, epool)},
+        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, Get>{&cpool...}; }, gpool)},
+          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
           elem{alloc} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
@@ -232,16 +229,16 @@ public:
 
     template<std::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
-        if constexpr(Index < sizeof...(Get)) {
+        if constexpr(Index < Get) {
             return pools[Index];
         } else {
-            return filter[Index - sizeof...(Get)];
+            return filter[Index - Get];
         }
     }
 
 private:
-    std::array<common_type *, sizeof...(Get)> pools;
-    std::array<common_type *, sizeof...(Exclude)> filter;
+    std::array<common_type *, Get> pools;
+    std::array<common_type *, Exclude> filter;
     common_type elem;
 };
 
@@ -307,7 +304,7 @@ public:
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
     /*! @brief Group handler type. */
-    using handler = internal::group_handler<common_type, owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
+    using handler = internal::group_handler<common_type, 0u, sizeof...(Get), sizeof...(Exclude)>;
 
     /*! @brief Group opaque marker. */
     static constexpr id_type group_id = type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
@@ -717,7 +714,7 @@ public:
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
     /*! @brief Group handler type. */
-    using handler = internal::group_handler<common_type, owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>;
+    using handler = internal::group_handler<common_type, sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)>;
 
     /*! @brief Group opaque marker. */
     static constexpr id_type group_id = type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
