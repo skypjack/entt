@@ -312,8 +312,13 @@ public:
     /*! @brief Group handler type. */
     using handler = internal::group_handler<common_type, 0u, sizeof...(Get), sizeof...(Exclude)>;
 
-    /*! @brief Group opaque marker. */
-    static constexpr id_type group_id = type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+    /**
+     * @brief Group opaque identifier.
+     * @return Group opaque identifier.
+     */
+    static id_type group_id() noexcept {
+        return type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+    }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
@@ -722,8 +727,13 @@ public:
     /*! @brief Group handler type. */
     using handler = internal::group_handler<common_type, sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)>;
 
-    /*! @brief Group opaque marker. */
-    static constexpr id_type group_id = type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+    /**
+     * @brief Group opaque identifier.
+     * @return Group opaque identifier.
+     */
+    static id_type group_id() noexcept {
+        return type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+    }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
     basic_group() noexcept
