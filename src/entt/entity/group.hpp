@@ -105,28 +105,29 @@ template<typename Type, typename... Owned, typename... Get, typename... Exclude>
 class group_handler<Type, owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> final: public group_descriptor {
     using entity_type = typename Type::entity_type;
 
-    template<std::size_t... Index>
-    void swap_elements(const std::size_t pos, const entity_type entt, std::index_sequence<Index...>) {
-        (pools[Index]->swap_elements(pools[Index]->data()[pos], entt), ...);
+    void swap_elements(const std::size_t pos, const entity_type entt) {
+        for(std::size_t next{}; next < sizeof...(Owned); ++next) {
+            pools[next]->swap_elements(pools[next]->data()[pos], entt);
+        }
     }
 
     void push_on_construct(const entity_type entt) {
         if(std::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
-            swap_elements(len++, entt, std::index_sequence_for<Owned...>{});
+            swap_elements(len++, entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
         if(std::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
            && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
-            swap_elements(len++, entt, std::index_sequence_for<Owned...>{});
+            swap_elements(len++, entt);
         }
     }
 
     void remove_if(const entity_type entt) {
         if(pools[0u]->contains(entt) && (pools[0u]->index(entt) < len)) {
-            swap_elements(--len, entt, std::index_sequence_for<Owned...>{});
+            swap_elements(--len, entt);
         }
     }
 
