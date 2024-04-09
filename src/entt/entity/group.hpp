@@ -130,6 +130,13 @@ class group_handler final: public group_descriptor {
         }
     }
 
+    void common_setup() {
+        // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
+        for(auto *first = pools[0u]->data(), *last = first + pools[0u]->size(); first != last; ++first) {
+            push_on_construct(*first);
+        }
+    }
+
 public:
     using common_type = Type;
     using size_type = typename Type::size_type;
@@ -141,11 +148,7 @@ public:
           len{} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
-
-        // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-        for(auto *first = pools[0u]->data(), *last = first + pools[0u]->size(); first != last; ++first) {
-            push_on_construct(*first);
-        }
+        common_setup();
     }
 
     size_type owned(const id_type *elem, const size_type length) const noexcept final {
@@ -203,6 +206,12 @@ class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
         elem.remove(entt);
     }
 
+    void common_setup() {
+        for(const auto entity: *pools[0u]) {
+            push_on_construct(entity);
+        }
+    }
+
 public:
     using common_type = Type;
 
@@ -213,10 +222,7 @@ public:
           elem{alloc} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
-
-        for(const auto entity: *pools[0u]) {
-            push_on_construct(entity);
-        }
+        common_setup();
     }
 
     common_type &handle() noexcept {
