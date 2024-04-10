@@ -4,6 +4,7 @@
 namespace test {
 
 struct empty {};
+struct other_empty {};
 
 } // namespace test
 
