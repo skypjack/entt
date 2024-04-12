@@ -9,11 +9,9 @@
 #include <entt/resource/cache.hpp>
 #include <entt/resource/loader.hpp>
 #include <entt/resource/resource.hpp>
+#include "../../common/empty.h"
 #include "../../common/linter.hpp"
 #include "../../common/throwing_allocator.hpp"
-
-struct broken_tag {};
-struct with_callback {};
 
 template<typename Type>
 struct loader {
@@ -25,12 +23,12 @@ struct loader {
     }
 
     template<typename Func>
-    result_type operator()(with_callback, Func &&func) const {
+    result_type operator()(test::other_empty, Func &&func) const {
         return std::forward<Func>(func)();
     }
 
     template<typename... Args>
-    result_type operator()(broken_tag) const {
+    result_type operator()(test::empty) const {
         return {};
     }
 };
@@ -393,7 +391,7 @@ TEST(ResourceCache, LoaderDispatching) {
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_EQ(cache["resource"_hs], 1);
 
-    cache.force_load("resource"_hs, with_callback{}, []() { return std::make_shared<int>(2); });
+    cache.force_load("resource"_hs, test::other_empty{}, []() { return std::make_shared<int>(2); });
 
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_EQ(cache["resource"_hs], 2);
@@ -403,7 +401,7 @@ TEST(ResourceCache, BrokenLoader) {
     using namespace entt::literals;
 
     entt::resource_cache<int, loader<int>> cache;
-    cache.load("resource"_hs, broken_tag{});
+    cache.load("resource"_hs, test::empty{});
 
     ASSERT_TRUE(cache.contains("resource"_hs));
     ASSERT_FALSE(cache["resource"_hs]);
