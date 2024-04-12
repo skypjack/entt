@@ -56,6 +56,18 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(copy);
     ASSERT_TRUE(move);
     ASSERT_EQ(copy, move);
+
+    copy.reset(std::make_shared<derived>());
+
+    ASSERT_TRUE(copy);
+    ASSERT_TRUE(move);
+    ASSERT_NE(copy, move);
+
+    move.reset();
+
+    ASSERT_TRUE(copy);
+    ASSERT_FALSE(move);
+    ASSERT_NE(copy, move);
 }
 
 TEST(Resource, DerivedToBase) {

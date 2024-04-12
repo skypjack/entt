@@ -148,6 +148,19 @@ public:
         return static_cast<bool>(value);
     }
 
+    /*! @brief Releases the ownership of the managed resource. */
+    void reset() {
+        value.reset();
+    }
+
+    /**
+     * @brief Replaces the managed resource.
+     * @param other A handle to a resource.
+     */
+    void reset(handle_type other) {
+        value = std::move(other);
+    }
+
     /**
      * @brief Returns the underlying resource handle.
      * @return The underlying resource handle.
