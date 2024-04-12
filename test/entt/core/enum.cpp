@@ -2,31 +2,14 @@
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/enum.hpp>
-
-enum class detected {
-    foo = 0x01,
-    bar = 0x02,
-    quux = 0x04,
-    _entt_enum_as_bitmask
-};
-
-// small type on purpose
-enum class registered : std::uint8_t {
-    foo = 0x01,
-    bar = 0x02,
-    quux = 0x04
-};
-
-template<>
-struct entt::enum_as_bitmask<registered>
-    : std::true_type {};
+#include "../../common/bitmask.h"
 
 template<typename Type>
 struct Enum: testing::Test {
     using type = Type;
 };
 
-using EnumTypes = ::testing::Types<detected, registered>;
+using EnumTypes = ::testing::Types<test::enum_is_bitmask, test::enum_as_bitmask>;
 
 TYPED_TEST_SUITE(Enum, EnumTypes, );
 
