@@ -959,7 +959,7 @@ class basic_storage<Entity, Entity, Allocator>
         entity_type entt = null;
 
         do {
-            ENTT_ASSERT(placeholder < traits_type::to_entity(null), "Invalid element");
+            ENTT_ASSERT(placeholder < traits_type::to_entity(null), "No more entities available");
             entt = traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder++), {});
         } while(base_type::current(entt) != traits_type::to_version(tombstone) && entt != null);
 
