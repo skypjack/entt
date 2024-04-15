@@ -5,7 +5,8 @@
 
 namespace entt {
 
-struct basic_table {
+template<typename... Type, typename Allocator>
+struct basic_table<type_list<Type...>, Allocator> {
 };
 
 } // namespace entt

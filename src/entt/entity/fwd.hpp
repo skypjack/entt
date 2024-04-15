@@ -28,6 +28,9 @@ class basic_sparse_set;
 template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
+template<typename, typename = std::allocator<void>>
+class basic_table;
+
 template<typename, typename>
 class basic_sigh_mixin;
 
@@ -70,6 +73,13 @@ using sparse_set = basic_sparse_set<>;
  */
 template<typename Type>
 using storage = basic_storage<Type>;
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Type Element types.
+ */
+template<typename... Type>
+using table = basic_table<type_list<Type...>>;
 
 /**
  * @brief Alias declaration for the most common use case.

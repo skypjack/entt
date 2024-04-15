@@ -2,5 +2,5 @@
 #include <entt/entity/table.hpp>
 
 TEST(Table, Placeholder) {
-    entt::basic_table table{};
+    entt::table<int, char> table{};
 }
