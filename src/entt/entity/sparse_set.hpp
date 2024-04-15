@@ -446,7 +446,7 @@ public:
           info{other.info},
           mode{other.mode},
           head{std::exchange(other.head, policy_to_head())} {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a sparse set is not allowed");
     }
 
     /*! @brief Default destructor. */
@@ -460,7 +460,7 @@ public:
      * @return This sparse set.
      */
     basic_sparse_set &operator=(basic_sparse_set &&other) noexcept {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || packed.get_allocator() == other.packed.get_allocator(), "Copying a sparse set is not allowed");
+        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a sparse set is not allowed");
 
         release_sparse_pages();
         sparse = std::move(other.sparse);
