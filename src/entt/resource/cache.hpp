@@ -157,14 +157,14 @@ class resource_cache {
     using container_type = dense_map<id_type, typename Loader::result_type, identity, std::equal_to<id_type>, container_allocator>;
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Resource type. */
     using value_type = Type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Loader type. */
     using loader_type = Loader;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Input iterator type. */
     using iterator = internal::resource_cache_iterator<Type, typename container_type::iterator>;
     /*! @brief Constant input iterator type. */

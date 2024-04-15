@@ -287,6 +287,8 @@ class dense_set {
     }
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Key type of the container. */
     using key_type = Type;
     /*! @brief Value type of the container. */
@@ -297,8 +299,6 @@ public:
     using hasher = Hash;
     /*! @brief Type of function to use to compare the elements for equality. */
     using key_equal = KeyEqual;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Random access iterator type. */
     using iterator = internal::dense_set_iterator<typename packed_container_type::iterator>;
     /*! @brief Constant random access iterator type. */

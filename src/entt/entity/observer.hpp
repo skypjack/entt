@@ -262,14 +262,14 @@ class basic_observer: private basic_storage<Mask, typename Registry::entity_type
     }
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! Basic registry type. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename registry_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Random access iterator type. */
     using iterator = typename registry_type::common_type::iterator;
 

@@ -341,6 +341,8 @@ class dense_map {
     }
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Key type of the container. */
     using key_type = Key;
     /*! @brief Mapped type of the container. */
@@ -353,8 +355,6 @@ public:
     using hasher = Hash;
     /*! @brief Type of function to use to compare the keys for equality. */
     using key_equal = KeyEqual;
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
     /*! @brief Input iterator type. */
     using iterator = internal::dense_map_iterator<typename packed_container_type::iterator>;
     /*! @brief Constant input iterator type. */
