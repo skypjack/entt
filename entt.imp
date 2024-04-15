@@ -24,6 +24,7 @@
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/snapshot.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/sparse_set.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/storage.hpp>", "public" ] },
+  { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/table.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/view.hpp>", "public" ] },
   { "include": [ "@[\"<].*/graph/fwd\\.hpp[\">]", "private", "<entt/graph/adjacency_matrix.hpp>", "public" ] },
   { "include": [ "@[\"<].*/graph/fwd\\.hpp[\">]", "private", "<entt/graph/dot.hpp>", "public" ] },

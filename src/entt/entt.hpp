@@ -32,6 +32,7 @@
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
 #include "entity/storage.hpp"
+#include "entity/table.hpp"
 #include "entity/view.hpp"
 #include "graph/adjacency_matrix.hpp"
 #include "graph/dot.hpp"
