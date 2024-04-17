@@ -31,10 +31,6 @@ struct basic_common_table {
  * no guarantees that objects are returned in the insertion order when iterate
  * a table. Do not make assumption on the order in any case.
  *
- * @warning
- * Empty types aren't explicitly instantiated. Therefore, many of the functions
- * normally available for non-empty types will not be available for empty ones.
- *
  * @tparam Type Element types.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
