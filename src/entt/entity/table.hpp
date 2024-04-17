@@ -111,6 +111,32 @@ public:
         return std::get<0>(payload).get_allocator();
     }
 
+    /**
+     * @brief Increases the capacity of a table.
+     *
+     * If the new capacity is greater than the current capacity, new storage is
+     * allocated, otherwise the method does nothing.
+     *
+     * @param cap Desired capacity.
+     */
+    void reserve(const size_type cap) override {
+        (std::get<container_for<Row>>(payload).reserve(cap), ...);
+    }
+
+    /**
+     * @brief Returns the number of rows that a table has currently allocated
+     * space for.
+     * @return Capacity of the table.
+     */
+    [[nodiscard]] size_type capacity() const noexcept override {
+        return std::get<0>(payload).capacity();
+    }
+
+    /*! @brief Requests the removal of unused capacity. */
+    void shrink_to_fit() override {
+        (std::get<container_for<Row>>(payload).shrink_to_fit(), ...);
+    }
+
 private:
     container_type payload;
 };
