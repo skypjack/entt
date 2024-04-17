@@ -34,13 +34,24 @@ struct basic_common_table {
  * @tparam Type Element types.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename... Type, typename Allocator>
-class basic_table<type_list<Type...>, Allocator> {
+template<typename... Row, typename Allocator>
+class basic_table<type_list<Row...>, Allocator>: internal::basic_common_table {
     using alloc_traits = std::allocator_traits<Allocator>;
+    static_assert(sizeof...(Row) != 0u, "Empty tables not allowed");
+
+    template<typename Type>
+    using container_for = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
+
+    using container_type = std::tuple<container_for<Row>...>;
+    using underlying_type = internal::basic_common_table;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
+    /*! @brief Base type. */
+    using base_type = underlying_type;
+    /*! @brief Unsigned integer type. */
+    using size_type = typename base_type::size_type;
 
     /*! @brief Default constructor. */
     basic_table()
@@ -52,14 +63,14 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_table(const allocator_type &allocator)
-        : alloc{allocator} {}
+        : payload{container_for<Row>{allocator}...} {}
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
     basic_table(basic_table &&other) noexcept
-        : alloc{std::move(other.alloc)} {}
+        : payload{std::move(other.payload)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -67,19 +78,20 @@ public:
      * @param allocator The allocator to use.
      */
     basic_table(basic_table &&other, const allocator_type &allocator) noexcept
-        : alloc{allocator} {
+        : payload{std::move(other.payload), allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
     }
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This storage.
+     * @return This table.
      */
     basic_table &operator=(basic_table &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
 
-        alloc = std::move(other.alloc)
+        payload = std::move(other.payload);
+        return *this;
     }
 
     /**
@@ -88,7 +100,7 @@ public:
      */
     void swap(basic_table &other) {
         using std::swap;
-        swap(alloc, other.alloc);
+        swap(payload, other.payload);
     }
 
     /**
@@ -96,11 +108,11 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return alloc;
+        return std::get<0>(payload).get_allocator();
     }
 
 private:
-    allocator_type alloc;
+    container_type payload;
 };
 
 } // namespace entt
