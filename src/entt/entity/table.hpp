@@ -1,11 +1,28 @@
 #ifndef ENTT_ENTITY_TABLE_HPP
 #define ENTT_ENTITY_TABLE_HPP
 
+#include <cstddef>
 #include <memory>
+#include <tuple>
 #include <utility>
+#include <vector>
 #include "fwd.hpp"
 
 namespace entt {
+
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+struct basic_common_table {
+    using size_type = std::size_t;
+
+    virtual void reserve(const size_type) = 0;
+    [[nodiscard]] virtual size_type capacity() const noexcept = 0;
+    virtual void shrink_to_fit() = 0;
+};
+
+} // namespace internal
+/*! @endcond */
 
 /**
  * @brief Basic table implementation.
