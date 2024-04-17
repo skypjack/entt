@@ -10,7 +10,6 @@ DOC:
 * bump entities, reserved bits on identifiers
 
 TODO:
-* resource cache: avoid using shared ptr with loader and the others
 * further optimize exclusion lists in multi type views (no existence check)
 * further improve meta resolve function by id (bimap)
 * get rid of observers, storage based views made them pointless - document alternatives
@@ -21,10 +20,9 @@ TODO:
 * view: update natvis as needed after the last rework, merge pools/filter in the same array, drop check (?) and turn view into a position
 * view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
-* review all // NOLINT + linter workflow + review clang-tidy file
+* review all // NOLINT
 * self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
-* group review: use handler as base with protected members and arrays of common type (see view for further details)
 * test: push sharing types further
 * after non-continuous generation for entity storage:
   - get/reset placeholder to position after saving/loading (avoid long lookup)
@@ -33,4 +31,5 @@ TODO:
 * view: review tombstone checks, no longer required with storage entity and Get 1
 * review the short-circuit model now that all storage are freely available
 * more test around views and storage entity - ie view ::back
-* drop swap-only mode, too ambiguous for my tastes
+* compilation flag to disable sigh mixin by default and only have plain storage types for all components
+* empty type optimization for tables (when they are in-place, no rush)
