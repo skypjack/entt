@@ -129,10 +129,10 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 template<typename It, typename... Type>
 struct extended_view_iterator final {
     using iterator_type = It;
-    using difference_type = std::ptrdiff_t;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Type>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 

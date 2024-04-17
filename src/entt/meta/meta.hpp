@@ -1631,10 +1631,10 @@ class meta_sequence_container::meta_iterator final {
     }
 
 public:
-    using difference_type = std::ptrdiff_t;
     using value_type = meta_any;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::bidirectional_iterator_tag;
 
@@ -1722,10 +1722,10 @@ class meta_associative_container::meta_iterator final {
     }
 
 public:
-    using difference_type = std::ptrdiff_t;
     using value_type = std::pair<meta_any, meta_any>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 
