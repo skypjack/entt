@@ -137,6 +137,14 @@ public:
         (std::get<container_for<Row>>(payload).shrink_to_fit(), ...);
     }
 
+    /**
+     * @brief Returns the number of rows in a table.
+     * @return Number of rows.
+     */
+    [[nodiscard]] size_type size() const noexcept {
+        return std::get<0>(payload).size();
+    }
+
 private:
     container_type payload;
 };
