@@ -75,7 +75,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return {it->first, Type{*ctx, it->second}};
+        return operator[](0);
     }
 
     template<typename... Args>
