@@ -145,6 +145,14 @@ public:
         return std::get<0>(payload).size();
     }
 
+    /**
+     * @brief Checks whether a table is empty.
+     * @return True if the table is empty, false otherwise.
+     */
+    [[nodiscard]] bool empty() const noexcept {
+        return std::get<0>(payload).empty();
+    }
+
 private:
     container_type payload;
 };
