@@ -99,7 +99,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return {it->first, *it->second};
+        return operator[](0);
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
