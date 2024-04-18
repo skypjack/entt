@@ -153,6 +153,11 @@ public:
         return std::get<0>(payload).empty();
     }
 
+    /*! @brief Clears a table. */
+    void clear() {
+        (std::get<container_for<Row>>(payload).clear(), ...);
+    }
+
 private:
     container_type payload;
 };
