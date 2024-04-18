@@ -94,9 +94,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        const auto pos = index();
-        constexpr auto page_size = component_traits<typename Container::value_type>::page_size;
-        return (*payload)[pos / page_size] + fast_mod(pos, page_size);
+        return std::addressof(operator[](0));
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
