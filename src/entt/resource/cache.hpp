@@ -85,7 +85,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return (*this)[0];
+        return operator[](0);
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
