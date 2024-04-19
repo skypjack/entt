@@ -2,10 +2,13 @@
 #define ENTT_ENTITY_TABLE_HPP
 
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
+#include "../core/iterator.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -20,6 +23,119 @@ struct basic_common_table {
     [[nodiscard]] virtual size_type capacity() const noexcept = 0;
     virtual void shrink_to_fit() = 0;
 };
+
+template<typename... It>
+struct table_iterator {
+    using value_type = decltype(std::forward_as_tuple(*std::declval<It>()...));
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
+    using iterator_concept = std::random_access_iterator_tag;
+
+    constexpr table_iterator() noexcept = default;
+
+    constexpr table_iterator(It... from) noexcept
+        : it{from...} {}
+
+    template<typename... Other, typename = std::enable_if_t<std::is_constructible_v<It, Other>...>>
+    constexpr table_iterator(const table_iterator<Other...> &other) noexcept
+        : table_iterator{std::get<Other>(other.it)...} {}
+
+    constexpr table_iterator &operator++() noexcept {
+        return (++std::get<It>(it)..., *this);
+    }
+
+    constexpr table_iterator operator++(int) noexcept {
+        table_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    constexpr table_iterator &operator--() noexcept {
+        return (--std::get<It>(it)..., *this);
+    }
+
+    constexpr table_iterator operator--(int) noexcept {
+        table_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    constexpr table_iterator &operator+=(const difference_type value) noexcept {
+        return ((std::get<It>(it) += value)..., *this);
+    }
+
+    constexpr table_iterator operator+(const difference_type value) const noexcept {
+        table_iterator copy = *this;
+        return (copy += value);
+    }
+
+    constexpr table_iterator &operator-=(const difference_type value) noexcept {
+        return (*this += -value);
+    }
+
+    constexpr table_iterator operator-(const difference_type value) const noexcept {
+        return (*this + -value);
+    }
+
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
+        return std::forward_as_tuple(*std::get<It>(it)...);
+    }
+
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
+        return std::addressof(operator[](0));
+    }
+
+    [[nodiscard]] constexpr reference operator*() const noexcept {
+        return *operator->();
+    }
+
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
+
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
+
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator<(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
+
+private:
+    std::tuple<It...> it;
+};
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(rhs.it) - std::get<0>(lhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) == std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) > std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs < rhs);
+}
 
 } // namespace internal
 /*! @endcond */
