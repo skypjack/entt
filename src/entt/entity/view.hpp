@@ -258,7 +258,7 @@ public:
     using entity_type = typename Type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Bidirectional iterator type. */
+    /*! @brief Forward iterator type. */
     using iterator = internal::view_iterator<common_type, Get, Exclude>;
 
     /*! @brief Updates the internal leading view if required. */
@@ -428,7 +428,7 @@ public:
     using entity_type = typename base_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename base_type::size_type;
-    /*! @brief Bidirectional iterator type. */
+    /*! @brief Forward iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Iterable view type. */
     using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, Get...>>;
@@ -637,7 +637,7 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator = typename common_type::iterator;
-    /*! @brief Reversed iterator type. */
+    /*! @brief Reverse iterator type. */
     using reverse_iterator = typename common_type::reverse_iterator;
 
     /**
@@ -778,7 +778,7 @@ public:
     using size_type = typename base_type::size_type;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
-    /*! @brief Reversed iterator type. */
+    /*! @brief Reverse iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable = decltype(std::declval<Get>().each());

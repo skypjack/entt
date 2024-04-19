@@ -305,7 +305,7 @@ public:
     using common_type = base_type;
     /*! @brief Random access iterator type. */
     using iterator = typename common_type::iterator;
-    /*! @brief Reversed iterator type. */
+    /*! @brief Reverse iterator type. */
     using reverse_iterator = typename common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<>, get_t<Get...>>>;
@@ -720,7 +720,7 @@ public:
     using common_type = base_type;
     /*! @brief Random access iterator type. */
     using iterator = typename common_type::iterator;
-    /*! @brief Reversed iterator type. */
+    /*! @brief Reverse iterator type. */
     using reverse_iterator = typename common_type::reverse_iterator;
     /*! @brief Iterable group type. */
     using iterable = iterable_adaptor<internal::extended_group_iterator<iterator, owned_t<Owned...>, get_t<Get...>>>;
