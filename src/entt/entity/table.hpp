@@ -38,12 +38,12 @@ struct table_iterator {
     constexpr table_iterator(It... from) noexcept
         : it{from...} {}
 
-    template<typename... Other, typename = std::enable_if_t<std::is_constructible_v<It, Other>...>>
+    template<typename... Other, typename = std::enable_if_t<(std::is_constructible_v<It, Other> && ...)>>
     constexpr table_iterator(const table_iterator<Other...> &other) noexcept
         : table_iterator{std::get<Other>(other.it)...} {}
 
     constexpr table_iterator &operator++() noexcept {
-        return (++std::get<It>(it)..., *this);
+        return (++std::get<It>(it), ...), *this;
     }
 
     constexpr table_iterator operator++(int) noexcept {
@@ -52,7 +52,7 @@ struct table_iterator {
     }
 
     constexpr table_iterator &operator--() noexcept {
-        return (--std::get<It>(it)..., *this);
+        return (--std::get<It>(it), ...), *this;
     }
 
     constexpr table_iterator operator--(int) noexcept {
@@ -61,7 +61,7 @@ struct table_iterator {
     }
 
     constexpr table_iterator &operator+=(const difference_type value) noexcept {
-        return ((std::get<It>(it) += value)..., *this);
+        return ((std::get<It>(it) += value), ...), *this;
     }
 
     constexpr table_iterator operator+(const difference_type value) const noexcept {
