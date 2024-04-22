@@ -277,6 +277,45 @@ public:
         return std::get<0>(payload).empty();
     }
 
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * If the table is empty, the returned iterator will be equal to `end()`.
+     *
+     * @return An iterator to the first row of the table.
+     */
+    [[nodiscard]] const_iterator cbegin() const noexcept {
+        return {std::get<container_for<Row>>(payload).cbegin()...};
+    }
+
+    /*! @copydoc cbegin */
+    [[nodiscard]] const_iterator begin() const noexcept {
+        return cbegin();
+    }
+
+    /*! @copydoc begin */
+    [[nodiscard]] iterator begin() noexcept {
+        return {std::get<container_for<Row>>(payload).begin()...};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     * @return An iterator to the element following the last row of the table.
+     */
+    [[nodiscard]] const_iterator cend() const noexcept {
+        return {std::get<container_for<Row>>(payload).cend()...};
+    }
+
+    /*! @copydoc cend */
+    [[nodiscard]] const_iterator end() const noexcept {
+        return cend();
+    }
+
+    /*! @copydoc end */
+    [[nodiscard]] iterator end() noexcept {
+        return {std::get<container_for<Row>>(payload).end()...};
+    }
+
     /*! @brief Clears a table. */
     void clear() {
         (std::get<container_for<Row>>(payload).clear(), ...);
