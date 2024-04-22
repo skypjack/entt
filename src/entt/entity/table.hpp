@@ -168,6 +168,14 @@ public:
     using base_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename base_type::size_type;
+    /*! @brief Input iterator type. */
+    using iterator = internal::table_iterator<typename container_for<Row>::iterator...>;
+    /*! @brief Constant input iterator type. */
+    using const_iterator = internal::table_iterator<typename container_for<Row>::const_iterator...>;
+    /*! @brief Reverse iterator type. */
+    using reverse_iterator = internal::table_iterator<typename container_for<Row>::reverse_iterator...>;
+    /*! @brief Constant reverse iterator type. */
+    using const_reverse_iterator = internal::table_iterator<typename container_for<Row>::const_reverse_iterator...>;
 
     /*! @brief Default constructor. */
     basic_table()
