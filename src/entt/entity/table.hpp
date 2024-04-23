@@ -316,6 +316,46 @@ public:
         return {std::get<container_for<Row>>(payload).end()...};
     }
 
+    /**
+     * @brief Returns a reverse iterator to the beginning.
+     *
+     * If the table is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @return An iterator to the first row of the reversed table.
+     */
+    [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
+        return {std::get<container_for<Row>>(payload).crbegin()...};
+    }
+
+    /*! @copydoc crbegin */
+    [[nodiscard]] const_reverse_iterator rbegin() const noexcept {
+        return crbegin();
+    }
+
+    /*! @copydoc rbegin */
+    [[nodiscard]] reverse_iterator rbegin() noexcept {
+        return {std::get<container_for<Row>>(payload).rbegin()...};
+    }
+
+    /**
+     * @brief Returns a reverse iterator to the end.
+     * @return An iterator to the element following the last row of the reversed
+     * table.
+     */
+    [[nodiscard]] const_reverse_iterator crend() const noexcept {
+        return {std::get<container_for<Row>>(payload).crend()...};
+    }
+
+    /*! @copydoc crend */
+    [[nodiscard]] const_reverse_iterator rend() const noexcept {
+        return crend();
+    }
+
+    /*! @copydoc rend */
+    [[nodiscard]] reverse_iterator rend() noexcept {
+        return {std::get<container_for<Row>>(payload).rend()...};
+    }
+
     /*! @brief Clears a table. */
     void clear() {
         (std::get<container_for<Row>>(payload).clear(), ...);
