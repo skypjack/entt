@@ -78,7 +78,7 @@ struct table_iterator {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return std::forward_as_tuple(*std::get<It>(it)...);
+        return std::forward_as_tuple(std::get<It>(it)[value]...);
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
