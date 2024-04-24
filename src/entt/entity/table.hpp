@@ -147,7 +147,7 @@ template<typename... Lhs, typename... Rhs>
  * no guarantees that objects are returned in the insertion order when iterate
  * a table. Do not make assumption on the order in any case.
  *
- * @tparam Type Element types.
+ * @tparam Row Element types.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename... Row, typename Allocator>
