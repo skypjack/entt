@@ -357,6 +357,17 @@ public:
     }
 
     /**
+     * @brief Appends a row to the end of a table.
+     * @tparam Args Types of arguments to use to construct the row data.
+     * @param args Parameters to use to construct the row data.
+     * @return A reference to the newly created row data.
+     */
+    template<typename... Args>
+    std::tuple<Row &> emplace(Args &&...args) {
+        return std::forward_as_tuple(std::get<container_for<Row>>(payload).emplace_back(std::forward<Args>(args))...);
+    }
+
+    /**
      * @brief Returns the row data at specified location.
      * @param pos The row for which to return the data.
      * @return The row data at specified location.
