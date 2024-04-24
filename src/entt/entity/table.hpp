@@ -363,7 +363,7 @@ public:
      * @return A reference to the newly created row data.
      */
     template<typename... Args>
-    std::tuple<Row &> emplace(Args &&...args) {
+    std::tuple<Row &...> emplace(Args &&...args) {
         return std::forward_as_tuple(std::get<container_for<Row>>(payload).emplace_back(std::forward<Args>(args))...);
     }
 
