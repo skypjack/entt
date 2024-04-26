@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "../config/config.h"
 #include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "fwd.hpp"
@@ -370,6 +371,25 @@ public:
     template<typename... Args>
     std::tuple<Row &...> emplace(Args &&...args) {
         return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back(std::forward<Args>(args))...);
+    }
+
+    /**
+     * @brief Removes a row from a table.
+     * @param pos An iterator to the row to remove.
+     * @return An iterator following the removed row.
+     */
+    iterator erase(const_iterator pos) {
+        const auto diff = pos - begin();
+        return {std::get<container_for<Row>>(payload.first()).erase(std::get<container_for<Row>>(payload.first()).begin() + diff)...};
+    }
+
+    /**
+     * @brief Removes a row from a table.
+     * @param pos Index of the row to remove.
+     */
+    void erase(const size_type pos) {
+        ENTT_ASSERT(pos < size(), "Index out of bounds");
+        erase(begin() + static_cast<typename const_iterator::difference_type>(pos));
     }
 
     /**
