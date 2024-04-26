@@ -715,7 +715,7 @@ public:
      * @return The entity at specified location.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const noexcept {
-        ENTT_ASSERT(pos < packed.size(), "Position is out of bounds");
+        ENTT_ASSERT(pos < packed.size(), "Index out of bounds");
         return packed[pos];
     }
 
