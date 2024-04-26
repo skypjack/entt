@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "fwd.hpp"
 
@@ -187,7 +188,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_table(const allocator_type &allocator)
-        : payload{container_for<Row>{allocator}...} {}
+        : payload{container_type{container_for<Row>{allocator}...}, allocator} {}
 
     /**
      * @brief Move constructor.
@@ -202,7 +203,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_table(basic_table &&other, const allocator_type &allocator) noexcept
-        : payload{std::move(other.payload), allocator} {
+        : payload{container_type{container_for<Row>{std::move(std::get<container_for<Row>>(other.payload.first())), allocator}...}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
     }
 
@@ -232,7 +233,7 @@ public:
      * @return The associated allocator.
      */
     [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return std::get<0>(payload).get_allocator();
+        return payload.second();
     }
 
     /**
@@ -244,7 +245,7 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(const size_type cap) override {
-        (std::get<container_for<Row>>(payload).reserve(cap), ...);
+        (std::get<container_for<Row>>(payload.first()).reserve(cap), ...);
     }
 
     /**
@@ -253,12 +254,12 @@ public:
      * @return Capacity of the table.
      */
     [[nodiscard]] size_type capacity() const noexcept override {
-        return std::get<0>(payload).capacity();
+        return std::get<0>(payload.first()).capacity();
     }
 
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() override {
-        (std::get<container_for<Row>>(payload).shrink_to_fit(), ...);
+        (std::get<container_for<Row>>(payload.first()).shrink_to_fit(), ...);
     }
 
     /**
@@ -266,7 +267,7 @@ public:
      * @return Number of rows.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return std::get<0>(payload).size();
+        return std::get<0>(payload.first()).size();
     }
 
     /**
@@ -274,7 +275,7 @@ public:
      * @return True if the table is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return std::get<0>(payload).empty();
+        return std::get<0>(payload.first()).empty();
     }
 
     /**
@@ -285,7 +286,7 @@ public:
      * @return An iterator to the first row of the table.
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
-        return {std::get<container_for<Row>>(payload).cbegin()...};
+        return {std::get<container_for<Row>>(payload.first()).cbegin()...};
     }
 
     /*! @copydoc cbegin */
@@ -295,7 +296,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() noexcept {
-        return {std::get<container_for<Row>>(payload).begin()...};
+        return {std::get<container_for<Row>>(payload.first()).begin()...};
     }
 
     /**
@@ -303,7 +304,7 @@ public:
      * @return An iterator to the element following the last row of the table.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
-        return {std::get<container_for<Row>>(payload).cend()...};
+        return {std::get<container_for<Row>>(payload.first()).cend()...};
     }
 
     /*! @copydoc cend */
@@ -313,7 +314,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
-        return {std::get<container_for<Row>>(payload).end()...};
+        return {std::get<container_for<Row>>(payload.first()).end()...};
     }
 
     /**
@@ -324,7 +325,7 @@ public:
      * @return An iterator to the first row of the reversed table.
      */
     [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
-        return {std::get<container_for<Row>>(payload).crbegin()...};
+        return {std::get<container_for<Row>>(payload.first()).crbegin()...};
     }
 
     /*! @copydoc crbegin */
@@ -334,7 +335,7 @@ public:
 
     /*! @copydoc rbegin */
     [[nodiscard]] reverse_iterator rbegin() noexcept {
-        return {std::get<container_for<Row>>(payload).rbegin()...};
+        return {std::get<container_for<Row>>(payload.first()).rbegin()...};
     }
 
     /**
@@ -343,7 +344,7 @@ public:
      * table.
      */
     [[nodiscard]] const_reverse_iterator crend() const noexcept {
-        return {std::get<container_for<Row>>(payload).crend()...};
+        return {std::get<container_for<Row>>(payload.first()).crend()...};
     }
 
     /*! @copydoc crend */
@@ -353,7 +354,7 @@ public:
 
     /*! @copydoc rend */
     [[nodiscard]] reverse_iterator rend() noexcept {
-        return {std::get<container_for<Row>>(payload).rend()...};
+        return {std::get<container_for<Row>>(payload.first()).rend()...};
     }
 
     /**
@@ -364,7 +365,7 @@ public:
      */
     template<typename... Args>
     std::tuple<Row &...> emplace(Args &&...args) {
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload).emplace_back(std::forward<Args>(args))...);
+        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back(std::forward<Args>(args))...);
     }
 
     /**
@@ -373,21 +374,21 @@ public:
      * @return The row data at specified location.
      */
     [[nodiscard]] std::tuple<const Row &...> operator[](const size_type pos) const {
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload)[pos]...);
+        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
     }
 
     /*! @copydoc operator[] */
     [[nodiscard]] std::tuple<Row &...> operator[](const size_type pos) {
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload)[pos]...);
+        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
     }
 
     /*! @brief Clears a table. */
     void clear() {
-        (std::get<container_for<Row>>(payload).clear(), ...);
+        (std::get<container_for<Row>>(payload.first()).clear(), ...);
     }
 
 private:
-    container_type payload;
+    compressed_pair<container_type, allocator_type> payload;
 };
 
 } // namespace entt
