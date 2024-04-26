@@ -26,7 +26,11 @@ struct basic_common_table {
 };
 
 template<typename... It>
-struct table_iterator {
+class table_iterator {
+    template<typename...>
+    friend class table_iterator;
+
+public:
     using value_type = decltype(std::forward_as_tuple(*std::declval<It>()...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
