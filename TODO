@@ -33,3 +33,5 @@ TODO:
 * more test around views and storage entity - ie view ::back
 * compilation flag to disable sigh mixin by default and only have plain storage types for all components
 * empty type optimization for tables (when they are in-place, no rush)
+* natvis for table class and all related types
+* single type view operator->
