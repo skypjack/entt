@@ -321,6 +321,7 @@ TYPED_TEST(Storage, ConstIterator) {
 
     iterator cend{pool.cbegin()};
     iterator cbegin{};
+
     cbegin = pool.cend();
     std::swap(cbegin, cend);
 
@@ -385,6 +386,7 @@ TYPED_TEST(Storage, ReverseIterator) {
 
     reverse_iterator end{pool.rbegin()};
     reverse_iterator begin{};
+
     begin = pool.rend();
     std::swap(begin, end);
 
@@ -425,6 +427,7 @@ TYPED_TEST(Storage, ReverseIterator) {
     ASSERT_EQ(end.base().index(), 0);
 
     pool.emplace(entt::entity{3}, 4);
+    begin = pool.rbegin();
     end = pool.rend();
 
     ASSERT_EQ(begin.base().index(), -1);
@@ -447,6 +450,7 @@ TYPED_TEST(Storage, ConstReverseIterator) {
 
     const_reverse_iterator cend{pool.crbegin()};
     const_reverse_iterator cbegin{};
+
     cbegin = pool.crend();
     std::swap(cbegin, cend);
 
@@ -489,6 +493,7 @@ TYPED_TEST(Storage, ConstReverseIterator) {
     ASSERT_EQ(cend.base().index(), 0);
 
     pool.emplace(entt::entity{3}, 4);
+    cbegin = pool.crbegin();
     cend = pool.crend();
 
     ASSERT_EQ(cbegin.base().index(), -1);
