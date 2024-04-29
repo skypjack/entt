@@ -219,7 +219,6 @@ public:
      */
     basic_table &operator=(basic_table &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
-
         payload = std::move(other.payload);
         return *this;
     }
