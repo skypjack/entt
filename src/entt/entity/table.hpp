@@ -110,7 +110,7 @@ private:
 
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
-    return std::get<0>(rhs.it) - std::get<0>(lhs.it);
+    return std::get<0>(lhs.it) - std::get<0>(rhs.it);
 }
 
 template<typename... Lhs, typename... Rhs>
