@@ -88,7 +88,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::addressof(operator[](0));
+        return {operator[](0)};
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
