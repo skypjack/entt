@@ -16,5 +16,3 @@ TEST(Table, Constructors) {
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = table.get_allocator());
 }
-
-}
