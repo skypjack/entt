@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/iterator.hpp>
 #include <entt/entity/table.hpp>
+#include "../../common/config.h"
 #include "../../common/linter.hpp"
 
 TEST(Table, Constructors) {
@@ -125,4 +126,20 @@ TEST(Table, ShrinkToFit) {
 
     ASSERT_EQ(table.capacity(), 0u);
     ASSERT_TRUE(table.empty());
+}
+
+TEST(Table, Indexing) {
+    entt::table<int, char> table;
+
+    table.emplace(3, 'c');
+    table.emplace(0, '\0');
+
+    ASSERT_EQ(table[0u], std::make_tuple(3, 'c'));
+    ASSERT_EQ(table[1u], std::make_tuple(0, '\0'));
+}
+
+ENTT_DEBUG_TEST(TableDeathTest, Indexing) {
+    entt::table<int, char> table;
+
+    ASSERT_DEATH([[maybe_unused]] auto value = table[0u], "");
 }
