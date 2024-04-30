@@ -143,3 +143,26 @@ ENTT_DEBUG_TEST(TableDeathTest, Indexing) {
 
     ASSERT_DEATH([[maybe_unused]] auto value = table[0u], "");
 }
+
+TEST(Table, Clear) {
+    entt::table<int, char> table;
+
+    table.emplace(3, 'c');
+    table.emplace(0, '\0');
+
+    ASSERT_EQ(table.size(), 2u);
+
+    table.clear();
+
+    ASSERT_EQ(table.size(), 0u);
+
+    table.emplace(3, 'c');
+    table.emplace(0, '\0');
+    table.erase(0u);
+
+    ASSERT_EQ(table.size(), 1u);
+
+    table.clear();
+
+    ASSERT_EQ(table.size(), 0u);
+}
