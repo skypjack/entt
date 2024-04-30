@@ -84,3 +84,45 @@ TEST(Table, Swap) {
     ASSERT_EQ(table[0u], std::make_tuple(0, '\0'));
     ASSERT_EQ(other[0u], std::make_tuple(3, 'c'));
 }
+
+TEST(Table, Capacity) {
+    entt::table<int, char> table;
+
+    ASSERT_EQ(table.capacity(), 0u);
+    ASSERT_TRUE(table.empty());
+
+    table.reserve(64u);
+
+    ASSERT_EQ(table.capacity(), 64u);
+    ASSERT_TRUE(table.empty());
+
+    table.reserve(0);
+
+    ASSERT_EQ(table.capacity(), 64u);
+    ASSERT_TRUE(table.empty());
+}
+
+TEST(Table, ShrinkToFit) {
+    entt::table<int, char> table;
+
+    table.reserve(64u);
+    table.emplace(3, 'c');
+
+    ASSERT_EQ(table.capacity(), 64u);
+    ASSERT_FALSE(table.empty());
+
+    table.shrink_to_fit();
+
+    ASSERT_EQ(table.capacity(), 1u);
+    ASSERT_FALSE(table.empty());
+
+    table.clear();
+
+    ASSERT_EQ(table.capacity(), 1u);
+    ASSERT_TRUE(table.empty());
+
+    table.shrink_to_fit();
+
+    ASSERT_EQ(table.capacity(), 0u);
+    ASSERT_TRUE(table.empty());
+}
