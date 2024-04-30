@@ -397,11 +397,13 @@ public:
      * @return The row data at specified location.
      */
     [[nodiscard]] std::tuple<const Row &...> operator[](const size_type pos) const {
+        ENTT_ASSERT(pos < size(), "Index out of bounds");
         return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
     }
 
     /*! @copydoc operator[] */
     [[nodiscard]] std::tuple<Row &...> operator[](const size_type pos) {
+        ENTT_ASSERT(pos < size(), "Index out of bounds");
         return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
     }
 
