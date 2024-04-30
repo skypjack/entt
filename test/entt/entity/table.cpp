@@ -62,3 +62,25 @@ TEST(Table, Move) {
 
     ASSERT_EQ(other[0u], std::make_tuple(3, 'c'));
 }
+
+TEST(Table, Swap) {
+    entt::table<int, char> table;
+    entt::table<int, char> other;
+
+    table.emplace(3, 'c');
+
+    other.emplace(1, 'a');
+    other.emplace(0, '\0');
+    other.erase(0u);
+
+    ASSERT_EQ(table.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    table.swap(other);
+
+    ASSERT_EQ(table.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(table[0u], std::make_tuple(0, '\0'));
+    ASSERT_EQ(other[0u], std::make_tuple(3, 'c'));
+}
