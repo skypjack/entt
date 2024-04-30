@@ -142,6 +142,7 @@ ENTT_DEBUG_TEST(TableDeathTest, Indexing) {
     entt::table<int, char> table;
 
     ASSERT_DEATH([[maybe_unused]] auto value = table[0u], "");
+    ASSERT_DEATH([[maybe_unused]] auto value = std::as_const(table)[0u], "");
 }
 
 TEST(Table, Clear) {
