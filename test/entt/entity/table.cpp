@@ -128,6 +128,246 @@ TEST(Table, ShrinkToFit) {
     ASSERT_TRUE(table.empty());
 }
 
+TEST(Table, Iterator) {
+    using iterator = typename entt::table<int, char>::iterator;
+
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, std::tuple<int &, char &>>();
+
+    entt::table<int, char> table;
+    table.emplace(3, 'c');
+
+    iterator end{table.begin()};
+    iterator begin{};
+
+    begin = table.end();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, table.begin());
+    ASSERT_EQ(end, table.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, table.begin());
+    ASSERT_EQ(begin--, table.end());
+
+    ASSERT_EQ(begin + 1, table.end());
+    ASSERT_EQ(end - 1, table.begin());
+
+    ASSERT_EQ(++begin, table.end());
+    ASSERT_EQ(--begin, table.begin());
+
+    ASSERT_EQ(begin += 1, table.end());
+    ASSERT_EQ(begin -= 1, table.begin());
+
+    ASSERT_EQ(begin + (end - begin), table.end());
+    ASSERT_EQ(begin - (begin - end), table.end());
+
+    ASSERT_EQ(end - (end - begin), table.begin());
+    ASSERT_EQ(end + (begin - end), table.begin());
+
+    ASSERT_EQ(begin[0u], *table.begin().operator->());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, table.begin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, table.end());
+
+    table.emplace(0, '\0');
+    begin = table.begin();
+
+    ASSERT_EQ(begin[0u], std::make_tuple(3, 'c'));
+    ASSERT_EQ(begin[1u], std::make_tuple(0, '\0'));
+}
+
+TEST(Table, ConstIterator) {
+    using iterator = typename entt::table<int, char>::const_iterator;
+
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
+    testing::StaticAssertTypeEq<typename iterator::reference, std::tuple<const int &, const char &>>();
+
+    entt::table<int, char> table;
+    table.emplace(3, 'c');
+
+    iterator cend{table.cbegin()};
+    iterator cbegin{};
+
+    cbegin = table.cend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, std::as_const(table).begin());
+    ASSERT_EQ(cend, std::as_const(table).end());
+    ASSERT_EQ(cbegin, table.cbegin());
+    ASSERT_EQ(cend, table.cend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, table.cbegin());
+    ASSERT_EQ(cbegin--, table.cend());
+
+    ASSERT_EQ(cbegin + 1, table.cend());
+    ASSERT_EQ(cend - 1, table.cbegin());
+
+    ASSERT_EQ(++cbegin, table.cend());
+    ASSERT_EQ(--cbegin, table.cbegin());
+
+    ASSERT_EQ(cbegin += 1, table.cend());
+    ASSERT_EQ(cbegin -= 1, table.cbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), table.cend());
+    ASSERT_EQ(cbegin - (cbegin - cend), table.cend());
+
+    ASSERT_EQ(cend - (cend - cbegin), table.cbegin());
+    ASSERT_EQ(cend + (cbegin - cend), table.cbegin());
+
+    ASSERT_EQ(cbegin[0u], *table.cbegin().operator->());
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, table.cbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, table.cend());
+
+    table.emplace(0, '\0');
+    cbegin = table.cbegin();
+
+    ASSERT_EQ(cbegin[0u], std::make_tuple(3, 'c'));
+    ASSERT_EQ(cbegin[1u], std::make_tuple(0, '\0'));
+}
+
+TEST(Table, ReverseIterator) {
+    using reverse_iterator = typename entt::table<int, char>::reverse_iterator;
+
+    testing::StaticAssertTypeEq<typename reverse_iterator::value_type, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<typename reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
+    testing::StaticAssertTypeEq<typename reverse_iterator::reference, std::tuple<int &, char &>>();
+
+    entt::table<int, char> table;
+    table.emplace(3, 'c');
+
+    reverse_iterator end{table.rbegin()};
+    reverse_iterator begin{};
+
+    begin = table.rend();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, table.rbegin());
+    ASSERT_EQ(end, table.rend());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, table.rbegin());
+    ASSERT_EQ(begin--, table.rend());
+
+    ASSERT_EQ(begin + 1, table.rend());
+    ASSERT_EQ(end - 1, table.rbegin());
+
+    ASSERT_EQ(++begin, table.rend());
+    ASSERT_EQ(--begin, table.rbegin());
+
+    ASSERT_EQ(begin += 1, table.rend());
+    ASSERT_EQ(begin -= 1, table.rbegin());
+
+    ASSERT_EQ(begin + (end - begin), table.rend());
+    ASSERT_EQ(begin - (begin - end), table.rend());
+
+    ASSERT_EQ(end - (end - begin), table.rbegin());
+    ASSERT_EQ(end + (begin - end), table.rbegin());
+
+    ASSERT_EQ(begin[0u], *table.rbegin().operator->());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, table.rbegin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, table.rend());
+
+    table.emplace(0, '\0');
+    begin = table.rbegin();
+
+    ASSERT_EQ(begin[0u], std::make_tuple(0, '\0'));
+    ASSERT_EQ(begin[1u], std::make_tuple(3, 'c'));
+}
+
+TEST(Table, ConstReverseIterator) {
+    using const_reverse_iterator = typename entt::table<int, char>::const_reverse_iterator;
+
+    testing::StaticAssertTypeEq<typename const_reverse_iterator::value_type, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<typename const_reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
+    testing::StaticAssertTypeEq<typename const_reverse_iterator::reference, std::tuple<const int &, const char &>>();
+
+    entt::table<int, char> table;
+    table.emplace(3, 'c');
+
+    const_reverse_iterator cend{table.crbegin()};
+    const_reverse_iterator cbegin{};
+
+    cbegin = table.crend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, std::as_const(table).rbegin());
+    ASSERT_EQ(cend, std::as_const(table).rend());
+    ASSERT_EQ(cbegin, table.crbegin());
+    ASSERT_EQ(cend, table.crend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, table.crbegin());
+    ASSERT_EQ(cbegin--, table.crend());
+
+    ASSERT_EQ(cbegin + 1, table.crend());
+    ASSERT_EQ(cend - 1, table.crbegin());
+
+    ASSERT_EQ(++cbegin, table.crend());
+    ASSERT_EQ(--cbegin, table.crbegin());
+
+    ASSERT_EQ(cbegin += 1, table.crend());
+    ASSERT_EQ(cbegin -= 1, table.crbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), table.crend());
+    ASSERT_EQ(cbegin - (cbegin - cend), table.crend());
+
+    ASSERT_EQ(cend - (cend - cbegin), table.crbegin());
+    ASSERT_EQ(cend + (cbegin - cend), table.crbegin());
+
+    ASSERT_EQ(cbegin[0u], *table.crbegin().operator->());
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, table.crbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, table.crend());
+
+    table.emplace(0, '\0');
+    cbegin = table.crbegin();
+
+    ASSERT_EQ(cbegin[0u], std::make_tuple(0, '\0'));
+    ASSERT_EQ(cbegin[1u], std::make_tuple(3, 'c'));
+}
+
+TEST(Table, IteratorConversion) {
+    entt::table<int, char> table;
+
+    table.emplace(3, 'c');
+
+    const typename entt::table<int, char>::iterator it = table.begin();
+    typename entt::table<int, char>::const_iterator cit = it;
+
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<const int &, const char &>>();
+
+    ASSERT_EQ(*it.operator->(), std::make_tuple(3, 'c'));
+    ASSERT_EQ(*it.operator->(), *cit);
+
+    ASSERT_EQ(it - cit, 0);
+    ASSERT_EQ(cit - it, 0);
+    ASSERT_LE(it, cit);
+    ASSERT_LE(cit, it);
+    ASSERT_GE(it, cit);
+    ASSERT_GE(cit, it);
+    ASSERT_EQ(it, cit);
+    ASSERT_NE(++cit, it);
+}
+
 TEST(Table, Indexing) {
     entt::table<int, char> table;
 
