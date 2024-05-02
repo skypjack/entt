@@ -18,14 +18,6 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-struct basic_common_table {
-    using size_type = std::size_t;
-
-    virtual void reserve(const size_type) = 0;
-    [[nodiscard]] virtual size_type capacity() const noexcept = 0;
-    virtual void shrink_to_fit() = 0;
-};
-
 template<typename... It>
 class table_iterator {
     template<typename...>
@@ -157,7 +149,7 @@ template<typename... Lhs, typename... Rhs>
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename... Row, typename Allocator>
-class basic_table<type_list<Row...>, Allocator>: internal::basic_common_table {
+class basic_table<type_list<Row...>, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(sizeof...(Row) != 0u, "Empty tables not allowed");
 
@@ -165,15 +157,12 @@ class basic_table<type_list<Row...>, Allocator>: internal::basic_common_table {
     using container_for = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
 
     using container_type = std::tuple<container_for<Row>...>;
-    using underlying_type = internal::basic_common_table;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
-    /*! @brief Base type. */
-    using base_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename base_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator = internal::table_iterator<typename container_for<Row>::iterator...>;
     /*! @brief Constant input iterator type. */
@@ -248,7 +237,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) override {
+    void reserve(const size_type cap) {
         (std::get<container_for<Row>>(payload.first()).reserve(cap), ...);
     }
 
@@ -257,12 +246,12 @@ public:
      * space for.
      * @return Capacity of the table.
      */
-    [[nodiscard]] size_type capacity() const noexcept override {
+    [[nodiscard]] size_type capacity() const noexcept {
         return std::get<0>(payload.first()).capacity();
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    void shrink_to_fit() override {
+    void shrink_to_fit() {
         (std::get<container_for<Row>>(payload.first()).shrink_to_fit(), ...);
     }
 
@@ -369,7 +358,11 @@ public:
      */
     template<typename... Args>
     std::tuple<Row &...> emplace(Args &&...args) {
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back(std::forward<Args>(args))...);
+        if constexpr(sizeof...(Args) == 0u) {
+            return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back()...);
+        } else {
+            return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back(std::forward<Args>(args))...);
+        }
     }
 
     /**
