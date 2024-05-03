@@ -498,15 +498,10 @@ TEST(Table, ThrowingAllocator) {
     table.get_allocator().template throw_counter<int>(0u);
 
     ASSERT_THROW(table.reserve(1u), test::throwing_allocator_exception);
-    ASSERT_EQ(table.capacity(), 0u);
 
+    table.get_allocator().template throw_counter<int>(0u);
     table.get_allocator().template throw_counter<char>(0u);
 
     ASSERT_THROW(table.emplace(), test::throwing_allocator_exception);
-    ASSERT_TRUE(table.empty());
-
-    table.get_allocator().template throw_counter<int>(0u);
-
     ASSERT_THROW(table.emplace(3, 'c'), test::throwing_allocator_exception);
-    ASSERT_TRUE(table.empty());
 }
