@@ -377,6 +377,37 @@ TEST(Table, Emplace) {
     ASSERT_EQ(table.emplace(3, 'c'), std::make_tuple(3, 'c'));
 }
 
+TEST(Table, Erase) {
+    entt::table<int, char> table;
+
+    table.emplace(3, 'c');
+    table.emplace(0, '\0');
+    table.erase(table.begin());
+
+    ASSERT_EQ(table.size(), 1u);
+    ASSERT_EQ(table[0u], std::make_tuple(0, '\0'));
+
+    table.emplace(3, 'c');
+    table.erase(1u);
+
+    ASSERT_EQ(table.size(), 1u);
+    ASSERT_EQ(table[0u], std::make_tuple(0, '\0'));
+
+    table.erase(0u);
+
+    ASSERT_EQ(table.size(), 0u);
+}
+
+TEST(TableDeathTest, Erase) {
+    entt::table<int, char> table;
+
+    ASSERT_DEATH(table.erase(0u), "");
+
+    table.emplace(3, 'c');
+
+    ASSERT_DEATH(table.erase(1u), "");
+}
+
 TEST(Table, Indexing) {
     entt::table<int, char> table;
 
