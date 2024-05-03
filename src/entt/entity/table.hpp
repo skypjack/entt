@@ -31,7 +31,8 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::random_access_iterator_tag;
 
-    constexpr table_iterator() noexcept = default;
+    constexpr table_iterator() noexcept
+        : it{} {}
 
     constexpr table_iterator(It... from) noexcept
         : it{from...} {}
