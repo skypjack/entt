@@ -368,6 +368,15 @@ TEST(Table, IteratorConversion) {
     ASSERT_NE(++cit, it);
 }
 
+TEST(Table, Emplace) {
+    entt::table<int, char> table;
+
+    testing::StaticAssertTypeEq<decltype(table.emplace()), std::tuple<int &, char &>>();
+
+    ASSERT_EQ(table.emplace(), std::make_tuple(int{}, char{}));
+    ASSERT_EQ(table.emplace(3, 'c'), std::make_tuple(3, 'c'));
+}
+
 TEST(Table, Indexing) {
     entt::table<int, char> table;
 
