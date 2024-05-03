@@ -6,9 +6,11 @@
 struct BasicHashedString: ::testing::Test {
     static constexpr auto expected() noexcept {
         if constexpr(std::is_same_v<entt::id_type, std::uint32_t>) {
-            return 0xbf9cf968;
+            constexpr auto foobar_hash = 0xbf9cf968;
+            return foobar_hash;
         } else if constexpr(std::is_same_v<entt::id_type, std::uint64_t>) {
-            return 0x85944171f73967e8;
+            constexpr auto foobar_hash = 0x85944171f73967e8;
+            return foobar_hash;
         }
     }
 };
