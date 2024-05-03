@@ -7,6 +7,7 @@
 #include <entt/entity/table.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
+#include "../../common/throwing_allocator.hpp"
 
 TEST(Table, Constructors) {
     entt::table<int, char> table;
@@ -446,4 +447,66 @@ TEST(Table, Clear) {
     table.clear();
 
     ASSERT_EQ(table.size(), 0u);
+}
+
+TEST(Table, CustomAllocator) {
+    const test::throwing_allocator<void> allocator{};
+    entt::basic_table<entt::type_list<int, char>, test::throwing_allocator<void>> table{allocator};
+
+    table.reserve(1u);
+
+    ASSERT_NE(table.capacity(), 0u);
+
+    table.emplace(3, 'c');
+    table.emplace(0, '\0');
+
+    decltype(table) other{std::move(table), allocator};
+
+    test::is_initialized(table);
+
+    ASSERT_TRUE(table.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_NE(other.capacity(), 0u);
+    ASSERT_EQ(other.size(), 2u);
+
+    table = std::move(other);
+    test::is_initialized(other);
+
+    ASSERT_FALSE(table.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_NE(table.capacity(), 0u);
+    ASSERT_EQ(table.size(), 2u);
+
+    table.swap(other);
+    table = std::move(other);
+    test::is_initialized(other);
+
+    ASSERT_FALSE(table.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_NE(table.capacity(), 0u);
+    ASSERT_EQ(table.size(), 2u);
+
+    table.clear();
+
+    ASSERT_NE(table.capacity(), 0u);
+    ASSERT_EQ(table.size(), 0u);
+}
+
+TEST(Table, ThrowingAllocator) {
+    entt::basic_table<entt::type_list<int, char>, test::throwing_allocator<void>> table{};
+
+    table.get_allocator().template throw_counter<int>(0u);
+
+    ASSERT_THROW(table.reserve(1u), test::throwing_allocator_exception);
+    ASSERT_EQ(table.capacity(), 0u);
+
+    table.get_allocator().template throw_counter<char>(0u);
+
+    ASSERT_THROW(table.emplace(), test::throwing_allocator_exception);
+    ASSERT_TRUE(table.empty());
+
+    table.get_allocator().template throw_counter<int>(0u);
+
+    ASSERT_THROW(table.emplace(3, 'c'), test::throwing_allocator_exception);
+    ASSERT_TRUE(table.empty());
 }
