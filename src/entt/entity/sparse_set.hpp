@@ -136,7 +136,7 @@ template<typename Container>
 /*! @endcond */
 
 /**
- * @brief Basic sparse set implementation.
+ * @brief Sparse set implementation.
  *
  * Sparse set or packed array or whatever is the name users give it.<br/>
  * Two arrays: an _external_ one and an _internal_ one; a _sparse_ one and a

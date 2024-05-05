@@ -211,7 +211,7 @@ template<typename... Lhs, typename... Rhs>
 /*! @endcond */
 
 /**
- * @brief Basic storage implementation.
+ * @brief Storage implementation.
  *
  * Internal data structures arrange elements to maximize performance. There are
  * no guarantees that objects are returned in the insertion order when iterate

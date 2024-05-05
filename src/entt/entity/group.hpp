@@ -215,11 +215,11 @@ class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
 public:
     using common_type = Type;
 
-    template<typename Alloc, typename... GType, typename... EType>
-    group_handler(const Alloc &alloc, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
+    template<typename Allocator, typename... GType, typename... EType>
+    group_handler(const Allocator &allocator, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
         : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, Get>{&cpool...}; }, gpool)},
           filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
-          elem{alloc} {
+          elem{allocator} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
         common_setup();
