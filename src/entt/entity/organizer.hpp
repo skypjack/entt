@@ -167,14 +167,14 @@ public:
     struct vertex {
         /**
          * @brief Constructs a vertex of the task graph.
-         * @param vtype True if the vertex is a top-level one, false otherwise.
          * @param data The data associated with the vertex.
-         * @param edges The indices of the children in the adjacency list.
+         * @param from List of in-edges of the vertex.
+         * @param to List of out-edges of the vertex.
          */
-        vertex(const bool vtype, vertex_data data, std::vector<std::size_t> edges)
-            : is_top_level{vtype},
-              node{std::move(data)},
-              reachable{std::move(edges)} {}
+        vertex(vertex_data data, std::vector<std::size_t> from, std::vector<std::size_t> to)
+            : node{std::move(data)},
+              in{std::move(from)},
+              out{std::move(to)} {}
 
         /**
          * @brief Fills a buffer with the type info objects for the writable
@@ -219,7 +219,7 @@ public:
          * @return True if the vertex is a top-level one, false otherwise.
          */
         bool top_level() const noexcept {
-            return is_top_level;
+            return in.empty();
         }
 
         /**
@@ -255,11 +255,27 @@ public:
         }
 
         /**
+         * @brief Returns the list of in-edges of a vertex.
+         * @return The list of in-edges of a vertex.
+         */
+        const std::vector<std::size_t> &in_edges() const noexcept {
+            return in;
+        }
+
+        /**
+         * @brief Returns the list of out-edges of a vertex.
+         * @return The list of out-edges of a vertex.
+         */
+        const std::vector<std::size_t> &out_edges() const noexcept {
+            return out;
+        }
+
+        /**
          * @brief Returns the list of nodes reachable from a given vertex.
          * @return The list of nodes reachable from the vertex.
          */
-        const std::vector<std::size_t> &children() const noexcept {
-            return reachable;
+        [[deprecated("use ::out_edges")]] const std::vector<std::size_t> &children() const noexcept {
+            return out_edges();
         }
 
         /**
@@ -272,9 +288,9 @@ public:
         }
 
     private:
-        bool is_top_level;
         vertex_data node;
-        std::vector<std::size_t> reachable;
+        std::vector<std::size_t> in;
+        std::vector<std::size_t> out;
     };
 
     /**
@@ -375,14 +391,18 @@ public:
         auto adjacency_matrix = builder.graph();
 
         for(auto curr: adjacency_matrix.vertices()) {
-            const auto iterable = adjacency_matrix.in_edges(curr);
-            std::vector<std::size_t> reachable{};
+            std::vector<std::size_t> in{};
+            std::vector<std::size_t> out{};
 
-            for(auto &&edge: adjacency_matrix.out_edges(curr)) {
-                reachable.push_back(edge.second);
+            for(auto &&edge: adjacency_matrix.in_edges(curr)) {
+                in.push_back(edge.first);
             }
 
-            adjacency_list.emplace_back(iterable.cbegin() == iterable.cend(), vertices[curr], std::move(reachable));
+            for(auto &&edge: adjacency_matrix.out_edges(curr)) {
+                out.push_back(edge.second);
+            }
+
+            adjacency_list.emplace_back(vertices[curr], std::move(in), std::move(out));
         }
 
         return adjacency_list;
