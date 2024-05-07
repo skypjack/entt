@@ -170,7 +170,6 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/template.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/type_traits.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/utility.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/platform/android-ndk-r17.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/poly.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/fwd.hpp>
@@ -201,7 +200,6 @@ if(ENTT_HAS_NATVIS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/graph.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/locator.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/meta.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/platform.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/poly.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/process.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/resource.natvis>
