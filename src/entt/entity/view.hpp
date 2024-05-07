@@ -844,6 +844,14 @@ public:
     }
 
     /**
+     * @brief Returns a pointer to the underlying storage.
+     * @return A pointer to the underlying storage.
+     */
+    [[nodiscard]] Get *operator->() const noexcept {
+        return storage();
+    }
+
+    /**
      * @brief Returns the element assigned to the given entity.
      * @param entt A valid identifier.
      * @return The element assigned to the given entity.

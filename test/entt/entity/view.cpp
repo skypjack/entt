@@ -531,6 +531,37 @@ TEST(SingleComponentView, Storage) {
     ASSERT_EQ(cview.storage<const char>(), nullptr);
 }
 
+TEST(SingleComponentView, ArrowOperator) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    auto view = registry.view<int>();
+    auto cview = registry.view<const char>();
+
+    testing::StaticAssertTypeEq<decltype(view.operator->()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(cview.operator->()), const entt::storage_type_t<char> *>();
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+
+    ASSERT_NE(view.operator->(), nullptr);
+    ASSERT_NE(cview.operator->(), nullptr);
+
+    view->emplace(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_EQ(view.operator->(), &registry.storage<int>());
+    ASSERT_EQ(cview.operator->(), &registry.storage<char>());
+
+    ASSERT_EQ(view.operator->(), view.storage());
+    ASSERT_EQ(cview.operator->(), cview.storage());
+
+    view = {};
+    cview = {};
+
+    ASSERT_EQ(view.operator->(), nullptr);
+    ASSERT_EQ(cview.operator->(), nullptr);
+}
+
 TEST(SingleComponentView, SwapStorage) {
     using namespace entt::literals;
 
