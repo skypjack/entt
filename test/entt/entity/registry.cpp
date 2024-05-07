@@ -957,7 +957,7 @@ TEST(Registry, StableEmplace) {
     ASSERT_EQ(registry.emplace<int>(registry.create(), 1), 1);
 }
 
-TEST(RegistryDeathTest, Emplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, Emplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
@@ -1003,7 +1003,7 @@ TEST(Registry, Insert) {
     ASSERT_EQ(registry.get<float>(entity[2u]), 2.f);
 }
 
-TEST(RegistryDeathTest, Insert) {
+ENTT_DEBUG_TEST(RegistryDeathTest, Insert) {
     entt::registry registry{};
     const std::array entity{registry.create()};
     const std::array value{0};
@@ -1039,7 +1039,7 @@ TEST(Registry, EmplaceOrReplaceAggregate) {
     ASSERT_EQ(instance.value, 1);
 }
 
-TEST(RegistryDeathTest, EmplaceOrReplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, EmplaceOrReplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
@@ -1447,7 +1447,7 @@ TEST(Registry, GetOrEmplace) {
     ASSERT_EQ(registry.get<int>(entity), 3);
 }
 
-TEST(RegistryDeathTest, GetOrEmplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, GetOrEmplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
