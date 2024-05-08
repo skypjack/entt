@@ -446,7 +446,7 @@ TEST(Table, Indexing) {
     table.emplace(0, '\0');
 
     ASSERT_EQ(table[0u], std::make_tuple(3, 'c'));
-    ASSERT_EQ(table[1u], std::make_tuple(0, '\0'));
+    ASSERT_EQ(std::as_const(table)[1u], std::make_tuple(0, '\0'));
 }
 
 ENTT_DEBUG_TEST(TableDeathTest, Indexing) {
