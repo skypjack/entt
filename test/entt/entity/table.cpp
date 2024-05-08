@@ -10,13 +10,43 @@
 #include "../../common/throwing_allocator.hpp"
 
 TEST(Table, Constructors) {
-    entt::table<int, char> table;
+    const std::vector<int> vec_of_int{1};
+    const std::vector<char> vec_of_char{'a'};
+    entt::table<int, char> table{};
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = table.get_allocator());
+    ASSERT_TRUE(table.empty());
 
     table = entt::table<int, char>{std::allocator<void>{}};
 
-    ASSERT_NO_THROW([[maybe_unused]] auto alloc = table.get_allocator());
+    ASSERT_TRUE(table.empty());
+
+    table = entt::table<int, char>{vec_of_int, vec_of_char};
+
+    ASSERT_EQ(table.size(), 1);
+
+    table = entt::table<int, char>{std::vector<int>{1, 2}, std::vector<char>{'a', 'b'}};
+
+    ASSERT_EQ(table.size(), 2);
+
+    table = entt::table<int, char>{vec_of_int, vec_of_char, std::allocator<void>{}};
+
+    ASSERT_EQ(table.size(), 1);
+
+    table = entt::table<int, char>{std::vector<int>{1, 2}, std::vector<char>{'a', 'b'}, std::allocator<void>{}};
+
+    ASSERT_EQ(table.size(), 2);
+}
+
+ENTT_DEBUG_TEST(TableDeathTest, Constructors) {
+    const std::vector<int> vec_of_int{0};
+    const std::vector<char> vec_of_char{};
+    entt::table<int, char> table{};
+
+    ASSERT_DEATH((table = entt::table<int, char>{vec_of_int, vec_of_char}), "");
+    ASSERT_DEATH((table = entt::table<int, char>{std::vector<int>{}, std::vector<char>{'\0'}}), "");
+
+    ASSERT_DEATH((table = entt::table<int, char>{vec_of_int, vec_of_char, std::allocator<void>{}}), "");
+    ASSERT_DEATH((table = entt::table<int, char>{std::vector<int>{}, std::vector<char>{'\0'}, std::allocator<void>{}}), "");
 }
 
 TEST(Table, Move) {
@@ -399,7 +429,7 @@ TEST(Table, Erase) {
     ASSERT_EQ(table.size(), 0u);
 }
 
-TEST(TableDeathTest, Erase) {
+ENTT_DEBUG_TEST(TableDeathTest, Erase) {
     entt::table<int, char> table;
 
     ASSERT_DEATH(table.erase(0u), "");
@@ -451,7 +481,7 @@ TEST(Table, Clear) {
 
 TEST(Table, CustomAllocator) {
     const test::throwing_allocator<void> allocator{};
-    entt::basic_table<entt::type_list<int, char>, test::throwing_allocator<void>> table{allocator};
+    entt::basic_table<std::vector<int, test::throwing_allocator<int>>, std::vector<char, test::throwing_allocator<char>>> table{allocator};
 
     table.reserve(1u);
 
@@ -493,14 +523,15 @@ TEST(Table, CustomAllocator) {
 }
 
 TEST(Table, ThrowingAllocator) {
-    entt::basic_table<entt::type_list<int, char>, test::throwing_allocator<void>> table{};
+    test::throwing_allocator<void> allocator{};
+    entt::basic_table<std::vector<int, test::throwing_allocator<int>>, std::vector<char, test::throwing_allocator<char>>> table{allocator};
 
-    table.get_allocator().template throw_counter<int>(0u);
+    allocator.throw_counter<int>(0u);
 
     ASSERT_THROW(table.reserve(1u), test::throwing_allocator_exception);
 
-    table.get_allocator().template throw_counter<int>(0u);
-    table.get_allocator().template throw_counter<char>(0u);
+    allocator.throw_counter<int>(0u);
+    allocator.throw_counter<char>(0u);
 
     ASSERT_THROW(table.emplace(), test::throwing_allocator_exception);
     ASSERT_THROW(table.emplace(3, 'c'), test::throwing_allocator_exception);
