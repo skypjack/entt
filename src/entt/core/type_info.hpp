@@ -197,7 +197,7 @@ private:
  * @param rhs A valid type info object.
  * @return True if the first element is less than the second, false otherwise.
  */
-[[nodiscard]] constexpr bool operator<(const type_info &lhs, const type_info &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator<(const type_info &lhs, const type_info &rhs) noexcept {
     return lhs.index() < rhs.index();
 }
 
@@ -208,7 +208,7 @@ private:
  * @return True if the first element is less than or equal to the second, false
  * otherwise.
  */
-[[nodiscard]] constexpr bool operator<=(const type_info &lhs, const type_info &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator<=(const type_info &lhs, const type_info &rhs) noexcept {
     return !(rhs < lhs);
 }
 
@@ -219,7 +219,7 @@ private:
  * @return True if the first element is greater than the second, false
  * otherwise.
  */
-[[nodiscard]] constexpr bool operator>(const type_info &lhs, const type_info &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator>(const type_info &lhs, const type_info &rhs) noexcept {
     return rhs < lhs;
 }
 
@@ -230,7 +230,7 @@ private:
  * @return True if the first element is greater than or equal to the second,
  * false otherwise.
  */
-[[nodiscard]] constexpr bool operator>=(const type_info &lhs, const type_info &rhs) noexcept {
+[[nodiscard]] inline constexpr bool operator>=(const type_info &lhs, const type_info &rhs) noexcept {
     return !(lhs < rhs);
 }
 
