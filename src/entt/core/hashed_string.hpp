@@ -15,14 +15,12 @@ struct fnv1a_traits;
 
 template<>
 struct fnv1a_traits<std::uint32_t> {
-    using type = std::uint32_t;
     static constexpr std::uint32_t offset = 2166136261;
     static constexpr std::uint32_t prime = 16777619;
 };
 
 template<>
 struct fnv1a_traits<std::uint64_t> {
-    using type = std::uint64_t;
     static constexpr std::uint64_t offset = 14695981039346656037ull;
     static constexpr std::uint64_t prime = 1099511628211ull;
 };
@@ -74,7 +72,7 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
         base_type base{str, 0u, traits_type::offset};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<traits_type::type>(str[base.length])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * traits_type::prime;
         }
 
         return base;
@@ -85,7 +83,7 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
         base_type base{str, len, traits_type::offset};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<traits_type::type>(str[pos])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * traits_type::prime;
         }
 
         return base;
