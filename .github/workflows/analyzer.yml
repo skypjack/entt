@@ -15,7 +15,9 @@ jobs:
       IWYU: "0.22"
       LLVM: "18"
 
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - 1ES.Pool=MC-Runner-1ES-Linux
     continue-on-error: true
 
     steps:

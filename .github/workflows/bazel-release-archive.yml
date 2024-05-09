@@ -8,7 +8,9 @@ jobs:
   # A release archive is required for bzlmod
   # See: https://blog.bazel.build/2023/02/15/github-archive-checksum.html
   bazel-release-archive:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - 1ES.Pool=MC-Runner-1ES-Linux
     continue-on-error: true
     permissions:
       contents: write
