@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include "fwd.hpp"
 
 namespace entt {
@@ -10,20 +11,21 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename>
-struct fnv1a_traits;
+[[nodiscard]] inline constexpr auto offset() noexcept {
+    if constexpr(std::is_same_v<id_type, std::uint32_t>) {
+        return 2166136261;
+    } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
+        return 14695981039346656037ull;
+    }
+}
 
-template<>
-struct fnv1a_traits<std::uint32_t> {
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
-};
-
-template<>
-struct fnv1a_traits<std::uint64_t> {
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-};
+[[nodiscard]] inline constexpr auto prime() noexcept {
+    if constexpr(std::is_same_v<id_type, std::uint32_t>) {
+        return 16777619;
+    } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
+        return 1099511628211ull;
+    }
+}
 
 template<typename Char>
 struct basic_hashed_string {
@@ -57,7 +59,6 @@ struct basic_hashed_string {
 template<typename Char>
 class basic_hashed_string: internal::basic_hashed_string<Char> {
     using base_type = internal::basic_hashed_string<Char>;
-    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -69,10 +70,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str) noexcept {
-        base_type base{str, 0u, traits_type::offset};
+        base_type base{str, 0u, internal::offset()};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * internal::prime();
         }
 
         return base;
@@ -80,10 +81,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) noexcept {
-        base_type base{str, len, traits_type::offset};
+        base_type base{str, len, internal::offset()};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * internal::prime();
         }
 
         return base;
