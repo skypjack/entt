@@ -8,9 +8,7 @@ jobs:
 
   homebrew-entt:
     timeout-minutes: 5
-    runs-on:
-      - self-hosted
-      - 1ES.Pool=MC-Runner-1ES-Linux
+    runs-on: ubuntu-latest
 
     env:
       GH_REPO: homebrew-entt

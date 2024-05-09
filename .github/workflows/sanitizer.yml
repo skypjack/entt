@@ -13,9 +13,7 @@ jobs:
         id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
 
-    runs-on:
-      - self-hosted
-      - 1ES.Pool=MC-Runner-1ES-Linux
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
