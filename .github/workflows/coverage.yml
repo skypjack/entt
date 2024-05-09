@@ -6,7 +6,9 @@ jobs:
 
   codecov:
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - 1ES.Pool=MC-Runner-1ES-Linux
 
     steps:
     - uses: actions/checkout@v4
