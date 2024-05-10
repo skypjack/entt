@@ -421,6 +421,8 @@ public:
     using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator, reverse_iterator>>;
     /*! @brief Constant extended reverse iterable storage proxy. */
     using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator, const_reverse_iterator>>;
+    /*! @brief Storage deletion policy. */
+    static constexpr deletion_policy storage_policy{traits_type::in_place_delete};
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -431,7 +433,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<element_type>(), deletion_policy{traits_type::in_place_delete}, allocator},
+        : base_type{type_id<element_type>(), storage_policy, allocator},
           payload{allocator} {}
 
     /**
@@ -797,6 +799,8 @@ public:
     using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator>>;
     /*! @brief Constant extended reverse iterable storage proxy. */
     using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator>>;
+    /*! @brief Storage deletion policy. */
+    static constexpr deletion_policy storage_policy{traits_type::in_place_delete};
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -807,7 +811,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<element_type>(), deletion_policy{traits_type::in_place_delete}, allocator} {}
+        : base_type{type_id<element_type>(), storage_policy, allocator} {}
 
     /**
      * @brief Move constructor.
@@ -999,6 +1003,8 @@ public:
     using reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::reverse_iterator>>;
     /*! @brief Constant extended reverse iterable storage proxy. */
     using const_reverse_iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::const_reverse_iterator>>;
+    /*! @brief Storage deletion policy. */
+    static constexpr deletion_policy storage_policy = deletion_policy::swap_only;
 
     /*! @brief Default constructor. */
     basic_storage()
@@ -1010,7 +1016,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<void>(), deletion_policy::swap_only, allocator},
+        : base_type{type_id<void>(), storage_policy, allocator},
           placeholder{} {}
 
     /**
