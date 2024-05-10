@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <vector>
+#include "../config/config.h"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 
@@ -226,7 +227,7 @@ struct type_list_transform<owned_t<Type...>, Op> {
 template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
-    using type = sigh_mixin<basic_storage<Type, Entity, Allocator>>;
+    using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
 };
 
 /**
