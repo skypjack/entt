@@ -244,6 +244,7 @@ class basic_registry {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if constexpr(std::is_same_v<Type, entity_type>) {
+            ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
         } else {
             auto &cpool = pools[id];
@@ -272,6 +273,7 @@ class basic_registry {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if constexpr(std::is_same_v<Type, entity_type>) {
+            ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return &entities;
         } else {
             if(const auto it = pools.find(id); it != pools.cend()) {

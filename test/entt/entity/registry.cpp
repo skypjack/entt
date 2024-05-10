@@ -525,6 +525,9 @@ ENTT_DEBUG_TEST(RegistryDeathTest, Storage) {
 
     ASSERT_DEATH(registry.storage<int>("other"_hs), "");
     ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");
+
+    ASSERT_DEATH(registry.storage<entt::entity>("other"_hs), "");
+    ASSERT_DEATH(std::as_const(registry).storage<entt::entity>("other"_hs), "");
 }
 
 TEST(Registry, Identifiers) {
