@@ -60,6 +60,12 @@
 #    define ENTT_ETO_TYPE(Type) Type
 #endif
 
+#ifdef ENTT_NO_MIXIN
+#    define ENTT_STORAGE(Mixin, ...) __VA_ARGS__
+#else
+#    define ENTT_STORAGE(Mixin, ...) Mixin<__VA_ARGS__>
+#endif
+
 #ifdef ENTT_STANDARD_CPP
 #    define ENTT_NONSTD false
 #else
