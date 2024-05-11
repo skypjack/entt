@@ -17,15 +17,14 @@ struct clazz {
         value = i;
     }
 
-    static void func() {
-        c = 'd';
+    static char func() {
+        return 'c';
     }
 
     operator int() const {
         return value;
     }
 
-    inline static char c = 'c'; // NOLINT
     int value{0};
 };
 
@@ -1348,14 +1347,16 @@ TEST_F(MetaAny, Invoke) {
 
     clazz instance;
     auto any = entt::forward_as_meta(instance);
+    const auto result = any.invoke("func"_hs);
 
-    ASSERT_TRUE(any.invoke("func"_hs));
     ASSERT_TRUE(any.invoke("member"_hs, 3));
     ASSERT_FALSE(std::as_const(any).invoke("member"_hs, 3));
     ASSERT_FALSE(std::as_const(any).as_ref().invoke("member"_hs, 3));
     ASSERT_FALSE(any.invoke("non_existent"_hs, 3));
 
-    ASSERT_EQ(clazz::c, 'd');
+    ASSERT_TRUE(result);
+    ASSERT_NE(result.try_cast<char>(), nullptr);
+    ASSERT_EQ(result.cast<char>(), 'c');
     ASSERT_EQ(instance.value, 3);
 }
 
