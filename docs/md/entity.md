@@ -1,8 +1,5 @@
 # Crash Course: entity-component system
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -65,9 +62,6 @@
   * [Iterators](#iterators)
   * [Const registry](#const-registry)
 * [Beyond this document](#beyond-this-document)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

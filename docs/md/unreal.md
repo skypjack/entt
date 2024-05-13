@@ -1,16 +1,10 @@
 # EnTT and Unreal Engine
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Enable Cpp17](#enable-cpp17)
 * [EnTT as a third party module](#entt-as-a-third-party-module)
 * [Include EnTT](#include-entt)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 ## Enable Cpp17
 

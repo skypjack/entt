@@ -1,8 +1,5 @@
 # EnTT in Action
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -11,9 +8,6 @@
   * [Engines and the like](#engines-and-the-like)
   * [Articles, videos and blog posts](#articles-videos-and-blog-posts)
   * [Any Other Business](#any-other-business)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

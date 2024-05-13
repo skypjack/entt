@@ -1,8 +1,5 @@
 # Crash Course: core functionalities
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -39,9 +36,6 @@
   * [Compile-time generator](#compile-time-generator)
   * [Runtime generator](#runtime-generator)
 * [Utilities](#utilities)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

@@ -1,8 +1,5 @@
 # Crash Course: graph
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -14,9 +11,6 @@
   * [Fake resources and order of execution](#fake-resources-and-order-of-execution)
   * [Sync points](#sync-points)
   * [Execution graph](#execution-graph)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

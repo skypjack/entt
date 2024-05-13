@@ -1,17 +1,11 @@
 # Crash Course: containers
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
 * [Containers](#containers)
   * [Dense map](#dense-map)
   * [Dense set](#dense-set)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

@@ -1,8 +1,5 @@
 # Crash Course: poly
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -14,9 +11,6 @@
 * [Inheritance](#inheritance)
 * [Static polymorphism in the wild](#static-polymorphism-in-the-wild)
 * [Storage size and alignment requirement](#storage-size-and-alignment-requirement)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

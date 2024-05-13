@@ -1,18 +1,12 @@
 # Crash Course: resource management
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
 * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
   * [Resource handle](#resource-handle)
-  * [Loaders](#loader)
-  * [The cache class](#the-cache)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
+  * [Loaders](#loaders)
+  * [The cache class](#the-cache-class)
 
 # Introduction
 

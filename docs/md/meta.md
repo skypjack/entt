@@ -1,8 +1,5 @@
 # Crash Course: runtime reflection system
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -21,9 +18,6 @@
   * [Properties and meta objects](#properties-and-meta-objects)
   * [Unregister types](#unregister-types)
   * [Meta context](#meta-context)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 
