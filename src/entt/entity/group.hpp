@@ -696,8 +696,7 @@ private:
  */
 template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
-    // nasty workaround for an issue with the toolset v141 that doesn't accept a fold expression here
-    static_assert(!std::disjunction_v<std::bool_constant<component_traits<typename Owned::value_type>::in_place_delete>...>, "Groups do not support in-place delete");
+    static_assert((!component_traits<typename Owned::value_type>::in_place_delete && ...), "Groups do not support in-place delete");
 
     using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;

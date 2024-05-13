@@ -84,10 +84,8 @@ jobs:
 
     strategy:
       matrix:
-        toolset: [default, v141, v142, clang-cl]
+        toolset: [default, v142, clang-cl]
         include:
-          - toolset: v141
-            toolset_option: -T"v141"
           - toolset: v142
             toolset_option: -T"v142"
           - toolset: clang-cl
