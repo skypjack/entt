@@ -33,4 +33,4 @@ TODO:
 * review the short-circuit model now that all storage are freely available
 * more test around views and storage entity - ie view ::back
 * empty type optimization for tables (when they are in-place, no rush)
-* table: move to container, write natvis view, add pop back to support swap and pop
+* table: write natvis view, pop back to support swap and pop, single column access
