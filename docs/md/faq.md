@@ -7,7 +7,6 @@
   * [Why is my debug build on Windows so slow?](#why-is-my-debug-build-on-windows-so-slow)
   * [How can I represent hierarchies with my components?](#how-can-i-represent-hierarchies-with-my-components)
   * [Custom entity identifiers: yay or nay?](#custom-entity-identifiers-yay-or-nay)
-  * [Warning C4307: integral constant overflow](#warning-c4307-integral-constant-overflow)
   * [Warning C4003: the min, the max and the macro](#warning-c4003-the-min-the-max-and-the-macro)
   * [The standard and the non-copyable types](#the-standard-and-the-non-copyable-types)
   * [Which functions trigger which signals](#which-functions-trigger-which-signals)
