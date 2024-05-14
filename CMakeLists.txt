@@ -118,6 +118,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/version.h>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_map.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_set.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/table.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/algorithm.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/any.hpp>
@@ -149,7 +150,6 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/snapshot.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/sparse_set.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/table.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/adjacency_matrix.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/dot.hpp>

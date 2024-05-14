@@ -1,5 +1,5 @@
-#ifndef ENTT_ENTITY_TABLE_HPP
-#define ENTT_ENTITY_TABLE_HPP
+#ifndef ENTT_CONTAINER_TABLE_HPP
+#define ENTT_CONTAINER_TABLE_HPP
 
 #include <cstddef>
 #include <iterator>

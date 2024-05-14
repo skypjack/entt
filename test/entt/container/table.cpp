@@ -3,8 +3,8 @@
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
+#include <entt/container/table.hpp>
 #include <entt/core/iterator.hpp>
-#include <entt/entity/table.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 #include "../../common/throwing_allocator.hpp"

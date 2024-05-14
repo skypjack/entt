@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <memory>
 #include <type_traits>
-#include <vector>
 #include "../config/config.h"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
@@ -29,9 +28,6 @@ class basic_sparse_set;
 
 template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
-
-template<typename...>
-class basic_table;
 
 template<typename, typename>
 class basic_sigh_mixin;
@@ -75,13 +71,6 @@ using sparse_set = basic_sparse_set<>;
  */
 template<typename Type>
 using storage = basic_storage<Type>;
-
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Type Element types.
- */
-template<typename... Type>
-using table = basic_table<std::vector<Type>...>;
 
 /**
  * @brief Alias declaration for the most common use case.
