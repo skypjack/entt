@@ -30,4 +30,10 @@
 			</IndexListItems>
 		</Expand>
 	</Type>
+	<Type Name="entt::basic_table&lt;*&gt;">
+		<DisplayString>{ payload }</DisplayString>
+		<Expand>
+			<ExpandedItem>payload</ExpandedItem>
+		</Expand>
+	</Type>
 </AutoVisualizer>
