@@ -49,7 +49,8 @@ public:
     }
 
     runtime_view_iterator &operator++() {
-        while(++it != (*pools)[0]->end() && !valid()) {}
+        ++it;
+        for(const auto last = (*pools)[0]->end(); it != last && !valid(); ++it) {}
         return *this;
     }
 
@@ -59,7 +60,8 @@ public:
     }
 
     runtime_view_iterator &operator--() {
-        while(--it != (*pools)[0]->begin() && !valid()) {}
+        --it;
+        for(const auto first = (*pools)[0]->begin(); it != first && !valid(); --it) {}
         return *this;
     }
 
