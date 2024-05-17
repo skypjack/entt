@@ -130,7 +130,7 @@ using const_runtime_view = basic_runtime_view<const sparse_set>;
 template<typename... Type>
 struct exclude_t final: type_list<Type...> {
     /*! @brief Default constructor. */
-    explicit constexpr exclude_t() {}
+    explicit constexpr exclude_t() = default;
 };
 
 /**
@@ -147,7 +147,7 @@ inline constexpr exclude_t<Type...> exclude{};
 template<typename... Type>
 struct get_t final: type_list<Type...> {
     /*! @brief Default constructor. */
-    explicit constexpr get_t() {}
+    explicit constexpr get_t() = default;
 };
 
 /**
@@ -164,7 +164,7 @@ inline constexpr get_t<Type...> get{};
 template<typename... Type>
 struct owned_t final: type_list<Type...> {
     /*! @brief Default constructor. */
-    explicit constexpr owned_t() {}
+    explicit constexpr owned_t() = default;
 };
 
 /**
