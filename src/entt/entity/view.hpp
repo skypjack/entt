@@ -216,7 +216,7 @@ class basic_common_view {
     template<typename Return, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
 
-    auto offset() const noexcept {
+    [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
         const auto *view = pools[index];
         const size_type len[]{view->size(), view->free_list()};
@@ -392,7 +392,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     static constexpr bool tombstone_check_required = ((sizeof...(Get) == 1u) && ... && (Get::storage_policy == deletion_policy::in_place));
 
     template<std::size_t... Index>
-    auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
         return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
     }
 

@@ -1038,7 +1038,7 @@ public:
      * @brief Returned value type, if any.
      * @return Returned value type, if any.
      */
-    const type_info &type() const noexcept {
+    [[nodiscard]] const type_info &type() const noexcept {
         return *info;
     }
 
