@@ -28,7 +28,7 @@ class extended_group_iterator;
 template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
-    auto index_to_element([[maybe_unused]] Type &cpool) const {
+    [[nodiscard]] auto index_to_element([[maybe_unused]] Type &cpool) const {
         if constexpr(component_traits<typename Type::value_type>::page_size == 0u) {
             return std::make_tuple();
         } else {
@@ -291,7 +291,7 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index>
-    auto pools_for(std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto pools_for(std::index_sequence<Index...>) const noexcept {
         using return_type = std::tuple<Get *...>;
         return descriptor ? return_type{static_cast<Get *>(descriptor->template storage<Index>())...} : return_type{};
     }
@@ -705,7 +705,7 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index, std::size_t... Other>
-    auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
+    [[nodiscard]] auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
         using return_type = std::tuple<Owned *..., Get *...>;
         return descriptor ? return_type{static_cast<Owned *>(descriptor->template storage<Index>())..., static_cast<Get *>(descriptor->template storage<sizeof...(Owned) + Other>())...} : return_type{};
     }
