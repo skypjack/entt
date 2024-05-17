@@ -39,7 +39,7 @@ struct compressed_pair_element {
     }
 
 private:
-    Type value;
+    Type value{};
 };
 
 template<typename Type, std::size_t Tag>
