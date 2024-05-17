@@ -281,12 +281,12 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(i), const int &>();
     });
 
-    for(auto [entt, iv]: view.each()) {
+    for([[maybe_unused]] auto [entt, iv]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
     }
 
-    for(auto [entt, iv]: cview.each()) {
+    for([[maybe_unused]] auto [entt, iv]: cview.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), const int &>();
     }
@@ -310,11 +310,11 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
 
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<test::empty>()), decltype(cview)>();
 
-    for(auto [entt]: view.each()) {
+    for([[maybe_unused]] auto [entt]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 
-    for(auto [entt]: cview.each()) {
+    for([[maybe_unused]] auto [entt]: cview.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 }
@@ -1070,7 +1070,7 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(c), const char &>();
     });
 
-    for(auto [entt, iv, cv]: view.each()) {
+    for([[maybe_unused]] auto [entt, iv, cv]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), const char &>();
