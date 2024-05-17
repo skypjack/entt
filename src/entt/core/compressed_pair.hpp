@@ -200,7 +200,7 @@ public:
      * reference to the second element if `Index` is 1.
      */
     template<std::size_t Index>
-    constexpr decltype(auto) get() noexcept {
+    [[nodiscard]] constexpr decltype(auto) get() noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
@@ -211,7 +211,7 @@ public:
 
     /*! @copydoc get */
     template<std::size_t Index>
-    constexpr decltype(auto) get() const noexcept {
+    [[nodiscard]] constexpr decltype(auto) get() const noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
