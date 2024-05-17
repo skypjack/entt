@@ -219,6 +219,8 @@ I hope the following lists can grow much more in the future.
     ECS-based game engine.
   * [Core SDK of Trollworks engine](https://github.com/trollworks/sdk-core): 2D
     game engine based on procrastination.
+  * [Rocky](https://github.com/pelicanmapping/rocky): 3D geospatial application
+    engine.
 
 ## Articles, videos and blog posts:
 
