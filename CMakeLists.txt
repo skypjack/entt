@@ -213,7 +213,7 @@ if(ENTT_HAS_SANITIZER)
 endif()
 
 if(ENTT_CLANG_TIDY_EXECUTABLE)
-    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*;--extra-arg=/EHsc")
+    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
 endif()
 
 if(ENTT_HAS_LIBCPP)

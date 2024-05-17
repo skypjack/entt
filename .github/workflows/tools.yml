@@ -1,4 +1,4 @@
-name: analyzer
+name: tools
 
 on:
   push:
@@ -59,7 +59,7 @@ jobs:
               ..
         make -j4
 
-  clang_tidy:
+  clang-tidy:
     timeout-minutes: 30
 
     runs-on: ubuntu-latest
