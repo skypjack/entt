@@ -1187,12 +1187,12 @@ public:
      * @brief Returns the context object, that is, a general purpose container.
      * @return The context object, that is, a general purpose container.
      */
-    context &ctx() noexcept {
+    [[nodiscard]] context &ctx() noexcept {
         return vars;
     }
 
     /*! @copydoc ctx */
-    const context &ctx() const noexcept {
+    [[nodiscard]] const context &ctx() const noexcept {
         return vars;
     }
 
