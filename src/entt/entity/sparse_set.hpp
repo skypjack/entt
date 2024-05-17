@@ -225,7 +225,7 @@ class basic_sparse_set {
     }
 
 private:
-    virtual const void *get_at(const std::size_t) const {
+    [[nodiscard]] virtual const void *get_at(const std::size_t) const {
         return nullptr;
     }
 

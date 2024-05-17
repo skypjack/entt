@@ -298,7 +298,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
 private:
-    const void *get_at(const std::size_t pos) const final {
+    [[nodiscard]] const void *get_at(const std::size_t pos) const final {
         return std::addressof(element_at(pos));
     }
 
