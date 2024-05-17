@@ -8,7 +8,7 @@ on:
 jobs:
 
   iwyu:
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     env:
       IWYU: "0.22"
@@ -60,7 +60,7 @@ jobs:
         make -j4
 
   clang-tidy:
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     runs-on: ubuntu-latest
     continue-on-error: true
