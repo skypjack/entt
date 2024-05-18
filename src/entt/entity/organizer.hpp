@@ -108,7 +108,7 @@ class basic_organizer final {
         const char *name{};
         const void *payload{};
         callback_type *callback{};
-        dependency_type *dependency;
+        dependency_type *dependency{};
         prepare_type *prepare{};
         const type_info *info{};
     };
