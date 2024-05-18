@@ -317,7 +317,7 @@ TEST(NonOwningGroup, SortAsAPool) {
         ASSERT_EQ(group.get<const int>(entity), --ival);
     }
 
-    registry.sort<unsigned int>(std::less<unsigned int>{});
+    registry.sort<unsigned int>(std::less<>{});
     const entt::sparse_set &other = *group.storage<unsigned int>();
     group.sort_as(other.begin(), other.end());
 

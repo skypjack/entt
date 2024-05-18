@@ -2150,7 +2150,7 @@ TEST(Registry, SortSingle) {
         ASSERT_EQ(registry.get<int>(entity), --val);
     }
 
-    registry.sort<int>(std::less<int>{});
+    registry.sort<int>(std::less<>{});
 
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), val++);
@@ -2177,7 +2177,7 @@ TEST(Registry, SortMulti) {
         ASSERT_EQ(registry.get<int>(entity), --ival);
     }
 
-    registry.sort<unsigned int>(std::less<unsigned int>{});
+    registry.sort<unsigned int>(std::less<>{});
     registry.sort<int, unsigned int>();
 
     for(auto entity: registry.view<unsigned int>()) {
@@ -2199,7 +2199,7 @@ TEST(Registry, SortEmpty) {
     ASSERT_LT(registry.storage<test::empty>().data()[0], registry.storage<test::empty>().data()[1]);
     ASSERT_LT(registry.storage<test::empty>().data()[1], registry.storage<test::empty>().data()[2]);
 
-    registry.sort<test::empty>(std::less<entt::entity>{});
+    registry.sort<test::empty>(std::less<>{});
 
     ASSERT_GT(registry.storage<test::empty>().data()[0], registry.storage<test::empty>().data()[1]);
     ASSERT_GT(registry.storage<test::empty>().data()[1], registry.storage<test::empty>().data()[2]);
