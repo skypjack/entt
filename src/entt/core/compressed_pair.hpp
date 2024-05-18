@@ -143,6 +143,9 @@ public:
         : first_base{std::move(args), std::index_sequence_for<Args...>{}},
           second_base{std::move(other), std::index_sequence_for<Other...>{}} {}
 
+    /*! @brief Default destructor. */
+    ~compressed_pair() noexcept = default;
+
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
