@@ -13,17 +13,21 @@ namespace internal {
 
 [[nodiscard]] inline constexpr auto offset() noexcept {
     if constexpr(std::is_same_v<id_type, std::uint32_t>) {
-        return 2166136261;
+        constexpr auto offset_value = 2166136261;
+        return offset_value;
     } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
-        return 14695981039346656037ull;
+        constexpr auto offset_value = 14695981039346656037ull;
+        return offset_value;
     }
 }
 
 [[nodiscard]] inline constexpr auto prime() noexcept {
     if constexpr(std::is_same_v<id_type, std::uint32_t>) {
-        return 16777619;
+        constexpr auto prime_value = 16777619;
+        return prime_value;
     } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
-        return 1099511628211ull;
+        constexpr auto prime_value = 1099511628211ull;
+        return prime_value;
     }
 }
 
