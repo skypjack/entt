@@ -144,8 +144,7 @@ public:
     template<typename... OGType, typename... EType>
     group_handler(std::tuple<OGType &...> ogpool, std::tuple<EType &...> epool)
         : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
-          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
-          len{} {
+          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)} {
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
         std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
         common_setup();
@@ -179,7 +178,7 @@ public:
 private:
     std::array<common_type *, (Owned + Get)> pools;
     std::array<common_type *, Exclude> filter;
-    std::size_t len;
+    std::size_t len{};
 };
 
 template<typename Type, std::size_t Get, std::size_t Exclude>
