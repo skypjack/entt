@@ -135,8 +135,7 @@ public:
     explicit basic_flow(const allocator_type &allocator)
         : index{0u, allocator},
           vertices{allocator},
-          deps{allocator},
-          sync_on{} {}
+          deps{allocator} {}
 
     /*! @brief Default copy constructor. */
     basic_flow(const basic_flow &) = default;
@@ -341,7 +340,7 @@ private:
     compressed_pair<size_type, allocator_type> index;
     task_container_type vertices;
     deps_container_type deps;
-    size_type sync_on;
+    size_type sync_on{};
 };
 
 } // namespace entt
