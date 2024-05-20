@@ -23,10 +23,12 @@ struct monostate {
      * @brief Assigns a value of a specific type to a given key.
      * @tparam Type Type of the value to assign.
      * @param val User data to assign to the given key.
+     * @return This monostate object.
      */
     template<typename Type>
-    void operator=(Type val) const noexcept {
+    monostate &operator=(Type val) noexcept {
         value<Type> = val;
+        return *this;
     }
 
     /**
@@ -49,7 +51,7 @@ private:
  * @tparam Value Value used to differentiate between different variables.
  */
 template<id_type Value>
-inline monostate<Value> monostate_v = {};
+inline monostate<Value> monostate_v{};
 
 } // namespace entt
 
