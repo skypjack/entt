@@ -67,7 +67,7 @@ public:
     using sink_type = sink<sigh<Ret(Args...), Allocator>>;
 
     /*! @brief Default constructor. */
-    sigh() noexcept(std::is_nothrow_default_constructible_v<allocator_type> &&std::is_nothrow_constructible_v<container_type, const allocator_type &>)
+    sigh() noexcept(std::is_nothrow_default_constructible_v<allocator_type> && std::is_nothrow_constructible_v<container_type, const allocator_type &>)
         : sigh{allocator_type{}} {}
 
     /**
@@ -314,7 +314,7 @@ struct scoped_connection {
      * @return This scoped connection.
      */
     scoped_connection &operator=(connection other) {
-        conn = std::move(other);
+        conn = other;
         return *this;
     }
 
@@ -414,7 +414,7 @@ public:
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type...>>(value_or_instance...);
-        return {std::move(conn), signal};
+        return {conn, signal};
     }
 
     /**
