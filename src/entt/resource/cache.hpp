@@ -201,7 +201,7 @@ public:
         : pool{std::piecewise_construct, std::forward_as_tuple(other.pool.first(), allocator), std::forward_as_tuple(other.pool.second())} {}
 
     /*! @brief Default move constructor. */
-    resource_cache(resource_cache &&) = default;
+    resource_cache(resource_cache &&) noexcept = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -221,7 +221,7 @@ public:
      * @brief Default move assignment operator.
      * @return This cache.
      */
-    resource_cache &operator=(resource_cache &&) = default;
+    resource_cache &operator=(resource_cache &&) noexcept = default;
 
     /**
      * @brief Returns the associated allocator.
