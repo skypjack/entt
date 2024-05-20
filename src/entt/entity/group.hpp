@@ -224,11 +224,11 @@ public:
         common_setup();
     }
 
-    common_type &handle() noexcept {
+    [[nodiscard]] common_type &handle() noexcept {
         return elem;
     }
 
-    const common_type &handle() const noexcept {
+    [[nodiscard]] const common_type &handle() const noexcept {
         return elem;
     }
 
