@@ -452,7 +452,7 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     registry.storage<int>();
 
     auto proxy = registry.storage();
-    auto cproxy = std::as_const(registry).storage();
+    [[maybe_unused]] auto cproxy = std::as_const(registry).storage();
 
     const typename decltype(proxy)::iterator it = proxy.begin();
     typename decltype(cproxy)::iterator cit = it;

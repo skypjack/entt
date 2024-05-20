@@ -403,7 +403,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(c), const char &>();
     });
 
-    for(auto [entt, iv, cv]: group.each()) {
+    for([[maybe_unused]] auto [entt, iv, cv]: group.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), const char &>();
@@ -1211,7 +1211,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(f), const float &>();
     });
 
-    for(auto [entt, iv, cv, dv, fv]: group.each()) {
+    for([[maybe_unused]] auto [entt, iv, cv, dv, fv]: group.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), const char &>();
