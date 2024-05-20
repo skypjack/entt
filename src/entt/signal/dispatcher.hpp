@@ -25,7 +25,7 @@ struct basic_dispatcher_handler {
     virtual void publish() = 0;
     virtual void disconnect(void *) = 0;
     virtual void clear() noexcept = 0;
-    virtual std::size_t size() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t size() const noexcept = 0;
 };
 
 template<typename Type, typename Allocator>
@@ -210,7 +210,7 @@ public:
      * @return The number of pending events for the given type.
      */
     template<typename Type>
-    size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
+    [[nodiscard]] size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
         const auto *cpool = assure<std::decay_t<Type>>(id);
         return cpool ? cpool->size() : 0u;
     }
@@ -219,7 +219,7 @@ public:
      * @brief Returns the total number of pending events.
      * @return The total number of pending events.
      */
-    size_type size() const noexcept {
+    [[nodiscard]] size_type size() const noexcept {
         size_type count{};
 
         for(auto &&cpool: pools.first()) {
