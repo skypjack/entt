@@ -344,10 +344,10 @@ public:
           reg{&source} {}
 
     /*! @brief Default move constructor. */
-    basic_continuous_loader(basic_continuous_loader &&) = default;
+    basic_continuous_loader(basic_continuous_loader &&) noexcept = default;
 
     /*! @brief Default move assignment operator. @return This loader. */
-    basic_continuous_loader &operator=(basic_continuous_loader &&) = default;
+    basic_continuous_loader &operator=(basic_continuous_loader &&) noexcept = default;
 
     /**
      * @brief Restores all elements of a type with associated identifiers.
