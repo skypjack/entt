@@ -28,12 +28,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 
-    constexpr edge_iterator() noexcept
-        : it{},
-          vert{},
-          pos{},
-          last{},
-          offset{} {}
+    constexpr edge_iterator() noexcept {}
 
     constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
         : it{std::move(base)},
@@ -66,10 +61,10 @@ public:
     friend constexpr bool operator==(const edge_iterator<Type> &, const edge_iterator<Type> &) noexcept;
 
 private:
-    It it;
-    size_type vert;
-    size_type pos;
-    size_type last;
+    It it{};
+    size_type vert{};
+    size_type pos{};
+    size_type last{};
     size_type offset{};
 };
 
