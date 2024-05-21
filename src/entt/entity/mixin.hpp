@@ -134,6 +134,9 @@ public:
           destruction{std::move(other.destruction), allocator},
           update{std::move(other.update), allocator} {}
 
+    /*! @brief Default destructor. */
+    ~basic_sigh_mixin() noexcept = default;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
