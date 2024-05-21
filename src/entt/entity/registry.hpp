@@ -355,6 +355,9 @@ public:
         rebind();
     }
 
+    /*! @brief Default destructor. */
+    ~basic_registry() noexcept = default;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
