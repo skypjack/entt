@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <string_view>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 

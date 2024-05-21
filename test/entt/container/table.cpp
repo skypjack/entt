@@ -2,6 +2,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/container/table.hpp>
 #include <entt/core/iterator.hpp>

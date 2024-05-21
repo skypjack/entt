@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/group.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 #include "../../common/boxed_type.h"
 #include "../../common/config.h"
 #include "../../common/empty.h"
