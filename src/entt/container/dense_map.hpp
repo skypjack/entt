@@ -435,6 +435,9 @@ public:
           packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
           threshold{other.threshold} {}
 
+    /*! @brief Default destructor. */
+    ~dense_map() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @return This container.
