@@ -107,6 +107,9 @@ public:
     sigh(sigh &&other, const allocator_type &allocator) noexcept(std::is_nothrow_constructible_v<container_type, container_type &&, const allocator_type &>)
         : calls{std::move(other.calls), allocator} {}
 
+    /*! @brief Default destructor. */
+    ~sigh() noexcept = default;
+
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
