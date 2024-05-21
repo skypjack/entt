@@ -166,6 +166,9 @@ public:
         : matrix{std::move(other.matrix), allocator},
           vert{std::exchange(other.vert, 0u)} {}
 
+    /*! @brief Default destructor. */
+    ~adjacency_matrix() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @param other The instance to copy from.
