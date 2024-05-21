@@ -28,7 +28,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 
-    constexpr edge_iterator() noexcept {}
+    constexpr edge_iterator() noexcept = default;
 
     constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
         : it{std::move(base)},
