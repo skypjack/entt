@@ -4,7 +4,7 @@
 #include "../../common/config.h"
 
 struct base_service {
-    virtual ~base_service() = default;
+    virtual ~base_service() noexcept = default;
     virtual int invoke(int) = 0;
 };
 

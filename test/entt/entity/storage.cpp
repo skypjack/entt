@@ -39,7 +39,7 @@ struct update_from_destructor {
         return *this;
     }
 
-    ~update_from_destructor() {
+    ~update_from_destructor() noexcept {
         if(target != entt::null && storage->contains(target)) {
             storage->erase(target);
         }

@@ -24,7 +24,7 @@ struct tracker {
     tracker(const tracker &) = default;
     tracker &operator=(const tracker &) = delete;
 
-    ~tracker() {
+    ~tracker() noexcept {
         ++(*counter);
     }
 

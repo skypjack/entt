@@ -15,7 +15,7 @@
 #include "../../common/config.h"
 
 struct base {
-    virtual ~base() = default;
+    virtual ~base() noexcept = default;
 
     static void destroy(base &) {
         ++counter;
