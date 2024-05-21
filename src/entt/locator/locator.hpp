@@ -39,7 +39,7 @@ public:
     /*! @brief Default constructor, deleted on purpose. */
     locator() = delete;
     /*! @brief Default destructor, deleted on purpose. */
-    ~locator() = delete;
+    ~locator() noexcept = delete;
 
     /**
      * @brief Checks whether a service locator contains a value.
