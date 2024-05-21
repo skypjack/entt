@@ -143,7 +143,7 @@ public:
           second_base{std::move(other), std::index_sequence_for<Other...>{}} {}
 
     /*! @brief Default destructor. */
-    ~compressed_pair() noexcept = default;
+    ~compressed_pair() noexcept(std::is_nothrow_destructible_v<First> && std::is_nothrow_destructible_v<Second>) = default;
 
     /**
      * @brief Copy assignment operator.
