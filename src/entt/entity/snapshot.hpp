@@ -64,6 +64,9 @@ public:
     /*! @brief Default move constructor. */
     basic_snapshot(basic_snapshot &&) noexcept = default;
 
+    /*! @brief Default destructor. */
+    ~basic_snapshot() noexcept = default;
+
     /*! @brief Default move assignment operator. @return This snapshot. */
     basic_snapshot &operator=(basic_snapshot &&) noexcept = default;
 
@@ -180,6 +183,9 @@ public:
 
     /*! @brief Default move constructor. */
     basic_snapshot_loader(basic_snapshot_loader &&) noexcept = default;
+
+    /*! @brief Default destructor. */
+    ~basic_snapshot_loader() noexcept = default;
 
     /*! @brief Default move assignment operator. @return This loader. */
     basic_snapshot_loader &operator=(basic_snapshot_loader &&) noexcept = default;
@@ -345,6 +351,9 @@ public:
 
     /*! @brief Default move constructor. */
     basic_continuous_loader(basic_continuous_loader &&) noexcept = default;
+
+    /*! @brief Default destructor. */
+    ~basic_continuous_loader() noexcept = default;
 
     /*! @brief Default move assignment operator. @return This loader. */
     basic_continuous_loader &operator=(basic_continuous_loader &&) noexcept = default;
