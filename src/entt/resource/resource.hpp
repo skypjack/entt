@@ -77,6 +77,9 @@ public:
     resource(resource<Other> &&other) noexcept
         : value{std::move(other.value)} {}
 
+    /*! @brief Default destructor. */
+    ~resource() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @return This resource handle.

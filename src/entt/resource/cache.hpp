@@ -211,6 +211,9 @@ public:
     resource_cache(resource_cache &&other, const allocator_type &allocator)
         : pool{std::piecewise_construct, std::forward_as_tuple(std::move(other.pool.first()), allocator), std::forward_as_tuple(std::move(other.pool.second()))} {}
 
+    /*! @brief Default destructor. */
+    ~resource_cache() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @return This cache.
