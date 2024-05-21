@@ -165,6 +165,9 @@ public:
           deps{std::move(other.deps), allocator},
           sync_on{other.sync_on} {}
 
+    /*! @brief Default destructor. */
+    ~basic_flow() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @return This flow builder.
