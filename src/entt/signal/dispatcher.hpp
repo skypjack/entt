@@ -21,7 +21,7 @@ namespace entt {
 namespace internal {
 
 struct basic_dispatcher_handler {
-    virtual ~basic_dispatcher_handler() = default;
+    virtual ~basic_dispatcher_handler() noexcept = default;
     virtual void publish() = 0;
     virtual void disconnect(void *) = 0;
     virtual void clear() noexcept = 0;
@@ -174,6 +174,9 @@ public:
         : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a dispatcher is not allowed");
     }
+
+    /*! @brief Default destructor. */
+    ~basic_dispatcher() noexcept = default;
 
     /**
      * @brief Move assignment operator.

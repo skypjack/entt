@@ -291,7 +291,7 @@ struct scoped_connection {
         : conn{std::exchange(other.conn, {})} {}
 
     /*! @brief Automatically breaks the link on destruction. */
-    ~scoped_connection() {
+    ~scoped_connection() noexcept {
         conn.release();
     }
 
