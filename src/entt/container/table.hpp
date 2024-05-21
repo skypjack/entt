@@ -234,6 +234,9 @@ public:
     basic_table(basic_table &&other, const Allocator &allocator) noexcept
         : payload{Container{std::move(std::get<Container>(other.payload)), allocator}...} {}
 
+    /*! @brief Default destructor. */
+    ~basic_table() noexcept = default;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
