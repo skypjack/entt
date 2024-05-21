@@ -456,7 +456,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_storage() override {
+    ~basic_storage() noexcept override {
         shrink_to_size(0u);
     }
 
@@ -827,6 +827,9 @@ public:
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator} {}
 
+    /*! @brief Default destructor. */
+    ~basic_storage() noexcept override = default;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
@@ -1035,6 +1038,9 @@ public:
     basic_storage(basic_storage &&other, const allocator_type &allocator) noexcept
         : base_type{std::move(other), allocator},
           placeholder{other.placeholder} {}
+
+    /*! @brief Default destructor. */
+    ~basic_storage() noexcept override = default;
 
     /**
      * @brief Move assignment operator.

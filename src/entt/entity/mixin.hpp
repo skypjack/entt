@@ -135,7 +135,7 @@ public:
           update{std::move(other.update), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_sigh_mixin() noexcept = default;
+    ~basic_sigh_mixin() noexcept override = default;
 
     /**
      * @brief Move assignment operator.

@@ -94,7 +94,7 @@ template<typename... Lhs, typename... Rhs>
 
 struct group_descriptor {
     using size_type = std::size_t;
-    virtual ~group_descriptor() = default;
+    virtual ~group_descriptor() noexcept = default;
     virtual size_type owned(const id_type *, const size_type) const noexcept {
         return 0u;
     }

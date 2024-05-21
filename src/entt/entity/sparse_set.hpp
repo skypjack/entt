@@ -450,7 +450,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    virtual ~basic_sparse_set() {
+    virtual ~basic_sparse_set() noexcept {
         release_sparse_pages();
     }
 

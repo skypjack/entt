@@ -173,6 +173,9 @@ public:
         : pools{std::move(other.pools), allocator},
           filter{std::move(other.filter), allocator} {}
 
+    /*! @brief Default destructor. */
+    ~basic_runtime_view() noexcept = default;
+
     /**
      * @brief Default copy assignment operator.
      * @return This container.
