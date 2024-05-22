@@ -58,10 +58,8 @@ public:
     explicit emitter(const allocator_type &allocator)
         : handlers{allocator, allocator} {}
 
-    /*! @brief Default destructor. */
-    virtual ~emitter() noexcept {
-        static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
-    }
+    /*! @brief Default copy constructor, deleted on purpose. */
+    emitter(const emitter &) = delete;
 
     /**
      * @brief Move constructor.
@@ -80,6 +78,17 @@ public:
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
     }
 
+    /*! @brief Default destructor. */
+    virtual ~emitter() noexcept {
+        static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
+    }
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This observer.
+     */
+    emitter &operator=(const emitter &) = delete;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
@@ -87,7 +96,6 @@ public:
      */
     emitter &operator=(emitter &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
-
         handlers = std::move(other.handlers);
         return *this;
     }
