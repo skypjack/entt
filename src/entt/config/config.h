@@ -3,6 +3,8 @@
 
 #include "version.h"
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_CONSTEXPR
 #    define ENTT_THROW throw
@@ -87,5 +89,7 @@
 #    pragma detect_mismatch("entt.id", ENTT_XSTR(ENTT_ID_TYPE))
 #    pragma detect_mismatch("entt.nonstd", ENTT_XSTR(ENTT_NONSTD))
 #endif
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif
