@@ -61,13 +61,25 @@ public:
     basic_snapshot(const registry_type &source) noexcept
         : reg{&source} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_snapshot(const basic_snapshot &) = delete;
+
     /*! @brief Default move constructor. */
     basic_snapshot(basic_snapshot &&) noexcept = default;
 
     /*! @brief Default destructor. */
     ~basic_snapshot() noexcept = default;
 
-    /*! @brief Default move assignment operator. @return This snapshot. */
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This snapshot.
+     */
+    basic_snapshot &operator=(const basic_snapshot &) = delete;
+
+    /*
+     * @brief Default move assignment operator.
+     * @return This snapshot.
+     */
     basic_snapshot &operator=(basic_snapshot &&) noexcept = default;
 
     /**
@@ -181,13 +193,25 @@ public:
         ENTT_ASSERT(reg->template storage<entity_type>().free_list() == 0u, "Registry must be empty");
     }
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_snapshot_loader(const basic_snapshot_loader &) = delete;
+
     /*! @brief Default move constructor. */
     basic_snapshot_loader(basic_snapshot_loader &&) noexcept = default;
 
     /*! @brief Default destructor. */
     ~basic_snapshot_loader() noexcept = default;
 
-    /*! @brief Default move assignment operator. @return This loader. */
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This loader.
+     */
+    basic_snapshot_loader &operator=(const basic_snapshot_loader &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This loader.
+     */
     basic_snapshot_loader &operator=(basic_snapshot_loader &&) noexcept = default;
 
     /**
@@ -349,13 +373,25 @@ public:
         : remloc{source.get_allocator()},
           reg{&source} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_continuous_loader(const basic_continuous_loader &) = delete;
+
     /*! @brief Default move constructor. */
     basic_continuous_loader(basic_continuous_loader &&) noexcept = default;
 
     /*! @brief Default destructor. */
     ~basic_continuous_loader() noexcept = default;
 
-    /*! @brief Default move assignment operator. @return This loader. */
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This loader.
+     */
+    basic_continuous_loader &operator=(const basic_continuous_loader &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This loader.
+     */
     basic_continuous_loader &operator=(basic_continuous_loader &&) noexcept = default;
 
     /**
