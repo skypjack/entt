@@ -132,7 +132,7 @@ public:
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This scheduler.
+     * @return This process scheduler.
      */
     basic_scheduler &operator=(basic_scheduler &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a scheduler is not allowed");

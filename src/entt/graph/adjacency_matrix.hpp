@@ -172,7 +172,7 @@ public:
     /**
      * @brief Default copy assignment operator.
      * @param other The instance to copy from.
-     * @return This container.
+     * @return This adjacency matrix.
      */
     adjacency_matrix &operator=(const adjacency_matrix &other) {
         matrix = other.matrix;
@@ -183,7 +183,7 @@ public:
     /**
      * @brief Default move assignment operator.
      * @param other The instance to move from.
-     * @return This container.
+     * @return This adjacency matrix.
      */
     adjacency_matrix &operator=(adjacency_matrix &&other) noexcept {
         matrix = std::move(other.matrix);

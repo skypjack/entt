@@ -178,13 +178,13 @@ public:
 
     /**
      * @brief Default copy assignment operator.
-     * @return This container.
+     * @return This runtime view.
      */
     basic_runtime_view &operator=(const basic_runtime_view &) = default;
 
     /**
      * @brief Default move assignment operator.
-     * @return This container.
+     * @return This runtime view.
      */
     basic_runtime_view &operator=(basic_runtime_view &&) noexcept(std::is_nothrow_move_assignable_v<container_type>) = default;
 

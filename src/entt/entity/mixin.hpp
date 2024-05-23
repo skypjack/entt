@@ -140,7 +140,7 @@ public:
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This storage.
+     * @return This mixin.
      */
     basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
         underlying_type::operator=(std::move(other));

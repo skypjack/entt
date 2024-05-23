@@ -85,14 +85,14 @@ public:
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
-     * @return This observer.
+     * @return This emitter.
      */
     emitter &operator=(const emitter &) = delete;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This dispatcher.
+     * @return This emitter.
      */
     emitter &operator=(emitter &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
