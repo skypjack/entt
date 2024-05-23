@@ -111,6 +111,9 @@ public:
           destruction{allocator},
           update{allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_sigh_mixin(const basic_sigh_mixin &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -136,6 +139,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_sigh_mixin() noexcept override = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This mixin.
+     */
+    basic_sigh_mixin &operator=(const basic_sigh_mixin &) = delete;
 
     /**
      * @brief Move assignment operator.
