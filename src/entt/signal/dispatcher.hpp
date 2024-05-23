@@ -158,6 +158,9 @@ public:
     explicit basic_dispatcher(const allocator_type &allocator)
         : pools{allocator, allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_dispatcher(const basic_dispatcher &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -177,6 +180,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_dispatcher() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This dispatcher.
+     */
+    basic_dispatcher &operator=(const basic_dispatcher &) = delete;
 
     /**
      * @brief Move assignment operator.
