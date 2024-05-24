@@ -440,7 +440,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator) noexcept
+    basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator)
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
           info{other.info},
