@@ -462,7 +462,7 @@ public:
      * @return The storage for the given element type.
      */
     template<typename Type>
-    const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
+    [[nodiscard]] const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
         return assure<Type>(id);
     }
 
