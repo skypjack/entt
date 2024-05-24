@@ -130,7 +130,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator) noexcept
+    basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator)
         : underlying_type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
