@@ -234,7 +234,7 @@ public:
      * @param allocator The allocator to use.
      */
     template<class Allocator>
-    basic_table(basic_table &&other, const Allocator &allocator) noexcept
+    basic_table(basic_table &&other, const Allocator &allocator)
         : payload{Container{std::move(std::get<Container>(other.payload)), allocator}...} {}
 
     /*! @brief Default destructor. */
