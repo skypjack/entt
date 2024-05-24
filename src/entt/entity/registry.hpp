@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -719,9 +720,9 @@ public:
         size_type count{};
 
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
-            common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
+            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
+            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
                 if constexpr(sizeof...(Other) != 0u) {
                     if(cpools[pos]->data() == first.data()) {
                         std::swap(cpools[pos], cpools[sizeof...(Other)]);
@@ -769,9 +770,9 @@ public:
     template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
-            common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
+            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
+            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
                 if constexpr(sizeof...(Other) != 0u) {
                     if(cpools[pos]->data() == first.data()) {
                         std::swap(cpools[pos], cpools[sizeof...(Other)]);
@@ -1085,8 +1086,8 @@ public:
             handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
         } else {
             handler = std::allocate_shared<handler_type>(get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
-            [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
+            [[maybe_unused]] const std::array elem{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem.data(), sizeof...(Owned)) == 0u; }), "Conflicting groups");
         }
 
         groups.emplace(group_type::group_id(), handler);
@@ -1116,8 +1117,8 @@ public:
      */
     template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
-        const id_type elem[]{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
-        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem, 1u + sizeof...(Other)); });
+        const std::array elem{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
+        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem.data(), 1u + sizeof...(Other)); });
     }
 
     /**
