@@ -109,6 +109,9 @@ public:
     explicit basic_scheduler(const allocator_type &allocator)
         : handlers{allocator, allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_scheduler(const basic_scheduler &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -128,6 +131,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_scheduler() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This process scheduler.
+     */
+    basic_scheduler &operator=(const basic_scheduler &) = delete;
 
     /**
      * @brief Move assignment operator.
