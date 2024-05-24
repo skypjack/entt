@@ -73,7 +73,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    emitter(emitter &&other, const allocator_type &allocator) noexcept
+    emitter(emitter &&other, const allocator_type &allocator)
         : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
     }
