@@ -173,7 +173,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator) noexcept
+    basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator)
         : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a dispatcher is not allowed");
     }
