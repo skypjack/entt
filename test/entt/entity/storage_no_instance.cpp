@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/iterator.hpp>
 #include <entt/core/type_info.hpp>
+#include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
 #include "../../common/config.h"
