@@ -184,6 +184,9 @@ public:
         ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
     }
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_table(const basic_table &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -236,6 +239,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_table() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This container.
+     */
+    basic_table &operator=(const basic_table &) = delete;
 
     /**
      * @brief Move assignment operator.
