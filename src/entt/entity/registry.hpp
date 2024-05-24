@@ -344,6 +344,9 @@ public:
         rebind();
     }
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_registry(const basic_registry &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -358,6 +361,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_registry() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This mixin.
+     */
+    basic_registry &operator=(const basic_registry &) = delete;
 
     /**
      * @brief Move assignment operator.
