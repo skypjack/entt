@@ -124,7 +124,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_scheduler(basic_scheduler &&other, const allocator_type &allocator) noexcept
+    basic_scheduler(basic_scheduler &&other, const allocator_type &allocator)
         : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a scheduler is not allowed");
     }
