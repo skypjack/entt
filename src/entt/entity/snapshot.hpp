@@ -76,7 +76,7 @@ public:
      */
     basic_snapshot &operator=(const basic_snapshot &) = delete;
 
-    /*
+    /**
      * @brief Default move assignment operator.
      * @return This snapshot.
      */
