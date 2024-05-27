@@ -436,6 +436,9 @@ public:
         : base_type{type_id<element_type>(), storage_policy, allocator},
           payload{allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_storage(const basic_storage &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -459,6 +462,12 @@ public:
     ~basic_storage() noexcept override {
         shrink_to_size(0u);
     }
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This storage.
+     */
+    basic_storage &operator=(const basic_storage &) = delete;
 
     /**
      * @brief Move assignment operator.
@@ -812,6 +821,9 @@ public:
     explicit basic_storage(const allocator_type &allocator)
         : base_type{type_id<element_type>(), storage_policy, allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_storage(const basic_storage &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -828,6 +840,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_storage() noexcept override = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This storage.
+     */
+    basic_storage &operator=(const basic_storage &) = delete;
 
     /**
      * @brief Move assignment operator.
@@ -1021,6 +1039,9 @@ public:
         : base_type{type_id<void>(), storage_policy, allocator},
           placeholder{} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_storage(const basic_storage &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -1040,6 +1061,12 @@ public:
 
     /*! @brief Default destructor. */
     ~basic_storage() noexcept override = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This storage.
+     */
+    basic_storage &operator=(const basic_storage &) = delete;
 
     /**
      * @brief Move assignment operator.
