@@ -34,3 +34,5 @@ TODO:
 * more test around views and storage entity - ie view ::back
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
+* meta: avoid unnecessary copies of iterators with meta containers
+* review constrained noexcpet-ness (ie sigh)
