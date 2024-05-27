@@ -152,11 +152,11 @@ public:
      * @return This mixin.
      */
     basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
-        underlying_type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
         destruction = std::move(other.destruction);
         update = std::move(other.update);
+        underlying_type::operator=(std::move(other));
         return *this;
     }
 
@@ -166,11 +166,11 @@ public:
      */
     void swap(basic_sigh_mixin &other) {
         using std::swap;
-        underlying_type::swap(other);
         swap(owner, other.owner);
         swap(construction, other.construction);
         swap(destruction, other.destruction);
         swap(update, other.update);
+        underlying_type::swap(other);
     }
 
     /**
