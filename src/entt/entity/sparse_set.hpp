@@ -424,6 +424,9 @@ public:
         ENTT_ASSERT(traits_type::version_mask || mode != deletion_policy::in_place, "Policy does not support zero-sized versions");
     }
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_sparse_set(const basic_sparse_set &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -453,6 +456,12 @@ public:
     virtual ~basic_sparse_set() noexcept {
         release_sparse_pages();
     }
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This sparse set.
+     */
+    basic_sparse_set &operator=(const basic_sparse_set &) = delete;
 
     /**
      * @brief Move assignment operator.
