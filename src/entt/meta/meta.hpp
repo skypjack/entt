@@ -883,6 +883,7 @@ struct meta_data {
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(meta_handle instance, Type &&value) const {
         return node->set && node->set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
@@ -1028,6 +1029,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(meta_handle instance, Args &&...args) const {
         meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
         return invoke(std::move(instance), arguments, sizeof...(Args));
@@ -1470,6 +1472,7 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
         meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
         return invoke(id, std::move(instance), arguments, sizeof...(Args));
@@ -1552,6 +1555,7 @@ private:
 }
 
 template<typename... Args>
+// NOLINTNEXTLINE(modernize-use-nodiscard)
 meta_any meta_any::invoke(const id_type id, Args &&...args) const {
     return type().invoke(id, *this, std::forward<Args>(args)...);
 }
