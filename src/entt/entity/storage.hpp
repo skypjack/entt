@@ -467,10 +467,9 @@ public:
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
-
         shrink_to_size(0u);
-        base_type::operator=(std::move(other));
         payload = std::move(other.payload);
+        base_type::operator=(std::move(other));
         return *this;
     }
 
@@ -480,8 +479,8 @@ public:
      */
     void swap(basic_storage &other) {
         using std::swap;
-        base_type::swap(other);
         swap(payload, other.payload);
+        base_type::swap(other);
     }
 
     /**
@@ -1048,8 +1047,8 @@ public:
      * @return This storage.
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
-        base_type::operator=(std::move(other));
         placeholder = other.placeholder;
+        base_type::operator=(std::move(other));
         return *this;
     }
 
