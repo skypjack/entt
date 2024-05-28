@@ -1,6 +1,7 @@
 #ifndef ENTT_META_META_HPP
 #define ENTT_META_META_HPP
 
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -1031,8 +1032,8 @@ struct meta_func {
     template<typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-        return invoke(std::move(instance), arguments, sizeof...(Args));
+        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
+        return invoke(std::move(instance), arguments.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::prop */
@@ -1415,8 +1416,8 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-        return construct(arguments, sizeof...(Args));
+        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
+        return construct(arguments.data(), sizeof...(Args));
     }
 
     /**
@@ -1474,8 +1475,8 @@ public:
     template<typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        meta_any arguments[sizeof...(Args) + !sizeof...(Args)]{{*ctx, std::forward<Args>(args)}...};
-        return invoke(id, std::move(instance), arguments, sizeof...(Args));
+        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
+        return invoke(id, std::move(instance), arguments.data(), sizeof...(Args));
     }
 
     /**
