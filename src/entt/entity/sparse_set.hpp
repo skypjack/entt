@@ -74,7 +74,7 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return packed->data()[index() - value];
+        return (*packed)[index() - value];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
