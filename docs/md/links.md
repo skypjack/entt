@@ -133,6 +133,8 @@ I hope the following lists can grow much more in the future.
     implementation using `EnTT` and `Raylib`.
   * [PalmRide: After Flight](https://store.steampowered.com/app/2812540/PalmRide_After_Flight/):
     an on-rails shooter with retro outrun aesthetics.
+  * [Exhibition of Speed](https://store.steampowered.com/app/2947450/Exhibition_of_Speed/):
+    build your own car and go racing.
 
 ## Engines and the like:
 
