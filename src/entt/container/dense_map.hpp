@@ -325,7 +325,7 @@ class dense_map {
 
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
-            size_type *curr = sparse.first().data() + key_to_bucket(packed.first().back().element.first);
+            size_type *curr = &sparse.first()[key_to_bucket(packed.first().back().element.first)];
             packed.first()[pos] = std::move(packed.first().back());
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
@@ -679,7 +679,7 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const key_type &key) {
-        for(size_type *curr = sparse.first().data() + key_to_bucket(key); *curr != (std::numeric_limits<size_type>::max)(); curr = &packed.first()[*curr].next) {
+        for(size_type *curr = &sparse.first()[key_to_bucket(key)]; *curr != (std::numeric_limits<size_type>::max)(); curr = &packed.first()[*curr].next) {
             if(packed.second()(packed.first()[*curr].element.first, key)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
