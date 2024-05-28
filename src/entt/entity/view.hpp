@@ -223,6 +223,18 @@ class basic_common_view {
         return len[view->policy() == deletion_policy::swap_only];
     }
 
+    void unchecked_refresh() noexcept {
+        index = 0u;
+
+        if constexpr(Get > 1u) {
+            for(size_type pos{1u}; pos < Get; ++pos) {
+                if(pools[pos]->size() < pools[index]->size()) {
+                    index = pos;
+                }
+            }
+        }
+    }
+
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept = default;
@@ -236,18 +248,6 @@ protected:
 
     void use(const std::size_t pos) noexcept {
         index = (index != Get) ? pos : Get;
-    }
-
-    void unchecked_refresh() noexcept {
-        index = 0u;
-
-        if constexpr(Get > 1u) {
-            for(size_type pos{1u}; pos < Get; ++pos) {
-                if(pools[pos]->size() < pools[index]->size()) {
-                    index = pos;
-                }
-            }
-        }
     }
     /*! @endcond */
 
