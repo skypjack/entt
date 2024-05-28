@@ -1122,15 +1122,13 @@ public:
      * @return A valid identifier.
      */
     entity_type emplace(const entity_type hint) {
-        if(hint == null || hint == tombstone) {
-            return emplace();
-        } else if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone) {
-            return *base_type::try_emplace(hint, true);
-        } else if(const auto idx = base_type::index(curr); idx < base_type::free_list()) {
-            return emplace();
-        } else {
-            return *base_type::try_emplace(hint, true);
+        if(hint != null && hint != tombstone) {
+            if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || !(base_type::index(curr) < base_type::free_list())) {
+                return *base_type::try_emplace(hint, true);
+            }
         }
+
+        return emplace();
     }
 
     /**
