@@ -27,6 +27,7 @@ using hashed_string = basic_hashed_string<char>;
 /*! @brief Aliases for common character types. */
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
+// NOLINTNEXTLINE(bugprone-forward-declaration-namespace)
 struct type_info;
 
 } // namespace entt
