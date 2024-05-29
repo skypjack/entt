@@ -751,10 +751,8 @@ public:
         return leading && leading->contains(entt);
     }
 
-protected:
-    /*! @cond TURN_OFF_DOXYGEN */
+private:
     const common_type *leading{};
-    /*! @endcond */
 };
 
 /**
@@ -823,7 +821,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->leading));
+        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->handle()));
     }
 
     /**
@@ -842,7 +840,7 @@ public:
     template<std::size_t Index>
     void storage(Get &elem) noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        this->leading = &elem;
+        *this = basic_view{elem};
     }
 
     /**
