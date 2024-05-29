@@ -105,8 +105,8 @@ class group_handler final: public group_descriptor {
     using entity_type = typename Type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
-        for(std::size_t next{}; next < Owned; ++next) {
-            pools[next]->swap_elements(pools[next]->data()[pos], entt);
+        for(auto first = pools.begin(), last = first + Owned; first != last; ++first) {
+            (*first)->swap_elements((**first)[pos], entt);
         }
     }
 
@@ -132,7 +132,7 @@ class group_handler final: public group_descriptor {
 
     void common_setup() {
         // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-        for(auto *first = pools[0u]->data(), *last = first + pools[0u]->size(); first != last; ++first) {
+        for(auto first = pools[0u]->rbegin(), last = first + pools[0u]->size(); first != last; ++first) {
             push_on_construct(*first);
         }
     }
