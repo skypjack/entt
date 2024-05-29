@@ -18,7 +18,9 @@ struct compressed_pair_element {
     using reference = Type &;
     using const_reference = const Type &;
 
-    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>) = default;
+    template<typename Dummy = Type, typename = std::enable_if_t<std::is_default_constructible_v<Dummy>>>
+    // NOLINTNEXTLINE(modernize-use-equals-default)
+    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>) {}
 
     template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
@@ -46,7 +48,9 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     using const_reference = const Type &;
     using base_type = Type;
 
-    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>) = default;
+    template<typename Dummy = Type, typename = std::enable_if_t<std::is_default_constructible_v<Dummy>>>
+    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>)
+        : base_type{} {}
 
     template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
