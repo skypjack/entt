@@ -134,12 +134,8 @@ public:
         : matrix{vertices * vertices, allocator},
           vert{vertices} {}
 
-    /**
-     * @brief Copy constructor.
-     * @param other The instance to copy from.
-     */
-    adjacency_matrix(const adjacency_matrix &other)
-        : adjacency_matrix{other, other.get_allocator()} {}
+    /*! @brief Default copy constructor. */
+    adjacency_matrix(const adjacency_matrix &) = default;
 
     /**
      * @brief Allocator-extended copy constructor.
@@ -150,12 +146,8 @@ public:
         : matrix{other.matrix, allocator},
           vert{other.vert} {}
 
-    /**
-     * @brief Move constructor.
-     * @param other The instance to move from.
-     */
-    adjacency_matrix(adjacency_matrix &&other) noexcept
-        : adjacency_matrix{std::move(other), other.get_allocator()} {}
+    /*! @brief Default move constructor. */
+    adjacency_matrix(adjacency_matrix &&) noexcept = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -164,32 +156,22 @@ public:
      */
     adjacency_matrix(adjacency_matrix &&other, const allocator_type &allocator)
         : matrix{std::move(other.matrix), allocator},
-          vert{std::exchange(other.vert, 0u)} {}
+          vert{other.vert} {}
 
     /*! @brief Default destructor. */
     ~adjacency_matrix() noexcept = default;
 
     /**
      * @brief Default copy assignment operator.
-     * @param other The instance to copy from.
-     * @return This adjacency matrix.
+     * @return This container.
      */
-    adjacency_matrix &operator=(const adjacency_matrix &other) {
-        matrix = other.matrix;
-        vert = other.vert;
-        return *this;
-    }
+    adjacency_matrix &operator=(const adjacency_matrix &) = default;
 
     /**
      * @brief Default move assignment operator.
-     * @param other The instance to move from.
-     * @return This adjacency matrix.
+     * @return This container.
      */
-    adjacency_matrix &operator=(adjacency_matrix &&other) noexcept {
-        matrix = std::move(other.matrix);
-        vert = std::exchange(other.vert, 0u);
-        return *this;
-    }
+    adjacency_matrix &operator=(adjacency_matrix &&other) noexcept = default;
 
     /**
      * @brief Returns the associated allocator.
