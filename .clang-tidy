@@ -29,3 +29,5 @@ CheckOptions:
       value: true
     - key: misc-non-private-member-variables-in-classes.IgnorePublicMemberVariables
       value: true
+    - key: modernize-avoid-c-arrays.AllowStringArrays
+      value: true
