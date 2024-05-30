@@ -1036,8 +1036,7 @@ public:
      * @param allocator The allocator to use.
      */
     explicit basic_storage(const allocator_type &allocator)
-        : base_type{type_id<void>(), storage_policy, allocator},
-          placeholder{} {}
+        : base_type{type_id<void>(), storage_policy, allocator} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     basic_storage(const basic_storage &) = delete;
@@ -1195,7 +1194,7 @@ public:
     }
 
 private:
-    size_type placeholder;
+    size_type placeholder{};
 };
 
 } // namespace entt
