@@ -1053,6 +1053,7 @@ public:
     }
 
     /*! @brief Forwards variables to derived classes, if any. */
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
     virtual void bind(any) noexcept {}
 
 private:
