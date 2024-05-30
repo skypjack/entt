@@ -76,8 +76,8 @@ public:
     inline bool reserve(const size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
-    inline iterator insert(iterator, meta_any);
-    inline iterator erase(iterator);
+    inline iterator insert(const iterator &, meta_any);
+    inline iterator erase(const iterator &);
     [[nodiscard]] inline meta_any operator[](const size_type);
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
@@ -1852,7 +1852,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @param value Element value to insert.
  * @return A possibly invalid iterator to the inserted element.
  */
-inline meta_sequence_container::iterator meta_sequence_container::insert(iterator it, meta_any value) {
+inline meta_sequence_container::iterator meta_sequence_container::insert(const iterator &it, meta_any value) {
     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
     if(const auto vtype = value_type_node(internal::meta_context::from(*ctx)); !const_only && (value.allow_cast({*ctx, vtype}) || value.allow_cast({*ctx, const_reference_node(internal::meta_context::from(*ctx))}))) {
         const bool is_value_type = (value.type().info() == *vtype.info);
@@ -1867,7 +1867,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(iterato
  * @param it Iterator to the element to remove.
  * @return A possibly invalid iterator following the last removed element.
  */
-inline meta_sequence_container::iterator meta_sequence_container::erase(iterator it) {
+inline meta_sequence_container::iterator meta_sequence_container::erase(const iterator &it) {
     return const_only ? iterator{*ctx} : erase_fn(*ctx, const_cast<void *>(data), it);
 }
 
