@@ -1,16 +1,10 @@
 # Crash Course: service locator
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
 * [Service locator](#service-locator)
   * [Opaque handles](#opaque-handles)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

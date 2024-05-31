@@ -1,14 +1,17 @@
 #include <cstdint>
 #include <string_view>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 
 struct BasicHashedString: ::testing::Test {
     static constexpr auto expected() noexcept {
         if constexpr(std::is_same_v<entt::id_type, std::uint32_t>) {
-            return 0xbf9cf968;
+            constexpr auto foobar_hash = 0xbf9cf968;
+            return foobar_hash;
         } else if constexpr(std::is_same_v<entt::id_type, std::uint64_t>) {
-            return 0x85944171f73967e8;
+            constexpr auto foobar_hash = 0x85944171f73967e8;
+            return foobar_hash;
         }
     }
 };
@@ -66,7 +69,7 @@ TEST_F(HashedString, Empty) {
     const entt::hashed_string hs{};
 
     ASSERT_EQ(hs.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::fnv1a_traits<entt::id_type>::offset);
+    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::offset<>);
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
 }
 
@@ -160,7 +163,7 @@ TEST_F(HashedWString, Empty) {
     const entt::hashed_wstring hws{};
 
     ASSERT_EQ(hws.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::fnv1a_traits<entt::id_type>::offset);
+    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::offset<>);
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
 }
 

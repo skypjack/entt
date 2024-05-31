@@ -1,5 +1,3 @@
-#include <cstdint>
-#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/enum.hpp>
 #include "../../common/bitmask.h"

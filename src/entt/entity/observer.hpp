@@ -303,6 +303,9 @@ public:
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
     }
 
+    /*! @brief Default destructor. */
+    ~basic_observer() noexcept = default;
+
     /**
      * @brief Default copy assignment operator, deleted on purpose.
      * @return This observer.

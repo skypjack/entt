@@ -1,8 +1,5 @@
 # Crash Course: events, signals and everything in between
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -14,9 +11,6 @@
 * [Event dispatcher](#event-dispatcher)
   * [Named queues](#named-queues)
 * [Event emitter](#event-emitter)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

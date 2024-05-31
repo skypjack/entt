@@ -235,12 +235,12 @@ template<typename Type>
     }
 
     if constexpr(std::is_arithmetic_v<Type>) {
-        node.conversion_helper = +[](void *bin, const void *value) {
-            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(*static_cast<const double *>(value))) : static_cast<double>(*static_cast<const Type *>(value));
+        node.conversion_helper = +[](void *lhs, const void *rhs) {
+            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(*static_cast<const double *>(rhs))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
     } else if constexpr(std::is_enum_v<Type>) {
-        node.conversion_helper = +[](void *bin, const void *value) {
-            return bin ? static_cast<double>(*static_cast<Type *>(bin) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(value)))) : static_cast<double>(*static_cast<const Type *>(value));
+        node.conversion_helper = +[](void *lhs, const void *rhs) {
+            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
     }
 

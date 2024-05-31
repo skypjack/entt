@@ -9,53 +9,44 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-20.04]
+        os: [ubuntu-latest, ubuntu-24.04]
         compiler:
-          - { pkg: g++, exe: 'g++', version: 7 }
-          - { pkg: g++, exe: 'g++', version: 8 }
           - { pkg: g++, exe: 'g++', version: 9 }
           - { pkg: g++, exe: 'g++', version: 10 }
           - { pkg: g++, exe: 'g++', version: 11 }
           - { pkg: g++, exe: 'g++', version: 12 }
           - { pkg: g++, exe: 'g++', version: 13 }
-          - { pkg: clang, exe: 'clang++', version: 8 }
-          - { pkg: clang, exe: 'clang++', version: 9 }
-          - { pkg: clang, exe: 'clang++', version: 10 }
-          - { pkg: clang, exe: 'clang++', version: 11 }
-          - { pkg: clang, exe: 'clang++', version: 12 }
+          - { pkg: g++, exe: 'g++', version: 14 }
           - { pkg: clang, exe: 'clang++', version: 13 }
           - { pkg: clang, exe: 'clang++', version: 14 }
           - { pkg: clang, exe: 'clang++', version: 15 }
+          - { pkg: clang, exe: 'clang++', version: 16 }
+          - { pkg: clang, exe: 'clang++', version: 17 }
+          - { pkg: clang, exe: 'clang++', version: 18 }
         exclude:
           - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 7 }
-          - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 8 }
-          - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 9 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 8 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 9 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 10 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 11 }
-          - os: ubuntu-20.04
-            compiler: { pkg: g++, exe: 'g++', version: 10 }
-          - os: ubuntu-20.04
-            compiler: { pkg: g++, exe: 'g++', version: 11 }
-          - os: ubuntu-20.04
             compiler: { pkg: g++, exe: 'g++', version: 12 }
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             compiler: { pkg: g++, exe: 'g++', version: 13 }
-          - os: ubuntu-20.04
-            compiler: { pkg: clang, exe: 'clang++', version: 12 }
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
+            compiler: { pkg: g++, exe: 'g++', version: 14 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang, exe: 'clang++', version: 16 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang, exe: 'clang++', version: 17 }
+          - os: ubuntu-latest
+            compiler: { pkg: clang, exe: 'clang++', version: 18 }
+          - os: ubuntu-24.04
+            compiler: { pkg: g++, exe: 'g++', version: 9 }
+          - os: ubuntu-24.04
+            compiler: { pkg: g++, exe: 'g++', version: 10 }
+          - os: ubuntu-24.04
+            compiler: { pkg: g++, exe: 'g++', version: 11 }
+          - os: ubuntu-24.04
             compiler: { pkg: clang, exe: 'clang++', version: 13 }
-          - os: ubuntu-20.04
+          - os: ubuntu-24.04
             compiler: { pkg: clang, exe: 'clang++', version: 14 }
-          - os: ubuntu-20.04
+          - os: ubuntu-24.04
             compiler: { pkg: clang, exe: 'clang++', version: 15 }
 
     runs-on: ${{ matrix.os }}
@@ -84,10 +75,8 @@ jobs:
 
     strategy:
       matrix:
-        toolset: [default, v141, v142, clang-cl]
+        toolset: [default, v142, clang-cl]
         include:
-          - toolset: v141
-            toolset_option: -T"v141"
           - toolset: v142
             toolset_option: -T"v142"
           - toolset: clang-cl

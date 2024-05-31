@@ -1,15 +1,14 @@
-name: analyzer
+name: tools
 
 on:
   push:
     branches:
-      - master
-      - wip
+      - tools
 
 jobs:
 
   iwyu:
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     env:
       IWYU: "0.22"
@@ -59,3 +58,24 @@ jobs:
               -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-Xiwyu;--mapping_file=${GITHUB_WORKSPACE}/entt.imp;-Xiwyu;--no_fwd_decls;-Xiwyu;--verbose=1" \
               ..
         make -j4
+
+  clang-tidy:
+    timeout-minutes: 60
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Compile tests
+      working-directory: build
+      env:
+        CXX: clang++
+      run: |
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON -DENTT_USE_CLANG_TIDY=ON ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest -C Debug -j4

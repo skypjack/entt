@@ -118,6 +118,7 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/version.h>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_map.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_set.hpp>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/table.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/algorithm.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/any.hpp>
@@ -149,7 +150,6 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/snapshot.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/sparse_set.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/table.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/adjacency_matrix.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/dot.hpp>
@@ -170,7 +170,6 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/template.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/type_traits.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/utility.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/platform/android-ndk-r17.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/fwd.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/poly.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/fwd.hpp>
@@ -201,7 +200,6 @@ if(ENTT_HAS_NATVIS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/graph.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/locator.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/meta.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/platform.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/poly.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/process.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/resource.natvis>
@@ -215,7 +213,7 @@ if(ENTT_HAS_SANITIZER)
 endif()
 
 if(ENTT_CLANG_TIDY_EXECUTABLE)
-    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*;--extra-arg=/EHsc")
+    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
 endif()
 
 if(ENTT_HAS_LIBCPP)
@@ -325,7 +323,7 @@ endif()
 option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
 
 if(ENTT_BUILD_DOCS)
-    find_package(Doxygen 1.8)
+    find_package(Doxygen 1.10)
 
     if(DOXYGEN_FOUND)
         add_subdirectory(docs)

@@ -1,8 +1,5 @@
 # EnTT in Action
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -11,9 +8,6 @@
   * [Engines and the like](#engines-and-the-like)
   * [Articles, videos and blog posts](#articles-videos-and-blog-posts)
   * [Any Other Business](#any-other-business)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 
@@ -139,6 +133,8 @@ I hope the following lists can grow much more in the future.
     implementation using `EnTT` and `Raylib`.
   * [PalmRide: After Flight](https://store.steampowered.com/app/2812540/PalmRide_After_Flight/):
     an on-rails shooter with retro outrun aesthetics.
+  * [Exhibition of Speed](https://store.steampowered.com/app/2947450/Exhibition_of_Speed/):
+    build your own car and go racing.
 
 ## Engines and the like:
 
@@ -225,6 +221,8 @@ I hope the following lists can grow much more in the future.
     ECS-based game engine.
   * [Core SDK of Trollworks engine](https://github.com/trollworks/sdk-core): 2D
     game engine based on procrastination.
+  * [Rocky](https://github.com/pelicanmapping/rocky): 3D geospatial application
+    engine.
 
 ## Articles, videos and blog posts:
 

@@ -2,6 +2,10 @@ Checks: >
     bugprone-*,
     concurrency-*,
     cppcoreguidelines-*,
+    -cppcoreguidelines-owning-memory,
+    -cppcoreguidelines-pro-type-const-cast,
+    -cppcoreguidelines-pro-type-reinterpret-cast,
+    -cppcoreguidelines-pro-type-union-access,
     misc-*,
     -misc-include-cleaner,
     -misc-no-recursion,
@@ -24,4 +28,6 @@ CheckOptions:
     - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
       value: true
     - key: misc-non-private-member-variables-in-classes.IgnorePublicMemberVariables
+      value: true
+    - key: modernize-avoid-c-arrays.AllowStringArrays
       value: true

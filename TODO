@@ -26,12 +26,14 @@ TODO:
 * test: push sharing types further
 * after non-continuous generation for entity storage:
   - get/reset placeholder to position after saving/loading (avoid long lookup)
+  - allow skipping/reserving entity identifiers
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
-* view: review tombstone checks, no longer required with storage entity and Get 1
+* view: propagate tombostone check request to iterator
 * review the short-circuit model now that all storage are freely available
 * more test around views and storage entity - ie view ::back
-* compilation flag to disable sigh mixin by default and only have plain storage types for all components
-* empty type optimization for tables (when they are in-place, no rush)
-* natvis for table class and all related types
-* single type view operator->
+* table: pop back to support swap and pop, single column access, empty type optimization
+* checkout tools workflow
+* meta: avoid unnecessary copies of iterators with meta containers
+* review constrained noexcept-ness (ie sigh)
+* has_single_bit/popcount vs is_power_of_two

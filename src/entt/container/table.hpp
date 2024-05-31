@@ -1,15 +1,12 @@
-#ifndef ENTT_ENTITY_TABLE_HPP
-#define ENTT_ENTITY_TABLE_HPP
+#ifndef ENTT_CONTAINER_TABLE_HPP
+#define ENTT_CONTAINER_TABLE_HPP
 
 #include <cstddef>
 #include <iterator>
-#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
-#include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "fwd.hpp"
 
@@ -17,14 +14,6 @@ namespace entt {
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
-
-struct basic_common_table {
-    using size_type = std::size_t;
-
-    virtual void reserve(const size_type) = 0;
-    [[nodiscard]] virtual size_type capacity() const noexcept = 0;
-    virtual void shrink_to_fit() = 0;
-};
 
 template<typename... It>
 class table_iterator {
@@ -39,7 +28,8 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::random_access_iterator_tag;
 
-    constexpr table_iterator() noexcept = default;
+    constexpr table_iterator() noexcept
+        : it{} {}
 
     constexpr table_iterator(It... from) noexcept
         : it{from...} {}
@@ -153,47 +143,49 @@ template<typename... Lhs, typename... Rhs>
  * no guarantees that objects are returned in the insertion order when iterate
  * a table. Do not make assumption on the order in any case.
  *
- * @tparam Row Element types.
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Container Sequence container row types.
  */
-template<typename... Row, typename Allocator>
-class basic_table<type_list<Row...>, Allocator>: internal::basic_common_table {
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(sizeof...(Row) != 0u, "Empty tables not allowed");
-
-    template<typename Type>
-    using container_for = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
-
-    using container_type = std::tuple<container_for<Row>...>;
-    using underlying_type = internal::basic_common_table;
+template<typename... Container>
+class basic_table {
+    using container_type = std::tuple<Container...>;
 
 public:
-    /*! @brief Allocator type. */
-    using allocator_type = Allocator;
-    /*! @brief Base type. */
-    using base_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename base_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
-    using iterator = internal::table_iterator<typename container_for<Row>::iterator...>;
+    using iterator = internal::table_iterator<typename Container::iterator...>;
     /*! @brief Constant input iterator type. */
-    using const_iterator = internal::table_iterator<typename container_for<Row>::const_iterator...>;
+    using const_iterator = internal::table_iterator<typename Container::const_iterator...>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = internal::table_iterator<typename container_for<Row>::reverse_iterator...>;
+    using reverse_iterator = internal::table_iterator<typename Container::reverse_iterator...>;
     /*! @brief Constant reverse iterator type. */
-    using const_reverse_iterator = internal::table_iterator<typename container_for<Row>::const_reverse_iterator...>;
+    using const_reverse_iterator = internal::table_iterator<typename Container::const_reverse_iterator...>;
 
     /*! @brief Default constructor. */
     basic_table()
-        : basic_table{allocator_type{}} {
+        : payload{} {
     }
 
     /**
-     * @brief Constructs an empty table with a given allocator.
-     * @param allocator The allocator to use.
+     * @brief Copy constructs the underlying containers.
+     * @param container The containers to copy from.
      */
-    explicit basic_table(const allocator_type &allocator)
-        : payload{container_type{container_for<Row>{allocator}...}, allocator} {}
+    explicit basic_table(const Container &...container) noexcept
+        : payload{container...} {
+        ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
+    }
+
+    /**
+     * @brief Move constructs the underlying containers.
+     * @param container The containers to move from.
+     */
+    explicit basic_table(Container &&...container) noexcept
+        : payload{std::move(container)...} {
+        ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
+    }
+
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_table(const basic_table &) = delete;
 
     /**
      * @brief Move constructor.
@@ -203,22 +195,63 @@ public:
         : payload{std::move(other.payload)} {}
 
     /**
+     * @brief Constructs the underlying containers using a given allocator.
+     * @tparam Allocator Type of allocator.
+     * @param allocator A valid allocator.
+     */
+    template<typename Allocator>
+    explicit basic_table(const Allocator &allocator)
+        : payload{Container{allocator}...} {}
+
+    /**
+     * @brief Copy constructs the underlying containers using a given allocator.
+     * @tparam Allocator Type of allocator.
+     * @param container The containers to copy from.
+     * @param allocator A valid allocator.
+     */
+    template<class Allocator>
+    basic_table(const Container &...container, const Allocator &allocator) noexcept
+        : payload{Container{container, allocator}...} {
+        ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
+    }
+
+    /**
+     * @brief Move constructs the underlying containers using a given allocator.
+     * @tparam Allocator Type of allocator.
+     * @param container The containers to move from.
+     * @param allocator A valid allocator.
+     */
+    template<class Allocator>
+    basic_table(Container &&...container, const Allocator &allocator) noexcept
+        : payload{Container{std::move(container), allocator}...} {
+        ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
+    }
+
+    /**
      * @brief Allocator-extended move constructor.
+     * @tparam Allocator Type of allocator.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_table(basic_table &&other, const allocator_type &allocator) noexcept
-        : payload{container_type{container_for<Row>{std::move(std::get<container_for<Row>>(other.payload.first())), allocator}...}, allocator} {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
-    }
+    template<class Allocator>
+    basic_table(basic_table &&other, const Allocator &allocator)
+        : payload{Container{std::move(std::get<Container>(other.payload)), allocator}...} {}
+
+    /*! @brief Default destructor. */
+    ~basic_table() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This container.
+     */
+    basic_table &operator=(const basic_table &) = delete;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This table.
+     * @return This container.
      */
     basic_table &operator=(basic_table &&other) noexcept {
-        ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a table is not allowed");
         payload = std::move(other.payload);
         return *this;
     }
@@ -233,14 +266,6 @@ public:
     }
 
     /**
-     * @brief Returns the associated allocator.
-     * @return The associated allocator.
-     */
-    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
-        return payload.second();
-    }
-
-    /**
      * @brief Increases the capacity of a table.
      *
      * If the new capacity is greater than the current capacity, new storage is
@@ -248,8 +273,8 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) override {
-        (std::get<container_for<Row>>(payload.first()).reserve(cap), ...);
+    void reserve(const size_type cap) {
+        (std::get<Container>(payload).reserve(cap), ...);
     }
 
     /**
@@ -257,13 +282,13 @@ public:
      * space for.
      * @return Capacity of the table.
      */
-    [[nodiscard]] size_type capacity() const noexcept override {
-        return std::get<0>(payload.first()).capacity();
+    [[nodiscard]] size_type capacity() const noexcept {
+        return std::get<0>(payload).capacity();
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    void shrink_to_fit() override {
-        (std::get<container_for<Row>>(payload.first()).shrink_to_fit(), ...);
+    void shrink_to_fit() {
+        (std::get<Container>(payload).shrink_to_fit(), ...);
     }
 
     /**
@@ -271,7 +296,7 @@ public:
      * @return Number of rows.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return std::get<0>(payload.first()).size();
+        return std::get<0>(payload).size();
     }
 
     /**
@@ -279,7 +304,7 @@ public:
      * @return True if the table is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return std::get<0>(payload.first()).empty();
+        return std::get<0>(payload).empty();
     }
 
     /**
@@ -290,7 +315,7 @@ public:
      * @return An iterator to the first row of the table.
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
-        return {std::get<container_for<Row>>(payload.first()).cbegin()...};
+        return {std::get<Container>(payload).cbegin()...};
     }
 
     /*! @copydoc cbegin */
@@ -300,7 +325,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() noexcept {
-        return {std::get<container_for<Row>>(payload.first()).begin()...};
+        return {std::get<Container>(payload).begin()...};
     }
 
     /**
@@ -308,7 +333,7 @@ public:
      * @return An iterator to the element following the last row of the table.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
-        return {std::get<container_for<Row>>(payload.first()).cend()...};
+        return {std::get<Container>(payload).cend()...};
     }
 
     /*! @copydoc cend */
@@ -318,7 +343,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
-        return {std::get<container_for<Row>>(payload.first()).end()...};
+        return {std::get<Container>(payload).end()...};
     }
 
     /**
@@ -329,7 +354,7 @@ public:
      * @return An iterator to the first row of the reversed table.
      */
     [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
-        return {std::get<container_for<Row>>(payload.first()).crbegin()...};
+        return {std::get<Container>(payload).crbegin()...};
     }
 
     /*! @copydoc crbegin */
@@ -339,7 +364,7 @@ public:
 
     /*! @copydoc rbegin */
     [[nodiscard]] reverse_iterator rbegin() noexcept {
-        return {std::get<container_for<Row>>(payload.first()).rbegin()...};
+        return {std::get<Container>(payload).rbegin()...};
     }
 
     /**
@@ -348,7 +373,7 @@ public:
      * table.
      */
     [[nodiscard]] const_reverse_iterator crend() const noexcept {
-        return {std::get<container_for<Row>>(payload.first()).crend()...};
+        return {std::get<Container>(payload).crend()...};
     }
 
     /*! @copydoc crend */
@@ -358,7 +383,7 @@ public:
 
     /*! @copydoc rend */
     [[nodiscard]] reverse_iterator rend() noexcept {
-        return {std::get<container_for<Row>>(payload.first()).rend()...};
+        return {std::get<Container>(payload).rend()...};
     }
 
     /**
@@ -368,8 +393,12 @@ public:
      * @return A reference to the newly created row data.
      */
     template<typename... Args>
-    std::tuple<Row &...> emplace(Args &&...args) {
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first()).emplace_back(std::forward<Args>(args))...);
+    std::tuple<typename Container::value_type &...> emplace(Args &&...args) {
+        if constexpr(sizeof...(Args) == 0u) {
+            return std::forward_as_tuple(std::get<Container>(payload).emplace_back()...);
+        } else {
+            return std::forward_as_tuple(std::get<Container>(payload).emplace_back(std::forward<Args>(args))...);
+        }
     }
 
     /**
@@ -379,7 +408,7 @@ public:
      */
     iterator erase(const_iterator pos) {
         const auto diff = pos - begin();
-        return {std::get<container_for<Row>>(payload.first()).erase(std::get<container_for<Row>>(payload.first()).begin() + diff)...};
+        return {std::get<Container>(payload).erase(std::get<Container>(payload).begin() + diff)...};
     }
 
     /**
@@ -396,26 +425,36 @@ public:
      * @param pos The row for which to return the data.
      * @return The row data at specified location.
      */
-    [[nodiscard]] std::tuple<const Row &...> operator[](const size_type pos) const {
+    [[nodiscard]] std::tuple<const typename Container::value_type &...> operator[](const size_type pos) const {
         ENTT_ASSERT(pos < size(), "Index out of bounds");
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
+        return std::forward_as_tuple(std::get<Container>(payload)[pos]...);
     }
 
     /*! @copydoc operator[] */
-    [[nodiscard]] std::tuple<Row &...> operator[](const size_type pos) {
+    [[nodiscard]] std::tuple<typename Container::value_type &...> operator[](const size_type pos) {
         ENTT_ASSERT(pos < size(), "Index out of bounds");
-        return std::forward_as_tuple(std::get<container_for<Row>>(payload.first())[pos]...);
+        return std::forward_as_tuple(std::get<Container>(payload)[pos]...);
     }
 
     /*! @brief Clears a table. */
     void clear() {
-        (std::get<container_for<Row>>(payload.first()).clear(), ...);
+        (std::get<Container>(payload).clear(), ...);
     }
 
 private:
-    compressed_pair<container_type, allocator_type> payload;
+    container_type payload;
 };
 
 } // namespace entt
+
+/*! @cond TURN_OFF_DOXYGEN */
+namespace std {
+
+template<typename... Container, typename Allocator>
+struct uses_allocator<entt::basic_table<Container...>, Allocator>
+    : std::bool_constant<(std::uses_allocator_v<Container, Allocator> && ...)> {};
+
+} // namespace std
+/*! @endcond */
 
 #endif

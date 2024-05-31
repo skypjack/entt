@@ -70,7 +70,7 @@ struct destruction_order {
     destruction_order(const destruction_order &) = delete;
     destruction_order &operator=(const destruction_order &) = delete;
 
-    ~destruction_order() {
+    ~destruction_order() noexcept {
         *ctx_check = *ctx_check && (registry->ctx().find<ctx_check_type>() != nullptr);
     }
 
@@ -452,7 +452,7 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     registry.storage<int>();
 
     auto proxy = registry.storage();
-    auto cproxy = std::as_const(registry).storage();
+    [[maybe_unused]] auto cproxy = std::as_const(registry).storage();
 
     const typename decltype(proxy)::iterator it = proxy.begin();
     typename decltype(cproxy)::iterator cit = it;
@@ -524,7 +524,10 @@ ENTT_DEBUG_TEST(RegistryDeathTest, Storage) {
     registry.storage<test::empty>("other"_hs);
 
     ASSERT_DEATH(registry.storage<int>("other"_hs), "");
-    ASSERT_DEATH(std::as_const(registry).storage<int>("other"_hs), "");
+    ASSERT_DEATH([[maybe_unused]] const auto *storage = std::as_const(registry).storage<int>("other"_hs), "");
+
+    ASSERT_DEATH(registry.storage<entt::entity>("other"_hs), "");
+    ASSERT_DEATH([[maybe_unused]] const auto *storage = std::as_const(registry).storage<entt::entity>("other"_hs), "");
 }
 
 TEST(Registry, Identifiers) {
@@ -957,7 +960,7 @@ TEST(Registry, StableEmplace) {
     ASSERT_EQ(registry.emplace<int>(registry.create(), 1), 1);
 }
 
-TEST(RegistryDeathTest, Emplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, Emplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
@@ -1003,7 +1006,7 @@ TEST(Registry, Insert) {
     ASSERT_EQ(registry.get<float>(entity[2u]), 2.f);
 }
 
-TEST(RegistryDeathTest, Insert) {
+ENTT_DEBUG_TEST(RegistryDeathTest, Insert) {
     entt::registry registry{};
     const std::array entity{registry.create()};
     const std::array value{0};
@@ -1039,7 +1042,7 @@ TEST(Registry, EmplaceOrReplaceAggregate) {
     ASSERT_EQ(instance.value, 1);
 }
 
-TEST(RegistryDeathTest, EmplaceOrReplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, EmplaceOrReplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
@@ -1447,7 +1450,7 @@ TEST(Registry, GetOrEmplace) {
     ASSERT_EQ(registry.get<int>(entity), 3);
 }
 
-TEST(RegistryDeathTest, GetOrEmplace) {
+ENTT_DEBUG_TEST(RegistryDeathTest, GetOrEmplace) {
     entt::registry registry{};
     const auto entity = registry.create();
 
@@ -2147,7 +2150,7 @@ TEST(Registry, SortSingle) {
         ASSERT_EQ(registry.get<int>(entity), --val);
     }
 
-    registry.sort<int>(std::less<int>{});
+    registry.sort<int>(std::less<>{});
 
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), val++);
@@ -2174,7 +2177,7 @@ TEST(Registry, SortMulti) {
         ASSERT_EQ(registry.get<int>(entity), --ival);
     }
 
-    registry.sort<unsigned int>(std::less<unsigned int>{});
+    registry.sort<unsigned int>(std::less<>{});
     registry.sort<int, unsigned int>();
 
     for(auto entity: registry.view<unsigned int>()) {
@@ -2196,7 +2199,7 @@ TEST(Registry, SortEmpty) {
     ASSERT_LT(registry.storage<test::empty>().data()[0], registry.storage<test::empty>().data()[1]);
     ASSERT_LT(registry.storage<test::empty>().data()[1], registry.storage<test::empty>().data()[2]);
 
-    registry.sort<test::empty>(std::less<entt::entity>{});
+    registry.sort<test::empty>(std::less<>{});
 
     ASSERT_GT(registry.storage<test::empty>().data()[0], registry.storage<test::empty>().data()[1]);
     ASSERT_GT(registry.storage<test::empty>().data()[1], registry.storage<test::empty>().data()[2]);

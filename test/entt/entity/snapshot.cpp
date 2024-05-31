@@ -64,7 +64,7 @@ TEST(BasicSnapshot, GetEntityType) {
     registry.destroy(entity[1u]);
 
     data.clear();
-    snapshot.get<entt::entity>(archive, "ignored"_hs);
+    snapshot.get<entt::entity>(archive);
 
     ASSERT_EQ(data.size(), 5u);
 
@@ -331,7 +331,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     data.emplace_back(entity[1u]);
     data.emplace_back(entity[2u]);
 
-    loader.get<entt::entity>(archive, "ignored"_hs);
+    loader.get<entt::entity>(archive);
 
     ASSERT_TRUE(registry.valid(entity[0u]));
     ASSERT_TRUE(registry.valid(entity[1u]));
@@ -608,7 +608,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     data.emplace_back(entity[1u]);
     data.emplace_back(entity[2u]);
 
-    loader.get<entt::entity>(archive, "ignored"_hs);
+    loader.get<entt::entity>(archive);
 
     ASSERT_TRUE(loader.contains(entity[0u]));
     ASSERT_TRUE(loader.contains(entity[1u]));
@@ -682,7 +682,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     data.emplace_back(entity[2u]);
     data.emplace_back(entity[0u]);
 
-    loader.get<entt::entity>(archive, "ignored"_hs);
+    loader.get<entt::entity>(archive);
 
     ASSERT_FALSE(loader.contains(entity[0u]));
     ASSERT_TRUE(loader.contains(entity[1u]));

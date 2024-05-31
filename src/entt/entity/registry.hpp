@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -218,7 +219,7 @@ public:
     }
 
 private:
-    dense_map<id_type, basic_any<0u>, identity, std::equal_to<id_type>, allocator_type> ctx;
+    dense_map<id_type, basic_any<0u>, identity, std::equal_to<>, allocator_type> ctx;
 };
 
 } // namespace internal
@@ -235,8 +236,8 @@ class basic_registry {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     // std::shared_ptr because of its type erased allocator which is useful here
-    using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<id_type>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
+    using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
+    using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
     using traits_type = entt_traits<Entity>;
 
     template<typename Type>
@@ -244,6 +245,7 @@ class basic_registry {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if constexpr(std::is_same_v<Type, entity_type>) {
+            ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
         } else {
             auto &cpool = pools[id];
@@ -272,6 +274,7 @@ class basic_registry {
         static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
 
         if constexpr(std::is_same_v<Type, entity_type>) {
+            ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return &entities;
         } else {
             if(const auto it = pools.find(id); it != pools.cend()) {
@@ -341,6 +344,9 @@ public:
         rebind();
     }
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_registry(const basic_registry &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -352,6 +358,15 @@ public:
           entities{std::move(other.entities)} {
         rebind();
     }
+
+    /*! @brief Default destructor. */
+    ~basic_registry() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This mixin.
+     */
+    basic_registry &operator=(const basic_registry &) = delete;
 
     /**
      * @brief Move assignment operator.
@@ -447,7 +462,7 @@ public:
      * @return The storage for the given element type.
      */
     template<typename Type>
-    const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
+    [[nodiscard]] const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
         return assure<Type>(id);
     }
 
@@ -714,9 +729,9 @@ public:
         size_type count{};
 
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
-            common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
+            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
+            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
                 if constexpr(sizeof...(Other) != 0u) {
                     if(cpools[pos]->data() == first.data()) {
                         std::swap(cpools[pos], cpools[sizeof...(Other)]);
@@ -764,9 +779,9 @@ public:
     template<typename Type, typename... Other, typename It>
     void erase(It first, It last) {
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
-            common_type *cpools[sizeof...(Other) + 1u]{&assure<Type>(), &assure<Other>()...};
+            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = sizeof...(Other) + 1u; pos < len; ++pos) {
+            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
                 if constexpr(sizeof...(Other) != 0u) {
                     if(cpools[pos]->data() == first.data()) {
                         std::swap(cpools[pos], cpools[sizeof...(Other)]);
@@ -1080,8 +1095,8 @@ public:
             handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
         } else {
             handler = std::allocate_shared<handler_type>(get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
-            [[maybe_unused]] const id_type elem[]{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem, sizeof...(Owned)) == 0u; }), "Conflicting groups");
+            [[maybe_unused]] const std::array elem{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem.data(), sizeof...(Owned)) == 0u; }), "Conflicting groups");
         }
 
         groups.emplace(group_type::group_id(), handler);
@@ -1090,7 +1105,7 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
+    [[nodiscard]] basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
     group_if_exists(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) const {
         using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
         using handler_type = typename group_type::handler;
@@ -1111,8 +1126,8 @@ public:
      */
     template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
-        const id_type elem[]{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
-        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem, 1u + sizeof...(Other)); });
+        const std::array elem{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
+        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem.data(), 1u + sizeof...(Other)); });
     }
 
     /**
@@ -1185,12 +1200,12 @@ public:
      * @brief Returns the context object, that is, a general purpose container.
      * @return The context object, that is, a general purpose container.
      */
-    context &ctx() noexcept {
+    [[nodiscard]] context &ctx() noexcept {
         return vars;
     }
 
     /*! @copydoc ctx */
-    const context &ctx() const noexcept {
+    [[nodiscard]] const context &ctx() const noexcept {
         return vars;
     }
 

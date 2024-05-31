@@ -1,17 +1,11 @@
 # Push EnTT across boundaries
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Working across boundaries](#working-across-boundaries)
   * [Smooth until proven otherwise](#smooth-until-proven-otherwise)
   * [Meta context](#meta-context)
   * [Memory management](#memory-management)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Working across boundaries
 

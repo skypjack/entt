@@ -9,11 +9,11 @@ struct aggregate {
     int value{};
 };
 
-inline bool operator==(const aggregate &lhs, const aggregate &rhs) {
+[[nodiscard]] inline bool operator==(const aggregate &lhs, const aggregate &rhs) {
     return lhs.value == rhs.value;
 }
 
-inline bool operator<(const aggregate &lhs, const aggregate &rhs) {
+[[nodiscard]] inline bool operator<(const aggregate &lhs, const aggregate &rhs) {
     return lhs.value < rhs.value;
 }
 

@@ -1,8 +1,5 @@
 ![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/103550016-90752280-4ea8-11eb-8667-12ed2219e137.png)
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
 [![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/zxW73f)
@@ -24,7 +21,7 @@ in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang, the
 [**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by Esri
 and the amazing [**Ragdoll**](https://ragdolldynamics.com/).<br/>
 If you don't see your project in the list, please open an issue, submit a PR or
-add the [#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
+add the [\#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
 
 ---
 
@@ -64,9 +61,6 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 * [EnTT in Action](#entt-in-action)
 * [Contributors](#contributors)
 * [License](#license)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 
@@ -354,16 +348,10 @@ To navigate it with your favorite browser:
     $ cd build
     $ your_favorite_browser docs/html/index.html
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 The same version is also available [online](https://skypjack.github.io/entt/)
 for the latest release, that is the last stable tag.<br/>
 Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
 to the project where users can find all related documentation pages.
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Tests
 
@@ -380,9 +368,6 @@ To build the most basic set of tests:
 
 Note that benchmarks are not part of this set.
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # EnTT in Action
 
 `EnTT` is widely used in private and commercial applications. I cannot even
@@ -410,14 +395,11 @@ I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all as soon as possible.
 
 If you decide to participate, please see the guidelines for
-[contributing](CONTRIBUTING.md) before to create issues or pull
-requests.<br/>
+[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING.md)
+before to create issues or pull requests.<br/>
 Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
 know who has participated so far.
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # License
 

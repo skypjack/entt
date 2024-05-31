@@ -3,6 +3,8 @@
 
 #include "version.h"
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+
 #if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
 #    define ENTT_CONSTEXPR
 #    define ENTT_THROW throw
@@ -60,6 +62,12 @@
 #    define ENTT_ETO_TYPE(Type) Type
 #endif
 
+#ifdef ENTT_NO_MIXIN
+#    define ENTT_STORAGE(Mixin, ...) __VA_ARGS__
+#else
+#    define ENTT_STORAGE(Mixin, ...) Mixin<__VA_ARGS__>
+#endif
+
 #ifdef ENTT_STANDARD_CPP
 #    define ENTT_NONSTD false
 #else
@@ -81,5 +89,7 @@
 #    pragma detect_mismatch("entt.id", ENTT_XSTR(ENTT_ID_TYPE))
 #    pragma detect_mismatch("entt.nonstd", ENTT_XSTR(ENTT_NONSTD))
 #endif
+
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 #endif

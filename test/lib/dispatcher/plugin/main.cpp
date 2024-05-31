@@ -6,14 +6,6 @@
 #include "../../../common/boxed_type.h"
 #include "../../../common/listener.h"
 
-struct listener {
-    void on(test::boxed_int msg) {
-        value = msg.value;
-    }
-
-    int value{};
-};
-
 TEST(Lib, Dispatcher) {
     entt::dispatcher dispatcher;
     test::listener<test::boxed_int> listener;

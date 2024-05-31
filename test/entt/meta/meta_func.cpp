@@ -13,11 +13,7 @@
 
 struct base {
     base() = default;
-    virtual ~base() = default;
-
-    static void destroy(base &) {
-        ++counter;
-    }
+    virtual ~base() noexcept = default;
 
     void setter(int v) {
         value = v;
@@ -31,7 +27,6 @@ struct base {
         ref.value = v;
     }
 
-    inline static int counter = 0; // NOLINT
     int value{3};
 };
 
@@ -103,7 +98,6 @@ struct MetaFunc: ::testing::Test {
 
         entt::meta<base>()
             .type("base"_hs)
-            .dtor<base::destroy>()
             .func<&base::setter>("setter"_hs)
             .func<fake_member>("fake_member"_hs)
             .func<fake_const_member>("fake_const_member"_hs);
@@ -113,8 +107,7 @@ struct MetaFunc: ::testing::Test {
             .base<base>()
             .func<&base::setter>("setter_from_base"_hs)
             .func<&base::getter>("getter_from_base"_hs)
-            .func<&base::static_setter>("static_setter_from_base"_hs)
-            .dtor<derived::destroy>();
+            .func<&base::static_setter>("static_setter_from_base"_hs);
 
         entt::meta<function>()
             .type("func"_hs)
@@ -134,8 +127,6 @@ struct MetaFunc: ::testing::Test {
             .func<&function::a, entt::as_ref_t>("a"_hs)
             .func<&function::a, entt::as_cref_t>("ca"_hs)
             .conv<int>();
-
-        base::counter = 0;
     }
 
     void TearDown() override {

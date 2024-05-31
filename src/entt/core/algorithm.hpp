@@ -2,6 +2,7 @@
 #define ENTT_CORE_ALGORITHM_HPP
 
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <iterator>
 #include <utility>
@@ -104,8 +105,8 @@ struct radix_sort {
                 constexpr auto mask = (1 << Bit) - 1;
                 constexpr auto buckets = 1 << Bit;
 
-                std::size_t index[buckets]{};
-                std::size_t count[buckets]{};
+                std::array<std::size_t, buckets> index{};
+                std::array<std::size_t, buckets> count{};
 
                 for(auto it = from; it != to; ++it) {
                     ++count[(getter(*it) >> start) & mask];

@@ -98,7 +98,7 @@ template<typename Registry, typename... Scope>
 class basic_handle {
     using traits_type = entt_traits<typename Registry::entity_type>;
 
-    auto &owner_or_assert() const noexcept {
+    [[nodiscard]] auto &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
         return static_cast<Registry &>(*owner);
     }
@@ -200,6 +200,7 @@ public:
      * @return A reference to the newly created element.
      */
     template<typename Type, typename... Args>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     decltype(auto) emplace(Args &&...args) const {
         static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template emplace<Type>(entt, std::forward<Args>(args)...);
@@ -250,6 +251,7 @@ public:
      * @return The number of elements actually removed.
      */
     template<typename... Type>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     size_type remove() const {
         static_assert(sizeof...(Scope) == 0 || (type_list_contains_v<type_list<Scope...>, Type> && ...), "Invalid type");
         return owner_or_assert().template remove<Type...>(entt);

@@ -216,11 +216,23 @@ class basic_common_view {
     template<typename Return, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
 
-    auto offset() const noexcept {
+    [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
         const auto *view = pools[index];
-        const size_type len[]{view->size(), view->free_list()};
+        const std::array len{view->size(), view->free_list()};
         return len[view->policy() == deletion_policy::swap_only];
+    }
+
+    void unchecked_refresh() noexcept {
+        index = 0u;
+
+        if constexpr(Get > 1u) {
+            for(size_type pos{1u}; pos < Get; ++pos) {
+                if(pools[pos]->size() < pools[index]->size()) {
+                    index = pos;
+                }
+            }
+        }
     }
 
 protected:
@@ -236,18 +248,6 @@ protected:
 
     void use(const std::size_t pos) noexcept {
         index = (index != Get) ? pos : Get;
-    }
-
-    void unchecked_refresh() noexcept {
-        index = 0u;
-
-        if constexpr(Get > 1u) {
-            for(size_type pos{1u}; pos < Get; ++pos) {
-                if(pools[pos]->size() < pools[index]->size()) {
-                    index = pos;
-                }
-            }
-        }
     }
     /*! @endcond */
 
@@ -389,8 +389,10 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
+    static constexpr bool tombstone_check_required = ((sizeof...(Get) == 1u) && ... && (Get::storage_policy == deletion_policy::in_place));
+
     template<std::size_t... Index>
-    auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
         return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
     }
 
@@ -406,7 +408,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); ((sizeof...(Get) != 1u) || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->filter.begin(), this->filter.end(), entt)) {
+            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->filter.begin(), this->filter.end(), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -749,10 +751,8 @@ public:
         return leading && leading->contains(entt);
     }
 
-protected:
-    /*! @cond TURN_OFF_DOXYGEN */
+private:
     const common_type *leading{};
-    /*! @endcond */
 };
 
 /**
@@ -821,7 +821,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->leading));
+        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->handle()));
     }
 
     /**
@@ -840,7 +840,15 @@ public:
     template<std::size_t Index>
     void storage(Get &elem) noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        this->leading = &elem;
+        *this = basic_view{elem};
+    }
+
+    /**
+     * @brief Returns a pointer to the underlying storage.
+     * @return A pointer to the underlying storage.
+     */
+    [[nodiscard]] Get *operator->() const noexcept {
+        return storage();
     }
 
     /**

@@ -1,8 +1,5 @@
 # Crash Course: entity-component system
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -65,9 +62,6 @@
   * [Iterators](#iterators)
   * [Const registry](#const-registry)
 * [Beyond this document](#beyond-this-document)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 
@@ -1319,16 +1313,6 @@ fact, entities are subject to different rules with respect to components
 * The `each` function iterates only the entities _in use_, that is, those not
   marked as _ready for reuse_. To iterate all the entities it's necessary to
   iterate the underlying sparse set instead.
-
-Moreover, the entity storage offers a couple of additional utilities such as:
-
-* The `in_use` function which is used to know how many entities are still
-  _in use_. When combined with `size`, it also makes it possible to know how
-  many entities are available for recycling.
-
-* The `pack` function which is used to make a given set of entities contiguous.
-  This is particularly useful to pass valid lists of entities via iterators
-  (with access usually optimized within the library).
 
 This kind of storage is designed to be used where any other storage is fine and
 can therefore be combined with views, groups and so on.

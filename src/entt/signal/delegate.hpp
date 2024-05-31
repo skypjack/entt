@@ -117,9 +117,7 @@ public:
     using result_type = Ret;
 
     /*! @brief Default constructor. */
-    delegate() noexcept
-        : instance{nullptr},
-          fn{nullptr} {}
+    delegate() noexcept = default;
 
     /**
      * @brief Constructs a delegate with a given object or payload, if any.
@@ -295,8 +293,8 @@ public:
     }
 
 private:
-    const void *instance;
-    function_type *fn;
+    const void *instance{};
+    function_type *fn{};
 };
 
 /**

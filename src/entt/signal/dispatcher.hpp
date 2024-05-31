@@ -21,11 +21,11 @@ namespace entt {
 namespace internal {
 
 struct basic_dispatcher_handler {
-    virtual ~basic_dispatcher_handler() = default;
+    virtual ~basic_dispatcher_handler() noexcept = default;
     virtual void publish() = 0;
     virtual void disconnect(void *) = 0;
     virtual void clear() noexcept = 0;
-    virtual std::size_t size() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t size() const noexcept = 0;
 };
 
 template<typename Type, typename Allocator>
@@ -115,7 +115,7 @@ class basic_dispatcher {
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
-    using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<key_type>, container_allocator>;
+    using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<>, container_allocator>;
 
     template<typename Type>
     [[nodiscard]] handler_type<Type> &assure(const id_type id) {
@@ -158,6 +158,9 @@ public:
     explicit basic_dispatcher(const allocator_type &allocator)
         : pools{allocator, allocator} {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_dispatcher(const basic_dispatcher &) = delete;
+
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
@@ -170,10 +173,19 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator) noexcept
+    basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator)
         : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a dispatcher is not allowed");
     }
+
+    /*! @brief Default destructor. */
+    ~basic_dispatcher() noexcept = default;
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This dispatcher.
+     */
+    basic_dispatcher &operator=(const basic_dispatcher &) = delete;
 
     /**
      * @brief Move assignment operator.
@@ -210,7 +222,7 @@ public:
      * @return The number of pending events for the given type.
      */
     template<typename Type>
-    size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
+    [[nodiscard]] size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
         const auto *cpool = assure<std::decay_t<Type>>(id);
         return cpool ? cpool->size() : 0u;
     }
@@ -219,7 +231,7 @@ public:
      * @brief Returns the total number of pending events.
      * @return The total number of pending events.
      */
-    size_type size() const noexcept {
+    [[nodiscard]] size_type size() const noexcept {
         size_type count{};
 
         for(auto &&cpool: pools.first()) {

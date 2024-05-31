@@ -64,15 +64,25 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 2u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].in_edges().size(), 0u);
+    ASSERT_EQ(graph[1u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].in_edges().size(), 2u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[0u].children()[1u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 3u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[1u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[2u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[3u].in_edges()[0u], 1u);
+    ASSERT_EQ(graph[3u].in_edges()[1u], 2u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 2u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
+    ASSERT_EQ(graph[0u].out_edges()[1u], 2u);
+    ASSERT_EQ(graph[1u].out_edges()[0u], 3u);
+    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -122,14 +132,23 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[0u].in_edges().size(), 0u);
+    ASSERT_EQ(graph[1u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].in_edges().size(), 1u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[1u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[2u].in_edges()[0u], 1u);
+    ASSERT_EQ(graph[3u].in_edges()[0u], 2u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
+    ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
+    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -185,16 +204,24 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_FALSE(graph[3u].top_level());
     ASSERT_FALSE(graph[4u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 1u);
-    ASSERT_EQ(graph[4u].children().size(), 0u);
+    ASSERT_EQ(graph[3u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[4u].in_edges().size(), 3u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 4u);
-    ASSERT_EQ(graph[1u].children()[0u], 4u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
-    ASSERT_EQ(graph[3u].children()[0u], 4u);
+    ASSERT_EQ(graph[3u].in_edges()[0u], 2u);
+    ASSERT_EQ(graph[4u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[4u].in_edges()[1u], 1u);
+    ASSERT_EQ(graph[4u].in_edges()[2u], 3u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[4u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 4u);
+    ASSERT_EQ(graph[1u].out_edges()[0u], 4u);
+    ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
+    ASSERT_EQ(graph[3u].children()[0u], 4u); // NOLINT
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -261,14 +288,22 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_FALSE(graph[2u].top_level());
     ASSERT_FALSE(graph[3u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 0u);
+    ASSERT_EQ(graph[1u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].in_edges().size(), 1u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u);
+    ASSERT_EQ(graph[1u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[2u].in_edges()[0u], 1u);
+    ASSERT_EQ(graph[3u].in_edges()[0u], 2u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
+    ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
+    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -310,19 +345,32 @@ TEST(Organizer, SyncPoint) {
     ASSERT_FALSE(graph[4u].top_level());
     ASSERT_FALSE(graph[5u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 2u);
-    ASSERT_EQ(graph[2u].children().size(), 1u);
-    ASSERT_EQ(graph[3u].children().size(), 1u);
-    ASSERT_EQ(graph[4u].children().size(), 1u);
-    ASSERT_EQ(graph[5u].children().size(), 0u);
+    ASSERT_EQ(graph[1u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].in_edges().size(), 1u);
+    ASSERT_EQ(graph[4u].in_edges().size(), 2u);
+    ASSERT_EQ(graph[5u].in_edges().size(), 1u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 1u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
-    ASSERT_EQ(graph[1u].children()[1u], 3u);
-    ASSERT_EQ(graph[2u].children()[0u], 4u);
-    ASSERT_EQ(graph[3u].children()[0u], 4u);
-    ASSERT_EQ(graph[4u].children()[0u], 5u);
+    ASSERT_EQ(graph[1u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[2u].in_edges()[0u], 1u);
+    ASSERT_EQ(graph[3u].in_edges()[0u], 1u);
+    ASSERT_EQ(graph[4u].in_edges()[0u], 2u);
+    ASSERT_EQ(graph[4u].in_edges()[1u], 3u);
+    ASSERT_EQ(graph[5u].in_edges()[0u], 4u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 2u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[3u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[4u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[5u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
+    ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
+    ASSERT_EQ(graph[1u].out_edges()[1u], 3u);
+    ASSERT_EQ(graph[2u].out_edges()[0u], 4u);
+    ASSERT_EQ(graph[3u].out_edges()[0u], 4u);
+    ASSERT_EQ(graph[4u].children()[0u], 5u); // NOLINT
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -349,12 +397,17 @@ TEST(Organizer, Override) {
     ASSERT_TRUE(graph[1u].top_level());
     ASSERT_FALSE(graph[2u].top_level());
 
-    ASSERT_EQ(graph[0u].children().size(), 1u);
-    ASSERT_EQ(graph[1u].children().size(), 1u);
-    ASSERT_EQ(graph[2u].children().size(), 0u);
+    ASSERT_EQ(graph[2u].in_edges().size(), 2u);
 
-    ASSERT_EQ(graph[0u].children()[0u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u);
+    ASSERT_EQ(graph[2u].in_edges()[0u], 0u);
+    ASSERT_EQ(graph[2u].in_edges()[1u], 1u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 1u);
+    ASSERT_EQ(graph[2u].out_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges()[0u], 2u);
+    ASSERT_EQ(graph[1u].children()[0u], 2u); // NOLINT
 }
 
 TEST(Organizer, Prepare) {

@@ -39,7 +39,7 @@ class emitter {
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
-    using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<key_type>, container_allocator>;
+    using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<>, container_allocator>;
 
 public:
     /*! @brief Allocator type. */
@@ -58,10 +58,8 @@ public:
     explicit emitter(const allocator_type &allocator)
         : handlers{allocator, allocator} {}
 
-    /*! @brief Default destructor. */
-    virtual ~emitter() noexcept {
-        static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
-    }
+    /*! @brief Default copy constructor, deleted on purpose. */
+    emitter(const emitter &) = delete;
 
     /**
      * @brief Move constructor.
@@ -75,19 +73,29 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    emitter(emitter &&other, const allocator_type &allocator) noexcept
+    emitter(emitter &&other, const allocator_type &allocator)
         : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
     }
 
+    /*! @brief Default destructor. */
+    virtual ~emitter() noexcept {
+        static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
+    }
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This emitter.
+     */
+    emitter &operator=(const emitter &) = delete;
+
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
-     * @return This dispatcher.
+     * @return This emitter.
      */
     emitter &operator=(emitter &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
-
         handlers = std::move(other.handlers);
         return *this;
     }

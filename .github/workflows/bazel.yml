@@ -3,6 +3,7 @@ name: bazel
 on: [push, pull_request]
 
 jobs:
+
   test:
     strategy:
       matrix:
@@ -10,8 +11,10 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
+
     runs-on: ${{ matrix.os }}
     continue-on-error: true
+
     steps:
     - uses: actions/checkout@v4
     - run: bazelisk test --config=ci ...

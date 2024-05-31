@@ -30,11 +30,11 @@ struct poly_inspector {
      * @return A poly inspector convertible to any type.
      */
     template<std::size_t Member, typename... Args>
-    poly_inspector invoke(Args &&...args) const;
+    [[nodiscard]] poly_inspector invoke(Args &&...args) const;
 
     /*! @copydoc invoke */
     template<std::size_t Member, typename... Args>
-    poly_inspector invoke(Args &&...args);
+    [[nodiscard]] poly_inspector invoke(Args &&...args);
 };
 
 /**
@@ -199,9 +199,7 @@ public:
     using vtable_type = typename poly_vtable<Concept, Len, Align>::type;
 
     /*! @brief Default constructor. */
-    basic_poly() noexcept
-        : storage{},
-          vtable{} {}
+    basic_poly() noexcept = default;
 
     /**
      * @brief Constructs a poly by directly initializing the new object.
@@ -303,8 +301,8 @@ public:
     }
 
 private:
-    basic_any<Len, Align> storage;
-    vtable_type vtable;
+    basic_any<Len, Align> storage{};
+    vtable_type vtable{};
 };
 
 } // namespace entt

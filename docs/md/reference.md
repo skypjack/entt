@@ -1,15 +1,9 @@
 # Similar projects
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Table of Contents
 
 * [Introduction](#introduction)
 * [Similar projects](#similar-projects)
-<!--
-@endcond TURN_OFF_DOXYGEN
--->
 
 # Introduction
 

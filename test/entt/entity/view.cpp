@@ -281,12 +281,12 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(i), const int &>();
     });
 
-    for(auto [entt, iv]: view.each()) {
+    for([[maybe_unused]] auto [entt, iv]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
     }
 
-    for(auto [entt, iv]: cview.each()) {
+    for([[maybe_unused]] auto [entt, iv]: cview.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), const int &>();
     }
@@ -310,11 +310,11 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
 
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).view<test::empty>()), decltype(cview)>();
 
-    for(auto [entt]: view.each()) {
+    for([[maybe_unused]] auto [entt]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 
-    for(auto [entt]: cview.each()) {
+    for([[maybe_unused]] auto [entt]: cview.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
     }
 }
@@ -529,6 +529,37 @@ TEST(SingleComponentView, Storage) {
 
     ASSERT_EQ(view.storage<0u>(), nullptr);
     ASSERT_EQ(cview.storage<const char>(), nullptr);
+}
+
+TEST(SingleComponentView, ArrowOperator) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    auto view = registry.view<int>();
+    auto cview = registry.view<const char>();
+
+    testing::StaticAssertTypeEq<decltype(view.operator->()), entt::storage_type_t<int> *>();
+    testing::StaticAssertTypeEq<decltype(cview.operator->()), const entt::storage_type_t<char> *>();
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+
+    ASSERT_NE(view.operator->(), nullptr);
+    ASSERT_NE(cview.operator->(), nullptr);
+
+    view->emplace(entity);
+    registry.emplace<char>(entity);
+
+    ASSERT_EQ(view.operator->(), &registry.storage<int>());
+    ASSERT_EQ(cview.operator->(), &registry.storage<char>());
+
+    ASSERT_EQ(view.operator->(), view.storage());
+    ASSERT_EQ(cview.operator->(), cview.storage());
+
+    view = {};
+    cview = {};
+
+    ASSERT_EQ(view.operator->(), nullptr);
+    ASSERT_EQ(cview.operator->(), nullptr);
 }
 
 TEST(SingleComponentView, SwapStorage) {
@@ -1039,7 +1070,7 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
         testing::StaticAssertTypeEq<decltype(c), const char &>();
     });
 
-    for(auto [entt, iv, cv]: view.each()) {
+    for([[maybe_unused]] auto [entt, iv, cv]: view.each()) {
         testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
         testing::StaticAssertTypeEq<decltype(iv), int &>();
         testing::StaticAssertTypeEq<decltype(cv), const char &>();

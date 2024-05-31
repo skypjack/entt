@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include "fwd.hpp"
 
 namespace entt {
@@ -10,22 +11,17 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename>
-struct fnv1a_traits;
+template<typename = id_type>
+inline constexpr auto offset = 2166136261;
 
 template<>
-struct fnv1a_traits<std::uint32_t> {
-    using type = std::uint32_t;
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
-};
+inline constexpr auto offset<std::uint64_t> = 14695981039346656037ull;
+
+template<typename = id_type>
+inline constexpr auto prime = 16777619;
 
 template<>
-struct fnv1a_traits<std::uint64_t> {
-    using type = std::uint64_t;
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-};
+inline constexpr auto prime<std::uint64_t> = 1099511628211ull;
 
 template<typename Char>
 struct basic_hashed_string {
@@ -59,7 +55,6 @@ struct basic_hashed_string {
 template<typename Char>
 class basic_hashed_string: internal::basic_hashed_string<Char> {
     using base_type = internal::basic_hashed_string<Char>;
-    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -71,10 +66,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str) noexcept {
-        base_type base{str, 0u, traits_type::offset};
+        base_type base{str, 0u, internal::offset<>};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<traits_type::type>(str[base.length])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * internal::prime<>;
         }
 
         return base;
@@ -82,10 +77,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) noexcept {
-        base_type base{str, len, traits_type::offset};
+        base_type base{str, len, internal::offset<>};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<traits_type::type>(str[pos])) * traits_type::prime;
+            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * internal::prime<>;
         }
 
         return base;
@@ -116,6 +111,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) noexcept {
         return basic_hashed_string{str};
     }
@@ -147,8 +143,9 @@ public:
      * @param str Human-readable identifier.
      */
     template<std::size_t N>
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     constexpr basic_hashed_string(const value_type (&str)[N]) noexcept
-        : base_type{helper(str)} {}
+        : base_type{helper(static_cast<const value_type *>(str))} {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
@@ -216,6 +213,7 @@ basic_hashed_string(const Char *str, const std::size_t len) -> basic_hashed_stri
  * @param str Human-readable identifier.
  */
 template<typename Char, std::size_t N>
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;
 
 /**

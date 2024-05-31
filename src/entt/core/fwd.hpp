@@ -6,6 +6,7 @@
 
 namespace entt {
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
 class basic_any;
 
@@ -27,6 +28,7 @@ using hashed_string = basic_hashed_string<char>;
 /*! @brief Aliases for common character types. */
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
+// NOLINTNEXTLINE(bugprone-forward-declaration-namespace)
 struct type_info;
 
 } // namespace entt

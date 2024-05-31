@@ -24,7 +24,7 @@ struct tracker {
     tracker(const tracker &) = default;
     tracker &operator=(const tracker &) = delete;
 
-    ~tracker() {
+    ~tracker() noexcept {
         ++(*counter);
     }
 
@@ -1547,6 +1547,4 @@ TEST(Any, ClassLevelNewDelete) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::type_id<test::new_delete>());
     ASSERT_EQ(entt::any_cast<const test::new_delete &>(any).value, 3);
-
-    // TODO
 }

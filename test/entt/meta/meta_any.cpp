@@ -17,15 +17,14 @@ struct clazz {
         value = i;
     }
 
-    static void func() {
-        c = 'd';
+    static char func() {
+        return 'c';
     }
 
     operator int() const {
         return value;
     }
 
-    inline static char c = 'c'; // NOLINT
     int value{0};
 };
 
@@ -35,7 +34,7 @@ struct empty {
     empty(const empty &) = default;
     empty &operator=(const empty &) = default;
 
-    virtual ~empty() {
+    virtual ~empty() noexcept {
         ++destructor_counter;
     }
 
@@ -54,7 +53,7 @@ struct fat: empty {
     fat(double v1, double v2, double v3, double v4)
         : value{v1, v2, v3, v4} {}
 
-    ~fat() override = default;
+    ~fat() noexcept override = default;
 
     fat(const fat &) = default;
     fat &operator=(const fat &) = default;
@@ -75,7 +74,7 @@ struct unmanageable {
     unmanageable()
         : value{std::make_unique<int>(3)} {}
 
-    ~unmanageable() = default;
+    ~unmanageable() noexcept = default;
 
     unmanageable(const unmanageable &) = delete;
     unmanageable(unmanageable &&) = delete;
@@ -1348,14 +1347,16 @@ TEST_F(MetaAny, Invoke) {
 
     clazz instance;
     auto any = entt::forward_as_meta(instance);
+    const auto result = any.invoke("func"_hs);
 
-    ASSERT_TRUE(any.invoke("func"_hs));
     ASSERT_TRUE(any.invoke("member"_hs, 3));
     ASSERT_FALSE(std::as_const(any).invoke("member"_hs, 3));
     ASSERT_FALSE(std::as_const(any).as_ref().invoke("member"_hs, 3));
     ASSERT_FALSE(any.invoke("non_existent"_hs, 3));
 
-    ASSERT_EQ(clazz::c, 'd');
+    ASSERT_TRUE(result);
+    ASSERT_NE(result.try_cast<char>(), nullptr);
+    ASSERT_EQ(result.cast<char>(), 'c');
     ASSERT_EQ(instance.value, 3);
 }
 

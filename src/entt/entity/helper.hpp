@@ -22,7 +22,7 @@ namespace entt {
 template<typename Registry>
 class as_view {
     template<typename... Get, typename... Exclude>
-    auto dispatch(get_t<Get...>, exclude_t<Exclude...>) const {
+    [[nodiscard]] auto dispatch(get_t<Get...>, exclude_t<Exclude...>) const {
         return reg.template view<constness_as_t<typename Get::element_type, Get>...>(exclude_t<constness_as_t<typename Exclude::element_type, Exclude>...>{});
     }
 
@@ -61,7 +61,7 @@ private:
 template<typename Registry>
 class as_group {
     template<typename... Owned, typename... Get, typename... Exclude>
-    auto dispatch(owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>) const {
+    [[nodiscard]] auto dispatch(owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>) const {
         if constexpr(std::is_const_v<registry_type>) {
             return reg.template group_if_exists<typename Owned::element_type...>(get_t<typename Get::element_type...>{}, exclude_t<typename Exclude::element_type...>{});
         } else {
