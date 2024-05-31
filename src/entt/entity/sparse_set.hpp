@@ -215,14 +215,14 @@ class basic_sparse_set {
         }
     }
 
-    void swap_at(const std::size_t from, const std::size_t to) {
-        auto &lhs = packed[from];
-        auto &rhs = packed[to];
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
+        auto &from = packed[lhs];
+        auto &to = packed[rhs];
 
-        sparse_ref(lhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(to), traits_type::to_integral(lhs));
-        sparse_ref(rhs) = traits_type::combine(static_cast<typename traits_type::entity_type>(from), traits_type::to_integral(rhs));
+        sparse_ref(from) = traits_type::combine(static_cast<typename traits_type::entity_type>(rhs), traits_type::to_integral(from));
+        sparse_ref(to) = traits_type::combine(static_cast<typename traits_type::entity_type>(lhs), traits_type::to_integral(to));
 
-        std::swap(lhs, rhs);
+        std::swap(from, to);
     }
 
 private:
