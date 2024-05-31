@@ -11,25 +11,17 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-[[nodiscard]] inline constexpr auto offset() noexcept {
-    if constexpr(std::is_same_v<id_type, std::uint32_t>) {
-        constexpr auto offset_value = 2166136261;
-        return offset_value;
-    } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
-        constexpr auto offset_value = 14695981039346656037ull;
-        return offset_value;
-    }
-}
+template<typename = id_type>
+inline constexpr auto offset = 2166136261;
 
-[[nodiscard]] inline constexpr auto prime() noexcept {
-    if constexpr(std::is_same_v<id_type, std::uint32_t>) {
-        constexpr auto prime_value = 16777619;
-        return prime_value;
-    } else if constexpr(std::is_same_v<id_type, std::uint64_t>) {
-        constexpr auto prime_value = 1099511628211ull;
-        return prime_value;
-    }
-}
+template<>
+inline constexpr auto offset<std::uint64_t> = 14695981039346656037ull;
+
+template<typename = id_type>
+inline constexpr auto prime = 16777619;
+
+template<>
+inline constexpr auto prime<std::uint64_t> = 1099511628211ull;
 
 template<typename Char>
 struct basic_hashed_string {
@@ -74,10 +66,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str) noexcept {
-        base_type base{str, 0u, internal::offset()};
+        base_type base{str, 0u, internal::offset<>};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * internal::prime();
+            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * internal::prime<>;
         }
 
         return base;
@@ -85,10 +77,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) noexcept {
-        base_type base{str, len, internal::offset()};
+        base_type base{str, len, internal::offset<>};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * internal::prime();
+            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * internal::prime<>;
         }
 
         return base;

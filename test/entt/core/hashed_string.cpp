@@ -69,7 +69,7 @@ TEST_F(HashedString, Empty) {
     const entt::hashed_string hs{};
 
     ASSERT_EQ(hs.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::offset());
+    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::offset<>);
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
 }
 
@@ -163,7 +163,7 @@ TEST_F(HashedWString, Empty) {
     const entt::hashed_wstring hws{};
 
     ASSERT_EQ(hws.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::offset());
+    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::offset<>);
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
 }
 
