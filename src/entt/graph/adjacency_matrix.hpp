@@ -171,7 +171,7 @@ public:
      * @brief Default move assignment operator.
      * @return This container.
      */
-    adjacency_matrix &operator=(adjacency_matrix &&other) noexcept = default;
+    adjacency_matrix &operator=(adjacency_matrix &&) noexcept = default;
 
     /**
      * @brief Returns the associated allocator.
