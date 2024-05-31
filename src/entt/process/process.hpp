@@ -110,7 +110,8 @@ class process {
         static_cast<Target *>(this)->aborted();
     }
 
-    void next(...) const noexcept {}
+    template<typename... Args>
+    void next(Args &&...) const noexcept {}
 
 protected:
     /**
