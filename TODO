@@ -35,4 +35,5 @@ TODO:
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
 * meta: avoid unnecessary copies of iterators with meta containers
-* review constrained noexcpet-ness (ie sigh)
+* review constrained noexcept-ness (ie sigh)
+* has_single_bit/popcount vs is_power_of_two
