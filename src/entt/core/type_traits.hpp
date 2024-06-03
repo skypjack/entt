@@ -771,15 +771,11 @@ template<typename Type>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
     if constexpr(std::is_array_v<Type>) {
         return false;
-    } else if constexpr(is_iterator_v<Type>) {
-        return maybe_equality_comparable<Type>(0);
-    } else if constexpr(has_value_type<Type>::value) {
+    } else if constexpr(!is_iterator_v<Type> && has_value_type<Type>::value) {
         if constexpr(std::is_same_v<typename Type::value_type, Type>) {
             return maybe_equality_comparable<Type>(0);
-        } else if constexpr(dispatch_is_equality_comparable<typename Type::value_type>()) {
-            return maybe_equality_comparable<Type>(0);
         } else {
-            return false;
+            return maybe_equality_comparable<Type>(0) && dispatch_is_equality_comparable<typename Type::value_type>();
         }
     } else if constexpr(is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
