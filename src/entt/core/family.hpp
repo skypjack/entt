@@ -15,6 +15,7 @@ namespace entt {
  */
 template<typename...>
 class family {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     inline static ENTT_MAYBE_ATOMIC(id_type) identifier{};
 
 public:
