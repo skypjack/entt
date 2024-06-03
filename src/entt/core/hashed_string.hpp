@@ -12,16 +12,19 @@ namespace entt {
 namespace internal {
 
 template<typename = id_type>
-inline constexpr auto offset = 2166136261;
+struct fnv_1a_params;
 
 template<>
-inline constexpr auto offset<std::uint64_t> = 14695981039346656037ull;
-
-template<typename = id_type>
-inline constexpr auto prime = 16777619;
+struct fnv_1a_params<std::uint32_t> {
+    static constexpr auto offset = 2166136261;
+    static constexpr auto prime = 16777619;
+};
 
 template<>
-inline constexpr auto prime<std::uint64_t> = 1099511628211ull;
+struct fnv_1a_params<std::uint64_t> {
+    static constexpr auto offset = 14695981039346656037ull;
+    static constexpr auto prime = 1099511628211ull;
+};
 
 template<typename Char>
 struct basic_hashed_string {
@@ -55,6 +58,7 @@ struct basic_hashed_string {
 template<typename Char>
 class basic_hashed_string: internal::basic_hashed_string<Char> {
     using base_type = internal::basic_hashed_string<Char>;
+    using params = internal::fnv_1a_params<>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -66,10 +70,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str) noexcept {
-        base_type base{str, 0u, internal::offset<>};
+        base_type base{str, 0u, params::offset};
 
         for(; str[base.length]; ++base.length) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * internal::prime<>;
+            base.hash = (base.hash ^ static_cast<id_type>(str[base.length])) * params::prime;
         }
 
         return base;
@@ -77,10 +81,10 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     [[nodiscard]] static constexpr auto helper(const Char *str, const std::size_t len) noexcept {
-        base_type base{str, len, internal::offset<>};
+        base_type base{str, len, params::offset};
 
         for(size_type pos{}; pos < len; ++pos) {
-            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * internal::prime<>;
+            base.hash = (base.hash ^ static_cast<id_type>(str[pos])) * params::prime;
         }
 
         return base;
