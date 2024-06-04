@@ -1,4 +1,5 @@
 #include <array>
+#include <cstddef>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/algorithm.hpp>
@@ -11,9 +12,8 @@ TEST(Algorithm, StdSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto &curr = *(it++);
-        ASSERT_LT(curr, *it);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_LT(arr[pos], arr[pos + 1u]);
     }
 }
 
@@ -26,9 +26,8 @@ TEST(Algorithm, StdSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto curr = it++;
-        ASSERT_GT(curr->value, it->value);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
     }
 }
 
@@ -45,9 +44,8 @@ TEST(Algorithm, InsertionSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto &curr = *(it++);
-        ASSERT_LT(curr, *it);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_LT(arr[pos], arr[pos + 1u]);
     }
 }
 
@@ -59,9 +57,8 @@ TEST(Algorithm, InsertionSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto curr = it++;
-        ASSERT_GT(curr->value, it->value);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
     }
 }
 
@@ -80,9 +77,8 @@ TEST(Algorithm, RadixSort) {
         return value;
     });
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto &curr = *(it++);
-        ASSERT_LT(curr, *it);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_LT(arr[pos], arr[pos + 1u]);
     }
 }
 
@@ -94,9 +90,8 @@ TEST(Algorithm, RadixSortBoxedInt) {
         return instance.value;
     });
 
-    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
-        const auto curr = it++;
-        ASSERT_GT(curr->value, it->value);
+    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
+        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
     }
 }
 
