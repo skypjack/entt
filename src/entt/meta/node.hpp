@@ -245,12 +245,12 @@ template<typename Type>
     }
 
     if constexpr(!std::is_void_v<Type> && !std::is_function_v<Type>) {
-        node.from_void = +[](const meta_ctx &ctx, void *element, const void *as_const) {
-            if(element) {
-                return meta_any{ctx, std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(element)};
+        node.from_void = +[](const meta_ctx &ctx, void *elem, const void *celem) {
+            if(elem) {
+                return meta_any{ctx, std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(elem)};
             }
 
-            return meta_any{ctx, std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(as_const)};
+            return meta_any{ctx, std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(celem)};
         };
     }
 
