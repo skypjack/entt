@@ -11,8 +11,9 @@ TEST(Algorithm, StdSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_LT(*it, *(it + 1u));
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto &curr = *(it++);
+        ASSERT_LT(curr, *it);
     }
 }
 
@@ -25,9 +26,17 @@ TEST(Algorithm, StdSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_GT(it->value, (it + 1u)->value);
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto curr = it++;
+        ASSERT_GT(curr->value, it->value);
     }
+}
+
+TEST(Algorithm, StdSortEmptyContainer) {
+    std::vector<int> vec{};
+    const entt::std_sort sort;
+    // this should crash with asan enabled if we break the constraint
+    sort(vec.begin(), vec.end());
 }
 
 TEST(Algorithm, InsertionSort) {
@@ -36,8 +45,9 @@ TEST(Algorithm, InsertionSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_LT(*it, *(it + 1u));
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto &curr = *(it++);
+        ASSERT_LT(curr, *it);
     }
 }
 
@@ -49,8 +59,9 @@ TEST(Algorithm, InsertionSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_GT(it->value, (it + 1u)->value);
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto curr = it++;
+        ASSERT_GT(curr->value, it->value);
     }
 }
 
@@ -69,8 +80,9 @@ TEST(Algorithm, RadixSort) {
         return value;
     });
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_LT(*it, *(it + 1u));
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto &curr = *(it++);
+        ASSERT_LT(curr, *it);
     }
 }
 
@@ -82,8 +94,9 @@ TEST(Algorithm, RadixSortBoxedInt) {
         return instance.value;
     });
 
-    for(auto it = arr.begin(), last = (arr.end() - 1u); it != last; ++it) {
-        ASSERT_GT(it->value, (it + 1u)->value);
+    for(auto it = arr.begin(), last = --arr.end(); it != last;) {
+        const auto curr = it++;
+        ASSERT_GT(curr->value, it->value);
     }
 }
 
