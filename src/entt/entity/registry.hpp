@@ -262,6 +262,8 @@ class basic_registry {
                 cpool->bind(forward_as_any(*this));
             }
 
+            // cpool->bind might mutate pools which invalidates this reference
+            cpool = pools.find(id)->second;
             ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
             return static_cast<storage_for_type<Type> &>(*cpool);
         }
