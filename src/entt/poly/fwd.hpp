@@ -5,6 +5,7 @@
 
 namespace entt {
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 template<typename, std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
 class basic_poly;
 
