@@ -21,7 +21,7 @@ public:
 
     void bind(entt::any value) noexcept override {
         if(auto *owner = entt::any_cast<registry_type>(&value)) {
-            owner->storage<int>();
+            owner->template storage<int>();
         }
     }
 };
