@@ -248,10 +248,10 @@ class basic_registry {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
         } else {
+            using storage_type = storage_for_type<Type>;
             auto &cpool = pools[id];
 
             if(!cpool) {
-                using storage_type = storage_for_type<Type>;
                 using alloc_type = typename storage_type::allocator_type;
 
                 if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
@@ -265,7 +265,7 @@ class basic_registry {
             }
 
             ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
-            return static_cast<storage_for_type<Type> &>(*cpool);
+            return static_cast<storage_type &>(*cpool);
         }
     }
 
