@@ -249,10 +249,10 @@ class basic_registry {
             return entities;
         } else {
             using storage_type = storage_for_type<Type>;
-            auto &cpool = pools[id];
 
-            if(!cpool) {
+            if(auto it = pools.find(id); it == pools.cend()) {
                 using alloc_type = typename storage_type::allocator_type;
+                typename pool_container_type::mapped_type cpool{};
 
                 if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
                     // std::allocator<void> has no cross constructors (waiting for C++20)
@@ -261,11 +261,14 @@ class basic_registry {
                     cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
                 }
 
+                pools.emplace(id, cpool);
                 cpool->bind(forward_as_any(*this));
-            }
 
-            ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
-            return static_cast<storage_type &>(*cpool);
+                return static_cast<storage_type &>(*cpool);
+            } else {
+                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                return static_cast<storage_type &>(*it->second);
+            }
         }
     }
 
