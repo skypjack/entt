@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <vector>
@@ -12,9 +13,7 @@ TEST(Algorithm, StdSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_LT(arr[pos], arr[pos + 1u]);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.begin(), arr.end()));
 }
 
 TEST(Algorithm, StdSortBoxedInt) {
@@ -26,9 +25,7 @@ TEST(Algorithm, StdSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.rbegin(), arr.rend()));
 }
 
 TEST(Algorithm, StdSortEmptyContainer) {
@@ -44,9 +41,7 @@ TEST(Algorithm, InsertionSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_LT(arr[pos], arr[pos + 1u]);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.begin(), arr.end()));
 }
 
 TEST(Algorithm, InsertionSortBoxedInt) {
@@ -57,9 +52,7 @@ TEST(Algorithm, InsertionSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.rbegin(), arr.rend()));
 }
 
 TEST(Algorithm, InsertionSortEmptyContainer) {
@@ -77,9 +70,7 @@ TEST(Algorithm, RadixSort) {
         return value;
     });
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_LT(arr[pos], arr[pos + 1u]);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.begin(), arr.end()));
 }
 
 TEST(Algorithm, RadixSortBoxedInt) {
@@ -90,9 +81,7 @@ TEST(Algorithm, RadixSortBoxedInt) {
         return instance.value;
     });
 
-    for(std::size_t pos{}, last = arr.size() - 1u; pos < last; ++pos) {
-        ASSERT_GT(arr[pos].value, arr[pos + 1u].value);
-    }
+    ASSERT_TRUE(std::is_sorted(arr.rbegin(), arr.rend()));
 }
 
 TEST(Algorithm, RadixSortEmptyContainer) {
