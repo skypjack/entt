@@ -734,15 +734,16 @@ public:
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
+            for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {
-                    if(cpools[pos]->data() == first.data()) {
-                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    if((*from)->data() == first.data()) {
+                        std::swap((*from), cpools.back());
                     }
                 }
 
-                count += cpools[pos]->remove(first, last);
+                count += (*from)->remove(first, last);
             }
+
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
                 count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
@@ -784,14 +785,14 @@ public:
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
+            for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {
-                    if(cpools[pos]->data() == first.data()) {
-                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    if((*from)->data() == first.data()) {
+                        std::swap(*from, cpools.back());
                     }
                 }
 
-                cpools[pos]->erase(first, last);
+                (*from)->erase(first, last);
             }
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
