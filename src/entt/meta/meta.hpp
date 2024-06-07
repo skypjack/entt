@@ -1154,8 +1154,8 @@ public:
      * @param area The context from which to search for meta types.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_type(const meta_ctx &area, const internal::meta_type_node &curr) noexcept
-        : node{curr},
+    meta_type(const meta_ctx &area, internal::meta_type_node curr) noexcept
+        : node{std::move(curr)},
           ctx{&area} {}
 
     /**
@@ -1422,16 +1422,16 @@ public:
 
     /**
      * @brief Wraps an opaque element of the underlying type.
-     * @param element A valid pointer to an element of the underlying type.
+     * @param elem A valid pointer to an element of the underlying type.
      * @return A wrapper that references the given instance.
      */
-    [[nodiscard]] meta_any from_void(void *element) const {
-        return (element && node.from_void) ? node.from_void(*ctx, element, nullptr) : meta_any{meta_ctx_arg, *ctx};
+    [[nodiscard]] meta_any from_void(void *elem) const {
+        return (elem && node.from_void) ? node.from_void(*ctx, elem, nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc from_void */
-    [[nodiscard]] meta_any from_void(const void *element) const {
-        return (element && node.from_void) ? node.from_void(*ctx, nullptr, element) : meta_any{meta_ctx_arg, *ctx};
+    [[nodiscard]] meta_any from_void(const void *elem) const {
+        return (elem && node.from_void) ? node.from_void(*ctx, nullptr, elem) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**

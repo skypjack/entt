@@ -49,9 +49,9 @@ public:
         : it{},
           pools{} {}
 
-    extended_group_iterator(iterator_type from, const std::tuple<Owned *..., Get *...> &cpools)
+    extended_group_iterator(iterator_type from, std::tuple<Owned *..., Get *...> cpools)
         : it{from},
-          pools{cpools} {}
+          pools{std::move(cpools)} {}
 
     extended_group_iterator &operator++() noexcept {
         return ++it, *this;

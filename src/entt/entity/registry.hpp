@@ -248,11 +248,11 @@ class basic_registry {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
         } else {
-            auto &cpool = pools[id];
+            using storage_type = storage_for_type<Type>;
 
-            if(!cpool) {
-                using storage_type = storage_for_type<Type>;
+            if(auto it = pools.find(id); it == pools.cend()) {
                 using alloc_type = typename storage_type::allocator_type;
+                typename pool_container_type::mapped_type cpool{};
 
                 if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
                     // std::allocator<void> has no cross constructors (waiting for C++20)
@@ -261,11 +261,14 @@ class basic_registry {
                     cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
                 }
 
+                pools.emplace(id, cpool);
                 cpool->bind(forward_as_any(*this));
-            }
 
-            ENTT_ASSERT(cpool->type() == type_id<Type>(), "Unexpected type");
-            return static_cast<storage_for_type<Type> &>(*cpool);
+                return static_cast<storage_type &>(*cpool);
+            } else {
+                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                return static_cast<storage_type &>(*it->second);
+            }
         }
     }
 
@@ -731,15 +734,16 @@ public:
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
+            for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {
-                    if(cpools[pos]->data() == first.data()) {
-                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    if((*from)->data() == first.data()) {
+                        std::swap((*from), cpools.back());
                     }
                 }
 
-                count += cpools[pos]->remove(first, last);
+                count += (*from)->remove(first, last);
             }
+
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
                 count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
@@ -781,14 +785,14 @@ public:
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
-            for(size_type pos{}, len = cpools.size(); pos < len; ++pos) {
+            for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {
-                    if(cpools[pos]->data() == first.data()) {
-                        std::swap(cpools[pos], cpools[sizeof...(Other)]);
+                    if((*from)->data() == first.data()) {
+                        std::swap(*from, cpools.back());
                     }
                 }
 
-                cpools[pos]->erase(first, last);
+                (*from)->erase(first, last);
             }
         } else {
             for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {

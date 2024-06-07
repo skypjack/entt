@@ -19,6 +19,7 @@
 #include "../../common/config.h"
 #include "../../common/empty.h"
 #include "../../common/entity.h"
+#include "../../common/mixin.hpp"
 #include "../../common/non_default_constructible.h"
 #include "../../common/pointer_stable.h"
 
@@ -2422,6 +2423,22 @@ TEST(Registry, ScramblingPoolsIsAllowed) {
     registry.view<const int>().each([](const auto entity, const auto &value) {
         ASSERT_EQ(static_cast<int>(entt::to_integral(entity)), value);
     });
+}
+
+TEST(Registry, AssureMixinLoop) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    ASSERT_EQ(std::as_const(registry).storage<test::assure_loop>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).storage<int>(), nullptr);
+
+    registry.emplace<test::assure_loop>(entity);
+
+    ASSERT_NE(std::as_const(registry).storage<test::assure_loop>(), nullptr);
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+
+    ASSERT_TRUE(registry.all_of<test::assure_loop>(entity));
+    ASSERT_FALSE(registry.all_of<int>(entity));
 }
 
 TEST(Registry, VoidType) {

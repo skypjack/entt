@@ -391,15 +391,15 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     /*! @brief Default constructor. */
-    basic_sparse_set()
-        : basic_sparse_set{type_id<void>()} {}
+    basic_sparse_set() = default;
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit basic_sparse_set(const allocator_type &allocator)
-        : basic_sparse_set{type_id<void>(), deletion_policy::swap_and_pop, allocator} {}
+        : sparse{allocator},
+          packed{allocator} {}
 
     /**
      * @brief Constructs an empty container with the given policy and allocator.
@@ -407,7 +407,10 @@ public:
      * @param allocator The allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &allocator = {})
-        : basic_sparse_set{type_id<void>(), pol, allocator} {}
+        : sparse{allocator},
+          packed{allocator},
+          mode{pol},
+          head{policy_to_head()} {}
 
     /**
      * @brief Constructs an empty container with the given value type, policy
@@ -1057,11 +1060,11 @@ public:
     virtual void bind(any) noexcept {}
 
 private:
-    sparse_container_type sparse;
-    packed_container_type packed;
-    const type_info *info;
-    deletion_policy mode;
-    size_type head;
+    sparse_container_type sparse{};
+    packed_container_type packed{};
+    const type_info *info{&type_id<void>()};
+    deletion_policy mode{deletion_policy::swap_and_pop};
+    size_type head{max_size};
 };
 
 } // namespace entt

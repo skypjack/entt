@@ -5,15 +5,10 @@
 #include <entt/core/hashed_string.hpp>
 
 struct BasicHashedString: ::testing::Test {
-    static constexpr auto expected() noexcept {
-        if constexpr(std::is_same_v<entt::id_type, std::uint32_t>) {
-            constexpr auto foobar_hash = 0xbf9cf968;
-            return foobar_hash;
-        } else if constexpr(std::is_same_v<entt::id_type, std::uint64_t>) {
-            constexpr auto foobar_hash = 0x85944171f73967e8;
-            return foobar_hash;
-        }
-    }
+    static constexpr auto expected = std::conditional_t<
+        std::is_same_v<entt::id_type, std::uint32_t>,
+        std::integral_constant<std::uint32_t, 0xbf9cf968>,
+        std::integral_constant<std::uint64_t, 0x85944171f73967e8>>::value;
 };
 
 using HashedString = BasicHashedString;
@@ -46,8 +41,8 @@ TEST_F(HashedString, Functionalities) {
 
     const entt::hashed_string hs{"foobar"};
 
-    ASSERT_EQ(static_cast<hash_type>(hs), expected());
-    ASSERT_EQ(hs.value(), expected());
+    ASSERT_EQ(static_cast<hash_type>(hs), expected);
+    ASSERT_EQ(hs.value(), expected);
 
     ASSERT_EQ(foo_hs, "foo"_hs);
     ASSERT_NE(bar_hs, "foo"_hs);
@@ -69,7 +64,7 @@ TEST_F(HashedString, Empty) {
     const entt::hashed_string hs{};
 
     ASSERT_EQ(hs.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::offset<>);
+    ASSERT_EQ(static_cast<hash_type>(hs), entt::internal::fnv_1a_params<>::offset);
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
 }
 
@@ -77,13 +72,13 @@ TEST_F(HashedString, Correctness) {
     const char *foobar = "foobar";
     const std::string_view view{"foobar__", 6};
 
-    ASSERT_EQ(entt::hashed_string{foobar}, expected());
-    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), expected());
-    ASSERT_EQ(entt::hashed_string{"foobar"}, expected());
+    ASSERT_EQ(entt::hashed_string{foobar}, expected);
+    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), expected);
+    ASSERT_EQ(entt::hashed_string{"foobar"}, expected);
 
-    ASSERT_EQ(entt::hashed_string::value(foobar), expected());
-    ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), expected());
-    ASSERT_EQ(entt::hashed_string::value("foobar"), expected());
+    ASSERT_EQ(entt::hashed_string::value(foobar), expected);
+    ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), expected);
+    ASSERT_EQ(entt::hashed_string::value("foobar"), expected);
 
     ASSERT_EQ(entt::hashed_string{foobar}.size(), 6u);
     ASSERT_EQ((entt::hashed_string{view.data(), view.size()}).size(), 6u);
@@ -110,16 +105,16 @@ TEST_F(HashedString, Constexprness) {
     constexpr std::string_view view{"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_string{"quux"}, "quux"_hs);
-    ASSERT_EQ(entt::hashed_string{"foobar"}, expected());
+    ASSERT_EQ(entt::hashed_string{"foobar"}, expected);
 
     ASSERT_EQ(entt::hashed_string::value("quux"), "quux"_hs);
-    ASSERT_EQ(entt::hashed_string::value("foobar"), expected());
+    ASSERT_EQ(entt::hashed_string::value("foobar"), expected);
 
     ASSERT_EQ((entt::hashed_string{"quux", 4}), "quux"_hs);
-    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), expected());
+    ASSERT_EQ((entt::hashed_string{view.data(), view.size()}), expected);
 
     ASSERT_EQ((entt::hashed_string::value("quux", 4)), "quux"_hs);
-    ASSERT_EQ((entt::hashed_string::value(view.data(), view.size())), expected());
+    ASSERT_EQ((entt::hashed_string::value(view.data(), view.size())), expected);
 
     ASSERT_LT(entt::hashed_string{"bar"}, "foo"_hs);
     ASSERT_LE(entt::hashed_string{"bar"}, "bar"_hs);
@@ -150,8 +145,8 @@ TEST_F(HashedWString, Functionalities) {
 
     const entt::hashed_wstring hws{L"foobar"};
 
-    ASSERT_EQ(static_cast<hash_type>(hws), expected());
-    ASSERT_EQ(hws.value(), expected());
+    ASSERT_EQ(static_cast<hash_type>(hws), expected);
+    ASSERT_EQ(hws.value(), expected);
 
     ASSERT_EQ(foo_hws, L"foo"_hws);
     ASSERT_NE(bar_hws, L"foo"_hws);
@@ -163,7 +158,7 @@ TEST_F(HashedWString, Empty) {
     const entt::hashed_wstring hws{};
 
     ASSERT_EQ(hws.size(), 0u);
-    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::offset<>);
+    ASSERT_EQ(static_cast<hash_type>(hws), entt::internal::fnv_1a_params<>::offset);
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
 }
 
@@ -171,13 +166,13 @@ TEST_F(HashedWString, Correctness) {
     const wchar_t *foobar = L"foobar";
     const std::wstring_view view{L"foobar__", 6};
 
-    ASSERT_EQ(entt::hashed_wstring{foobar}, expected());
-    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), expected());
-    ASSERT_EQ(entt::hashed_wstring{L"foobar"}, expected());
+    ASSERT_EQ(entt::hashed_wstring{foobar}, expected);
+    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), expected);
+    ASSERT_EQ(entt::hashed_wstring{L"foobar"}, expected);
 
-    ASSERT_EQ(entt::hashed_wstring::value(foobar), expected());
-    ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), expected());
-    ASSERT_EQ(entt::hashed_wstring::value(L"foobar"), expected());
+    ASSERT_EQ(entt::hashed_wstring::value(foobar), expected);
+    ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), expected);
+    ASSERT_EQ(entt::hashed_wstring::value(L"foobar"), expected);
 
     ASSERT_EQ(entt::hashed_wstring{foobar}.size(), 6u);
     ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}).size(), 6u);
@@ -204,16 +199,16 @@ TEST_F(HashedWString, Constexprness) {
     constexpr std::wstring_view view{L"foobar__", 6};
 
     ASSERT_EQ(entt::hashed_wstring{L"quux"}, L"quux"_hws);
-    ASSERT_EQ(entt::hashed_wstring{L"foobar"}, expected());
+    ASSERT_EQ(entt::hashed_wstring{L"foobar"}, expected);
 
     ASSERT_EQ(entt::hashed_wstring::value(L"quux"), L"quux"_hws);
-    ASSERT_EQ(entt::hashed_wstring::value(L"foobar"), expected());
+    ASSERT_EQ(entt::hashed_wstring::value(L"foobar"), expected);
 
     ASSERT_EQ((entt::hashed_wstring{L"quux", 4}), L"quux"_hws);
-    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), expected());
+    ASSERT_EQ((entt::hashed_wstring{view.data(), view.size()}), expected);
 
     ASSERT_EQ((entt::hashed_wstring::value(L"quux", 4)), L"quux"_hws);
-    ASSERT_EQ((entt::hashed_wstring::value(view.data(), view.size())), expected());
+    ASSERT_EQ((entt::hashed_wstring::value(view.data(), view.size())), expected);
 
     ASSERT_LT(entt::hashed_wstring{L"bar"}, L"foo"_hws);
     ASSERT_LE(entt::hashed_wstring{L"bar"}, L"bar"_hws);

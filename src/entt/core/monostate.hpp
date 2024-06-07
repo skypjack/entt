@@ -43,6 +43,7 @@ struct monostate {
 
 private:
     template<typename Type>
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
     inline static ENTT_MAYBE_ATOMIC(Type) value{};
 };
 
@@ -51,6 +52,7 @@ private:
  * @tparam Value Value used to differentiate between different variables.
  */
 template<id_type Value>
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 inline monostate<Value> monostate_v{};
 
 } // namespace entt
