@@ -220,9 +220,9 @@ class meta_any {
         }
     }
 
-    meta_any(const meta_ctx &area, const meta_any &other, any ref) noexcept
+    meta_any(const meta_any &other, any ref) noexcept
         : storage{std::move(ref)},
-          ctx{&area},
+          ctx{other.ctx},
           node{storage ? other.node : internal::meta_type_node{}},
           vtable{storage ? other.vtable : &basic_vtable<void>} {}
 
@@ -597,12 +597,12 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        return meta_any{*ctx, *this, storage.as_ref()};
+        return meta_any{*this, storage.as_ref()};
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        return meta_any{*ctx, *this, storage.as_ref()};
+        return meta_any{*this, storage.as_ref()};
     }
 
     /**
