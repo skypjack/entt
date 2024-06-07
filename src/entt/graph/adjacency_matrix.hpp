@@ -114,14 +114,16 @@ public:
     using graph_category = Category;
 
     /*! @brief Default constructor. */
-    adjacency_matrix() noexcept(noexcept(allocator_type{})) = default;
+    adjacency_matrix() noexcept(noexcept(allocator_type{}))
+        : adjacency_matrix{0u} {
+    }
 
     /**
      * @brief Constructs an empty container with a given allocator.
      * @param allocator The allocator to use.
      */
     explicit adjacency_matrix(const allocator_type &allocator) noexcept
-        : matrix{allocator} {}
+        : adjacency_matrix{0u, allocator} {}
 
     /**
      * @brief Constructs an empty container with a given allocator and user
@@ -324,8 +326,8 @@ public:
     }
 
 private:
-    container_type matrix{};
-    size_type vert{};
+    container_type matrix;
+    size_type vert;
 };
 
 } // namespace entt

@@ -145,8 +145,8 @@ class basic_any {
     basic_any(const basic_any &other, const any_policy pol) noexcept
         : instance{other.data()},
           info{other.info},
-          mode{pol},
-          vtable{other.vtable} {}
+          vtable{other.vtable},
+          mode{pol} {}
 
 public:
     /*! @brief Size of the internal storage. */
@@ -156,7 +156,7 @@ public:
 
     /*! @brief Default constructor. */
     constexpr basic_any() noexcept
-        : instance{} {}
+        : basic_any{std::in_place_type<void>} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -166,7 +166,10 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
-        : instance{} {
+        : instance{},
+          info{},
+          vtable{},
+          mode{any_policy::owner} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -177,16 +180,14 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
     basic_any(Type &&value)
-        : instance{} {
-        initialize<std::decay_t<Type>>(std::forward<Type>(value));
-    }
+        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
     basic_any(const basic_any &other)
-        : instance{} {
+        : basic_any{} {
         if(other.vtable) {
             other.vtable(operation::copy, other, this);
         }
@@ -199,8 +200,8 @@ public:
     basic_any(basic_any &&other) noexcept
         : instance{},
           info{other.info},
-          mode{other.mode},
-          vtable{other.vtable} {
+          vtable{other.vtable},
+          mode{other.mode} {
         if(other.vtable) {
             other.vtable(operation::move, other, this);
         }
@@ -239,8 +240,8 @@ public:
         if(other.vtable) {
             other.vtable(operation::move, other, this);
             info = other.info;
-            mode = other.mode;
             vtable = other.vtable;
+            mode = other.mode;
         }
 
         return *this;
@@ -347,8 +348,8 @@ public:
         // unnecessary but it helps to detect nasty bugs
         ENTT_ASSERT((instance = nullptr) == nullptr, "");
         info = &type_id<void>();
-        mode = any_policy::owner;
         vtable = nullptr;
+        mode = any_policy::owner;
     }
 
     /**
@@ -407,9 +408,9 @@ private:
         const void *instance;
         storage_type storage;
     };
-    const type_info *info{&type_id<void>()};
-    any_policy mode{any_policy::owner};
-    vtable_type *vtable{};
+    const type_info *info;
+    vtable_type *vtable;
+    any_policy mode;
 };
 
 /**
