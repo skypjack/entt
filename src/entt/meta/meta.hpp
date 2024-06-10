@@ -290,10 +290,10 @@ public:
      * @param other The instance to copy from.
      */
     meta_any(const meta_ctx &area, const meta_any &other)
-        : meta_any{other} {
-        ctx = &area;
-        node = node.resolve ? node.resolve(internal::meta_context::from(*ctx)) : node;
-    }
+        : storage{other.storage},
+          ctx{&area},
+          node{other.node.resolve ? other.node.resolve(internal::meta_context::from(*ctx)) : other.node},
+          vtable{other.vtable} {}
 
     /**
      * @brief Context aware move constructor.
@@ -301,10 +301,10 @@ public:
      * @param other The instance to move from.
      */
     meta_any(const meta_ctx &area, meta_any &&other)
-        : meta_any{std::move(other)} {
-        ctx = &area;
-        node = node.resolve ? node.resolve(internal::meta_context::from(*ctx)) : node;
-    }
+        : storage{std::move(other.storage)},
+          ctx{&area},
+          node{other.node.resolve ? std::exchange(other.node, internal::meta_type_node{}).resolve(internal::meta_context::from(*ctx)) : std::exchange(other.node, internal::meta_type_node{})},
+          vtable{std::exchange(other.vtable, &basic_vtable<void>)} {}
 
     /**
      * @brief Copy constructor.
