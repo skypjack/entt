@@ -5,18 +5,13 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/memory.hpp"
 #include "fwd.hpp"
 
 namespace entt {
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
-
-// waiting for C++20 and std::popcount
-template<typename Type>
-constexpr int popcount(Type value) noexcept {
-    return value ? (int(value & 1) + popcount(value >> 1)) : 0;
-}
 
 template<typename, typename = void>
 struct entt_traits;
@@ -64,7 +59,7 @@ struct entt_traits<std::uint64_t> {
  */
 template<typename Traits>
 class basic_entt_traits {
-    static constexpr auto length = internal::popcount(Traits::entity_mask);
+    static constexpr auto length = popcount(Traits::entity_mask);
 
     static_assert(Traits::entity_mask && ((Traits::entity_mask & (Traits::entity_mask + 1)) == 0), "Invalid entity mask");
     static_assert((Traits::version_mask & (Traits::version_mask + 1)) == 0, "Invalid version mask");

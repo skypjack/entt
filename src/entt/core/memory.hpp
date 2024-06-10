@@ -12,6 +12,18 @@
 namespace entt {
 
 /**
+ * @brief Returns the number of set bits in a value (waiting for C++20 and
+ * `std::popcount`).
+ * @tparam Type Unsigned integer type.
+ * @param value A value of unsigned integer type.
+ * @return The number of set bits in the value.
+ */
+template<typename Type>
+constexpr std::enable_if_t<std::is_unsigned_v<Type>, int> popcount(Type value) noexcept {
+    return value ? (int(value & 1) + popcount(static_cast<Type>(value >> 1))) : 0;
+}
+
+/**
  * @brief Checks whether a value is a power of two or not (waiting for C++20 and
  * `std::has_single_bit`).
  * @param value A value that may or may not be a power of two.

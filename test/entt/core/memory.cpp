@@ -15,32 +15,17 @@
 #include "../../common/throwing_type.hpp"
 #include "../../common/tracked_memory_resource.hpp"
 
-TEST(ToAddress, Functionalities) {
-    const std::shared_ptr<int> shared = std::make_shared<int>();
-    auto *plain = std::addressof(*shared);
+TEST(PopCount, Functionalities) {
+    // constexpr-ness guaranteed
+    constexpr auto zero_popcount = entt::popcount(0u);
 
-    ASSERT_EQ(entt::to_address(shared), plain);
-    ASSERT_EQ(entt::to_address(plain), plain);
-}
-
-TEST(PoccaPocmaAndPocs, Functionalities) {
-    test::basic_test_allocator<int> lhs, rhs;
-    test::basic_test_allocator<int, std::false_type> no_pocs;
-
-    // code coverage purposes
-    ASSERT_FALSE(lhs == rhs);
-    ASSERT_NO_THROW(entt::propagate_on_container_swap(no_pocs, no_pocs));
-
-    // honestly, I don't even know how one is supposed to test such a thing :)
-    entt::propagate_on_container_copy_assignment(lhs, rhs);
-    entt::propagate_on_container_move_assignment(lhs, rhs);
-    entt::propagate_on_container_swap(lhs, rhs);
-}
-
-ENTT_DEBUG_TEST(PoccaPocmaAndPocsDeathTest, Functionalities) {
-    test::basic_test_allocator<int, std::false_type> lhs, rhs;
-
-    ASSERT_DEATH(entt::propagate_on_container_swap(lhs, rhs), "");
+    ASSERT_EQ(zero_popcount, 0u);
+    ASSERT_EQ(entt::popcount(1u), 1u);
+    ASSERT_EQ(entt::popcount(2u), 1u);
+    ASSERT_EQ(entt::popcount(3u), 2u);
+    ASSERT_EQ(entt::popcount(7u), 3u);
+    ASSERT_EQ(entt::popcount(128u), 1u);
+    ASSERT_EQ(entt::popcount(201u), 4u);
 }
 
 TEST(IsPowerOfTwo, Functionalities) {
@@ -82,6 +67,34 @@ TEST(FastMod, Functionalities) {
     ASSERT_EQ(fast_mod_of_zero, 0u);
     ASSERT_EQ(entt::fast_mod(7u, 8u), 7u);
     ASSERT_EQ(entt::fast_mod(8u, 8u), 0u);
+}
+
+TEST(ToAddress, Functionalities) {
+    const std::shared_ptr<int> shared = std::make_shared<int>();
+    auto *plain = std::addressof(*shared);
+
+    ASSERT_EQ(entt::to_address(shared), plain);
+    ASSERT_EQ(entt::to_address(plain), plain);
+}
+
+TEST(PoccaPocmaAndPocs, Functionalities) {
+    test::basic_test_allocator<int> lhs, rhs;
+    test::basic_test_allocator<int, std::false_type> no_pocs;
+
+    // code coverage purposes
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NO_THROW(entt::propagate_on_container_swap(no_pocs, no_pocs));
+
+    // honestly, I don't even know how one is supposed to test such a thing :)
+    entt::propagate_on_container_copy_assignment(lhs, rhs);
+    entt::propagate_on_container_move_assignment(lhs, rhs);
+    entt::propagate_on_container_swap(lhs, rhs);
+}
+
+ENTT_DEBUG_TEST(PoccaPocmaAndPocsDeathTest, Functionalities) {
+    test::basic_test_allocator<int, std::false_type> lhs, rhs;
+
+    ASSERT_DEATH(entt::propagate_on_container_swap(lhs, rhs), "");
 }
 
 TEST(AllocateUnique, Functionalities) {
