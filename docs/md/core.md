@@ -6,6 +6,7 @@
 * [Any as in any type](#any-as-in-any-type)
   * [Small buffer optimization](#small-buffer-optimization)
   * [Alignment requirement](#alignment-requirement)
+* [Bit](#bit)
 * [Compressed pair](#compressed-pair)
 * [Enum as bitmask](#enum-as-bitmask)
 * [Hashed strings](#hashed-strings)
@@ -16,7 +17,6 @@
   * [Iota iterator](#iota-iterator)
   * [Iterable adaptor](#iterable-adaptor)
 * [Memory](#memory)
-  * [Power of two and fast modulus](#power-of-two-and-fast-modulus)
   * [Allocator aware unique pointers](#allocator-aware-unique-pointers)
 * [Monostate](#monostate)
 * [Type support](#type-support)
@@ -195,6 +195,22 @@ using my_any = entt::basic_any<sizeof(double[4]), alignof(double[4])>;
 The `basic_any` class template inspects the alignment requirements in each case,
 even when not provided and may decide not to use the small buffer optimization
 in order to meet them.
+
+# Bit
+
+Finding out the population count of an unsigned integral value (`popcount`),
+whether a number is a power of two or not (`has_single_bit`) as well as the next
+power of two given a random value (`next_power_of_two`) can be useful.<br/>
+For example, it helps to allocate memory in pages having a size suitable for the
+fast modulus:
+
+```cpp
+const std::size_t result = entt::fast_mod(value, modulus);
+```
+
+Where `modulus` is necessarily a power of two. Perhaps not everyone knows that
+this type of operation is far superior in terms of performance to the basic
+modulus and for this reason preferred in many areas.
 
 # Compressed pair
 
@@ -435,22 +451,6 @@ unwrap fancy or plain pointers (`to_address`) or to help forget the meaning of
 acronyms like _POCCA_, _POCMA_ or _POCS_.<br/>
 I won't describe them here in detail. Instead, I recommend reading the inline
 documentation to those interested in the subject.
-
-## Power of two and fast modulus
-
-Finding out if a number is a power of two (`has_single_bit`) or what the next
-power of two is given a random value (`next_power_of_two`) is very useful at
-times.<br/>
-For example, it helps to allocate memory in pages having a size suitable for the
-fast modulus:
-
-```cpp
-const std::size_t result = entt::fast_mod(value, modulus);
-```
-
-Where `modulus` is necessarily a power of two. Perhaps not everyone knows that
-this type of operation is far superior in terms of performance to the basic
-modulus and for this reason preferred in many areas.
 
 ## Allocator aware unique pointers
 
