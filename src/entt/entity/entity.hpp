@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/memory.hpp"
+#include "../core/bit.hpp"
 #include "fwd.hpp"
 
 namespace entt {

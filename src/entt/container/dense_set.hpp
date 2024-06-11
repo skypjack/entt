@@ -12,8 +12,8 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
-#include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 

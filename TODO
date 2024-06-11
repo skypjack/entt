@@ -36,5 +36,4 @@ TODO:
 * checkout tools workflow
 * meta: avoid unnecessary copies of iterators with meta containers
 * review constrained noexcept-ness (ie sigh)
-* has_single_bit/popcount vs is_power_of_two (move them to bit.hpp)
 * offer 16b from meta_traits to users or change type

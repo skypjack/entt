@@ -11,7 +11,7 @@
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
-#include "../core/memory.hpp"
+#include "../core/bit.hpp"
 #include "../core/type_info.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"

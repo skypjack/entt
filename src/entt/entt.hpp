@@ -8,6 +8,7 @@
 #include "core/algorithm.hpp"
 #include "core/any.hpp"
 #include "core/attribute.h"
+#include "core/bit.hpp"
 #include "core/compressed_pair.hpp"
 #include "core/enum.hpp"
 #include "core/family.hpp"

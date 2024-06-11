@@ -232,6 +232,7 @@ SETUP_BASIC_TEST(table entt/container/table.cpp)
 
 SETUP_BASIC_TEST(algorithm entt/core/algorithm.cpp)
 SETUP_BASIC_TEST(any entt/core/any.cpp)
+SETUP_BASIC_TEST(bit entt/core/bit.cpp)
 SETUP_BASIC_TEST(compressed_pair entt/core/compressed_pair.cpp)
 SETUP_BASIC_TEST(enum entt/core/enum.cpp)
 SETUP_BASIC_TEST(family entt/core/family.cpp)

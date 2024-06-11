@@ -15,6 +15,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
+#include "../core/bit.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 

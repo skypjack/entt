@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../core/bit.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
@@ -90,7 +91,7 @@ public:
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = index() - value;
         constexpr auto page_size = component_traits<typename Container::value_type>::page_size;
-        return (*payload)[pos / page_size][fast_mod(pos, page_size)];
+        return (*payload)[pos / page_size][fast_mod(static_cast<std::size_t>(pos), page_size)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {

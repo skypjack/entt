@@ -2,7 +2,6 @@
 #define ENTT_CORE_MEMORY_HPP
 
 #include <cstddef>
-#include <limits>
 #include <memory>
 #include <tuple>
 #include <type_traits>
@@ -10,58 +9,6 @@
 #include "../config/config.h"
 
 namespace entt {
-
-/**
- * @brief Returns the number of set bits in a value (waiting for C++20 and
- * `std::popcount`).
- * @tparam Type Unsigned integer type.
- * @param value A value of unsigned integer type.
- * @return The number of set bits in the value.
- */
-template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, int> popcount(const Type value) noexcept {
-    return value ? (int(value & 1) + popcount(static_cast<Type>(value >> 1))) : 0;
-}
-
-/**
- * @brief Checks whether a value is a power of two or not (waiting for C++20 and
- * `std::has_single_bit`).
- * @tparam Type Unsigned integer type.
- * @param value A value of unsigned integer type that may be a power of two.
- * @return True if the value is a power of two, false otherwise.
- */
-template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, bool> has_single_bit(const Type value) noexcept {
-    return value && ((value & (value - 1)) == 0);
-}
-
-/**
- * @brief Computes the smallest power of two greater than or equal to a value
- * (waiting for C++20 and `std::bit_ceil`).
- * @param value The value to use.
- * @return The smallest power of two greater than or equal to the given value.
- */
-[[nodiscard]] inline constexpr std::size_t next_power_of_two(const std::size_t value) noexcept {
-    ENTT_ASSERT_CONSTEXPR(value < (std::size_t{1u} << (std::numeric_limits<std::size_t>::digits - 1)), "Numeric limits exceeded");
-    std::size_t curr = value - (value != 0u);
-
-    for(int next = 1; next < std::numeric_limits<std::size_t>::digits; next = next * 2) {
-        curr |= curr >> next;
-    }
-
-    return ++curr;
-}
-
-/**
- * @brief Fast module utility function (powers of two only).
- * @param value A value for which to calculate the modulus.
- * @param mod _Modulus_, it must be a power of two.
- * @return The common remainder.
- */
-[[nodiscard]] inline constexpr std::size_t fast_mod(const std::size_t value, const std::size_t mod) noexcept {
-    ENTT_ASSERT_CONSTEXPR(has_single_bit(mod), "Value must be a power of two");
-    return value & (mod - 1u);
-}
 
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
