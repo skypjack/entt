@@ -19,17 +19,19 @@ namespace entt {
  * @return The number of set bits in the value.
  */
 template<typename Type>
-constexpr std::enable_if_t<std::is_unsigned_v<Type>, int> popcount(Type value) noexcept {
+[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, int> popcount(const Type value) noexcept {
     return value ? (int(value & 1) + popcount(static_cast<Type>(value >> 1))) : 0;
 }
 
 /**
  * @brief Checks whether a value is a power of two or not (waiting for C++20 and
  * `std::has_single_bit`).
- * @param value A value that may or may not be a power of two.
+ * @tparam Type Unsigned integer type.
+ * @param value A value of unsigned integer type that may be a power of two.
  * @return True if the value is a power of two, false otherwise.
  */
-[[nodiscard]] inline constexpr bool is_power_of_two(const std::size_t value) noexcept {
+template<typename Type>
+[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, bool> has_single_bit(const Type value) noexcept {
     return value && ((value & (value - 1)) == 0);
 }
 
@@ -57,7 +59,7 @@ constexpr std::enable_if_t<std::is_unsigned_v<Type>, int> popcount(Type value) n
  * @return The common remainder.
  */
 [[nodiscard]] inline constexpr std::size_t fast_mod(const std::size_t value, const std::size_t mod) noexcept {
-    ENTT_ASSERT_CONSTEXPR(is_power_of_two(mod), "Value must be a power of two");
+    ENTT_ASSERT_CONSTEXPR(has_single_bit(mod), "Value must be a power of two");
     return value & (mod - 1u);
 }
 

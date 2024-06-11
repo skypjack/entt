@@ -438,7 +438,7 @@ documentation to those interested in the subject.
 
 ## Power of two and fast modulus
 
-Finding out if a number is a power of two (`is_power_of_two`) or what the next
+Finding out if a number is a power of two (`has_single_bit`) or what the next
 power of two is given a random value (`next_power_of_two`) is very useful at
 times.<br/>
 For example, it helps to allocate memory in pages having a size suitable for the
