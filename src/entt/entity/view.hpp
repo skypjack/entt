@@ -583,9 +583,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(this->index != sizeof...(Get)) {
-            pick_and_each(func, std::index_sequence_for<Get...>{});
-        }
+        pick_and_each(func, std::index_sequence_for<Get...>{});
     }
 
     /**
