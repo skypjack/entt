@@ -13,3 +13,4 @@ cpp.hint
 /bazel-*
 /test/bazel-*
 /user.bazelrc
+*.bazel.lock

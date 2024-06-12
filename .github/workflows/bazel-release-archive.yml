@@ -13,7 +13,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/setup-go@v5
+      - run: go install github.com/bazelbuild/buildtools/buildozer@latest
       - uses: actions/checkout@v4
+      - run: ./scripts/sync_bzlmod_version.sh
       - run: git archive $GITHUB_REF -o "entt-${GITHUB_REF:10}.tar.gz"
       - run: gh release upload ${GITHUB_REF:10} "entt-${GITHUB_REF:10}.tar.gz"
         env:
