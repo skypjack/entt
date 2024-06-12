@@ -31,11 +31,10 @@ template<typename It, typename Entity>
     return first == last;
 }
 
-template<typename Type>
-[[nodiscard]] bool fully_initialized(const Type *const *it, const std::size_t len) noexcept {
-    std::size_t pos{};
-    for(; (pos != len) && it[pos]; ++pos) {}
-    return pos == len;
+template<typename It>
+[[nodiscard]] bool fully_initialized(It first, const It last) noexcept {
+    for(; (first != last) && *first; ++first) {}
+    return first == last;
 }
 
 template<typename Result, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
@@ -347,7 +346,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (index != Get) && internal::fully_initialized(filter.data(), Exclude);
+        return (index != Get) && internal::fully_initialized(filter.begin(), filter.end());
     }
 
     /**
