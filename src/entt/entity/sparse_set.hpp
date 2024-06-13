@@ -34,7 +34,7 @@ struct sparse_set_iterator final {
           offset{} {}
 
     constexpr sparse_set_iterator(const Container &ref, const difference_type idx) noexcept
-        : packed{std::addressof(ref)},
+        : packed{&ref},
           offset{idx} {}
 
     constexpr sparse_set_iterator &operator++() noexcept {
@@ -82,7 +82,7 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return *operator->();
+        return operator[](0);
     }
 
     [[nodiscard]] constexpr pointer data() const noexcept {

@@ -99,7 +99,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return *operator->();
+        return operator[](0);
     }
 
     [[nodiscard]] constexpr difference_type index() const noexcept {
