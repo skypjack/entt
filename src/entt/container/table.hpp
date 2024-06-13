@@ -82,7 +82,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return *operator->();
+        return operator[](0);
     }
 
     template<typename... Lhs, typename... Rhs>
