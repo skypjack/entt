@@ -14,7 +14,7 @@
 
 TEST(ToAddress, Functionalities) {
     const std::shared_ptr<int> shared = std::make_shared<int>();
-    auto *plain = std::addressof(*shared);
+    auto *plain = &*shared;
 
     ASSERT_EQ(entt::to_address(shared), plain);
     ASSERT_EQ(entt::to_address(plain), plain);

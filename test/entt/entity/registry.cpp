@@ -330,7 +330,7 @@ TEST(Registry, StorageIterable) {
         testing::StaticAssertTypeEq<decltype(id), entt::id_type>();
 
         ASSERT_TRUE(pool.contains(entity));
-        ASSERT_EQ(std::addressof(storage), std::addressof(pool));
+        ASSERT_EQ(&storage, &pool);
         ASSERT_EQ(id, "other"_hs);
     }
 }
@@ -349,7 +349,7 @@ TEST(Registry, ConstStorageIterable) {
         testing::StaticAssertTypeEq<decltype(curr.first), entt::id_type>();
 
         ASSERT_TRUE(curr.second.contains(entity));
-        ASSERT_EQ(std::addressof(storage), std::addressof(curr.second));
+        ASSERT_EQ(&storage, &curr.second);
         ASSERT_EQ(curr.first, "other"_hs);
     }
 }
@@ -389,7 +389,7 @@ TEST(Registry, RegistryStorageIterator) {
     ASSERT_EQ(end + (begin - end), iterable.begin());
 
     ASSERT_EQ(begin[0u].first, iterable.begin()->first);
-    ASSERT_EQ(std::addressof(begin[0u].second), std::addressof((*iterable.begin()).second));
+    ASSERT_EQ(&begin[0u].second, &(*iterable.begin()).second);
 
     ASSERT_LT(begin, end);
     ASSERT_LE(begin, iterable.begin());
@@ -436,7 +436,7 @@ TEST(Registry, RegistryConstStorageIterator) {
     ASSERT_EQ(end + (begin - end), iterable.begin());
 
     ASSERT_EQ(begin[0u].first, iterable.begin()->first);
-    ASSERT_EQ(std::addressof(begin[0u].second), std::addressof((*iterable.begin()).second));
+    ASSERT_EQ(&begin[0u].second, &(*iterable.begin()).second);
 
     ASSERT_LT(begin, end);
     ASSERT_LE(begin, iterable.begin());
