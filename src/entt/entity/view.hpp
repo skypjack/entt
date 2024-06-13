@@ -41,8 +41,7 @@ template<typename Result, typename View, typename Other, std::size_t... VGet, st
 [[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>) {
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
-    elem.pools = {view.template storage<VGet>()..., other.template storage<OGet>()...};
-    elem.filter = {view.template storage<sizeof...(VGet) + VExclude>()..., other.template storage<sizeof...(OGet) + OExclude>()...};
+    elem.pools = {view.template storage<VGet>()..., other.template storage<OGet>()..., view.template storage<sizeof...(VGet) + VExclude>()..., other.template storage<sizeof...(OGet) + OExclude>()...};
     elem.refresh();
     return elem;
 }
@@ -50,15 +49,15 @@ template<typename Result, typename View, typename Other, std::size_t... VGet, st
 template<typename Type, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
-    friend struct extended_view_iterator;
+    friend class extended_view_iterator;
 
     using iterator_type = typename Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
         return ((Get != 1u) || (entt != tombstone))
-               && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
-               && internal::none_of(filter.begin(), filter.end(), entt);
+               && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.begin() + Get, entt)
+               && internal::none_of(pools.begin() + Get, pools.end(), entt);
     }
 
 public:
@@ -72,14 +71,12 @@ public:
         : it{},
           last{},
           pools{},
-          filter{},
           index{} {}
 
-    view_iterator(iterator_type first, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
+    view_iterator(iterator_type first, std::array<const Type *, Get + Exclude> value, const std::size_t idx) noexcept
         : it{first},
           last{value[idx]->end()},
           pools{value},
-          filter{excl},
           index{idx} {
         while(it != last && !valid(*it)) {
             ++it;
@@ -110,8 +107,7 @@ public:
 private:
     iterator_type it;
     iterator_type last;
-    std::array<const Type *, Get> pools;
-    std::array<const Type *, Exclude> filter;
+    std::array<const Type *, Get + Exclude> pools;
     std::size_t index;
 };
 
@@ -126,7 +122,13 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 }
 
 template<typename It, typename... Type>
-struct extended_view_iterator final {
+class extended_view_iterator final {
+    template<std::size_t... Index>
+    auto dereference(std::index_sequence<Index...>) const noexcept {
+        return std::tuple_cat(std::make_tuple(*it), static_cast<Type *>(const_cast<constness_as_t<typename Type::base_type, Type> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
+    }
+
+public:
     using iterator_type = It;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Type>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
@@ -151,7 +153,7 @@ struct extended_view_iterator final {
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return std::apply([entt = *it](auto *...curr) { return std::tuple_cat(std::make_tuple(entt), static_cast<Type *>(const_cast<constness_as_t<typename Type::base_type, Type> *>(curr))->get_as_tuple(entt)...); }, it.pools);
+        return dereference(std::index_sequence_for<Type...>{});
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
@@ -238,9 +240,8 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept = default;
 
-    basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
+    basic_common_view(std::array<const Type *, Get + Exclude> value) noexcept
         : pools{value},
-          filter{excl},
           index{Get} {
         unchecked_refresh();
     }
@@ -294,7 +295,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end() - static_cast<typename iterator::difference_type>(offset()), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->end() - static_cast<typename iterator::difference_type>(offset()), pools, index} : iterator{};
     }
 
     /**
@@ -302,7 +303,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end(), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->end(), pools, index} : iterator{};
     }
 
     /**
@@ -338,7 +339,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{pools[index]->find(entt), pools, filter, index} : end();
+        return contains(entt) ? iterator{pools[index]->find(entt), pools, index} : end();
     }
 
     /**
@@ -346,7 +347,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (index != Get) && internal::fully_initialized(filter.begin(), filter.end());
+        return (index != Get) && internal::fully_initialized(pools.begin() + Get, pools.end());
     }
 
     /**
@@ -356,15 +357,14 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
         return (index != Get)
-               && internal::all_of(pools.begin(), pools.end(), entt)
-               && internal::none_of(filter.begin(), filter.end(), entt)
+               && internal::all_of(pools.begin(), pools.begin() + Get, entt)
+               && internal::none_of(pools.begin() + Get, pools.end(), entt)
                && pools[index]->index(entt) < offset();
     }
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    std::array<const common_type *, Get> pools{};
-    std::array<const common_type *, Exclude> filter{};
+    std::array<const common_type *, Get + Exclude> pools{};
     size_type index{Get};
     /*! @endcond */
 };
@@ -407,7 +407,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view
     template<std::size_t Curr, typename Func, std::size_t... Index>
     void each(Func &func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->filter.begin(), this->filter.end(), entt)) {
+            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->pools.begin() + sizeof...(Get), this->pools.end(), entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -444,7 +444,7 @@ public:
      * @param excl The storage for the types used to filter the view.
      */
     basic_view(Get &...value, Exclude &...excl) noexcept
-        : base_type{{&value...}, {&excl...}} {
+        : base_type{{&value..., &excl...}} {
     }
 
     /**
@@ -491,12 +491,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
-
-        if constexpr(Index < sizeof...(Get)) {
-            return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(this->pools[Index]));
-        } else {
-            return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(this->filter[Index - sizeof...(Get)]));
-        }
+        return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(this->pools[Index]));
     }
 
     /**
@@ -518,12 +513,10 @@ public:
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         static_assert(std::is_convertible_v<Type &, type_list_element_t<Index, type_list<Get..., Exclude...>> &>, "Unexpected type");
+        this->pools[Index] = &elem;
 
         if constexpr(Index < sizeof...(Get)) {
-            this->pools[Index] = &elem;
             base_type::refresh();
-        } else {
-            this->filter[Index - sizeof...(Get)] = &elem;
         }
     }
 
