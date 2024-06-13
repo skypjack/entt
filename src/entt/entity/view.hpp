@@ -46,7 +46,7 @@ template<typename Result, typename View, typename Other, std::size_t... VGet, st
     return elem;
 }
 
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, std::size_t Size, std::size_t Get>
 class view_iterator final {
     template<typename, typename...>
     friend class extended_view_iterator;
@@ -73,7 +73,7 @@ public:
           pools{},
           index{} {}
 
-    view_iterator(iterator_type first, std::array<const Type *, Get + Exclude> value, const std::size_t idx) noexcept
+    view_iterator(iterator_type first, std::array<const Type *, Size> value, const std::size_t idx) noexcept
         : it{first},
           last{value[idx]->end()},
           pools{value},
@@ -107,7 +107,7 @@ public:
 private:
     iterator_type it;
     iterator_type last;
-    std::array<const Type *, Get + Exclude> pools;
+    std::array<const Type *, Size> pools;
     std::size_t index;
 };
 
@@ -209,10 +209,10 @@ class basic_view;
  * @brief Basic storage view implementation.
  * @warning For internal use only, backward compatibility not guaranteed.
  * @tparam Type Common type among all storage types.
+ * @tparam Size Number of storage in use.
  * @tparam Get Number of storage iterated by the view.
- * @tparam Exclude Number of storage used to filter the view.
  */
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, std::size_t Size, std::size_t Get>
 class basic_common_view {
     template<typename Return, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
@@ -240,7 +240,7 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept = default;
 
-    basic_common_view(std::array<const Type *, Get + Exclude> value) noexcept
+    basic_common_view(std::array<const Type *, Size> value) noexcept
         : pools{value},
           index{Get} {
         unchecked_refresh();
@@ -259,7 +259,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Forward iterator type. */
-    using iterator = internal::view_iterator<common_type, Get, Exclude>;
+    using iterator = internal::view_iterator<common_type, Size, Get>;
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
@@ -364,7 +364,7 @@ public:
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    std::array<const common_type *, Get + Exclude> pools{};
+    std::array<const common_type *, Size> pools{};
     size_type index{Get};
     /*! @endcond */
 };
@@ -382,8 +382,8 @@ protected:
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
-    using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
+class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get) + sizeof...(Exclude), sizeof...(Get)> {
+    using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get) + sizeof...(Exclude), sizeof...(Get)>;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
