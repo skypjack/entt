@@ -60,6 +60,10 @@ class view_iterator final {
                && internal::none_of(pools.begin() + Get, pools.end(), entt);
     }
 
+    void seek_next() {
+        for(constexpr iterator_type sentinel{}; it != sentinel && !valid(*it); ++it) {}
+    }
+
 public:
     using value_type = typename iterator_traits::value_type;
     using pointer = typename iterator_traits::pointer;
@@ -69,22 +73,19 @@ public:
 
     constexpr view_iterator() noexcept
         : it{},
-          last{},
           pools{},
           index{} {}
 
     view_iterator(iterator_type first, std::array<const Type *, Size> value, const std::size_t idx) noexcept
         : it{first},
-          last{value[idx]->end()},
           pools{value},
           index{idx} {
-        while(it != last && !valid(*it)) {
-            ++it;
-        }
+        seek_next();
     }
 
     view_iterator &operator++() noexcept {
-        while(++it != last && !valid(*it)) {}
+        ++it;
+        seek_next();
         return *this;
     }
 
@@ -106,7 +107,6 @@ public:
 
 private:
     iterator_type it;
-    iterator_type last;
     std::array<const Type *, Size> pools;
     std::size_t index;
 };
