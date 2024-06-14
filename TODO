@@ -36,3 +36,4 @@ TODO:
 * checkout tools workflow
 * review constrained noexcept-ness (ie sigh)
 * offer 16b from meta_traits to users or change type
+* registry::view const invokes refresh multiple times implicitly
