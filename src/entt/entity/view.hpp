@@ -37,11 +37,11 @@ template<typename It>
     return first == last;
 }
 
-template<typename Result, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
-[[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>) {
+template<typename Result, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
+[[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>) {
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
-    elem.pools = {view.template storage<VGet>()..., other.template storage<OGet>()..., view.template storage<sizeof...(VGet) + VExclude>()..., other.template storage<sizeof...(OGet) + OExclude>()...};
+    elem.pools = {view.template storage<GLhs>()..., other.template storage<GRhs>()..., view.template storage<sizeof...(GLhs) + ELhs>()..., other.template storage<sizeof...(GRhs) + ERhs>()...};
     elem.refresh();
     return elem;
 }
@@ -214,8 +214,8 @@ class basic_view;
  */
 template<typename Type, std::size_t Size, std::size_t Get>
 class basic_common_view {
-    template<typename Return, typename View, typename Other, std::size_t... VGet, std::size_t... VExclude, std::size_t... OGet, std::size_t... OExclude>
-    friend Return internal::view_pack(const View &, const Other &, std::index_sequence<VGet...>, std::index_sequence<VExclude...>, std::index_sequence<OGet...>, std::index_sequence<OExclude...>);
+    template<typename Return, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
+    friend Return internal::view_pack(const View &, const Other &, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>);
 
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
