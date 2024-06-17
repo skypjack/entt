@@ -807,7 +807,7 @@ public:
      * The function type is equivalent to:
      *
      * @code{.cpp}
-     * void(const id_type, typename basic_registry<Entity>::base_type &);
+     * void(const id_type, typename basic_registry<Entity>::common_type &);
      * @endcode
      *
      * Only storage where the entity exists are passed to the function.
