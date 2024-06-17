@@ -59,7 +59,7 @@ private:
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
             if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
-                for(typename Type::size_type pos{}, last = Type::free_list(); pos < last; ++pos) {
+                for(typename underlying_type::size_type pos{}, last = underlying_type::free_list(); pos < last; ++pos) {
                     destruction.publish(reg, underlying_type::base_type::operator[](pos));
                 }
             } else {
