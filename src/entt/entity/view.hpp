@@ -240,8 +240,9 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept = default;
 
-    basic_common_view(std::array<const Type *, Size> value) noexcept
-        : pools{value},
+    template<typename... Args>
+    basic_common_view(const Args &...value) noexcept
+        : pools{&value...},
           index{Get} {
         unchecked_refresh();
     }
@@ -444,7 +445,7 @@ public:
      * @param excl The storage for the types used to filter the view.
      */
     basic_view(Get &...value, Exclude &...excl) noexcept
-        : base_type{{&value..., &excl...}} {
+        : base_type{value..., excl...} {
     }
 
     /**
@@ -616,8 +617,8 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_storage_view() noexcept = default;
 
-    basic_storage_view(const Type *value) noexcept
-        : leading{value} {}
+    basic_storage_view(const Type &value) noexcept
+        : leading{&value} {}
     /*! @endcond */
 
 public:
@@ -782,7 +783,7 @@ public:
      * @param value The storage for the type to iterate.
      */
     basic_view(Get &value) noexcept
-        : base_type{&value} {
+        : base_type{value} {
     }
 
     /**
@@ -790,7 +791,7 @@ public:
      * @param value The storage for the type to iterate.
      */
     basic_view(std::tuple<Get &> value, std::tuple<> = {}) noexcept
-        : basic_view{std::get<0>(value)} {}
+        : base_type{std::get<0>(value)} {}
 
     /**
      * @brief Returns the storage for a given element type, if any.
