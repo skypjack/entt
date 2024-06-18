@@ -6,7 +6,6 @@
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../signal/sigh.hpp"
-#include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -64,7 +63,7 @@ private:
                 }
             } else {
                 for(auto entt: static_cast<typename underlying_type::base_type &>(*this)) {
-                    if constexpr(component_traits<typename underlying_type::element_type>::in_place_delete) {
+                    if constexpr(underlying_type::storage_policy == deletion_policy::in_place) {
                         if(entt != tombstone) {
                             destruction.publish(reg, entt);
                         }
