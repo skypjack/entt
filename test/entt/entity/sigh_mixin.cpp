@@ -497,8 +497,8 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
     typename storage_type::base_type &base = pool;
     registry_type registry;
 
-    constexpr auto packed_page_size = entt::component_traits<typename storage_type::element_type>::page_size;
-    constexpr auto sparse_page_size = entt::entt_traits<typename storage_type::entity_type>::page_size;
+    constexpr auto packed_page_size = entt::component_traits<value_type>::page_size;
+    constexpr auto sparse_page_size = entt::entt_traits<entt::entity>::page_size;
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
