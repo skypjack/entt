@@ -29,7 +29,7 @@ template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
     [[nodiscard]] auto index_to_element([[maybe_unused]] Type &cpool) const {
-        if constexpr(component_traits<typename Type::value_type>::page_size == 0u) {
+        if constexpr(component_traits<typename Type::element_type>::page_size == 0u) {
             return std::make_tuple();
         } else {
             return std::forward_as_tuple(cpool.rbegin()[it.index()]);
@@ -695,7 +695,7 @@ private:
  */
 template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
-    static_assert((!component_traits<typename Owned::value_type>::in_place_delete && ...), "Groups do not support in-place delete");
+    static_assert((!component_traits<typename Owned::element_type>::in_place_delete && ...), "Groups do not support in-place delete");
 
     using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = typename base_type::entity_type;

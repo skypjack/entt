@@ -795,7 +795,7 @@ public:
     /*! @brief Element type. */
     using element_type = Type;
     /*! @brief Type of the objects assigned to entities. */
-    using value_type = element_type;
+    using value_type = void;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -1013,7 +1013,7 @@ public:
     /*! @brief Element type. */
     using element_type = Entity;
     /*! @brief Type of the objects assigned to entities. */
-    using value_type = element_type;
+    using value_type = void;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
