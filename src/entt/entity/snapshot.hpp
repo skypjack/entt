@@ -101,7 +101,7 @@ public:
                 for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
                     archive(*first);
                 }
-            } else if constexpr(registry_type::storage_for_type<Type>::storage_policy == deletion_policy::in_place) {
+            } else if constexpr(registry_type::template storage_for_type<Type>::storage_policy == deletion_policy::in_place) {
                 const typename registry_type::common_type &base = *storage;
 
                 for(auto it = base.rbegin(), last = base.rend(); it != last; ++it) {
