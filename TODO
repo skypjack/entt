@@ -37,3 +37,5 @@ TODO:
 * review constrained noexcept-ness (ie sigh)
 * offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
+* decouple all non-storage classes from component_traits
+* cleanup the view void_t<enable_if_t<...>> check
