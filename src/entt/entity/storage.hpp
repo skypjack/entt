@@ -1012,6 +1012,8 @@ public:
     using base_type = basic_sparse_set<Entity, Allocator>;
     /*! @brief Element type. */
     using element_type = Entity;
+    /*! @brief Type of the objects assigned to entities. */
+    using value_type = element_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
