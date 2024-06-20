@@ -134,7 +134,8 @@ class basic_any {
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     instance = new plain_type{std::forward<Args>(args)...};
                 } else if constexpr(std::is_array_v<plain_type>) {
-                    instance = new plain_type[std::extent_v<plain_type>](std::forward<Args>(args)...);
+                    static_assert(sizeof...(Args) == 0u);
+                    instance = new plain_type[std::extent_v<plain_type>]();
                 } else {
                     instance = new plain_type(std::forward<Args>(args)...);
                 }
