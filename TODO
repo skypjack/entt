@@ -39,3 +39,4 @@ TODO:
 * registry::view const invokes refresh multiple times implicitly
 * decouple all non-storage classes from component_traits
 * cleanup the view void_t<enable_if_t<...>> check
+* rollback std::array uses due to linter
