@@ -1,7 +1,6 @@
 #ifndef ENTT_CORE_ANY_HPP
 #define ENTT_CORE_ANY_HPP
 
-#include <array>
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -50,6 +49,10 @@ class basic_any {
     using operation = internal::any_operation;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
+    struct storage_type {
+        alignas(Align) std::byte data[Len + !Len];
+    };
+
     template<typename Type>
     static constexpr bool in_situ = Len && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
 
@@ -59,7 +62,7 @@ class basic_any {
         const Type *elem = nullptr;
 
         if constexpr(in_situ<Type>) {
-            elem = (value.mode == any_policy::owner) ? reinterpret_cast<const Type *>(value.storage.data()) : static_cast<const Type *>(value.instance);
+            elem = (value.mode == any_policy::owner) ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
         } else {
             elem = static_cast<const Type *>(value.instance);
         }
@@ -73,7 +76,7 @@ class basic_any {
         case operation::move:
             if constexpr(in_situ<Type>) {
                 if(value.mode == any_policy::owner) {
-                    return ::new(static_cast<basic_any *>(const_cast<void *>(other))->storage.data()) Type{std::move(*const_cast<Type *>(elem))};
+                    return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
                 }
             }
 
@@ -126,9 +129,9 @@ class basic_any {
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<plain_type>) {
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                    ::new(storage.data()) plain_type{std::forward<Args>(args)...};
+                    ::new(&storage) plain_type{std::forward<Args>(args)...};
                 } else {
-                    ::new(storage.data()) plain_type(std::forward<Args>(args)...);
+                    ::new(&storage) plain_type(std::forward<Args>(args)...);
                 }
             } else {
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
@@ -407,7 +410,7 @@ public:
 private:
     union {
         const void *instance;
-        alignas(Align) std::array<std::byte, Len> storage;
+        storage_type storage;
     };
     const type_info *info;
     vtable_type *vtable;
