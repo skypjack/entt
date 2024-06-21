@@ -205,15 +205,15 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index, typename... Ignore>
         static void maybe_valid_if(storage_type &obs, Registry &reg, const typename Registry::entity_type entt) {
-            auto condition = [&reg, entt]() {
-                if constexpr(sizeof...(Ignore) == 0) {
-                    return reg.template all_of<AllOf..., Require...>(entt) && !reg.template any_of<NoneOf..., Reject...>(entt);
-                } else {
-                    return reg.template all_of<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any_of<NoneOf>(entt)) && ...) && !reg.template any_of<Reject...>(entt);
-                }
-            };
+            bool guard{};
 
-            if(condition()) {
+            if constexpr(sizeof...(Ignore) == 0) {
+                guard = reg.template all_of<AllOf..., Require...>(entt) && !reg.template any_of<NoneOf..., Reject...>(entt);
+            } else {
+                guard = reg.template all_of<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any_of<NoneOf>(entt)) && ...) && !reg.template any_of<Reject...>(entt);
+            }
+
+            if(guard) {
                 if(!obs.contains(entt)) {
                     obs.emplace(entt);
                 }
