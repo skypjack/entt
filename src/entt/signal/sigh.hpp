@@ -440,9 +440,8 @@ public:
      * @param value_or_instance A valid object that fits the purpose.
      */
     void disconnect(const void *value_or_instance) {
-        if(value_or_instance) {
-            disconnect_if([value_or_instance](const auto &elem) { return elem.data() == value_or_instance; });
-        }
+        ENTT_ASSERT(value_or_instance != nullptr, "Invalid value or instance");
+        disconnect_if([value_or_instance](const auto &elem) { return elem.data() == value_or_instance; });
     }
 
     /*! @brief Disconnects all the listeners from a signal. */
