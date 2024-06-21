@@ -162,6 +162,13 @@ template<typename Registry, typename Mask, typename Allocator>
 class basic_observer {
     using storage_type = basic_storage<Mask, typename Registry::entity_type, Allocator>;
 
+    template<std::size_t Index>
+    static void discard_if(storage_type &obs, Registry &, const typename Registry::entity_type entt) {
+        if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
+            obs.erase(entt);
+        }
+    }
+
     template<typename>
     struct matcher_handler;
 
@@ -175,13 +182,6 @@ class basic_observer {
                 }
 
                 obs.get(entt) |= (1 << Index);
-            }
-        }
-
-        template<std::size_t Index>
-        static void discard_if(storage_type &obs, Registry &, const typename Registry::entity_type entt) {
-            if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
-                obs.erase(entt);
             }
         }
 
@@ -219,13 +219,6 @@ class basic_observer {
                 }
 
                 obs.get(entt) |= (1 << Index);
-            }
-        }
-
-        template<std::size_t Index>
-        static void discard_if(storage_type &obs, Registry &, const typename Registry::entity_type entt) {
-            if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
-                obs.erase(entt);
             }
         }
 
