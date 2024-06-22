@@ -7,7 +7,6 @@
 #include <type_traits>
 #include <utility>
 #include "../core/type_traits.hpp"
-#include "../signal/delegate.hpp"
 #include "fwd.hpp"
 #include "storage.hpp"
 
@@ -251,7 +250,6 @@ class basic_observer {
     void connect(Registry &reg, std::index_sequence<Index...>) {
         static_assert(sizeof...(Matcher) < std::numeric_limits<Mask>::digits, "Too many matchers");
         (matcher_handler<Matcher>::template connect<Index>(storage, reg), ...);
-        release.template connect<&basic_observer::disconnect<Matcher...>>(reg);
     }
 
 public:
@@ -276,6 +274,7 @@ public:
      */
     explicit basic_observer(const allocator_type &allocator)
         : release{},
+          parent{},
           storage{allocator} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
@@ -292,7 +291,9 @@ public:
      */
     template<typename... Matcher>
     basic_observer(registry_type &reg, basic_collector<Matcher...>, const allocator_type &allocator = allocator_type{})
-        : basic_observer{allocator} {
+        : release{&basic_observer::disconnect<Matcher...>},
+          parent{&reg},
+          storage{allocator} {
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
     }
 
@@ -319,6 +320,8 @@ public:
     template<typename... Matcher>
     void connect(registry_type &reg, basic_collector<Matcher...>) {
         disconnect();
+        parent = &reg;
+        release = &basic_observer::disconnect<Matcher...>;
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
         storage.clear();
     }
@@ -326,8 +329,8 @@ public:
     /*! @brief Disconnects an observer from the registry it keeps track of. */
     void disconnect() {
         if(release) {
-            release(storage);
-            release.reset();
+            release(*parent, storage);
+            release = nullptr;
         }
     }
 
@@ -424,7 +427,8 @@ public:
     }
 
 private:
-    delegate<void(storage_type &)> release;
+    void (*release)(registry_type &, storage_type &);
+    registry_type *parent;
     storage_type storage;
 };
 
