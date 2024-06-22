@@ -163,9 +163,9 @@ class basic_observer {
     using storage_type = basic_storage<Mask, typename Registry::entity_type, Allocator>;
 
     template<std::size_t Index>
-    static void discard_if(storage_type &obs, Registry &, const typename Registry::entity_type entt) {
-        if(obs.contains(entt) && !(obs.get(entt) &= (~(1 << Index)))) {
-            obs.erase(entt);
+    static void discard_if(storage_type &storage, Registry &, const typename Registry::entity_type entt) {
+        if(storage.contains(entt) && !(storage.get(entt) &= (~(1 << Index)))) {
+            storage.erase(entt);
         }
     }
 
@@ -175,36 +175,36 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename AnyOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
-        static void maybe_valid_if(storage_type &obs, Registry &reg, const typename Registry::entity_type entt) {
+        static void maybe_valid_if(storage_type &storage, Registry &reg, const typename Registry::entity_type entt) {
             if(reg.template all_of<Require...>(entt) && !reg.template any_of<Reject...>(entt)) {
-                if(!obs.contains(entt)) {
-                    obs.emplace(entt);
+                if(!storage.contains(entt)) {
+                    storage.emplace(entt);
                 }
 
-                obs.get(entt) |= (1 << Index);
+                storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
-        static void connect(storage_type &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            reg.template on_update<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
-            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(obs);
+        static void connect(storage_type &storage, Registry &reg) {
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(storage), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(storage), ...);
+            reg.template on_update<AnyOf>().template connect<&maybe_valid_if<Index>>(storage);
+            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(storage);
         }
 
-        static void disconnect(storage_type &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            reg.template on_update<AnyOf>().disconnect(&obs);
-            reg.template on_destroy<AnyOf>().disconnect(&obs);
+        static void disconnect(storage_type &storage, Registry &reg) {
+            (reg.template on_destroy<Require>().disconnect(&storage), ...);
+            (reg.template on_construct<Reject>().disconnect(&storage), ...);
+            reg.template on_update<AnyOf>().disconnect(&storage);
+            reg.template on_destroy<AnyOf>().disconnect(&storage);
         }
     };
 
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index, typename... Ignore>
-        static void maybe_valid_if(storage_type &obs, Registry &reg, const typename Registry::entity_type entt) {
+        static void maybe_valid_if(storage_type &storage, Registry &reg, const typename Registry::entity_type entt) {
             bool guard{};
 
             if constexpr(sizeof...(Ignore) == 0) {
@@ -214,37 +214,37 @@ class basic_observer {
             }
 
             if(guard) {
-                if(!obs.contains(entt)) {
-                    obs.emplace(entt);
+                if(!storage.contains(entt)) {
+                    storage.emplace(entt);
                 }
 
-                obs.get(entt) |= (1 << Index);
+                storage.get(entt) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
-        static void connect(storage_type &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
-            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index, NoneOf>>(obs), ...);
-            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(obs), ...);
-            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(obs), ...);
+        static void connect(storage_type &storage, Registry &reg) {
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(storage), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(storage), ...);
+            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(storage), ...);
+            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index, NoneOf>>(storage), ...);
+            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(storage), ...);
+            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(storage), ...);
         }
 
-        static void disconnect(storage_type &obs, Registry &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            (reg.template on_construct<AllOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<NoneOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<AllOf>().disconnect(&obs), ...);
-            (reg.template on_construct<NoneOf>().disconnect(&obs), ...);
+        static void disconnect(storage_type &storage, Registry &reg) {
+            (reg.template on_destroy<Require>().disconnect(&storage), ...);
+            (reg.template on_construct<Reject>().disconnect(&storage), ...);
+            (reg.template on_construct<AllOf>().disconnect(&storage), ...);
+            (reg.template on_destroy<NoneOf>().disconnect(&storage), ...);
+            (reg.template on_destroy<AllOf>().disconnect(&storage), ...);
+            (reg.template on_construct<NoneOf>().disconnect(&storage), ...);
         }
     };
 
     template<typename... Matcher>
-    static void disconnect(Registry &reg, storage_type &obs) {
-        (matcher_handler<Matcher>::disconnect(obs, reg), ...);
+    static void disconnect(Registry &reg, storage_type &storage) {
+        (matcher_handler<Matcher>::disconnect(storage, reg), ...);
     }
 
     template<typename... Matcher, std::size_t... Index>
