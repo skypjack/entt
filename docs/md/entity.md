@@ -686,14 +686,15 @@ to create tombstones.
 
 ### To entity
 
-This function accepts a registry and an instance of a component and returns the
-entity associated with the latter:
+This function accepts a storage and an instance of a component of the storage
+type, then it returns the entity associated with the latter:
 
 ```cpp
-const auto entity = entt::to_entity(registry, position);
+const auto entity = entt::to_entity(registry.storage<position>(), instance);
 ```
 
-A null entity is returned in case the component doesn't belong to the registry.
+Where `instance` is a component of type `position`. A null entity is returned in
+case the instance doesn't belong to the registry.
 
 ### Dependencies
 
