@@ -294,7 +294,7 @@ public:
         : release{&basic_observer::disconnect<Matcher...>},
           parent{&reg},
           storage{allocator} {
-        connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
+        connect<Matcher...>(std::index_sequence_for<Matcher...>{});
     }
 
     /*! @brief Default destructor. */
@@ -322,7 +322,7 @@ public:
         disconnect();
         parent = &reg;
         release = &basic_observer::disconnect<Matcher...>;
-        connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
+        connect<Matcher...>(std::index_sequence_for<Matcher...>{});
         storage.clear();
     }
 
