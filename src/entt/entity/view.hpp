@@ -223,7 +223,7 @@ class basic_common_view {
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
         const auto *view = pools[index];
-        const std::array len{view->size(), view->free_list()};
+        const size_type len[]{view->size(), view->free_list()};
         return len[view->policy() == deletion_policy::swap_only];
     }
 

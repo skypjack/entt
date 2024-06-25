@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_ORGANIZER_HPP
 #define ENTT_ENTITY_ORGANIZER_HPP
 
-#include <array>
 #include <cstddef>
 #include <type_traits>
 #include <utility>
@@ -135,8 +134,9 @@ class basic_organizer final {
         if constexpr(sizeof...(Type) == 0u) {
             return {};
         } else {
-            std::array info{&type_id<Type>()...};
-            const auto length = count < info.size() ? count : info.size();
+            const type_info *info[]{&type_id<Type>()...};
+            constexpr auto extent = std::extent_v<decltype(info)>;
+            const auto length = count < extent ? count : extent;
 
             for(std::size_t pos{}; pos < length; ++pos) {
                 buffer[pos] = info[pos];
