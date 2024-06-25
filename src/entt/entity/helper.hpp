@@ -6,7 +6,6 @@
 #include <utility>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
-#include "../signal/delegate.hpp"
 #include "component.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -108,9 +107,7 @@ private:
 template<auto Member, typename Registry = std::decay_t<nth_argument_t<0u, decltype(Member)>>>
 void invoke(Registry &reg, const typename Registry::entity_type entt) {
     static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
-    delegate<void(Registry &, const typename Registry::entity_type)> func;
-    func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
-    func(reg, entt);
+    (reg.template get<member_class_t<decltype(Member)>>(entt).*Member)(reg, entt);
 }
 
 /**
