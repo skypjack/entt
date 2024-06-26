@@ -247,9 +247,9 @@ class basic_observer {
     }
 
     template<typename... Matcher, std::size_t... Index>
-    void connect(std::index_sequence<Index...>) {
+    static void connect(Registry &parent, storage_type &storage, std::index_sequence<Index...>) {
         static_assert(sizeof...(Matcher) < std::numeric_limits<mask_type>::digits, "Too many matchers");
-        (matcher_handler<Matcher>::template connect<Index>(storage, *parent), ...);
+        (matcher_handler<Matcher>::template connect<Index>(storage, parent), ...);
     }
 
 public:
@@ -294,7 +294,7 @@ public:
         : release{&basic_observer::disconnect<Matcher...>},
           parent{&reg},
           storage{allocator} {
-        connect<Matcher...>(std::index_sequence_for<Matcher...>{});
+        connect<Matcher...>(reg, storage, std::index_sequence_for<Matcher...>{});
     }
 
     /*! @brief Default destructor. */
@@ -320,10 +320,11 @@ public:
     template<typename... Matcher>
     void connect(registry_type &reg, basic_collector<Matcher...>) {
         disconnect();
+        storage.clear();
+
         parent = &reg;
         release = &basic_observer::disconnect<Matcher...>;
-        connect<Matcher...>(std::index_sequence_for<Matcher...>{});
-        storage.clear();
+        connect<Matcher...>(reg, storage, std::index_sequence_for<Matcher...>{});
     }
 
     /*! @brief Disconnects an observer from the registry it keeps track of. */
