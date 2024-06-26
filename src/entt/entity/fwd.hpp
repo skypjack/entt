@@ -44,7 +44,7 @@ class basic_runtime_view;
 template<typename, typename, typename>
 class basic_group;
 
-template<typename, typename Mask = std::uint32_t, typename = std::allocator<Mask>>
+template<typename, typename = std::allocator<void>>
 class basic_observer;
 
 template<typename>

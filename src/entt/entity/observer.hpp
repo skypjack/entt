@@ -154,12 +154,12 @@ inline constexpr basic_collector<> collector{};
  * pointers.
  *
  * @tparam Registry Basic registry type.
- * @tparam Mask Mask type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Registry, typename Mask, typename Allocator>
+template<typename Registry, typename Allocator>
 class basic_observer {
-    using storage_type = basic_storage<Mask, typename Registry::entity_type, Allocator>;
+    using mask_type = std::uint64_t;
+    using storage_type = basic_storage<mask_type, typename Registry::entity_type, typename std::allocator_traits<Allocator>::template rebind_alloc<mask_type>>;
 
     template<std::size_t Index>
     static void discard_if(storage_type &storage, Registry &, const typename Registry::entity_type entt) {
@@ -248,7 +248,7 @@ class basic_observer {
 
     template<typename... Matcher, std::size_t... Index>
     void connect(std::index_sequence<Index...>) {
-        static_assert(sizeof...(Matcher) < std::numeric_limits<Mask>::digits, "Too many matchers");
+        static_assert(sizeof...(Matcher) < std::numeric_limits<mask_type>::digits, "Too many matchers");
         (matcher_handler<Matcher>::template connect<Index>(storage, *parent), ...);
     }
 
