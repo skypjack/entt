@@ -623,12 +623,12 @@ public:
  * @tparam Type Common type among all storage types.
  */
 template<typename Type>
-class basic_storage_view {
+class basic_swap_and_pop_view {
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    basic_storage_view() noexcept = default;
+    basic_swap_and_pop_view() noexcept = default;
 
-    basic_storage_view(const Type *value) noexcept
+    basic_swap_and_pop_view(const Type *value) noexcept
         : leading{value} {}
     /*! @endcond */
 
@@ -768,8 +768,8 @@ private:
  * @tparam Get Type of storage iterated by the view.
  */
 template<typename Get>
-class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<std::remove_const_t<Get>::storage_policy == deletion_policy::swap_and_pop>>>: public basic_storage_view<typename Get::base_type> {
-    using base_type = basic_storage_view<typename Get::base_type>;
+class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<std::remove_const_t<Get>::storage_policy == deletion_policy::swap_and_pop>>>: public basic_swap_and_pop_view<typename Get::base_type> {
+    using base_type = basic_swap_and_pop_view<typename Get::base_type>;
 
 public:
     /*! @brief Common type among all storage types. */
