@@ -612,7 +612,7 @@ TEST(SingleStorageView, StorageEntity) {
     ASSERT_EQ(view.front(), other);
     ASSERT_EQ(view.back(), other);
 
-    ASSERT_EQ(view.size(), 1u);
+    ASSERT_EQ(view.size(), 2u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
