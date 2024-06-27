@@ -317,7 +317,6 @@ TYPED_TEST(StorageNoInstance, Iterable) {
     using iterator = typename entt::storage<value_type>::iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
@@ -360,7 +359,6 @@ TYPED_TEST(StorageNoInstance, ConstIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::const_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
@@ -433,7 +431,6 @@ TYPED_TEST(StorageNoInstance, ReverseIterable) {
     using iterator = typename entt::storage<value_type>::reverse_iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
@@ -476,7 +473,6 @@ TYPED_TEST(StorageNoInstance, ConstReverseIterable) {
     using value_type = typename TestFixture::type;
     using iterator = typename entt::storage<value_type>::const_reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
