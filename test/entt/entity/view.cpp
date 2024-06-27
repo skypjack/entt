@@ -14,7 +14,7 @@
 #include "../../common/empty.h"
 #include "../../common/pointer_stable.h"
 
-TEST(SingleComponentView, Functionalities) {
+TEST(SingleStorageView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<char>();
     auto cview = std::as_const(registry).view<const char>();
@@ -69,7 +69,7 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
-TEST(SingleComponentView, InvalidView) {
+TEST(SingleStorageView, InvalidView) {
     entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<>> view{};
 
     ASSERT_FALSE(view);
@@ -105,7 +105,7 @@ TEST(SingleComponentView, InvalidView) {
     view.each([](const entt::entity, const int &) { FAIL(); });
 }
 
-TEST(SingleComponentView, Constructors) {
+TEST(SingleStorageView, Constructors) {
     entt::storage<int> storage{};
 
     const entt::view<entt::get_t<int>> invalid{};
@@ -120,7 +120,7 @@ TEST(SingleComponentView, Constructors) {
     ASSERT_EQ(from_storage.handle(), from_tuple.handle());
 }
 
-TEST(SingleComponentView, Handle) {
+TEST(SingleStorageView, Handle) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -140,7 +140,7 @@ TEST(SingleComponentView, Handle) {
     ASSERT_EQ(handle, view.handle());
 }
 
-TEST(SingleComponentView, LazyTypeFromConstRegistry) {
+TEST(SingleStorageView, LazyTypeFromConstRegistry) {
     entt::registry registry{};
     auto eview = std::as_const(registry).view<const test::empty>();
     auto cview = std::as_const(registry).view<const int>();
@@ -163,7 +163,7 @@ TEST(SingleComponentView, LazyTypeFromConstRegistry) {
     ASSERT_NE(eview.back(), entity);
 }
 
-TEST(SingleComponentView, ElementAccess) {
+TEST(SingleStorageView, ElementAccess) {
     entt::registry registry;
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
@@ -178,7 +178,7 @@ TEST(SingleComponentView, ElementAccess) {
     ASSERT_EQ(cview[e1], 1);
 }
 
-TEST(SingleComponentView, Contains) {
+TEST(SingleStorageView, Contains) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -195,7 +195,7 @@ TEST(SingleComponentView, Contains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(SingleComponentView, Empty) {
+TEST(SingleStorageView, Empty) {
     entt::registry registry;
     auto view = registry.view<int>();
 
@@ -204,7 +204,7 @@ TEST(SingleComponentView, Empty) {
     ASSERT_EQ(view.rbegin(), view.rend());
 }
 
-TEST(SingleComponentView, Each) {
+TEST(SingleStorageView, Each) {
     entt::registry registry;
     const std::array entity{registry.create(), registry.create()};
 
@@ -250,7 +250,7 @@ TEST(SingleComponentView, Each) {
     }
 }
 
-TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
+TEST(SingleStorageView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
@@ -292,7 +292,7 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     }
 }
 
-TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
+TEST(SingleStorageView, ConstNonConstAndAllInBetweenWithEmptyType) {
     entt::registry registry;
     auto view = registry.view<test::empty>();
     auto cview = std::as_const(registry).view<const test::empty>();
@@ -319,7 +319,7 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
     }
 }
 
-TEST(SingleComponentView, Find) {
+TEST(SingleStorageView, Find) {
     entt::registry registry;
     auto view = registry.view<int>();
 
@@ -359,7 +359,7 @@ TEST(SingleComponentView, Find) {
     ASSERT_EQ(view.find(e4), view.end());
 }
 
-TEST(SingleComponentView, EmptyTypes) {
+TEST(SingleStorageView, EmptyTypes) {
     entt::registry registry;
     entt::entity entity = registry.create();
 
@@ -396,7 +396,7 @@ TEST(SingleComponentView, EmptyTypes) {
     }
 }
 
-TEST(SingleComponentView, FrontBack) {
+TEST(SingleStorageView, FrontBack) {
     entt::registry registry;
     auto view = registry.view<const int>();
 
@@ -413,7 +413,7 @@ TEST(SingleComponentView, FrontBack) {
     ASSERT_EQ(view.back(), e0);
 }
 
-TEST(SingleComponentView, DeductionGuide) {
+TEST(SingleStorageView, DeductionGuide) {
     using int_storage = entt::storage_type_t<int>;
     using stable_storage = entt::storage_type_t<test::pointer_stable>;
 
@@ -426,7 +426,7 @@ TEST(SingleComponentView, DeductionGuide) {
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<test::pointer_stable>>, entt::exclude_t<>>, decltype(entt::basic_view{std::forward_as_tuple(std::declval<stable_storage &>())})>();
 }
 
-TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
+TEST(SingleStorageView, IterableViewAlgorithmCompatibility) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -439,7 +439,7 @@ TEST(SingleComponentView, IterableViewAlgorithmCompatibility) {
     ASSERT_EQ(std::get<0>(*it), entity);
 }
 
-TEST(SingleComponentView, StableType) {
+TEST(SingleStorageView, StableType) {
     entt::registry registry;
     auto view = registry.view<test::pointer_stable>();
 
@@ -480,7 +480,7 @@ TEST(SingleComponentView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
-TEST(SingleComponentView, Storage) {
+TEST(SingleStorageView, Storage) {
     entt::registry registry;
     const auto entity = registry.create();
     auto view = registry.view<int>();
@@ -531,7 +531,7 @@ TEST(SingleComponentView, Storage) {
     ASSERT_EQ(cview.storage<const char>(), nullptr);
 }
 
-TEST(SingleComponentView, ArrowOperator) {
+TEST(SingleStorageView, ArrowOperator) {
     entt::registry registry;
     const auto entity = registry.create();
     auto view = registry.view<int>();
@@ -562,7 +562,7 @@ TEST(SingleComponentView, ArrowOperator) {
     ASSERT_EQ(cview.operator->(), nullptr);
 }
 
-TEST(SingleComponentView, SwapStorage) {
+TEST(SingleStorageView, SwapStorage) {
     using namespace entt::literals;
 
     entt::registry registry;
@@ -597,7 +597,7 @@ TEST(SingleComponentView, SwapStorage) {
     ASSERT_TRUE(cview.empty());
 }
 
-TEST(SingleComponentView, StorageEntity) {
+TEST(SingleStorageView, StorageEntity) {
     entt::registry registry;
     auto view = registry.view<entt::entity>();
 
@@ -612,7 +612,7 @@ TEST(SingleComponentView, StorageEntity) {
     ASSERT_EQ(view.front(), other);
     ASSERT_EQ(view.back(), other);
 
-    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_EQ(view.size(), 1u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
