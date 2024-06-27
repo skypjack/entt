@@ -627,7 +627,7 @@ TEST(SingleComponentView, StorageEntity) {
     });
 }
 
-TEST(MultiComponentView, Functionalities) {
+TEST(MultiStorageView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
@@ -669,7 +669,7 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
-TEST(MultiComponentView, InvalidView) {
+TEST(MultiStorageView, InvalidView) {
     entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<entt::storage<char>>> view{};
 
     ASSERT_FALSE(view);
@@ -709,7 +709,7 @@ TEST(MultiComponentView, InvalidView) {
     view.each([](const entt::entity, const int &) { FAIL(); });
 }
 
-TEST(MultiComponentView, Constructors) {
+TEST(MultiStorageView, Constructors) {
     entt::storage<int> storage{};
 
     const entt::view<entt::get_t<int, int>> invalid{};
@@ -724,7 +724,7 @@ TEST(MultiComponentView, Constructors) {
     ASSERT_EQ(from_storage.handle(), from_tuple.handle());
 }
 
-TEST(MultiComponentView, Handle) {
+TEST(MultiStorageView, Handle) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -759,7 +759,7 @@ TEST(MultiComponentView, Handle) {
     ASSERT_EQ(handle, view.handle());
 }
 
-TEST(MultiComponentView, LazyTypesFromConstRegistry) {
+TEST(MultiStorageView, LazyTypesFromConstRegistry) {
     entt::registry registry{};
     auto view = std::as_const(registry).view<const test::empty, const int>();
 
@@ -778,7 +778,7 @@ TEST(MultiComponentView, LazyTypesFromConstRegistry) {
     ASSERT_NE(view.back(), entity);
 }
 
-TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
+TEST(MultiStorageView, LazyExcludedTypeFromConstRegistry) {
     entt::registry registry;
 
     auto entity = registry.create();
@@ -797,7 +797,7 @@ TEST(MultiComponentView, LazyExcludedTypeFromConstRegistry) {
     ASSERT_EQ(view.back(), entity);
 }
 
-TEST(MultiComponentView, Iterator) {
+TEST(MultiStorageView, Iterator) {
     entt::registry registry;
     const std::array entity{registry.create(), registry.create()};
 
@@ -825,7 +825,7 @@ TEST(MultiComponentView, Iterator) {
     ASSERT_EQ(++begin, view.end());
 }
 
-TEST(MultiComponentView, ElementAccess) {
+TEST(MultiStorageView, ElementAccess) {
     entt::registry registry;
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
@@ -842,7 +842,7 @@ TEST(MultiComponentView, ElementAccess) {
     ASSERT_EQ(cview[e1], std::make_tuple(1, '1'));
 }
 
-TEST(MultiComponentView, Contains) {
+TEST(MultiStorageView, Contains) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -861,7 +861,7 @@ TEST(MultiComponentView, Contains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(MultiComponentView, SizeHint) {
+TEST(MultiStorageView, SizeHint) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -878,7 +878,7 @@ TEST(MultiComponentView, SizeHint) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
-TEST(MultiComponentView, UseAndRefresh) {
+TEST(MultiStorageView, UseAndRefresh) {
     entt::registry registry;
     const std::array entity{registry.create(), registry.create(), registry.create()};
 
@@ -908,7 +908,7 @@ TEST(MultiComponentView, UseAndRefresh) {
     ASSERT_EQ(view.handle()->type(), entt::type_id<int>());
 }
 
-TEST(MultiComponentView, Each) {
+TEST(MultiStorageView, Each) {
     entt::registry registry;
     const std::array entity{registry.create(), registry.create()};
 
@@ -960,7 +960,7 @@ TEST(MultiComponentView, Each) {
     }
 }
 
-TEST(MultiComponentView, EachWithSuggestedType) {
+TEST(MultiStorageView, EachWithSuggestedType) {
     entt::registry registry;
     auto view = registry.view<int, char>();
 
@@ -1010,7 +1010,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     }
 }
 
-TEST(MultiComponentView, EachWithHoles) {
+TEST(MultiStorageView, EachWithHoles) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -1038,7 +1038,7 @@ TEST(MultiComponentView, EachWithHoles) {
     }
 }
 
-TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
+TEST(MultiStorageView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto view = registry.view<int, test::empty, const char>();
 
@@ -1077,7 +1077,7 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     }
 }
 
-TEST(MultiComponentView, Find) {
+TEST(MultiStorageView, Find) {
     entt::registry registry;
     auto view = registry.view<int, const char>();
 
@@ -1122,7 +1122,7 @@ TEST(MultiComponentView, Find) {
     ASSERT_EQ(view.find(e4), view.end());
 }
 
-TEST(MultiComponentView, ExcludedComponents) {
+TEST(MultiStorageView, Exclude) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -1169,7 +1169,7 @@ TEST(MultiComponentView, ExcludedComponents) {
     }
 }
 
-TEST(MultiComponentView, EmptyTypes) {
+TEST(MultiStorageView, EmptyTypes) {
     entt::registry registry;
 
     auto v1 = registry.view<int, char, test::empty>(entt::exclude<double>);
@@ -1253,7 +1253,7 @@ TEST(MultiComponentView, EmptyTypes) {
     }
 }
 
-TEST(MultiComponentView, FrontBack) {
+TEST(MultiStorageView, FrontBack) {
     entt::registry registry;
     auto view = registry.view<const int, const char>();
 
@@ -1275,7 +1275,7 @@ TEST(MultiComponentView, FrontBack) {
     ASSERT_EQ(view.back(), e0);
 }
 
-TEST(MultiComponentView, ExtendedGet) {
+TEST(MultiStorageView, ExtendedGet) {
     using type = decltype(std::declval<entt::registry>().view<int, test::empty, char>().get({}));
 
     ASSERT_EQ(std::tuple_size_v<type>, 2u);
@@ -1284,7 +1284,7 @@ TEST(MultiComponentView, ExtendedGet) {
     testing::StaticAssertTypeEq<std::tuple_element_t<1, type>, char &>();
 }
 
-TEST(MultiComponentView, DeductionGuide) {
+TEST(MultiStorageView, DeductionGuide) {
     using int_storage = entt::storage_type_t<int>;
     using double_storage = entt::storage_type_t<double>;
     using stable_storage = entt::storage_type_t<test::pointer_stable>;
@@ -1308,7 +1308,7 @@ TEST(MultiComponentView, DeductionGuide) {
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage_type_t<int>>, entt::exclude_t<entt::storage_type_t<test::pointer_stable>>>, decltype(entt::basic_view{std::forward_as_tuple(std::declval<int_storage &>()), std::forward_as_tuple(std::declval<stable_storage &>())})>();
 }
 
-TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
+TEST(MultiStorageView, IterableViewAlgorithmCompatibility) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -1322,7 +1322,7 @@ TEST(MultiComponentView, IterableViewAlgorithmCompatibility) {
     ASSERT_EQ(std::get<0>(*it), entity);
 }
 
-TEST(MultiComponentView, StableType) {
+TEST(MultiStorageView, StableType) {
     entt::registry registry;
     auto view = registry.view<int, test::pointer_stable>();
 
@@ -1370,7 +1370,7 @@ TEST(MultiComponentView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
-TEST(MultiComponentView, StableTypeWithExcludedComponent) {
+TEST(MultiStorageView, StableTypeWithExclude) {
     entt::registry registry;
     auto view = registry.view<test::pointer_stable>(entt::exclude<int>);
     const entt::entity tombstone = entt::tombstone;
@@ -1409,7 +1409,7 @@ TEST(MultiComponentView, StableTypeWithExcludedComponent) {
     });
 }
 
-TEST(MultiComponentView, SameComponentTypes) {
+TEST(MultiStorageView, SameStorageTypes) {
     entt::registry registry;
     entt::storage_type_t<int> storage;
     entt::storage_type_t<int> other;
@@ -1454,7 +1454,7 @@ TEST(MultiComponentView, SameComponentTypes) {
     ASSERT_EQ(view.handle(), &other);
 }
 
-TEST(MultiComponentView, Storage) {
+TEST(MultiStorageView, Storage) {
     entt::registry registry;
     const auto entity = registry.create();
     auto view = registry.view<int, const char>(entt::exclude<double, const float>);
@@ -1527,7 +1527,7 @@ TEST(MultiComponentView, Storage) {
     ASSERT_EQ(view.storage<const float>(), nullptr);
 }
 
-TEST(MultiComponentView, SwapStorage) {
+TEST(MultiStorageView, SwapStorage) {
     using namespace entt::literals;
 
     entt::registry registry;
@@ -1561,7 +1561,7 @@ TEST(MultiComponentView, SwapStorage) {
     ASSERT_EQ(view.size_hint(), 0u);
 }
 
-TEST(MultiComponentView, StorageEntity) {
+TEST(MultiStorageView, StorageEntity) {
     entt::registry registry;
     auto view = registry.view<entt::entity, int>();
 
@@ -1594,7 +1594,7 @@ TEST(MultiComponentView, StorageEntity) {
     });
 }
 
-TEST(MultiComponentView, StorageEntityWithExcludedComponent) {
+TEST(MultiStorageView, StorageEntityWithExclude) {
     entt::registry registry;
     auto view = registry.view<entt::entity, int>(entt::exclude<char>);
 
@@ -1632,7 +1632,7 @@ TEST(MultiComponentView, StorageEntityWithExcludedComponent) {
     });
 }
 
-TEST(MultiComponentView, StorageEntityExcludeOnly) {
+TEST(MultiStorageView, StorageEntityExcludeOnly) {
     entt::registry registry;
     auto view = registry.view<entt::entity>(entt::exclude<int>);
 
