@@ -878,7 +878,7 @@ public:
      * @param entt A valid identifier.
      */
     void get([[maybe_unused]] const entity_type entt) const noexcept {
-        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::contains(entt), "Invalid entity");
     }
 
     /**
@@ -887,7 +887,7 @@ public:
      * @return Returns an empty tuple.
      */
     [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
-        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::contains(entt), "Invalid entity");
         return std::tuple{};
     }
 
@@ -914,7 +914,7 @@ public:
      */
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
-        ENTT_ASSERT(base_type::contains(entt), "Storage does not contain entity");
+        ENTT_ASSERT(base_type::contains(entt), "Invalid entity");
         (std::forward<Func>(func)(), ...);
     }
 
