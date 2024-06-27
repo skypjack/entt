@@ -357,7 +357,7 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, FreeList) {
 TEST(StorageEntity, Iterable) {
     using iterator = typename entt::storage<entt::entity>::iterable::iterator;
 
-    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
@@ -401,7 +401,7 @@ TEST(StorageEntity, Iterable) {
 TEST(StorageEntity, ConstIterable) {
     using iterator = typename entt::storage<entt::entity>::const_iterable::iterator;
 
-    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
@@ -469,7 +469,7 @@ TEST(StorageEntity, IterableAlgorithmCompatibility) {
 TEST(StorageEntity, ReverseIterable) {
     using iterator = typename entt::storage<entt::entity>::reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
@@ -513,7 +513,7 @@ TEST(StorageEntity, ReverseIterable) {
 TEST(StorageEntity, ReverseConstIterable) {
     using iterator = typename entt::storage<entt::entity>::const_reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
