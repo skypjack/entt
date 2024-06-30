@@ -38,4 +38,5 @@ TODO:
 * offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
 * decouple all non-storage classes from component_traits
-* cleanup the view void_t<enable_if_t<...>> check
+* group, runtime view: avoid using registry when testing
+* improve front for multi-type view
