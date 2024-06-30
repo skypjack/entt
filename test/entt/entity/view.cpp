@@ -565,15 +565,15 @@ TEST(MultiStorageView, Functionalities) {
     ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size_hint(), 1u);
 
-    for(auto entity: view) {
-        ASSERT_EQ(std::get<0>(cview.get<const int, const char>(entity)), 4);
-        ASSERT_EQ(std::get<0>(cview.get<0u, 1u>(entity)), 4);
+    for(auto entt: view) {
+        ASSERT_EQ(std::get<0>(cview.get<const int, const char>(entt)), 4);
+        ASSERT_EQ(std::get<0>(cview.get<0u, 1u>(entt)), 4);
 
-        ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
-        ASSERT_EQ(std::get<1>(view.get<0u, 1u>(entity)), '2');
+        ASSERT_EQ(std::get<1>(view.get<int, char>(entt)), '2');
+        ASSERT_EQ(std::get<1>(view.get<0u, 1u>(entt)), '2');
 
-        ASSERT_EQ(cview.get<const char>(entity), '2');
-        ASSERT_EQ(cview.get<1u>(entity), '2');
+        ASSERT_EQ(cview.get<const char>(entt), '2');
+        ASSERT_EQ(cview.get<1u>(entt), '2');
     }
 
     const decltype(view) invalid{};
