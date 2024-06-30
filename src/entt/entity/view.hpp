@@ -387,7 +387,8 @@ protected:
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-class basic_view<get_t<Get...>, exclude_t<Exclude...>>: public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
+class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) + sizeof...(Exclude) > 1) || ((Get::storage_policy != deletion_policy::swap_and_pop) && ...)>>
+    : public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
 
     template<typename Type>
@@ -768,7 +769,8 @@ private:
  * @tparam Get Type of storage iterated by the view.
  */
 template<typename Get>
-class basic_view<get_t<Get>, exclude_t<>, std::void_t<std::enable_if_t<std::remove_const_t<Get>::storage_policy == deletion_policy::swap_and_pop>>>: public basic_swap_and_pop_view<typename Get::base_type> {
+class basic_view<get_t<Get>, exclude_t<>, std::enable_if_t<Get::storage_policy == deletion_policy::swap_and_pop>>
+    : public basic_swap_and_pop_view<typename Get::base_type> {
     using base_type = basic_swap_and_pop_view<typename Get::base_type>;
 
 public:
