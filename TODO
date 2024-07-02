@@ -30,10 +30,12 @@ TODO:
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * view: propagate tombostone check request to iterator
-* more test around views and storage entity - ie view ::back
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
 * review constrained noexcept-ness (ie sigh)
 * offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
 * improve front for multi-type view
+* cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
+* consider returning subrange for swap-only sparse sets or consider using filtered each for in-place storage (smilar to storage entity), cleanup views
+* single-type view specialization for in-place

@@ -387,7 +387,7 @@ protected:
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) + sizeof...(Exclude) > 1) || (type_list_element_t<0u, type_list<Get...>>::storage_policy != deletion_policy::swap_and_pop)>>
+class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) + sizeof...(Exclude) > 1) || (type_list_element_t<0u, type_list<Get...>>::storage_policy == deletion_policy::in_place)>>
     : public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
 
@@ -622,15 +622,20 @@ public:
  * @brief Basic storage view implementation.
  * @warning For internal use only, backward compatibility not guaranteed.
  * @tparam Type Common type among all storage types.
+ * @tparam Policy Storage policy.
  */
-template<typename Type>
-class basic_swap_and_pop_view {
+template<typename Type, deletion_policy Policy>
+class basic_storage_view {
+    static_assert(Policy != deletion_policy::in_place, "Not supported yet");
+
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    basic_swap_and_pop_view() noexcept = default;
+    basic_storage_view() noexcept = default;
 
-    basic_swap_and_pop_view(const Type *value) noexcept
-        : leading{value} {}
+    basic_storage_view(const Type *value) noexcept
+        : leading{value} {
+        ENTT_ASSERT(leading->policy() == Policy, "Unexpected storage policy");
+    }
     /*! @endcond */
 
 public:
@@ -658,7 +663,12 @@ public:
      * @return Number of entities that have the given element.
      */
     [[nodiscard]] size_type size() const noexcept {
-        return leading ? leading->size() : size_type{};
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return leading ? leading->size() : size_type{};
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return leading ? leading->free_list() : size_type{};
+        }
     }
 
     /**
@@ -666,7 +676,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return !leading || leading->empty();
+        return (size() == 0u);
     }
 
     /**
@@ -677,7 +687,12 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return leading ? leading->begin() : iterator{};
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return leading ? leading->begin() : iterator{};
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return leading ? (leading->end() - leading->free_list()) : iterator{};
+        }
     }
 
     /**
@@ -706,7 +721,12 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return leading ? leading->rend() : reverse_iterator{};
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return leading ? leading->rend() : reverse_iterator{};
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return leading ? (leading->rbegin() + leading->free_list()) : reverse_iterator{};
+        }
     }
 
     /**
@@ -715,7 +735,12 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type front() const noexcept {
-        return empty() ? null : *leading->begin();
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return empty() ? null : *leading->begin();
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return empty() ? null : *(leading->end() - leading->free_list());
+        }
     }
 
     /**
@@ -734,7 +759,17 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return leading ? leading->find(entt) : iterator{};
+        if(leading) {
+            if constexpr(Policy == deletion_policy::swap_and_pop) {
+                return leading->find(entt);
+            } else {
+                static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+                const auto it = leading->find(entt);
+                return (static_cast<size_type>(it.index()) < leading->free_list()) ? it : iterator{};
+            }
+        }
+
+        return iterator{};
     }
 
     /**
@@ -751,7 +786,12 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return leading && leading->contains(entt);
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return leading && leading->contains(entt);
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return leading && leading->contains(entt) && (leading->index(entt) < leading->free_list());
+        }
     }
 
 private:
@@ -769,9 +809,9 @@ private:
  * @tparam Get Type of storage iterated by the view.
  */
 template<typename Get>
-class basic_view<get_t<Get>, exclude_t<>, std::enable_if_t<Get::storage_policy == deletion_policy::swap_and_pop>>
-    : public basic_swap_and_pop_view<typename Get::base_type> {
-    using base_type = basic_swap_and_pop_view<typename Get::base_type>;
+class basic_view<get_t<Get>, exclude_t<>, std::enable_if_t<Get::storage_policy != deletion_policy::in_place>>
+    : public basic_storage_view<typename Get::base_type, Get::storage_policy> {
+    using base_type = basic_storage_view<typename Get::base_type, Get::storage_policy>;
 
 public:
     /*! @brief Common type among all storage types. */
@@ -908,19 +948,19 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(auto *elem = storage(); elem) {
-            if constexpr(is_applicable_v<Func, decltype(*elem->each().begin())>) {
-                for(const auto pack: elem->each()) {
-                    std::apply(func, pack);
+        if constexpr(is_applicable_v<Func, decltype(*storage()->each().begin())>) {
+            for(const auto pack: this->each()) {
+                std::apply(func, pack);
+            }
+        } else if constexpr(std::is_invocable_v<Func, decltype(*storage()->begin())>) {
+            if(size_type len = this->size(); len != 0u) {
+                for(auto last = storage()->end(), first = last - len; first != last; ++first) {
+                    func(*first);
                 }
-            } else if constexpr(std::is_invocable_v<Func, decltype(*elem->begin())>) {
-                for(auto &&curr: *elem) {
-                    func(curr);
-                }
-            } else {
-                for(size_type pos = elem->size(); pos; --pos) {
-                    func();
-                }
+            }
+        } else {
+            for(size_type pos = this->size(); pos; --pos) {
+                func();
             }
         }
     }
@@ -934,7 +974,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] iterable each() const noexcept {
+    [[nodiscard]] iterable
+    each() const noexcept {
         auto *elem = storage();
         return elem ? elem->each() : iterable{};
     }

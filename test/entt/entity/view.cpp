@@ -521,17 +521,43 @@ TEST(SingleStorageView, StorageEntity) {
     storage.erase(entity[0u]);
     storage.bump(entity[0u]);
 
+    ASSERT_EQ(view.size(), 1u);
+    ASSERT_EQ(view->size(), 2u);
+
+    ASSERT_FALSE(view.empty());
+    ASSERT_FALSE(view->empty());
+
     ASSERT_FALSE(view.contains(entity[0u]));
+    ASSERT_TRUE(view->contains(entity[0u]));
     ASSERT_TRUE(view.contains(entity[1u]));
+
+    ASSERT_NE(view.begin(), view->begin());
+    ASSERT_EQ(view.end(), view->end());
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
+    ASSERT_EQ(std::distance(view->begin(), view->end()), 2);
+
+    ASSERT_EQ(*view.begin(), entity[1u]);
+    ASSERT_EQ(*view->begin(), entity[0u]);
+
+    ASSERT_EQ(++view->begin(), view.begin());
+    ASSERT_EQ(++view.begin(), view.end());
+
+    ASSERT_EQ(view.rbegin(), view->rbegin());
+    ASSERT_NE(view.rend(), view->rend());
+
+    ASSERT_EQ(std::distance(view.rbegin(), view.rend()), 1);
+    ASSERT_EQ(std::distance(view->rbegin(), view->rend()), 2);
+
+    ASSERT_EQ(++view.rbegin(), view.rend());
+    ASSERT_EQ(++view.rend(), view->rend());
 
     ASSERT_EQ(view.front(), entity[1u]);
     ASSERT_EQ(view.back(), entity[1u]);
 
-    ASSERT_EQ(view.size_hint(), 2u);
-    ASSERT_NE(view.begin(), view.end());
-
-    ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
-    ASSERT_EQ(*view.begin(), entity[1u]);
+    ASSERT_EQ(view.find(entity[0u]), view.end());
+    ASSERT_NE(view->find(entity[0u]), view.end());
+    ASSERT_NE(view.find(entity[1u]), view.end());
 
     for(auto elem: view.each()) {
         ASSERT_EQ(std::get<0>(elem), entity[1u]);
@@ -540,6 +566,16 @@ TEST(SingleStorageView, StorageEntity) {
     view.each([&entity](auto entt) {
         ASSERT_EQ(entt, entity[1u]);
     });
+
+    view.each([&]() {
+        storage.erase(entity[1u]);
+    });
+
+    ASSERT_EQ(view.size(), 0u);
+    ASSERT_EQ(view->size(), 2u);
+
+    ASSERT_TRUE(view.empty());
+    ASSERT_FALSE(view->empty());
 }
 
 TEST(MultiStorageView, Functionalities) {
