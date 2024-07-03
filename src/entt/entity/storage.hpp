@@ -90,7 +90,7 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = index() - value;
-        constexpr auto page_size = component_traits<typename Container::value_type>::page_size;
+        constexpr auto page_size = component_traits<value_type>::page_size;
         return (*payload)[pos / page_size][fast_mod(static_cast<std::size_t>(pos), page_size)];
     }
 
