@@ -660,15 +660,27 @@ public:
 
     /**
      * @brief Returns the number of entities that have the given element.
+     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return Number of entities that have the given element.
      */
-    [[nodiscard]] size_type size() const noexcept {
+    template<typename..., deletion_policy Pol = Policy>
+    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, size_type> size() const noexcept {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->size() : size_type{};
         } else {
             static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
             return leading ? leading->free_list() : size_type{};
         }
+    }
+
+    /**
+     * @brief Estimates the number of entities iterated by the view.
+     * @tparam Pol Dummy template parameter used for sfinae purposes only.
+     * @return Estimated number of entities iterated by the view.
+     */
+    template<typename..., deletion_policy Pol = Policy>
+    [[nodiscard]] std::enable_if_t<Pol == deletion_policy::in_place, size_type> size_hint() const noexcept {
+        return leading ? leading->size() : size_type{};
     }
 
     /**
