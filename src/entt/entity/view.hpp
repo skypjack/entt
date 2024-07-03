@@ -648,7 +648,7 @@ public:
     /*! @brief Random access iterator type. */
     using iterator = typename common_type::iterator;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = typename common_type::reverse_iterator;
+    using reverse_iterator = std::conditional_t<Policy == deletion_policy::in_place, void, typename common_type::reverse_iterator>;
 
     /**
      * @brief Returns the leading storage of a view, if any.
@@ -720,19 +720,23 @@ public:
      *
      * If the view is empty, the returned iterator will be equal to `rend()`.
      *
+     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return An iterator to the first entity of the reversed view.
      */
-    [[nodiscard]] reverse_iterator rbegin() const noexcept {
+    template<typename..., deletion_policy Pol = Policy>
+    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, reverse_iterator> rbegin() const noexcept {
         return leading ? leading->rbegin() : reverse_iterator{};
     }
 
     /**
      * @brief Returns an iterator that is past the last entity of the reversed
      * view.
+     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return An iterator to the entity following the last entity of the
      * reversed view.
      */
-    [[nodiscard]] reverse_iterator rend() const noexcept {
+    template<typename..., deletion_policy Pol = Policy>
+    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, reverse_iterator> rend() const noexcept {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->rend() : reverse_iterator{};
         } else {
