@@ -802,7 +802,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        if constexpr(Policy == deletion_policy::swap_and_pop) {
+        if constexpr(Policy == deletion_policy::swap_and_pop || Policy == deletion_policy::in_place) {
             return leading && leading->contains(entt);
         } else {
             static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
