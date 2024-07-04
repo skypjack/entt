@@ -685,10 +685,17 @@ public:
 
     /**
      * @brief Checks whether a view is empty.
+     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return True if the view is empty, false otherwise.
      */
-    [[nodiscard]] bool empty() const noexcept {
-        return (size() == 0u);
+    template<typename..., deletion_policy Pol = Policy>
+    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, bool> empty() const noexcept {
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
+            return !leading || leading->empty();
+        } else {
+            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+            return !leading || (leading->free_list() == 0u);
+        }
     }
 
     /**
