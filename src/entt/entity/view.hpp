@@ -767,9 +767,12 @@ public:
     [[nodiscard]] entity_type front() const noexcept {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return empty() ? null : *leading->begin();
-        } else {
-            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+        } else if constexpr(Policy == deletion_policy::swap_only) {
             return empty() ? null : *(leading->end() - leading->free_list());
+        } else {
+            static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
+            const auto it = begin();
+            return (it == end()) ? null : *it;
         }
     }
 
@@ -779,7 +782,20 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
+        if constexpr(Policy == deletion_policy::swap_and_pop || Policy == deletion_policy::swap_only) {
         return empty() ? null : *leading->rbegin();
+        } else {
+            static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
+
+            if(leading) {
+                auto it = leading->rbegin();
+                const auto last = leading->rend();
+                for(; (it != last) && (*it == tombstone); ++it) {}
+                return it == last ? null : *it;
+    }
+
+            return null;
+        }
     }
 
     /**
@@ -789,17 +805,15 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        if(leading) {
             if constexpr(Policy == deletion_policy::swap_and_pop) {
-                return leading->find(entt);
+            return leading ? leading->find(entt) : iterator{};
+        } else if constexpr(Policy == deletion_policy::swap_only) {
+            const auto it = leading ? leading->find(entt) : iterator{};
+            return leading && (static_cast<size_type>(it.index()) < leading->free_list()) ? it : iterator{};
             } else {
-                static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
-                const auto it = leading->find(entt);
-                return (static_cast<size_type>(it.index()) < leading->free_list()) ? it : iterator{};
-            }
+            const auto it = leading ? leading->find(entt) : typename common_type::iterator{};
+            return iterator{it, {leading}, {}, 0u};
         }
-
-        return iterator{};
     }
 
     /**
