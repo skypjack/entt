@@ -701,9 +701,11 @@ public:
     [[nodiscard]] iterator begin() const noexcept {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->begin() : iterator{};
-        } else {
-            static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
+        } else if constexpr(Policy == deletion_policy::swap_only) {
             return leading ? (leading->end() - leading->free_list()) : iterator{};
+        } else {
+            static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
+            return leading ? iterator{leading->begin(), {leading}, {}, 0u} : iterator{};
         }
     }
 
@@ -712,7 +714,12 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return leading ? leading->end() : iterator{};
+        if constexpr(Policy == deletion_policy::swap_and_pop || Policy == deletion_policy::swap_only) {
+            return leading ? leading->end() : iterator{};
+        } else {
+            static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
+            return leading ? iterator{leading->end(), {leading}, {}, 0u} : iterator{};
+        }
     }
 
     /**
