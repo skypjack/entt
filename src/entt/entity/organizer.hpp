@@ -135,8 +135,7 @@ class basic_organizer final {
             return {};
         } else {
             const type_info *info[]{&type_id<Type>()...};
-            constexpr auto extent = std::extent_v<decltype(info)>;
-            const auto length = count < extent ? count : extent;
+            const auto length = count < sizeof...(Type) ? count : sizeof...(Type);
 
             for(std::size_t pos{}; pos < length; ++pos) {
                 buffer[pos] = info[pos];
