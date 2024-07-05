@@ -387,7 +387,7 @@ protected:
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) + sizeof...(Exclude) > 1) || (type_list_element_t<0u, type_list<Get...>>::storage_policy == deletion_policy::in_place)>>
+class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) + sizeof...(Exclude) > 1)>>
     : public basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
 
@@ -626,8 +626,6 @@ public:
  */
 template<typename Type, deletion_policy Policy>
 class basic_storage_view {
-    static_assert(Policy != deletion_policy::in_place, "Not supported yet");
-
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_storage_view() noexcept = default;
@@ -853,7 +851,7 @@ private:
  * @tparam Get Type of storage iterated by the view.
  */
 template<typename Get>
-class basic_view<get_t<Get>, exclude_t<>, std::enable_if_t<Get::storage_policy != deletion_policy::in_place>>
+class basic_view<get_t<Get>, exclude_t<>>
     : public basic_storage_view<typename Get::base_type, Get::storage_policy> {
     using base_type = basic_storage_view<typename Get::base_type, Get::storage_policy>;
 
