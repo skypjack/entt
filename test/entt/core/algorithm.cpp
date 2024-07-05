@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <array>
-#include <cstddef>
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/algorithm.hpp>

@@ -12,7 +12,6 @@
 #include <entt/container/dense_map.hpp>
 #include <entt/core/bit.hpp>
 #include <entt/core/iterator.hpp>
-#include <entt/core/memory.hpp>
 #include <entt/core/utility.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
