@@ -50,6 +50,7 @@ class basic_any {
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     struct storage_type {
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
         alignas(Align) std::byte data[Len + !Len];
     };
 
