@@ -127,7 +127,7 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 template<typename It, typename... Get>
 class extended_view_iterator final {
     template<std::size_t... Index>
-    auto dereference(std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto dereference(std::index_sequence<Index...>) const noexcept {
         return std::tuple_cat(std::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
     }
 
