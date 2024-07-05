@@ -783,7 +783,7 @@ public:
      */
     [[nodiscard]] entity_type back() const noexcept {
         if constexpr(Policy == deletion_policy::swap_and_pop || Policy == deletion_policy::swap_only) {
-        return empty() ? null : *leading->rbegin();
+            return empty() ? null : *leading->rbegin();
         } else {
             static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
 
@@ -792,7 +792,7 @@ public:
                 const auto last = leading->rend();
                 for(; (it != last) && (*it == tombstone); ++it) {}
                 return it == last ? null : *it;
-    }
+            }
 
             return null;
         }
@@ -805,12 +805,12 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-            if constexpr(Policy == deletion_policy::swap_and_pop) {
+        if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->find(entt) : iterator{};
         } else if constexpr(Policy == deletion_policy::swap_only) {
             const auto it = leading ? leading->find(entt) : iterator{};
             return leading && (static_cast<size_type>(it.index()) < leading->free_list()) ? it : iterator{};
-            } else {
+        } else {
             const auto it = leading ? leading->find(entt) : typename common_type::iterator{};
             return iterator{it, {leading}, {}, 0u};
         }
@@ -869,7 +869,7 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = typename base_type::reverse_iterator;
     /*! @brief Iterable view type. */
-    using iterable = decltype(std::declval<Get>().each());
+    using iterable = std::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(std::declval<Get>().each())>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept
@@ -997,14 +997,30 @@ public:
                 std::apply(func, pack);
             }
         } else if constexpr(std::is_invocable_v<Func, decltype(*storage()->begin())>) {
-            if(size_type len = this->size(); len != 0u) {
-                for(auto last = storage()->end(), first = last - len; first != last; ++first) {
-                    func(*first);
+            if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
+                if(size_type len = this->size(); len != 0u) {
+                    for(auto last = storage()->end(), first = last - len; first != last; ++first) {
+                        func(*first);
+                    }
+                }
+            } else {
+                static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
+
+                for(const auto pack: this->each()) {
+                    func(std::get<1>(pack));
                 }
             }
         } else {
-            for(size_type pos = this->size(); pos; --pos) {
-                func();
+            if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
+                for(size_type pos = this->size(); pos; --pos) {
+                    func();
+                }
+            } else {
+                static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
+
+                for([[maybe_unused]] const auto entt: *this) {
+                    func();
+                }
             }
         }
     }
@@ -1018,10 +1034,13 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] iterable
-    each() const noexcept {
-        auto *elem = storage();
-        return elem ? elem->each() : iterable{};
+    [[nodiscard]] iterable each() const noexcept {
+        if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
+            return this->handle() ? storage()->each() : iterable{};
+        } else {
+            static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
+            return iterable{base_type::begin(), base_type::end()};
+        }
     }
 
     /**
