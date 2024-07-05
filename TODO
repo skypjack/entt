@@ -35,7 +35,7 @@ TODO:
 * review constrained noexcept-ness (ie sigh)
 * offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
-* improve front for multi-type view
+* improve front (no multiple checks) and back (ie no contains) for multi-type view
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * consider returning subrange for swap-only sparse sets or consider using filtered each for in-place storage (smilar to storage entity), cleanup views
-* single-type view specialization for in-place
+* stop supporting func() for view::each (nonsense)
