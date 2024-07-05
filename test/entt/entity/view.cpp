@@ -1527,25 +1527,23 @@ TEST(MultiStorageView, StorageEntityExcludeOnly) {
 }
 
 TEST(View, Pipe) {
-    std::tuple<entt::storage<int>, entt::storage<char>, entt::storage<double>, entt::storage<test::empty>, entt::storage<test::pointer_stable>, entt::storage<float>> storage{};
+    std::tuple<entt::storage<int>, entt::storage<double>, entt::storage<test::empty>, entt::storage<test::pointer_stable>, entt::storage<float>> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     std::get<0>(storage).emplace(entity[0u]);
     std::get<1>(storage).emplace(entity[0u]);
     std::get<2>(storage).emplace(entity[0u]);
-    std::get<3>(storage).emplace(entity[0u]);
 
     std::get<0>(storage).emplace(entity[1u]);
-    std::get<1>(storage).emplace(entity[1u]);
-    std::get<4>(storage).emplace(entity[1u]);
+    std::get<3>(storage).emplace(entity[1u]);
 
-    entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::as_const(std::get<2>(storage)))};
-    entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<1>(storage))), std::forward_as_tuple(std::get<5>(storage))};
-    entt::basic_view view3{std::get<3>(storage)};
-    entt::basic_view view4{std::get<4>(storage)};
+    entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
+    entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<0>(storage))), std::forward_as_tuple(std::get<4>(storage))};
+    entt::basic_view view3{std::get<2>(storage)};
+    entt::basic_view view4{std::get<3>(storage)};
 
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage<int>, const entt::storage<char>>, entt::exclude_t<const entt::storage<double>, entt::storage<float>>>, decltype(view1 | view2)>();
-    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage<char>, entt::storage<int>>, entt::exclude_t<entt::storage<float>, const entt::storage<double>>>, decltype(view2 | view1)>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage<int>, const entt::storage<int>>, entt::exclude_t<const entt::storage<double>, entt::storage<float>>>, decltype(view1 | view2)>();
+    testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage<int>, entt::storage<int>>, entt::exclude_t<entt::storage<float>, const entt::storage<double>>>, decltype(view2 | view1)>();
     testing::StaticAssertTypeEq<decltype((view3 | view2) | view1), decltype(view3 | (view2 | view1))>();
 
     ASSERT_FALSE((view1 | view2).contains(entity[0u]));
@@ -1579,6 +1577,6 @@ TEST(View, Pipe) {
     ASSERT_NE(pack14.storage<test::pointer_stable>(), nullptr);
 
     ASSERT_EQ(pack32.storage<test::empty>(), nullptr);
-    ASSERT_NE(pack32.storage<const char>(), nullptr);
+    ASSERT_NE(pack32.storage<const int>(), nullptr);
     ASSERT_NE(pack32.storage<float>(), nullptr);
 }
