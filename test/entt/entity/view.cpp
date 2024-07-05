@@ -515,8 +515,14 @@ TEST(SingleStorageView, SwapStorage) {
 
 TEST(SingleStorageView, StorageEntity) {
     entt::storage<entt::entity> storage{};
-    entt::basic_view view{storage};
+    entt::basic_view<entt::get_t<entt::storage<entt::entity>>, entt::exclude_t<>> view{};
     const std::array entity{storage.emplace(), storage.emplace()};
+
+    ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.find(entity[0u]), view.end());
+
+    view.storage(storage);
 
     storage.erase(entity[0u]);
     storage.bump(entity[0u]);
@@ -576,6 +582,12 @@ TEST(SingleStorageView, StorageEntity) {
 
     ASSERT_TRUE(view.empty());
     ASSERT_FALSE(view->empty());
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 0);
+    ASSERT_EQ(std::distance(view->begin(), view->end()), 2);
+
+    ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
 }
 
 TEST(MultiStorageView, Functionalities) {
