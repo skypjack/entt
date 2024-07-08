@@ -44,3 +44,5 @@ TODO:
 * self assignment support for any and meta_any
 * meta support for use defined traits (room for them on meta traits)
 * entity based component_traits
+* seek functions for meta factory (data/func/whatever)
+* investigate using any rather than shared<void> for meta properties
