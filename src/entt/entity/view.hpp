@@ -250,6 +250,29 @@ protected:
         unchecked_refresh();
     }
 
+    template<std::size_t Index>
+    const Type *storage() const noexcept {
+        if constexpr(Index < Get) {
+            return pools[Index];
+        } else {
+            return filter[Index - Get];
+        }
+    }
+
+    template<std::size_t Index>
+    void storage(const Type *elem) noexcept {
+        if constexpr(Index < Get) {
+            pools[Index] = elem;
+            refresh();
+        } else {
+            filter[Index - Get] = elem;
+        }
+    }
+
+    bool none_of(const typename Type::entity_type entt) const noexcept {
+        return internal::none_of(filter.begin(), filter.end(), entt);
+    }
+
     void use(const std::size_t pos) noexcept {
         index = (index != Get) ? pos : Get;
     }
@@ -366,12 +389,10 @@ public:
                && pools[index]->index(entt) < offset();
     }
 
-protected:
-    /*! @cond TURN_OFF_DOXYGEN */
+private:
     std::array<const common_type *, Get> pools{};
     std::array<const common_type *, Exclude> filter{};
     size_type index{Get};
-    /*! @endcond */
 };
 
 /**
@@ -413,7 +434,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
         static constexpr bool tombstone_check_required = ((sizeof...(Get) == 1u) && ... && (Get::storage_policy == deletion_policy::in_place));
 
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || this->pools[Index]->contains(entt)) && ...) && internal::none_of(this->filter.begin(), this->filter.end(), entt)) {
+            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || base_type::storage<Index>()->contains(entt)) && ...) && base_type::none_of(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -425,7 +446,9 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
 
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
-        ((Index == this->index ? each<Index>(func, seq) : void()), ...);
+        if(const auto *view = base_type::handle(); view != nullptr) {
+            ((view == base_type::storage<Index>() ? each<Index>(func, seq) : void()), ...);
+        }
     }
 
 public:
@@ -497,12 +520,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
-
-        if constexpr(Index < sizeof...(Get)) {
-            return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(this->pools[Index]));
-        } else {
-            return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(this->filter[Index - sizeof...(Get)]));
-        }
+        return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(base_type::storage<Index>()));
     }
 
     /**
@@ -524,13 +542,7 @@ public:
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         static_assert(std::is_convertible_v<Type &, type_list_element_t<Index, type_list<Get..., Exclude...>> &>, "Unexpected type");
-
-        if constexpr(Index < sizeof...(Get)) {
-            this->pools[Index] = &elem;
-            base_type::refresh();
-        } else {
-            this->filter[Index - sizeof...(Get)] = &elem;
-        }
+        base_type::storage<Index>(&elem);
     }
 
     /**
@@ -907,7 +919,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(Index == 0u, "Index out of bounds");
-        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(this->handle()));
+        return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(base_type::handle()));
     }
 
     /**
@@ -991,12 +1003,12 @@ public:
     template<typename Func>
     void each(Func func) const {
         if constexpr(is_applicable_v<Func, decltype(*storage()->each().begin())>) {
-            for(const auto pack: this->each()) {
+            for(const auto pack: each()) {
                 std::apply(func, pack);
             }
         } else if constexpr(std::is_invocable_v<Func, decltype(*storage()->begin())>) {
             if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-                if(size_type len = this->size(); len != 0u) {
+                if(size_type len = base_type::size(); len != 0u) {
                     for(auto last = storage()->end(), first = last - len; first != last; ++first) {
                         func(*first);
                     }
@@ -1004,13 +1016,13 @@ public:
             } else {
                 static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
 
-                for(const auto pack: this->each()) {
+                for(const auto pack: each()) {
                     func(std::get<1>(pack));
                 }
             }
         } else {
             if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-                for(size_type pos = this->size(); pos; --pos) {
+                for(size_type pos = base_type::size(); pos; --pos) {
                     func();
                 }
             } else {
@@ -1034,7 +1046,7 @@ public:
      */
     [[nodiscard]] iterable each() const noexcept {
         if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-            return this->handle() ? storage()->each() : iterable{};
+            return base_type::handle() ? storage()->each() : iterable{};
         } else {
             static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
             return iterable{base_type::begin(), base_type::end()};
