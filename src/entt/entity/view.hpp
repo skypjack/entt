@@ -1008,10 +1008,8 @@ public:
             }
         } else if constexpr(std::is_invocable_v<Func, decltype(*storage()->begin())>) {
             if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-                if(size_type len = base_type::size(); len != 0u) {
-                    for(auto last = storage()->end(), first = last - len; first != last; ++first) {
-                        func(*first);
-                    }
+                for(auto last = storage()->end(), first = last - base_type::size(); first != last; ++first) {
+                    func(*first);
                 }
             } else {
                 static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
