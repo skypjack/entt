@@ -1,7 +1,7 @@
 #ifndef ENTT_COMMON_TRACKED_MEMORY_RESOURCE_HPP
 #define ENTT_COMMON_TRACKED_MEMORY_RESOURCE_HPP
 
-#ifdef ENTT_HAS_HEADER_VERSION
+#if __has_include(<version>)
 #    include <version>
 #
 #    if defined(__cpp_lib_memory_resource) && __cpp_lib_memory_resource >= 201603L
