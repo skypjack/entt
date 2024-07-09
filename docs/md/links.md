@@ -223,6 +223,8 @@ I hope the following lists can grow much more in the future.
     game engine based on procrastination.
   * [Rocky](https://github.com/pelicanmapping/rocky): 3D geospatial application
     engine.
+  * [Donner](https://github.com/jwmcglynn/donner): a modern C++20 SVG2 rendering
+    API with CSS3.
 
 ## Articles, videos and blog posts:
 
