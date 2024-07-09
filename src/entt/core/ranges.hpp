@@ -1,5 +1,5 @@
-#ifndef ENTT_ENTITY_RANGES_HPP
-#define ENTT_ENTITY_RANGES_HPP
+#ifndef ENTT_CORE_RANGES_HPP
+#define ENTT_CORE_RANGES_HPP
 
 #if __cplusplus >= 202002L
 
