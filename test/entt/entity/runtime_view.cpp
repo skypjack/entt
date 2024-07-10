@@ -33,10 +33,6 @@ TYPED_TEST(RuntimeView, Functionalities) {
     ASSERT_FALSE(view.contains(e0));
     ASSERT_FALSE(view.contains(e1));
 
-    // forces the creation of the pools
-    static_cast<void>(registry.storage<int>());
-    static_cast<void>(registry.storage<char>());
-
     view.iterate(registry.storage<int>()).iterate(registry.storage<char>());
 
     ASSERT_TRUE(view);
