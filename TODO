@@ -30,13 +30,10 @@ TODO:
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * view: propagate tombostone check request to iterator
-* review the short-circuit model now that all storage are freely available
 * more test around views and storage entity - ie view ::back
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
 * review constrained noexcept-ness (ie sigh)
 * offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
-* decouple all non-storage classes from component_traits
-* group, runtime view: avoid using registry when testing
 * improve front for multi-type view
