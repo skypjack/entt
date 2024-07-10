@@ -222,9 +222,7 @@ class basic_common_view {
 
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
-        const auto *view = pools[index];
-        const size_type len[]{view->size(), view->free_list()};
-        return len[view->policy() == deletion_policy::swap_only];
+        return (pools[index]->policy() == deletion_policy::swap_only) ? pools[index]->free_list() : pools[index]->size();
     }
 
     void unchecked_refresh() noexcept {
