@@ -401,17 +401,16 @@ TEST(SingleStorageView, StableType) {
         ASSERT_EQ(entt, entity[1u]);
     }
 
-    view.each([&entity](const auto entt, const auto &) {
+    view.each([&](const auto entt, const auto &elem) {
+        ASSERT_EQ(elem, view->get(entity[1u]));
         ASSERT_EQ(entt, entity[1u]);
     });
 
-    view.each([check = view->get(entity[1u])](const auto &elem) {
-        ASSERT_EQ(elem, check);
+    view.each([&](const auto &elem) {
+        ASSERT_EQ(elem, view->get(entity[1u]));
     });
 
-    view.each([&]() {
-        storage.erase(entity[1u]);
-    });
+    storage.erase(view.begin(), view.end());
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_EQ(view->size(), 2u);

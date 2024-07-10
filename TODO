@@ -20,7 +20,6 @@ TODO:
 * view: update natvis as needed after the last rework, merge pools/filter in the same array, drop check (?) and turn view into a position
 * view: type-only view_iterator (dyn get/excl sizes), type-only basic_common_view (dyn get/excl sizes with pointer to array from derived)
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
-* review all // NOLINT
 * self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
 * test: push sharing types further
@@ -38,7 +37,6 @@ TODO:
 * improve front (no multiple checks) and back (ie no contains) for multi-type view
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * consider returning subrange for swap-only sparse sets or consider using filtered each for in-place storage (smilar to storage entity), cleanup views
-* stop supporting func() for view::each (nonsense)
 * exploit ref/cref in any to avoid invoking the vtable if possible
 * review meta properties and details, maybe a dense map is too much
 * self assignment support for any and meta_any

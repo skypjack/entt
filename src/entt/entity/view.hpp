@@ -1002,35 +1002,27 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_applicable_v<Func, decltype(*storage()->each().begin())>) {
+        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
             for(const auto pack: each()) {
                 std::apply(func, pack);
             }
-        } else if constexpr(std::is_invocable_v<Func, decltype(*storage()->begin())>) {
-            if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
+        } else if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
+            if constexpr(std::is_void_v<typename Get::value_type>) {
+                for(size_type pos = base_type::size(); pos; --pos) {
+                    func();
+                }
+            } else {
                 if(const auto len = base_type::size(); len != 0u) {
                     for(auto last = storage()->end(), first = last - len; first != last; ++first) {
                         func(*first);
                     }
                 }
-            } else {
-                static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
-
-                for(const auto pack: each()) {
-                    func(std::get<1>(pack));
-                }
             }
         } else {
-            if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-                for(size_type pos = base_type::size(); pos; --pos) {
-                    func();
-                }
-            } else {
-                static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
+            static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
 
-                for([[maybe_unused]] const auto entt: *this) {
-                    func();
-                }
+            for(const auto pack: each()) {
+                std::apply([&func](const auto, auto &&...elem) { func(std::forward<decltype(elem)>(elem)...); }, pack);
             }
         }
     }
