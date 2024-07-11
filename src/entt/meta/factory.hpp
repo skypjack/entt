@@ -52,15 +52,32 @@ inline meta_func_node &meta_extend(internal::meta_type_node &parent, const id_ty
     return parent.details->func.insert_or_assign(id, std::move(node)).first->second;
 }
 
+class basic_meta_factory {
+    using bucket_type = dense_map<id_type, internal::meta_prop_node, identity>;
+
+protected:
+    void bucket(bucket_type *curr) {
+        properties = curr;
+    }
+
+    void property(const id_type key, internal::meta_prop_node value) {
+        ENTT_ASSERT(properties != nullptr, "Meta object does not support properties");
+        (*properties)[key] = std::move(value);
+    }
+
+private:
+    bucket_type *properties{};
+};
+
 } // namespace internal
 /*! @endcond */
 
 /**
- * @brief Basic meta factory to be used for reflection purposes.
+ * @brief Meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
  */
 template<typename Type>
-class meta_factory {
+class meta_factory: private internal::basic_meta_factory {
     template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
     void data(const id_type id, std::index_sequence<Index...>) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
@@ -79,7 +96,7 @@ class meta_factory {
                 +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
 
-        bucket = &elem.prop;
+        this->bucket(&elem.prop);
     }
 
 public:
@@ -98,7 +115,7 @@ public:
             elem.details = std::make_shared<internal::meta_type_descriptor>();
         }
 
-        bucket = &elem.details->prop;
+        this->bucket(&elem.details->prop);
     }
 
     /**
@@ -109,7 +126,7 @@ public:
     auto type(const id_type id) noexcept {
         auto &&elem = internal::owner(*ctx, *info);
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        bucket = &elem.details->prop;
+        this->bucket(&elem.details->prop);
         elem.id = id;
         return *this;
     }
@@ -127,7 +144,7 @@ public:
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
         auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->base.insert_or_assign(type_id<Base>().hash(), internal::meta_base_node{&internal::resolve<Base>, op});
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -148,7 +165,7 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{op});
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -166,7 +183,7 @@ public:
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
         internal::owner(*ctx, *info).details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{op});
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -189,7 +206,7 @@ public:
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
         internal::owner(*ctx, *info).details->ctor.insert_or_assign(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Candidate, Policy>});
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -211,7 +228,7 @@ public:
             internal::owner(*ctx, *info).details->ctor.insert_or_assign(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Args...>});
         }
 
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -238,7 +255,7 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         internal::owner(*ctx, *info).dtor = internal::meta_dtor_node{op};
-        bucket = nullptr;
+        this->bucket(nullptr);
         return *this;
     }
 
@@ -273,7 +290,7 @@ public:
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
-            bucket = &elem.prop;
+            this->bucket(&elem.prop);
         } else {
             using data_type = std::remove_pointer_t<decltype(Data)>;
 
@@ -294,7 +311,7 @@ public:
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
 
-            bucket = &elem.prop;
+            this->bucket(&elem.prop);
         }
 
         return *this;
@@ -338,7 +355,7 @@ public:
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
 
-            bucket = &elem.prop;
+            this->bucket(&elem.prop);
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
@@ -354,7 +371,7 @@ public:
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
 
-            bucket = &elem.prop;
+            this->bucket(&elem.prop);
         }
 
         return *this;
@@ -411,7 +428,7 @@ public:
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 
-        bucket = &elem.prop;
+        this->bucket(&elem.prop);
         return *this;
     }
 
@@ -427,14 +444,12 @@ public:
      */
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
-        ENTT_ASSERT(bucket != nullptr, "Meta object does not support properties");
-
         if constexpr(sizeof...(Value) == 0u) {
-            (*bucket)[id] = internal::meta_prop_node{&internal::resolve<void>};
+            internal::meta_prop_node node{&internal::resolve<void>};
+            this->property(id, std::move(node));
         } else {
-            (*bucket)[id] = internal::meta_prop_node{
-                &internal::resolve<std::decay_t<Value>>...,
-                std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
+            internal::meta_prop_node node{&internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
+            this->property(id, std::move(node));
         }
 
         return *this;
@@ -442,7 +457,6 @@ public:
 
 private:
     meta_ctx *ctx{&locator<meta_ctx>::value_or()};
-    dense_map<id_type, internal::meta_prop_node, identity> *bucket{};
     const type_info *info{&type_id<Type>()};
 };
 
