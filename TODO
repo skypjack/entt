@@ -44,3 +44,4 @@ TODO:
 * entity based component_traits
 * seek functions for meta factory (data/func/whatever)
 * investigate using any rather than shared<void> for meta properties
+* finish migrating data to basic_meta_factory
