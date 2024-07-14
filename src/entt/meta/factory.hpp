@@ -25,10 +25,6 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-inline meta_data_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_data_node node) {
-    return parent.details->data.insert_or_assign(id, std::move(node)).first->second;
-}
-
 inline meta_func_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_func_node node) {
     if(auto it = parent.details->func.find(id); it != parent.details->func.end()) {
         for(auto *curr = &it->second; curr; curr = curr->next.get()) {
@@ -72,6 +68,11 @@ protected:
         elem.id = id;
     }
 
+    void extend(const id_type id, meta_data_node node) {
+        auto &&elem = owner().details->data.insert_or_assign(id, std::move(node)).first->second;
+        properties = &elem.prop;
+    }
+
     void property(const id_type key, internal::meta_prop_node value) {
         ENTT_ASSERT(properties != nullptr, "Meta object does not support properties");
         (*properties)[key] = std::move(value);
@@ -98,8 +99,7 @@ class meta_factory: private internal::basic_meta_factory {
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
-        auto &&elem = internal::meta_extend(
-            this->owner(),
+        this->extend(
             id,
             internal::meta_data_node{
                 /* this is never static */
@@ -109,8 +109,6 @@ class meta_factory: private internal::basic_meta_factory {
                 &meta_arg<type_list<type_list_element_t<type_list_element_t<Index, args_type>::size != 1u, type_list_element_t<Index, args_type>>...>>,
                 +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
                 &meta_getter<Type, Getter, Policy>});
-
-        this->bucket(&elem.prop);
     }
 
 public:
@@ -290,8 +288,7 @@ public:
             using data_type = std::invoke_result_t<decltype(Data), Type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
-            auto &&elem = internal::meta_extend(
-                this->owner(),
+            this->extend(
                 id,
                 internal::meta_data_node{
                     /* this is never static */
@@ -301,8 +298,6 @@ public:
                     &meta_arg<type_list<std::remove_cv_t<std::remove_reference_t<data_type>>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
-
-            this->bucket(&elem.prop);
         } else {
             using data_type = std::remove_pointer_t<decltype(Data)>;
 
@@ -312,8 +307,7 @@ public:
                 static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
             }
 
-            auto &&elem = internal::meta_extend(
-                this->owner(),
+            this->extend(
                 id,
                 internal::meta_data_node{
                     ((std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<data_type>>> || std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
@@ -322,8 +316,6 @@ public:
                     &meta_arg<type_list<std::remove_cv_t<std::remove_reference_t<data_type>>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
-
-            this->bucket(&elem.prop);
         }
 
         return *this;
@@ -355,8 +347,7 @@ public:
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
-            auto &&elem = internal::meta_extend(
-                this->owner(),
+            this->extend(
                 id,
                 internal::meta_data_node{
                     /* this is never static */
@@ -366,13 +357,10 @@ public:
                     &meta_arg<type_list<>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
-
-            this->bucket(&elem.prop);
         } else {
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
-            auto &&elem = internal::meta_extend(
-                this->owner(),
+            this->extend(
                 id,
                 internal::meta_data_node{
                     /* this is never static nor const */
@@ -382,8 +370,6 @@ public:
                     &meta_arg<type_list<type_list_element_t<args_type::size != 1u, args_type>>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
-
-            this->bucket(&elem.prop);
         }
 
         return *this;
@@ -457,11 +443,16 @@ public:
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
         if constexpr(sizeof...(Value) == 0u) {
-            internal::meta_prop_node node{&internal::resolve<void>};
-            this->property(id, std::move(node));
+            this->property(
+                id,
+                internal::meta_prop_node{
+                    &internal::resolve<void>});
         } else {
-            internal::meta_prop_node node{&internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...};
-            this->property(id, std::move(node));
+            this->property(
+                id,
+                internal::meta_prop_node{
+                    &internal::resolve<std::decay_t<Value>>...,
+                    std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
         return *this;
