@@ -29,11 +29,6 @@ class basic_meta_factory {
     using bucket_type = dense_map<id_type, internal::meta_prop_node, identity>;
 
 protected:
-    basic_meta_factory(const type_info &type, meta_ctx &area)
-        : info{&type},
-          properties{},
-          ctx{&area} {}
-
     [[nodiscard]] inline decltype(auto) owner() {
         auto &&context = internal::meta_context::from(*ctx);
         ENTT_ASSERT(context.value.contains(info->hash()), "Type not available");
@@ -82,6 +77,20 @@ protected:
         (*properties)[key] = std::move(value);
     }
 
+public:
+    basic_meta_factory(const type_info &type, meta_ctx &area)
+        : info{&type},
+          properties{},
+          ctx{&area} {
+        auto &&parent = owner();
+
+        if(!parent.details) {
+            parent.details = std::make_shared<internal::meta_type_descriptor>();
+        }
+
+        properties = &parent.details->prop;
+    }
+
 private:
     const type_info *info;
     bucket_type *properties;
@@ -125,15 +134,7 @@ public:
      * @param area The context into which to construct meta types.
      */
     meta_factory(meta_ctx &area) noexcept
-        : internal::basic_meta_factory{type_id<Type>(), area} {
-        auto &&elem = this->owner();
-
-        if(!elem.details) {
-            elem.details = std::make_shared<internal::meta_type_descriptor>();
-        }
-
-        this->bucket(&elem.details->prop);
-    }
+        : internal::basic_meta_factory{type_id<Type>(), area} {}
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
