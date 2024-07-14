@@ -35,10 +35,6 @@ protected:
         return context.value[info->hash()];
     }
 
-    void bucket(bucket_type *curr) {
-        properties = curr;
-    }
-
     void track(const id_type id) noexcept {
         auto &&elem = this->owner();
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
