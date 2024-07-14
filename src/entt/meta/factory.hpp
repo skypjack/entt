@@ -46,6 +46,26 @@ protected:
         elem.id = id;
     }
 
+    void extend(const id_type id, meta_base_node node) {
+        owner().details->base.insert_or_assign(id, std::move(node));
+        properties = nullptr;
+    }
+
+    void extend(const id_type id, meta_conv_node node) {
+        owner().details->conv.insert_or_assign(id, std::move(node));
+        properties = nullptr;
+    }
+
+    void extend(const id_type id, meta_ctor_node node) {
+        owner().details->ctor.insert_or_assign(id, std::move(node));
+        properties = nullptr;
+    }
+
+    void extend(meta_dtor_node node) {
+        owner().dtor = std::move(node);
+        properties = nullptr;
+    }
+
     void extend(const id_type id, meta_data_node node) {
         auto &&elem = owner().details->data.insert_or_assign(id, std::move(node)).first->second;
         properties = &elem.prop;
@@ -158,8 +178,7 @@ public:
     auto base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
         auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
-        this->owner().details->base.insert_or_assign(type_id<Base>().hash(), internal::meta_base_node{&internal::resolve<Base>, op});
-        this->bucket(nullptr);
+        this->extend(type_id<Base>().hash(), internal::meta_base_node{&internal::resolve<Base>, op});
         return *this;
     }
 
@@ -179,8 +198,7 @@ public:
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
-        this->owner().details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{op});
-        this->bucket(nullptr);
+        this->extend(type_id<conv_type>().hash(), internal::meta_conv_node{op});
         return *this;
     }
 
@@ -197,8 +215,7 @@ public:
     auto conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
-        this->owner().details->conv.insert_or_assign(type_id<conv_type>().hash(), internal::meta_conv_node{op});
-        this->bucket(nullptr);
+        this->extend(type_id<conv_type>().hash(), internal::meta_conv_node{op});
         return *this;
     }
 
@@ -220,8 +237,7 @@ public:
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
-        this->owner().details->ctor.insert_or_assign(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Candidate, Policy>});
-        this->bucket(nullptr);
+        this->extend(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Candidate, Policy>});
         return *this;
     }
 
@@ -240,10 +256,9 @@ public:
         // default constructor is already implicitly generated, no need for redundancy
         if constexpr(sizeof...(Args) != 0u) {
             using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
-            this->owner().details->ctor.insert_or_assign(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Args...>});
+            this->extend(type_id<typename descriptor::args_type>().hash(), internal::meta_ctor_node{descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Args...>});
         }
 
-        this->bucket(nullptr);
         return *this;
     }
 
@@ -269,8 +284,7 @@ public:
     auto dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
-        this->owner().dtor = internal::meta_dtor_node{op};
-        this->bucket(nullptr);
+        this->extend(internal::meta_dtor_node{op});
         return *this;
     }
 
