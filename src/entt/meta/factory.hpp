@@ -25,23 +25,6 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-inline meta_func_node &meta_extend(internal::meta_type_node &parent, const id_type id, meta_func_node node) {
-    if(auto it = parent.details->func.find(id); it != parent.details->func.end()) {
-        for(auto *curr = &it->second; curr; curr = curr->next.get()) {
-            if(curr->invoke == node.invoke) {
-                node.next = std::move(curr->next);
-                *curr = std::move(node);
-                return *curr;
-            }
-        }
-
-        // locally overloaded function
-        node.next = std::make_shared<meta_func_node>(std::move(parent.details->func[id]));
-    }
-
-    return parent.details->func.insert_or_assign(id, std::move(node)).first->second;
-}
-
 class basic_meta_factory {
     using bucket_type = dense_map<id_type, internal::meta_prop_node, identity>;
 
@@ -70,6 +53,27 @@ protected:
 
     void extend(const id_type id, meta_data_node node) {
         auto &&elem = owner().details->data.insert_or_assign(id, std::move(node)).first->second;
+        properties = &elem.prop;
+    }
+
+    void extend(const id_type id, meta_func_node node) {
+        auto &parent = owner();
+
+        if(auto it = parent.details->func.find(id); it != parent.details->func.end()) {
+            for(auto *curr = &it->second; curr; curr = curr->next.get()) {
+                if(curr->invoke == node.invoke) {
+                    node.next = std::move(curr->next);
+                    *curr = std::move(node);
+                    properties = &curr->prop;
+                    return;
+                }
+            }
+
+            // locally overloaded function
+            node.next = std::make_shared<meta_func_node>(std::move(parent.details->func[id]));
+        }
+
+        auto &&elem = parent.details->func.insert_or_assign(id, std::move(node)).first->second;
         properties = &elem.prop;
     }
 
@@ -416,8 +420,7 @@ public:
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
-        auto &&elem = internal::meta_extend(
-            this->owner(),
+        this->extend(
             id,
             internal::meta_func_node{
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
@@ -426,7 +429,6 @@ public:
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 
-        this->bucket(&elem.prop);
         return *this;
     }
 
