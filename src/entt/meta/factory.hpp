@@ -31,29 +31,29 @@ class basic_meta_factory {
 protected:
     [[nodiscard]] inline decltype(auto) owner() {
         auto &&context = internal::meta_context::from(*ctx);
-        ENTT_ASSERT(context.value.contains(info->hash()), "Type not available");
-        return context.value[info->hash()];
+        ENTT_ASSERT(context.value.contains(parent), "Type not available");
+        return context.value[parent];
     }
 
     void track(const id_type id) noexcept {
-        auto &&elem = this->owner();
+        auto &&elem = owner();
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        properties = &elem.details->prop;
+        properties = &details->prop;
         elem.id = id;
     }
 
     void extend(const id_type id, meta_base_node node) {
-        owner().details->base.insert_or_assign(id, std::move(node));
+        details->base.insert_or_assign(id, std::move(node));
         properties = nullptr;
     }
 
     void extend(const id_type id, meta_conv_node node) {
-        owner().details->conv.insert_or_assign(id, std::move(node));
+        details->conv.insert_or_assign(id, std::move(node));
         properties = nullptr;
     }
 
     void extend(const id_type id, meta_ctor_node node) {
-        owner().details->ctor.insert_or_assign(id, std::move(node));
+        details->ctor.insert_or_assign(id, std::move(node));
         properties = nullptr;
     }
 
@@ -63,14 +63,12 @@ protected:
     }
 
     void extend(const id_type id, meta_data_node node) {
-        auto &&elem = owner().details->data.insert_or_assign(id, std::move(node)).first->second;
+        auto &&elem = details->data.insert_or_assign(id, std::move(node)).first->second;
         properties = &elem.prop;
     }
 
     void extend(const id_type id, meta_func_node node) {
-        auto &parent = owner();
-
-        if(auto it = parent.details->func.find(id); it != parent.details->func.end()) {
+        if(auto it = details->func.find(id); it != details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
@@ -81,10 +79,10 @@ protected:
             }
 
             // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(parent.details->func[id]));
+            node.next = std::make_shared<meta_func_node>(std::move(details->func[id]));
         }
 
-        auto &&elem = parent.details->func.insert_or_assign(id, std::move(node)).first->second;
+        auto &&elem = details->func.insert_or_assign(id, std::move(node)).first->second;
         properties = &elem.prop;
     }
 
@@ -94,21 +92,24 @@ protected:
     }
 
 public:
-    basic_meta_factory(const type_info &type, meta_ctx &area)
-        : info{&type},
+    basic_meta_factory(const type_info &info, meta_ctx &area)
+        : parent{info.hash()},
+          details{},
           properties{},
           ctx{&area} {
-        auto &&parent = owner();
+        auto &&type = owner();
 
-        if(!parent.details) {
-            parent.details = std::make_shared<internal::meta_type_descriptor>();
+        if(!type.details) {
+            type.details = std::make_shared<internal::meta_type_descriptor>();
         }
 
-        properties = &parent.details->prop;
+        details = type.details;
+        properties = &details->prop;
     }
 
 private:
-    const type_info *info;
+    const id_type parent;
+    std::shared_ptr<meta_type_descriptor> details;
     bucket_type *properties;
     meta_ctx *ctx;
 };
