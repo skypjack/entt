@@ -457,16 +457,9 @@ public:
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
         if constexpr(sizeof...(Value) == 0u) {
-            this->property(
-                id,
-                internal::meta_prop_node{
-                    &internal::resolve<void>});
+            this->property(id, internal::meta_prop_node{&internal::resolve<void>});
         } else {
-            this->property(
-                id,
-                internal::meta_prop_node{
-                    &internal::resolve<std::decay_t<Value>>...,
-                    std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
+            this->property(id, internal::meta_prop_node{&internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
         return *this;
