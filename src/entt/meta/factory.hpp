@@ -2,6 +2,7 @@
 #define ENTT_META_FACTORY_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <tuple>
@@ -26,7 +27,9 @@ namespace entt {
 namespace internal {
 
 class basic_meta_factory {
-    using bucket_type = dense_map<id_type, internal::meta_prop_node, identity>;
+    enum class bucket_category : std::uint8_t { type,
+                                                data,
+                                                func };
 
 protected:
     [[nodiscard]] inline decltype(auto) owner() {
@@ -38,78 +41,91 @@ protected:
     void track(const id_type id) noexcept {
         auto &&elem = owner();
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        properties = &owner().details->prop;
+        category = bucket_category::type;
         elem.id = id;
     }
 
     void extend(const id_type id, meta_base_node node) {
         owner().details->base.insert_or_assign(id, std::move(node));
-        properties = nullptr;
+        category = bucket_category::type;
     }
 
     void extend(const id_type id, meta_conv_node node) {
         owner().details->conv.insert_or_assign(id, std::move(node));
-        properties = nullptr;
+        category = bucket_category::type;
     }
 
     void extend(const id_type id, meta_ctor_node node) {
         owner().details->ctor.insert_or_assign(id, std::move(node));
-        properties = nullptr;
+        category = bucket_category::type;
     }
 
     void extend(meta_dtor_node node) {
         owner().dtor = std::move(node);
-        properties = nullptr;
+        category = bucket_category::type;
     }
 
     void extend(const id_type id, meta_data_node node) {
-        auto &&elem = owner().details->data.insert_or_assign(id, std::move(node)).first->second;
-        properties = &elem.prop;
+        owner().details->data.insert_or_assign(id, std::move(node));
+        category = bucket_category::data;
+        bucket = id;
     }
 
     void extend(const id_type id, meta_func_node node) {
-        auto &&type = owner();
+        category = bucket_category::func;
+        bucket = id;
 
-        if(auto it = type.details->func.find(id); it != type.details->func.end()) {
+        auto &&elem = owner();
+
+        if(auto it = elem.details->func.find(id); it != elem.details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
                     *curr = std::move(node);
-                    properties = &curr->prop;
                     return;
                 }
             }
 
             // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(type.details->func[id]));
+            node.next = std::make_shared<meta_func_node>(std::move(elem.details->func[id]));
         }
 
-        auto &&elem = type.details->func.insert_or_assign(id, std::move(node)).first->second;
-        properties = &elem.prop;
+        elem.details->func.insert_or_assign(id, std::move(node));
     }
 
     void property(const id_type key, internal::meta_prop_node value) {
-        ENTT_ASSERT(properties != nullptr, "Meta object does not support properties");
-        (*properties)[key] = std::move(value);
+        auto &&elem = owner();
+
+        switch(category) {
+        case bucket_category::type:
+            elem.details->prop[key] = std::move(value);
+            break;
+        case bucket_category::data:
+            ENTT_ASSERT(elem.details->data.find(bucket) != elem.details->data.cend(), "Invalid bucket");
+            elem.details->data[bucket].prop[key] = std::move(value);
+            break;
+        case bucket_category::func:
+            ENTT_ASSERT(elem.details->func.find(bucket) != elem.details->func.cend(), "Invalid bucket");
+            elem.details->func[bucket].prop[key] = std::move(value);
+            break;
+        }
     }
 
 public:
     basic_meta_factory(const type_info &info, meta_ctx &area)
         : parent{info.hash()},
-          properties{},
+          bucket{parent},
+          category{bucket_category::type},
           ctx{&area} {
-        auto &&type = owner();
-
-        if(!type.details) {
-            type.details = std::make_shared<internal::meta_type_descriptor>();
+        if(auto &&elem = owner(); !elem.details) {
+            elem.details = std::make_shared<internal::meta_type_descriptor>();
         }
-
-        properties = &type.details->prop;
     }
 
 private:
     const id_type parent;
-    bucket_type *properties;
+    id_type bucket;
+    bucket_category category;
     meta_ctx *ctx;
 };
 
