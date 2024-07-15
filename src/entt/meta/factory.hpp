@@ -27,12 +27,6 @@ namespace entt {
 namespace internal {
 
 class basic_meta_factory {
-    enum class bucket_category : std::uint8_t {
-        type,
-        data,
-        func
-    };
-
 protected:
     [[nodiscard]] inline decltype(auto) owner() {
         auto &&context = internal::meta_context::from(*ctx);
@@ -43,38 +37,38 @@ protected:
     void track(const id_type id) noexcept {
         auto &&elem = owner();
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        category = bucket_category::type;
+        bucket = parent;
         elem.id = id;
     }
 
     void extend(const id_type id, meta_base_node node) {
         details->base.insert_or_assign(id, std::move(node));
-        category = bucket_category::type;
+        bucket = parent;
     }
 
     void extend(const id_type id, meta_conv_node node) {
         details->conv.insert_or_assign(id, std::move(node));
-        category = bucket_category::type;
+        bucket = parent;
     }
 
     void extend(const id_type id, meta_ctor_node node) {
         details->ctor.insert_or_assign(id, std::move(node));
-        category = bucket_category::type;
+        bucket = parent;
     }
 
     void extend(meta_dtor_node node) {
         owner().dtor = std::move(node);
-        category = bucket_category::type;
+        bucket = parent;
     }
 
     void extend(const id_type id, meta_data_node node) {
         details->data.insert_or_assign(id, std::move(node));
-        category = bucket_category::data;
+        is_data = true;
         bucket = id;
     }
 
     void extend(const id_type id, meta_func_node node) {
-        category = bucket_category::func;
+        is_data = false;
         bucket = id;
 
         if(auto it = details->func.find(id); it != details->func.end()) {
@@ -94,28 +88,24 @@ protected:
     }
 
     void property(const id_type key, internal::meta_prop_node value) {
-        switch(category) {
-        case bucket_category::type:
+        if(bucket == parent) {
             details->prop[key] = std::move(value);
-            break;
-        case bucket_category::data:
+        } else if(is_data) {
             ENTT_ASSERT(details->data.find(bucket) != details->data.cend(), "Invalid bucket");
             details->data[bucket].prop[key] = std::move(value);
-            break;
-        case bucket_category::func:
+        } else {
             ENTT_ASSERT(details->func.find(bucket) != details->func.cend(), "Invalid bucket");
             details->func[bucket].prop[key] = std::move(value);
-            break;
         }
     }
 
 public:
     basic_meta_factory(const type_info &info, meta_ctx &area)
-        : parent{info.hash()},
+        : ctx{&area},
           details{},
-          category{bucket_category::type},
+          parent{info.hash()},
           bucket{parent},
-          ctx{&area} {
+          is_data{} {
         auto &&elem = owner();
 
         if(!elem.details) {
@@ -126,11 +116,11 @@ public:
     }
 
 private:
-    const id_type parent;
-    std::shared_ptr<meta_type_descriptor> details;
-    bucket_category category;
-    id_type bucket;
     meta_ctx *ctx;
+    std::shared_ptr<meta_type_descriptor> details;
+    const id_type parent;
+    id_type bucket;
+    bool is_data;
 };
 
 } // namespace internal
