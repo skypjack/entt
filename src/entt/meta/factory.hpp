@@ -165,7 +165,7 @@ public:
      * @param id A custom unique identifier.
      * @return A meta factory for the given type.
      */
-    auto type(const id_type id) noexcept {
+    meta_factory type(const id_type id) noexcept {
         this->track(id);
         return *this;
     }
@@ -179,7 +179,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Base>
-    auto base() noexcept {
+    meta_factory base() noexcept {
         static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
         auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
         this->extend(type_id<Base>().hash(), internal::meta_base_node{&internal::resolve<Base>, op});
@@ -216,7 +216,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename To>
-    auto conv() noexcept {
+    meta_factory conv() noexcept {
         using conv_type = std::remove_cv_t<std::remove_reference_t<To>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
         this->extend(type_id<conv_type>().hash(), internal::meta_conv_node{op});
@@ -237,7 +237,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto ctor() noexcept {
+    meta_factory ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
@@ -256,7 +256,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename... Args>
-    auto ctor() noexcept {
+    meta_factory ctor() noexcept {
         // default constructor is already implicitly generated, no need for redundancy
         if constexpr(sizeof...(Args) != 0u) {
             using descriptor = meta_function_helper_t<Type, Type (*)(Args...)>;
@@ -285,7 +285,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Func>
-    auto dtor() noexcept {
+    meta_factory dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
         this->extend(internal::meta_dtor_node{op});
@@ -297,7 +297,7 @@ public:
      * @param id Unique identifier.
      * @return A meta factory for the parent type.
      */
-    auto data(const id_type id) noexcept {
+    meta_factory data(const id_type id) noexcept {
         constexpr auto is_data = true;
         this->seek(id, is_data);
         return *this;
@@ -317,7 +317,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const id_type id) noexcept {
+    meta_factory data(const id_type id) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::invoke_result_t<decltype(Data), Type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -376,7 +376,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type id) noexcept {
+    meta_factory data(const id_type id) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
@@ -427,7 +427,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type id) noexcept {
+    meta_factory data(const id_type id) noexcept {
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
         return *this;
     }
@@ -437,7 +437,7 @@ public:
      * @param id Unique identifier.
      * @return A meta factory for the parent type.
      */
-    auto func(const id_type id) noexcept {
+    meta_factory func(const id_type id) noexcept {
         constexpr auto is_data = false;
         this->seek(id, is_data);
         return *this;
@@ -457,7 +457,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const id_type id) noexcept {
+    meta_factory func(const id_type id) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
