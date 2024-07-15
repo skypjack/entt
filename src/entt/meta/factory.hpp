@@ -27,9 +27,11 @@ namespace entt {
 namespace internal {
 
 class basic_meta_factory {
-    enum class bucket_category : std::uint8_t { type,
-                                                data,
-                                                func };
+    enum class bucket_category : std::uint8_t {
+        type,
+        data,
+        func
+    };
 
 protected:
     [[nodiscard]] inline decltype(auto) owner() {
@@ -46,17 +48,17 @@ protected:
     }
 
     void extend(const id_type id, meta_base_node node) {
-        owner().details->base.insert_or_assign(id, std::move(node));
+        details->base.insert_or_assign(id, std::move(node));
         category = bucket_category::type;
     }
 
     void extend(const id_type id, meta_conv_node node) {
-        owner().details->conv.insert_or_assign(id, std::move(node));
+        details->conv.insert_or_assign(id, std::move(node));
         category = bucket_category::type;
     }
 
     void extend(const id_type id, meta_ctor_node node) {
-        owner().details->ctor.insert_or_assign(id, std::move(node));
+        details->ctor.insert_or_assign(id, std::move(node));
         category = bucket_category::type;
     }
 
@@ -66,7 +68,7 @@ protected:
     }
 
     void extend(const id_type id, meta_data_node node) {
-        owner().details->data.insert_or_assign(id, std::move(node));
+        details->data.insert_or_assign(id, std::move(node));
         category = bucket_category::data;
         bucket = id;
     }
@@ -75,9 +77,7 @@ protected:
         category = bucket_category::func;
         bucket = id;
 
-        auto &&elem = owner();
-
-        if(auto it = elem.details->func.find(id); it != elem.details->func.end()) {
+        if(auto it = details->func.find(id); it != details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
@@ -87,26 +87,24 @@ protected:
             }
 
             // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(elem.details->func[id]));
+            node.next = std::make_shared<meta_func_node>(std::move(details->func[id]));
         }
 
-        elem.details->func.insert_or_assign(id, std::move(node));
+        details->func.insert_or_assign(id, std::move(node));
     }
 
     void property(const id_type key, internal::meta_prop_node value) {
-        auto &&elem = owner();
-
         switch(category) {
         case bucket_category::type:
-            elem.details->prop[key] = std::move(value);
+            details->prop[key] = std::move(value);
             break;
         case bucket_category::data:
-            ENTT_ASSERT(elem.details->data.find(bucket) != elem.details->data.cend(), "Invalid bucket");
-            elem.details->data[bucket].prop[key] = std::move(value);
+            ENTT_ASSERT(details->data.find(bucket) != details->data.cend(), "Invalid bucket");
+            details->data[bucket].prop[key] = std::move(value);
             break;
         case bucket_category::func:
-            ENTT_ASSERT(elem.details->func.find(bucket) != elem.details->func.cend(), "Invalid bucket");
-            elem.details->func[bucket].prop[key] = std::move(value);
+            ENTT_ASSERT(details->func.find(bucket) != details->func.cend(), "Invalid bucket");
+            details->func[bucket].prop[key] = std::move(value);
             break;
         }
     }
@@ -114,18 +112,24 @@ protected:
 public:
     basic_meta_factory(const type_info &info, meta_ctx &area)
         : parent{info.hash()},
-          bucket{parent},
+          details{},
           category{bucket_category::type},
+          bucket{parent},
           ctx{&area} {
-        if(auto &&elem = owner(); !elem.details) {
+        auto &&elem = owner();
+
+        if(!elem.details) {
             elem.details = std::make_shared<internal::meta_type_descriptor>();
         }
+
+        details = elem.details;
     }
 
 private:
     const id_type parent;
-    id_type bucket;
+    std::shared_ptr<meta_type_descriptor> details;
     bucket_category category;
+    id_type bucket;
     meta_ctx *ctx;
 };
 
