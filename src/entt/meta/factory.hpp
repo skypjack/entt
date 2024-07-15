@@ -28,14 +28,8 @@ namespace internal {
 
 class basic_meta_factory {
 protected:
-    [[nodiscard]] inline decltype(auto) owner() {
-        auto &&context = internal::meta_context::from(*ctx);
-        ENTT_ASSERT(context.value.contains(parent), "Type not available");
-        return context.value[parent];
-    }
-
     void track(const id_type id) noexcept {
-        auto &&elem = owner();
+        auto &&elem = internal::meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = parent;
         elem.id = id;
@@ -57,7 +51,7 @@ protected:
     }
 
     void extend(meta_dtor_node node) {
-        owner().dtor = std::move(node);
+        internal::meta_context::from(*ctx).value[parent].dtor = std::move(node);
         bucket = parent;
     }
 
@@ -87,14 +81,18 @@ protected:
         details->func.insert_or_assign(id, std::move(node));
     }
 
+    void seek(const id_type id, const bool data) {
+        ENTT_ASSERT((data && (details->data.find(id) != details->data.cend())) || (!data && (details->func.find(id) != details->func.cend())), "Invalid id");
+        is_data = data;
+        bucket = id;
+    }
+
     void property(const id_type key, internal::meta_prop_node value) {
         if(bucket == parent) {
             details->prop[key] = std::move(value);
         } else if(is_data) {
-            ENTT_ASSERT(details->data.find(bucket) != details->data.cend(), "Invalid bucket");
             details->data[bucket].prop[key] = std::move(value);
         } else {
-            ENTT_ASSERT(details->func.find(bucket) != details->func.cend(), "Invalid bucket");
             details->func[bucket].prop[key] = std::move(value);
         }
     }
@@ -106,7 +104,7 @@ public:
           parent{info.hash()},
           bucket{parent},
           is_data{} {
-        auto &&elem = owner();
+        auto &&elem = internal::meta_context::from(*ctx).value[parent];
 
         if(!elem.details) {
             elem.details = std::make_shared<internal::meta_type_descriptor>();
@@ -295,6 +293,17 @@ public:
     }
 
     /**
+     * @brief Seeks an arbitrary meta data in a meta type.
+     * @param id Unique identifier.
+     * @return A meta factory for the parent type.
+     */
+    auto data(const id_type id) noexcept {
+        constexpr auto is_data = true;
+        this->seek(id, is_data);
+        return *this;
+    }
+
+    /**
      * @brief Assigns a meta data to a meta type.
      *
      * Both data members and static and global variables, as well as constants
@@ -420,6 +429,17 @@ public:
     template<typename Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) noexcept {
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
+        return *this;
+    }
+
+    /**
+     * @brief Seeks an arbitrary meta function in a meta type.
+     * @param id Unique identifier.
+     * @return A meta factory for the parent type.
+     */
+    auto func(const id_type id) noexcept {
+        constexpr auto is_data = false;
+        this->seek(id, is_data);
         return *this;
     }
 

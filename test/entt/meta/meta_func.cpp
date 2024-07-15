@@ -605,6 +605,21 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     ASSERT_TRUE(registry.all_of<function>(entity));
 }
 
+TEST_F(MetaFunc, Seek) {
+    using namespace entt::literals;
+
+    auto func = entt::resolve<function>().func("f2"_hs);
+
+    ASSERT_TRUE(func);
+    ASSERT_FALSE(func.prop('c'));
+
+    entt::meta<function>()
+        .func("f2"_hs)
+        .prop('c');
+
+    ASSERT_TRUE(func.prop('c'));
+}
+
 TEST_F(MetaFunc, ReRegistration) {
     using namespace entt::literals;
 

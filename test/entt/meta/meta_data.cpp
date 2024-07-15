@@ -640,6 +640,21 @@ TEST_F(MetaData, SetGetFromBase) {
     ASSERT_EQ(instance.value, 1);
 }
 
+TEST_F(MetaData, Seek) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<clazz>().data("i"_hs);
+
+    ASSERT_TRUE(data);
+    ASSERT_FALSE(data.prop('c'));
+
+    entt::meta<clazz>()
+        .data("i"_hs)
+        .prop('c');
+
+    ASSERT_TRUE(data.prop('c'));
+}
+
 TEST_F(MetaData, ReRegistration) {
     using namespace entt::literals;
 
