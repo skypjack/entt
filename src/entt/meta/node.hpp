@@ -39,7 +39,8 @@ enum class meta_traits : std::uint32_t {
     is_meta_pointer_like = 0x0200,
     is_meta_sequence_container = 0x0400,
     is_meta_associative_container = 0x0800,
-    _entt_enum_as_bitmask
+    _user_defined_traits = 0xFFFF,
+    _entt_enum_as_bitmask = 0xFFFF
 };
 
 struct meta_type_node;

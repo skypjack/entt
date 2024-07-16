@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/bit.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
@@ -100,6 +101,18 @@ protected:
             details->data[bucket].prop[key] = std::move(value);
         } else {
             details->func[bucket].prop[key] = std::move(value);
+        }
+    }
+
+    void traits(const std::underlying_type_t<internal::meta_traits> value) {
+        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
+
+        if(const internal::meta_traits data{value << shift}; bucket == parent) {
+            internal::meta_context::from(*ctx).value[parent].traits |= data;
+        } else if(is_data) {
+            details->data[bucket].traits |= data;
+        } else {
+            details->func[bucket].traits |= data;
         }
     }
 
@@ -480,7 +493,7 @@ public:
     }
 
     /**
-     * @brief Assigns a property to the last meta object created.
+     * @brief Assigns a property to the last created meta object.
      *
      * Both the key and the value (if any) must be at least copy constructible.
      *
@@ -497,6 +510,22 @@ public:
             base_type::prop(id, internal::meta_prop_node{&internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
+        return *this;
+    }
+
+    /**
+     * @brief Sets traits on the last created meta object.
+     *
+     * The assigned value must be an enum and intended as a bitmask.
+     *
+     * @tparam Value Type of the traits value.
+     * @param value Traits value.
+     * @return A meta factory for the parent type.
+     */
+    template<typename Value>
+    meta_factory traits(const Value value) {
+        static_assert(std::is_enum_v<Value>, "Invalid enum type");
+        base_type::traits(static_cast<std::underlying_type_t<internal::meta_traits>>(static_cast<std::underlying_type_t<Value>>(value)));
         return *this;
     }
 };

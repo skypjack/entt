@@ -32,15 +32,14 @@ TODO:
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
 * review constrained noexcept-ness (ie sigh)
-* offer 16b from meta_traits to users or change type
 * registry::view const invokes refresh multiple times implicitly
 * improve front (no multiple checks) and back (ie no contains) for multi-type view
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
-* consider returning subrange for swap-only sparse sets or consider using filtered each for in-place storage (smilar to storage entity), cleanup views
 * exploit ref/cref in any to avoid invoking the vtable if possible
 * review meta properties and details, maybe a dense map is too much
 * self assignment support for any and meta_any
 * meta support for use defined traits (room for them on meta traits)
 * entity based component_traits
-* seek functions for meta factory (data/func/whatever)
 * investigate using any rather than shared<void> for meta properties
+* refine user defined meta traits implementation
+

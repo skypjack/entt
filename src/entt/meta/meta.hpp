@@ -9,6 +9,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
+#include "../core/bit.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -913,6 +914,18 @@ struct meta_data {
     }
 
     /**
+     * @brief Returns all meta traits for a given meta object.
+     * @tparam Type The type to convert the meta traits to.
+     * @return The registered meta traits, if any.
+     */
+    template<typename Type>
+    [[nodiscard]] Type traits() const noexcept {
+        static_assert(std::is_enum_v<Type>, "Invalid enum type");
+        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
+        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node->traits) >> shift)};
+    }
+
+    /**
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
@@ -996,10 +1009,6 @@ struct meta_func {
 
     /**
      * @brief Invokes the underlying function, if possible.
-     *
-     * @warning
-     * The context of the arguments is **never** changed.
-     *
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
@@ -1036,6 +1045,18 @@ struct meta_func {
     [[nodiscard]] meta_prop prop(const id_type key) const {
         const auto it = node->prop.find(key);
         return it != node->prop.cend() ? meta_prop{*ctx, it->second} : meta_prop{};
+    }
+
+    /**
+     * @brief Returns all meta traits for a given meta object.
+     * @tparam Type The type to convert the meta traits to.
+     * @return The registered meta traits, if any.
+     */
+    template<typename Type>
+    [[nodiscard]] Type traits() const noexcept {
+        static_assert(std::is_enum_v<Type>, "Invalid enum type");
+        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
+        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node->traits) >> shift)};
     }
 
     /**
@@ -1373,10 +1394,6 @@ public:
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
-     *
-     * @warning
-     * The context of the arguments is **never** changed.
-     *
      * @param args Parameters to use to construct the instance.
      * @param sz Number of parameters to use to construct the instance.
      * @return A wrapper containing the new instance, if any.
@@ -1423,10 +1440,6 @@ public:
 
     /**
      * @brief Invokes a function given an identifier, if possible.
-     *
-     * @warning
-     * The context of the arguments is **never** changed.
-     *
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -1508,6 +1521,18 @@ public:
     [[nodiscard]] meta_prop prop(const id_type key) const {
         const auto *elem = internal::look_for<&internal::meta_type_descriptor::prop>(internal::meta_context::from(*ctx), node, key);
         return elem ? meta_prop{*ctx, *elem} : meta_prop{};
+    }
+
+    /**
+     * @brief Returns all meta traits for a given meta object.
+     * @tparam Type The type to convert the meta traits to.
+     * @return The registered meta traits, if any.
+     */
+    template<typename Type>
+    [[nodiscard]] Type traits() const noexcept {
+        static_assert(std::is_enum_v<Type>, "Invalid enum type");
+        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
+        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node.traits) >> shift)};
     }
 
     /**
