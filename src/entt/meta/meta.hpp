@@ -39,7 +39,7 @@ public:
     using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
-    meta_sequence_container() noexcept = default;
+    meta_sequence_container() = default;
 
     /**
      * @brief Context aware constructor.
@@ -108,7 +108,7 @@ public:
     using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
-    meta_associative_container() noexcept = default;
+    meta_associative_container() = default;
 
     /**
      * @brief Context aware constructor.
@@ -227,13 +227,13 @@ class meta_any {
 
 public:
     /*! Default constructor. */
-    meta_any() noexcept = default;
+    meta_any() = default;
 
     /**
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
      */
-    meta_any(meta_ctx_arg_t, const meta_ctx &area) noexcept
+    meta_any(meta_ctx_arg_t, const meta_ctx &area)
         : ctx{&area} {}
 
     /**
@@ -646,27 +646,27 @@ template<typename Type>
  */
 struct meta_handle {
     /*! Default constructor. */
-    meta_handle() noexcept = default;
+    meta_handle() = default;
 
     /**
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
      */
-    meta_handle(meta_ctx_arg_t, const meta_ctx &area) noexcept
+    meta_handle(meta_ctx_arg_t, const meta_ctx &area)
         : any{meta_ctx_arg, area} {}
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
      * @param value An instance of an object to use to initialize the handle.
      */
-    meta_handle(meta_any &value) noexcept
+    meta_handle(meta_any &value)
         : any{value.as_ref()} {}
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
      * @param value An instance of an object to use to initialize the handle.
      */
-    meta_handle(const meta_any &value) noexcept
+    meta_handle(const meta_any &value)
         : any{value.as_ref()} {}
 
     /**
@@ -676,7 +676,7 @@ struct meta_handle {
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
-    meta_handle(const meta_ctx &ctx, Type &value) noexcept
+    meta_handle(const meta_ctx &ctx, Type &value)
         : any{ctx, std::in_place_type<Type &>, value} {}
 
     /**
@@ -685,7 +685,7 @@ struct meta_handle {
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
-    meta_handle(Type &value) noexcept
+    meta_handle(Type &value)
         : meta_handle{locator<meta_ctx>::value_or(), value} {}
 
     /**
@@ -1657,7 +1657,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::bidirectional_iterator_tag;
 
-    meta_iterator() noexcept = default;
+    meta_iterator() = default;
 
     template<typename It>
     meta_iterator(const meta_ctx &area, It iter) noexcept
@@ -1744,7 +1744,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 
-    meta_iterator() noexcept = default;
+    meta_iterator() = default;
 
     template<bool KeyOnly, typename It>
     meta_iterator(const meta_ctx &area, std::bool_constant<KeyOnly>, It iter) noexcept
