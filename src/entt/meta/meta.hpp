@@ -38,8 +38,7 @@ public:
     using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
-    meta_sequence_container() noexcept
-        : meta_sequence_container{locator<meta_ctx>::value_or()} {}
+    meta_sequence_container() noexcept = default;
 
     /**
      * @brief Context aware constructor.
@@ -82,7 +81,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*const_reference_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *){};
@@ -108,8 +107,7 @@ public:
     using iterator = meta_iterator;
 
     /*! @brief Default constructor. */
-    meta_associative_container() noexcept
-        : meta_associative_container{locator<meta_ctx>::value_or()} {}
+    meta_associative_container() noexcept = default;
 
     /**
      * @brief Context aware constructor.
@@ -158,7 +156,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
@@ -228,18 +226,14 @@ class meta_any {
 
 public:
     /*! Default constructor. */
-    meta_any() noexcept
-        : meta_any{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
+    meta_any() noexcept = default;
 
     /**
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
      */
     meta_any(meta_ctx_arg_t, const meta_ctx &area) noexcept
-        : storage{},
-          ctx{&area},
-          node{},
-          vtable{&basic_vtable<void>} {}
+        : ctx{&area} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -614,10 +608,10 @@ public:
     }
 
 private:
-    any storage;
-    const meta_ctx *ctx;
-    internal::meta_type_node node;
-    vtable_type *vtable;
+    any storage{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    internal::meta_type_node node{};
+    vtable_type *vtable{&basic_vtable<void>};
 };
 
 /**
@@ -651,8 +645,7 @@ template<typename Type>
  */
 struct meta_handle {
     /*! Default constructor. */
-    meta_handle() noexcept
-        : meta_handle{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
+    meta_handle() noexcept = default;
 
     /**
      * @brief Context aware constructor.
@@ -763,15 +756,13 @@ struct meta_handle {
     }
 
 private:
-    meta_any any;
+    meta_any any{meta_ctx_arg, locator<meta_ctx>::value_or()};
 };
 
 /*! @brief Opaque wrapper for properties of any type. */
 struct meta_prop {
     /*! @brief Default constructor. */
-    meta_prop() noexcept
-        : node{},
-          ctx{} {}
+    meta_prop() noexcept = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -816,8 +807,8 @@ struct meta_prop {
     }
 
 private:
-    const internal::meta_prop_node *node;
-    const meta_ctx *ctx;
+    const internal::meta_prop_node *node{};
+    const meta_ctx *ctx{};
 };
 
 /**
@@ -836,9 +827,7 @@ struct meta_data {
     using size_type = typename internal::meta_data_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_data() noexcept
-        : node{},
-          ctx{} {}
+    meta_data() noexcept = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -937,8 +926,8 @@ struct meta_data {
     }
 
 private:
-    const internal::meta_data_node *node;
-    const meta_ctx *ctx;
+    const internal::meta_data_node *node{};
+    const meta_ctx *ctx{};
 };
 
 /**
@@ -957,9 +946,7 @@ struct meta_func {
     using size_type = typename internal::meta_func_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_func() noexcept
-        : node{},
-          ctx{} {}
+    meta_func() noexcept = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -1073,8 +1060,8 @@ struct meta_func {
     }
 
 private:
-    const internal::meta_func_node *node;
-    const meta_ctx *ctx;
+    const internal::meta_func_node *node{};
+    const meta_ctx *ctx{};
 };
 
 /**
@@ -1147,9 +1134,7 @@ public:
     using size_type = typename internal::meta_type_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_type() noexcept
-        : node{},
-          ctx{} {}
+    meta_type() noexcept = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -1539,8 +1524,8 @@ public:
     }
 
 private:
-    internal::meta_type_node node;
-    const meta_ctx *ctx;
+    internal::meta_type_node node{};
+    const meta_ctx *ctx{};
 };
 
 /**
@@ -1647,11 +1632,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::bidirectional_iterator_tag;
 
-    meta_iterator() noexcept
-        : meta_iterator{locator<meta_ctx>::value_or()} {}
-
-    meta_iterator(const meta_ctx &area) noexcept
-        : ctx{&area} {}
+    meta_iterator() noexcept = default;
 
     template<typename It>
     meta_iterator(const meta_ctx &area, It iter) noexcept
@@ -1708,7 +1689,7 @@ public:
     }
 
 private:
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     vtable_type *vtable{};
     any handle{};
 };
@@ -1738,11 +1719,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using iterator_concept = std::forward_iterator_tag;
 
-    meta_iterator() noexcept
-        : meta_iterator{locator<meta_ctx>::value_or()} {}
-
-    meta_iterator(const meta_ctx &area) noexcept
-        : ctx{&area} {}
+    meta_iterator() noexcept = default;
 
     template<bool KeyOnly, typename It>
     meta_iterator(const meta_ctx &area, std::bool_constant<KeyOnly>, It iter) noexcept
@@ -1784,7 +1761,7 @@ public:
     }
 
 private:
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     vtable_type *vtable{};
     any handle{};
 };
@@ -1861,7 +1838,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(const i
         return insert_fn(*ctx, const_cast<void *>(data), is_value_type ? std::as_const(value).data() : nullptr, is_value_type ? nullptr : std::as_const(value).data(), it);
     }
 
-    return iterator{*ctx};
+    return iterator{};
 }
 
 /**
@@ -1870,7 +1847,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(const i
  * @return A possibly invalid iterator following the last removed element.
  */
 inline meta_sequence_container::iterator meta_sequence_container::erase(const iterator &it) {
-    return const_only ? iterator{*ctx} : erase_fn(*ctx, const_cast<void *>(data), it);
+    return const_only ? iterator{} : erase_fn(*ctx, const_cast<void *>(data), it);
 }
 
 /**
@@ -1965,7 +1942,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) ? find_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, std::as_const(key).data()) : iterator{*ctx};
+    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) ? find_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, std::as_const(key).data()) : iterator{};
 }
 
 /**
