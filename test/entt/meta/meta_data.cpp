@@ -13,6 +13,7 @@
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
+#include "../../common/meta_traits.h"
 
 struct base {
     virtual ~base() noexcept = default;
@@ -109,13 +110,17 @@ struct MetaData: ::testing::Test {
         entt::meta<clazz>()
             .type("clazz"_hs)
             .data<&clazz::i, entt::as_ref_t>("i"_hs)
+            .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
             .prop(3u, 0)
             .data<&clazz::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz::j>("j"_hs)
+            .traits(test::meta_traits::one)
             .prop("true"_hs, 1)
             .data<&clazz::h>("h"_hs)
+            .traits(test::meta_traits::two)
             .prop(static_cast<entt::id_type>(property_type::random), 2)
             .data<&clazz::k>("k"_hs)
+            .traits(test::meta_traits::three)
             .prop(static_cast<entt::id_type>(property_type::value), 3)
             .data<&clazz::instance>("base"_hs)
             .data<&clazz::i, entt::as_void_t>("void"_hs)
@@ -183,6 +188,18 @@ TEST_F(MetaData, Functionalities) {
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.value(), 0);
+}
+
+TEST_F(MetaData, UserTraits) {
+    using namespace entt::literals;
+
+    ASSERT_EQ(entt::resolve<clazz>().data("ci"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(entt::resolve<clazz>().data("base"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+
+    ASSERT_EQ(entt::resolve<clazz>().data("i"_hs).traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::two | test::meta_traits::three);
+    ASSERT_EQ(entt::resolve<clazz>().data("j"_hs).traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_EQ(entt::resolve<clazz>().data("h"_hs).traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(entt::resolve<clazz>().data("k"_hs).traits<test::meta_traits>(), test::meta_traits::three);
 }
 
 TEST_F(MetaData, Const) {

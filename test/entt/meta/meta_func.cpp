@@ -10,6 +10,7 @@
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
+#include "../../common/meta_traits.h"
 
 struct base {
     base() = default;
@@ -112,10 +113,14 @@ struct MetaFunc: ::testing::Test {
         entt::meta<function>()
             .type("func"_hs)
             .func<&entt::registry::emplace_or_replace<function>>("emplace"_hs)
+            .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
             .func<entt::overload<int(const base &, int, int)>(&function::f)>("f3"_hs)
+            .traits(test::meta_traits::three)
             .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
+            .traits(test::meta_traits::two)
             .prop("true"_hs, false)
             .func<entt::overload<int(int) const>(&function::f)>("f1"_hs)
+            .traits(test::meta_traits::one)
             .prop("true"_hs, false)
             .func<&function::g>("g"_hs)
             .prop("true"_hs, false)
@@ -198,6 +203,18 @@ TEST_F(MetaFunc, Functionalities) {
 
     ASSERT_TRUE(prop);
     ASSERT_FALSE(prop.value().cast<bool>());
+}
+
+TEST_F(MetaFunc, UserTraits) {
+    using namespace entt::literals;
+
+    ASSERT_EQ(entt::resolve<function>().func("h"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(entt::resolve<function>().func("k"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+
+    ASSERT_EQ(entt::resolve<function>().func("emplace"_hs).traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::two | test::meta_traits::three);
+    ASSERT_EQ(entt::resolve<function>().func("f1"_hs).traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_EQ(entt::resolve<function>().func("f2"_hs).traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(entt::resolve<function>().func("f3"_hs).traits<test::meta_traits>(), test::meta_traits::three);
 }
 
 TEST_F(MetaFunc, Const) {
