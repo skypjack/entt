@@ -15,7 +15,9 @@
   * [From void to any](#from-void-to-any)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
-  * [Properties and meta objects](#properties-and-meta-objects)
+  * [Properties vs traits](#properties-and-traits)
+    * [Properties and meta objects](#properties-and-meta-objects)
+    * [User defined traits](#user-defined-traits)
   * [Unregister types](#unregister-types)
   * [Meta context](#meta-context)
 
@@ -835,18 +837,31 @@ auto max = entt::resolve<int>().data("max_int"_hs).get({}).cast<int>();
 All this happens behind the scenes without any allocation because of the small
 object optimization performed by the `meta_any` class.
 
-## Properties and meta objects
+## Properties vs traits
 
 Sometimes (for example, when it comes to creating an editor) it might be useful
-to attach properties to the meta objects created. Fortunately, this is possible
-for most of them:
+to attach _properties_ and _traits_ to the meta objects created.
+
+The biggest difference between the two is that traits are simple user-defined
+flags with much higher access performance while properties are usually key-only
+or key-value pairs with lower access performance.<br/>
+Another important difference is that `EnTT` reserves up to 16 bits for traits,
+that is 16 flags for a bitmask or 2^16 values otherwise. On the other hand,
+there is no limit on the number of properties available.
+
+Both properties and traits are currently available only for meta types, meta
+data and meta functions.
+
+### Properties and meta objects
+
+Properties are set via a meta factory and are not editable once created:
 
 ```cpp
 entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
 ```
 
-Properties are always in the key/value form. The key is a numeric identifier,
-mostly similar to the identifier used to register meta objects. There are no
+They are always in the key/value form. The key is a numeric identifier, mostly
+similar to the identifier used to register meta objects. There are no
 restrictions on the type of the value instead, as long as it's movable.<br/>
 Key only properties are also supported out of the box:
 
@@ -857,12 +872,19 @@ entt::meta<my_type>().type("reflected_type"_hs).prop(my_enum::key_only);
 To attach multiple properties to a meta object, just invoke `prop` more than
 once.<br/>
 It's also possible to call `prop` at different times, as long as the factory is
-reset to the meta object of interest.
+reset to the meta object of interest. For example, to attach a property to an
+already existing meta data object:
 
-The meta objects for which properties are supported are currently meta types,
-meta data and meta functions.<br/>
-These types also offer a couple of member functions named `prop` to iterate all
-properties at once or to search a specific property by key:
+```cpp
+entt::meta<my_type>().data("member"_hs).prop("key"_hs, value);
+```
+
+The `data` and `func` overloads which accept only the name of the member to be
+searched for assume that it already exists and make it the _current element_ for
+subsequent calls.
+
+Once created, all meta objects offer a couple of member functions named `prop`
+to iterate all properties at once or to search a specific property by key:
 
 ```cpp
 // iterate all properties of a meta type
@@ -877,6 +899,39 @@ auto prop = entt::resolve<my_type>().prop("tooltip"_hs);
 Meta properties are objects having a fairly poor interface, all in all. They
 only provide the `value` member function to retrieve the contained value in the
 form of a `meta_any` object.
+
+### User defined traits
+
+User-defined traits are also set via a meta factory:
+
+```cpp
+entt::meta<my_type>().type("reflected_type"_hs).traits(my_traits::required | my_traits::hidden);
+```
+
+In the example above `EnTT` bitmask enum support is used but any integral value
+is fine, as long as it doesn't exceed 16 bits.<br/>
+As for traits, it's not possible to assign them at different times. Therefore,
+multiple calls to the `traits` function overwrite previous values. However, it's
+still possible to set traits later if necessary:
+
+```cpp
+entt::meta<my_type>().func("invoke"_hs).traits(my_traits::internal);
+```
+
+The `data` and `func` overloads which accept only the name of the member to be
+searched for assume that it already exists and make it the _current element_ for
+subsequent calls.
+
+Once created, all meta objects offer a member function named `traits` to get the
+currently set value:
+
+```cpp
+auto value = entt::resolve<my_type>().traits<my_traits>();
+```
+
+Note that the type is erased upon registration and must therefore be repeated
+when traits are _extracted_, so as to allow the library to _reconstruct_ them
+correctly.
 
 ## Unregister types
 
