@@ -225,10 +225,12 @@ public:
      * @return This any object.
      */
     basic_any &operator=(const basic_any &other) {
-        reset();
+        if(this != &other) {
+            reset();
 
-        if(other.vtable) {
-            other.vtable(operation::copy, other, this);
+            if(other.vtable) {
+                other.vtable(operation::copy, other, this);
+            }
         }
 
         return *this;
@@ -240,6 +242,8 @@ public:
      * @return This any object.
      */
     basic_any &operator=(basic_any &&other) noexcept {
+        ENTT_ASSERT(this != &other, "Self move assignment");
+
         reset();
 
         if(other.vtable) {
