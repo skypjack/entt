@@ -328,11 +328,14 @@ public:
      * @return This meta any object.
      */
     meta_any &operator=(const meta_any &other) {
-        release();
-        storage = other.storage;
-        ctx = other.ctx;
-        node = other.node;
-        vtable = other.vtable;
+        if(this != &other) {
+            release();
+            storage = other.storage;
+            ctx = other.ctx;
+            node = other.node;
+            vtable = other.vtable;
+        }
+
         return *this;
     }
 
@@ -342,6 +345,8 @@ public:
      * @return This meta any object.
      */
     meta_any &operator=(meta_any &&other) noexcept {
+        ENTT_ASSERT(this != &other, "Self move assignment");
+
         release();
         storage = std::move(other.storage);
         ctx = other.ctx;

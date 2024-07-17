@@ -277,6 +277,19 @@ TEST_F(MetaAny, SBOCopyAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
+TEST_F(MetaAny, SBOSelfCopyAssignment) {
+    entt::meta_any any{3};
+
+    // avoid warnings due to self-assignment
+    any = *&any;
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<int>(), 3);
+    ASSERT_EQ(any, entt::meta_any{3});
+    ASSERT_NE(any, entt::meta_any{0});
+}
+
 TEST_F(MetaAny, SBOMoveConstruction) {
     entt::meta_any any{3};
     entt::meta_any other{std::move(any)};
@@ -304,6 +317,13 @@ TEST_F(MetaAny, SBOMoveAssignment) {
     ASSERT_EQ(other.cast<int>(), 3);
     ASSERT_EQ(other, entt::meta_any{3});
     ASSERT_NE(other, entt::meta_any{0});
+}
+
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, SBOSelfMoveAssignment) {
+    entt::meta_any any{3};
+
+    // avoid warnings due to self-assignment
+    ASSERT_DEATH(any = std::move(*&any), "");
 }
 
 TEST_F(MetaAny, SBODirectAssignment) {
@@ -547,6 +567,20 @@ TEST_F(MetaAny, NoSBOCopyAssignment) {
     ASSERT_NE(other, fat{});
 }
 
+TEST_F(MetaAny, NoSBOSelfCopyAssignment) {
+    const fat instance{.1, .2, .3, .4};
+    entt::meta_any any{instance};
+
+    // avoid warnings due to self-assignment
+    any = *&any;
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<fat>(), instance);
+    ASSERT_EQ(any, entt::meta_any{instance});
+    ASSERT_NE(any, fat{});
+}
+
 TEST_F(MetaAny, NoSBOMoveConstruction) {
     const fat instance{.1, .2, .3, .4};
     entt::meta_any any{instance};
@@ -576,6 +610,14 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
     ASSERT_EQ(other.cast<fat>(), instance);
     ASSERT_EQ(other, entt::meta_any{instance});
     ASSERT_NE(other, fat{});
+}
+
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, NoSBOSelfMoveAssignment) {
+    const fat instance{.1, .2, .3, .4};
+    entt::meta_any any{instance};
+
+    // avoid warnings due to self-assignment
+    ASSERT_DEATH(any = std::move(*&any), "");
 }
 
 TEST_F(MetaAny, NoSBODirectAssignment) {
@@ -755,6 +797,18 @@ TEST_F(MetaAny, VoidCopyAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
+TEST_F(MetaAny, VoidSelfCopyAssignment) {
+    entt::meta_any any{std::in_place_type<void>};
+
+    // avoid warnings due to self-assignment
+    any = *&any;
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+    ASSERT_EQ(any, entt::meta_any{std::in_place_type<void>});
+}
+
 TEST_F(MetaAny, VoidMoveConstruction) {
     entt::meta_any any{std::in_place_type<void>};
     const entt::meta_any other{std::move(any)};
@@ -778,6 +832,13 @@ TEST_F(MetaAny, VoidMoveAssignment) {
     ASSERT_TRUE(other);
     ASSERT_EQ(other.type(), entt::resolve<void>());
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
+}
+
+ENTT_DEBUG_TEST_F(MetaAnyDeathTest, VoidSelfMoveAssignment) {
+    entt::meta_any any{std::in_place_type<void>};
+
+    // avoid warnings due to self-assignment
+    ASSERT_DEATH(any = std::move(*&any), "");
 }
 
 TEST_F(MetaAny, SBOMoveInvalidate) {
