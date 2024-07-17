@@ -249,7 +249,7 @@ protected:
     }
 
     template<std::size_t Index>
-    const Type *storage() const noexcept {
+    [[nodiscard]] const Type *storage() const noexcept {
         if constexpr(Index < Get) {
             return pools[Index];
         } else {
@@ -267,7 +267,7 @@ protected:
         }
     }
 
-    bool none_of(const typename Type::entity_type entt) const noexcept {
+    [[nodiscard]] bool none_of(const typename Type::entity_type entt) const noexcept {
         return internal::none_of(filter.begin(), filter.end(), entt);
     }
 
