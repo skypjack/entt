@@ -43,5 +43,6 @@ TODO:
 * investigate using any rather than shared<void> for meta properties
 * refine user defined meta traits implementation
 * copy-and-swap for any and meta_any
+* improve seek function for overloaded meta functions
 * fix cmake warning about FetchContent_Populate
 
