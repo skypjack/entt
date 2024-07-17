@@ -15,7 +15,7 @@
   * [From void to any](#from-void-to-any)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
-  * [Properties vs traits](#properties-and-traits)
+  * [Properties vs traits](#properties-vs-traits)
     * [Properties and meta objects](#properties-and-meta-objects)
     * [User defined traits](#user-defined-traits)
   * [Unregister types](#unregister-types)
