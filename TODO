@@ -42,5 +42,6 @@ TODO:
 * entity based component_traits
 * investigate using any rather than shared<void> for meta properties
 * refine user defined meta traits implementation
+* copy-and-swap for any and meta_any
 * fix cmake warning about FetchContent_Populate
 
