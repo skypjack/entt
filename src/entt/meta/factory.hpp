@@ -37,22 +37,22 @@ protected:
     }
 
     void base(const id_type id, meta_base_node node) {
-        details->base.insert_or_assign(id, std::move(node));
+        details->base.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void conv(const id_type id, meta_conv_node node) {
-        details->conv.insert_or_assign(id, std::move(node));
+        details->conv.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
-        details->ctor.insert_or_assign(id, std::move(node));
+        details->ctor.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void dtor(meta_dtor_node node) {
-        internal::meta_context::from(*ctx).value[parent].dtor = std::move(node);
+        internal::meta_context::from(*ctx).value[parent].dtor = node;
         bucket = parent;
     }
 
@@ -119,10 +119,8 @@ protected:
 public:
     basic_meta_factory(const type_info &info, meta_ctx &area)
         : ctx{&area},
-          details{},
           parent{info.hash()},
-          bucket{parent},
-          is_data{} {
+          bucket{parent} {
         auto &&elem = internal::meta_context::from(*ctx).value[parent];
 
         if(!elem.details) {
@@ -133,11 +131,11 @@ public:
     }
 
 private:
-    meta_ctx *ctx;
-    std::shared_ptr<meta_type_descriptor> details;
-    const id_type parent;
-    id_type bucket;
-    bool is_data;
+    meta_ctx *ctx{};
+    std::shared_ptr<meta_type_descriptor> details{};
+    const id_type parent{};
+    id_type bucket{};
+    bool is_data{};
 };
 
 } // namespace internal
