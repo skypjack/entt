@@ -8,6 +8,7 @@
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/attribute.h"
+#include "../core/bit.hpp"
 #include "../core/enum.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
@@ -42,6 +43,20 @@ enum class meta_traits : std::uint32_t {
     _user_defined_traits = 0xFFFF,
     _entt_enum_as_bitmask = 0xFFFF
 };
+
+template<typename Type>
+[[nodiscard]] auto meta_to_user_traits(const meta_traits traits) noexcept {
+    static_assert(std::is_enum_v<Type>, "Invalid enum type");
+    constexpr auto shift = popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<meta_traits>>(traits) >> shift)};
+}
+
+template<typename Type>
+[[nodiscard]] auto user_to_meta_traits(const Type value) noexcept {
+    static_assert(std::is_enum_v<Type>, "Invalid enum type");
+    constexpr auto shift = popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    return meta_traits{static_cast<std::underlying_type_t<internal::meta_traits>>(static_cast<std::underlying_type_t<Type>>(value)) << shift};
+}
 
 struct meta_type_node;
 

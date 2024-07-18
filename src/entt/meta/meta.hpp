@@ -9,7 +9,6 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
-#include "../core/bit.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -925,9 +924,7 @@ struct meta_data {
      */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
-        static_assert(std::is_enum_v<Type>, "Invalid enum type");
-        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
-        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node->traits) >> shift)};
+        return internal::meta_to_user_traits<Type>(node->traits);
     }
 
     /**
@@ -1059,9 +1056,7 @@ struct meta_func {
      */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
-        static_assert(std::is_enum_v<Type>, "Invalid enum type");
-        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
-        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node->traits) >> shift)};
+        return internal::meta_to_user_traits<Type>(node->traits);
     }
 
     /**
@@ -1535,9 +1530,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
-        static_assert(std::is_enum_v<Type>, "Invalid enum type");
-        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
-        return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<internal::meta_traits>>(node.traits) >> shift)};
+        return internal::meta_to_user_traits<Type>(node.traits);
     }
 
     /**

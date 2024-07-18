@@ -104,15 +104,13 @@ protected:
         }
     }
 
-    void traits(const std::underlying_type_t<internal::meta_traits> value) {
-        constexpr auto shift = popcount(static_cast<std::underlying_type_t<internal::meta_traits>>(internal::meta_traits::_user_defined_traits));
-
-        if(const internal::meta_traits data{value << shift}; bucket == parent) {
-            internal::meta_context::from(*ctx).value[parent].traits |= data;
+    void traits(const internal::meta_traits value) {
+        if(bucket == parent) {
+            internal::meta_context::from(*ctx).value[parent].traits |= value;
         } else if(is_data) {
-            details->data[bucket].traits |= data;
+            details->data[bucket].traits |= value;
         } else {
-            details->func[bucket].traits |= data;
+            details->func[bucket].traits |= value;
         }
     }
 
@@ -523,7 +521,7 @@ public:
     template<typename Value>
     meta_factory traits(const Value value) {
         static_assert(std::is_enum_v<Value>, "Invalid enum type");
-        base_type::traits(static_cast<std::underlying_type_t<internal::meta_traits>>(static_cast<std::underlying_type_t<Value>>(value)));
+        base_type::traits(internal::user_to_meta_traits(value));
         return *this;
     }
 };
