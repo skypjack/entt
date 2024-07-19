@@ -94,8 +94,8 @@ template<typename... Lhs, typename... Rhs>
 struct group_descriptor {
     using size_type = std::size_t;
     virtual ~group_descriptor() noexcept = default;
-    virtual size_type owned(const id_type *, const size_type) const noexcept {
-        return 0u;
+    virtual bool owned(const id_type) const noexcept {
+        return false;
     }
 };
 
@@ -149,16 +149,14 @@ public:
         common_setup();
     }
 
-    size_type owned(const id_type *elem, const size_type length) const noexcept final {
-        size_type cnt = 0u;
-
-        for(auto pos = 0u; pos < length; ++pos) {
-            for(auto next = 0u; next < Owned; ++next) {
-                cnt += (elem[pos] == pools[next]->type().hash());
+    virtual bool owned(const id_type hash) const noexcept {
+        for(size_type pos{}; pos < Owned; ++pos) {
+            if(pools[pos]->type().hash() == hash) {
+                return true;
             }
         }
 
-        return cnt;
+        return false;
     }
 
     [[nodiscard]] size_type length() const noexcept {

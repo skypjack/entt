@@ -1099,8 +1099,7 @@ public:
             handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
         } else {
             handler = std::allocate_shared<handler_type>(get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
-            [[maybe_unused]] const std::array elem{type_hash<std::remove_const_t<Owned>>::value()..., type_hash<std::remove_const_t<Get>>::value()..., type_hash<std::remove_const_t<Exclude>>::value()...};
-            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&elem](const auto &data) { return data.second->owned(elem.data(), sizeof...(Owned)) == 0u; }), "Conflicting groups");
+            ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [](const auto &data) { return !(data.second->owned(type_id<Owned>().hash()) || ...); }), "Conflicting groups");
         }
 
         groups.emplace(group_type::group_id(), handler);
@@ -1130,8 +1129,7 @@ public:
      */
     template<typename Type, typename... Other>
     [[nodiscard]] bool owned() const {
-        const std::array elem{type_hash<std::remove_const_t<Type>>::value(), type_hash<std::remove_const_t<Other>>::value()...};
-        return std::any_of(groups.cbegin(), groups.cend(), [&elem](auto &&data) { return data.second->owned(elem.data(), 1u + sizeof...(Other)); });
+        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&data) { return (data.second->owned(type_id<Type>().hash()) || ... || data.second->owned(type_id<Other>().hash())); });
     }
 
     /**
