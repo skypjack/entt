@@ -30,6 +30,7 @@ public:
 
     constexpr edge_iterator() noexcept = default;
 
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
         : it{std::move(base)},
           vert{vertices},
