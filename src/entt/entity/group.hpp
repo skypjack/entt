@@ -149,7 +149,7 @@ public:
         common_setup();
     }
 
-    virtual bool owned(const id_type hash) const noexcept {
+    bool owned(const id_type hash) const noexcept override {
         for(size_type pos{}; pos < Owned; ++pos) {
             if(pools[pos]->type().hash() == hash) {
                 return true;
