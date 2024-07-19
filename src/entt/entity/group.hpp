@@ -104,8 +104,8 @@ class group_handler final: public group_descriptor {
     using entity_type = typename Type::entity_type;
 
     void swap_elements(const std::size_t pos, const entity_type entt) {
-        for(auto first = pools.begin(), last = first + Owned; first != last; ++first) {
-            (*first)->swap_elements((**first)[pos], entt);
+        for(size_type next{}; next < Owned; ++next) {
+            pools[next]->swap_elements((*pools[next])[pos], entt);
         }
     }
 
