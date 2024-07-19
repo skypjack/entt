@@ -38,6 +38,7 @@ public:
           it{},
           tombstone_check{} {}
 
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     runtime_view_iterator(const std::vector<Set *> &cpools, const std::vector<Set *> &ignore, iterator_type curr) noexcept
         : pools{&cpools},
           filter{&ignore},
