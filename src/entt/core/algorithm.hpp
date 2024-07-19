@@ -58,9 +58,11 @@ struct insertion_sort {
                 auto value = std::move(*it);
                 auto pre = it;
 
+                // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 for(; pre > first && compare(value, *(pre - 1)); --pre) {
                     *pre = std::move(*(pre - 1));
                 }
+                // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
                 *pre = std::move(value);
             }
