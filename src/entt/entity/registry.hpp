@@ -1122,14 +1122,13 @@ public:
 
     /**
      * @brief Checks whether the given elements belong to any group.
-     * @tparam Type Type of element in which one is interested.
-     * @tparam Other Other types of elements in which one is interested.
+     * @tparam Type Types of elements in which one is interested.
      * @return True if the pools of the given elements are _free_, false
      * otherwise.
      */
-    template<typename Type, typename... Other>
+    template<typename... Type>
     [[nodiscard]] bool owned() const {
-        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&data) { return (data.second->owned(type_id<Type>().hash()) || ... || data.second->owned(type_id<Other>().hash())); });
+        return std::any_of(groups.cbegin(), groups.cend(), [](auto &&data) { return (data.second->owned(type_id<Type>().hash()) || ...); });
     }
 
     /**
