@@ -94,7 +94,7 @@ template<typename... Lhs, typename... Rhs>
 struct group_descriptor {
     using size_type = std::size_t;
     virtual ~group_descriptor() noexcept = default;
-    virtual bool owned(const id_type) const noexcept {
+    [[nodiscard]] virtual bool owned(const id_type) const noexcept {
         return false;
     }
 };
@@ -149,7 +149,7 @@ public:
         common_setup();
     }
 
-    bool owned(const id_type hash) const noexcept override {
+    [[nodiscard]] bool owned(const id_type hash) const noexcept override {
         for(size_type pos{}; pos < Owned; ++pos) {
             if(pools[pos]->type().hash() == hash) {
                 return true;
