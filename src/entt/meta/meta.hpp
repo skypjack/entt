@@ -1049,11 +1049,7 @@ struct meta_func {
         return it != node->prop.cend() ? meta_prop{*ctx, it->second} : meta_prop{};
     }
 
-    /**
-     * @brief Returns all meta traits for a given meta object.
-     * @tparam Type The type to convert the meta traits to.
-     * @return The registered meta traits, if any.
-     */
+    /*! @copydoc meta_data::traits */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node->traits);
@@ -1523,11 +1519,7 @@ public:
         return elem ? meta_prop{*ctx, *elem} : meta_prop{};
     }
 
-    /**
-     * @brief Returns all meta traits for a given meta object.
-     * @tparam Type The type to convert the meta traits to.
-     * @return The registered meta traits, if any.
-     */
+    /*! @copydoc meta_data::traits */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node.traits);
