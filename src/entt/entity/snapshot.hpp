@@ -93,17 +93,17 @@ public:
     template<typename Type, typename Archive>
     const basic_snapshot &get(Archive &archive, const id_type id = type_hash<Type>::value()) const {
         if(const auto *storage = reg->template storage<Type>(id); storage) {
+            const typename registry_type::common_type &base = *storage;
+
             archive(static_cast<typename traits_type::entity_type>(storage->size()));
 
             if constexpr(std::is_same_v<Type, entity_type>) {
                 archive(static_cast<typename traits_type::entity_type>(storage->free_list()));
 
-                for(auto first = storage->data(), last = first + storage->size(); first != last; ++first) {
+                for(auto first = base.rbegin(), last = base.rend(); first != last; ++first) {
                     archive(*first);
                 }
             } else if constexpr(registry_type::template storage_for_type<Type>::storage_policy == deletion_policy::in_place) {
-                const typename registry_type::common_type &base = *storage;
-
                 for(auto it = base.rbegin(), last = base.rend(); it != last; ++it) {
                     if(const auto entt = *it; entt == tombstone) {
                         archive(static_cast<entity_type>(null));
