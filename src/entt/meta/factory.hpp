@@ -114,6 +114,16 @@ protected:
         }
     }
 
+    void custom(std::shared_ptr<void> udata) {
+        if(bucket == parent) {
+            internal::meta_context::from(*ctx).value[parent].custom = std::move(udata);
+        } else if(is_data) {
+            details->data[bucket].custom = std::move(udata);
+        } else {
+            details->func[bucket].custom = std::move(udata);
+        }
+    }
+
 public:
     basic_meta_factory(const type_info &info, meta_ctx &area)
         : ctx{&area},
@@ -522,6 +532,19 @@ public:
     meta_factory traits(const Value value) {
         static_assert(std::is_enum_v<Value>, "Invalid enum type");
         base_type::traits(internal::user_to_meta_traits(value));
+        return *this;
+    }
+
+    /**
+     * @brief Sets user defined data that will never be used by the library.
+     * @tparam Value Type of user defined data to store.
+     * @tparam Args Types of arguments to use to construct the user data.
+     * @param args Parameters to use to initialize the user data.
+     * @return A meta factory for the parent type.
+     */
+    template<typename Value, typename... Args>
+    meta_factory custom(Args &&...args) {
+        base_type::custom(std::make_shared<Value>(std::forward<Args>(args)...));
         return *this;
     }
 };

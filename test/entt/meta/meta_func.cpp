@@ -117,9 +117,11 @@ struct MetaFunc: ::testing::Test {
             .func<entt::overload<int(const base &, int, int)>(&function::f)>("f3"_hs)
             .traits(test::meta_traits::three)
             .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
+            .custom<int>(3)
             .traits(test::meta_traits::two)
             .prop("true"_hs, false)
             .func<entt::overload<int(int) const>(&function::f)>("f1"_hs)
+            .custom<char>('c')
             .traits(test::meta_traits::one)
             .prop("true"_hs, false)
             .func<&function::g>("g"_hs)
@@ -215,6 +217,19 @@ TEST_F(MetaFunc, UserTraits) {
     ASSERT_EQ(entt::resolve<function>().func("f1"_hs).traits<test::meta_traits>(), test::meta_traits::one);
     ASSERT_EQ(entt::resolve<function>().func("f2"_hs).traits<test::meta_traits>(), test::meta_traits::two);
     ASSERT_EQ(entt::resolve<function>().func("f3"_hs).traits<test::meta_traits>(), test::meta_traits::three);
+}
+
+TEST_F(MetaFunc, Custom) {
+    using namespace entt::literals;
+
+    ASSERT_EQ(entt::resolve<function>().func("f1"_hs).custom<char>(), 'c');
+    ASSERT_EQ(entt::resolve("func"_hs).func("f2"_hs).custom<int>(), 3);
+}
+
+ENTT_DEBUG_TEST_F(MetaFuncDeathTest, Custom) {
+    using namespace entt::literals;
+
+    ASSERT_DEATH([[maybe_unused]] auto &&value = entt::resolve<function>().func("f3"_hs).custom<int>(), "");
 }
 
 TEST_F(MetaFunc, Const) {

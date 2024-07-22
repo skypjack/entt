@@ -128,6 +128,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<base>()
             .type("base"_hs)
+            .custom<char>('c')
             .data<&base::value>("value"_hs);
 
         entt::meta<derived>()
@@ -176,6 +177,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<clazz>()
             .type("class"_hs)
+            .custom<int>(3)
             .prop(static_cast<entt::id_type>(property_type::value), 3)
             .ctor<const base &, int>()
             .data<&clazz::value>("value"_hs)
@@ -296,6 +298,17 @@ TEST_F(MetaType, UserTraits) {
     ASSERT_EQ(entt::resolve<unsigned int>().traits<test::meta_traits>(), test::meta_traits::two);
     ASSERT_EQ(entt::resolve<derived>().traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::three);
     ASSERT_EQ(entt::resolve<property_type>().traits<test::meta_traits>(), test::meta_traits::two | test::meta_traits::three);
+}
+
+TEST_F(MetaType, Custom) {
+    using namespace entt::literals;
+
+    ASSERT_EQ(entt::resolve<base>().custom<char>(), 'c');
+    ASSERT_EQ(entt::resolve("class"_hs).custom<int>(), 3);
+}
+
+ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
+    ASSERT_DEATH([[maybe_unused]] auto &&value = entt::resolve<derived>().custom<int>(), "");
 }
 
 TEST_F(MetaType, RemovePointer) {

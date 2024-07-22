@@ -928,6 +928,17 @@ struct meta_data {
     }
 
     /**
+     * @brief Returns user defined data for a given meta object.
+     * @tparam Type The type to convert the user defined data to.
+     * @return User defined arbitrary data.
+     */
+    template<typename Type>
+    [[nodiscard]] const Type &custom() const noexcept {
+        ENTT_ASSERT(node->custom != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node->custom);
+    }
+
+    /**
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
@@ -1053,6 +1064,13 @@ struct meta_func {
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node->traits);
+    }
+
+    /*! @copydoc meta_data::custom */
+    template<typename Type>
+    [[nodiscard]] const Type &custom() const noexcept {
+        ENTT_ASSERT(node->custom != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node->custom);
     }
 
     /**
@@ -1523,6 +1541,13 @@ public:
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node.traits);
+    }
+
+    /*! @copydoc meta_data::custom */
+    template<typename Type>
+    [[nodiscard]] const Type &custom() const noexcept {
+        ENTT_ASSERT(node.custom != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node.custom);
     }
 
     /**
