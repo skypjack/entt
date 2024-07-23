@@ -934,8 +934,8 @@ struct meta_data {
      */
     template<typename Type>
     [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node->custom != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node->custom);
+        ENTT_ASSERT(node->custom.data != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node->custom.data);
     }
 
     /**
@@ -1069,8 +1069,8 @@ struct meta_func {
     /*! @copydoc meta_data::custom */
     template<typename Type>
     [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node->custom != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node->custom);
+        ENTT_ASSERT(node->custom.data != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node->custom.data);
     }
 
     /**
@@ -1546,8 +1546,8 @@ public:
     /*! @copydoc meta_data::custom */
     template<typename Type>
     [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node.custom != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node.custom);
+        ENTT_ASSERT(node.custom.data != nullptr, "Invalid user data");
+        return *std::static_pointer_cast<Type>(node.custom.data);
     }
 
     /**

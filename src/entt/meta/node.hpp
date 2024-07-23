@@ -60,6 +60,11 @@ template<typename Type>
 
 struct meta_type_node;
 
+struct meta_custom_node {
+    id_type type;
+    std::shared_ptr<void> data;
+};
+
 struct meta_prop_node {
     meta_type_node (*type)(const meta_context &) noexcept {};
     std::shared_ptr<void> value{};
@@ -96,7 +101,7 @@ struct meta_data_node {
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(const meta_ctx &, meta_handle){};
     dense_map<id_type, meta_prop_node, identity> prop{};
-    std::shared_ptr<void> custom{};
+    meta_custom_node custom{};
 };
 
 struct meta_func_node {
@@ -109,7 +114,7 @@ struct meta_func_node {
     meta_any (*invoke)(const meta_ctx &, meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
     dense_map<id_type, meta_prop_node, identity> prop{};
-    std::shared_ptr<void> custom{};
+    meta_custom_node custom{};
 };
 
 struct meta_template_node {
@@ -144,7 +149,7 @@ struct meta_type_node {
     meta_template_node templ{};
     meta_dtor_node dtor{};
     std::shared_ptr<meta_type_descriptor> details{};
-    std::shared_ptr<void> custom{};
+    meta_custom_node custom{};
 };
 
 template<auto Member>

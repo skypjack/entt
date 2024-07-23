@@ -114,13 +114,13 @@ protected:
         }
     }
 
-    void custom(std::shared_ptr<void> udata) {
+    void custom(const id_type type, std::shared_ptr<void> udata) {
         if(bucket == parent) {
-            internal::meta_context::from(*ctx).value[parent].custom = std::move(udata);
+            internal::meta_context::from(*ctx).value[parent].custom = {type, std::move(udata)};
         } else if(is_data) {
-            details->data[bucket].custom = std::move(udata);
+            details->data[bucket].custom = {type, std::move(udata)};
         } else {
-            details->func[bucket].custom = std::move(udata);
+            details->func[bucket].custom = {type, std::move(udata)};
         }
     }
 
@@ -544,7 +544,7 @@ public:
      */
     template<typename Value, typename... Args>
     meta_factory custom(Args &&...args) {
-        base_type::custom(std::make_shared<Value>(std::forward<Args>(args)...));
+        base_type::custom(type_id<Value>().hash(), std::make_shared<Value>(std::forward<Args>(args)...));
         return *this;
     }
 };
