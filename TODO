@@ -42,3 +42,4 @@ TODO:
 * fix cmake warning about FetchContent_Populate
 * deprecate meta properties in favor of custom data
 * make meta objects safe to use with null nodes
+* natvis for meta_custom
