@@ -858,7 +858,7 @@ struct meta_custom {
     }
 
 private:
-    const internal::meta_custom_node node{};
+    internal::meta_custom_node node{};
 };
 
 /*! @brief Opaque wrapper for data members. */
