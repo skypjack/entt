@@ -43,3 +43,4 @@ TODO:
 * deprecate meta properties in favor of custom data
 * make meta objects safe to use with null nodes
 * natvis for meta_custom
+* suppress -Wself-move on CI with g++13
