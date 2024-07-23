@@ -9,11 +9,16 @@
 #include "../../common/config.h"
 
 struct clazz {
-    int i{0};
-    char j{1};
+    int i{2};
+    char j{'c'};
 
-    void f(int) {}
-    void g(char) {}
+    int f(int) const {
+        return i;
+    }
+
+    char g(char) const {
+        return j;
+    }
 };
 
 struct MetaCustom: ::testing::Test {
@@ -24,10 +29,10 @@ struct MetaCustom: ::testing::Test {
             .type("clazz"_hs)
             .custom<char>('c')
             .data<&clazz::i>("i"_hs)
-            .custom<int>(2)
+            .custom<int>(0)
             .data<&clazz::j>("j"_hs)
             .func<&clazz::f>("f"_hs)
-            .custom<int>(3)
+            .custom<int>(1)
             .func<&clazz::g>("g"_hs);
     }
 
@@ -73,9 +78,17 @@ TEST_F(MetaCustom, Type) {
 TEST_F(MetaCustom, Data) {
     using namespace entt::literals;
 
+    const clazz instance{};
+
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs));
+    ASSERT_EQ(entt::resolve<clazz>().get("i"_hs, instance).cast<int>(), 2);
+
+    ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs));
+    ASSERT_EQ(entt::resolve<clazz>().get("j"_hs, instance).cast<char>(), 'c');
+
     ASSERT_NE(static_cast<const int *>(entt::resolve<clazz>().data("i"_hs).custom()), nullptr);
-    ASSERT_EQ(*static_cast<const int *>(entt::resolve<clazz>().data("i"_hs).custom()), 2);
-    ASSERT_EQ(static_cast<const int &>(entt::resolve<clazz>().data("i"_hs).custom()), 2);
+    ASSERT_EQ(*static_cast<const int *>(entt::resolve<clazz>().data("i"_hs).custom()), 0);
+    ASSERT_EQ(static_cast<const int &>(entt::resolve<clazz>().data("i"_hs).custom()), 0);
 
     ASSERT_EQ(static_cast<const char *>(entt::resolve<clazz>().data("i"_hs).custom()), nullptr);
     ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().data("j"_hs).custom()), nullptr);
@@ -84,9 +97,17 @@ TEST_F(MetaCustom, Data) {
 TEST_F(MetaCustom, Func) {
     using namespace entt::literals;
 
+    const clazz instance{};
+
+    ASSERT_TRUE(entt::resolve<clazz>().func("f"_hs));
+    ASSERT_EQ(entt::resolve<clazz>().invoke("f"_hs, instance, 0).cast<int>(), 2);
+
+    ASSERT_TRUE(entt::resolve<clazz>().func("g"_hs));
+    ASSERT_EQ(entt::resolve<clazz>().invoke("g"_hs, instance, 'c').cast<char>(), 'c');
+
     ASSERT_NE(static_cast<const int *>(entt::resolve<clazz>().func("f"_hs).custom()), nullptr);
-    ASSERT_EQ(*static_cast<const int *>(entt::resolve<clazz>().func("f"_hs).custom()), 3);
-    ASSERT_EQ(static_cast<const int &>(entt::resolve<clazz>().func("f"_hs).custom()), 3);
+    ASSERT_EQ(*static_cast<const int *>(entt::resolve<clazz>().func("f"_hs).custom()), 1);
+    ASSERT_EQ(static_cast<const int &>(entt::resolve<clazz>().func("f"_hs).custom()), 1);
 
     ASSERT_EQ(static_cast<const char *>(entt::resolve<clazz>().func("f"_hs).custom()), nullptr);
     ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().func("g"_hs).custom()), nullptr);
