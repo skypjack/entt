@@ -41,5 +41,4 @@ TODO:
 * improve seek function for overloaded meta functions
 * fix cmake warning about FetchContent_Populate
 * deprecate meta properties in favor of custom data
-* refine custom with debug-only type check if possible
 * make meta objects safe to use with null nodes

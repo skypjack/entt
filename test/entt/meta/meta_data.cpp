@@ -115,7 +115,6 @@ struct MetaData: ::testing::Test {
             .prop(3u, 0)
             .data<&clazz::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz::j>("j"_hs)
-            .custom<int>(3)
             .traits(test::meta_traits::one)
             .prop("true"_hs, 1)
             .data<&clazz::h>("h"_hs)
@@ -207,14 +206,18 @@ TEST_F(MetaData, UserTraits) {
 TEST_F(MetaData, Custom) {
     using namespace entt::literals;
 
-    ASSERT_EQ(entt::resolve<clazz>().data("i"_hs).custom<char>(), 'c');
-    ASSERT_EQ(entt::resolve("clazz"_hs).data("j"_hs).custom<int>(), 3);
+    ASSERT_EQ(*static_cast<const char *>(entt::resolve<clazz>().data("i"_hs).custom()), 'c');
+    ASSERT_EQ(static_cast<const char &>(entt::resolve<clazz>().data("i"_hs).custom()), 'c');
+
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().data("i"_hs).custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().data("j"_hs).custom()), nullptr);
 }
 
 ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
     using namespace entt::literals;
 
-    ASSERT_DEATH([[maybe_unused]] auto &&value = entt::resolve<clazz>().data("k"_hs).custom<int>(), "");
+    ASSERT_DEATH([[maybe_unused]] const int &value = entt::resolve<clazz>().data("i"_hs).custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const char &value = entt::resolve<clazz>().data("j"_hs).custom(), "");
 }
 
 TEST_F(MetaData, Const) {

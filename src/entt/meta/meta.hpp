@@ -826,6 +826,41 @@ private:
     return !(lhs == rhs);
 }
 
+/*! @brief Opaque wrapper for user defined data of any type. */
+struct meta_custom {
+    /*! @brief Default constructor. */
+    meta_custom() noexcept = default;
+
+    /**
+     * @brief Basic constructor for meta objects.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_custom(internal::meta_custom_node curr) noexcept
+        : node{std::move(curr)} {}
+
+    /**
+     * @brief Generic conversion operator.
+     * @tparam Type Type to which conversion is requested.
+     */
+    template<typename Type>
+    [[nodiscard]] operator const Type *() const noexcept {
+        return (type_id<Type>().hash() == node.type) ? std::static_pointer_cast<Type>(node.data).get() : nullptr;
+    }
+
+    /**
+     * @brief Generic conversion operator.
+     * @tparam Type Type to which conversion is requested.
+     */
+    template<typename Type>
+    [[nodiscard]] operator const Type &() const noexcept {
+        ENTT_ASSERT(type_id<Type>().hash() == node.type, "Invalid type");
+        return *std::static_pointer_cast<Type>(node.data);
+    }
+
+private:
+    const internal::meta_custom_node node{};
+};
+
 /*! @brief Opaque wrapper for data members. */
 struct meta_data {
     /*! @brief Unsigned integer type. */
@@ -929,13 +964,10 @@ struct meta_data {
 
     /**
      * @brief Returns user defined data for a given meta object.
-     * @tparam Type The type to convert the user defined data to.
      * @return User defined arbitrary data.
      */
-    template<typename Type>
-    [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node->custom.data != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node->custom.data);
+    [[nodiscard]] meta_custom custom() const noexcept {
+        return {node->custom};
     }
 
     /**
@@ -1067,10 +1099,8 @@ struct meta_func {
     }
 
     /*! @copydoc meta_data::custom */
-    template<typename Type>
-    [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node->custom.data != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node->custom.data);
+    [[nodiscard]] meta_custom custom() const noexcept {
+        return {node->custom};
     }
 
     /**
@@ -1544,10 +1574,8 @@ public:
     }
 
     /*! @copydoc meta_data::custom */
-    template<typename Type>
-    [[nodiscard]] const Type &custom() const noexcept {
-        ENTT_ASSERT(node.custom.data != nullptr, "Invalid user data");
-        return *std::static_pointer_cast<Type>(node.custom.data);
+    [[nodiscard]] meta_custom custom() const noexcept {
+        return {node.custom};
     }
 
     /**

@@ -128,7 +128,6 @@ struct MetaType: ::testing::Test {
 
         entt::meta<base>()
             .type("base"_hs)
-            .custom<char>('c')
             .data<&base::value>("value"_hs);
 
         entt::meta<derived>()
@@ -177,7 +176,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<clazz>()
             .type("class"_hs)
-            .custom<int>(3)
+            .custom<char>('c')
             .prop(static_cast<entt::id_type>(property_type::value), 3)
             .ctor<const base &, int>()
             .data<&clazz::value>("value"_hs)
@@ -301,14 +300,16 @@ TEST_F(MetaType, UserTraits) {
 }
 
 TEST_F(MetaType, Custom) {
-    using namespace entt::literals;
+    ASSERT_EQ(*static_cast<const char *>(entt::resolve<clazz>().custom()), 'c');
+    ASSERT_EQ(static_cast<const char &>(entt::resolve<clazz>().custom()), 'c');
 
-    ASSERT_EQ(entt::resolve<base>().custom<char>(), 'c');
-    ASSERT_EQ(entt::resolve("class"_hs).custom<int>(), 3);
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<base>().custom()), nullptr);
 }
 
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
-    ASSERT_DEATH([[maybe_unused]] auto &&value = entt::resolve<derived>().custom<int>(), "");
+    ASSERT_DEATH([[maybe_unused]] const int &value = entt::resolve<clazz>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const char &value = entt::resolve<base>().custom(), "");
 }
 
 TEST_F(MetaType, RemovePointer) {
