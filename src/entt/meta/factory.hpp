@@ -30,46 +30,45 @@ namespace internal {
 class basic_meta_factory {
 protected:
     void type(const id_type id) noexcept {
-        auto &&elem = internal::meta_context::from(*ctx).value[parent];
-        ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
+        ENTT_ASSERT(owner->id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = parent;
-        elem.id = id;
+        owner->id = id;
     }
 
     void base(const id_type id, meta_base_node node) {
-        details->base.insert_or_assign(id, node);
+        owner->details->base.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void conv(const id_type id, meta_conv_node node) {
-        details->conv.insert_or_assign(id, node);
+        owner->details->conv.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
-        details->ctor.insert_or_assign(id, node);
+        owner->details->ctor.insert_or_assign(id, node);
         bucket = parent;
     }
 
     void dtor(meta_dtor_node node) {
-        internal::meta_context::from(*ctx).value[parent].dtor = node;
+        owner->dtor = node;
         bucket = parent;
     }
 
     void data(const id_type id) {
-        ENTT_ASSERT(details->data.find(id) != details->data.cend(), "Invalid id");
+        ENTT_ASSERT(owner->details->data.find(id) != owner->details->data.cend(), "Invalid id");
         is_data = true;
         bucket = id;
     }
 
     void data(const id_type id, meta_data_node node) {
-        details->data.insert_or_assign(id, std::move(node));
+        owner->details->data.insert_or_assign(id, std::move(node));
         is_data = true;
         bucket = id;
     }
 
     void func(const id_type id) {
-        ENTT_ASSERT(details->func.find(id) != details->func.cend(), "Invalid id");
+        ENTT_ASSERT(owner->details->func.find(id) != owner->details->func.cend(), "Invalid id");
         is_data = false;
         bucket = id;
     }
@@ -78,7 +77,7 @@ protected:
         is_data = false;
         bucket = id;
 
-        if(auto it = details->func.find(id); it != details->func.end()) {
+        if(auto it = owner->details->func.find(id); it != owner->details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
@@ -88,59 +87,56 @@ protected:
             }
 
             // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(details->func[id]));
+            node.next = std::make_shared<meta_func_node>(std::move(owner->details->func[id]));
         }
 
-        details->func.insert_or_assign(id, std::move(node));
+        owner->details->func.insert_or_assign(id, std::move(node));
     }
 
     void prop(const id_type key, internal::meta_prop_node value) {
         if(bucket == parent) {
-            details->prop[key] = std::move(value);
+            owner->details->prop[key] = std::move(value);
         } else if(is_data) {
-            details->data[bucket].prop[key] = std::move(value);
+            owner->details->data[bucket].prop[key] = std::move(value);
         } else {
-            details->func[bucket].prop[key] = std::move(value);
+            owner->details->func[bucket].prop[key] = std::move(value);
         }
     }
 
     void traits(const internal::meta_traits value) {
         if(bucket == parent) {
-            internal::meta_context::from(*ctx).value[parent].traits |= value;
+            owner->traits |= value;
         } else if(is_data) {
-            details->data[bucket].traits |= value;
+            owner->details->data[bucket].traits |= value;
         } else {
-            details->func[bucket].traits |= value;
+            owner->details->func[bucket].traits |= value;
         }
     }
 
     void custom(meta_custom_node node) {
         if(bucket == parent) {
-            internal::meta_context::from(*ctx).value[parent].custom = std::move(node);
+            owner->custom = std::move(node);
         } else if(is_data) {
-            details->data[bucket].custom = std::move(node);
+            owner->details->data[bucket].custom = std::move(node);
         } else {
-            details->func[bucket].custom = std::move(node);
+            owner->details->func[bucket].custom = std::move(node);
         }
     }
 
 public:
-    basic_meta_factory(const type_info &info, meta_ctx &area)
+    basic_meta_factory(internal::meta_type_node &elem, meta_ctx &area)
         : ctx{&area},
-          parent{info.hash()},
-          bucket{parent} {
-        auto &&elem = internal::meta_context::from(*ctx).value[parent];
-
-        if(!elem.details) {
-            elem.details = std::make_shared<internal::meta_type_descriptor>();
+          owner{&elem},
+          parent{elem.info->hash()},
+          bucket{elem.info->hash()} {
+        if(!owner->details) {
+            owner->details = std::make_shared<internal::meta_type_descriptor>();
         }
-
-        details = elem.details;
     }
 
 private:
     meta_ctx *ctx{};
-    std::shared_ptr<meta_type_descriptor> details{};
+    internal::meta_type_node *owner{};
     const id_type parent{};
     id_type bucket{};
     bool is_data{};
@@ -185,7 +181,7 @@ public:
      * @param area The context into which to construct meta types.
      */
     meta_factory(meta_ctx &area) noexcept
-        : internal::basic_meta_factory{type_id<Type>(), area} {}
+        : internal::basic_meta_factory{internal::meta_context::from(area).value[type_id<Type>().hash()], area} {}
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
