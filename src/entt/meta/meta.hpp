@@ -844,7 +844,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator const Type *() const noexcept {
-        return (type_id<Type>().hash() == node.type) ? std::static_pointer_cast<Type>(node.data).get() : nullptr;
+        return (type_id<Type>().hash() == node.type) ? std::static_pointer_cast<Type>(node.value).get() : nullptr;
     }
 
     /**
@@ -854,7 +854,7 @@ struct meta_custom {
     template<typename Type>
     [[nodiscard]] operator const Type &() const noexcept {
         ENTT_ASSERT(type_id<Type>().hash() == node.type, "Invalid type");
-        return *std::static_pointer_cast<Type>(node.data);
+        return *std::static_pointer_cast<Type>(node.value);
     }
 
 private:
