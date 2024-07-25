@@ -29,51 +29,52 @@ namespace internal {
 
 class basic_meta_factory {
 protected:
-    void type(const id_type id) noexcept {
-        ENTT_ASSERT(owner->id == id || !resolve(*ctx, id), "Duplicate identifier");
-        bucket = &owner->details->prop;
-        user = &owner->custom;
-        mask = &owner->traits;
-        owner->id = id;
+    void type(const id_type parent, const id_type id) noexcept {
+        auto &&elem = meta_context::from(*ctx).value[parent];
+        ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
+        bucket = &elem.details->prop;
+        user = &elem.custom;
+        mask = &elem.traits;
+        elem.id = id;
     }
 
     void base(const id_type id, meta_base_node node) {
-        owner->details->base.insert_or_assign(id, node);
+        details->base.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
     }
 
     void conv(const id_type id, meta_conv_node node) {
-        owner->details->conv.insert_or_assign(id, node);
+        details->conv.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
-        owner->details->ctor.insert_or_assign(id, node);
+        details->ctor.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
     }
 
-    void dtor(meta_dtor_node node) {
-        owner->dtor = node;
+    void dtor(const id_type parent, meta_dtor_node node) {
+        meta_context::from(*ctx).value[parent].dtor = node;
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
     }
 
     void data(const id_type id, meta_data_node node) {
-        auto &&it = owner->details->data.insert_or_assign(id, std::move(node)).first;
+        auto &&it = details->data.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
         user = &it->second.custom;
         mask = &it->second.traits;
     }
 
     void func(const id_type id, meta_func_node node) {
-        if(auto it = owner->details->func.find(id); it != owner->details->func.end()) {
+        if(auto it = details->func.find(id); it != details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
                     node.next = std::move(curr->next);
@@ -86,10 +87,10 @@ protected:
             }
 
             // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(owner->details->func[id]));
+            node.next = std::make_shared<meta_func_node>(std::move(details->func[id]));
         }
 
-        auto &&it = owner->details->func.insert_or_assign(id, std::move(node)).first;
+        auto &&it = details->func.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
         user = &it->second.custom;
         mask = &it->second.traits;
@@ -108,20 +109,23 @@ protected:
     }
 
 public:
-    basic_meta_factory(meta_type_node &elem, meta_ctx &area)
-        : ctx{&area},
-          owner{&elem} {
-        if(!owner->details) {
-            owner->details = std::make_shared<meta_type_descriptor>();
+    basic_meta_factory(const id_type parent, meta_ctx &area)
+        : ctx{&area} {
+        auto &&elem = meta_context::from(*ctx).value[parent];
+
+        if(!elem.details) {
+            elem.details = std::make_shared<meta_type_descriptor>();
         }
 
-        bucket = &owner->details->prop;
-        user = &owner->custom;
+        details = elem.details.get();
+        bucket = &details->prop;
+        user = &elem.custom;
+        mask = &elem.traits;
     }
 
 private:
     [[maybe_unused]] meta_ctx *ctx{};
-    meta_type_node *owner{};
+    meta_type_descriptor *details{};
     dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
     meta_traits *mask;
@@ -166,7 +170,7 @@ public:
      * @param area The context into which to construct meta types.
      */
     meta_factory(meta_ctx &area) noexcept
-        : internal::basic_meta_factory{internal::meta_context::from(area).value[type_id<Type>().hash()], area} {}
+        : internal::basic_meta_factory{type_id<Type>().hash(), area} {}
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
@@ -174,7 +178,7 @@ public:
      * @return A meta factory for the given type.
      */
     meta_factory type(const id_type id) noexcept {
-        base_type::type(id);
+        base_type::type(type_id<Type>().hash(), id);
         return *this;
     }
 
@@ -296,7 +300,7 @@ public:
     meta_factory dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
-        base_type::dtor(internal::meta_dtor_node{op});
+        base_type::dtor(type_id<Type>().hash(), internal::meta_dtor_node{op});
         return *this;
     }
 

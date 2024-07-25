@@ -45,5 +45,3 @@ TODO:
 * natvis for meta_custom
 * meta: vectors for details and props
 * suppress -Wself-move on CI with g++13
-* meta: make context publicly available from the factory
-* only use details in the meta factory, not the meta type as a whole
