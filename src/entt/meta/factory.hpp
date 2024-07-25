@@ -124,7 +124,7 @@ public:
     }
 
 private:
-    [[maybe_unused]] meta_ctx *ctx{};
+    meta_ctx *ctx{};
     meta_type_descriptor *details{};
     dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
