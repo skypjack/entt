@@ -34,7 +34,6 @@ protected:
         bucket = &owner->details->prop;
         user = &owner->custom;
         mask = &owner->traits;
-        dest = parent;
         owner->id = id;
     }
 
@@ -43,7 +42,6 @@ protected:
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
-        dest = parent;
     }
 
     void conv(const id_type id, meta_conv_node node) {
@@ -51,7 +49,6 @@ protected:
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
-        dest = parent;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
@@ -59,7 +56,6 @@ protected:
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
-        dest = parent;
     }
 
     void dtor(meta_dtor_node node) {
@@ -67,7 +63,6 @@ protected:
         bucket = nullptr;
         user = nullptr;
         mask = nullptr;
-        dest = parent;
     }
 
     void data(const id_type id) {
@@ -76,8 +71,6 @@ protected:
         bucket = &elem.prop;
         user = &elem.custom;
         mask = &elem.traits;
-        is_data = true;
-        dest = id;
     }
 
     void data(const id_type id, meta_data_node node) {
@@ -85,8 +78,6 @@ protected:
         bucket = &it->second.prop;
         user = &it->second.custom;
         mask = &it->second.traits;
-        is_data = true;
-        dest = id;
     }
 
     void func(const id_type id) {
@@ -95,14 +86,9 @@ protected:
         bucket = &elem.prop;
         user = &elem.custom;
         mask = &elem.traits;
-        is_data = false;
-        dest = id;
     }
 
     void func(const id_type id, meta_func_node node) {
-        is_data = false;
-        dest = id;
-
         if(auto it = owner->details->func.find(id); it != owner->details->func.end()) {
             for(auto *curr = &it->second; curr; curr = curr->next.get()) {
                 if(curr->invoke == node.invoke) {
@@ -140,9 +126,7 @@ protected:
 public:
     basic_meta_factory(meta_type_node &elem, meta_ctx &area)
         : ctx{&area},
-          owner{&elem},
-          parent{elem.info->hash()},
-          dest{elem.info->hash()} {
+          owner{&elem} {
         if(!owner->details) {
             owner->details = std::make_shared<meta_type_descriptor>();
         }
@@ -157,9 +141,6 @@ private:
     dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
     meta_traits *mask;
-    const id_type parent{};
-    id_type dest{};
-    bool is_data{};
 };
 
 } // namespace internal
