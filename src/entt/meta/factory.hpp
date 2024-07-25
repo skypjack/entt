@@ -65,27 +65,11 @@ protected:
         mask = nullptr;
     }
 
-    void data(const id_type id) {
-        ENTT_ASSERT(owner->details->data.contains(id), "Invalid id");
-        auto &&elem = owner->details->data[id];
-        bucket = &elem.prop;
-        user = &elem.custom;
-        mask = &elem.traits;
-    }
-
     void data(const id_type id, meta_data_node node) {
         auto &&it = owner->details->data.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
         user = &it->second.custom;
         mask = &it->second.traits;
-    }
-
-    void func(const id_type id) {
-        ENTT_ASSERT(owner->details->func.contains(id), "Invalid id");
-        auto &&elem = owner->details->func[id];
-        bucket = &elem.prop;
-        user = &elem.custom;
-        mask = &elem.traits;
     }
 
     void func(const id_type id, meta_func_node node) {
@@ -317,16 +301,6 @@ public:
     }
 
     /**
-     * @brief Seeks an arbitrary meta data in a meta type.
-     * @param id Unique identifier.
-     * @return A meta factory for the parent type.
-     */
-    meta_factory data(const id_type id) noexcept {
-        base_type::data(id);
-        return *this;
-    }
-
-    /**
      * @brief Assigns a meta data to a meta type.
      *
      * Both data members and static and global variables, as well as constants
@@ -452,16 +426,6 @@ public:
     template<typename Setter, auto Getter, typename Policy = as_is_t>
     meta_factory data(const id_type id) noexcept {
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
-        return *this;
-    }
-
-    /**
-     * @brief Seeks an arbitrary meta function in a meta type.
-     * @param id Unique identifier.
-     * @return A meta factory for the parent type.
-     */
-    meta_factory func(const id_type id) noexcept {
-        base_type::func(id);
         return *this;
     }
 
