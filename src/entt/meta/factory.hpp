@@ -33,6 +33,7 @@ protected:
         ENTT_ASSERT(owner->id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = &owner->details->prop;
         user = &owner->custom;
+        mask = &owner->traits;
         dest = parent;
         owner->id = id;
     }
@@ -41,6 +42,7 @@ protected:
         owner->details->base.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
+        mask = nullptr;
         dest = parent;
     }
 
@@ -48,6 +50,7 @@ protected:
         owner->details->conv.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
+        mask = nullptr;
         dest = parent;
     }
 
@@ -55,6 +58,7 @@ protected:
         owner->details->ctor.insert_or_assign(id, node);
         bucket = nullptr;
         user = nullptr;
+        mask = nullptr;
         dest = parent;
     }
 
@@ -62,6 +66,7 @@ protected:
         owner->dtor = node;
         bucket = nullptr;
         user = nullptr;
+        mask = nullptr;
         dest = parent;
     }
 
@@ -70,6 +75,7 @@ protected:
         auto &&elem = owner->details->data[id];
         bucket = &elem.prop;
         user = &elem.custom;
+        mask = &elem.traits;
         is_data = true;
         dest = id;
     }
@@ -78,6 +84,7 @@ protected:
         auto &&it = owner->details->data.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
         user = &it->second.custom;
+        mask = &it->second.traits;
         is_data = true;
         dest = id;
     }
@@ -87,6 +94,7 @@ protected:
         auto &&elem = owner->details->func[id];
         bucket = &elem.prop;
         user = &elem.custom;
+        mask = &elem.traits;
         is_data = false;
         dest = id;
     }
@@ -102,6 +110,7 @@ protected:
                     *curr = std::move(node);
                     bucket = &curr->prop;
                     user = &curr->custom;
+                    mask = &curr->traits;
                     return;
                 }
             }
@@ -113,6 +122,7 @@ protected:
         auto &&it = owner->details->func.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
         user = &it->second.custom;
+        mask = &it->second.traits;
     }
 
     void prop(const id_type key, meta_prop_node value) {
@@ -120,13 +130,7 @@ protected:
     }
 
     void traits(const meta_traits value) {
-        if(dest == parent) {
-            owner->traits |= value;
-        } else if(is_data) {
-            owner->details->data[dest].traits |= value;
-        } else {
-            owner->details->func[dest].traits |= value;
-        }
+        *mask |= value;
     }
 
     void custom(meta_custom_node node) {
@@ -152,6 +156,7 @@ private:
     meta_type_node *owner{};
     dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
+    meta_traits *mask;
     const id_type parent{};
     id_type dest{};
     bool is_data{};
