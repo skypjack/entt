@@ -880,16 +880,13 @@ entt::meta<my_type>().prop(my_enum::key_only);
 To attach multiple properties to a meta object, just invoke `prop` more than
 once.<br/>
 It's also possible to call `prop` at different times, as long as the factory is
-reset to the meta object of interest. For example, to attach a property to an
-already existing meta data object:
+reset to the meta object of interest:
 
 ```cpp
-entt::meta<my_type>().data("member"_hs).prop("key"_hs, value);
+entt::meta<my_type>()
+    .data<&my_type::data_member, entt::as_ref_t>("member"_hs)
+    .prop("key"_hs, value);
 ```
-
-The `data` and `func` overloads which accept only the name of the member to be
-searched for assume that it already exists and make it the _current element_ for
-subsequent calls.
 
 Once created, all meta objects offer a couple of member functions named `prop`
 to iterate all properties at once or to search a specific property by key:
@@ -922,15 +919,14 @@ It's not possible to assign traits at different times. Therefore, multiple calls
 to the `traits` function overwrite previous values. However, traits can be read
 from meta objects and used to update existing data with a factory, effectively
 extending them as needed.<br/>
-Likewise, users can also set traits on meta objects later if needed:
+Likewise, users can also set traits on meta objects later if needed, as long as
+the factory is reset to the meta object of interest:
 
 ```cpp
-entt::meta<my_type>().data("member"_hs).traits(my_traits::internal);
+entt::meta<my_type>()
+    .data<&my_type::data_member, entt::as_ref_t>("member"_hs)
+    .traits(my_traits::internal);
 ```
-
-The `data` and `func` overloads which accept only the name of the member to be
-searched for assume that it already exists and make it the _current element_ for
-subsequent calls.
 
 Once created, all meta objects offer a member function named `traits` to get the
 currently set value:
@@ -957,15 +953,14 @@ It's not possible to assign custom data at different times. Therefore, multiple
 calls to the `custom` function overwrite previous values. However, this value
 can be read from meta objects and used to update existing data with a factory,
 effectively extending them as needed.<br/>
-Likewise, users can also set custom data on meta objects later if needed:
+Likewise, users can also set custom data on meta objects later if needed, as
+long as the factory is reset to the meta object of interest:
 
 ```cpp
-entt::meta<my_type>().func("invoke"_hs).custom<function_data>("tooltip");
+entt::meta<my_type>()
+    .func<&my_type::member_function>("member"_hs)
+    .custom<function_data>("tooltip");
 ```
-
-The `data` and `func` overloads which accept only the name of the member to be
-searched for assume that it already exists and make it the _current element_ for
-subsequent calls.
 
 Once created, all meta objects offer a member function named `custom` to get the
 currently set value as a const reference or as a pointer to a const element:
