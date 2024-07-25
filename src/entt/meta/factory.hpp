@@ -56,7 +56,7 @@ protected:
     }
 
     void data(const id_type id) {
-        ENTT_ASSERT(owner->details->data.find(id) != owner->details->data.cend(), "Invalid id");
+        ENTT_ASSERT(owner->details->data.contains(id), "Invalid id");
         is_data = true;
         bucket = id;
     }
@@ -68,7 +68,7 @@ protected:
     }
 
     void func(const id_type id) {
-        ENTT_ASSERT(owner->details->func.find(id) != owner->details->func.cend(), "Invalid id");
+        ENTT_ASSERT(owner->details->func.contains(id), "Invalid id");
         is_data = false;
         bucket = id;
     }
