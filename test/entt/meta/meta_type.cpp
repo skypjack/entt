@@ -71,17 +71,13 @@ struct clazz {
 };
 
 struct overloaded_func {
-    [[nodiscard]] int e(int v) const {
-        return v + v;
-    }
-
     [[nodiscard]] int f(const base &, int a, int b) {
         return f(a, b);
     }
 
     [[nodiscard]] int f(int a, const int b) {
         value = a;
-        return g(b);
+        return b * b;
     }
 
     [[nodiscard]] int f(int v) {
@@ -89,16 +85,12 @@ struct overloaded_func {
     }
 
     [[nodiscard]] int f(int v) const {
-        return g(v);
+        return v * v;
     }
 
     [[nodiscard]] float f(int a, const float b) {
         value = a;
-        return static_cast<float>(e(static_cast<int>(b)));
-    }
-
-    [[nodiscard]] int g(int v) const {
-        return v * v;
+        return b + b;
     }
 
     int value{};
@@ -147,13 +139,11 @@ struct MetaType: ::testing::Test {
 
         entt::meta<overloaded_func>()
             .type("overloaded_func"_hs)
-            .func<&overloaded_func::e>("e"_hs)
             .func<entt::overload<int(const base &, int, int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int, int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int) const>(&overloaded_func::f)>("f"_hs)
-            .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs)
-            .func<&overloaded_func::g>("g"_hs);
+            .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs);
 
         entt::meta<property_type>()
             .type("property"_hs)
@@ -457,8 +447,6 @@ TEST_F(MetaType, OverloadedFunc) {
     entt::meta_any res{};
 
     ASSERT_TRUE(type.func("f"_hs));
-    ASSERT_TRUE(type.func("e"_hs));
-    ASSERT_TRUE(type.func("g"_hs));
 
     res = type.invoke("f"_hs, instance, base{}, 1, 2);
 
@@ -504,6 +492,46 @@ TEST_F(MetaType, OverloadedFunc) {
 
     // it fails as an ambiguous call
     ASSERT_FALSE(type.invoke("f"_hs, instance, 4, 8.));
+}
+
+TEST_F(MetaType, OverloadedFuncOrder) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<overloaded_func>();
+    auto func = type.func("f"_hs);
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 3u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 2u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_TRUE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 2u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<float>());
 }
 
 TEST_F(MetaType, Construct) {

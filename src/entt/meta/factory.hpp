@@ -74,26 +74,29 @@ protected:
     }
 
     void func(const id_type id, meta_func_node node) {
-        if(auto it = details->func.find(id); it != details->func.end()) {
-            for(auto *curr = &it->second; curr; curr = curr->next.get()) {
-                if(curr->invoke == node.invoke) {
-                    node.next = std::move(curr->next);
-                    *curr = std::move(node);
-                    bucket = &curr->prop;
-                    user = &curr->custom;
-                    mask = &curr->traits;
-                    return;
-                }
+        if(auto it = details->func.find(id); it == details->func.end()) {
+            auto &&elem = details->func.insert_or_assign(id, std::move(node)).first;
+            bucket = &elem->second.prop;
+            user = &elem->second.custom;
+            mask = &elem->second.traits;
+        } else {
+            auto *curr = &it->second;
+
+            while(curr->invoke != node.invoke && curr->next) {
+                curr = curr->next.get();
             }
 
-            // locally overloaded function
-            node.next = std::make_shared<meta_func_node>(std::move(details->func[id]));
-        }
+            if(curr->invoke != node.invoke) {
+                curr->next = std::make_shared<meta_func_node>();
+                curr = curr->next.get();
+            }
 
-        auto &&it = details->func.insert_or_assign(id, std::move(node)).first;
-        bucket = &it->second.prop;
-        user = &it->second.custom;
-        mask = &it->second.traits;
+            node.next = std::move(curr->next);
+            *curr = std::move(node);
+            bucket = &curr->prop;
+            user = &curr->custom;
+            mask = &curr->traits;
+        }
     }
 
     void prop(const id_type key, meta_prop_node value) {
