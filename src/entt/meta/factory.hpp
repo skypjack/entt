@@ -32,6 +32,7 @@ protected:
     void type(const id_type id) noexcept {
         ENTT_ASSERT(owner->id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = &owner->details->prop;
+        user = &owner->custom;
         dest = parent;
         owner->id = id;
     }
@@ -39,24 +40,28 @@ protected:
     void base(const id_type id, meta_base_node node) {
         owner->details->base.insert_or_assign(id, node);
         bucket = nullptr;
+        user = nullptr;
         dest = parent;
     }
 
     void conv(const id_type id, meta_conv_node node) {
         owner->details->conv.insert_or_assign(id, node);
         bucket = nullptr;
+        user = nullptr;
         dest = parent;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
         owner->details->ctor.insert_or_assign(id, node);
         bucket = nullptr;
+        user = nullptr;
         dest = parent;
     }
 
     void dtor(meta_dtor_node node) {
         owner->dtor = node;
         bucket = nullptr;
+        user = nullptr;
         dest = parent;
     }
 
@@ -64,6 +69,7 @@ protected:
         ENTT_ASSERT(owner->details->data.contains(id), "Invalid id");
         auto &&elem = owner->details->data[id];
         bucket = &elem.prop;
+        user = &elem.custom;
         is_data = true;
         dest = id;
     }
@@ -71,6 +77,7 @@ protected:
     void data(const id_type id, meta_data_node node) {
         auto &&it = owner->details->data.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
+        user = &it->second.custom;
         is_data = true;
         dest = id;
     }
@@ -79,6 +86,7 @@ protected:
         ENTT_ASSERT(owner->details->func.contains(id), "Invalid id");
         auto &&elem = owner->details->func[id];
         bucket = &elem.prop;
+        user = &elem.custom;
         is_data = false;
         dest = id;
     }
@@ -93,6 +101,7 @@ protected:
                     node.next = std::move(curr->next);
                     *curr = std::move(node);
                     bucket = &curr->prop;
+                    user = &curr->custom;
                     return;
                 }
             }
@@ -103,6 +112,7 @@ protected:
 
         auto &&it = owner->details->func.insert_or_assign(id, std::move(node)).first;
         bucket = &it->second.prop;
+        user = &it->second.custom;
     }
 
     void prop(const id_type key, internal::meta_prop_node value) {
@@ -120,13 +130,7 @@ protected:
     }
 
     void custom(meta_custom_node node) {
-        if(dest == parent) {
-            owner->custom = std::move(node);
-        } else if(is_data) {
-            owner->details->data[dest].custom = std::move(node);
-        } else {
-            owner->details->func[dest].custom = std::move(node);
-        }
+        *user = std::move(node);
     }
 
 public:
@@ -140,12 +144,14 @@ public:
         }
 
         bucket = &owner->details->prop;
+        user = &owner->custom;
     }
 
 private:
     meta_ctx *ctx{};
     internal::meta_type_node *owner{};
     dense_map<id_type, internal::meta_prop_node, identity> *bucket{};
+    meta_custom_node *user{};
     const id_type parent{};
     id_type dest{};
     bool is_data{};
