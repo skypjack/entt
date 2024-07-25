@@ -47,3 +47,4 @@ TODO:
 * suppress -Wself-move on CI with g++13
 * meta: custom data can be attached to wrong func if overloaded and re-run/seek (fix and test)
 * meta: use common base node class in the factory for custom/prop
+* meta: drop seek functions, too tricky to support unfortunately
