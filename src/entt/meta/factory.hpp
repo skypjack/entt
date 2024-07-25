@@ -115,11 +115,11 @@ protected:
         user = &it->second.custom;
     }
 
-    void prop(const id_type key, internal::meta_prop_node value) {
+    void prop(const id_type key, meta_prop_node value) {
         (*bucket)[key] = std::move(value);
     }
 
-    void traits(const internal::meta_traits value) {
+    void traits(const meta_traits value) {
         if(dest == parent) {
             owner->traits |= value;
         } else if(is_data) {
@@ -134,13 +134,13 @@ protected:
     }
 
 public:
-    basic_meta_factory(internal::meta_type_node &elem, meta_ctx &area)
+    basic_meta_factory(meta_type_node &elem, meta_ctx &area)
         : ctx{&area},
           owner{&elem},
           parent{elem.info->hash()},
           dest{elem.info->hash()} {
         if(!owner->details) {
-            owner->details = std::make_shared<internal::meta_type_descriptor>();
+            owner->details = std::make_shared<meta_type_descriptor>();
         }
 
         bucket = &owner->details->prop;
@@ -149,8 +149,8 @@ public:
 
 private:
     meta_ctx *ctx{};
-    internal::meta_type_node *owner{};
-    dense_map<id_type, internal::meta_prop_node, identity> *bucket{};
+    meta_type_node *owner{};
+    dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
     const id_type parent{};
     id_type dest{};
