@@ -29,7 +29,7 @@ namespace internal {
 
 class basic_meta_factory {
 protected:
-    void type(const id_type parent, const id_type id) noexcept {
+    void type(const id_type id) noexcept {
         auto &&elem = meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
         bucket = &elem.details->prop;
@@ -59,7 +59,7 @@ protected:
         mask = nullptr;
     }
 
-    void dtor(const id_type parent, meta_dtor_node node) {
+    void dtor(meta_dtor_node node) {
         meta_context::from(*ctx).value[parent].dtor = node;
         bucket = nullptr;
         user = nullptr;
@@ -112,8 +112,9 @@ protected:
     }
 
 public:
-    basic_meta_factory(const id_type parent, meta_ctx &area)
-        : ctx{&area} {
+    basic_meta_factory(const id_type id, meta_ctx &area)
+        : ctx{&area},
+          parent{id} {
         auto &&elem = meta_context::from(*ctx).value[parent];
 
         if(!elem.details) {
@@ -128,6 +129,7 @@ public:
 
 private:
     meta_ctx *ctx{};
+    id_type parent{};
     meta_type_descriptor *details{};
     dense_map<id_type, meta_prop_node, identity> *bucket{};
     meta_custom_node *user{};
@@ -181,7 +183,7 @@ public:
      * @return A meta factory for the given type.
      */
     meta_factory type(const id_type id) noexcept {
-        base_type::type(type_id<Type>().hash(), id);
+        base_type::type(id);
         return *this;
     }
 
@@ -303,7 +305,7 @@ public:
     meta_factory dtor() noexcept {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
-        base_type::dtor(type_id<Type>().hash(), internal::meta_dtor_node{op});
+        base_type::dtor(internal::meta_dtor_node{op});
         return *this;
     }
 
