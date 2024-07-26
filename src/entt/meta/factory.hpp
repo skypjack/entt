@@ -28,57 +28,62 @@ namespace entt {
 namespace internal {
 
 class basic_meta_factory {
+    using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
+
+    auto *find_overload() {
+        auto *curr = &details->func[bucket];
+
+        while(curr->invoke != invoke) {
+            curr = curr->next.get();
+        }
+
+        return curr;
+    }
+
 protected:
     void type(const id_type id) noexcept {
         auto &&elem = meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        bucket = &elem.details->prop;
-        user = &elem.custom;
-        mask = &elem.traits;
+        invoke = nullptr;
+        bucket = parent;
         elem.id = id;
     }
 
     void base(const id_type id, meta_base_node node) {
         details->base.insert_or_assign(id, node);
-        bucket = nullptr;
-        user = nullptr;
-        mask = nullptr;
+        invoke = nullptr;
+        bucket = parent;
     }
 
     void conv(const id_type id, meta_conv_node node) {
         details->conv.insert_or_assign(id, node);
-        bucket = nullptr;
-        user = nullptr;
-        mask = nullptr;
+        invoke = nullptr;
+        bucket = parent;
     }
 
     void ctor(const id_type id, meta_ctor_node node) {
         details->ctor.insert_or_assign(id, node);
-        bucket = nullptr;
-        user = nullptr;
-        mask = nullptr;
+        invoke = nullptr;
+        bucket = parent;
     }
 
     void dtor(meta_dtor_node node) {
         meta_context::from(*ctx).value[parent].dtor = node;
-        bucket = nullptr;
-        user = nullptr;
-        mask = nullptr;
+        invoke = nullptr;
+        bucket = parent;
     }
 
     void data(const id_type id, meta_data_node node) {
-        auto &&it = details->data.insert_or_assign(id, std::move(node)).first;
-        bucket = &it->second.prop;
-        user = &it->second.custom;
-        mask = &it->second.traits;
+        details->data.insert_or_assign(id, std::move(node));
+        invoke = nullptr;
+        bucket = id;
     }
 
     void func(const id_type id, meta_func_node node) {
         if(auto it = details->func.find(id); it == details->func.end()) {
             auto &&elem = details->func.insert_or_assign(id, std::move(node)).first;
-            bucket = &elem->second.prop;
-            user = &elem->second.custom;
-            mask = &elem->second.traits;
+            invoke = elem->second.invoke;
+            bucket = id;
         } else {
             auto *curr = &it->second;
 
@@ -93,28 +98,47 @@ protected:
 
             node.next = std::move(curr->next);
             *curr = std::move(node);
-            bucket = &curr->prop;
-            user = &curr->custom;
-            mask = &curr->traits;
+
+            invoke = curr->invoke;
+            bucket = id;
         }
     }
 
     void prop(const id_type key, meta_prop_node value) {
-        (*bucket)[key] = std::move(value);
+        if(bucket == parent) {
+            details->prop[key] = std::move(value);
+        } else if(invoke == nullptr) {
+            details->data[bucket].prop[key] = std::move(value);
+        } else {
+            find_overload()->prop[key] = std::move(value);
+        }
     }
 
     void traits(const meta_traits value) {
-        *mask |= value;
+        if(bucket == parent) {
+            meta_context::from(*ctx).value[bucket].traits |= value;
+        } else if(invoke == nullptr) {
+            details->data[bucket].traits |= value;
+        } else {
+            find_overload()->traits |= value;
+        }
     }
 
     void custom(meta_custom_node node) {
-        *user = std::move(node);
+        if(bucket == parent) {
+            meta_context::from(*ctx).value[bucket].custom = std::move(node);
+        } else if(invoke == nullptr) {
+            details->data[bucket].custom = std::move(node);
+        } else {
+            find_overload()->custom = std::move(node);
+        }
     }
 
 public:
     basic_meta_factory(const id_type id, meta_ctx &area)
         : ctx{&area},
-          parent{id} {
+          parent{id},
+          bucket{id} {
         auto &&elem = meta_context::from(*ctx).value[parent];
 
         if(!elem.details) {
@@ -122,18 +146,14 @@ public:
         }
 
         details = elem.details.get();
-        bucket = &details->prop;
-        user = &elem.custom;
-        mask = &elem.traits;
     }
 
 private:
     meta_ctx *ctx{};
     id_type parent{};
+    id_type bucket{};
+    invoke_type *invoke{};
     meta_type_descriptor *details{};
-    dense_map<id_type, meta_prop_node, identity> *bucket{};
-    meta_custom_node *user{};
-    meta_traits *mask;
 };
 
 } // namespace internal
