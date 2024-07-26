@@ -136,10 +136,12 @@ struct type_info final {
      * @tparam Type Type for which to construct a type info object.
      */
     template<typename Type>
+    // NOLINTBEGIN(modernize-use-transparent-functors)
     constexpr type_info(std::in_place_type_t<Type>) noexcept
         : seq{type_index<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
           identifier{type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
           alias{type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()} {}
+    // NOLINTEND(modernize-use-transparent-functors)
 
     /**
      * @brief Type index.
