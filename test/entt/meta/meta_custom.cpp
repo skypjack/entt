@@ -12,11 +12,11 @@ struct clazz {
     int i{2};
     char j{'c'};
 
-    int f(int) const {
+    [[nodiscard]] int f(int) const {
         return i;
     }
 
-    char g(char) const {
+    [[nodiscard]] char g(char) const {
         return j;
     }
 };
