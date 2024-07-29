@@ -74,7 +74,10 @@ protected:
     }
 
     void data(const id_type id, meta_data_node node) {
-        details->data.insert_or_assign(id, std::move(node));
+        if(auto it = details->data.find(id); it == details->data.end() || it->second.set != node.set || it->second.get != node.get) {
+            details->data.insert_or_assign(id, std::move(node));
+        }
+
         invoke = nullptr;
         bucket = id;
     }
@@ -93,11 +96,8 @@ protected:
 
             if(curr->invoke != node.invoke) {
                 curr->next = std::make_shared<meta_func_node>();
-                curr = curr->next.get();
+                *curr->next = std::move(node);
             }
-
-            node.next = std::move(curr->next);
-            *curr = std::move(node);
 
             invoke = curr->invoke;
             bucket = id;

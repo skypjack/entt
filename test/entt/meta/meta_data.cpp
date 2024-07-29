@@ -702,6 +702,16 @@ TEST_F(MetaData, ReRegistration) {
     ASSERT_EQ(node.details->data.size(), 2u);
     ASSERT_TRUE(type.data("value"_hs));
     ASSERT_TRUE(type.data("field"_hs));
+
+    entt::meta<base>()
+        .data<&base::value>("field"_hs)
+        .traits(test::meta_traits::one)
+        .custom<int>(3)
+        // this should not overwrite traits and custom data
+        .data<&base::value>("field"_hs);
+
+    ASSERT_EQ(type.data("field"_hs).traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_NE(static_cast<const int *>(type.data("field"_hs).custom()), nullptr);
 }
 
 TEST_F(MetaData, CollisionAndReuse) {

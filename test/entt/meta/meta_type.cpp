@@ -830,11 +830,20 @@ TEST_F(MetaType, ReRegistration) {
     ASSERT_EQ(count, 0);
     ASSERT_TRUE(entt::resolve("double"_hs));
 
+    entt::meta<double>()
+        .type("real"_hs)
+        .traits(test::meta_traits::one)
+        .custom<int>(3);
+
+    // this should not overwrite traits and custom data
     entt::meta<double>().type("real"_hs);
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs).data("var"_hs));
+
+    ASSERT_EQ(entt::resolve<double>().traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_NE(static_cast<const int *>(entt::resolve<double>().custom()), nullptr);
 }
 
 TEST_F(MetaType, NameCollision) {

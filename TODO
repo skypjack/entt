@@ -45,3 +45,4 @@ TODO:
 * natvis for meta_custom
 * meta: vectors for details and props
 * suppress -Wself-move on CI with g++13
+* meta_custom operator bool

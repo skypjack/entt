@@ -666,6 +666,10 @@ TEST_F(MetaFunc, ReRegistration) {
 
     entt::meta<function>()
         .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
+        .traits(test::meta_traits::one)
+        .custom<int>(3)
+        // this should not overwrite traits and custom data
+        .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
         .func<entt::overload<int(int) const>(&function::f)>("f"_hs);
 
     ASSERT_TRUE(type.func("f1"_hs));
@@ -674,6 +678,9 @@ TEST_F(MetaFunc, ReRegistration) {
 
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0));
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0, 0));
+
+    ASSERT_EQ(type.func("f"_hs).traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_NE(static_cast<const int *>(type.func("f"_hs).custom()), nullptr);
 
     ASSERT_EQ(reset_and_check(), 0u);
 }
