@@ -218,6 +218,14 @@ TEST_F(MetaFunc, UserTraits) {
     ASSERT_EQ(entt::resolve<function>().func("f3"_hs).traits<test::meta_traits>(), test::meta_traits::three);
 }
 
+ENTT_DEBUG_TEST_F(MetaFuncDeathTest, UserTraits) {
+    using namespace entt::literals;
+
+    using traits_type = entt::internal::meta_traits;
+    constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
+    ASSERT_DEATH(entt::meta<function>().func<&function::g>("g"_hs).traits(value), "");
+}
+
 TEST_F(MetaFunc, Custom) {
     using namespace entt::literals;
 
