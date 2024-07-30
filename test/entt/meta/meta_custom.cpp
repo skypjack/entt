@@ -113,6 +113,17 @@ TEST_F(MetaCustom, Func) {
     ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().func("g"_hs).custom()), nullptr);
 }
 
+TEST_F(MetaCustom, ConstNonConstAndAllInBetween) {
+    testing::StaticAssertTypeEq<decltype(static_cast<int *>(entt::meta_custom{})), int *>();
+    testing::StaticAssertTypeEq<decltype(static_cast<int &>(entt::meta_custom{})), int &>();
+    testing::StaticAssertTypeEq<decltype(static_cast<const int *>(entt::meta_custom{})), const int *>();
+    testing::StaticAssertTypeEq<decltype(static_cast<const int &>(entt::meta_custom{})), const int &>();
+
+    static_cast<char &>(entt::resolve<clazz>().custom()) = '\n';
+
+    ASSERT_EQ(*static_cast<const char *>(entt::resolve<clazz>().custom()), '\n');
+}
+
 TEST_F(MetaCustom, ReRegistration) {
     using namespace entt::literals;
 

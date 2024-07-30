@@ -843,7 +843,7 @@ struct meta_custom {
      * @tparam Type Type to which conversion is requested.
      */
     template<typename Type>
-    [[nodiscard]] operator const Type *() const noexcept {
+    [[nodiscard]] operator Type *() const noexcept {
         return (type_id<Type>().hash() == node.type) ? std::static_pointer_cast<Type>(node.value).get() : nullptr;
     }
 
@@ -852,7 +852,7 @@ struct meta_custom {
      * @tparam Type Type to which conversion is requested.
      */
     template<typename Type>
-    [[nodiscard]] operator const Type &() const noexcept {
+    [[nodiscard]] operator Type &() const noexcept {
         ENTT_ASSERT(type_id<Type>().hash() == node.type, "Invalid type");
         return *std::static_pointer_cast<Type>(node.value);
     }
