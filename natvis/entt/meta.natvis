@@ -14,6 +14,14 @@
 			<Item Name="[arity]">arity</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::internal::meta_custom_node">
+		<DisplayString Condition="value != nullptr">{{ type={ type } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<Item Name="[type]">type</Item>
+			<ExpandedItem>value</ExpandedItem>
+		</Expand>
+	</Type>
 	<Type Name="entt::internal::meta_data_node">
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
@@ -26,6 +34,7 @@
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
+			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
 			<Synthetic Name="[prop]">
 				<DisplayString>{ prop.size() }</DisplayString>
 				<Expand>
@@ -54,6 +63,7 @@
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
+			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
 			<Synthetic Name="[prop]">
 				<DisplayString>{ prop.size() }</DisplayString>
 				<Expand>
@@ -72,7 +82,9 @@
 	</Type>
 	<Type Name="entt::internal::meta_prop_node">
 		<DisplayString>{ value }</DisplayString>
-		<Expand/>
+		<Expand>
+			<ExpandedItem>value</ExpandedItem>
+		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_template_node">
 		<DisplayString>{{ arity={ arity } }}</DisplayString>
@@ -210,6 +222,7 @@
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
 			<Item Name="[template_info]" Condition="templ.arity != 0u">templ</Item>
+			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
 			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 		</Expand>
 	</Type>
