@@ -74,8 +74,10 @@ protected:
     }
 
     void data(const id_type id, meta_data_node node) {
-        if(auto it = details->data.find(id); it == details->data.end() || it->second.set != node.set || it->second.get != node.get) {
+        if(auto it = details->data.find(id); it == details->data.end()) {
             details->data.insert_or_assign(id, std::move(node));
+        } else if(it->second.set != node.set || it->second.get != node.get) {
+            it->second = std::move(node);
         }
 
         invoke = nullptr;
