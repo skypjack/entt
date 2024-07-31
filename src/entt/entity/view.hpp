@@ -248,22 +248,20 @@ protected:
         unchecked_refresh();
     }
 
-    template<std::size_t Index>
-    [[nodiscard]] const Type *storage() const noexcept {
-        if constexpr(Index < Get) {
-            return pools[Index];
-        } else {
-            return filter[Index - Get];
-        }
+    [[nodiscard]] const Type *pool_at(const std::size_t pos) const noexcept {
+        return pools[pos];
     }
 
-    template<std::size_t Index>
-    void storage(const Type *elem) noexcept {
-        if constexpr(Index < Get) {
-            pools[Index] = elem;
+    [[nodiscard]] const Type *storage(const std::size_t pos) const noexcept {
+        return (pos < Get) ? pools[pos] : filter[pos - Get];
+    }
+
+    [[nodiscard]] void storage(const std::size_t pos, const Type *elem) noexcept {
+        if(pos < Get) {
+            pools[pos] = elem;
             refresh();
         } else {
-            filter[Index - Get] = elem;
+            filter[pos - Get] = elem;
         }
     }
 
@@ -432,7 +430,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
         static constexpr bool tombstone_check_required = ((sizeof...(Get) == 1u) && ... && (Get::storage_policy == deletion_policy::in_place));
 
         for(const auto curr: storage<Curr>()->each()) {
-            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || base_type::template storage<Index>()->contains(entt)) && ...) && base_type::none_of(entt)) {
+            if(const auto entt = std::get<0>(curr); (!tombstone_check_required || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                     std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
@@ -445,7 +443,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
     template<typename Func, std::size_t... Index>
     void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
         if(const auto *view = base_type::handle(); view != nullptr) {
-            ((view == base_type::template storage<Index>() ? each<Index>(func, seq) : void()), ...);
+            ((view == base_type::pool_at(Index) ? each<Index>(func, seq) : void()), ...);
         }
     }
 
@@ -518,7 +516,7 @@ public:
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
-        return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(base_type::template storage<Index>()));
+        return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(base_type::storage(Index)));
     }
 
     /**
@@ -540,7 +538,7 @@ public:
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         static_assert(std::is_convertible_v<Type &, type_list_element_t<Index, type_list<Get..., Exclude...>> &>, "Unexpected type");
-        base_type::template storage<Index>(&elem);
+        base_type::storage(Index, &elem);
     }
 
     /**
