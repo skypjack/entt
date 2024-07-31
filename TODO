@@ -38,10 +38,10 @@ TODO:
 * exploit ref/cref in any to avoid invoking the vtable if possible
 * entity based component_traits
 * copy-and-swap for any and meta_any
-* improve seek function for overloaded meta functions
 * fix cmake warning about FetchContent_Populate
 * deprecate meta properties in favor of custom data
 * make meta objects safe to use with null nodes
-* natvis for meta_custom
 * meta: vectors for details and props
 * suppress -Wself-move on CI with g++13
+* view and view iterator specializations for multi, single and filtered elements
+* organizer support to groups
