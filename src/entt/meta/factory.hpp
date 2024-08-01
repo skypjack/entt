@@ -97,11 +97,13 @@ protected:
             }
 
             if(curr->invoke != node.invoke) {
+                invoke = node.invoke;
                 curr->next = std::make_shared<meta_func_node>();
                 *curr->next = std::move(node);
+            } else {
+                invoke = curr->invoke;
             }
 
-            invoke = curr->invoke;
             bucket = id;
         }
     }

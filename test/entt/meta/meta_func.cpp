@@ -118,6 +118,7 @@ struct MetaFunc: ::testing::Test {
             .traits(test::meta_traits::three)
             .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
             .traits(test::meta_traits::two)
+            .custom<int>(2)
             .prop("true"_hs, false)
             .func<entt::overload<int(int) const>(&function::f)>("f1"_hs)
             .traits(test::meta_traits::one)
@@ -648,6 +649,61 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     ASSERT_TRUE(registry.all_of<function>(entity));
 }
 
+TEST_F(MetaFunc, Overloaded) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<function>();
+
+    ASSERT_FALSE(type.func("f2"_hs).next());
+
+    entt::meta<function>()
+        // this should not overwrite traits and custom data
+        .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
+        // this should put traits and custom data on the new overload instead
+        .func<entt::overload<int(int) const>(&function::f)>("f2"_hs)
+        .traits(test::meta_traits::three)
+        .custom<int>(3);
+
+    ASSERT_TRUE(type.func("f2"_hs).next());
+    ASSERT_FALSE(type.func("f2"_hs).next().next());
+
+    ASSERT_EQ(type.func("f2"_hs).traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(type.func("f2"_hs).next().traits<test::meta_traits>(), test::meta_traits::three);
+
+    ASSERT_NE(static_cast<const int *>(type.func("f2"_hs).custom()), nullptr);
+    ASSERT_NE(static_cast<const int *>(type.func("f2"_hs).next().custom()), nullptr);
+
+    ASSERT_EQ(static_cast<const int &>(type.func("f2"_hs).custom()), 2);
+    ASSERT_EQ(static_cast<const int &>(type.func("f2"_hs).next().custom()), 3);
+}
+
+TEST_F(MetaFunc, OverloadedOrder) {
+    using namespace entt::literals;
+
+    entt::meta<function>()
+        .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
+        .func<entt::overload<int(int) const>(&function::f)>("f2"_hs);
+
+    auto type = entt::resolve<function>();
+    auto func = type.func("f2"_hs);
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 2u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_TRUE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+
+    func = func.next();
+
+    ASSERT_FALSE(func);
+}
+
 TEST_F(MetaFunc, ReRegistration) {
     using namespace entt::literals;
 
@@ -666,10 +722,6 @@ TEST_F(MetaFunc, ReRegistration) {
 
     entt::meta<function>()
         .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
-        .traits(test::meta_traits::one)
-        .custom<int>(3)
-        // this should not overwrite traits and custom data
-        .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
         .func<entt::overload<int(int) const>(&function::f)>("f"_hs);
 
     ASSERT_TRUE(type.func("f1"_hs));
@@ -678,9 +730,6 @@ TEST_F(MetaFunc, ReRegistration) {
 
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0));
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0, 0));
-
-    ASSERT_EQ(type.func("f"_hs).traits<test::meta_traits>(), test::meta_traits::one);
-    ASSERT_NE(static_cast<const int *>(type.func("f"_hs).custom()), nullptr);
 
     ASSERT_EQ(reset_and_check(), 0u);
 }
