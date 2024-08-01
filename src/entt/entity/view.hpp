@@ -256,7 +256,7 @@ protected:
         return (pos < Get) ? pools[pos] : filter[pos - Get];
     }
 
-    [[nodiscard]] void storage(const std::size_t pos, const Type *elem) noexcept {
+    void storage(const std::size_t pos, const Type *elem) noexcept {
         if(pos < Get) {
             pools[pos] = elem;
             refresh();
