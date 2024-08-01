@@ -96,12 +96,12 @@ protected:
                 curr = curr->next.get();
             }
 
-            if(curr->invoke != node.invoke) {
+            if(curr->invoke == node.invoke) {
+                invoke = curr->invoke;
+            } else {
                 invoke = node.invoke;
                 curr->next = std::make_shared<meta_func_node>();
                 *curr->next = std::move(node);
-            } else {
-                invoke = curr->invoke;
             }
 
             bucket = id;
