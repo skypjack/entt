@@ -225,6 +225,9 @@ I hope the following lists can grow much more in the future.
     engine.
   * [Donner](https://github.com/jwmcglynn/donner): a modern C++20 SVG2 rendering
     API with CSS3.
+  * [Hazel Engine](https://github.com/TheCherno/Hazel): a work in progress
+    engine created by [The Cherno](https://github.com/TheCherno/Hazel) during
+    one of his most famous video series.
 
 ## Articles, videos and blog posts:
 
