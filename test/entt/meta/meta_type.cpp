@@ -190,8 +190,7 @@ TEST_F(MetaType, Resolve) {
     ASSERT_FALSE(entt::resolve(entt::type_id<void>()));
 
     auto range = entt::resolve();
-    // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
-    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == entt::hashed_string::value("class"); });
+    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == "class"_hs; });
 
     ASSERT_NE(it, range.end());
     ASSERT_EQ(it->second, entt::resolve<clazz>());
