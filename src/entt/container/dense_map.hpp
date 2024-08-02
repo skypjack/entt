@@ -268,6 +268,7 @@ class dense_map {
 
     template<typename Other>
     [[nodiscard]] std::size_t key_to_bucket(const Other &key) const noexcept {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 

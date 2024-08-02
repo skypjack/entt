@@ -132,6 +132,7 @@ class basic_any {
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     ::new(&storage) plain_type{std::forward<Args>(args)...};
                 } else {
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
                     ::new(&storage) plain_type(std::forward<Args>(args)...);
                 }
             } else {
