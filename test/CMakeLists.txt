@@ -51,21 +51,11 @@ function(SETUP_TARGET TARGET_NAME)
         target_compile_options(
             ${TARGET_NAME}
             PRIVATE
-                # vs2017 emits too many false positives for my tastes
-                $<IF:$<EQUAL:${MSVC_TOOLSET_VERSION},141>, /W1, /W4>
-                # clang-cl goes a little wrong with some warnings instead
                 $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:
+                    -Wdocumentation
                     -Wno-deprecated-declarations
-                    -Wno-ignored-qualifiers
-                    -Wno-unknown-warning-option
                     -Wno-exceptions
-                    -Wno-unused-local-typedef
-                    -Wno-unused-private-field
                 >
-                # documentation diagnostic turned on for clang-cl only
-                $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wdocumentation>
-                # warnings from compilers that think I don't know what I'm doing
-                $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wcomma>
                 /EHsc /wd4324 /wd4996
                 # disabling INCREMENTAL is required by SizeBench
                 $<$<CONFIG:Debug>:/Od /INCREMENTAL:NO>
@@ -82,7 +72,11 @@ function(SETUP_TARGET TARGET_NAME)
         target_compile_options(
             ${TARGET_NAME}
             PRIVATE
-                -pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations
+                -fvisibility=hidden
+                -pedantic
+                -Wall
+                -Wno-deprecated-declarations
+                -Wshadow
                 $<$<CONFIG:Debug>:-O0 -g>
                 $<$<CONFIG:Release>:-O2>
         )
