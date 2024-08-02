@@ -456,6 +456,7 @@ public:
     basic_storage(basic_storage &&other, const allocator_type &allocator)
         : base_type{std::move(other), allocator},
           payload{std::move(other.payload), allocator} {
+        // NOLINTNEXTLINE(bugprone-use-after-move)
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
     }
 
