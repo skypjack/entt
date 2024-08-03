@@ -236,7 +236,7 @@ To use `EnTT` from a `CMake` project, just link an existing target to the
 The library offers everything you need for locating (as in `find_package`),
 embedding (as in `add_subdirectory`), fetching (as in `FetchContent`) or using
 it in many of the ways that you can think of and that involve `CMake`.<br/>
-Covering all possible cases would require a treaty and not a simple README file,
+Covering all possible cases would require a treatise and not a simple README file,
 but I'm confident that anyone reading this section also knows what it's about
 and can use `EnTT` from a `CMake` project without problems.
 
@@ -385,7 +385,7 @@ open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
 
-Requests for features, PRs, suggestions ad feedback are highly appreciated.
+Requests for features, PRs, suggestions and feedback are highly appreciated.
 
 If you find you can help and want to contribute to the project with your
 experience or you do want to get part of the project for some other reason, feel
