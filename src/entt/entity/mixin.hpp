@@ -11,6 +11,42 @@
 
 namespace entt {
 
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template <typename T, typename Reg, typename = void>
+struct has_on_construct final : std::false_type {};
+
+template <typename T, typename Reg>
+struct has_on_construct<
+    T, Reg,
+    std::void_t<decltype(T::on_construct(std::declval<Reg &>(),
+                                         std::declval<Reg &>().create()))>>
+    : std::true_type {};
+
+template <typename T, typename Reg, typename = void>
+struct has_on_update final : std::false_type {};
+
+template <typename T, typename Reg>
+struct has_on_update<
+    T, Reg,
+    std::void_t<decltype(T::on_update(std::declval<Reg &>(),
+                                      std::declval<Reg &>().create()))>>
+    : std::true_type {};
+
+template <typename T, typename Reg, typename = void>
+struct has_on_destroy final : std::false_type {};
+
+template <typename T, typename Reg>
+struct has_on_destroy<
+    T, Reg,
+    std::void_t<decltype(T::on_destroy(std::declval<Reg &>(),
+                                       std::declval<Reg &>().create()))>>
+    : std::true_type {};
+
+} // namespace internal
+/*! @endcond */
+
 /**
  * @brief Mixin type used to add signal support to storage types.
  *
@@ -108,7 +144,22 @@ public:
           owner{},
           construction{allocator},
           destruction{allocator},
-          update{allocator} {}
+          update{allocator}
+    {
+        using element_type = typename Type::element_type;
+
+        if constexpr (internal::has_on_construct<element_type, Registry>::value) {
+            entt::sink{construction}.template connect<&element_type::on_construct>();
+        }
+
+        if constexpr (internal::has_on_update<element_type, Registry>::value) {
+            entt::sink{update}.template connect<&element_type::on_update>();
+        }
+
+        if constexpr (internal::has_on_destroy<element_type, Registry>::value) {
+            entt::sink{destruction}.template connect<&element_type::on_destroy>();
+        }
+    }
 
     /*! @brief Default copy constructor, deleted on purpose. */
     basic_sigh_mixin(const basic_sigh_mixin &) = delete;
