@@ -18,6 +18,13 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
+template<typename Type>
+const Type *view_placeholder() {
+    static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Unexpected type");
+    static const Type placeholder{};
+    return &placeholder;
+}
+
 template<typename It, typename Entity>
 [[nodiscard]] bool all_of(It first, const It last, const Entity entt) noexcept {
     for(; (first != last) && (*first)->contains(entt); ++first) {}
@@ -26,13 +33,13 @@ template<typename It, typename Entity>
 
 template<typename It, typename Entity>
 [[nodiscard]] bool none_of(It first, const It last, const Entity entt) noexcept {
-    for(; (first != last) && !(*first && (*first)->contains(entt)); ++first) {}
+    for(; (first != last) && !(*first)->contains(entt); ++first) {}
     return first == last;
 }
 
 template<typename It>
 [[nodiscard]] bool fully_initialized(It first, const It last) noexcept {
-    for(; (first != last) && *first; ++first) {}
+    for(const auto *placeholder = view_placeholder<std::remove_const_t<std::remove_pointer_t<std::iterator_traits<It>::value_type>>>(); (first != last) && *first != placeholder; ++first) {}
     return first == last;
 }
 
@@ -239,12 +246,22 @@ class basic_common_view {
 
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
-    basic_common_view() noexcept = default;
+    basic_common_view() noexcept {
+        for(size_type pos{}; pos < Exclude; ++pos) {
+            filter[pos] = internal::view_placeholder<Type>();
+        }
+    }
 
     basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
           index{Get} {
+        for(size_type pos{}; pos < Exclude; ++pos) {
+            if(filter[pos] == nullptr) {
+                filter[pos] = internal::view_placeholder<Type>();
+            }
+        }
+
         unchecked_refresh();
     }
 
@@ -253,7 +270,13 @@ protected:
     }
 
     [[nodiscard]] const Type *storage(const std::size_t pos) const noexcept {
-        return (pos < Get) ? pools[pos] : filter[pos - Get];
+        if(pos < Get) {
+            return pools[pos];
+        } else if(filter[pos - Get] != internal::view_placeholder<Type>()) {
+            return filter[pos - Get];
+        }
+
+        return nullptr;
     }
 
     void storage(const std::size_t pos, const Type *elem) noexcept {
@@ -261,7 +284,7 @@ protected:
             pools[pos] = elem;
             refresh();
         } else {
-            filter[pos - Get] = elem;
+            filter[pos - Get] = (elem == nullptr) ? internal::view_placeholder<Type>() : elem;
         }
     }
 
