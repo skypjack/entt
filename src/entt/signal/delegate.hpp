@@ -27,7 +27,7 @@ constexpr auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)
 template<typename Class, typename Ret, typename... Args, typename... Other>
 constexpr auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
 
-template<typename Class, typename Type, typename... Other>
+template<typename Class, typename Type, typename... Other, typename = std::enable_if_t<std::is_member_object_pointer_v<Type Class::*>>>
 constexpr auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
