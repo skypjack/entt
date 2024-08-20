@@ -224,6 +224,8 @@ class basic_view;
  */
 template<typename Type, std::size_t Get, std::size_t Exclude>
 class basic_common_view {
+    static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Unexpected type");
+
     template<typename Return, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>);
 
@@ -657,6 +659,8 @@ public:
  */
 template<typename Type, deletion_policy Policy>
 class basic_storage_view {
+    static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Unexpected type");
+
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_storage_view() noexcept = default;
