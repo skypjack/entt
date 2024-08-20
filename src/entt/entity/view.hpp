@@ -39,7 +39,7 @@ template<typename It, typename Entity>
 
 template<typename It>
 [[nodiscard]] bool fully_initialized(It first, const It last) noexcept {
-    for(const auto *placeholder = view_placeholder<std::remove_const_t<std::remove_pointer_t<std::iterator_traits<It>::value_type>>>(); (first != last) && *first != placeholder; ++first) {}
+    for(const auto *placeholder = view_placeholder<std::remove_const_t<std::remove_pointer_t<typename std::iterator_traits<It>::value_type>>>(); (first != last) && *first != placeholder; ++first) {}
     return first == last;
 }
 
