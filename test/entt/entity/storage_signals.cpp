@@ -18,13 +18,13 @@ struct count_tracker final {
     inline static std::size_t created = 0;
     inline static std::size_t updated = 0;
     inline static std::size_t destroyed = 0;
-    
+
     inline static std::size_t alive() {
         return created - destroyed;
     }
 };
 
-template <typename Type>
+template<typename Type>
 struct StorageSignals: testing::Test {
     using type = Type;
 };
@@ -60,5 +60,3 @@ TYPED_TEST(StorageSignals, AutoSignals) {
     ASSERT_EQ(count_tracker::destroyed, 1);
     ASSERT_EQ(count_tracker::alive(), 0);
 }
-
-
