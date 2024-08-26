@@ -41,17 +41,23 @@ class basic_meta_factory {
         return curr;
     }
 
+    void reset_bucket(const id_type id) {
+        invoke = nullptr;
+        bucket = id;
+    }
+
 protected:
     void type(const id_type id) noexcept {
+        reset_bucket(parent);
         auto &&elem = meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        invoke = nullptr;
-        bucket = parent;
         elem.id = id;
     }
 
     template<typename Type>
     void insert_or_assign(const id_type id, Type node) {
+        reset_bucket(parent);
+
         if constexpr(std::is_same_v<Type, meta_base_node>) {
             details->base.insert_or_assign(id, node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
@@ -60,33 +66,29 @@ protected:
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
             details->ctor.insert_or_assign(id, node);
         }
-
-        invoke = nullptr;
-        bucket = parent;
     }
 
     void dtor(meta_dtor_node node) {
+        reset_bucket(parent);
         meta_context::from(*ctx).value[parent].dtor = node;
-        invoke = nullptr;
-        bucket = parent;
     }
 
     void data(const id_type id, meta_data_node node) {
+        reset_bucket(id);
+
         if(auto it = details->data.find(id); it == details->data.end()) {
             details->data.insert_or_assign(id, std::move(node));
         } else if(it->second.set != node.set || it->second.get != node.get) {
             it->second = std::move(node);
         }
-
-        invoke = nullptr;
-        bucket = id;
     }
 
     void func(const id_type id, meta_func_node node) {
+        reset_bucket(id);
+
         if(auto it = details->func.find(id); it == details->func.end()) {
             auto &&elem = details->func.insert_or_assign(id, std::move(node)).first;
             invoke = elem->second.invoke;
-            bucket = id;
         } else {
             auto *curr = &it->second;
 
@@ -101,8 +103,6 @@ protected:
                 curr->next = std::make_shared<meta_func_node>();
                 *curr->next = std::move(node);
             }
-
-            bucket = id;
         }
     }
 
