@@ -110,6 +110,7 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
 
+    id_type id{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
     meta_type_node (*ret)(const meta_context &) noexcept {};

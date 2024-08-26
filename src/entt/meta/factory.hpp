@@ -83,11 +83,11 @@ protected:
         }
     }
 
-    void func(const id_type id, meta_func_node node) {
-        reset_bucket(id);
+    void func(meta_func_node node) {
+        reset_bucket(node.id);
 
-        if(auto it = details->func.find(id); it == details->func.end()) {
-            auto &&elem = details->func.insert_or_assign(id, std::move(node)).first;
+        if(auto it = details->func.find(node.id); it == details->func.end()) {
+            auto &&elem = details->func.insert_or_assign(node.id, std::move(node)).first;
             invoke = elem->second.invoke;
         } else {
             auto *curr = &it->second;
@@ -479,8 +479,8 @@ public:
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         base_type::func(
-            id,
             internal::meta_func_node{
+                id,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
                 &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
