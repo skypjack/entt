@@ -74,17 +74,20 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
+    id_type id{};
     meta_type_node (*type)(const meta_context &) noexcept {};
     const void *(*cast)(const void *) noexcept {};
 };
 
 struct meta_conv_node {
+    id_type type{};
     meta_any (*conv)(const meta_ctx &, const void *){};
 };
 
 struct meta_ctor_node {
     using size_type = std::size_t;
 
+    id_type id{};
     size_type arity{0u};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     meta_any (*invoke)(const meta_ctx &, meta_any *const){};
