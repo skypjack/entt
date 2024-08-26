@@ -73,11 +73,11 @@ protected:
         meta_context::from(*ctx).value[parent].dtor = node;
     }
 
-    void data(const id_type id, meta_data_node node) {
-        reset_bucket(id);
+    void data(meta_data_node node) {
+        reset_bucket(node.id);
 
-        if(auto it = details->data.find(id); it == details->data.end()) {
-            details->data.insert_or_assign(id, std::move(node));
+        if(auto it = details->data.find(node.id); it == details->data.end()) {
+            details->data.insert_or_assign(node.id, std::move(node));
         } else if(it->second.set != node.set || it->second.get != node.get) {
             it->second = std::move(node);
         }
@@ -176,8 +176,8 @@ class meta_factory: private internal::basic_meta_factory {
         static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
         base_type::data(
-            id,
             internal::meta_data_node{
+                id,
                 /* this is never static */
                 (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                 Setter::size,
@@ -351,8 +351,8 @@ public:
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
             base_type::data(
-                id,
                 internal::meta_data_node{
+                    id,
                     /* this is never static */
                     std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
@@ -370,8 +370,8 @@ public:
             }
 
             base_type::data(
-                id,
                 internal::meta_data_node{
+                    id,
                     ((std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<data_type>>> || std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
@@ -410,8 +410,8 @@ public:
 
         if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>) {
             base_type::data(
-                id,
                 internal::meta_data_node{
+                    id,
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,
@@ -423,8 +423,8 @@ public:
             using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             base_type::data(
-                id,
                 internal::meta_data_node{
+                    id,
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
