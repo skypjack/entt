@@ -106,13 +106,13 @@ protected:
         }
     }
 
-    void prop(const id_type key, meta_prop_node value) {
+    void prop(meta_prop_node node) {
         if(bucket == parent) {
-            details->prop[key] = std::move(value);
+            details->prop[node.id] = std::move(node);
         } else if(invoke == nullptr) {
-            find_member(details->data)->prop[key] = std::move(value);
+            find_member(details->data)->prop[node.id] = std::move(node);
         } else {
-            find_overload()->prop[key] = std::move(value);
+            find_overload()->prop[node.id] = std::move(node);
         }
     }
 
@@ -503,9 +503,9 @@ public:
     template<typename... Value>
     meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
         if constexpr(sizeof...(Value) == 0u) {
-            base_type::prop(id, internal::meta_prop_node{&internal::resolve<void>});
+            base_type::prop(internal::meta_prop_node{id, &internal::resolve<void>});
         } else {
-            base_type::prop(id, internal::meta_prop_node{&internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
+            base_type::prop(internal::meta_prop_node{id, &internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
         }
 
         return *this;
