@@ -74,8 +74,8 @@ struct meta_prop_node {
 };
 
 struct meta_base_node {
-    id_type id{};
-    meta_type_node (*type)(const meta_context &) noexcept {};
+    id_type type{};
+    meta_type_node (*resolve)(const meta_context &) noexcept {};
     const void *(*cast)(const void *) noexcept {};
 };
 
@@ -170,7 +170,7 @@ auto *look_for(const meta_context &context, const meta_type_node &node, const id
         }
 
         for(auto &&curr: node.details->base) {
-            if(auto *elem = look_for<Member>(context, curr.type(context), id); elem) {
+            if(auto *elem = look_for<Member>(context, curr.resolve(context), id); elem) {
                 return elem;
             }
         }
@@ -198,7 +198,7 @@ template<typename... Args>
 
     if(from.details) {
         for(auto &&curr: from.details->base) {
-            if(const void *elem = try_cast(context, curr.type(context), to, curr.cast(instance)); elem) {
+            if(const void *elem = try_cast(context, curr.resolve(context), to, curr.cast(instance)); elem) {
                 return elem;
             }
         }
@@ -221,7 +221,7 @@ template<typename Func>
         }
 
         for(auto &&curr: from.details->base) {
-            if(auto other = try_convert(context, curr.type(context), to, arithmetic_or_enum, curr.cast(instance), func); other) {
+            if(auto other = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); other) {
                 return other;
             }
         }

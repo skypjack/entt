@@ -13,6 +13,8 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
+struct meta_base_node;
+
 template<typename Type, typename It>
 struct meta_range_iterator final {
     using value_type = std::pair<id_type, Type>;
@@ -69,6 +71,8 @@ struct meta_range_iterator final {
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         if constexpr(std::is_same_v<It, typename decltype(meta_context::value)::const_iterator>) {
             return {it[value].first, Type{*ctx, it[value].second}};
+        } else if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, meta_base_node>) {
+            return {it[value].type, Type{*ctx, it[value]}};
         } else {
             return {it[value].id, Type{*ctx, it[value]}};
         }

@@ -1180,7 +1180,7 @@ class meta_type {
 
                         if(!can_continue && type.node.details) {
                             for(std::size_t idx{}, last = type.node.details->base.size(); !can_continue && idx != last; ++idx) {
-                                can_continue = (type.node.details->base[idx].id == info.hash());
+                                can_continue = (type.node.details->base[idx].type == info.hash());
                             }
 
                             for(std::size_t idx{}, last = type.node.details->conv.size(); !can_continue && idx != last; ++idx) {
@@ -1240,7 +1240,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      */
     meta_type(const meta_ctx &area, const internal::meta_base_node &curr) noexcept
-        : meta_type{area, curr.type(internal::meta_context::from(area))} {}
+        : meta_type{area, curr.resolve(internal::meta_context::from(area))} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
