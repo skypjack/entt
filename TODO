@@ -49,6 +49,4 @@ TODO:
 * update natvis for meta, many nodes changes due to the map-to-vector switch
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
 * refine find_member in meta and use it also for conv and the others
-* assert on null member/overload in meta prop/custom/traits
 * move find_member/find_overload to node.hpp, reuse them ie in meta_type::invoke
-* AllowShortFunctionsOnASingleLine (inline func) e AllowShortBlocksOnASingleLine (while, for, whatever) always, then review
