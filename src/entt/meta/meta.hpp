@@ -1432,7 +1432,7 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        const auto *elem = internal::deprecated_look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), node, id);
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), node, id);
         return elem ? meta_data{*ctx, *elem} : meta_data{};
     }
 

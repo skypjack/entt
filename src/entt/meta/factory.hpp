@@ -31,13 +31,15 @@ class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
     template<typename Type>
-    auto *find_member(Type &from) {
-        return &from[bucket];
+    static auto *find_member(Type &from, const id_type id) {
+        std::size_t pos{};
+        for(const std::size_t last = from.size(); (pos != last) && (from[pos].id != id); ++pos) {}
+        return (pos == from.size()) ? nullptr : &from[pos];
     }
 
-    auto *find_overload() {
-        auto *curr = find_member(details->func);
-        for(; curr->invoke != invoke; curr = curr->next.get()) {}
+    static auto *find_overload(meta_func_node *curr, invoke_type *const ref) {
+        for(; curr->invoke != ref; curr = curr->next.get()) {}
+        ENTT_ASSERT(curr != nullptr, "Cannot find overload");
         return curr;
     }
 
@@ -80,10 +82,10 @@ protected:
     void data(meta_data_node node) {
         reset_bucket(node.id);
 
-        if(auto it = details->data.find(node.id); it == details->data.end()) {
-            details->data.insert_or_assign(node.id, std::move(node));
-        } else if(it->second.set != node.set || it->second.get != node.get) {
-            it->second = std::move(node);
+        if(auto *member = find_member(details->data, node.id); member == nullptr) {
+            details->data.emplace_back(std::move(node));
+        } else if(member->set != node.set || member->get != node.get) {
+            *member = std::move(node);
         }
     }
 
@@ -116,9 +118,9 @@ protected:
         if(bucket == parent) {
             container = &details->prop;
         } else if(invoke == nullptr) {
-            container = &find_member(details->data)->prop;
+            container = &find_member(details->data, bucket)->prop;
         } else {
-            container = &find_overload()->prop;
+            container = &find_overload(&details->func[bucket], invoke)->prop; // wait until func is a vector too: find_member(details->func, bucket);
         }
 
         std::size_t pos{};
@@ -130,9 +132,9 @@ protected:
         if(bucket == parent) {
             meta_context::from(*ctx).value[bucket].traits |= value;
         } else if(invoke == nullptr) {
-            find_member(details->data)->traits |= value;
+            find_member(details->data, bucket)->traits |= value;
         } else {
-            find_overload()->traits |= value;
+            find_overload(&details->func[bucket], invoke)->traits |= value; // wait until func is a vector too: find_member(details->func, bucket);
         }
     }
 
@@ -140,9 +142,9 @@ protected:
         if(bucket == parent) {
             meta_context::from(*ctx).value[bucket].custom = std::move(node);
         } else if(invoke == nullptr) {
-            find_member(details->data)->custom = std::move(node);
+            find_member(details->data, bucket)->custom = std::move(node);
         } else {
-            find_overload()->custom = std::move(node);
+            find_overload(&details->func[bucket], invoke)->custom = std::move(node); // wait until func is a vector too: find_member(details->func, bucket);
         }
     }
 

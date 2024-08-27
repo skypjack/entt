@@ -138,7 +138,7 @@ struct meta_type_descriptor {
     std::vector<meta_ctor_node> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
     std::vector<meta_conv_node> conv{};
-    dense_map<id_type, meta_data_node, identity> data{};
+    std::vector<meta_data_node> data{};
     dense_map<id_type, meta_func_node, identity> func{};
     std::vector<meta_prop_node> prop{};
 };
