@@ -61,7 +61,9 @@ protected:
         if constexpr(std::is_same_v<Type, meta_base_node>) {
             details->base.insert_or_assign(node.id, node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
-            details->conv.insert_or_assign(node.type, node);
+            std::size_t pos{};
+            for(const std::size_t last = details->conv.size(); (pos != last) && (details->conv[pos].type != node.type); ++pos) {}
+            (pos == details->conv.size()) ? details->conv.emplace_back(node) : (details->conv[pos] = node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
             std::size_t pos{};

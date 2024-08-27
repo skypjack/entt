@@ -1165,8 +1165,20 @@ class meta_type {
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++match;
-                    } else if(!((type.node.details && (type.node.details->base.contains(info.hash()) || type.node.details->conv.contains(info.hash()))) || (type.node.conversion_helper && other.node.conversion_helper))) {
-                        break;
+                    } else {
+                        bool can_continue = type.node.conversion_helper && other.node.conversion_helper;
+
+                        if(!can_continue && type.node.details) {
+                            can_continue = type.node.details->base.contains(info.hash());
+
+                            for(std::size_t idx{}, last = type.node.details->conv.size(); !can_continue && idx != last; ++idx) {
+                                can_continue = (type.node.details->conv[idx].type == info.hash());
+                            }
+                        }
+
+                        if(!can_continue) {
+                            break;
+                        }
                     }
                 }
                 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)

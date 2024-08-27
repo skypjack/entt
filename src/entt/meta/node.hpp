@@ -137,7 +137,7 @@ struct meta_template_node {
 struct meta_type_descriptor {
     std::vector<meta_ctor_node> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
-    dense_map<id_type, meta_conv_node, identity> conv{};
+    std::vector<meta_conv_node> conv{};
     dense_map<id_type, meta_data_node, identity> data{};
     dense_map<id_type, meta_func_node, identity> func{};
     dense_map<id_type, meta_prop_node, identity> prop{};
@@ -213,8 +213,10 @@ template<typename Func>
     }
 
     if(from.details) {
-        if(auto it = from.details->conv.find(to.hash()); it != from.details->conv.cend()) {
-            return func(instance, it->second);
+        for(auto &&elem: from.details->conv) {
+            if(elem.type == to.hash()) {
+                return func(instance, elem);
+            }
         }
 
         for(auto &&curr: from.details->base) {
