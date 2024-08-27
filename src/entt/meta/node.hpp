@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include <vector>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/attribute.h"
@@ -134,7 +135,7 @@ struct meta_template_node {
 };
 
 struct meta_type_descriptor {
-    dense_map<id_type, meta_ctor_node, identity> ctor{};
+    std::vector<meta_ctor_node> ctor{};
     dense_map<id_type, meta_base_node, identity> base{};
     dense_map<id_type, meta_conv_node, identity> conv{};
     dense_map<id_type, meta_data_node, identity> data{};

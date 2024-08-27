@@ -64,7 +64,9 @@ protected:
             details->conv.insert_or_assign(node.type, node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
-            details->ctor.insert_or_assign(node.id, node);
+            std::size_t pos{};
+            for(const std::size_t last = details->ctor.size(); (pos != last) && (details->ctor[pos].id != node.id); ++pos) {}
+            (pos == details->ctor.size()) ? details->ctor.emplace_back(node) : (details->ctor[pos] = node);
         }
     }
 
