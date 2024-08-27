@@ -109,7 +109,7 @@ struct meta_data_node {
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(const meta_ctx &, meta_handle){};
     meta_custom_node custom{};
-    dense_map<id_type, meta_prop_node, identity> prop{};
+    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_func_node {
@@ -123,7 +123,7 @@ struct meta_func_node {
     meta_any (*invoke)(const meta_ctx &, meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
     meta_custom_node custom{};
-    dense_map<id_type, meta_prop_node, identity> prop{};
+    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_template_node {
@@ -140,7 +140,7 @@ struct meta_type_descriptor {
     std::vector<meta_conv_node> conv{};
     dense_map<id_type, meta_data_node, identity> data{};
     dense_map<id_type, meta_func_node, identity> func{};
-    dense_map<id_type, meta_prop_node, identity> prop{};
+    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_type_node {
@@ -162,10 +162,29 @@ struct meta_type_node {
 };
 
 template<auto Member>
-auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+auto *deprecated_look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
     if(node.details) {
         if(const auto it = (node.details.get()->*Member).find(id); it != (node.details.get()->*Member).cend()) {
             return &it->second;
+        }
+
+        for(auto &&curr: node.details->base) {
+            if(auto *elem = deprecated_look_for<Member>(context, curr.second.type(context), id); elem) {
+                return elem;
+            }
+        }
+    }
+
+    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::mapped_type *>(nullptr);
+}
+
+template<auto Member>
+auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+    if(node.details) {
+        for(auto &&elem: (node.details.get()->*Member)) {
+            if(elem.id == id) {
+                return &elem;
+            }
         }
 
         for(auto &&curr: node.details->base) {
@@ -175,7 +194,7 @@ auto *look_for(const meta_context &context, const meta_type_node &node, const id
         }
     }
 
-    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::mapped_type *>(nullptr);
+    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::value_type *>(nullptr);
 }
 
 template<typename Type>

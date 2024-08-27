@@ -111,13 +111,19 @@ protected:
     }
 
     void prop(meta_prop_node node) {
+        std::vector<meta_prop_node> *container = nullptr;
+
         if(bucket == parent) {
-            details->prop[node.id] = std::move(node);
+            container = &details->prop;
         } else if(invoke == nullptr) {
-            find_member(details->data)->prop[node.id] = std::move(node);
+            container = &find_member(details->data)->prop;
         } else {
-            find_overload()->prop[node.id] = std::move(node);
+            container = &find_overload()->prop;
         }
+
+        std::size_t pos{};
+        for(const std::size_t last = container->size(); (pos != last) && ((*container)[pos].id != node.id); ++pos) {}
+        (pos == container->size()) ? container->emplace_back(std::move(node)) : ((*container)[pos] = std::move(node));
     }
 
     void traits(const meta_traits value) {

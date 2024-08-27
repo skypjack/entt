@@ -948,8 +948,13 @@ struct meta_data {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        const auto it = node->prop.find(key);
-        return it != node->prop.cend() ? meta_prop{*ctx, it->second} : meta_prop{};
+        for(auto &&elem: node->prop) {
+            if(elem.id == key) {
+                return meta_prop{*ctx, elem};
+            }
+        }
+
+        return meta_prop{};
     }
 
     /**
@@ -1088,8 +1093,13 @@ struct meta_func {
      * @return The registered meta property for the given key, if any.
      */
     [[nodiscard]] meta_prop prop(const id_type key) const {
-        const auto it = node->prop.find(key);
-        return it != node->prop.cend() ? meta_prop{*ctx, it->second} : meta_prop{};
+        for(auto &&elem: node->prop) {
+            if(elem.id == key) {
+                return meta_prop{*ctx, elem};
+            }
+        }
+
+        return meta_prop{};
     }
 
     /*! @copydoc meta_data::traits */
@@ -1422,7 +1432,7 @@ public:
      * @return The registered meta data for the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        const auto *elem = internal::look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), node, id);
+        const auto *elem = internal::deprecated_look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), node, id);
         return elem ? meta_data{*ctx, *elem} : meta_data{};
     }
 
@@ -1444,7 +1454,7 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        const auto *elem = internal::look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), node, id);
+        const auto *elem = internal::deprecated_look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), node, id);
         return elem ? meta_func{*ctx, *elem} : meta_func{};
     }
 

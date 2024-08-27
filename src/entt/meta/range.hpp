@@ -13,8 +13,89 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename Type, typename It>
+template<typename Type, typename It, typename = void>
 struct meta_range_iterator final {
+    using value_type = std::pair<id_type, Type>;
+    using pointer = input_iterator_pointer<value_type>;
+    using reference = value_type;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::input_iterator_tag;
+    using iterator_concept = std::random_access_iterator_tag;
+
+    constexpr meta_range_iterator() noexcept
+        : it{},
+          ctx{} {}
+
+    constexpr meta_range_iterator(const meta_ctx &area, const It iter) noexcept
+        : it{iter},
+          ctx{&area} {}
+
+    constexpr meta_range_iterator &operator++() noexcept {
+        return ++it, *this;
+    }
+
+    constexpr meta_range_iterator operator++(int) noexcept {
+        meta_range_iterator orig = *this;
+        return ++(*this), orig;
+    }
+
+    constexpr meta_range_iterator &operator--() noexcept {
+        return --it, *this;
+    }
+
+    constexpr meta_range_iterator operator--(int) noexcept {
+        meta_range_iterator orig = *this;
+        return operator--(), orig;
+    }
+
+    constexpr meta_range_iterator &operator+=(const difference_type value) noexcept {
+        it += value;
+        return *this;
+    }
+
+    constexpr meta_range_iterator operator+(const difference_type value) const noexcept {
+        meta_range_iterator copy = *this;
+        return (copy += value);
+    }
+
+    constexpr meta_range_iterator &operator-=(const difference_type value) noexcept {
+        return (*this += -value);
+    }
+
+    constexpr meta_range_iterator operator-(const difference_type value) const noexcept {
+        return (*this + -value);
+    }
+
+    [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
+        return {it[value].id, Type{*ctx, it[value]}};
+    }
+
+    [[nodiscard]] constexpr pointer operator->() const noexcept {
+        return operator*();
+    }
+
+    [[nodiscard]] constexpr reference operator*() const noexcept {
+        return operator[](0);
+    }
+
+    template<typename... Args>
+    friend constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+
+    template<typename... Args>
+    friend constexpr bool operator==(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+
+    template<typename... Args>
+    friend constexpr bool operator<(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+
+private:
+    It it;
+    const meta_ctx *ctx;
+};
+
+template<typename Type, typename It>
+struct meta_range_iterator<Type, It, std::void_t<typename std::iterator_traits<It>::value_type::second_type>> final {
+    // deprecated work-in-progress specialization
+
     using value_type = std::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
