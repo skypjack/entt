@@ -62,15 +62,16 @@ protected:
     void insert_or_assign(Type node) {
         reset_bucket(parent);
 
+        std::size_t pos{};
+
         if constexpr(std::is_same_v<Type, meta_base_node>) {
-            details->base.insert_or_assign(node.id, node);
+            for(const std::size_t last = details->base.size(); (pos != last) && (details->base[pos].id != node.id); ++pos) {}
+            (pos == details->base.size()) ? details->base.emplace_back(node) : (details->base[pos] = node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
-            std::size_t pos{};
             for(const std::size_t last = details->conv.size(); (pos != last) && (details->conv[pos].type != node.type); ++pos) {}
             (pos == details->conv.size()) ? details->conv.emplace_back(node) : (details->conv[pos] = node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
-            std::size_t pos{};
             for(const std::size_t last = details->ctor.size(); (pos != last) && (details->ctor[pos].id != node.id); ++pos) {}
             (pos == details->ctor.size()) ? details->ctor.emplace_back(node) : (details->ctor[pos] = node);
         }

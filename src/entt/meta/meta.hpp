@@ -1179,7 +1179,9 @@ class meta_type {
                         bool can_continue = type.node.conversion_helper && other.node.conversion_helper;
 
                         if(!can_continue && type.node.details) {
-                            can_continue = type.node.details->base.contains(info.hash());
+                            for(std::size_t idx{}, last = type.node.details->base.size(); !can_continue && idx != last; ++idx) {
+                                can_continue = (type.node.details->base[idx].id == info.hash());
+                            }
 
                             for(std::size_t idx{}, last = type.node.details->conv.size(); !can_continue && idx != last; ++idx) {
                                 can_continue = (type.node.details->conv[idx].type == info.hash());

@@ -7,7 +7,6 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../container/dense_map.hpp"
 #include "../core/attribute.h"
 #include "../core/bit.hpp"
 #include "../core/enum.hpp"
@@ -136,7 +135,7 @@ struct meta_template_node {
 
 struct meta_type_descriptor {
     std::vector<meta_ctor_node> ctor{};
-    dense_map<id_type, meta_base_node, identity> base{};
+    std::vector<meta_base_node> base{};
     std::vector<meta_conv_node> conv{};
     std::vector<meta_data_node> data{};
     std::vector<meta_func_node> func{};
@@ -171,7 +170,7 @@ auto *look_for(const meta_context &context, const meta_type_node &node, const id
         }
 
         for(auto &&curr: node.details->base) {
-            if(auto *elem = look_for<Member>(context, curr.second.type(context), id); elem) {
+            if(auto *elem = look_for<Member>(context, curr.type(context), id); elem) {
                 return elem;
             }
         }
@@ -199,7 +198,7 @@ template<typename... Args>
 
     if(from.details) {
         for(auto &&curr: from.details->base) {
-            if(const void *elem = try_cast(context, curr.second.type(context), to, curr.second.cast(instance)); elem) {
+            if(const void *elem = try_cast(context, curr.type(context), to, curr.cast(instance)); elem) {
                 return elem;
             }
         }
@@ -222,7 +221,7 @@ template<typename Func>
         }
 
         for(auto &&curr: from.details->base) {
-            if(auto other = try_convert(context, curr.second.type(context), to, arithmetic_or_enum, curr.second.cast(instance), func); other) {
+            if(auto other = try_convert(context, curr.type(context), to, arithmetic_or_enum, curr.cast(instance), func); other) {
                 return other;
             }
         }
