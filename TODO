@@ -48,3 +48,4 @@ TODO:
 * meta factory: share code and cleanup after the map-to-vector rework
 * update natvis for meta, many nodes changes due to the map-to-vector switch
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
+* refine find_member in meta and use it also for conv and the others
