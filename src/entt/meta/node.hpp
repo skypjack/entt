@@ -129,7 +129,7 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node (*type)(const meta_context &) noexcept {};
+    meta_type_node (*resolve)(const meta_context &) noexcept {};
     meta_type_node (*arg)(const meta_context &, const size_type) noexcept {};
 };
 
