@@ -42,6 +42,18 @@ class basic_meta_factory {
         return curr;
     }
 
+    auto *find_member_or_assert() {
+        auto *member = find_member(details->data, bucket);
+        ENTT_ASSERT(member != nullptr, "Cannot find member");
+        return member;
+    }
+
+    auto *find_overload_or_assert() {
+        auto *overload = find_overload(find_member(details->func, bucket), invoke);
+        ENTT_ASSERT(overload != nullptr, "Cannot find overload");
+        return overload;
+    }
+
     void reset_bucket(const id_type id, invoke_type *const ref = nullptr) {
         invoke = ref;
         bucket = id;
@@ -62,7 +74,7 @@ protected:
         std::size_t pos{};
 
         if constexpr(std::is_same_v<Type, meta_base_node>) {
-            for(const std::size_t last = details->base.size(); (pos != last) && (details->base[pos].id != node.id); ++pos) {}
+            for(const std::size_t last = details->base.size(); (pos != last) && (details->base[pos].type != node.type); ++pos) {}
             (pos == details->base.size()) ? details->base.emplace_back(node) : (details->base[pos] = node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
             for(const std::size_t last = details->conv.size(); (pos != last) && (details->conv[pos].type != node.type); ++pos) {}
@@ -106,9 +118,9 @@ protected:
         if(bucket == parent) {
             container = &details->prop;
         } else if(invoke == nullptr) {
-            container = &find_member(details->data, bucket)->prop;
+            container = &find_member_or_assert()->prop;
         } else {
-            container = &find_overload(find_member(details->func, bucket), invoke)->prop;
+            container = &find_overload_or_assert()->prop;
         }
 
         std::size_t pos{};
@@ -120,9 +132,9 @@ protected:
         if(bucket == parent) {
             meta_context::from(*ctx).value[bucket].traits |= value;
         } else if(invoke == nullptr) {
-            find_member(details->data, bucket)->traits |= value;
+            find_member_or_assert()->traits |= value;
         } else {
-            find_overload(find_member(details->func, bucket), invoke)->traits |= value;
+            find_overload_or_assert()->traits |= value;
         }
     }
 
@@ -130,9 +142,9 @@ protected:
         if(bucket == parent) {
             meta_context::from(*ctx).value[bucket].custom = std::move(node);
         } else if(invoke == nullptr) {
-            find_member(details->data, bucket)->custom = std::move(node);
+            find_member_or_assert()->custom = std::move(node);
         } else {
-            find_overload(find_member(details->func, bucket), invoke)->custom = std::move(node);
+            find_overload_or_assert()->custom = std::move(node);
         }
     }
 
