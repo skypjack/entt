@@ -38,10 +38,7 @@ class basic_meta_factory {
     }
 
     static auto *find_overload(meta_func_node *curr, invoke_type *const ref) {
-        while(curr && (curr->invoke != ref)) {
-            curr = curr->next.get();
-        }
-
+        while(curr && (curr->invoke != ref)) { curr = curr->next.get(); }
         return curr;
     }
 
@@ -98,10 +95,7 @@ protected:
         if(auto *member = find_member(details->func, node.id); member == nullptr) {
             details->func.emplace_back(std::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
-            while(member->next != nullptr) {
-                member = member->next.get();
-            }
-
+            while(member->next != nullptr) { member = member->next.get(); }
             member->next = std::make_shared<meta_func_node>(std::move(node));
         }
     }
