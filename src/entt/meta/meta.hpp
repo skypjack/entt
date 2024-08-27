@@ -1454,7 +1454,7 @@ public:
      * @return The registered meta function for the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        const auto *elem = internal::deprecated_look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), node, id);
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), node, id);
         return elem ? meta_func{*ctx, *elem} : meta_func{};
     }
 
@@ -1514,9 +1514,13 @@ public:
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
-            if(auto it = node.details->func.find(id); it != node.details->func.cend()) {
-                if(const auto *candidate = lookup(args, sz, instance && (instance->data() == nullptr), [curr = &it->second]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
+            for(auto &&elem: node.details->func) {
+                if(elem.id == id) {
+                    if(const auto *candidate = lookup(args, sz, instance && (instance->data() == nullptr), [curr = &elem]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                        return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
+                    }
+
+                    break;
                 }
             }
         }

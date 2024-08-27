@@ -139,7 +139,7 @@ struct meta_type_descriptor {
     dense_map<id_type, meta_base_node, identity> base{};
     std::vector<meta_conv_node> conv{};
     std::vector<meta_data_node> data{};
-    dense_map<id_type, meta_func_node, identity> func{};
+    std::vector<meta_func_node> func{};
     std::vector<meta_prop_node> prop{};
 };
 
@@ -160,23 +160,6 @@ struct meta_type_node {
     meta_custom_node custom{};
     std::shared_ptr<meta_type_descriptor> details{};
 };
-
-template<auto Member>
-auto *deprecated_look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
-    if(node.details) {
-        if(const auto it = (node.details.get()->*Member).find(id); it != (node.details.get()->*Member).cend()) {
-            return &it->second;
-        }
-
-        for(auto &&curr: node.details->base) {
-            if(auto *elem = deprecated_look_for<Member>(context, curr.second.type(context), id); elem) {
-                return elem;
-            }
-        }
-    }
-
-    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::mapped_type *>(nullptr);
-}
 
 template<auto Member>
 auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {

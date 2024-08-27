@@ -38,13 +38,15 @@ class basic_meta_factory {
     }
 
     static auto *find_overload(meta_func_node *curr, invoke_type *const ref) {
-        for(; curr->invoke != ref; curr = curr->next.get()) {}
-        ENTT_ASSERT(curr != nullptr, "Cannot find overload");
+        while(curr && (curr->invoke != ref)) {
+            curr = curr->next.get();
+        }
+
         return curr;
     }
 
-    void reset_bucket(const id_type id) {
-        invoke = nullptr;
+    void reset_bucket(const id_type id, invoke_type *const ref = nullptr) {
+        invoke = ref;
         bucket = id;
     }
 
@@ -90,25 +92,16 @@ protected:
     }
 
     void func(meta_func_node node) {
-        reset_bucket(node.id);
+        reset_bucket(node.id, node.invoke);
 
-        if(auto it = details->func.find(node.id); it == details->func.end()) {
-            auto &&elem = details->func.insert_or_assign(node.id, std::move(node)).first;
-            invoke = elem->second.invoke;
-        } else {
-            auto *curr = &it->second;
-
-            while(curr->invoke != node.invoke && curr->next) {
-                curr = curr->next.get();
+        if(auto *member = find_member(details->func, node.id); member == nullptr) {
+            details->func.emplace_back(std::move(node));
+        } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
+            while(member->next != nullptr) {
+                member = member->next.get();
             }
 
-            if(curr->invoke == node.invoke) {
-                invoke = curr->invoke;
-            } else {
-                invoke = node.invoke;
-                curr->next = std::make_shared<meta_func_node>();
-                *curr->next = std::move(node);
-            }
+            member->next = std::make_shared<meta_func_node>(std::move(node));
         }
     }
 
@@ -120,7 +113,7 @@ protected:
         } else if(invoke == nullptr) {
             container = &find_member(details->data, bucket)->prop;
         } else {
-            container = &find_overload(&details->func[bucket], invoke)->prop; // wait until func is a vector too: find_member(details->func, bucket);
+            container = &find_overload(find_member(details->func, bucket), invoke)->prop;
         }
 
         std::size_t pos{};
@@ -134,7 +127,7 @@ protected:
         } else if(invoke == nullptr) {
             find_member(details->data, bucket)->traits |= value;
         } else {
-            find_overload(&details->func[bucket], invoke)->traits |= value; // wait until func is a vector too: find_member(details->func, bucket);
+            find_overload(find_member(details->func, bucket), invoke)->traits |= value;
         }
     }
 
@@ -144,7 +137,7 @@ protected:
         } else if(invoke == nullptr) {
             find_member(details->data, bucket)->custom = std::move(node);
         } else {
-            find_overload(&details->func[bucket], invoke)->custom = std::move(node); // wait until func is a vector too: find_member(details->func, bucket);
+            find_overload(find_member(details->func, bucket), invoke)->custom = std::move(node);
         }
     }
 
