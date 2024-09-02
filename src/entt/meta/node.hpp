@@ -161,7 +161,7 @@ struct meta_type_node {
 };
 
 template<auto Member, typename Type, typename Value>
-static auto *find_member(Type &from, const Value value) {
+[[nodiscard]] auto *find_member(Type &from, const Value value) {
     for(auto &&elem: from) {
         if((elem.*Member) == value) {
             return &elem;
@@ -171,7 +171,7 @@ static auto *find_member(Type &from, const Value value) {
     return static_cast<typename Type::value_type *>(nullptr);
 }
 
-static auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
+[[nodiscard]] inline auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
     while(curr && (curr->invoke != ref)) { curr = curr->next.get(); }
     return curr;
 }
