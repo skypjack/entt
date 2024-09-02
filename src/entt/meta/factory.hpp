@@ -30,26 +30,14 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
-    template<typename Type>
-    static auto *find_member(Type &from, const id_type id) {
-        std::size_t pos{};
-        for(const std::size_t last = from.size(); (pos != last) && (from[pos].id != id); ++pos) {}
-        return (pos == from.size()) ? nullptr : &from[pos];
-    }
-
-    static auto *find_overload(meta_func_node *curr, invoke_type *const ref) {
-        while(curr && (curr->invoke != ref)) { curr = curr->next.get(); }
-        return curr;
-    }
-
     auto *find_member_or_assert() {
-        auto *member = find_member(details->data, bucket);
+        auto *member = find_member<&meta_data_node::id>(details->data, bucket);
         ENTT_ASSERT(member != nullptr, "Cannot find member");
         return member;
     }
 
     auto *find_overload_or_assert() {
-        auto *overload = find_overload(find_member(details->func, bucket), invoke);
+        auto *overload = find_overload(find_member<&meta_func_node::id>(details->func, bucket), invoke);
         ENTT_ASSERT(overload != nullptr, "Cannot find overload");
         return overload;
     }
@@ -71,18 +59,16 @@ protected:
     void insert_or_assign(Type node) {
         reset_bucket(parent);
 
-        std::size_t pos{};
-
         if constexpr(std::is_same_v<Type, meta_base_node>) {
-            for(const std::size_t last = details->base.size(); (pos != last) && (details->base[pos].type != node.type); ++pos) {}
-            (pos == details->base.size()) ? details->base.emplace_back(node) : (details->base[pos] = node);
+            auto *member = find_member<&meta_base_node::type>(details->base, node.type);
+            member ? (*member = node) : details->base.emplace_back(node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
-            for(const std::size_t last = details->conv.size(); (pos != last) && (details->conv[pos].type != node.type); ++pos) {}
-            (pos == details->conv.size()) ? details->conv.emplace_back(node) : (details->conv[pos] = node);
+            auto *member = find_member<&meta_conv_node::type>(details->conv, node.type);
+            member ? (*member = node) : details->conv.emplace_back(node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
-            for(const std::size_t last = details->ctor.size(); (pos != last) && (details->ctor[pos].id != node.id); ++pos) {}
-            (pos == details->ctor.size()) ? details->ctor.emplace_back(node) : (details->ctor[pos] = node);
+            auto *member = find_member<&meta_ctor_node::id>(details->ctor, node.id);
+            member ? (*member = node) : details->ctor.emplace_back(node);
         }
     }
 
@@ -94,7 +80,7 @@ protected:
     void data(meta_data_node node) {
         reset_bucket(node.id);
 
-        if(auto *member = find_member(details->data, node.id); member == nullptr) {
+        if(auto *member = find_member<&meta_data_node::id>(details->data, node.id); member == nullptr) {
             details->data.emplace_back(std::move(node));
         } else if(member->set != node.set || member->get != node.get) {
             *member = std::move(node);
@@ -104,7 +90,7 @@ protected:
     void func(meta_func_node node) {
         reset_bucket(node.id, node.invoke);
 
-        if(auto *member = find_member(details->func, node.id); member == nullptr) {
+        if(auto *member = find_member<&meta_func_node::id>(details->func, node.id); member == nullptr) {
             details->func.emplace_back(std::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
             while(member->next != nullptr) { member = member->next.get(); }
@@ -123,9 +109,8 @@ protected:
             container = &find_overload_or_assert()->prop;
         }
 
-        std::size_t pos{};
-        for(const std::size_t last = container->size(); (pos != last) && ((*container)[pos].id != node.id); ++pos) {}
-        (pos == container->size()) ? container->emplace_back(std::move(node)) : ((*container)[pos] = std::move(node));
+        auto *member = find_member<&meta_prop_node::id>(*container, node.id);
+        member ? (*member = std::move(node)) : container->emplace_back(std::move(node));
     }
 
     void traits(const meta_traits value) {

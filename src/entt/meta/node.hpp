@@ -160,13 +160,29 @@ struct meta_type_node {
     std::shared_ptr<meta_type_descriptor> details{};
 };
 
+template<auto Member, typename Type, typename Value>
+static auto *find_member(Type &from, const Value value) {
+    for(auto &&elem: from) {
+        if((elem.*Member) == value) {
+            return &elem;
+        }
+    }
+
+    return static_cast<typename Type::value_type *>(nullptr);
+}
+
+static auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
+    while(curr && (curr->invoke != ref)) { curr = curr->next.get(); }
+    return curr;
+}
+
 template<auto Member>
 auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+    using value_type = typename std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
+
     if(node.details) {
-        for(auto &&elem: (node.details.get()->*Member)) {
-            if(elem.id == id) {
-                return &elem;
-            }
+        if(auto *member = find_member<&value_type::id>((node.details.get()->*Member), id); member != nullptr) {
+            return member;
         }
 
         for(auto &&curr: node.details->base) {
@@ -176,7 +192,7 @@ auto *look_for(const meta_context &context, const meta_type_node &node, const id
         }
     }
 
-    return static_cast<typename std::remove_reference_t<decltype(node.details.get()->*Member)>::value_type *>(nullptr);
+    return static_cast<value_type *>(nullptr);
 }
 
 template<typename Type>
