@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::internal::meta_base_node">
+		<DisplayString Condition="resolve != nullptr">{{ type={ type } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
-		<Expand/>
+		<Expand>
+			<Item Name="[type]">type</Item>
+		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_conv_node">
+		<DisplayString Condition="conv != nullptr">{{ type={ type } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
-		<Expand/>
+		<Expand>
+			<Item Name="[type]">type</Item>
+		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_ctor_node">
-		<DisplayString>{{ arity={ arity } }}</DisplayString>
+		<DisplayString Condition="invoke != nullptr">{{ id={ id } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
+			<Item Name="[id]">id</Item>
 			<Item Name="[arity]">arity</Item>
 		</Expand>
 	</Type>
@@ -19,184 +27,68 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[type]">type</Item>
-			<ExpandedItem>value</ExpandedItem>
+			<Item Name="[value]">value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_data_node">
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
-		<Intrinsic Name="prop_at" Expression="prop.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<DisplayString>{{ arity={ arity } }}</DisplayString>
+		<DisplayString Condition="get != nullptr">{{ id={ id } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
+			<Item Name="[id]">id</Item>
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
-			<Synthetic Name="[prop]">
-				<DisplayString>{ prop.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="prop.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ prop_at(pos).first }]">prop_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[prop]">prop,view(simple)</Item>
+			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::internal::meta_dtor_node">
+		<DisplayString>{{}}</DisplayString>
+		<Expand/>
+	</Type>	
 	<Type Name="entt::internal::meta_func_node"	>
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
-		<Intrinsic Name="prop_at" Expression="prop.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<DisplayString>{{ arity={ arity } }}</DisplayString>
+		<DisplayString Condition="invoke != nullptr">{{ id={ id } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
+			<Item Name="[id]">id</Item>
+			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
-			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
-			<Synthetic Name="[prop]">
-				<DisplayString>{ prop.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="prop.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ prop_at(pos).first }]">prop_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[prop]">prop,view(simple)</Item>
+			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_prop_node">
-		<DisplayString>{ value }</DisplayString>
+		<DisplayString Condition="value != nullptr">{{ key={ id } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>value</ExpandedItem>
+			<Item Name="[key]">id</Item>
+			<Item Name="[value]">value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_template_node">
-		<DisplayString>{{ arity={ arity } }}</DisplayString>
+		<DisplayString Condition="arity != 0u">{{ arity={ arity } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[arity]">arity</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_type_descriptor">
-		<Intrinsic Name="ctor_at" Expression="ctor.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="base_at" Expression="base.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="conv_at" Expression="conv.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="data_at" Expression="data.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="func_at" Expression="func.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
-		<Intrinsic Name="prop_at" Expression="prop.packed.first_base::value[pos].element">
-			<Parameter Name="pos" Type="int"/>
-		</Intrinsic>
 		<DisplayString/>
 		<Expand>
-			<Synthetic Name="[ctor]">
-				<DisplayString>{ ctor.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="ctor.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ ctor_at(pos).first }]">ctor_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[base]">
-				<DisplayString>{ base.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="base.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ base_at(pos).first }]">base_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[conv]">
-				<DisplayString>{ conv.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="conv.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ conv_at(pos).first }]">conv_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[data]">
-				<DisplayString>{ data.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="data.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ data_at(pos).first }]">data_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[func]">
-				<DisplayString>{ func.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="func.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ func_at(pos).first }]">func_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
-			<Synthetic Name="[prop]">
-				<DisplayString>{ prop.size() }</DisplayString>
-				<Expand>
-					<CustomListItems>
-						<Variable Name="pos" InitialValue="0"/>
-						<Variable Name="last" InitialValue="prop.size()"/>
-						<Loop>
-							<Break Condition="pos == last"/>
-							<Item Name="[{ prop_at(pos).first }]">prop_at(pos).second</Item>
-							<Exec>++pos</Exec>
-						</Loop>
-					</CustomListItems>
-				</Expand>
-			</Synthetic>
+			<Item Name="[ctor]">ctor,view(simple)</Item>
+			<Item Name="[base]">base,view(simple)</Item>
+			<Item Name="[conv]">conv,view(simple)</Item>
+			<Item Name="[data]">data,view(simple)</Item>
+			<Item Name="[func]">func,view(simple)</Item>
+			<Item Name="[prop]">prop,view(simple)</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_type_node">
@@ -221,9 +113,9 @@
 			<Item Name="[default_constructor]">default_constructor != nullptr</Item>
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
-			<Item Name="[template_info]" Condition="templ.arity != 0u">templ</Item>
-			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>
-			<Item Name="[details]" Condition="details != nullptr">*details</Item>
+			<Item Name="[template_info]">templ</Item>
+			<Item Name="[custom]">custom</Item>
+			<Item Name="[details]" Condition="!(details == nullptr)">*details</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_any">
@@ -236,7 +128,9 @@
 	</Type>
 	<Type Name="entt::meta_handle">
 		<DisplayString>{ any }</DisplayString>
-		<Expand/>
+		<Expand>
+			<ExpandedItem>any</ExpandedItem>
+		</Expand>
 	</Type>
 	<Type Name="entt::meta_associative_container">
 		<DisplayString>{ storage }</DisplayString>

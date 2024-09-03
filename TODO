@@ -41,12 +41,9 @@ TODO:
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
 * deprecate meta properties in favor of custom data
 * make meta objects safe to use with null nodes
-* meta: vectors for details and props
 * suppress -Wself-move on CI with g++13
 * view and view iterator specializations for multi, single and filtered elements
 * organizer support to groups
 * meta factory: share code and cleanup after the map-to-vector rework
-* update natvis for meta, many nodes changes due to the map-to-vector switch
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
-* refine find_member in meta and use it also for conv and the others
-* move find_member/find_overload to node.hpp, reuse them ie in meta_type::invoke
+* reuse find_member/find_overload ie in meta_type::invoke
