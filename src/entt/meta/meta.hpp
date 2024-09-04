@@ -1175,22 +1175,8 @@ class meta_type {
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++match;
-                    } else {
-                        bool can_continue = type.node.conversion_helper && other.node.conversion_helper;
-
-                        if(!can_continue && type.node.details) {
-                            for(std::size_t idx{}, last = type.node.details->base.size(); !can_continue && idx != last; ++idx) {
-                                can_continue = (type.node.details->base[idx].type == info.hash());
-                            }
-
-                            for(std::size_t idx{}, last = type.node.details->conv.size(); !can_continue && idx != last; ++idx) {
-                                can_continue = (type.node.details->conv[idx].type == info.hash());
-                            }
-                        }
-
-                        if(!can_continue) {
-                            break;
-                        }
+                    } else if(!(type.node.conversion_helper && other.node.conversion_helper) && !(type.node.details && (internal::find_member<&internal::meta_base_node::type>(type.node.details->base, info.hash()) || internal::find_member<&internal::meta_conv_node::type>(type.node.details->conv, info.hash())))) {
+                        break;
                     }
                 }
                 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -1516,13 +1502,9 @@ public:
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
-            for(auto &&elem: node.details->func) {
-                if(elem.id == id) {
-                    if(const auto *candidate = lookup(args, sz, instance && (instance->data() == nullptr), [curr = &elem]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                        return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
-                    }
-
-                    break;
+            if(auto *elem = internal::find_member<&internal::meta_func_node::id>(node.details->func, id); elem != nullptr) {
+                if(const auto *candidate = lookup(args, sz, instance && (instance->data() == nullptr), [curr = elem]() mutable { return curr ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                    return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
                 }
             }
         }

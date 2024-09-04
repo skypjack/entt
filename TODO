@@ -44,6 +44,4 @@ TODO:
 * suppress -Wself-move on CI with g++13
 * view and view iterator specializations for multi, single and filtered elements
 * organizer support to groups
-* meta factory: share code and cleanup after the map-to-vector rework
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
-* reuse find_member/find_overload ie in meta_type::invoke
