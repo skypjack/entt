@@ -258,12 +258,6 @@ protected:
         : pools{value},
           filter{excl},
           index{Get} {
-        for(size_type pos{}; pos < Exclude; ++pos) {
-            if(filter[pos] == nullptr) {
-                filter[pos] = internal::view_placeholder<Type>();
-            }
-        }
-
         unchecked_refresh();
     }
 
