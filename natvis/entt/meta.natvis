@@ -133,15 +133,21 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_associative_container">
-		<DisplayString>{ storage }</DisplayString>
+		<DisplayString Condition="data != nullptr">{{ const={ const_only } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[const]">const_only</Item>
+			<Item Name="[data]">data</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_sequence_container">
-		<DisplayString>{ storage }</DisplayString>
+		<DisplayString Condition="data != nullptr">{{ const={ const_only } }}</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[const]">const_only</Item>
+			<Item Name="[data]">data</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
