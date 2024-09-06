@@ -298,7 +298,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_observer() noexcept = default;
+    ~basic_observer() noexcept(false) {}
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
