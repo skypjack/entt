@@ -839,7 +839,7 @@ public:
         : base_type{std::move(other), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept override = default;
+    ~basic_storage() noexcept(false) override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
@@ -1061,7 +1061,7 @@ public:
           placeholder{other.placeholder} {}
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept override = default;
+    ~basic_storage() noexcept(false) override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
