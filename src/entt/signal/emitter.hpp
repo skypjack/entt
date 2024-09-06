@@ -96,7 +96,7 @@ public:
      */
     emitter &operator=(emitter &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
-        handlers = std::move(other.handlers);
+        swap(other);
         return *this;
     }
 

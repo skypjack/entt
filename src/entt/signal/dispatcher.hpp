@@ -194,7 +194,7 @@ public:
      */
     basic_dispatcher &operator=(basic_dispatcher &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a dispatcher is not allowed");
-        pools = std::move(other.pools);
+        swap(other);
         return *this;
     }
 

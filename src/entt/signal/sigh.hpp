@@ -125,8 +125,8 @@ public:
      * @param other The instance to move from.
      * @return This signal handler.
      */
-    sigh &operator=(sigh &&other) noexcept(std::is_nothrow_move_assignable_v<container_type>) {
-        calls = std::move(other.calls);
+    sigh &operator=(sigh &&other) noexcept(std::is_nothrow_swappable_v<container_type>) {
+        swap(other);
         return *this;
     }
 
