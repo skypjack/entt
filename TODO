@@ -45,4 +45,4 @@ TODO:
 * view and view iterator specializations for multi, single and filtered elements
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
-* review all move assignment operators
+* resource: swap support
