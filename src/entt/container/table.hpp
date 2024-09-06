@@ -252,7 +252,7 @@ public:
      * @return This container.
      */
     basic_table &operator=(basic_table &&other) noexcept {
-        payload = std::move(other.payload);
+        swap(other);
         return *this;
     }
 

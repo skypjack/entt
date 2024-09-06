@@ -90,7 +90,7 @@ TEST(Table, Move) {
     other = std::move(table);
     test::is_initialized(table);
 
-    ASSERT_TRUE(table.empty());
+    ASSERT_FALSE(table.empty());
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other[0u], std::make_tuple(3, 'c'));
