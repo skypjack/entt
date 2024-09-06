@@ -117,7 +117,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
+    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept(noexcept(underlying_type{std::move(other)}))
         : underlying_type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -137,7 +137,7 @@ public:
           update{std::move(other.update), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_sigh_mixin() noexcept override = default;
+    ~basic_sigh_mixin() noexcept(noexcept(std::declval<underlying_type>().~underlying_type())) override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
@@ -150,7 +150,7 @@ public:
      * @param other The instance to move from.
      * @return This mixin.
      */
-    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
+    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept(noexcept(std::declval<underlying_type>().operator=(std::move(other)))) {
         owner = other.owner;
         construction = std::move(other.construction);
         destruction = std::move(other.destruction);
