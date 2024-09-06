@@ -377,13 +377,7 @@ public:
      * @return This registry.
      */
     basic_registry &operator=(basic_registry &&other) noexcept {
-        vars = std::move(other.vars);
-        pools = std::move(other.pools);
-        groups = std::move(other.groups);
-        entities = std::move(other.entities);
-
-        rebind();
-
+        swap(other);
         return *this;
     }
 
