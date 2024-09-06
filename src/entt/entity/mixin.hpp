@@ -151,11 +151,7 @@ public:
      * @return This mixin.
      */
     basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept(noexcept(std::declval<underlying_type>().operator=(std::move(other)))) {
-        owner = other.owner;
-        construction = std::move(other.construction);
-        destruction = std::move(other.destruction);
-        update = std::move(other.update);
-        underlying_type::operator=(std::move(other));
+        swap(other);
         return *this;
     }
 

@@ -476,11 +476,9 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage &operator=(basic_storage &&other) noexcept(false) {
+    basic_storage &operator=(basic_storage &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
-        shrink_to_size(0u);
-        payload = std::move(other.payload);
-        base_type::operator=(std::move(other));
+        swap(other);
         return *this;
     }
 

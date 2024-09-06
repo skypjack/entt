@@ -128,7 +128,7 @@ TYPED_TEST(SparseSet, Move) {
         other = std::move(set);
         test::is_initialized(set);
 
-        ASSERT_TRUE(set.empty());
+        ASSERT_FALSE(set.empty());
         ASSERT_FALSE(other.empty());
 
         ASSERT_EQ(other.policy(), policy);
