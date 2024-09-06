@@ -44,7 +44,7 @@
 #    define ENTT_ASSERT(condition, msg) (void(0))
 #elif !defined ENTT_ASSERT
 #    include <cassert>
-#    define ENTT_ASSERT(condition, msg) assert(((condition) && msg))
+#    define ENTT_ASSERT(condition, msg) assert(((condition) && (msg)))
 #endif
 
 #ifdef ENTT_DISABLE_ASSERT
