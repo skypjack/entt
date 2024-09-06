@@ -453,7 +453,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    virtual ~basic_sparse_set() noexcept {
+    virtual ~basic_sparse_set() noexcept(false) {
         release_sparse_pages();
     }
 
@@ -468,7 +468,7 @@ public:
      * @param other The instance to move from.
      * @return This sparse set.
      */
-    basic_sparse_set &operator=(basic_sparse_set &&other) noexcept {
+    basic_sparse_set &operator=(basic_sparse_set &&other) noexcept(false) {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a sparse set is not allowed");
 
         release_sparse_pages();

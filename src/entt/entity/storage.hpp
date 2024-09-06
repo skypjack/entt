@@ -461,7 +461,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept override {
+    ~basic_storage() noexcept(false) override {
         shrink_to_size(0u);
     }
 
@@ -476,7 +476,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_storage &operator=(basic_storage &&other) noexcept {
+    basic_storage &operator=(basic_storage &&other) noexcept(false) {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
         shrink_to_size(0u);
         payload = std::move(other.payload);
