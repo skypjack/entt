@@ -117,6 +117,15 @@ public:
     }
 
     /**
+     * @brief Exchanges the content with that of a given resource.
+     * @param other Resource to exchange the content with.
+     */
+    void swap(resource &other) {
+        using std::swap;
+        swap(value, other.value);
+    }
+
+    /**
      * @brief Returns a reference to the managed resource.
      *
      * @warning

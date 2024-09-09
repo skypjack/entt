@@ -70,6 +70,31 @@ TEST(Resource, Functionalities) {
     ASSERT_NE(copy, move);
 }
 
+TEST(Resource, Swap) {
+    entt::resource<int> resource{};
+    entt::resource<int> other{};
+
+    ASSERT_FALSE(resource);
+    ASSERT_FALSE(other);
+
+    resource.swap(other);
+
+    ASSERT_FALSE(resource);
+    ASSERT_FALSE(other);
+
+    resource.reset(std::make_shared<int>(1));
+
+    ASSERT_TRUE(resource);
+    ASSERT_EQ(*resource, 1);
+    ASSERT_FALSE(other);
+
+    resource.swap(other);
+
+    ASSERT_FALSE(resource);
+    ASSERT_TRUE(other);
+    ASSERT_EQ(*other, 1);
+}
+
 TEST(Resource, DerivedToBase) {
     const entt::resource<derived> resource{std::make_shared<derived>()};
     entt::resource<base> other{resource};
