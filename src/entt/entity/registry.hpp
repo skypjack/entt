@@ -464,6 +464,16 @@ public:
     }
 
     /**
+     * @brief Discards the storage associated with a given name, if any.
+     * @param id Name used to map the storage within the registry.
+     * @return True in case of success, false otherwise.
+     */
+    bool reset(const id_type id) {
+        ENTT_ASSERT(id != type_hash<entity_type>::value(), "Cannot reset entity storage");
+        return !(pools.erase(id) == 0u);
+    }
+
+    /**
      * @brief Checks if an identifier refers to a valid entity.
      * @param entt An identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.

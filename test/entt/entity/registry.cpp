@@ -531,6 +531,38 @@ ENTT_DEBUG_TEST(RegistryDeathTest, Storage) {
     ASSERT_DEATH([[maybe_unused]] const auto *storage = std::as_const(registry).storage<entt::entity>("other"_hs), "");
 }
 
+TEST(Registry, StorageReset) {
+    using namespace entt::literals;
+
+    entt::registry registry{};
+    auto &storage = registry.storage<int>();
+    auto &other = registry.storage<int>("other"_hs);
+
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_NE(registry.storage("other"_hs), nullptr);
+
+    ASSERT_EQ(registry.reset("other"_hs), 1u);
+
+    ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_EQ(registry.storage("other"_hs), nullptr);
+
+    ASSERT_EQ(registry.reset("other"_hs), 0u);
+    ASSERT_EQ(registry.reset(entt::type_id<int>().hash()), 1u);
+    ASSERT_EQ(registry.reset(entt::type_id<int>().hash()), 0u);
+
+    ASSERT_EQ(std::as_const(registry).storage<int>(), nullptr);
+    ASSERT_EQ(registry.storage("other"_hs), nullptr);
+}
+
+ENTT_DEBUG_TEST(RegistryDeathTest, StorageReset) {
+    entt::registry registry{};
+    const entt::entity entity = registry.create();
+
+    ASSERT_TRUE(registry.valid(entity));
+    ASSERT_DEATH(registry.reset(entt::type_id<entt::entity>().hash()), "");
+    ASSERT_TRUE(registry.valid(entity));
+}
+
 TEST(Registry, Identifiers) {
     using traits_type = entt::entt_traits<entt::entity>;
 
