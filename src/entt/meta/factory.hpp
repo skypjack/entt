@@ -498,7 +498,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename... Value>
-    meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
+    [[deprecated("use ::custom() instead")]] meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
         if constexpr(sizeof...(Value) == 0u) {
             base_type::prop(internal::meta_prop_node{id, &internal::resolve<void>});
         } else {
