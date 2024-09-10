@@ -952,7 +952,7 @@ passing the necessary arguments to construct it correctly.<br/>
 It's not possible to assign custom data at different times. Therefore, multiple
 calls to the `custom` function overwrite previous values. However, this value
 can be read from meta objects and used to update existing data with a factory,
-effectively extending them as needed.<br/>
+effectively updating them as needed.<br/>
 Likewise, users can also set custom data on meta objects later if needed, as
 long as the factory is reset to the meta object of interest:
 
@@ -963,14 +963,16 @@ entt::meta<my_type>()
 ```
 
 Once created, all meta objects offer a member function named `custom` to get the
-currently set value as a const reference or as a pointer to a const element:
+currently set value as a reference or as a pointer to an element:
 
 ```cpp
 const type_data &value = entt::resolve<my_type>().custom();
 ```
 
 Note that the returned object performs an extra check in debug before converting
-to the requested type, so as to avoid subtle bugs.
+to the requested type, so as to avoid subtle bugs.<br/>
+Only in the case of conversion to a pointer is this check safe and such that a
+null pointer is returned to inform the user of the failed attempt.
 
 ## Unregister types
 
