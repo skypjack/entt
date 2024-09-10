@@ -28,8 +28,6 @@ TODO:
 * view: propagate tombostone check request to iterator
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
-* review constrained noexcept-ness (ie sigh)
-* registry::view const invokes refresh multiple times implicitly
 * improve front (no multiple checks) and back (ie no contains) for multi-type view
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * entity based component_traits
