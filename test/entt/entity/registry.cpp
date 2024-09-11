@@ -535,8 +535,8 @@ TEST(Registry, StorageReset) {
     using namespace entt::literals;
 
     entt::registry registry{};
-    auto &storage = registry.storage<int>();
-    auto &other = registry.storage<int>("other"_hs);
+    registry.storage<int>();
+    registry.storage<int>("other"_hs);
 
     ASSERT_NE(std::as_const(registry).storage<int>(), nullptr);
     ASSERT_NE(registry.storage("other"_hs), nullptr);
