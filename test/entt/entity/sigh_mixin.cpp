@@ -18,6 +18,24 @@
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
 
+struct auto_signal final {
+    inline static void on_construct(const entt::registry &, entt::entity) {
+        ++created;
+    }
+
+    inline static void on_update(entt::registry &, const entt::entity) {
+        ++updated;
+    }
+
+    inline static void on_destroy(entt::registry &, entt::entity) {
+        ++destroyed;
+    }
+
+    inline static std::size_t created{};
+    inline static std::size_t updated{};
+    inline static std::size_t destroyed{};
+};
+
 template<typename Registry>
 void listener(std::size_t &counter, Registry &, typename Registry::entity_type) {
     ++counter;
@@ -624,4 +642,31 @@ TEST(SighMixin, ThrowingComponent) {
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 3u);
+}
+
+TEST(SighMixin, AutoSignal) {
+    entt::registry registry;
+    auto const entity = registry.create();
+
+    registry.emplace<auto_signal>(entity);
+    registry.replace<auto_signal>(entity);
+    registry.erase<auto_signal>(entity);
+
+    ASSERT_EQ(auto_signal::created, 1u);
+    ASSERT_EQ(auto_signal::updated, 1u);
+    ASSERT_EQ(auto_signal::destroyed, 1u);
+
+    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_TRUE(registry.valid(entity));
+
+    registry.emplace<auto_signal>(entity);
+    registry.replace<auto_signal>(entity);
+    registry.destroy(entity);
+
+    ASSERT_EQ(auto_signal::created, 2u);
+    ASSERT_EQ(auto_signal::updated, 2u);
+    ASSERT_EQ(auto_signal::destroyed, 2u);
+
+    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_FALSE(registry.valid(entity));
 }

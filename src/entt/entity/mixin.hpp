@@ -14,34 +14,25 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename T, typename Reg, typename = void>
+template<typename, typename, typename = void>
 struct has_on_construct final: std::false_type {};
 
-template<typename T, typename Reg>
-struct has_on_construct<
-    T, Reg,
-    std::void_t<decltype(T::on_construct(std::declval<Reg &>(),
-                                         std::declval<Reg &>().create()))>>
+template<typename Type, typename Registry>
+struct has_on_construct<Type, Registry, std::void_t<decltype(Type::on_construct(std::declval<Registry &>(), std::declval<Registry>().create()))>>
     : std::true_type {};
 
-template<typename T, typename Reg, typename = void>
+template<typename, typename, typename = void>
 struct has_on_update final: std::false_type {};
 
-template<typename T, typename Reg>
-struct has_on_update<
-    T, Reg,
-    std::void_t<decltype(T::on_update(std::declval<Reg &>(),
-                                      std::declval<Reg &>().create()))>>
+template<typename Type, typename Registry>
+struct has_on_update<Type, Registry, std::void_t<decltype(Type::on_update(std::declval<Registry &>(), std::declval<Registry>().create()))>>
     : std::true_type {};
 
-template<typename T, typename Reg, typename = void>
+template<typename, typename, typename = void>
 struct has_on_destroy final: std::false_type {};
 
-template<typename T, typename Reg>
-struct has_on_destroy<
-    T, Reg,
-    std::void_t<decltype(T::on_destroy(std::declval<Reg &>(),
-                                       std::declval<Reg &>().create()))>>
+template<typename Type, typename Registry>
+struct has_on_destroy<Type, Registry, std::void_t<decltype(Type::on_destroy(std::declval<Registry &>(), std::declval<Registry>().create()))>>
     : std::true_type {};
 
 } // namespace internal
