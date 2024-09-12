@@ -136,18 +136,16 @@ public:
           construction{allocator},
           destruction{allocator},
           update{allocator} {
-        using element_type = typename Type::element_type;
-
-        if constexpr(internal::has_on_construct<element_type, Registry>::value) {
-            entt::sink{construction}.template connect<&element_type::on_construct>();
+        if constexpr(internal::has_on_construct<typename underlying_type::element_type, Registry>::value) {
+            entt::sink{construction}.template connect<&underlying_type::element_type::on_construct>();
         }
 
-        if constexpr(internal::has_on_update<element_type, Registry>::value) {
-            entt::sink{update}.template connect<&element_type::on_update>();
+        if constexpr(internal::has_on_update<typename underlying_type::element_type, Registry>::value) {
+            entt::sink{update}.template connect<&underlying_type::element_type::on_update>();
         }
 
-        if constexpr(internal::has_on_destroy<element_type, Registry>::value) {
-            entt::sink{destruction}.template connect<&element_type::on_destroy>();
+        if constexpr(internal::has_on_destroy<typename underlying_type::element_type, Registry>::value) {
+            entt::sink{destruction}.template connect<&underlying_type::element_type::on_destroy>();
         }
     }
 
