@@ -158,7 +158,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept(noexcept(underlying_type{std::move(other)}))
+    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
         : underlying_type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -191,7 +191,7 @@ public:
      * @param other The instance to move from.
      * @return This mixin.
      */
-    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept(noexcept(std::declval<underlying_type>().operator=(std::move(other)))) {
+    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
         swap(other);
         return *this;
     }
