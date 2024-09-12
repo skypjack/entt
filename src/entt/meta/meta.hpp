@@ -774,8 +774,8 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @param area The context from which to search for meta types.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_prop(const meta_ctx &area, const internal::meta_prop_node &curr) noexcept
-        : node{&curr},
+    meta_prop(const meta_ctx &area, internal::meta_prop_node curr) noexcept
+        : node{curr},
           ctx{&area} {}
 
     /**
@@ -783,7 +783,7 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
-        return node->value ? node->type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, node->value.get()) : meta_any{meta_ctx_arg, *ctx};
+        return node.value ? node.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, node.value.get()) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -791,7 +791,7 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @return A wrapper containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() {
-        return node->value ? node->type(internal::meta_context::from(*ctx)).from_void(*ctx, node->value.get(), nullptr) : meta_any{meta_ctx_arg, *ctx};
+        return node.value ? node.type(internal::meta_context::from(*ctx)).from_void(*ctx, node.value.get(), nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -799,7 +799,7 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
+        return static_cast<bool>(node.type);
     }
 
     /**
@@ -808,11 +808,11 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_prop &other) const noexcept {
-        return (ctx == other.ctx && node == other.node);
+        return (ctx == other.ctx && node.value == other.node.value);
     }
 
 private:
-    const internal::meta_prop_node *node{};
+    internal::meta_prop_node node{};
     const meta_ctx *ctx{};
 };
 
