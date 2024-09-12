@@ -167,10 +167,10 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_prop">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString Condition="node.type != nullptr">{ node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem Condition="node.type != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
