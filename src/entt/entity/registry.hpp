@@ -363,7 +363,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_registry() noexcept(false) {}
+    ~basic_registry() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
