@@ -177,7 +177,7 @@ template<auto Member, typename Type, typename Value>
 }
 
 template<auto Member>
-auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+[[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
     using value_type = typename std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
