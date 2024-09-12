@@ -93,7 +93,7 @@ template<typename... Lhs, typename... Rhs>
 
 struct group_descriptor {
     using size_type = std::size_t;
-    virtual ~group_descriptor() = default;
+    virtual ~group_descriptor() noexcept(false) {} // NOLINT
     [[nodiscard]] virtual bool owned(const id_type) const noexcept {
         return false;
     }
