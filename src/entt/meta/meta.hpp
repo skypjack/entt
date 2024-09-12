@@ -775,7 +775,7 @@ struct [[deprecated("use meta_custom instead")]] meta_prop {
      * @param curr The underlying node with which to construct the instance.
      */
     meta_prop(const meta_ctx &area, internal::meta_prop_node curr) noexcept
-        : node{curr},
+        : node{std::move(curr)},
           ctx{&area} {}
 
     /**
