@@ -166,7 +166,7 @@ public:
           sync_on{other.sync_on} {}
 
     /*! @brief Default destructor. */
-    ~basic_flow() noexcept = default;
+    ~basic_flow() = default;
 
     /**
      * @brief Default copy assignment operator.

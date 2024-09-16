@@ -161,7 +161,7 @@ public:
           vert{other.vert} {}
 
     /*! @brief Default destructor. */
-    ~adjacency_matrix() noexcept = default;
+    ~adjacency_matrix() = default;
 
     /**
      * @brief Default copy assignment operator.
