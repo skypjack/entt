@@ -16,7 +16,7 @@
 #include "../../common/meta_traits.h"
 
 struct base {
-    virtual ~base() noexcept = default;
+    virtual ~base() = default;
 
     static void destroy(base &) {
         ++counter;

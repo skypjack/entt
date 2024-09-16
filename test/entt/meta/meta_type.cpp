@@ -39,7 +39,7 @@ struct derived: base {
 };
 
 struct abstract {
-    virtual ~abstract() noexcept = default;
+    virtual ~abstract() = default;
 
     virtual void func(int) {}
     void base_only(int) {}

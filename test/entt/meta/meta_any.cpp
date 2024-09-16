@@ -34,7 +34,7 @@ struct empty {
     empty(const empty &) = default;
     empty &operator=(const empty &) = default;
 
-    virtual ~empty() noexcept {
+    virtual ~empty() {
         ++destructor_counter;
     }
 
@@ -53,7 +53,7 @@ struct fat: empty {
     fat(double v1, double v2, double v3, double v4)
         : value{v1, v2, v3, v4} {}
 
-    ~fat() noexcept override = default;
+    ~fat() override = default;
 
     fat(const fat &) = default;
     fat &operator=(const fat &) = default;
@@ -74,7 +74,7 @@ struct unmanageable {
     unmanageable()
         : value{std::make_unique<int>(3)} {}
 
-    ~unmanageable() noexcept = default;
+    ~unmanageable() = default;
 
     unmanageable(const unmanageable &) = delete;
     unmanageable(unmanageable &&) = delete;

@@ -10,7 +10,7 @@ struct entity_id final {
     constexpr entity_id(entity_type value = null) noexcept
         : entt{value} {}
 
-    ~entity_id() noexcept = default;
+    ~entity_id() = default;
 
     constexpr entity_id(const entity_id &other) = default;
     constexpr entity_id(entity_id &&other) noexcept = default;

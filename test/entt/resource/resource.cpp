@@ -6,7 +6,7 @@
 #include "../../common/linter.hpp"
 
 struct base {
-    virtual ~base() noexcept = default;
+    virtual ~base() = default;
 
     [[nodiscard]] virtual const entt::type_info &type() const noexcept {
         return entt::type_id<base>();

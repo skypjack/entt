@@ -15,7 +15,7 @@
 
 struct base {
     base() = default;
-    virtual ~base() noexcept = default;
+    virtual ~base() = default;
 
     void setter(int v) {
         value = v;
