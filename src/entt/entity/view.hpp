@@ -276,11 +276,12 @@ protected:
     }
 
     void storage(const std::size_t pos, const Type *elem) noexcept {
+        ENTT_ASSERT(elem != nullptr, "Unexpected element");
+
         if(pos < Get) {
             pools[pos] = elem;
             refresh();
         } else {
-            ENTT_ASSERT(elem != nullptr, "Unexpected element");
             filter[pos - Get] = elem;
         }
     }
