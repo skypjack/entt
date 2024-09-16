@@ -322,7 +322,7 @@ TYPED_TEST(SighMixin, Move) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
+    pool.bind(registry);
     pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
 
@@ -355,7 +355,7 @@ TYPED_TEST(SighMixin, Move) {
     ASSERT_EQ(pool.get(entt::entity{3}), value_type{3});
 
     other = entt::sigh_mixin<entt::storage<value_type>>{};
-    other.bind(entt::forward_as_any(registry));
+    other.bind(registry);
 
     other.emplace(entt::entity{1}, 1);
     other = std::move(pool);
@@ -384,11 +384,11 @@ TYPED_TEST(SighMixin, Swap) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
+    pool.bind(registry);
     pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
     pool.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
 
-    other.bind(entt::forward_as_any(registry));
+    other.bind(registry);
     other.on_construct().template connect<&listener<entt::registry>>(on_construct);
     other.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
 
@@ -460,7 +460,7 @@ TYPED_TEST(SighMixin, CustomAllocator) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
+    pool.bind(registry);
     pool.on_construct().template connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
@@ -521,7 +521,7 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
+    pool.bind(registry);
     pool.on_construct().template connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
@@ -589,7 +589,7 @@ TEST(SighMixin, ThrowingComponent) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.bind(entt::forward_as_any(registry));
+    pool.bind(registry);
     pool.on_construct().connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().connect<&listener<registry_type>>(on_destroy);
 
