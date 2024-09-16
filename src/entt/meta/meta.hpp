@@ -317,7 +317,7 @@ public:
           vtable{std::exchange(other.vtable, &basic_vtable<void>)} {}
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~meta_any() noexcept {
+    ~meta_any() {
         release();
     }
 
@@ -715,7 +715,7 @@ struct meta_handle {
     meta_handle(meta_handle &&) = default;
 
     /*! @brief Default destructor. */
-    ~meta_handle() noexcept = default;
+    ~meta_handle() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
