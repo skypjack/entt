@@ -79,7 +79,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    virtual ~emitter() noexcept {
+    virtual ~emitter() {
         static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
     }
 

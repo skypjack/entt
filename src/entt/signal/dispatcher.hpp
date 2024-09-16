@@ -21,7 +21,7 @@ namespace entt {
 namespace internal {
 
 struct basic_dispatcher_handler {
-    virtual ~basic_dispatcher_handler() noexcept = default;
+    virtual ~basic_dispatcher_handler() = default;
     virtual void publish() = 0;
     virtual void disconnect(void *) = 0;
     virtual void clear() noexcept = 0;
@@ -179,7 +179,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_dispatcher() noexcept = default;
+    ~basic_dispatcher() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.

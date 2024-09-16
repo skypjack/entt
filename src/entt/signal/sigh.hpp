@@ -108,7 +108,7 @@ public:
         : calls{std::move(other.calls), allocator} {}
 
     /*! @brief Default destructor. */
-    ~sigh() noexcept = default;
+    ~sigh() = default;
 
     /**
      * @brief Copy assignment operator.
@@ -291,7 +291,7 @@ struct scoped_connection {
         : conn{std::exchange(other.conn, {})} {}
 
     /*! @brief Automatically breaks the link on destruction. */
-    ~scoped_connection() noexcept {
+    ~scoped_connection() {
         conn.release();
     }
 
