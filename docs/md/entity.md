@@ -1473,11 +1473,11 @@ the mixins. The latter can then make use of any information, which is set via
 `bind`:
 
 ```cpp
-base.bind(entt::forward_as_any(registry));
+base.bind(registry);
 ```
 
-The `bind` function accepts an `entt::any` object, that is a _typed type-erased_
-value.<br/>
+The `bind` function accepts any element by reference or by value and forwards it
+to derived classes.<br/>
 This is how a registry _passes_ itself to all pools that support signals and
 also why a storage keeps sending events without requiring the registry to be
 passed to it every time.
