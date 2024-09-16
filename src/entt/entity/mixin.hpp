@@ -182,7 +182,7 @@ public:
           update{std::move(other.update), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_sigh_mixin() noexcept(noexcept(std::declval<underlying_type>().~underlying_type())) override = default;
+    ~basic_sigh_mixin() override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.

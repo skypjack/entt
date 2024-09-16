@@ -68,7 +68,7 @@ public:
     basic_snapshot(basic_snapshot &&) noexcept = default;
 
     /*! @brief Default destructor. */
-    ~basic_snapshot() noexcept = default;
+    ~basic_snapshot() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
@@ -200,7 +200,7 @@ public:
     basic_snapshot_loader(basic_snapshot_loader &&) noexcept = default;
 
     /*! @brief Default destructor. */
-    ~basic_snapshot_loader() noexcept = default;
+    ~basic_snapshot_loader() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
@@ -380,7 +380,7 @@ public:
     basic_continuous_loader(basic_continuous_loader &&) noexcept = default;
 
     /*! @brief Default destructor. */
-    ~basic_continuous_loader() noexcept = default;
+    ~basic_continuous_loader() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.

@@ -175,7 +175,7 @@ public:
           filter{std::move(other.filter), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_runtime_view() noexcept = default;
+    ~basic_runtime_view() = default;
 
     /**
      * @brief Default copy assignment operator.

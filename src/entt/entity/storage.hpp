@@ -461,7 +461,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept(false) override {
+    ~basic_storage() override {
         shrink_to_size(0u);
     }
 
@@ -839,7 +839,7 @@ public:
         : base_type{std::move(other), allocator} {}
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept(false) override = default;
+    ~basic_storage() override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
@@ -1061,7 +1061,7 @@ public:
           placeholder{other.placeholder} {}
 
     /*! @brief Default destructor. */
-    ~basic_storage() noexcept(false) override = default;
+    ~basic_storage() override = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
