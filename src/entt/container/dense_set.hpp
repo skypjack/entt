@@ -383,7 +383,7 @@ public:
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
-    ~dense_set() noexcept = default;
+    ~dense_set() = default;
 
     /**
      * @brief Default copy assignment operator.

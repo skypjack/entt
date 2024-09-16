@@ -437,7 +437,7 @@ public:
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
-    ~dense_map() noexcept = default;
+    ~dense_map() = default;
 
     /**
      * @brief Default copy assignment operator.

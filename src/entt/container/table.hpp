@@ -238,7 +238,7 @@ public:
         : payload{Container{std::move(std::get<Container>(other.payload)), allocator}...} {}
 
     /*! @brief Default destructor. */
-    ~basic_table() noexcept = default;
+    ~basic_table() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
