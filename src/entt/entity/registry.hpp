@@ -262,7 +262,7 @@ class basic_registry {
                 }
 
                 pools.emplace(id, cpool);
-                cpool->bind(forward_as_any(*this));
+                cpool->bind(*this);
 
                 return static_cast<storage_type &>(*cpool);
             } else {
@@ -290,10 +290,10 @@ class basic_registry {
     }
 
     void rebind() {
-        entities.bind(forward_as_any(*this));
+        entities.bind(*this);
 
         for(auto &&curr: pools) {
-            curr.second->bind(forward_as_any(*this));
+            curr.second->bind(*this);
         }
     }
 
