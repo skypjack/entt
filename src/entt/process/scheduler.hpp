@@ -18,7 +18,7 @@ namespace internal {
 
 template<typename Delta>
 struct basic_process_handler {
-    virtual ~basic_process_handler() noexcept = default;
+    virtual ~basic_process_handler() = default;
 
     virtual bool update(const Delta, void *) = 0;
     virtual void abort(const bool) = 0;
@@ -130,7 +130,7 @@ public:
     }
 
     /*! @brief Default destructor. */
-    ~basic_scheduler() noexcept = default;
+    ~basic_scheduler() = default;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
