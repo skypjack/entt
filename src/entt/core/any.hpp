@@ -214,7 +214,7 @@ public:
     }
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~basic_any() noexcept {
+    ~basic_any() {
         if(vtable && (mode == any_policy::owner)) {
             vtable(operation::destroy, *this, nullptr);
         }
