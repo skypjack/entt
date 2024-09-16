@@ -212,7 +212,7 @@ public:
         : pool{std::piecewise_construct, std::forward_as_tuple(std::move(other.pool.first()), allocator), std::forward_as_tuple(std::move(other.pool.second()))} {}
 
     /*! @brief Default destructor. */
-    ~resource_cache() noexcept = default;
+    ~resource_cache() = default;
 
     /**
      * @brief Default copy assignment operator.

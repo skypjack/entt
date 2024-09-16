@@ -78,7 +78,7 @@ public:
         : value{std::move(other.value)} {}
 
     /*! @brief Default destructor. */
-    ~resource() noexcept = default;
+    ~resource() = default;
 
     /**
      * @brief Default copy assignment operator.
