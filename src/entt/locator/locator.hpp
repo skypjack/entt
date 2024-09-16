@@ -43,7 +43,7 @@ public:
     locator(const locator &) = delete;
 
     /*! @brief Default destructor, deleted on purpose. */
-    ~locator() noexcept = delete;
+    ~locator() = delete;
 
     /**
      * @brief Default copy assignment operator, deleted on purpose.
