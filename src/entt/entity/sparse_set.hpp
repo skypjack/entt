@@ -369,6 +369,10 @@ protected:
         return --(end() - static_cast<typename iterator::difference_type>(pos));
     }
 
+    /*! @brief Forwards variables to derived classes, if any. */
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
+    virtual void bind_any(any) noexcept {}
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -1045,9 +1049,30 @@ public:
         return *info;
     }
 
-    /*! @brief Forwards variables to derived classes, if any. */
-    // NOLINTNEXTLINE(performance-unnecessary-value-param)
-    virtual void bind(any) noexcept {}
+    /**
+     * @brief Forwards variables to derived classes, if any.
+     * @tparam Type Type of the element to forward.
+     * @param value The element to forward.
+     * @return Nothing.
+     */
+    template<typename Type>
+    [[deprecated("avoid wrapping elements with basic_any")]] std::enable_if_t<std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, basic_any<>>>
+    bind(Type &&value) noexcept {
+        // backward compatibility
+        bind_any(std::forward<Type>(value));
+    }
+
+    /**
+     * @brief Forwards variables to derived classes, if any.
+     * @tparam Type Type of the element to forward.
+     * @param value The element to forward.
+     * @return Nothing.
+     */
+    template<typename Type>
+    std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, basic_any<>>>
+    bind(Type &&value) noexcept {
+        bind_any(forward_as_any(std::forward<Type>(value)));
+    }
 
 private:
     sparse_container_type sparse;

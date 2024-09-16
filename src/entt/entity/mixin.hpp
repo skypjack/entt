@@ -114,6 +114,12 @@ private:
         return it;
     }
 
+    void bind_any(any value) noexcept final {
+        auto *reg = any_cast<basic_registry_type>(&value);
+        owner = reg ? reg : owner;
+        underlying_type::bind_any(std::move(value));
+    }
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename underlying_type::allocator_type;
@@ -329,16 +335,6 @@ public:
                 construction.publish(reg, underlying_type::operator[](from));
             }
         }
-    }
-
-    /**
-     * @brief Forwards variables to derived classes, if any.
-     * @param value A variable wrapped in an opaque container.
-     */
-    void bind(any value) noexcept final {
-        auto *reg = any_cast<basic_registry_type>(&value);
-        owner = reg ? reg : owner;
-        underlying_type::bind(std::move(value));
     }
 
 private:
