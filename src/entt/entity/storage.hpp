@@ -461,6 +461,7 @@ public:
     }
 
     /*! @brief Default destructor. */
+    // NOLINTNEXTLINE(bugprone-exception-escape)
     ~basic_storage() override {
         shrink_to_size(0u);
     }
