@@ -153,7 +153,7 @@ public:
      * @brief Exchanges the contents with those of a given scheduler.
      * @param other Scheduler to exchange the content with.
      */
-    void swap(basic_scheduler &other) {
+    void swap(basic_scheduler &other) noexcept {
         using std::swap;
         swap(handlers, other.handlers);
     }
