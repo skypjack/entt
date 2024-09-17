@@ -209,7 +209,7 @@ public:
      * @brief Exchanges the contents with those of a given flow builder.
      * @param other Flow builder to exchange the content with.
      */
-    void swap(basic_flow &other) {
+    void swap(basic_flow &other) noexcept {
         using std::swap;
         std::swap(index, other.index);
         std::swap(vertices, other.vertices);

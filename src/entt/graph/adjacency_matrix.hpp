@@ -193,7 +193,7 @@ public:
      * @brief Exchanges the contents with those of a given adjacency matrix.
      * @param other Adjacency matrix to exchange the content with.
      */
-    void swap(adjacency_matrix &other) {
+    void swap(adjacency_matrix &other) noexcept {
         using std::swap;
         swap(matrix, other.matrix);
         swap(vert, other.vert);
