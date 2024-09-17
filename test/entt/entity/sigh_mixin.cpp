@@ -19,21 +19,27 @@
 #include "../../common/throwing_type.hpp"
 
 struct auto_signal final {
-    inline static void on_construct(const entt::registry &, entt::entity) {
-        ++created;
+    auto_signal(bool &cflag, bool &uflag, bool &dflag)
+        : created{&cflag},
+          updated{&uflag},
+          destroyed{&dflag} {}
+
+    inline static void on_construct(entt::registry &registry, const entt::entity entt) {
+        *registry.get<auto_signal>(entt).created = true;
     }
 
-    inline static void on_update(entt::registry &, const entt::entity) {
-        ++updated;
+    inline static void on_update(entt::registry &registry, const entt::entity entt) {
+        *registry.get<auto_signal>(entt).updated = true;
     }
 
-    inline static void on_destroy(entt::registry &, entt::entity) {
-        ++destroyed;
+    inline static void on_destroy(entt::registry &registry, const entt::entity entt) {
+        *registry.get<auto_signal>(entt).destroyed = true;
     }
 
-    inline static std::size_t created{};
-    inline static std::size_t updated{};
-    inline static std::size_t destroyed{};
+private:
+    bool *created{};
+    bool *updated{};
+    bool *destroyed{};
 };
 
 template<typename Registry>
@@ -648,24 +654,30 @@ TEST(SighMixin, AutoSignal) {
     entt::registry registry;
     auto const entity = registry.create();
 
-    registry.emplace<auto_signal>(entity);
-    registry.replace<auto_signal>(entity);
+    bool created{};
+    bool updated{};
+    bool destroyed{};
+
+    registry.emplace<auto_signal>(entity, created, updated, destroyed);
+    registry.replace<auto_signal>(entity, created, updated, destroyed);
     registry.erase<auto_signal>(entity);
 
-    ASSERT_EQ(auto_signal::created, 1u);
-    ASSERT_EQ(auto_signal::updated, 1u);
-    ASSERT_EQ(auto_signal::destroyed, 1u);
+    ASSERT_TRUE(created);
+    ASSERT_TRUE(updated);
+    ASSERT_TRUE(destroyed);
 
     ASSERT_TRUE(registry.storage<auto_signal>().empty());
     ASSERT_TRUE(registry.valid(entity));
 
-    registry.emplace<auto_signal>(entity);
-    registry.replace<auto_signal>(entity);
+    created = updated = destroyed = false;
+
+    registry.emplace<auto_signal>(entity, created, updated, destroyed);
+    registry.replace<auto_signal>(entity, created, updated, destroyed);
     registry.destroy(entity);
 
-    ASSERT_EQ(auto_signal::created, 2u);
-    ASSERT_EQ(auto_signal::updated, 2u);
-    ASSERT_EQ(auto_signal::destroyed, 2u);
+    ASSERT_TRUE(created);
+    ASSERT_TRUE(updated);
+    ASSERT_TRUE(destroyed);
 
     ASSERT_TRUE(registry.storage<auto_signal>().empty());
     ASSERT_FALSE(registry.valid(entity));
