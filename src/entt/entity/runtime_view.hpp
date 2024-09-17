@@ -163,7 +163,7 @@ public:
           filter{other.filter, allocator} {}
 
     /*! @brief Default move constructor. */
-    basic_runtime_view(basic_runtime_view &&) noexcept(std::is_nothrow_move_constructible_v<container_type>) = default;
+    basic_runtime_view(basic_runtime_view &&) noexcept = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -187,13 +187,13 @@ public:
      * @brief Default move assignment operator.
      * @return This runtime view.
      */
-    basic_runtime_view &operator=(basic_runtime_view &&) noexcept(std::is_nothrow_move_assignable_v<container_type>) = default;
+    basic_runtime_view &operator=(basic_runtime_view &&) noexcept = default;
 
     /**
      * @brief Exchanges the contents with those of a given view.
      * @param other View to exchange the content with.
      */
-    void swap(basic_runtime_view &other) {
+    void swap(basic_runtime_view &other) noexcept {
         using std::swap;
         swap(pools, other.pools);
         swap(filter, other.filter);

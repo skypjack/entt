@@ -385,7 +385,7 @@ public:
      * @brief Exchanges the contents with those of a given registry.
      * @param other Registry to exchange the content with.
      */
-    void swap(basic_registry &other) {
+    void swap(basic_registry &other) noexcept {
         using std::swap;
 
         swap(vars, other.vars);

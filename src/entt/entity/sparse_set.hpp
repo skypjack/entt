@@ -482,7 +482,7 @@ public:
      * @brief Exchanges the contents with those of a given sparse set.
      * @param other Sparse set to exchange the content with.
      */
-    void swap(basic_sparse_set &other) {
+    void swap(basic_sparse_set &other) noexcept {
         using std::swap;
         swap(sparse, other.sparse);
         swap(packed, other.packed);

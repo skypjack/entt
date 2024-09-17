@@ -204,7 +204,7 @@ public:
      * @brief Exchanges the contents with those of a given storage.
      * @param other Storage to exchange the content with.
      */
-    void swap(basic_sigh_mixin &other) {
+    void swap(basic_sigh_mixin &other) noexcept {
         using std::swap;
         swap(owner, other.owner);
         swap(construction, other.construction);
