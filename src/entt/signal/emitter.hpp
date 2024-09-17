@@ -104,7 +104,7 @@ public:
      * @brief Exchanges the contents with those of a given emitter.
      * @param other Emitter to exchange the content with.
      */
-    void swap(emitter &other) {
+    void swap(emitter &other) noexcept {
         using std::swap;
         swap(handlers, other.handlers);
     }

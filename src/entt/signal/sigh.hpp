@@ -67,21 +67,21 @@ public:
     using sink_type = sink<sigh<Ret(Args...), Allocator>>;
 
     /*! @brief Default constructor. */
-    sigh() noexcept(std::is_nothrow_default_constructible_v<allocator_type> && std::is_nothrow_constructible_v<container_type, const allocator_type &>)
+    sigh() noexcept(noexcept(allocator_type{}))
         : sigh{allocator_type{}} {}
 
     /**
      * @brief Constructs a signal handler with a given allocator.
      * @param allocator The allocator to use.
      */
-    explicit sigh(const allocator_type &allocator) noexcept(std::is_nothrow_constructible_v<container_type, const allocator_type &>)
+    explicit sigh(const allocator_type &allocator) noexcept
         : calls{allocator} {}
 
     /**
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    sigh(const sigh &other) noexcept(std::is_nothrow_copy_constructible_v<container_type>)
+    sigh(const sigh &other)
         : calls{other.calls} {}
 
     /**
@@ -89,14 +89,14 @@ public:
      * @param other The instance to copy from.
      * @param allocator The allocator to use.
      */
-    sigh(const sigh &other, const allocator_type &allocator) noexcept(std::is_nothrow_constructible_v<container_type, const container_type &, const allocator_type &>)
+    sigh(const sigh &other, const allocator_type &allocator)
         : calls{other.calls, allocator} {}
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    sigh(sigh &&other) noexcept(std::is_nothrow_move_constructible_v<container_type>)
+    sigh(sigh &&other) noexcept
         : calls{std::move(other.calls)} {}
 
     /**
@@ -104,7 +104,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    sigh(sigh &&other, const allocator_type &allocator) noexcept(std::is_nothrow_constructible_v<container_type, container_type &&, const allocator_type &>)
+    sigh(sigh &&other, const allocator_type &allocator)
         : calls{std::move(other.calls), allocator} {}
 
     /*! @brief Default destructor. */
@@ -115,7 +115,7 @@ public:
      * @param other The instance to copy from.
      * @return This signal handler.
      */
-    sigh &operator=(const sigh &other) noexcept(std::is_nothrow_copy_assignable_v<container_type>) {
+    sigh &operator=(const sigh &other) {
         calls = other.calls;
         return *this;
     }
@@ -125,7 +125,7 @@ public:
      * @param other The instance to move from.
      * @return This signal handler.
      */
-    sigh &operator=(sigh &&other) noexcept(std::is_nothrow_swappable_v<container_type>) {
+    sigh &operator=(sigh &&other) noexcept {
         swap(other);
         return *this;
     }
@@ -134,7 +134,7 @@ public:
      * @brief Exchanges the contents with those of a given signal handler.
      * @param other Signal handler to exchange the content with.
      */
-    void swap(sigh &other) noexcept(std::is_nothrow_swappable_v<container_type>) {
+    void swap(sigh &other) noexcept {
         using std::swap;
         swap(calls, other.calls);
     }

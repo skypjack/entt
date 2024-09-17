@@ -202,7 +202,7 @@ public:
      * @brief Exchanges the contents with those of a given dispatcher.
      * @param other Dispatcher to exchange the content with.
      */
-    void swap(basic_dispatcher &other) {
+    void swap(basic_dispatcher &other) noexcept {
         using std::swap;
         swap(pools, other.pools);
     }
