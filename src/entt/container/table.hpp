@@ -260,7 +260,7 @@ public:
      * @brief Exchanges the contents with those of a given table.
      * @param other Table to exchange the content with.
      */
-    void swap(basic_table &other) {
+    void swap(basic_table &other) noexcept {
         using std::swap;
         swap(payload, other.payload);
     }

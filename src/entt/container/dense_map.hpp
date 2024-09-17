@@ -12,10 +12,10 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
-#include "../core/bit.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 
@@ -424,7 +424,7 @@ public:
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
-    dense_map(dense_map &&) noexcept(std::is_nothrow_move_constructible_v<compressed_pair<sparse_container_type, hasher>> && std::is_nothrow_move_constructible_v<compressed_pair<packed_container_type, key_equal>>) = default;
+    dense_map(dense_map &&) noexcept = default;
 
     /**
      * @brief Allocator-extended move constructor.
@@ -449,7 +449,7 @@ public:
      * @brief Default move assignment operator.
      * @return This container.
      */
-    dense_map &operator=(dense_map &&) noexcept(std::is_nothrow_move_assignable_v<compressed_pair<sparse_container_type, hasher>> && std::is_nothrow_move_assignable_v<compressed_pair<packed_container_type, key_equal>>) = default;
+    dense_map &operator=(dense_map &&) noexcept = default;
 
     /**
      * @brief Returns the associated allocator.
@@ -697,7 +697,7 @@ public:
      * @brief Exchanges the contents with those of a given container.
      * @param other Container to exchange the content with.
      */
-    void swap(dense_map &other) {
+    void swap(dense_map &other) noexcept {
         using std::swap;
         swap(sparse, other.sparse);
         swap(packed, other.packed);
