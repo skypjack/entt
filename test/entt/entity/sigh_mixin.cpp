@@ -428,6 +428,39 @@ TYPED_TEST(SighMixin, Swap) {
     ASSERT_EQ(on_destroy, 3u);
 }
 
+TEST(SighMixin, AutoSignal) {
+    entt::registry registry;
+    auto const entity = registry.create();
+
+    bool created{};
+    bool updated{};
+    bool destroyed{};
+
+    registry.emplace<auto_signal>(entity, created, updated, destroyed);
+    registry.replace<auto_signal>(entity, created, updated, destroyed);
+    registry.erase<auto_signal>(entity);
+
+    ASSERT_TRUE(created);
+    ASSERT_TRUE(updated);
+    ASSERT_TRUE(destroyed);
+
+    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_TRUE(registry.valid(entity));
+
+    created = updated = destroyed = false;
+
+    registry.emplace<auto_signal>(entity, created, updated, destroyed);
+    registry.replace<auto_signal>(entity, created, updated, destroyed);
+    registry.destroy(entity);
+
+    ASSERT_TRUE(created);
+    ASSERT_TRUE(updated);
+    ASSERT_TRUE(destroyed);
+
+    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_FALSE(registry.valid(entity));
+}
+
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
 
@@ -648,37 +681,4 @@ TEST(SighMixin, ThrowingComponent) {
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 3u);
-}
-
-TEST(SighMixin, AutoSignal) {
-    entt::registry registry;
-    auto const entity = registry.create();
-
-    bool created{};
-    bool updated{};
-    bool destroyed{};
-
-    registry.emplace<auto_signal>(entity, created, updated, destroyed);
-    registry.replace<auto_signal>(entity, created, updated, destroyed);
-    registry.erase<auto_signal>(entity);
-
-    ASSERT_TRUE(created);
-    ASSERT_TRUE(updated);
-    ASSERT_TRUE(destroyed);
-
-    ASSERT_TRUE(registry.storage<auto_signal>().empty());
-    ASSERT_TRUE(registry.valid(entity));
-
-    created = updated = destroyed = false;
-
-    registry.emplace<auto_signal>(entity, created, updated, destroyed);
-    registry.replace<auto_signal>(entity, created, updated, destroyed);
-    registry.destroy(entity);
-
-    ASSERT_TRUE(created);
-    ASSERT_TRUE(updated);
-    ASSERT_TRUE(destroyed);
-
-    ASSERT_TRUE(registry.storage<auto_signal>().empty());
-    ASSERT_FALSE(registry.valid(entity));
 }
