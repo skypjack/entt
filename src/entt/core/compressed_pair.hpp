@@ -111,13 +111,13 @@ public:
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    constexpr compressed_pair(const compressed_pair &other) noexcept(std::is_nothrow_copy_constructible_v<first_base> && std::is_nothrow_copy_constructible_v<second_base>) = default;
+    constexpr compressed_pair(const compressed_pair &other) = default;
 
     /**
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    constexpr compressed_pair(compressed_pair &&other) noexcept(std::is_nothrow_move_constructible_v<first_base> && std::is_nothrow_move_constructible_v<second_base>) = default;
+    constexpr compressed_pair(compressed_pair &&other) noexcept = default;
 
     /**
      * @brief Constructs a pair from its values.
@@ -151,14 +151,14 @@ public:
      * @param other The instance to copy from.
      * @return This compressed pair object.
      */
-    constexpr compressed_pair &operator=(const compressed_pair &other) noexcept(std::is_nothrow_copy_assignable_v<first_base> && std::is_nothrow_copy_assignable_v<second_base>) = default;
+    constexpr compressed_pair &operator=(const compressed_pair &other) = default;
 
     /**
      * @brief Move assignment operator.
      * @param other The instance to move from.
      * @return This compressed pair object.
      */
-    constexpr compressed_pair &operator=(compressed_pair &&other) noexcept(std::is_nothrow_move_assignable_v<first_base> && std::is_nothrow_move_assignable_v<second_base>) = default;
+    constexpr compressed_pair &operator=(compressed_pair &&other) noexcept = default;
 
     /**
      * @brief Returns the first element that a pair stores.
@@ -190,7 +190,7 @@ public:
      * @brief Swaps two compressed pair objects.
      * @param other The compressed pair to swap with.
      */
-    constexpr void swap(compressed_pair &other) noexcept(std::is_nothrow_swappable_v<first_type> && std::is_nothrow_swappable_v<second_type>) {
+    constexpr void swap(compressed_pair &other) noexcept {
         using std::swap;
         swap(first(), other.first());
         swap(second(), other.second());
