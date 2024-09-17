@@ -120,7 +120,7 @@ public:
      * @brief Exchanges the content with that of a given resource.
      * @param other Resource to exchange the content with.
      */
-    void swap(resource &other) {
+    void swap(resource &other) noexcept {
         using std::swap;
         swap(value, other.value);
     }
