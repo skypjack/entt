@@ -38,3 +38,5 @@ TODO:
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
 * doc: automatic signal registration
+* refine the storage fallback mechanism for views (ie alloc?)
+* reactive_mixin: auto disconnect mechanism

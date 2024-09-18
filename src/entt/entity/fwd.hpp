@@ -32,6 +32,9 @@ class basic_storage;
 template<typename, typename>
 class basic_sigh_mixin;
 
+template<typename, typename>
+class basic_reactive_mixin;
+
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
 
@@ -78,6 +81,13 @@ using storage = basic_storage<Type>;
  */
 template<typename Type>
 using sigh_mixin = basic_sigh_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Type Underlying storage type.
+ */
+template<typename Type>
+using reactive_mixin = basic_reactive_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<>;
