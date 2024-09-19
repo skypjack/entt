@@ -508,10 +508,10 @@ public:
      * @return A newly created view.
      */
     template<typename... Type, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
+    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) const {
-        basic_registry_type &parent = owner_or_assert();
-        basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>> elem{};
+        const basic_registry_type &parent = owner_or_assert();
+        basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>> elem{};
         [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.storage<std::remove_const_t<Exclude>>()..., parent.storage<std::remove_const_t<Type>>()..., this);
         return elem;
     }
