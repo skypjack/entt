@@ -30,8 +30,9 @@ TEST(StorageEntity, Constructors) {
 
 TEST(StorageEntity, Move) {
     entt::storage<entt::entity> pool;
+    const std::array entity{entt::entity{3}, entt::entity{2}};
 
-    pool.emplace(entt::entity{3});
+    pool.emplace(entity[0u]);
 
     static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
     static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
@@ -44,7 +45,7 @@ TEST(StorageEntity, Move) {
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.type(), entt::type_id<void>());
-    ASSERT_EQ(other.index(entt::entity{3}), 0u);
+    ASSERT_EQ(other.index(entity[0u]), 0u);
 
     entt::storage<entt::entity> extended{std::move(other), std::allocator<entt::entity>{}};
 
@@ -54,7 +55,7 @@ TEST(StorageEntity, Move) {
     ASSERT_FALSE(extended.empty());
 
     ASSERT_EQ(extended.type(), entt::type_id<void>());
-    ASSERT_EQ(extended.index(entt::entity{3}), 0u);
+    ASSERT_EQ(extended.index(entity[0u]), 0u);
 
     pool = std::move(extended);
     test::is_initialized(extended);
@@ -64,10 +65,10 @@ TEST(StorageEntity, Move) {
     ASSERT_TRUE(extended.empty());
 
     ASSERT_EQ(pool.type(), entt::type_id<void>());
-    ASSERT_EQ(pool.index(entt::entity{3}), 0u);
+    ASSERT_EQ(pool.index(entity[0u]), 0u);
 
     other = entt::storage<entt::entity>{};
-    other.emplace(entt::entity{2});
+    other.emplace(entity[1u]);
     other = std::move(pool);
     test::is_initialized(pool);
 
@@ -75,7 +76,7 @@ TEST(StorageEntity, Move) {
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.type(), entt::type_id<void>());
-    ASSERT_EQ(other.index(entt::entity{3}), 0u);
+    ASSERT_EQ(other.index(entity[0u]), 0u);
 }
 
 TEST(StorageEntity, Swap) {
@@ -108,8 +109,9 @@ TEST(StorageEntity, Swap) {
 
 TEST(StorageEntity, Getters) {
     entt::storage<entt::entity> pool;
+    const entt::entity entity{4};
 
-    pool.emplace(entt::entity{4});
+    pool.emplace(entity);
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), void>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), void>();
@@ -117,21 +119,22 @@ TEST(StorageEntity, Getters) {
     testing::StaticAssertTypeEq<decltype(pool.get_as_tuple({})), std::tuple<>>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get_as_tuple({})), std::tuple<>>();
 
-    ASSERT_NO_THROW(pool.get(entt::entity{4}));
-    ASSERT_NO_THROW(std::as_const(pool).get(entt::entity{4}));
+    ASSERT_NO_THROW(pool.get(entity));
+    ASSERT_NO_THROW(std::as_const(pool).get(entity));
 
-    ASSERT_EQ(pool.get_as_tuple(entt::entity{4}), std::make_tuple());
-    ASSERT_EQ(std::as_const(pool).get_as_tuple(entt::entity{4}), std::make_tuple());
+    ASSERT_EQ(pool.get_as_tuple(entity), std::make_tuple());
+    ASSERT_EQ(std::as_const(pool).get_as_tuple(entity), std::make_tuple());
 }
 
 ENTT_DEBUG_TEST(StorageEntityDeathTest, Getters) {
     entt::storage<entt::entity> pool;
+    const entt::entity entity{4};
 
-    ASSERT_DEATH(pool.get(entt::entity{4}), "");
-    ASSERT_DEATH(std::as_const(pool).get(entt::entity{4}), "");
+    ASSERT_DEATH(pool.get(entity), "");
+    ASSERT_DEATH(std::as_const(pool).get(entity), "");
 
-    ASSERT_DEATH([[maybe_unused]] const auto value = pool.get_as_tuple(entt::entity{4}), "");
-    ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entt::entity{4}), "");
+    ASSERT_DEATH([[maybe_unused]] const auto value = pool.get_as_tuple(entity), "");
+    ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entity), "");
 }
 
 TEST(StorageEntity, Emplace) {
@@ -580,7 +583,6 @@ TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
 
 TEST(StorageEntity, SortOrdered) {
     entt::storage<entt::entity> pool;
-
     const std::array entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}};
 
     pool.push(entity.begin(), entity.end());
@@ -591,7 +593,6 @@ TEST(StorageEntity, SortOrdered) {
 
 TEST(StorageEntity, SortReverse) {
     entt::storage<entt::entity> pool;
-
     const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
 
     pool.push(entity.begin(), entity.end());
@@ -602,7 +603,6 @@ TEST(StorageEntity, SortReverse) {
 
 TEST(StorageEntity, SortUnordered) {
     entt::storage<entt::entity> pool;
-
     const std::array entity{entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
     pool.push(entity.begin(), entity.end());
@@ -617,7 +617,6 @@ TEST(StorageEntity, SortUnordered) {
 
 TEST(StorageEntity, SortN) {
     entt::storage<entt::entity> pool;
-
     const std::array entity{entt::entity{2}, entt::entity{4}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
     pool.push(entity.begin(), entity.end());
@@ -644,7 +643,6 @@ TEST(StorageEntity, SortN) {
 TEST(StorageEntity, SortAsDisjoint) {
     entt::storage<entt::entity> lhs;
     const entt::storage<entt::entity> rhs;
-
     const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
 
     lhs.push(entity.begin(), entity.end());
@@ -659,7 +657,6 @@ TEST(StorageEntity, SortAsDisjoint) {
 TEST(StorageEntity, SortAsOverlap) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
-
     const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
     const std::array rhs_entity{entt::entity{2}};
 
@@ -679,7 +676,6 @@ TEST(StorageEntity, SortAsOverlap) {
 TEST(StorageEntity, SortAsOrdered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
-
     const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
     const std::array rhs_entity{entt::entity{32}, entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
 
@@ -697,7 +693,6 @@ TEST(StorageEntity, SortAsOrdered) {
 TEST(StorageEntity, SortAsReverse) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
-
     const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
     const std::array rhs_entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{32}};
 
@@ -720,7 +715,6 @@ TEST(StorageEntity, SortAsReverse) {
 TEST(StorageEntity, SortAsUnordered) {
     entt::storage<entt::entity> lhs;
     entt::storage<entt::entity> rhs;
-
     const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
     const std::array rhs_entity{entt::entity{4}, entt::entity{2}, entt::entity{32}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
 
