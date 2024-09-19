@@ -455,7 +455,7 @@ public:
      */
     template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_construct(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_construct<Candidate>(*this);
+        owner_or_assert().storage<Type>(id).on_construct().connect<Candidate>(*this);
     }
 
     /**
@@ -466,7 +466,7 @@ public:
      */
     template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_update(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_update<Candidate>(*this);
+        owner_or_assert().storage<Type>(id).on_update().connect<Candidate>(*this);
     }
 
     /**
@@ -477,7 +477,7 @@ public:
      */
     template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_destroy(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_destroy<Candidate>(*this);
+        owner_or_assert().storage<Type>(id).on_destroy().connect<Candidate>(*this);
     }
 
     /**
