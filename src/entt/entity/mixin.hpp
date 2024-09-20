@@ -455,7 +455,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_construct(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_construct().connect<Candidate>(*this);
+        owner_or_assert().storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
     }
 
     /**
@@ -466,7 +466,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_update(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_update().connect<Candidate>(*this);
+        owner_or_assert().storage<Clazz>(id).on_update().template connect<Candidate>(*this);
     }
 
     /**
@@ -477,7 +477,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_destroy(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_destroy().connect<Candidate>(*this);
+        owner_or_assert().storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
     }
 
     /**
@@ -512,7 +512,7 @@ public:
     view(exclude_t<Exclude...> = exclude_t{}) const {
         const basic_registry_type &parent = owner_or_assert();
         basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>> elem{};
-        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.storage<std::remove_const_t<Exclude>>()..., parent.storage<std::remove_const_t<Get>>()..., this);
+        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.template storage<std::remove_const_t<Exclude>>()..., parent.template storage<std::remove_const_t<Get>>()..., this);
         return elem;
     }
 
@@ -521,7 +521,7 @@ public:
     [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) {
         basic_registry_type &parent = owner_or_assert();
-        return {*this, parent.storage<std::remove_const_t<Get>>()..., parent.storage<std::remove_const_t<Exclude>>()...};
+        return {*this, parent.template storage<std::remove_const_t<Get>>()..., parent.template storage<std::remove_const_t<Exclude>>()...};
     }
 
 private:
