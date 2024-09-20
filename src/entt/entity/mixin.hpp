@@ -449,35 +449,35 @@ public:
 
     /**
      * @brief Makes storage _react_ to creation of objects of the given type.
-     * @tparam Type Type of element to _react_ to.
+     * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
      */
-    template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_construct(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_construct().connect<Candidate>(*this);
+    template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
+    void on_construct(const id_type id = type_hash<Clazz>::value()) {
+        owner_or_assert().storage<Clazz>(id).on_construct().connect<Candidate>(*this);
     }
 
     /**
      * @brief Makes storage _react_ to update of objects of the given type.
-     * @tparam Type Type of element to _react_ to.
+     * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
      */
-    template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_update(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_update().connect<Candidate>(*this);
+    template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
+    void on_update(const id_type id = type_hash<Clazz>::value()) {
+        owner_or_assert().storage<Clazz>(id).on_update().connect<Candidate>(*this);
     }
 
     /**
      * @brief Makes storage _react_ to destruction of objects of the given type.
-     * @tparam Type Type of element to _react_ to.
+     * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
      */
-    template<typename Type, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_destroy(const id_type id = type_hash<Type>::value()) {
-        owner_or_assert().storage<Type>(id).on_destroy().connect<Candidate>(*this);
+    template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
+    void on_destroy(const id_type id = type_hash<Clazz>::value()) {
+        owner_or_assert().storage<Clazz>(id).on_destroy().connect<Candidate>(*this);
     }
 
     /**
@@ -503,25 +503,25 @@ public:
 
     /**
      * @brief Returns a view that is filtered by the underlying storage.
-     * @tparam Type Types of elements used to construct the view.
+     * @tparam Get Types of elements used to construct the view.
      * @tparam Exclude Types of elements used to filter the view.
      * @return A newly created view.
      */
-    template<typename... Type, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>>
+    template<typename... Get, typename... Exclude>
+    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) const {
         const basic_registry_type &parent = owner_or_assert();
-        basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>> elem{};
-        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.storage<std::remove_const_t<Exclude>>()..., parent.storage<std::remove_const_t<Type>>()..., this);
+        basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>> elem{};
+        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.storage<std::remove_const_t<Exclude>>()..., parent.storage<std::remove_const_t<Get>>()..., this);
         return elem;
     }
 
     /*! @copydoc view */
-    template<typename... Type, typename... Exclude>
-    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Type>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
+    template<typename... Get, typename... Exclude>
+    [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) {
         basic_registry_type &parent = owner_or_assert();
-        return {*this, parent.storage<std::remove_const_t<Type>>()..., parent.storage<std::remove_const_t<Exclude>>()...};
+        return {*this, parent.storage<std::remove_const_t<Get>>()..., parent.storage<std::remove_const_t<Exclude>>()...};
     }
 
 private:
