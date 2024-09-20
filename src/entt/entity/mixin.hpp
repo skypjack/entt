@@ -455,7 +455,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_construct(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
+        owner_or_assert().template storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
     }
 
     /**
@@ -466,7 +466,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_update(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_update().template connect<Candidate>(*this);
+        owner_or_assert().template storage<Clazz>(id).on_update().template connect<Candidate>(*this);
     }
 
     /**
@@ -477,7 +477,7 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     void on_destroy(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
+        owner_or_assert().template storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
     }
 
     /**
