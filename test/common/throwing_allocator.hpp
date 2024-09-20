@@ -18,6 +18,16 @@ class throwing_allocator {
     template<typename Other>
     friend class throwing_allocator;
 
+    template<typename Other, typename = std::enable_if_t<!std::is_void_v<Type> || std::is_constructible_v<std::allocator<Type>, std::allocator<Other>>>>
+    throwing_allocator(int, const throwing_allocator<Other> &other)
+        : allocator{other.allocator},
+          config{other.config} {}
+
+    template<typename Other, typename = std::enable_if_t<std::is_void_v<Type> && !std::is_constructible_v<std::allocator<Type>, std::allocator<Other>>>>
+    throwing_allocator(char, const throwing_allocator<Other> &other)
+        : allocator{},
+          config{other.config} {}
+
 public:
     using value_type = Type;
     using pointer = value_type *;
@@ -39,8 +49,8 @@ public:
 
     template<typename Other>
     throwing_allocator(const throwing_allocator<Other> &other)
-        : allocator{other.allocator},
-          config{other.config} {}
+        // std::allocator<void> has no cross constructors (waiting for C++20)
+        : throwing_allocator{0, other} {}
 
     pointer allocate(std::size_t length) {
         if(const auto hash = entt::type_id<Type>().hash(); config->contains(hash)) {
