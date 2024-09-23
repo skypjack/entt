@@ -10,6 +10,7 @@ _TESTS = [
     "helper",
     "observer",
     "organizer",
+    "reactive_mixin",
     "registry",
     "runtime_view",
     "sigh_mixin",
