@@ -15,6 +15,7 @@
 #include "../../common/linter.hpp"
 #include "../../common/non_default_constructible.h"
 #include "../../common/pointer_stable.h"
+#include "../../common/registry.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
 
@@ -47,11 +48,9 @@ void listener(std::size_t &counter, Registry &, typename Registry::entity_type) 
     ++counter;
 }
 
-struct custom_registry: entt::basic_registry<test::entity> {};
-
 template<typename Type>
 struct entt::storage_type<Type, test::entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, test::entity>>> {
-    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::entity>, custom_registry>;
+    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::entity>, test::basic_custom_registry<test::entity>>;
 };
 
 template<typename Type>
@@ -463,17 +462,18 @@ TEST(SighMixin, AutoSignal) {
 
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
+    using registry_type = test::basic_custom_registry<test::entity>;
 
-    custom_registry registry;
+    registry_type registry;
     auto &pool = registry.storage<value_type>();
 
-    testing::StaticAssertTypeEq<decltype(pool), entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, custom_registry> &>();
+    testing::StaticAssertTypeEq<decltype(pool), entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> &>();
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.on_construct().template connect<&listener<custom_registry>>(on_construct);
-    pool.on_destroy().template connect<&listener<custom_registry>>(on_destroy);
+    pool.on_construct().template connect<&listener<registry_type>>(on_construct);
+    pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
     pool.emplace(registry.create());
     pool.emplace(registry.create());
