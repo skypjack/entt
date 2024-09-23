@@ -40,3 +40,6 @@ TODO:
 * doc: automatic signal registration
 * refine the storage fallback mechanism for views (ie alloc?)
 * reactive_mixin: auto disconnect mechanism
+* sigh_mixin: make registry available and change cb signature from reg/entt to storage/entt (breaking for the good)
+* mixin bind_any support for both registry types
+* replace doc for reactive systems/storage
