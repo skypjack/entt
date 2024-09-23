@@ -229,6 +229,20 @@ struct storage_type {
     using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
 };
 
+/*! @brief Empty value type for reactive storage types. */
+struct reactive final {};
+
+/**
+ * @ brief Partial specialization for reactive storage types.
+ * @tparam Entity A valid entity type.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ */
+template<typename Entity, typename Allocator>
+struct storage_type<reactive, Entity, Allocator> {
+    /*! @brief Type-to-storage conversion result. */
+    using type = ENTT_STORAGE(reactive_mixin, basic_storage<reactive, Entity, Allocator>);
+};
+
 /**
  * @brief Helper type.
  * @tparam Args Arguments to forward.
