@@ -10,6 +10,8 @@
 #include <entt/entity/storage.hpp>
 #include "../../common/empty.h"
 #include "../../common/linter.hpp"
+#include "../../common/throwing_allocator.hpp"
+
 template<typename Type>
 struct ReactiveMixin: testing::Test {
     using type = Type;
@@ -136,3 +138,36 @@ TYPED_TEST(ReactiveMixin, Swap) {
     ASSERT_EQ(other.index(entity[1u]), 0u);
 }
 
+TYPED_TEST(ReactiveMixin, ThrowingAllocator) {
+    using value_type = typename TestFixture::type;
+    using storage_type = entt::reactive_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
+    using registry_type = typename storage_type::registry_type;
+
+    storage_type pool{};
+    typename storage_type::base_type &base = pool;
+    registry_type registry;
+    const std::array entity{registry.create(), registry.create()};
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+
+    pool.get_allocator().template throw_counter<entt::entity>(0u);
+
+    ASSERT_THROW(pool.reserve(1u), test::throwing_allocator_exception);
+    ASSERT_EQ(pool.capacity(), 0u);
+
+    pool.get_allocator().template throw_counter<entt::entity>(1u);
+
+    ASSERT_THROW(registry.template emplace<test::empty>(entity[0u]), test::throwing_allocator_exception);
+    ASSERT_TRUE(registry.template all_of<test::empty>(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[0u]));
+
+    registry.template clear<test::empty>();
+    pool.get_allocator().template throw_counter<entt::entity>(1u);
+
+    ASSERT_THROW(registry.template insert<test::empty>(entity.begin(), entity.end()), test::throwing_allocator_exception);
+    ASSERT_TRUE(registry.template all_of<test::empty>(entity[0u]));
+    ASSERT_TRUE(registry.template all_of<test::empty>(entity[1u]));
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[1u]));
+}
