@@ -102,3 +102,37 @@ TYPED_TEST(ReactiveMixin, Move) {
     ASSERT_EQ(&other.registry(), &pool.registry());
 }
 
+TYPED_TEST(ReactiveMixin, Swap) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    entt::reactive_mixin<entt::storage<value_type>> other;
+    const std::array entity{registry.create(), registry.create()};
+
+    registry.emplace<test::empty>(entity[0u]);
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+
+    other.bind(registry);
+    other.template on_destroy<test::empty>();
+
+    registry.emplace<test::empty>(entity[1u]);
+    registry.erase<test::empty>(entity[0u]);
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    pool.swap(other);
+
+    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(pool.index(entity[0u]), 0u);
+    ASSERT_EQ(other.index(entity[1u]), 0u);
+}
+
