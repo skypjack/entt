@@ -22,6 +22,11 @@ void emplace(Type &storage, const typename Type::registry_type &, const typename
 }
 
 template<typename Type>
+void remove(Type &storage, const typename Type::registry_type &, const typename Type::entity_type entity) {
+    storage.remove(entity);
+}
+
+template<typename Type>
 struct ReactiveMixin: testing::Test {
     using type = Type;
 };
@@ -295,6 +300,82 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, OnUpdate) {
     using value_type = typename TestFixture::type;
     entt::reactive_mixin<entt::storage<value_type>> pool;
     ASSERT_DEATH(pool.template on_update<test::empty>(), "");
+}
+
+TYPED_TEST(ReactiveMixin, OnDestroy) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    const entt::entity entity{registry.create()};
+
+    pool.bind(registry);
+    registry.emplace<test::empty>(entity);
+    registry.erase<test::empty>(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
+
+    pool.template on_destroy<test::other_empty>();
+    registry.emplace<test::empty>(entity);
+    registry.erase<test::empty>(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
+
+    registry.on_destroy<test::other_empty>().disconnect(&pool);
+    pool.template on_destroy<test::empty>();
+    registry.emplace<test::empty>(entity);
+    registry.erase<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.clear<test::empty>();
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.emplace<test::empty>(entity);
+    registry.erase<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.destroy(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+}
+
+TYPED_TEST(ReactiveMixin, OnDestroyCallback) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    const std::array entity{registry.create(), registry.create(entt::entity{3})};
+
+    pool.bind(registry);
+    pool.template on_destroy<test::empty, &emplace<entt::reactive_mixin<entt::storage<value_type>>, 3u>>();
+    registry.insert<test::empty>(entity.begin(), entity.end());
+    registry.erase<test::empty>(entity[0u]);
+
+    ASSERT_TRUE(pool.empty());
+
+    registry.erase<test::empty>(entity[1u]);
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(entity[1u]));
+
+    pool.clear();
+
+    ASSERT_TRUE(pool.empty());
+
+    registry.insert<test::empty>(entity.begin(), entity.end());
+    registry.erase<test::empty>(entity.begin(), entity.end());
+
+    ASSERT_EQ(pool.size(), 1u);
+    ASSERT_TRUE(pool.contains(entity[1u]));
+}
+
+ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, OnDestroy) {
+    using value_type = typename TestFixture::type;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    ASSERT_DEATH(pool.template on_destroy<test::empty>(), "");
 }
 
 TYPED_TEST(ReactiveMixin, ThrowingAllocator) {
