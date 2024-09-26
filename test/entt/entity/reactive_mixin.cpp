@@ -432,6 +432,58 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, CustomRegistry) {
     ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
 
+TYPED_TEST(ReactiveMixin, CustomAllocator) {
+    using value_type = typename TestFixture::type;
+    using storage_type = entt::reactive_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
+    using registry_type = typename storage_type::registry_type;
+
+    const test::throwing_allocator<entt::entity> allocator{};
+    storage_type pool{allocator};
+    registry_type registry;
+    const std::array entity{registry.create(), registry.create()};
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+
+    pool.reserve(1u);
+
+    ASSERT_NE(pool.capacity(), 0u);
+
+    registry.template emplace<test::empty>(entity[0u]);
+    registry.template emplace<test::empty>(entity[1u]);
+
+    decltype(pool) other{std::move(pool), allocator};
+
+    test::is_initialized(pool);
+
+    ASSERT_TRUE(pool.empty());
+    ASSERT_FALSE(other.empty());
+    ASSERT_NE(other.capacity(), 0u);
+    ASSERT_EQ(other.size(), 2u);
+
+    pool = std::move(other);
+    test::is_initialized(other);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_NE(pool.capacity(), 0u);
+    ASSERT_EQ(pool.size(), 2u);
+
+    pool.swap(other);
+    pool = std::move(other);
+    test::is_initialized(other);
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_TRUE(other.empty());
+    ASSERT_NE(pool.capacity(), 0u);
+    ASSERT_EQ(pool.size(), 2u);
+
+    pool.clear();
+
+    ASSERT_NE(pool.capacity(), 0u);
+    ASSERT_EQ(pool.size(), 0u);
+}
+
 TYPED_TEST(ReactiveMixin, ThrowingAllocator) {
     using value_type = typename TestFixture::type;
     using storage_type = entt::reactive_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
