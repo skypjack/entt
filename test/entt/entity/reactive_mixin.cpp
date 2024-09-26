@@ -11,7 +11,9 @@
 #include <entt/entity/storage.hpp>
 #include "../../common/config.h"
 #include "../../common/empty.h"
+#include "../../common/entity.h"
 #include "../../common/linter.hpp"
+#include "../../common/registry.h"
 #include "../../common/throwing_allocator.hpp"
 
 template<typename Type, std::size_t Value>
@@ -25,6 +27,11 @@ template<typename Type>
 void remove(Type &storage, const typename Type::registry_type &, const typename Type::entity_type entity) {
     storage.remove(entity);
 }
+
+template<typename Type>
+struct entt::storage_type<Type, test::entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, test::entity>>> {
+    using type = entt::basic_sigh_mixin<entt::basic_storage<Type, test::entity>, test::basic_custom_registry<test::entity>>;
+};
 
 template<typename Type>
 struct ReactiveMixin: testing::Test {
@@ -376,6 +383,53 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, OnDestroy) {
     using value_type = typename TestFixture::type;
     entt::reactive_mixin<entt::storage<value_type>> pool;
     ASSERT_DEATH(pool.template on_destroy<test::empty>(), "");
+}
+
+TYPED_TEST(ReactiveMixin, Registry) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+
+    ASSERT_FALSE(pool);
+
+    pool.bind(registry);
+
+    ASSERT_TRUE(pool);
+    ASSERT_EQ(&pool.registry(), &registry);
+    ASSERT_EQ(&std::as_const(pool).registry(), &registry);
+}
+
+ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, Registry) {
+    using value_type = typename TestFixture::type;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
+}
+
+TYPED_TEST(ReactiveMixin, CustomRegistry) {
+    using value_type = typename TestFixture::type;
+    using registry_type = test::basic_custom_registry<test::entity>;
+
+    registry_type registry;
+    entt::basic_reactive_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    const std::array entity{registry.create(), registry.create()};
+
+    pool.bind(static_cast<entt::basic_registry<test::entity> &>(registry));
+    pool.template on_construct<test::empty>();
+    registry.insert<test::empty>(entity.begin(), entity.end());
+
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
+}
+
+ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, CustomRegistry) {
+    using value_type = typename TestFixture::type;
+    using registry_type = test::basic_custom_registry<test::entity>;
+    entt::basic_reactive_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
 
 TYPED_TEST(ReactiveMixin, ThrowingAllocator) {
