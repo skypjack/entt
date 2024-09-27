@@ -1,5 +1,6 @@
 #include <array>
 #include <cstddef>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -383,6 +384,53 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, OnDestroy) {
     using value_type = typename TestFixture::type;
     entt::reactive_mixin<entt::storage<value_type>> pool;
     ASSERT_DEATH(pool.template on_destroy<test::empty>(), "");
+}
+
+TYPED_TEST(ReactiveMixin, EntityLifecycle) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    const entt::entity entity{registry.create()};
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+    pool.template on_destroy<entt::entity, &remove<decltype(pool)>>();
+
+    ASSERT_FALSE(pool.contains(entity));
+
+    registry.emplace<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.erase<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.emplace<test::empty>(entity);
+    registry.destroy(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
+}
+
+TYPED_TEST(ReactiveMixin, ManagedStorage) {
+    entt::registry registry;
+    entt::storage_for_t<entt::reactive> &pool = registry.storage<entt::reactive>();
+    const entt::entity entity{registry.create()};
+
+    pool.template on_construct<test::empty>();
+    registry.emplace<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.erase<test::empty>(entity);
+
+    ASSERT_TRUE(pool.contains(entity));
+
+    registry.emplace<test::empty>(entity);
+    registry.destroy(entity);
+
+    ASSERT_FALSE(pool.contains(entity));
 }
 
 TYPED_TEST(ReactiveMixin, Registry) {
