@@ -480,6 +480,58 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, CustomRegistry) {
     ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
 
+TYPED_TEST(ReactiveMixin, View) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    const std::array entity{registry.create(), registry.create()};
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+    registry.insert<test::empty>(entity.begin(), entity.end());
+    registry.insert<double>(entity.begin(), entity.end());
+    registry.emplace<int>(entity[1u], 42);
+
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
+
+    const auto view = pool.view();
+    const auto cview = std::as_const(pool).view();
+
+    ASSERT_EQ(view.size(), 2u);
+    ASSERT_EQ(view.front(), entity[1u]);
+    ASSERT_EQ(view.back(), entity[0u]);
+
+    ASSERT_EQ(cview.size(), view.size());
+
+    for(const auto entt: cview) {
+        ASSERT_TRUE(view.contains(entt));
+    }
+
+    const auto filtered = pool.template view<double>(entt::exclude<int>);
+    const auto cfiltered = std::as_const(pool).template view<double>(entt::exclude<int>);
+
+    ASSERT_EQ(filtered.size_hint(), 2u);
+    ASSERT_EQ(std::distance(filtered.begin(), filtered.end()), 1);
+    ASSERT_TRUE(filtered.contains(entity[0u]));
+    ASSERT_FALSE(filtered.contains(entity[1u]));
+
+    ASSERT_NE(std::distance(cfiltered.begin(), cfiltered.end()), 0);
+
+    for(const auto entt: cfiltered) {
+        ASSERT_TRUE(filtered.contains(entt));
+    }
+}
+
+ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, View) {
+    using value_type = typename TestFixture::type;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    ASSERT_DEATH([[maybe_unused]] const auto view = pool.view(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto cview = std::as_const(pool).view(), "");
+}
+
 TYPED_TEST(ReactiveMixin, CustomAllocator) {
     using value_type = typename TestFixture::type;
     using storage_type = entt::reactive_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
