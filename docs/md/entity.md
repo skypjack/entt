@@ -1553,7 +1553,7 @@ pointer and behaves differently depending on the case:
 * When the pointer is null, the function tries to default-construct an instance
   of the object to bind to the entity and returns true on success.
 
-* When the pointer is non-null, the function tries to copy-construct an instance
+* When the pointer is not null, the function tries to copy-construct an instance
   of the object to bind to the entity and returns true on success.
 
 This means that, starting from a reference to the base, it's possible to bind
