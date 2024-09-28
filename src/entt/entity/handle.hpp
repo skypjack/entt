@@ -150,8 +150,8 @@ public:
     }
 
     /**
-     * @brief Checks if a handle refers to non-null registry pointer and entity.
-     * @return True if the handle refers to non-null registry and entity, false
+     * @brief Checks if a handle refers to a valid registry and entity.
+     * @return True if the handle refers to a valid registry and entity, false
      * otherwise.
      */
     [[nodiscard]] bool valid() const {
