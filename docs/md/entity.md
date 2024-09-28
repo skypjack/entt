@@ -13,7 +13,7 @@
   * [Observe changes](#observe-changes)
     * [Entity lifecycle](#entity-lifecycle)
     * [Listeners disconnection](#listeners-disconnection)
-    * [They call me Reactive System](#they-call-me-reactive-system)
+    * [They call me reactive storage](#they-call-me-reactive-storage)
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
@@ -455,11 +455,11 @@ As a result, a listener that wants to access components, entities, or pools can
 safely do so against a still valid registry, while checking for the existence of
 the various elements as appropriate.
 
-### They call me Reactive System
+### They call me reactive storage
 
 Signals are the basic tools to construct reactive systems, even if they aren't
 enough on their own. `EnTT` tries to take another step in that direction with
-the `observer` class template.<br/>
+its _reactive mixin_.<br/>
 In order to explain what reactive systems are, this is a slightly revised quote
 from the documentation of the library that first introduced this tool,
 [Entitas](https://github.com/sschmid/Entitas-CSharp):
@@ -475,100 +475,156 @@ On these words, however, the similarities with the proposal of `Entitas` also
 end. The rules of the language and the design of the library obviously impose
 and allow different things.
 
-An `observer` is initialized with an instance of a registry and a set of _rules_
-that describes what are the entities to intercept. As an example:
+A reactive mixin can be used on a standalone storage with any value type
+(perhaps using an alias to simplify its use):
 
 ```cpp
-entt::observer observer{registry, entt::collector.update<sprite>()};
+using reactive_storage = entt::reactive_mixin<entt::storage<void>>;
+
+entt::registry registry{};
+reactive_storage storage{};
+
+storage.bind(registry);
 ```
 
-The class is default constructible and is reconfigured at any time by means of
-the `connect` member function. Moreover, an observer is disconnected from the
-underlying registry through the `disconnect` member function.<br/>
-The `observer` offers also what is needed to query its _internal state_ and to
-know if it's empty or how many entities it contains. Moreover, it can return a
-raw pointer to the list of entities it contains.
-
-However, the most important features of this class are that:
-
-* It's iterable and therefore users can easily walk through the list of entities
-  by means of a range-for loop or the `each` member function.
-
-* It's clearable and therefore users can consume the entities and literally
-  reset the observer after each iteration.
-
-These aspects make the observer an incredibly powerful tool to know at any time
-what are the entities that matched the given rules since the last time one
-asked:
+In this case, it must be provided with a reference registry for subsequent
+operations.<br/>
+Alternatively, when using the value type provided directly by `EnTT`, it's also
+possible to create a reactive storage directly inside a registry:
 
 ```cpp
-for(const auto entity: observer) {
-    // ...
+entt::registry registry{};
+auto &storage = registry.storage<entt::reactive>("observer"_hs);
+```
+
+In the latter case there is the advantage that, in the event of destruction of
+an entity, this storage is also automatically cleaned up.<br/>
+Also note that, unlike all other storage, these classes don't support signals by
+default (although they can be enabled if necessary).
+
+Once it has been created and associated with a registry, the reactive mixin
+needs to be informed about what it should _observe_.<br/>
+Here the choice boils down to three main events affecting all elements (entities
+or components), namely creation, update or destruction:
+
+```cpp
+// observe position component construction
+storage.on_construct<position>();
+
+// observe velocity component update
+storage.on_update<velocity>();
+
+// observe renderable component destruction
+storage.on_destroy<renderable>();
+```
+
+It goes without saying that it's possible to observe multiple events of the same
+type or of different types with the same storage.<br/>
+For example, to know which entities have been assigned or updated a component of
+a certain type:
+
+```cpp
+storage.on_construct<my_type>();
+storage.on_update<my_type>();
+```
+
+Note that all configurations are in _or_ and never in _and_. Therefore, to track
+entities that have been assigned two different components, there are a couple of
+options:
+
+* Create two reactive storage, then combine them in a view:
+
+  ```cpp
+  first_storage.on_construct<position>();
+  second_storage.on_construct<velocity>();
+
+  for(auto entity: entt::basic_view{first_storage, second_storage}) {
+      // ...
+  }
+  ```
+
+* Use a reactive storage with a non-`void` value type and a custom tracking
+  function for the purpose:
+
+  ```cpp
+  using my_reactive_storage = entt::reactive_mixin<entt::storage<bool>>;
+
+  void callback(my_reactive_storage &storage, const entt::registry &, const entt::entity entity) {
+      storage.contains(entity) ? (storage.get(entity) = true) : storage.emplace(entity, false);
+  }
+
+  // ...
+
+  my_reactive_storage storage{};
+  storage.on_construct<position, &callback>();
+  storage.on_construct<velocity, &callback>();
+
+  // ...
+
+  for(auto [entity, both_were_added]: storage.each()) {
+      if(both_were_added) {
+          // ...
+      }
+  }
+  ```
+
+As highlighted in the last example, the reactive mixin tracks the entities that
+match the given conditions and saves them aside. However, this behavior can be
+changed.<br/>
+For example, it's possible to _capture_ all and only the entities for which a
+certain component has been updated but only if a specific value is within a
+given range:
+
+```cpp
+void callback(reactive_storage &storage, const entt::registry &registry, const entt::entity entity) {
+    storage.remove(entity);
+
+    if(const auto x = registry.get<position>(entity).x; x >= min_x && x <= max_x) {
+        storage.emplace(entity);
+    }
 }
 
-observer.clear();
+// ...
+
+storage.on_update<position, &callback>();
 ```
 
-The snippet above is equivalent to the following:
+This makes reactive storage extremely flexible and usable in a large number of
+cases.<br/>
+Finally, once the entities of interest have been collected, it's possible to
+_visit_ the storage like any other:
 
 ```cpp
-observer.each([](const auto entity) {
+for(auto entity: storage) {
     // ...
-});
+}
 ```
 
-At least as long as the `observer` isn't const. This means that the non-const
-overload of `each` does also reset the underlying data structure before to
-return to the caller, while the const overload does not for obvious reasons.
-
-A `collector` is a utility aimed to generate a list of `matcher`s (the actual
-rules) to use with an `observer`.<br/>
-There are two types of `matcher`s:
-
-* Observing matcher: an observer returns at least the entities for which one or
-  more of the given components have been updated and not yet destroyed.
-
-  ```cpp
-  entt::collector.update<sprite>();
-  ```
-
-  Where _updated_ means that all listeners attached to `on_update` are invoked.
-  In order for this to happen, specific functions such as `patch` must be used.
-  Refer to the specific documentation for more details.
-
-* Grouping matcher: an observer returns at least the entities that would have
-  entered the given group if it existed and that would have not yet left it.
-
-  ```cpp
-  entt::collector.group<position, velocity>(entt::exclude<destroyed>);
-  ```
-
-  A grouping matcher supports also exclusion lists as well as single components.
-
-Roughly speaking, an observing matcher intercepts the entities for which the
-given components are updated while a grouping matcher tracks the entities that
-have assigned the given components since the last time one asked.<br/>
-If an entity already has all the components except one and the missing type is
-assigned to it, the entity is intercepted by a grouping matcher.
-
-In addition, matchers support filtering by means of a `where` clause:
+Wrapping it in a view and combining it with other views is another option:
 
 ```cpp
-entt::collector.update<sprite>().where<position>(entt::exclude<velocity>);
+for(auto [entity, pos]: (entt:.basic_view{storage} | registry.view<position>(entt::exclude<velocity>)).each()) {
+    // ...
+}
 ```
 
-This clause introduces a way to intercept entities if and only if they are
-already part of a hypothetical group. If they are not, they aren't returned by
-the observer, no matter if they matched the given rule.<br/>
-In the example above, whenever the component `sprite` of an entity is updated,
-the observer checks the entity itself to verify that it has at least `position`
-and has not `velocity`. If one of the two conditions isn't satisfied, the entity
-is discarded, no matter what.
+In order to simplify this last use case, the reactive mixin also provides a
+specific function that returns a view of the storage already filtered according
+to the provided requirements:
 
-A `where` clause accepts a theoretically unlimited number of types as well as
-multiple elements in the exclusion list. Moreover, every matcher can have its
-own clause and multiple clauses for the same matcher are combined in a single
-one.
+```cpp
+for(auto [entity, pos]: storage.view<position>(entt::exclude<velocity>).each()) {
+    // ...
+}
+```
+
+The registry used in this case is the one associated with the storage and also
+available via the `registry` function.
+
+Finally, it should be noted that a reactive storage never deletes its entities
+(and elements, if any).<br/>
+To process and then discard entities at regular intervals, refer to the `clear`
+function available by default for each storage type.
 
 ## Sorting: is it possible?
 
