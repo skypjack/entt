@@ -590,7 +590,6 @@ TYPED_TEST(ReactiveMixin, ThrowingAllocator) {
     using registry_type = typename storage_type::registry_type;
 
     storage_type pool{};
-    typename storage_type::base_type &base = pool;
     registry_type registry;
     const std::array entity{registry.create(), registry.create()};
 
