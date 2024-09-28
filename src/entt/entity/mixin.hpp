@@ -481,8 +481,8 @@ public:
     }
 
     /**
-     * @brief Checks if a mixin refers to non-null registry.
-     * @return True if the mixin refers to non-null registry, false otherwise.
+     * @brief Checks if a mixin refers to a valid registry.
+     * @return True if the mixin refers to a valid registry, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
         return (owner != nullptr);
