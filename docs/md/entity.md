@@ -508,14 +508,13 @@ Here the choice boils down to three main events affecting all elements (entities
 or components), namely creation, update or destruction:
 
 ```cpp
-// observe position component construction
-storage.on_construct<position>();
-
-// observe velocity component update
-storage.on_update<velocity>();
-
-// observe renderable component destruction
-storage.on_destroy<renderable>();
+storage
+    // observe position component construction
+    .on_construct<position>()
+    // observe velocity component update
+    .on_update<velocity>()
+    // observe renderable component destruction
+    .on_destroy<renderable>();
 ```
 
 It goes without saying that it's possible to observe multiple events of the same
@@ -524,8 +523,9 @@ For example, to know which entities have been assigned or updated a component of
 a certain type:
 
 ```cpp
-storage.on_construct<my_type>();
-storage.on_update<my_type>();
+storage
+    .on_construct<my_type>()
+    .on_update<my_type>();
 ```
 
 Note that all configurations are in _or_ and never in _and_. Therefore, to track
@@ -556,8 +556,9 @@ options:
   // ...
 
   my_reactive_storage storage{};
-  storage.on_construct<position, &callback>();
-  storage.on_construct<velocity, &callback>();
+  storage
+      .on_construct<position, &callback>()
+      .on_construct<velocity, &callback>();
 
   // ...
 

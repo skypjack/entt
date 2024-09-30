@@ -452,10 +452,12 @@ public:
      * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
+     * @return This mixin.
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_construct(const id_type id = type_hash<Clazz>::value()) {
+    basic_reactive_mixin &on_construct(const id_type id = type_hash<Clazz>::value()) {
         owner_or_assert().template storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
+        return *this;
     }
 
     /**
@@ -463,10 +465,12 @@ public:
      * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
+     * @return This mixin.
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_update(const id_type id = type_hash<Clazz>::value()) {
+    basic_reactive_mixin &on_update(const id_type id = type_hash<Clazz>::value()) {
         owner_or_assert().template storage<Clazz>(id).on_update().template connect<Candidate>(*this);
+        return *this;
     }
 
     /**
@@ -474,10 +478,12 @@ public:
      * @tparam Clazz Type of element to _react_ to.
      * @tparam Candidate Function to use to _react_ to the event.
      * @param id Optional name used to map the storage within the registry.
+     * @return This mixin.
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
-    void on_destroy(const id_type id = type_hash<Clazz>::value()) {
+    basic_reactive_mixin &on_destroy(const id_type id = type_hash<Clazz>::value()) {
         owner_or_assert().template storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
+        return *this;
     }
 
     /**

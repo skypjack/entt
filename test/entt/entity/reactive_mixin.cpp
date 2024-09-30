@@ -72,8 +72,7 @@ TYPED_TEST(ReactiveMixin, Move) {
     const std::array entity{registry.create(), registry.create()};
 
     pool.bind(registry);
-    pool.template on_construct<test::empty>();
-    pool.template on_update<test::empty>();
+    pool.template on_construct<test::empty>().template on_update<test::empty>();
     registry.emplace<test::empty>(entity[0u]);
 
     static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
@@ -394,8 +393,7 @@ TYPED_TEST(ReactiveMixin, EntityLifecycle) {
     const entt::entity entity{registry.create()};
 
     pool.bind(registry);
-    pool.template on_construct<test::empty>();
-    pool.template on_destroy<entt::entity, &remove<decltype(pool)>>();
+    pool.template on_construct<test::empty>().template on_destroy<entt::entity, &remove<decltype(pool)>>();
 
     ASSERT_FALSE(pool.contains(entity));
 
@@ -463,7 +461,12 @@ TYPED_TEST(ReactiveMixin, CustomRegistry) {
     entt::basic_reactive_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
     const std::array entity{registry.create(), registry.create()};
 
+    ASSERT_FALSE(pool);
+
     pool.bind(static_cast<entt::basic_registry<test::entity> &>(registry));
+
+    ASSERT_TRUE(pool);
+
     pool.template on_construct<test::empty>();
     registry.insert<test::empty>(entity.begin(), entity.end());
 
