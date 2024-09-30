@@ -66,7 +66,7 @@ struct basic_collector<> {
  * @tparam Other Other matchers.
  */
 template<typename... Reject, typename... Require, typename... Rule, typename... Other>
-struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule...>, Other...> {
+struct [[deprecated("use reactive mixin instead")]] basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule...>, Other...> {
     /*! @brief Current matcher. */
     using current_type = matcher<type_list<Reject...>, type_list<Require...>, Rule...>;
 
