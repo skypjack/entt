@@ -241,8 +241,8 @@ TEST_F(MetaFunc, Custom) {
 ENTT_DEBUG_TEST_F(MetaFuncDeathTest, Custom) {
     using namespace entt::literals;
 
-    ASSERT_DEATH([[maybe_unused]] const int &value = entt::resolve<function>().func("g"_hs).custom(), "");
-    ASSERT_DEATH([[maybe_unused]] const char &value = entt::resolve<function>().func("h"_hs).custom(), "");
+    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<function>().func("g"_hs).custom(), "");
+    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<function>().func("h"_hs).custom(), "");
 }
 
 TEST_F(MetaFunc, Const) {

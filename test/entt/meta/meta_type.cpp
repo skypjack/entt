@@ -303,8 +303,8 @@ TEST_F(MetaType, Custom) {
 }
 
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
-    ASSERT_DEATH([[maybe_unused]] const int &value = entt::resolve<clazz>().custom(), "");
-    ASSERT_DEATH([[maybe_unused]] const char &value = entt::resolve<base>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<base>().custom(), "");
 }
 
 TEST_F(MetaType, RemovePointer) {
