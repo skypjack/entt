@@ -13,7 +13,7 @@
   * [Observe changes](#observe-changes)
     * [Entity lifecycle](#entity-lifecycle)
     * [Listeners disconnection](#listeners-disconnection)
-    * [They call me reactive storage](#they-call-me-reactive-storage)
+  * [They call me reactive storage](#they-call-me-reactive-storage)
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
@@ -455,7 +455,7 @@ As a result, a listener that wants to access components, entities, or pools can
 safely do so against a still valid registry, while checking for the existence of
 the various elements as appropriate.
 
-### They call me reactive storage
+## They call me reactive storage
 
 Signals are the basic tools to construct reactive systems, even if they aren't
 enough on their own. `EnTT` tries to take another step in that direction with
