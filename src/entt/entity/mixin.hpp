@@ -260,6 +260,27 @@ public:
     }
 
     /**
+     * @brief Checks if a mixin refers to a valid registry.
+     * @return True if the mixin refers to a valid registry, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return (owner != nullptr);
+    }
+
+    /**
+     * @brief Returns a pointer to the underlying registry, if any.
+     * @return A pointer to the underlying registry, if any.
+     */
+    [[nodiscard]] const registry_type &registry() const noexcept {
+        return owner_or_assert();
+    }
+
+    /*! @copydoc registry */
+    [[nodiscard]] registry_type &registry() noexcept {
+        return owner_or_assert();
+    }
+
+    /**
      * @brief Emplace elements into a storage.
      *
      * The behavior of this operation depends on the underlying storage type

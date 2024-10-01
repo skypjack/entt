@@ -10,6 +10,7 @@
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
+#include "../../common/config.h"
 #include "../../common/entity.h"
 #include "../../common/linter.hpp"
 #include "../../common/non_default_constructible.h"
@@ -57,9 +58,13 @@ struct SighMixin: testing::Test {
     using type = Type;
 };
 
+template<typename Type>
+using SighMixinDeathTest = SighMixin<Type>;
+
 using SighMixinTypes = ::testing::Types<int, test::pointer_stable>;
 
 TYPED_TEST_SUITE(SighMixin, SighMixinTypes, );
+TYPED_TEST_SUITE(SighMixinDeathTest, SighMixinTypes, );
 
 TYPED_TEST(SighMixin, Functionalities) {
     using value_type = typename TestFixture::type;
@@ -459,14 +464,41 @@ TEST(SighMixin, AutoSignal) {
     ASSERT_FALSE(registry.valid(entity));
 }
 
+TYPED_TEST(SighMixin, Registry) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::sigh_mixin<entt::storage<value_type>> pool;
+
+    ASSERT_FALSE(pool);
+
+    pool.bind(registry);
+
+    ASSERT_TRUE(pool);
+    ASSERT_EQ(&pool.registry(), &registry);
+    ASSERT_EQ(&std::as_const(pool).registry(), &registry);
+}
+
+ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, Registry) {
+    using value_type = typename TestFixture::type;
+    entt::sigh_mixin<entt::storage<value_type>> pool;
+    ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
+}
+
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = typename TestFixture::type;
     using registry_type = test::basic_custom_registry<test::entity>;
 
     registry_type registry;
-    auto &pool = registry.storage<value_type>();
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    const std::array entity{registry.create(), registry.create()};
 
-    testing::StaticAssertTypeEq<decltype(pool), entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> &>();
+    ASSERT_FALSE(pool);
+
+    pool.bind(static_cast<entt::basic_registry<test::entity> &>(registry));
+
+    ASSERT_TRUE(pool);
 
     std::size_t on_construct{};
     std::size_t on_destroy{};
@@ -474,8 +506,8 @@ TYPED_TEST(SighMixin, CustomRegistry) {
     pool.on_construct().template connect<&listener<registry_type>>(on_construct);
     pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
 
-    pool.emplace(registry.create());
-    pool.emplace(registry.create());
+    pool.emplace(entity[0u]);
+    pool.emplace(entity[1u]);
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 0u);
@@ -484,6 +516,14 @@ TYPED_TEST(SighMixin, CustomRegistry) {
 
     ASSERT_EQ(on_construct, 2u);
     ASSERT_EQ(on_destroy, 2u);
+}
+
+ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, CustomRegistry) {
+    using value_type = typename TestFixture::type;
+    using registry_type = test::basic_custom_registry<test::entity>;
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
+    ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
 
 TYPED_TEST(SighMixin, CustomAllocator) {
