@@ -25,7 +25,7 @@ TODO:
   - allow skipping/reserving entity identifiers
   - documentation for reserved entities
 * storage entity: no emplace/insert, rename and add a fast range-push from above
-* view: propagate tombostone check request to iterator
+* view: propagate tombstone check request to iterator
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
 * improve front (no multiple checks) and back (ie no contains) for multi-type view
@@ -37,10 +37,10 @@ TODO:
 * view and view iterator specializations for multi, single and filtered elements
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
-* doc: automatic signal registration
 * refine the storage fallback mechanism for views (ie alloc?)
-* reactive_mixin: auto disconnect mechanism
-* sigh_mixin: make registry available and change cb signature from reg/entt to storage/entt (breaking for the good)
+* sigh_mixin: automatic signal registration
+* sigh_mixin: change cb signature from reg/entt to storage/entt (breaking for the good)
 * mixin bind_any support for both registry types
-* reactive mixin: return *this from on_* functions (and update doc)
-* double check reactive storage examples and fix them if needed
+* reactive_mixin: note about no-auto-disconnect mechanism
+* reactive_mixin: in-code and md doc about callback signature
+* don't pass reactive storage by default to callback
