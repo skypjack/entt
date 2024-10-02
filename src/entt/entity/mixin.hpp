@@ -58,7 +58,7 @@ class basic_sigh_mixin final: public Type {
     using underlying_type = Type;
     using owner_type = Registry;
 
-    using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
+    using basic_registry_type = basic_registry<typename owner_type::entity_type, typename owner_type::allocator_type>;
     using sigh_type = sigh<void(owner_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
     using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
@@ -376,7 +376,7 @@ class basic_reactive_mixin final: public Type {
     using underlying_type = Type;
     using owner_type = Registry;
 
-    using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
+    using basic_registry_type = basic_registry<typename owner_type::entity_type, typename owner_type::allocator_type>;
 
     static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
 
