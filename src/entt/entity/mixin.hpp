@@ -36,6 +36,20 @@ template<typename Type, typename Registry>
 struct has_on_destroy<Type, Registry, std::void_t<decltype(Type::on_destroy(std::declval<Registry &>(), std::declval<Registry>().create()))>>
     : std::true_type {};
 
+template<typename Type>
+auto *any_to_owner(any &value) noexcept {
+    using base_type = basic_registry<typename Type::entity_type, typename Type::allocator_type>;
+    base_type *reg = any_cast<base_type>(&value);
+
+    if constexpr(!std::is_same_v<Type, base_type>) {
+        if(!reg) {
+            reg = any_cast<Type>(&value);
+        }
+    }
+
+    return reg;
+}
+
 } // namespace internal
 /*! @endcond */
 
@@ -116,8 +130,7 @@ private:
     }
 
     void bind_any(any value) noexcept final {
-        auto *reg = any_cast<basic_registry_type>(&value);
-        owner = reg ? reg : owner;
+        owner = internal::any_to_owner<registry_type>(value);
         underlying_type::bind_any(std::move(value));
     }
 
@@ -393,8 +406,7 @@ class basic_reactive_mixin final: public Type {
 
 private:
     void bind_any(any value) noexcept final {
-        auto *reg = any_cast<basic_registry_type>(&value);
-        owner = reg ? reg : owner;
+        owner = internal::any_to_owner<registry_type>(value);
         underlying_type::bind_any(std::move(value));
     }
 

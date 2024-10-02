@@ -40,7 +40,6 @@ TODO:
 * refine the storage fallback mechanism for views (ie alloc?)
 * sigh_mixin: automatic signal registration
 * sigh_mixin: change cb signature from reg/entt to storage/entt (breaking for the good)
-* mixin bind_any support for both registry types
 * reactive_mixin: note about no-auto-disconnect mechanism
 * reactive_mixin: in-code and md doc about callback signature
 * don't pass reactive storage by default to callback

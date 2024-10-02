@@ -496,7 +496,7 @@ TYPED_TEST(SighMixin, CustomRegistry) {
 
     ASSERT_FALSE(pool);
 
-    pool.bind(static_cast<entt::basic_registry<test::entity> &>(registry));
+    pool.bind(registry);
 
     ASSERT_TRUE(pool);
 
