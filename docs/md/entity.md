@@ -489,8 +489,8 @@ storage.bind(registry);
 
 In this case, it must be provided with a reference registry for subsequent
 operations.<br/>
-Alternatively, when using the value type provided directly by `EnTT`, it's also
-possible to create a reactive storage directly inside a registry:
+Alternatively, when using the value type provided by `EnTT`, it's also possible
+to create a reactive storage directly inside a registry:
 
 ```cpp
 entt::registry registry{};
@@ -622,10 +622,21 @@ for(auto [entity, pos]: storage.view<position>(entt::exclude<velocity>).each()) 
 The registry used in this case is the one associated with the storage and also
 available via the `registry` function.
 
-Finally, it should be noted that a reactive storage never deletes its entities
-(and elements, if any).<br/>
-To process and then discard entities at regular intervals, refer to the `clear`
-function available by default for each storage type.
+It should be noted that a reactive storage never deletes its entities (and
+elements, if any). To process and then discard entities at regular intervals,
+refer to the `clear` function available by default for each storage type.<br/>
+Similarly, the reactive mixin doesn't disconnect itself from observed storages
+upon destruction. Therefore, users have to do this themselves:
+
+```cpp
+entt::registry = storage.registry();
+
+registry.on_construct<position>().disconnect(&storage);
+registry.on_construct<velocity>().disconnect(&storage);
+```
+
+Destroying a reactive storage without disconnecting it from observed pools will
+result in undefined behavior.
 
 ## Sorting: is it possible?
 
