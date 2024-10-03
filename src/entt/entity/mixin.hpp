@@ -39,7 +39,7 @@ struct has_on_destroy<Type, Registry, std::void_t<decltype(Type::on_destroy(std:
 template<typename Type>
 auto *any_to_owner(any &value) noexcept {
     using base_type = basic_registry<typename Type::entity_type, typename Type::allocator_type>;
-    base_type *reg = any_cast<base_type>(&value);
+    auto *reg = any_cast<base_type>(&value);
 
     if constexpr(!std::is_same_v<Type, base_type>) {
         if(!reg) {
