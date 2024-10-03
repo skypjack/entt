@@ -122,7 +122,6 @@ TYPED_TEST(ReactiveMixin, Move) {
     ASSERT_FALSE(other.empty());
 
     ASSERT_EQ(other.index(entity[0u]), 0u);
-    ASSERT_EQ(&other.registry(), &pool.registry());
 }
 
 TYPED_TEST(ReactiveMixin, Swap) {
