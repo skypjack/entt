@@ -494,7 +494,7 @@ TYPED_TEST(ReactiveMixin, View) {
     pool.template on_construct<test::empty>();
     registry.insert<test::empty>(entity.begin(), entity.end());
     registry.insert<double>(entity.begin(), entity.end());
-    registry.emplace<int>(entity[1u], 42);
+    registry.emplace<int>(entity[1u], 1);
 
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_TRUE(pool.contains(entity[0u]));
