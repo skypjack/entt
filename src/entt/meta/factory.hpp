@@ -110,7 +110,7 @@ protected:
         }
 
         auto *member = find_member<&meta_prop_node::id>(*container, node.id);
-        member ? (*member = std::move(node)) : container->emplace_back(std::move(node));
+        (member != nullptr) ? (*member = std::move(node)) : container->emplace_back(std::move(node));
     }
 
     void traits(const meta_traits value) {
