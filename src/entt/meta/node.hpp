@@ -172,7 +172,7 @@ template<auto Member, typename Type, typename Value>
 }
 
 [[nodiscard]] inline auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
-    while(curr && (curr->invoke != ref)) { curr = curr->next.get(); }
+    while((curr != nullptr) && (curr->invoke != ref)) { curr = curr->next.get(); }
     return curr;
 }
 
@@ -208,7 +208,7 @@ template<typename... Args>
 }
 
 [[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
-    if(from.info && to.info && *from.info == *to.info) {
+    if((from.info != nullptr) && (to.info != nullptr) && *from.info == *to.info) {
         return instance;
     }
 
