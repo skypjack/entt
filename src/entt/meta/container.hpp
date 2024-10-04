@@ -257,8 +257,8 @@ struct basic_meta_associative_container_traits {
      * @return An iterator that is past the last element of the container.
      */
     static iterator end(const meta_ctx &area, void *container, const void *as_const) {
-        return (container != nullptr)) ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->end()}
-                         : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->end()};
+        return (container != nullptr) ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->end()}
+                                      : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->end()};
     }
 
     /**
