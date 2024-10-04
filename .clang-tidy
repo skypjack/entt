@@ -42,3 +42,7 @@ CheckOptions:
       value: 2
     - key: readability-identifier-length.MinimumVariableNameLength
       value: 2
+    - key: readability-magic-numbers.IgnoreAllFloatingPointValues
+      value: true
+    - key: readability-magic-numbers.IgnorePowersOf2IntegerValues
+      value: true
