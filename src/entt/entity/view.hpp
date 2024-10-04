@@ -268,7 +268,9 @@ protected:
     [[nodiscard]] const Type *storage(const std::size_t pos) const noexcept {
         if(pos < Get) {
             return pools[pos];
-        } else if(const auto idx = pos - Get; filter[idx] != internal::view_placeholder<Type>()) {
+        }
+
+        if(const auto idx = pos - Get; filter[idx] != internal::view_placeholder<Type>()) {
             return filter[idx];
         }
 
