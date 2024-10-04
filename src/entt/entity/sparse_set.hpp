@@ -681,7 +681,7 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        const auto elem = sparse_ptr(entt);
+        const auto *elem = sparse_ptr(entt);
         constexpr auto cap = traits_type::entity_mask;
         constexpr auto mask = traits_type::to_integral(null) & ~cap;
         // testing versions permits to avoid accessing the packed array
@@ -695,7 +695,7 @@ public:
      * version otherwise.
      */
     [[nodiscard]] version_type current(const entity_type entt) const noexcept {
-        const auto elem = sparse_ptr(entt);
+        const auto *elem = sparse_ptr(entt);
         constexpr auto fallback = traits_type::to_version(tombstone);
         return elem ? traits_type::to_version(*elem) : fallback;
     }
