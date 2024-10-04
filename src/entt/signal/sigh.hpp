@@ -236,8 +236,7 @@ class connection {
 public:
     /*! @brief Default constructor. */
     connection()
-        : disconnect{},
-          signal{} {}
+        : signal{} {}
 
     /**
      * @brief Checks whether a connection is properly initialized.
