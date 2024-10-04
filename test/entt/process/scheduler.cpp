@@ -9,11 +9,11 @@ struct foo_process: entt::process<foo_process, entt::scheduler::delta_type> {
     foo_process(std::function<void()> upd, std::function<void()> abort)
         : on_update{std::move(upd)}, on_aborted{std::move(abort)} {}
 
-    void update(delta_type, void *) {
+    void update(delta_type, void *) const {
         on_update();
     }
 
-    void aborted() {
+    void aborted() const {
         on_aborted();
     }
 
