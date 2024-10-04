@@ -85,7 +85,7 @@ template<typename Type>
 [[nodiscard]] inline meta_type resolve(const meta_ctx &ctx, const type_info &info) noexcept {
     auto &&context = internal::meta_context::from(ctx);
     const auto *elem = internal::try_resolve(context, info);
-    return elem ? meta_type{ctx, *elem} : meta_type{};
+    return (elem == nullptr) ? meta_type{ctx, *elem} : meta_type{};
 }
 
 /**
