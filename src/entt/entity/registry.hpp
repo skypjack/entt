@@ -538,7 +538,7 @@ public:
      * @return The version of the recycled entity.
      */
     version_type destroy(const entity_type entt) {
-        for(size_type pos = pools.size(); pos; --pos) {
+        for(size_type pos = pools.size(); pos != 0u; --pos) {
             pools.begin()[pos - 1u].second->remove(entt);
         }
 
