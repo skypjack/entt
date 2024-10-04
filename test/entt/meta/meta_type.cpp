@@ -46,9 +46,9 @@ struct abstract {
 };
 
 struct concrete: base, abstract {
-    void func(int v) override {
-        abstract::func(v);
-        value = v;
+    void func(int val) override {
+        abstract::func(val);
+        value = val;
     }
 
     int value{3};
@@ -57,8 +57,8 @@ struct concrete: base, abstract {
 struct clazz {
     clazz() = default;
 
-    clazz(const base &, int v)
-        : value{v} {}
+    clazz(const base &, int val)
+        : value{val} {}
 
     void member() {}
     static void func() {}
@@ -71,26 +71,26 @@ struct clazz {
 };
 
 struct overloaded_func {
-    [[nodiscard]] int f(const base &, int a, int b) {
-        return f(a, b);
+    [[nodiscard]] int f(const base &, int first, int second) {
+        return f(first, second);
     }
 
-    [[nodiscard]] int f(int a, const int b) {
-        value = a;
-        return b * b;
+    [[nodiscard]] int f(int first, const int second) {
+        value = first;
+        return second * second;
     }
 
-    [[nodiscard]] int f(int v) {
-        return 2 * std::as_const(*this).f(v);
+    [[nodiscard]] int f(int val) {
+        return 2 * std::as_const(*this).f(val);
     }
 
-    [[nodiscard]] int f(int v) const {
-        return v * v;
+    [[nodiscard]] int f(int val) const {
+        return val * val;
     }
 
-    [[nodiscard]] float f(int a, const float b) {
-        value = a;
-        return b + b;
+    [[nodiscard]] float f(int first, const float second) {
+        value = first;
+        return second + second;
     }
 
     int value{};
