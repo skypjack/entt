@@ -250,25 +250,25 @@ class basic_registry {
         } else {
             using storage_type = storage_for_type<Type>;
 
-            if(auto it = pools.find(id); it == pools.cend()) {
-                using alloc_type = typename storage_type::allocator_type;
-                typename pool_container_type::mapped_type cpool{};
-
-                if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
-                    // std::allocator<void> has no cross constructors (waiting for C++20)
-                    cpool = std::allocate_shared<storage_type>(get_allocator(), alloc_type{});
-                } else {
-                    cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
-                }
-
-                pools.emplace(id, cpool);
-                cpool->bind(*this);
-
-                return static_cast<storage_type &>(*cpool);
-            } else {
+            if(auto it = pools.find(id); it != pools.cend()) {
                 ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
                 return static_cast<storage_type &>(*it->second);
             }
+
+            using alloc_type = typename storage_type::allocator_type;
+            typename pool_container_type::mapped_type cpool{};
+
+            if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
+                // std::allocator<void> has no cross constructors (waiting for C++20)
+                cpool = std::allocate_shared<storage_type>(get_allocator(), alloc_type{});
+            } else {
+                cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
+            }
+
+            pools.emplace(id, cpool);
+            cpool->bind(*this);
+
+            return static_cast<storage_type &>(*cpool);
         }
     }
 
