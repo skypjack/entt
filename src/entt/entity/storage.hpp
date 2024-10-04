@@ -374,7 +374,7 @@ protected:
      * @return Iterator pointing to the emplaced element.
      */
     underlying_iterator try_emplace([[maybe_unused]] const Entity entt, [[maybe_unused]] const bool force_back, const void *value) override {
-        if(value) {
+        if(value != nullptr) {
             if constexpr(std::is_copy_constructible_v<element_type>) {
                 return emplace_element(entt, force_back, *static_cast<const element_type *>(value));
             } else {
