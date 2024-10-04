@@ -35,5 +35,7 @@ CheckOptions:
       value: true
     - key: modernize-avoid-c-arrays.AllowStringArrays
       value: true
+    - key: readability-identifier-length.MinimumParameterNameLength
+      value: 2
     - key: readability-identifier-length.MinimumVariableNameLength
       value: 2
