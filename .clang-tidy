@@ -15,7 +15,9 @@ Checks: >
     -modernize-use-trailing-return-type,
     performance-*,
     portability-*,
-    readability-*
+    readability-*,
+    -readability-named-parameter,
+    -readability-uppercase-literal-suffix
 CheckOptions:
     - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
       value: true
