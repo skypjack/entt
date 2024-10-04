@@ -16,8 +16,9 @@ Checks: >
     performance-*,
     portability-*,
     readability-*,
+    -readability-function-cognitive-complexity,
     -readability-named-parameter,
-    -readability-uppercase-literal-suffix
+    -readability-uppercase-literal-suffix,
 CheckOptions:
     - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
       value: true
@@ -34,6 +35,8 @@ CheckOptions:
     - key: misc-non-private-member-variables-in-classes.IgnorePublicMemberVariables
       value: true
     - key: modernize-avoid-c-arrays.AllowStringArrays
+      value: true
+    - key: readability-function-cognitive-complexity.IgnoreMacros
       value: true
     - key: readability-identifier-length.MinimumParameterNameLength
       value: 2
