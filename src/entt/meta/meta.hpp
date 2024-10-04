@@ -70,14 +70,14 @@ public:
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
-    inline bool resize(const size_type);
+    inline bool resize(size_type);
     inline bool clear();
-    inline bool reserve(const size_type);
+    inline bool reserve(size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline iterator insert(const iterator &, meta_any);
     inline iterator erase(const iterator &);
-    [[nodiscard]] inline meta_any operator[](const size_type);
+    [[nodiscard]] inline meta_any operator[](size_type);
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
@@ -147,7 +147,7 @@ public:
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
     inline bool clear();
-    inline bool reserve(const size_type);
+    inline bool reserve(size_type);
     [[nodiscard]] inline iterator begin();
     [[nodiscard]] inline iterator end();
     inline bool insert(meta_any, meta_any);
@@ -387,11 +387,11 @@ public:
      * @return A wrapper containing the returned value, if any.
      */
     template<typename... Args>
-    meta_any invoke(const id_type id, Args &&...args) const;
+    meta_any invoke(id_type id, Args &&...args) const;
 
     /*! @copydoc invoke */
     template<typename... Args>
-    meta_any invoke(const id_type id, Args &&...args);
+    meta_any invoke(id_type id, Args &&...args);
 
     /**
      * @brief Sets the value of a given variable.
@@ -401,17 +401,17 @@ public:
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
-    bool set(const id_type id, Type &&value);
+    bool set(id_type id, Type &&value);
 
     /**
      * @brief Gets the value of a given variable.
      * @param id Unique identifier.
      * @return A wrapper containing the value of the underlying variable.
      */
-    [[nodiscard]] meta_any get(const id_type id) const;
+    [[nodiscard]] meta_any get(id_type id) const;
 
     /*! @copydoc get */
-    [[nodiscard]] meta_any get(const id_type id);
+    [[nodiscard]] meta_any get(id_type id);
 
     /**
      * @brief Tries to cast an instance to a given type.
@@ -932,7 +932,7 @@ struct meta_data {
      * @param index Index of the setter of which to return the accepted type.
      * @return The type accepted by the i-th setter.
      */
-    [[nodiscard]] inline meta_type arg(const size_type index) const noexcept;
+    [[nodiscard]] inline meta_type arg(size_type index) const noexcept;
 
     /**
      * @brief Returns a range to visit registered meta properties.
@@ -1055,7 +1055,7 @@ struct meta_func {
      * @param index Index of the argument of which to return the type.
      * @return The type of the i-th argument of a member function.
      */
-    [[nodiscard]] inline meta_type arg(const size_type index) const noexcept;
+    [[nodiscard]] inline meta_type arg(size_type index) const noexcept;
 
     /**
      * @brief Invokes the underlying function, if possible.

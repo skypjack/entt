@@ -197,7 +197,7 @@ public:
  * @param len Length of the string to hash.
  */
 template<typename Char>
-basic_hashed_string(const Char *str, const std::size_t len) -> basic_hashed_string<Char>;
+basic_hashed_string(const Char *str, std::size_t len) -> basic_hashed_string<Char>;
 
 /**
  * @brief Deduction guide.
