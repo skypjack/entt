@@ -1467,10 +1467,10 @@ TEST(OwningGroup, PreventEarlyOptOut) {
     registry.emplace<int>(entity, 2);
 
     // thanks to @pgruenbacher for pointing out this corner case
-    registry.group<char, int>().each([entity](const auto entt, const auto &c, const auto &i) {
+    registry.group<char, int>().each([entity](const auto entt, const auto &cv, const auto &iv) {
         ASSERT_EQ(entity, entt);
-        ASSERT_EQ(c, 'c');
-        ASSERT_EQ(i, 2);
+        ASSERT_EQ(cv, 'c');
+        ASSERT_EQ(iv, 2);
     });
 }
 
