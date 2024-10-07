@@ -742,7 +742,7 @@ TEST(MultiStorageView, Handle) {
     ASSERT_EQ(handle, view.handle());
 
     view.refresh();
-    auto *other = view.handle();
+    const auto *other = view.handle();
 
     ASSERT_NE(other, nullptr);
 
