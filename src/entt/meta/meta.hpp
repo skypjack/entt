@@ -1484,12 +1484,12 @@ public:
      * @return A wrapper that references the given instance.
      */
     [[nodiscard]] meta_any from_void(void *elem) const {
-        return ((elem != nullptr) && node.from_void) ? node.from_void(*ctx, elem, nullptr) : meta_any{meta_ctx_arg, *ctx};
+        return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, elem, nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc from_void */
     [[nodiscard]] meta_any from_void(const void *elem) const {
-        return ((elem != nullptr) && node.from_void) ? node.from_void(*ctx, nullptr, elem) : meta_any{meta_ctx_arg, *ctx};
+        return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, nullptr, elem) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
