@@ -116,7 +116,7 @@ TEST(SingleStorageView, Handle) {
     entt::basic_view view{storage};
     const entt::entity entity{0};
 
-    auto *handle = view.handle();
+    const auto *handle = view.handle();
 
     ASSERT_NE(handle, nullptr);
 
@@ -726,7 +726,7 @@ TEST(MultiStorageView, Handle) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
 
-    auto *handle = view.handle();
+    const auto *handle = view.handle();
     const entt::entity entity{0};
 
     ASSERT_NE(handle, nullptr);
