@@ -51,7 +51,7 @@ TEST(BasicSnapshot, GetEntityType) {
 
     ASSERT_EQ(data.size(), 2u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
@@ -68,7 +68,7 @@ TEST(BasicSnapshot, GetEntityType) {
 
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
@@ -107,7 +107,7 @@ TEST(BasicSnapshot, GetType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
@@ -115,7 +115,7 @@ TEST(BasicSnapshot, GetType) {
 
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
@@ -154,7 +154,7 @@ TEST(BasicSnapshot, GetPointerStableType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
@@ -162,7 +162,7 @@ TEST(BasicSnapshot, GetPointerStableType) {
 
     ASSERT_EQ(data.size(), 6u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
@@ -203,7 +203,7 @@ TEST(BasicSnapshot, GetEmptyType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
@@ -211,7 +211,7 @@ TEST(BasicSnapshot, GetEmptyType) {
 
     ASSERT_EQ(data.size(), 3u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
@@ -243,7 +243,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
@@ -251,7 +251,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
 
     ASSERT_EQ(data.size(), 6u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[0u]), nullptr);
+    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
     ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), static_cast<typename traits_type::entity_type>(std::distance(entity.begin(), entity.end())));
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
