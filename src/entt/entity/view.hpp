@@ -309,7 +309,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        size_type pos = (index != Get) * Get;
+        size_type pos = static_cast<size_type>(index != Get) * Get;
         for(; pos < Get && pools[pos] != nullptr; ++pos) {}
 
         if(pos == Get) {
