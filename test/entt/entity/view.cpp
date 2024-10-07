@@ -234,12 +234,12 @@ TEST(SingleStorageView, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(cview.get<const int>({})), const int &>();
     testing::StaticAssertTypeEq<decltype(cview.get({})), std::tuple<const int &>>();
 
-    view.each([](auto &&i) {
-        testing::StaticAssertTypeEq<decltype(i), int &>();
+    view.each([](auto &&iv) {
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
     });
 
-    cview.each([](auto &&i) {
-        testing::StaticAssertTypeEq<decltype(i), const int &>();
+    cview.each([](auto &&iv) {
+        testing::StaticAssertTypeEq<decltype(iv), const int &>();
     });
 
     for([[maybe_unused]] auto [entt, iv]: view.each()) {
@@ -985,10 +985,10 @@ TEST(MultiStorageView, EachWithHoles) {
     std::get<1>(storage).emplace(entity[0u], 0);
     std::get<1>(storage).emplace(entity[2u], 2);
 
-    view.each([&entity](auto entt, const char &c, const test::boxed_int &i) {
+    view.each([&entity](auto entt, const char &cv, const test::boxed_int &iv) {
         ASSERT_EQ(entt, entity[0u]);
-        ASSERT_EQ(c, '0');
-        ASSERT_EQ(i.value, 0);
+        ASSERT_EQ(cv, '0');
+        ASSERT_EQ(iv.value, 0);
     });
 
     for(auto &&curr: view.each()) {
@@ -1021,9 +1021,9 @@ TEST(MultiStorageView, ConstNonConstAndAllInBetween) {
 
     testing::StaticAssertTypeEq<decltype(view.get({})), std::tuple<int &, const char &>>();
 
-    view.each([](auto &&i, auto &&c) {
-        testing::StaticAssertTypeEq<decltype(i), int &>();
-        testing::StaticAssertTypeEq<decltype(c), const char &>();
+    view.each([](auto &&iv, auto &&cv) {
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), const char &>();
     });
 
     for([[maybe_unused]] auto [entt, iv, cv]: view.each()) {
