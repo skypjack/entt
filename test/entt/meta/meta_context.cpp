@@ -75,7 +75,7 @@ template<typename...>
 struct template_clazz {};
 
 class MetaContext: public ::testing::Test {
-    void init_global_context() {
+    static void init_global_context() {
         using namespace entt::literals;
 
         entt::meta<int>()
