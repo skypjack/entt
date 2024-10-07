@@ -5,6 +5,7 @@
 
 TEST(Observer, Functionalities) {
     entt::registry registry;
+    // NOLINTNEXTLINE(readability-static-accessed-through-instance)
     entt::observer observer{registry, entt::collector.group<int>()};
 
     ASSERT_EQ(observer.size(), 0u);
@@ -132,7 +133,7 @@ TEST(Observer, AllOfFiltered) {
 
 TEST(Observer, Observe) {
     entt::registry registry;
-    entt::observer observer{registry, entt::collector.update<int>().update<char>()};
+    entt::observer observer{registry, entt::basic_collector<>::update<int>().update<char>()};
     const auto entity = registry.create();
 
     ASSERT_TRUE(observer.empty());
@@ -214,7 +215,7 @@ TEST(Observer, AllOfObserve) {
     entt::observer observer{};
     const auto entity = registry.create();
 
-    observer.connect(registry, entt::collector.group<int>().update<char>());
+    observer.connect(registry, entt::basic_collector<>::group<int>().update<char>());
 
     ASSERT_TRUE(observer.empty());
 
@@ -246,7 +247,7 @@ TEST(Observer, AllOfObserve) {
 
 TEST(Observer, CrossRulesCornerCase) {
     entt::registry registry;
-    entt::observer observer{registry, entt::collector.group<int>().group<char>()};
+    entt::observer observer{registry, entt::basic_collector<>::group<int>().group<char>()};
     const auto entity = registry.create();
 
     registry.emplace<int>(entity);
@@ -262,7 +263,7 @@ TEST(Observer, CrossRulesCornerCase) {
 
 TEST(Observer, Each) {
     entt::registry registry;
-    entt::observer observer{registry, entt::collector.group<int>()};
+    entt::observer observer{registry, entt::basic_collector<>::group<int>()};
     const auto entity = registry.create();
     registry.emplace<int>(entity);
 
@@ -344,8 +345,8 @@ TEST(Observer, MultipleFilters) {
 }
 
 TEST(Observer, GroupCornerCase) {
-    constexpr auto add_collector = entt::collector.group<int>(entt::exclude<char>);
-    constexpr auto remove_collector = entt::collector.group<int, char>();
+    constexpr auto add_collector = entt::basic_collector<>::group<int>(entt::exclude<char>);
+    constexpr auto remove_collector = entt::basic_collector<>::group<int, char>();
 
     entt::registry registry;
     entt::observer add_observer{registry, add_collector};
