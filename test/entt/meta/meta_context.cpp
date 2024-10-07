@@ -17,8 +17,8 @@
 struct base {
     base() = default;
 
-    base(char v)
-        : value{v} {}
+    base(char cv)
+        : value{cv} {}
 
     [[nodiscard]] char get() const {
         return value;
@@ -31,20 +31,20 @@ struct clazz: base {
     clazz()
         : base{} {}
 
-    clazz(int v)
+    clazz(int iv)
         : base{},
-          value{v} {}
+          value{iv} {}
 
-    clazz(char c, int v) // NOLINT
-        : base{c},
-          value{v} {}
+    clazz(char cv, int iv) // NOLINT
+        : base{cv},
+          value{iv} {}
 
-    [[nodiscard]] int func(int v) {
-        return (value = v);
+    [[nodiscard]] int func(int iv) {
+        return (value = iv);
     }
 
-    [[nodiscard]] int cfunc(int v) const {
-        return v;
+    [[nodiscard]] int cfunc(int iv) const {
+        return iv;
     }
 
     static void move_to_bucket(const clazz &instance) {
