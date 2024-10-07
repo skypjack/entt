@@ -1449,8 +1449,8 @@ TEST(OwningGroup, StableLateInitialization) {
 
     for(std::size_t i{}; i < number_of_entities; ++i) {
         auto entity = registry.create();
-        if(!(i % 2u)) registry.emplace<int>(entity);
-        if(!(i % 3u)) registry.emplace<char>(entity);
+        if((i % 2u) == 0u) { registry.emplace<int>(entity); }
+        if((i % 3u) == 0u) { registry.emplace<char>(entity); }
     }
 
     // thanks to @pgruenbacher for pointing out this corner case
