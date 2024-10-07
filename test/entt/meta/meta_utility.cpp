@@ -11,16 +11,16 @@
 #include "../../common/empty.h"
 
 struct clazz {
-    void setter(int v) {
-        member = v;
+    void setter(int iv) {
+        member = iv;
     }
 
     [[nodiscard]] int getter() const {
         return member;
     }
 
-    static void static_setter(clazz &instance, int v) {
-        instance.member = v;
+    static void static_setter(clazz &instance, int iv) {
+        instance.member = iv;
     }
 
     [[nodiscard]] static int static_getter(const clazz &instance) {
@@ -35,9 +35,9 @@ struct clazz {
         return value;
     }
 
-    [[nodiscard]] static clazz factory(int v) {
+    [[nodiscard]] static clazz factory(int iv) {
         clazz instance{};
-        instance.member = v;
+        instance.member = iv;
         return instance;
     }
 
