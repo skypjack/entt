@@ -16,9 +16,9 @@ struct common_type: Base {
         entt::poly_call<member_index>(*this);
     }
 
-    void set(int v) {
+    void set(int iv) {
         constexpr auto member_index = 1u;
-        entt::poly_call<member_index>(*this, v);
+        entt::poly_call<member_index>(*this, iv);
     }
 
     [[nodiscard]] int get() const {
@@ -31,9 +31,9 @@ struct common_type: Base {
         entt::poly_call<member_index>(*this);
     }
 
-    [[nodiscard]] int mul(int v) const {
+    [[nodiscard]] int mul(int iv) const {
         constexpr auto member_index = 4u;
-        return static_cast<int>(entt::poly_call<member_index>(*this, v));
+        return static_cast<int>(entt::poly_call<member_index>(*this, iv));
     }
 
     [[nodiscard]] int rand() const {
@@ -48,8 +48,8 @@ struct common_members {
         self.set(self.get() - 1);
     }
 
-    [[nodiscard]] static double mul(const Type &self, double v) {
-        return v * self.get();
+    [[nodiscard]] static double mul(const Type &self, double dv) {
+        return dv * self.get();
     }
 };
 
@@ -130,15 +130,15 @@ struct DefinedEmbedded
 struct impl {
     impl() = default;
 
-    impl(int v)
-        : value{v} {}
+    impl(int iv)
+        : value{iv} {}
 
     void incr() {
         ++value;
     }
 
-    void set(int v) {
-        value = v;
+    void set(int iv) {
+        value = iv;
     }
 
     [[nodiscard]] int get() const {
