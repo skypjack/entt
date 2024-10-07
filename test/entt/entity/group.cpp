@@ -399,9 +399,9 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).group_if_exists(entt::get<const int, char>)), decltype(std::as_const(registry).group_if_exists(entt::get<const int, const char>))>();
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).group_if_exists(entt::get<int, const char>)), decltype(std::as_const(registry).group_if_exists(entt::get<const int, const char>))>();
 
-    group.each([](auto &&i, auto &&c) {
-        testing::StaticAssertTypeEq<decltype(i), int &>();
-        testing::StaticAssertTypeEq<decltype(c), const char &>();
+    group.each([](auto &&iv, auto &&cv) {
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), const char &>();
     });
 
     for([[maybe_unused]] auto [entt, iv, cv]: group.each()) {
@@ -1205,11 +1205,11 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).group_if_exists<const int>(entt::get<char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>();
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).group_if_exists<int>(entt::get<const char>)), decltype(std::as_const(registry).group_if_exists<const int>(entt::get<const char>))>();
 
-    group.each([](auto &&i, auto &&c, auto &&d, auto &&f) {
-        testing::StaticAssertTypeEq<decltype(i), int &>();
-        testing::StaticAssertTypeEq<decltype(c), const char &>();
-        testing::StaticAssertTypeEq<decltype(d), double &>();
-        testing::StaticAssertTypeEq<decltype(f), const float &>();
+    group.each([](auto &&iv, auto &&cv, auto &&dv, auto &&fv) {
+        testing::StaticAssertTypeEq<decltype(iv), int &>();
+        testing::StaticAssertTypeEq<decltype(cv), const char &>();
+        testing::StaticAssertTypeEq<decltype(dv), double &>();
+        testing::StaticAssertTypeEq<decltype(fv), const float &>();
     });
 
     for([[maybe_unused]] auto [entt, iv, cv, dv, fv]: group.each()) {
