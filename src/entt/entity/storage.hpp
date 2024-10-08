@@ -266,8 +266,8 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         const auto it = base_type::try_emplace(entt, force_back);
 
         ENTT_TRY {
-            auto elem = assure_at_least(static_cast<size_type>(it.index()));
-            entt::uninitialized_construct_using_allocator(to_address(elem), get_allocator(), std::forward<Args>(args)...);
+            auto *elem = to_address(assure_at_least(static_cast<size_type>(it.index())));
+            entt::uninitialized_construct_using_allocator(elem, get_allocator(), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
             base_type::pop(it, it + 1u);
