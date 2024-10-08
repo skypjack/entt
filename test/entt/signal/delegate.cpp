@@ -432,7 +432,7 @@ TEST(Delegate, UnboundDataMember) {
 }
 
 TEST(Delegate, UnboundMemberFunction) {
-    entt::delegate<int(delegate_functor *, const int &i)> delegate;
+    entt::delegate<int(delegate_functor *, const int &)> delegate;
     delegate.connect<&delegate_functor::operator()>();
     delegate_functor functor;
 
