@@ -4,20 +4,20 @@
 #include <entt/signal/delegate.hpp>
 #include "../../common/config.h"
 
-int power_of_two(const int &i) {
-    return i * i;
+int power_of_two(const int &iv) {
+    return iv * iv;
 }
 
-int sum_with_ref(const int &i, int j) {
-    return i + j;
+int sum_with_ref(const int &iv, int jv) {
+    return iv + jv;
 }
 
-int sum_with_ptr(const int *i, int j) {
-    return (*i) + j;
+int sum_with_ptr(const int *iv, int jv) {
+    return (*iv) + jv;
 }
 
-int non_const_reference(int &i) {
-    return i *= i;
+int non_const_reference(int &iv) {
+    return iv *= iv;
 }
 
 int move_only_type(std::unique_ptr<int> ptr) {
@@ -25,12 +25,12 @@ int move_only_type(std::unique_ptr<int> ptr) {
 }
 
 struct delegate_functor {
-    int operator()(int i) {
-        return i + i;
+    int operator()(int iv) {
+        return iv + iv;
     }
 
-    [[nodiscard]] int identity(int i) const {
-        return i;
+    [[nodiscard]] int identity(int iv) const {
+        return iv;
     }
 
     static const int static_value = 3;
