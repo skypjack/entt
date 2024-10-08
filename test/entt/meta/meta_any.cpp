@@ -13,8 +13,8 @@
 #include "../../common/non_comparable.h"
 
 struct clazz {
-    void member(int i) {
-        value = i;
+    void member(int iv) {
+        value = iv;
     }
 
     static char func() {
