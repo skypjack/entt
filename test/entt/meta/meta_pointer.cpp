@@ -25,8 +25,8 @@ private:
 struct self_ptr {
     using element_type = self_ptr;
 
-    self_ptr(int v)
-        : value{v} {}
+    self_ptr(int val)
+        : value{val} {}
 
     const self_ptr &operator*() const {
         return *this;
@@ -38,8 +38,8 @@ struct self_ptr {
 struct proxy_ptr {
     using element_type = proxy_ptr;
 
-    proxy_ptr(int &v)
-        : value{&v} {}
+    proxy_ptr(int &val)
+        : value{&val} {}
 
     proxy_ptr operator*() const {
         return *this;
