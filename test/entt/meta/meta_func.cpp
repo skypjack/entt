@@ -17,16 +17,16 @@ struct base {
     base() = default;
     virtual ~base() = default;
 
-    void setter(int v) {
-        value = v;
+    void setter(int iv) {
+        value = iv;
     }
 
     [[nodiscard]] int getter() const {
         return value;
     }
 
-    static void static_setter(base &ref, int v) {
-        ref.value = v;
+    static void static_setter(base &ref, int iv) {
+        ref.value = iv;
     }
 
     int value{3};
@@ -46,33 +46,33 @@ struct derived: base {
 };
 
 struct function {
-    [[nodiscard]] int f(const base &, int a, int b) {
-        return f(a, b);
+    [[nodiscard]] int f(const base &, int val, int other) {
+        return f(val, other);
     }
 
-    [[nodiscard]] int f(int a, const int b) {
-        value = a;
-        return b * b;
+    [[nodiscard]] int f(int val, const int other) {
+        value = val;
+        return other * other;
     }
 
-    [[nodiscard]] int f(int v) const {
-        return v * v;
+    [[nodiscard]] int f(int iv) const {
+        return iv * iv;
     }
 
-    void g(int v) {
-        value = v * v;
+    void g(int iv) {
+        value = iv * iv;
     }
 
-    [[nodiscard]] static int h(int &v) {
-        return (v *= value);
+    [[nodiscard]] static int h(int &iv) {
+        return (iv *= value);
     }
 
-    static void k(int v) {
-        value = v;
+    static void k(int iv) {
+        value = iv;
     }
 
-    [[nodiscard]] int v(int v) const {
-        return (value = v);
+    [[nodiscard]] int v(int iv) const {
+        return (value = iv);
     }
 
     [[nodiscard]] int &a() const {
