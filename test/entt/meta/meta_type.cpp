@@ -724,15 +724,15 @@ TEST_F(MetaType, Variables) {
     auto d_data = entt::resolve("double"_hs).data("var"_hs);
 
     property_type prop{property_type::key_only};
-    double d = 3.;
+    double value = 3.;
 
     p_data.set(prop, property_type::random);
-    d_data.set(d, 3.);
+    d_data.set(value, 3.);
 
     ASSERT_EQ(p_data.get(prop).cast<property_type>(), property_type::random);
-    ASSERT_EQ(d_data.get(d).cast<double>(), 3.);
+    ASSERT_EQ(d_data.get(value).cast<double>(), 3.);
     ASSERT_EQ(prop, property_type::random);
-    ASSERT_EQ(d, 3.);
+    ASSERT_EQ(value, 3.);
 }
 
 TEST_F(MetaType, PropertiesAndCornerCases) {
