@@ -41,7 +41,7 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
     }
 
     void update(typename entt::process<fake_process<Delta>, Delta>::delta_type, void *data) {
-        if(data) {
+        if(data != nullptr) {
             (*static_cast<int *>(data))++;
         }
 
