@@ -739,7 +739,8 @@ TEST(Registry, CreateClearCycle) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry{};
-    entt::entity pre{}, post{};
+    entt::entity pre = entt::null;
+    entt::entity post = entt::null;
 
     const std::size_t first_iteration = 10u;
     const std::size_t second_iteration = 7u;
