@@ -42,7 +42,6 @@ void fake_member(base &instance, int value) {
 
 struct derived: base {
     derived() = default;
-        : base{} {}
 };
 
 struct function {
