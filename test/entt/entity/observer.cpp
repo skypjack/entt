@@ -36,10 +36,7 @@ TEST(Observer, Functionalities) {
 }
 
 TEST(Observer, AllOf) {
-    constexpr auto collector =
-        entt::collector
-            .group<int, char>(entt::exclude<float>)
-            .group<int, double>();
+    constexpr auto collector = entt::basic_collector<>::group<int, char>(entt::exclude<float>).group<int, double>();
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -85,10 +82,7 @@ TEST(Observer, AllOf) {
 }
 
 TEST(Observer, AllOfFiltered) {
-    constexpr auto collector =
-        entt::collector
-            .group<int>()
-            .where<char>(entt::exclude<double>);
+    constexpr auto collector = entt::basic_collector<>::group<int>().where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -166,10 +160,7 @@ TEST(Observer, Observe) {
 }
 
 TEST(Observer, ObserveFiltered) {
-    constexpr auto collector =
-        entt::collector
-            .update<int>()
-            .where<char>(entt::exclude<double>);
+    constexpr auto collector = entt::basic_collector<>::update<int>().where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -286,12 +277,7 @@ TEST(Observer, Each) {
 }
 
 TEST(Observer, MultipleFilters) {
-    constexpr auto collector =
-        entt::collector
-            .update<int>()
-            .where<char>()
-            .update<double>()
-            .where<float>();
+    constexpr auto collector = entt::basic_collector<>::update<int>().where<char>().update<double>().where<float>();
 
     entt::registry registry;
     entt::observer observer{registry, collector};
