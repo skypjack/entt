@@ -20,7 +20,7 @@ struct sigh_listener {
 
     // useless definition just because msvc does weird things if both are empty
     void i() {
-        val = true && val;
+        val = val && val;
     }
 
     bool val{false};
@@ -57,7 +57,8 @@ TEST(SigH, Lifetime) {
 
     ASSERT_NO_THROW(signal{});
 
-    signal src{}, other{};
+    signal src{};
+    signal other{};
 
     ASSERT_NO_THROW(signal{src});
     ASSERT_NO_THROW(signal{std::move(other)});
@@ -188,7 +189,8 @@ TEST(SigH, FunctionsWithPayload) {
 }
 
 TEST(SigH, Members) {
-    sigh_listener l1, l2;
+    sigh_listener l1;
+    sigh_listener l2;
     entt::sigh<bool(int)> sigh;
     entt::sink sink{sigh};
 
