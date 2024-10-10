@@ -130,6 +130,7 @@ TEST(CompressedPair, Get) {
     ASSERT_EQ(pair.first(), 3);
     ASSERT_EQ(pair.second(), 4);
 
+    // NOLINTNEXTLINE((readability-qualified-auto)
     auto &[cfirst, csecond] = std::as_const(pair);
 
     ASSERT_EQ(cfirst, 3);
