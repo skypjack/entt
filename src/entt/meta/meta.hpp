@@ -441,7 +441,7 @@ public:
      * @return A reference to the contained instance.
      */
     template<typename Type>
-    [[nodiscard]] Type cast() const {
+    [[nodiscard]] std::remove_const_t<Type> cast() const {
         auto *const instance = try_cast<std::remove_reference_t<Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(*instance);
@@ -449,7 +449,7 @@ public:
 
     /*! @copydoc cast */
     template<typename Type>
-    [[nodiscard]] Type cast() {
+    [[nodiscard]] std::remove_const_t<Type> cast() {
         // forces const on non-reference types to make them work also with wrappers for const references
         auto *const instance = try_cast<std::remove_reference_t<const Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
