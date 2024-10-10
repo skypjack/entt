@@ -300,7 +300,7 @@ public:
      * (for example, components vs entities).<br/>
      * Refer to the specific documentation for more details.
      *
-     * @return A return value as returned by the underlying storage.
+     * @return Whatever the underlying storage returns.
      */
     auto emplace() {
         const auto entt = underlying_type::emplace();
@@ -318,10 +318,11 @@ public:
      * @tparam Args Types of arguments to forward to the underlying storage.
      * @param hint A valid identifier.
      * @param args Parameters to forward to the underlying storage.
-     * @return A return value as returned by the underlying storage.
+     * @return Whatever the underlying storage returns.
      */
     template<typename... Args>
-    decltype(auto) emplace(const entity_type hint, Args &&...args) {
+    std::conditional_t<std::is_same_v<typename underlying_type::element_type, entity_type>, entity_type, decltype(std::declval<underlying_type>().get({}))>
+    emplace(const entity_type hint, Args &&...args) {
         if constexpr(std::is_same_v<typename underlying_type::element_type, entity_type>) {
             const auto entt = underlying_type::emplace(hint, std::forward<Args>(args)...);
             construction.publish(owner_or_assert(), entt);
