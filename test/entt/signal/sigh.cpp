@@ -14,7 +14,7 @@ struct sigh_listener {
         return true;
     }
 
-    [[nodiscard]] bool h(const int &) {
+    [[nodiscard]] bool h(const int &) const {
         return val;
     }
 
