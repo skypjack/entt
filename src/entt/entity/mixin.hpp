@@ -99,7 +99,7 @@ private:
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
+            if constexpr(std::is_same_v<typename underlying_type::element_type, entity_type>) {
                 for(typename underlying_type::size_type pos{}, last = underlying_type::free_list(); pos < last; ++pos) {
                     destruction.publish(reg, underlying_type::base_type::operator[](pos));
                 }
@@ -322,7 +322,7 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type hint, Args &&...args) {
-        if constexpr(std::is_same_v<typename underlying_type::element_type, typename underlying_type::entity_type>) {
+        if constexpr(std::is_same_v<typename underlying_type::element_type, entity_type>) {
             const auto entt = underlying_type::emplace(hint, std::forward<Args>(args)...);
             construction.publish(owner_or_assert(), entt);
             return entt;
