@@ -765,7 +765,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for properties of any type. */
-struct [[deprecated("use meta_custom instead")]] meta_prop {
+struct meta_prop {
     /*! @brief Default constructor. */
     meta_prop() noexcept = default;
 
