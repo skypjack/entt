@@ -19,8 +19,8 @@ struct nlohmann_json_like final {
 };
 
 struct clazz {
-    char foo(int) {
-        return static_cast<char>(quux);
+    char foo(int value) {
+        return static_cast<char>(quux = (value != 0));
     }
 
     [[nodiscard]] int bar(double, float) const {

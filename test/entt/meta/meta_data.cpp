@@ -47,7 +47,7 @@ struct setter_getter {
         return value = static_cast<int>(val);
     }
 
-    int getter() {
+    int getter() const {
         return value;
     }
 
@@ -55,7 +55,7 @@ struct setter_getter {
         return value = val;
     }
 
-    const int &getter_with_ref() {
+    const int &getter_with_ref() const {
         return value;
     }
 
@@ -366,7 +366,7 @@ TEST_F(MetaData, SetConvert) {
     using namespace entt::literals;
 
     clazz instance{};
-    instance.h = 1;
+    clazz::h = 1;
 
     ASSERT_EQ(instance.i, 0);
     ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(instance, instance));

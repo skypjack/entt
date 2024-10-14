@@ -43,8 +43,8 @@ struct clazz: base {
         return (value = iv);
     }
 
-    [[nodiscard]] int cfunc(int iv) const {
-        return iv;
+    [[nodiscard]] int cfunc(int) const {
+        return value;
     }
 
     static void move_to_bucket(const clazz &instance) {
@@ -206,7 +206,7 @@ TEST_F(MetaContext, MetaType) {
     ASSERT_EQ(instance.value, value.get());
 
     ASSERT_NE(instance.value, value.get_mul());
-    ASSERT_EQ(local.invoke("func"_hs, instance, value).cast<int>(), value.get_mul());
+    ASSERT_EQ(local.invoke("func"_hs, instance, value).cast<int>(), instance.value);
     ASSERT_NE(instance.value, value.get_mul());
 
     ASSERT_FALSE(global.invoke("get"_hs, instance));
@@ -287,7 +287,7 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_EQ(instance.value, value.get());
 
     ASSERT_NE(instance.value, value.get_mul());
-    ASSERT_EQ(local.func("func"_hs).invoke(instance, value).cast<int>(), value.get_mul());
+    ASSERT_EQ(local.func("func"_hs).invoke(instance, value).cast<int>(), instance.value);
     ASSERT_NE(instance.value, value.get_mul());
 
     ASSERT_FALSE(global.func("get"_hs));

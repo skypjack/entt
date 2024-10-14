@@ -190,7 +190,8 @@ TEST_F(MetaUtility, MetaGetter) {
 
 TEST_F(MetaUtility, MetaInvokeWithCandidate) {
     std::array args{entt::meta_any{clazz{}}, entt::meta_any{4}};
-    args[0u].cast<clazz &>().value = 3;
+
+    clazz::value = 3;
 
     ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::setter, std::next(args.data()))));
     ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::getter, nullptr)));
@@ -213,7 +214,8 @@ TEST_F(MetaUtility, MetaInvokeWithCandidate) {
 
 TEST_F(MetaUtility, MetaInvoke) {
     std::array args{entt::meta_any{clazz{}}, entt::meta_any{4}};
-    args[0u].cast<clazz &>().value = 3;
+
+    clazz::value = 3;
 
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>({}, std::next(args.data()))));
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>({}, nullptr)));
