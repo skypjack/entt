@@ -55,8 +55,15 @@ struct common_members {
 
 namespace {
 
+template<typename... Type>
+entt::type_list<Type...> as_type_list(const entt::type_list<Type...> &);
+
 [[nodiscard]] int absolutely_random() {
     return 4;
+}
+
+[[nodiscard]] int three_is_a_magic_number() {
+    return 3;
 }
 
 } // namespace
@@ -127,6 +134,38 @@ struct DefinedEmbedded
     using impl = entt::value_list<&Type::get>;
 };
 
+struct DeducedDerived
+    : entt::type_list<> {
+    template<typename Base>
+    struct type: Deduced::type<Base> {
+        static constexpr auto base = Deduced::impl<Deduced::type<entt::poly_inspector>>::size;
+
+        int three_is_a_magic_number() {
+            return entt::poly_call<base + 0>(*this);
+        }
+    };
+
+    template<typename Type>
+    using impl = entt::value_list_cat_t<typename Deduced::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
+};
+
+struct DefinedDerived
+    : entt::type_list_cat_t<
+          decltype(as_type_list(std::declval<Defined>())),
+          entt::type_list<int()>> {
+    template<typename Base>
+    struct type: Defined::type<Base> {
+        static constexpr auto base = Defined::impl<Defined::type<entt::poly_inspector>>::size;
+
+        int three_is_a_magic_number() {
+            return entt::poly_call<base + 0>(*this);
+        }
+    };
+
+    template<typename Type>
+    using impl = entt::value_list_cat_t<typename Defined::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
+};
+
 struct impl {
     impl() = default;
 
@@ -173,6 +212,15 @@ using PolyEmbeddedTypes = ::testing::Types<DeducedEmbedded, DefinedEmbedded>;
 
 TYPED_TEST_SUITE(PolyEmbedded, PolyEmbeddedTypes, );
 
+template<typename Type>
+struct PolyDerived: testing::Test {
+    using type = entt::basic_poly<Type>;
+};
+
+using PolyDerivedTypes = ::testing::Types<DeducedDerived, DefinedDerived>;
+
+TYPED_TEST_SUITE(PolyDerived, PolyDerivedTypes, );
+
 TYPED_TEST(Poly, Functionalities) {
     using poly_type = typename TestFixture::template type<>;
 
@@ -196,7 +244,7 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_EQ(alias.data(), &instance);
     ASSERT_EQ(std::as_const(alias).data(), &instance);
 
-    ASSERT_EQ(value->rand(), 4);
+    ASSERT_EQ(value->rand(), absolutely_random());
 
     empty = impl{};
 
@@ -241,22 +289,6 @@ TYPED_TEST(Poly, Functionalities) {
 
     ASSERT_FALSE(move);
     ASSERT_EQ(move.type(), entt::type_id<void>());
-}
-
-TYPED_TEST(PolyEmbedded, EmbeddedVtable) {
-    using poly_type = typename TestFixture::type;
-
-    poly_type poly{impl{}};
-    auto *ptr = static_cast<impl *>(poly.data());
-
-    ASSERT_TRUE(poly);
-    ASSERT_NE(poly.data(), nullptr);
-    ASSERT_NE(std::as_const(poly).data(), nullptr);
-    ASSERT_EQ(poly->get(), 0);
-
-    ptr->value = 2;
-
-    ASSERT_EQ(poly->get(), 2);
 }
 
 TYPED_TEST(Poly, Owned) {
@@ -439,4 +471,28 @@ TYPED_TEST(Poly, NoSboAlignment) {
     // NOLINTEND(*-reinterpret-cast)
 
     ASSERT_EQ(data, nosbo[1].data());
+}
+
+TYPED_TEST(PolyEmbedded, EmbeddedVtable) {
+    using poly_type = typename TestFixture::type;
+
+    poly_type poly{impl{}};
+    auto *ptr = static_cast<impl *>(poly.data());
+
+    ASSERT_TRUE(poly);
+    ASSERT_NE(poly.data(), nullptr);
+    ASSERT_NE(std::as_const(poly).data(), nullptr);
+    ASSERT_EQ(poly->get(), 0);
+
+    ptr->value = 2;
+
+    ASSERT_EQ(poly->get(), 2);
+}
+
+TYPED_TEST(PolyDerived, InheritanceSupport) {
+    using poly_type = typename TestFixture::type;
+
+    poly_type poly{impl{}};
+
+    ASSERT_EQ(poly->three_is_a_magic_number(), three_is_a_magic_number());
 }

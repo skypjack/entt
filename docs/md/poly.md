@@ -230,8 +230,8 @@ For a deduced concept, inheritance is achieved in a few steps:
 ```cpp
 struct DrawableAndErasable: entt::type_list<> {
     template<typename Base>
-    struct type: typename Drawable::template type<Base> {
-        static constexpr auto base = std::tuple_size_v<typename entt::poly_vtable<Drawable>::type>;
+    struct type: typename Drawable::type<Base> {
+        static constexpr auto base = Drawable::impl<Drawable::type<entt::poly_inspector>>::size;
         void erase() { entt::poly_call<base + 0>(*this); }
     };
 
@@ -267,8 +267,7 @@ a `decltype` as it follows:
 ```cpp
 struct DrawableAndErasable: entt::type_list_cat_t<
     decltype(as_type_list(std::declval<Drawable>())),
-    entt::type_list<void()>
-> {
+    entt::type_list<void()>> {
     // ...
 };
 ```
