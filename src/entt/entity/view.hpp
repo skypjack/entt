@@ -330,7 +330,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return (index != Get) ? pools[index]->size() : size_type{};
+        return (index != Get) ? offset() : size_type{};
     }
 
     /**

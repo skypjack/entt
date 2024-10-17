@@ -1441,7 +1441,7 @@ TEST(MultiStorageView, StorageEntity) {
     ASSERT_EQ(view.front(), entity[1u]);
     ASSERT_EQ(view.back(), entity[1u]);
 
-    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_EQ(view.size_hint(), 1u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
@@ -1478,7 +1478,7 @@ TEST(MultiStorageView, StorageEntityWithExclude) {
     ASSERT_EQ(view.front(), entity[1u]);
     ASSERT_EQ(view.back(), entity[1u]);
 
-    ASSERT_EQ(view.size_hint(), 3u);
+    ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
@@ -1510,7 +1510,7 @@ TEST(MultiStorageView, StorageEntityExcludeOnly) {
     ASSERT_EQ(view.front(), entity[1u]);
     ASSERT_EQ(view.back(), entity[1u]);
 
-    ASSERT_EQ(view.size_hint(), 3u);
+    ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);

@@ -1873,7 +1873,7 @@ TEST(Registry, ExcludeOnlyView) {
 
     registry.destroy(entity[3u]);
 
-    ASSERT_EQ(view.size_hint(), 4u);
+    ASSERT_EQ(view.size_hint(), 3u);
     ASSERT_NE(view.begin(), view.end());
 
     ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
