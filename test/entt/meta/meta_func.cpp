@@ -62,19 +62,19 @@ struct function {
         value = iv * iv;
     }
 
-    [[nodiscard]] static int h(int &iv) {
-        return (iv *= value);
+    [[nodiscard]] static int h(int &iv, const function &instance) {
+        return (iv *= instance.value);
     }
 
-    static void k(int iv) {
-        value = iv;
+    static void k(int iv, function &instance) {
+        instance.value = iv;
     }
 
-    [[nodiscard]] int v(int iv) const {
-        return (value = iv);
+    [[nodiscard]] int v(int &iv) const {
+        return (iv = value);
     }
 
-    [[nodiscard]] int &a() const {
+    [[nodiscard]] int &a() {
         return value;
     }
 
@@ -82,7 +82,7 @@ struct function {
         return value;
     }
 
-    inline static int value = 0; // NOLINT
+    int value{};
 };
 
 double double_member(const double &value) {
@@ -112,7 +112,7 @@ struct MetaFunc: ::testing::Test {
 
         entt::meta<function>()
             .type("func"_hs)
-            .func<&entt::registry::emplace_or_replace<function>>("emplace"_hs)
+            .func<&entt::registry::emplace_or_replace<function>, entt::as_ref_t>("emplace"_hs)
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
             .func<entt::overload<int(const base &, int, int)>(&function::f)>("f3"_hs)
             .traits(test::meta_traits::three)
@@ -191,7 +191,7 @@ TEST_F(MetaFunc, Functionalities) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 4);
-    ASSERT_EQ(function::value, 3);
+    ASSERT_EQ(instance.value, 3);
 
     for(auto curr: func.prop()) {
         ASSERT_EQ(curr.first, "true"_hs);
@@ -298,7 +298,7 @@ TEST_F(MetaFunc, RetVoid) {
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
-    ASSERT_EQ(function::value, 16);
+    ASSERT_EQ(instance.value, 16);
 
     for(auto curr: func.prop()) {
         ASSERT_EQ(curr.first, "true"_hs);
@@ -318,18 +318,19 @@ TEST_F(MetaFunc, Static) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("h"_hs);
-    function::value = 2;
+    function instance{2};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
-    ASSERT_FALSE(func.arg(1u));
+    ASSERT_EQ(func.arg(1u), entt::resolve<function>());
+    ASSERT_FALSE(func.arg(2u));
 
-    auto any = func.invoke({}, 3);
-    auto empty = func.invoke({}, derived{});
+    auto any = func.invoke({}, 3, entt::forward_as_meta(instance));
+    auto empty = func.invoke({}, derived{}, entt::forward_as_meta(instance));
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
@@ -354,20 +355,22 @@ TEST_F(MetaFunc, StaticRetVoid) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("k"_hs);
+    function instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
     ASSERT_EQ(func.ret(), entt::resolve<void>());
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
-    ASSERT_FALSE(func.arg(1u));
+    ASSERT_EQ(func.arg(1u), entt::resolve<function>());
+    ASSERT_FALSE(func.arg(2u));
 
-    auto any = func.invoke({}, 3);
+    auto any = func.invoke({}, 3, entt::forward_as_meta(instance));
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
-    ASSERT_EQ(function::value, 3);
+    ASSERT_EQ(instance.value, 3);
 
     for(auto curr: func.prop()) {
         ASSERT_EQ(curr.first, "true"_hs);
@@ -503,12 +506,13 @@ TEST_F(MetaFunc, ArgsByRef) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("h"_hs);
-    function::value = 2;
+
+    function instance{2};
     entt::meta_any any{3};
     int value = 4;
 
-    ASSERT_EQ(func.invoke({}, entt::forward_as_meta(value)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, any.as_ref()).cast<int>(), 6);
+    ASSERT_EQ(func.invoke({}, entt::forward_as_meta(value), entt::forward_as_meta(instance)).cast<int>(), 8);
+    ASSERT_EQ(func.invoke({}, any.as_ref(), entt::forward_as_meta(instance)).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
@@ -522,10 +526,10 @@ TEST_F(MetaFunc, ArgsByConstRef) {
     int value = 3;
 
     ASSERT_TRUE(func.invoke(instance, entt::forward_as_meta(std::as_const(value))));
-    ASSERT_EQ(function::value, 9);
+    ASSERT_EQ(instance.value, 9);
 
     ASSERT_TRUE(func.invoke(instance, std::as_const(any).as_ref()));
-    ASSERT_EQ(function::value, 4);
+    ASSERT_EQ(instance.value, 4);
 }
 
 TEST_F(MetaFunc, ConstInstance) {
@@ -543,11 +547,12 @@ TEST_F(MetaFunc, AsVoid) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("v"_hs);
-    function instance{};
+    function instance{3};
+    int value{2};
 
-    ASSERT_EQ(func.invoke(instance, 1), entt::meta_any{std::in_place_type<void>});
+    ASSERT_EQ(func.invoke(instance, entt::forward_as_meta(value)), entt::meta_any{std::in_place_type<void>});
     ASSERT_EQ(func.ret(), entt::resolve<void>());
-    ASSERT_EQ(instance.value, 1);
+    ASSERT_EQ(value, instance.value);
 }
 
 TEST_F(MetaFunc, AsRef) {
@@ -564,7 +569,7 @@ TEST_F(MetaFunc, AsRef) {
 TEST_F(MetaFunc, AsConstRef) {
     using namespace entt::literals;
 
-    function instance{};
+    function instance{3};
     auto func = entt::resolve<function>().func("ca"_hs);
 
     ASSERT_EQ(func.ret(), entt::resolve<int>());
@@ -634,7 +639,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
     ASSERT_EQ(func.arity(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
-    ASSERT_EQ(func.ret(), entt::resolve<void>());
+    ASSERT_EQ(func.ret(), entt::resolve<function>());
     ASSERT_EQ(func.arg(0u), entt::resolve<entt::registry>());
     ASSERT_EQ(func.arg(1u), entt::resolve<entt::entity>());
     ASSERT_FALSE(func.arg(2u));

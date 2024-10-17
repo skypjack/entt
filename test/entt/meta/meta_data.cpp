@@ -47,7 +47,7 @@ struct setter_getter {
         return value = static_cast<int>(val);
     }
 
-    int getter() const {
+    [[nodiscard]] int getter() const {
         return value;
     }
 
@@ -55,7 +55,7 @@ struct setter_getter {
         return value = val;
     }
 
-    const int &getter_with_ref() const {
+    [[nodiscard]] const int &getter_with_ref() const {
         return value;
     }
 
