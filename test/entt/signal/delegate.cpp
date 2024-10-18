@@ -29,8 +29,8 @@ struct delegate_functor {
         return iv + iv;
     }
 
-    [[nodiscard]] int identity(int iv) const {
-        return iv;
+    [[nodiscard]] int mul(int iv) const {
+        return iv * data_member;
     }
 
     static const int static_value = 3;
@@ -73,7 +73,7 @@ TEST(Delegate, Functionalities) {
 
     ff_del.connect<&power_of_two>();
     mf_del.connect<&delegate_functor::operator()>(functor);
-    lf_del.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
+    lf_del.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->mul(value); }, &functor);
 
     ASSERT_TRUE(ff_del);
     ASSERT_TRUE(mf_del);
@@ -81,7 +81,7 @@ TEST(Delegate, Functionalities) {
 
     ASSERT_EQ(ff_del(3), 9);
     ASSERT_EQ(mf_del(3), 6);
-    ASSERT_EQ(lf_del(3), 3);
+    ASSERT_EQ(lf_del(3), 12);
 
     ff_del.reset();
 
@@ -206,7 +206,7 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val) * val; }, &functor);
+    lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->mul(val) * val; }, &functor);
 
     ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *, int val) { return val + val; }, &functor}));
     ASSERT_NE(lhs.target(), rhs.target());
@@ -215,7 +215,7 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val) + val; }, &functor);
+    rhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->mul(val) + val; }, &functor);
 
     ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *, int val) { return val * val; }, &functor}));
     ASSERT_TRUE(lhs != rhs);
@@ -315,10 +315,10 @@ TEST(Delegate, ConstInstance) {
 
     ASSERT_FALSE(delegate);
 
-    delegate.connect<&delegate_functor::identity>(functor);
+    delegate.connect<&delegate_functor::mul>(functor);
 
     ASSERT_TRUE(delegate);
-    ASSERT_EQ(delegate(3), 3);
+    ASSERT_EQ(delegate(3), 12);
 
     delegate.reset();
 
@@ -416,7 +416,7 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
 
     const entt::delegate<void(int)> func{entt::connect_arg<&power_of_two>};
     const entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
-    const entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, &std::as_const(functor)};
+    const entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::mul>, &std::as_const(functor)};
 
     ASSERT_TRUE(func);
     ASSERT_TRUE(member);
@@ -455,9 +455,9 @@ TEST(Delegate, TheLessTheBetter) {
     ASSERT_EQ(bound(3, 'c'), 6);
 
     // int delegate_functor::operator()(int);
-    bound.connect<&delegate_functor::identity>(&functor);
+    bound.connect<&delegate_functor::mul>(&functor);
 
-    ASSERT_EQ(bound(3, 'c'), 3);
+    ASSERT_EQ(bound(3, 'c'), 12);
 
     // int delegate_functor::operator()(int);
     unbound.connect<&delegate_functor::operator()>();

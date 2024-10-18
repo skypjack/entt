@@ -55,7 +55,7 @@ struct function {
     }
 
     [[nodiscard]] int f(int iv) const {
-        return iv * iv;
+        return value * iv;
     }
 
     void g(int iv) {
@@ -248,7 +248,7 @@ TEST_F(MetaFunc, Const) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("f1"_hs);
-    function instance{};
+    function instance{2};
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.arity(), 1u);
@@ -264,7 +264,7 @@ TEST_F(MetaFunc, Const) {
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
-    ASSERT_EQ(any.cast<int>(), 16);
+    ASSERT_EQ(any.cast<int>(), 8);
 
     for(auto curr: func.prop()) {
         ASSERT_EQ(curr.first, "true"_hs);
@@ -462,7 +462,7 @@ TEST_F(MetaFunc, NonClassTypeMember) {
 TEST_F(MetaFunc, MetaAnyArgs) {
     using namespace entt::literals;
 
-    function instance;
+    function instance{3};
     auto any = entt::resolve<function>().func("f1"_hs).invoke(instance, 3);
 
     ASSERT_TRUE(any);
@@ -535,7 +535,7 @@ TEST_F(MetaFunc, ArgsByConstRef) {
 TEST_F(MetaFunc, ConstInstance) {
     using namespace entt::literals;
 
-    function instance{};
+    function instance{2};
     auto any = entt::resolve<function>().func("f1"_hs).invoke(std::as_const(instance), 2);
 
     ASSERT_FALSE(entt::resolve<function>().func("g"_hs).invoke(std::as_const(instance), 1));

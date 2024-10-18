@@ -85,7 +85,7 @@ struct overloaded_func {
     }
 
     [[nodiscard]] int f(int val) const {
-        return val * val;
+        return val * value;
     }
 
     [[nodiscard]] float f(int first, const float second) {
@@ -472,14 +472,14 @@ TEST_F(MetaType, OverloadedFunc) {
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
-    ASSERT_EQ(res.cast<int>(), 8);
+    ASSERT_EQ(res.cast<int>(), 12);
 
     res = type.invoke("f"_hs, std::as_const(instance), 2);
 
     ASSERT_TRUE(res);
     ASSERT_EQ(instance.value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
-    ASSERT_EQ(res.cast<int>(), 4);
+    ASSERT_EQ(res.cast<int>(), 6);
 
     res = type.invoke("f"_hs, instance, 0, 1.f);
 
@@ -576,7 +576,7 @@ TEST_F(MetaType, ConstructCastAndConvert) {
 }
 
 TEST_F(MetaType, ConstructArithmeticConversion) {
-    auto any = entt::resolve<clazz>().construct(derived{}, clazz{derived{}, true});
+    auto any = entt::resolve<clazz>().construct(derived{}, true);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz>().value, 1);
