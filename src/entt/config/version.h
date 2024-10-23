@@ -6,7 +6,7 @@
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
 #define ENTT_VERSION_MAJOR 3
-#define ENTT_VERSION_MINOR 14
+#define ENTT_VERSION_MINOR 15
 #define ENTT_VERSION_PATCH 0
 
 #define ENTT_VERSION \
