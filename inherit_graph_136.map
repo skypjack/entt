@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1type__list.html" title="A class to use to push around lists of types, nothing more." alt="" coords="5,5,159,31"/>
+<area shape="rect" id="Node000000" href="$structentt_1_1type__list.html" title=" " alt="" coords="5,55,171,80"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1exclude__t.html" title="Alias for exclusion lists." alt="" coords="219,5,379,31"/>
+<area shape="poly" id="edge28_Node000000_Node000001" title=" " alt="" coords="155,49,243,28,244,33,157,54"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1get__t.html" title="Alias for lists of observed elements." alt="" coords="232,55,365,80"/>
+<area shape="poly" id="edge29_Node000000_Node000002" title=" " alt="" coords="185,65,231,65,231,70,185,70"/>
+<area shape="rect" id="Node000003" href="$structentt_1_1owned__t.html" title="Alias for lists of owned elements." alt="" coords="223,104,375,129"/>
+<area shape="poly" id="edge30_Node000000_Node000003" title=" " alt="" coords="157,81,244,101,243,107,155,86"/>
 </map>

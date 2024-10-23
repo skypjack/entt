@@ -13,5 +13,6 @@ var searchData=
   ['size_5fof_3c_20type_2c_20std_3a_3avoid_5ft_3c_20decltype_28sizeof_28type_29_29_3e_20_3e_10',['size_of&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;',['../structentt_1_1size__of_3_01Type_00_01std_1_1void__t_3_01decltype_07sizeof_07Type_08_08_4_01_4.html',1,'entt']]],
   ['std_5fsort_11',['std_sort',['../structentt_1_1std__sort.html',1,'entt']]],
   ['storage_5ffor_12',['storage_for',['../structentt_1_1storage__for.html',1,'entt']]],
-  ['storage_5ftype_13',['storage_type',['../structentt_1_1storage__type.html',1,'entt']]]
+  ['storage_5ftype_13',['storage_type',['../structentt_1_1storage__type.html',1,'entt']]],
+  ['storage_5ftype_3c_20reactive_2c_20entity_2c_20allocator_20_3e_14',['storage_type&lt; reactive, Entity, Allocator &gt;',['../structentt_1_1storage__type_3_01reactive_00_01Entity_00_01Allocator_01_4.html',1,'entt']]]
 ];

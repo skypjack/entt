@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['similar_20projects_0',['Similar projects',['../md_docs_2md_2reference.html',1,'']]]
+  ['frequently_20asked_20questions_0',['Frequently Asked Questions',['../md_docs_2md_2faq.html',1,'']]],
+  ['functionalities_1',['Crash Course: core functionalities',['../md_docs_2md_2core.html',1,'']]]
 ];
