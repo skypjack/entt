@@ -1052,24 +1052,9 @@ public:
      * @brief Forwards variables to derived classes, if any.
      * @tparam Type Type of the element to forward.
      * @param value The element to forward.
-     * @return Nothing.
      */
     template<typename Type>
-    [[deprecated("avoid wrapping elements with basic_any")]] std::enable_if_t<std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, basic_any<>>>
-    bind(Type &&value) noexcept {
-        // backward compatibility
-        bind_any(std::forward<Type>(value));
-    }
-
-    /**
-     * @brief Forwards variables to derived classes, if any.
-     * @tparam Type Type of the element to forward.
-     * @param value The element to forward.
-     * @return Nothing.
-     */
-    template<typename Type>
-    std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, basic_any<>>>
-    bind(Type &&value) noexcept {
+    void bind(Type &&value) noexcept {
         bind_any(forward_as_any(std::forward<Type>(value)));
     }
 

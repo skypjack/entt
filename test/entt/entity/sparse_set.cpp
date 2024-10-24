@@ -442,7 +442,6 @@ TYPED_TEST(SparseSet, Bind) {
         sparse_set_type set{policy};
 
         ASSERT_NO_THROW(set.bind(0));
-        ASSERT_NO_THROW(set.bind(entt::make_any<int>(0)));
     }
 }
 
