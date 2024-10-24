@@ -82,7 +82,7 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
     ASSERT_EQ(graph[0u].out_edges()[1u], 2u);
     ASSERT_EQ(graph[1u].out_edges()[0u], 3u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
+    ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -148,7 +148,7 @@ TEST(Organizer, EmplaceMemberFunction) {
 
     ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
     ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
+    ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -221,7 +221,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_EQ(graph[0u].out_edges()[0u], 4u);
     ASSERT_EQ(graph[1u].out_edges()[0u], 4u);
     ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
-    ASSERT_EQ(graph[3u].children()[0u], 4u); // NOLINT
+    ASSERT_EQ(graph[3u].out_edges()[0u], 4u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -303,7 +303,7 @@ TEST(Organizer, EmplaceDirectFunction) {
 
     ASSERT_EQ(graph[0u].out_edges()[0u], 1u);
     ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
-    ASSERT_EQ(graph[2u].children()[0u], 3u); // NOLINT
+    ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -370,7 +370,7 @@ TEST(Organizer, SyncPoint) {
     ASSERT_EQ(graph[1u].out_edges()[1u], 3u);
     ASSERT_EQ(graph[2u].out_edges()[0u], 4u);
     ASSERT_EQ(graph[3u].out_edges()[0u], 4u);
-    ASSERT_EQ(graph[4u].children()[0u], 5u); // NOLINT
+    ASSERT_EQ(graph[4u].out_edges()[0u], 5u);
 
     for(auto &&vertex: graph) {
         typename entt::organizer::function_type *cb = vertex.callback();
@@ -407,7 +407,7 @@ TEST(Organizer, Override) {
     ASSERT_EQ(graph[2u].out_edges().size(), 0u);
 
     ASSERT_EQ(graph[0u].out_edges()[0u], 2u);
-    ASSERT_EQ(graph[1u].children()[0u], 2u); // NOLINT
+    ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
 }
 
 TEST(Organizer, Prepare) {

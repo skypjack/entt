@@ -273,14 +273,6 @@ public:
         }
 
         /**
-         * @brief Returns the list of nodes reachable from a given vertex.
-         * @return The list of nodes reachable from the vertex.
-         */
-        [[deprecated("use ::out_edges")]] [[nodiscard]] const std::vector<std::size_t> &children() const noexcept {
-            return out_edges();
-        }
-
-        /**
          * @brief Prepares a registry and assures that all required resources
          * are properly instantiated before using them.
          * @param reg A valid registry.
