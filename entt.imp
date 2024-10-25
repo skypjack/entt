@@ -20,7 +20,6 @@
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/handle.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/helper.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/mixin.hpp>", "public" ] },
-  { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/observer.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/organizer.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/ranges.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/registry.hpp>", "public" ] },

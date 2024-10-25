@@ -8,7 +8,6 @@ _TESTS = [
     "group",
     "handle",
     "helper",
-    "observer",
     "organizer",
     "reactive_mixin",
     "registry",

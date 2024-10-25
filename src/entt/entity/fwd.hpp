@@ -47,9 +47,6 @@ class basic_runtime_view;
 template<typename, typename, typename>
 class basic_group;
 
-template<typename, typename = std::allocator<void>>
-class basic_observer;
-
 template<typename>
 class basic_organizer;
 
@@ -91,9 +88,6 @@ using reactive_mixin = basic_reactive_mixin<Type, basic_registry<typename Type::
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<>;
-
-/*! @brief Alias declaration for the most common use case. */
-using observer = basic_observer<registry>;
 
 /*! @brief Alias declaration for the most common use case. */
 using organizer = basic_organizer<registry>;

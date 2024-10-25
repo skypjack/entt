@@ -28,7 +28,6 @@
 #include "entity/handle.hpp"
 #include "entity/helper.hpp"
 #include "entity/mixin.hpp"
-#include "entity/observer.hpp"
 #include "entity/organizer.hpp"
 #include "entity/ranges.hpp"
 #include "entity/registry.hpp"
