@@ -42,3 +42,4 @@ TODO:
 * sigh_mixin: change cb signature from reg/entt to storage/entt (breaking for the good)
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
+* bypass vtable in any (improvements available for move/get, add more policy types)

@@ -75,13 +75,13 @@ class basic_any {
             }
             break;
         case operation::move:
-            if constexpr(in_situ<Type>) {
-                if(value.mode == any_policy::owner) {
-                    return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
-                }
-            }
+            ENTT_ASSERT(value.mode == any_policy::owner, "Unexpected mode");
 
-            return (static_cast<basic_any *>(const_cast<void *>(other))->instance = std::exchange(const_cast<basic_any &>(value).instance, nullptr));
+            if constexpr(in_situ<Type>) {
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
+            } else {
+                return (static_cast<basic_any *>(const_cast<void *>(other))->instance = std::exchange(const_cast<basic_any &>(value).instance, nullptr));
+            }
         case operation::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
@@ -208,7 +208,10 @@ public:
           info{other.info},
           vtable{other.vtable},
           mode{other.mode} {
-        if(other.vtable) {
+        if(other.mode != any_policy::owner) {
+            ENTT_ASSERT(other.mode == any_policy::ref || other.mode == any_policy::cref, "Unexpected mode");
+            instance = std::exchange(other.instance, nullptr);
+        } else if(other.vtable) {
             other.vtable(operation::move, other, this);
         }
     }
@@ -247,12 +250,16 @@ public:
 
         reset();
 
-        if(other.vtable) {
+        if(other.mode != any_policy::owner) {
+            ENTT_ASSERT(other.mode == any_policy::ref || other.mode == any_policy::cref, "Unexpected mode");
+            instance = std::exchange(other.instance, nullptr);
+        } else if(other.vtable) {
             other.vtable(operation::move, other, this);
-            info = other.info;
-            vtable = other.vtable;
-            mode = other.mode;
         }
+
+        info = other.info;
+        vtable = other.vtable;
+        mode = other.mode;
 
         return *this;
     }
