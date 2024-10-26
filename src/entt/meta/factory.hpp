@@ -98,7 +98,7 @@ protected:
         }
     }
 
-    void prop(meta_prop_node node) {
+    [[deprecated("use ::custom() instead")]] void prop(meta_prop_node node) {
         std::vector<meta_prop_node> *container = nullptr;
 
         if(bucket == parent) {

@@ -67,7 +67,7 @@ struct meta_custom_node {
     std::shared_ptr<void> value{};
 };
 
-struct meta_prop_node {
+struct [[deprecated("no longer required")]] meta_prop_node {
     id_type id{};
     meta_type_node (*type)(const meta_context &) noexcept {};
     std::shared_ptr<void> value{};
