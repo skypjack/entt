@@ -199,7 +199,6 @@ TEST_F(MetaFunc, Comparison) {
     using namespace entt::literals;
 
     auto func = entt::resolve<function>().func("f2"_hs);
-    function instance{};
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func, func);
