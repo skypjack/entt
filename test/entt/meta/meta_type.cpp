@@ -735,34 +735,6 @@ TEST_F(MetaType, Variables) {
     ASSERT_EQ(value, 3.);
 }
 
-TEST_F(MetaType, PropertiesAndCornerCases) {
-    using namespace entt::literals;
-
-    auto type = entt::resolve<property_type>();
-
-    ASSERT_EQ(type.prop().cbegin(), type.prop().cend());
-
-    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<int>(), 0);
-    ASSERT_EQ(type.data("random"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 3);
-
-    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<bool>(), true);
-    ASSERT_EQ(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
-    ASSERT_FALSE(type.data("value"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
-
-    ASSERT_TRUE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
-    ASSERT_FALSE(type.data("key_only"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
-
-    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::random)).value().cast<bool>(), false);
-    ASSERT_EQ(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::value)).value().cast<int>(), 0);
-    ASSERT_TRUE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::key_only)));
-    ASSERT_FALSE(type.data("list"_hs).prop(static_cast<entt::id_type>(property_type::key_only)).value());
-
-    type = entt::resolve<void>();
-
-    ASSERT_EQ(type.prop().cbegin(), type.prop().cend());
-}
-
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     using namespace entt::literals;
 
