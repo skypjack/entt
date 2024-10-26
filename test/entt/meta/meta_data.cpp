@@ -155,42 +155,6 @@ struct MetaData: ::testing::Test {
 
 using MetaDataDeathTest = MetaData;
 
-TEST_F(MetaData, Functionalities) {
-    using namespace entt::literals;
-
-    auto data = entt::resolve<clazz>().data("i"_hs);
-    clazz instance{};
-
-    ASSERT_TRUE(data);
-
-    ASSERT_EQ(data, data);
-    ASSERT_NE(data, entt::meta_data{});
-    ASSERT_FALSE(data != data);
-    ASSERT_TRUE(data == data);
-
-    ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
-    ASSERT_FALSE(data.is_const());
-    ASSERT_FALSE(data.is_static());
-    ASSERT_EQ(data.get(instance).cast<int>(), 0);
-    ASSERT_TRUE(data.set(instance, 1));
-    ASSERT_EQ(data.get(instance).cast<int>(), 1);
-
-    for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, 3u);
-        ASSERT_EQ(curr.second.value(), 0);
-    }
-
-    ASSERT_FALSE(data.prop(2));
-    ASSERT_FALSE(data.prop('c'));
-
-    auto prop = data.prop(3u);
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 0);
-}
-
 TEST_F(MetaData, UserTraits) {
     using namespace entt::literals;
 
@@ -226,6 +190,42 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
 
     ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().data("i"_hs).custom(), "");
     ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
+}
+
+TEST_F(MetaData, NonConst) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<clazz>().data("i"_hs);
+    clazz instance{};
+
+    ASSERT_TRUE(data);
+
+    ASSERT_EQ(data, data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_FALSE(data != data);
+    ASSERT_TRUE(data == data);
+
+    ASSERT_EQ(data.arity(), 1u);
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<int>());
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 1));
+    ASSERT_EQ(data.get(instance).cast<int>(), 1);
+
+    for(auto curr: data.prop()) {
+        ASSERT_EQ(curr.first, 3u);
+        ASSERT_EQ(curr.second.value(), 0);
+    }
+
+    ASSERT_FALSE(data.prop(2));
+    ASSERT_FALSE(data.prop('c'));
+
+    auto prop = data.prop(3u);
+
+    ASSERT_TRUE(prop);
+    ASSERT_EQ(prop.value(), 0);
 }
 
 TEST_F(MetaData, Const) {

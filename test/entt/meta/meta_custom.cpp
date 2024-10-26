@@ -40,7 +40,7 @@ struct MetaCustom: ::testing::Test {
 
 using MetaCustomDeathTest = MetaCustom;
 
-TEST_F(MetaCustom, Functionalities) {
+TEST_F(MetaCustom, Custom) {
     entt::meta_custom custom{};
 
     ASSERT_EQ(static_cast<const char *>(custom), nullptr);
@@ -53,7 +53,7 @@ TEST_F(MetaCustom, Functionalities) {
     ASSERT_EQ(static_cast<const char &>(custom), 'c');
 }
 
-ENTT_DEBUG_TEST_F(MetaCustomDeathTest, Functionalities) {
+ENTT_DEBUG_TEST_F(MetaCustomDeathTest, Custom) {
     entt::meta_custom custom{};
 
     ASSERT_DEATH([[maybe_unused]] const char &value = custom, "");

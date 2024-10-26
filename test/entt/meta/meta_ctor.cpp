@@ -73,7 +73,7 @@ struct MetaCtor: ::testing::Test {
     }
 };
 
-TEST_F(MetaCtor, Functionalities) {
+TEST_F(MetaCtor, Ctor) {
     auto any = entt::resolve<clazz>().construct(1, 'c');
 
     ASSERT_TRUE(any);

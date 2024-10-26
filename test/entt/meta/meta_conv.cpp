@@ -42,7 +42,7 @@ struct MetaConv: ::testing::Test {
     }
 };
 
-TEST_F(MetaConv, Functionalities) {
+TEST_F(MetaConv, Conv) {
     auto any = entt::resolve<clazz>().construct();
     any.cast<clazz &>().value = 2;
 

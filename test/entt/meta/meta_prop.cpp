@@ -43,7 +43,7 @@ struct MetaProp: ::testing::Test {
     }
 };
 
-TEST_F(MetaProp, Functionalities) {
+TEST_F(MetaProp, Prop) {
     using namespace entt::literals;
 
     auto prop = entt::resolve<base_1>().prop("int"_hs);

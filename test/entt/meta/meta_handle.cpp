@@ -31,7 +31,7 @@ struct MetaHandle: ::testing::Test {
     }
 };
 
-TEST_F(MetaHandle, Functionalities) {
+TEST_F(MetaHandle, Handle) {
     using namespace entt::literals;
 
     clazz instance{};

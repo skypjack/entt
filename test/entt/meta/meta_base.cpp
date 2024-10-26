@@ -60,7 +60,7 @@ struct MetaBase: ::testing::Test {
     }
 };
 
-TEST_F(MetaBase, Functionalities) {
+TEST_F(MetaBase, Base) {
     auto any = entt::resolve<derived>().construct();
     any.cast<derived &>().value_1 = 2;
     auto as_derived = any.as_ref();

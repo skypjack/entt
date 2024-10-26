@@ -40,7 +40,7 @@ struct MetaDtor: ::testing::Test {
     }
 };
 
-TEST_F(MetaDtor, Functionalities) {
+TEST_F(MetaDtor, Dtor) {
     int counter{};
 
     auto any = entt::resolve<clazz>().construct(entt::forward_as_meta(counter));
