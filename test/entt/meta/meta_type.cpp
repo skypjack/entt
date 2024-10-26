@@ -20,13 +20,13 @@
 #include "../../common/meta_traits.h"
 
 template<typename Type>
-void set(Type &prop, Type value) {
-    prop = value;
+void set(Type &elem, Type value) {
+    elem = value;
 }
 
 template<typename Type>
-Type get(Type &prop) {
-    return prop;
+Type get(Type &elem) {
+    return elem;
 }
 
 struct base {
@@ -204,7 +204,36 @@ TEST_F(MetaType, Resolve) {
     ASSERT_TRUE(found);
 }
 
-TEST_F(MetaType, Functionalities) {
+TEST_F(MetaType, UserTraits) {
+    ASSERT_EQ(entt::resolve<bool>().traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(entt::resolve<clazz>().traits<test::meta_traits>(), test::meta_traits::none);
+
+    ASSERT_EQ(entt::resolve<double>().traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_EQ(entt::resolve<unsigned int>().traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(entt::resolve<derived>().traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::three);
+    ASSERT_EQ(entt::resolve<property_type>().traits<test::meta_traits>(), test::meta_traits::two | test::meta_traits::three);
+}
+
+ENTT_DEBUG_TEST_F(MetaTypeDeathTest, UserTraits) {
+    using traits_type = entt::internal::meta_traits;
+    constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
+    ASSERT_DEATH(entt::meta<clazz>().traits(value), "");
+}
+
+TEST_F(MetaType, Custom) {
+    ASSERT_EQ(*static_cast<const char *>(entt::resolve<clazz>().custom()), 'c');
+    ASSERT_EQ(static_cast<const char &>(entt::resolve<clazz>().custom()), 'c');
+
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(entt::resolve<base>().custom()), nullptr);
+}
+
+ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
+    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<base>().custom(), "");
+}
+
+TEST_F(MetaType, Info) {
     using namespace entt::literals;
 
     auto type = entt::resolve<clazz>();
@@ -276,35 +305,6 @@ TEST_F(MetaType, Traits) {
     ASSERT_FALSE((entt::resolve<int>().is_associative_container()));
     ASSERT_TRUE((entt::resolve<std::map<int, char>>().is_associative_container()));
     ASSERT_FALSE(entt::resolve<std::vector<int>>().is_associative_container());
-}
-
-TEST_F(MetaType, UserTraits) {
-    ASSERT_EQ(entt::resolve<bool>().traits<test::meta_traits>(), test::meta_traits::none);
-    ASSERT_EQ(entt::resolve<clazz>().traits<test::meta_traits>(), test::meta_traits::none);
-
-    ASSERT_EQ(entt::resolve<double>().traits<test::meta_traits>(), test::meta_traits::one);
-    ASSERT_EQ(entt::resolve<unsigned int>().traits<test::meta_traits>(), test::meta_traits::two);
-    ASSERT_EQ(entt::resolve<derived>().traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::three);
-    ASSERT_EQ(entt::resolve<property_type>().traits<test::meta_traits>(), test::meta_traits::two | test::meta_traits::three);
-}
-
-ENTT_DEBUG_TEST_F(MetaTypeDeathTest, UserTraits) {
-    using traits_type = entt::internal::meta_traits;
-    constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
-    ASSERT_DEATH(entt::meta<clazz>().traits(value), "");
-}
-
-TEST_F(MetaType, Custom) {
-    ASSERT_EQ(*static_cast<const char *>(entt::resolve<clazz>().custom()), 'c');
-    ASSERT_EQ(static_cast<const char &>(entt::resolve<clazz>().custom()), 'c');
-
-    ASSERT_EQ(static_cast<const int *>(entt::resolve<clazz>().custom()), nullptr);
-    ASSERT_EQ(static_cast<const int *>(entt::resolve<base>().custom()), nullptr);
-}
-
-ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
-    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().custom(), "");
-    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<base>().custom(), "");
 }
 
 TEST_F(MetaType, RemovePointer) {
@@ -801,14 +801,17 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    entt::meta<property_type>()
-        .type("property"_hs)
-        .data<property_type::random>("rand"_hs)
-        .prop(static_cast<entt::id_type>(property_type::value), 3)
-        .prop(static_cast<entt::id_type>(property_type::random), 3);
+    entt::meta<base>()
+        .traits(test::meta_traits::one)
+        .custom<int>(3)
+        // this should not overwrite traits and custom data
+        .type("base"_hs);
 
-    ASSERT_TRUE(entt::resolve<property_type>().data("rand"_hs).prop(static_cast<entt::id_type>(property_type::value)));
-    ASSERT_TRUE(entt::resolve<property_type>().data("rand"_hs).prop(static_cast<entt::id_type>(property_type::random)));
+    // this should not overwrite traits and custom data
+    [[maybe_unused]] auto factory = entt::meta<base>();
+
+    ASSERT_EQ(entt::resolve<base>().traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_NE(static_cast<const int *>(entt::resolve("base"_hs).custom()), nullptr);
 }
 
 TEST_F(MetaType, ReRegistration) {
