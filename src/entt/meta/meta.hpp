@@ -1082,26 +1082,6 @@ struct meta_func {
         return invoke(std::move(instance), arguments.data(), sizeof...(Args));
     }
 
-    /*! @copydoc meta_data::prop */
-    [[nodiscard]] [[deprecated("use ::custom() instead")]] meta_range<meta_prop, typename decltype(internal::meta_func_node::prop)::const_iterator> prop() const noexcept {
-        return {{*ctx, node->prop.cbegin()}, {*ctx, node->prop.cend()}};
-    }
-
-    /**
-     * @brief Lookup utility for meta properties.
-     * @param key The key to use to search for a property.
-     * @return The registered meta property for the given key, if any.
-     */
-    [[nodiscard]] [[deprecated("use ::custom() instead")]] meta_prop prop(const id_type key) const {
-        for(auto &&elem: node->prop) {
-            if(elem.id == key) {
-                return meta_prop{*ctx, elem};
-            }
-        }
-
-        return meta_prop{};
-    }
-
     /*! @copydoc meta_data::traits */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
