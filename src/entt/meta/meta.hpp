@@ -983,7 +983,11 @@ struct meta_data {
         return (node != nullptr);
     }
 
-    /*! @copydoc meta_prop::operator== */
+    /**
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
+     */
     [[nodiscard]] bool operator==(const meta_data &other) const noexcept {
         return (ctx == other.ctx && node == other.node);
     }
@@ -1109,7 +1113,7 @@ struct meta_func {
         return (node != nullptr);
     }
 
-    /*! @copydoc meta_prop::operator== */
+    /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_func &other) const noexcept {
         return (ctx == other.ctx && node == other.node);
     }
@@ -1576,7 +1580,7 @@ public:
         return !(ctx == nullptr);
     }
 
-    /*! @copydoc meta_prop::operator== */
+    /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_type &other) const noexcept {
         return (ctx == other.ctx) && (((node.info == nullptr) && (other.node.info == nullptr)) || ((node.info != nullptr) && (other.node.info != nullptr) && *node.info == *other.node.info));
     }
