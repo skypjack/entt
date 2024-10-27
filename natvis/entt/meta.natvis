@@ -41,7 +41,6 @@
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
-			<Item Name="[prop]">prop,view(simple)</Item>
 			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
@@ -61,16 +60,7 @@
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
 			<Item Name="[next]" Condition="next != nullptr">*next</Item>
-			<Item Name="[prop]">prop,view(simple)</Item>
 			<Item Name="[custom]">custom</Item>
-		</Expand>
-	</Type>
-	<Type Name="entt::internal::meta_prop_node">
-		<DisplayString Condition="value != nullptr">{{ key={ id } }}</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<Item Name="[key]">id</Item>
-			<Item Name="[value]">value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_template_node">
@@ -88,7 +78,6 @@
 			<Item Name="[conv]">conv,view(simple)</Item>
 			<Item Name="[data]">data,view(simple)</Item>
 			<Item Name="[func]">func,view(simple)</Item>
-			<Item Name="[prop]">prop,view(simple)</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_type_node">
@@ -163,14 +152,6 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
-		</Expand>
-	</Type>
-	<Type Name="entt::meta_prop">
-		<DisplayString Condition="node.type != nullptr">{ node }</DisplayString>
-		<DisplayString>{{}}</DisplayString>
-		<Expand>
-			<ExpandedItem Condition="node.type != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
