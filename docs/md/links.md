@@ -234,6 +234,9 @@ I hope the following lists can grow much more in the future.
     API with CSS3.
   * [Coral Engine](https://github.com/GuusKemperman/CoralEngine): open-source
     student engine with the tools to make games in C++ and Visual scripting.
+  * [Star Engine](https://github.com/HODAKdev/StarEngine): an Advanced C++
+    DirectX 11 game engine.
+  * [Darmok](https://github.com/miguelibero/darmok): another C++ game engine.
 
 ## Articles, videos and blog posts:
 
