@@ -935,29 +935,6 @@ struct meta_data {
     [[nodiscard]] inline meta_type arg(size_type index) const noexcept;
 
     /**
-     * @brief Returns a range to visit registered meta properties.
-     * @return An iterable range to visit registered meta properties.
-     */
-    [[nodiscard]] [[deprecated("use ::custom() instead")]] meta_range<meta_prop, typename decltype(internal::meta_data_node::prop)::const_iterator> prop() const noexcept {
-        return {{*ctx, node->prop.cbegin()}, {*ctx, node->prop.cend()}};
-    }
-
-    /**
-     * @brief Lookup utility for meta properties.
-     * @param key The key to use to search for a property.
-     * @return The registered meta property for the given key, if any.
-     */
-    [[nodiscard]] [[deprecated("use ::custom() instead")]] meta_prop prop(const id_type key) const {
-        for(auto &&elem: node->prop) {
-            if(elem.id == key) {
-                return meta_prop{*ctx, elem};
-            }
-        }
-
-        return meta_prop{};
-    }
-
-    /**
      * @brief Returns all meta traits for a given meta object.
      * @tparam Type The type to convert the meta traits to.
      * @return The registered meta traits, if any.

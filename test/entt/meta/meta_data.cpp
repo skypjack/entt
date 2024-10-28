@@ -87,11 +87,6 @@ struct array {
     int local[4];                // NOLINT
 };
 
-enum class property_type : entt::id_type {
-    random,
-    value
-};
-
 struct MetaData: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
@@ -112,17 +107,13 @@ struct MetaData: ::testing::Test {
             .data<&clazz::i, entt::as_ref_t>("i"_hs)
             .custom<char>('c')
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
-            .prop(3u, 0)
             .data<&clazz::i, entt::as_cref_t>("ci"_hs)
             .data<&clazz::j>("j"_hs)
             .traits(test::meta_traits::one)
-            .prop("true"_hs, 1)
             .data<&clazz::h>("h"_hs)
             .traits(test::meta_traits::two)
-            .prop(static_cast<entt::id_type>(property_type::random), 2)
             .data<&clazz::k>("k"_hs)
             .traits(test::meta_traits::three)
-            .prop(static_cast<entt::id_type>(property_type::value), 3)
             .data<&clazz::instance>("base"_hs)
             .data<&clazz::i, entt::as_void_t>("void"_hs)
             .conv<int>();
@@ -192,11 +183,10 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
 }
 
-TEST_F(MetaData, NonConst) {
+TEST_F(MetaData, Comparison) {
     using namespace entt::literals;
 
     auto data = entt::resolve<clazz>().data("i"_hs);
-    clazz instance{};
 
     ASSERT_TRUE(data);
 
@@ -204,7 +194,15 @@ TEST_F(MetaData, NonConst) {
     ASSERT_NE(data, entt::meta_data{});
     ASSERT_FALSE(data != data);
     ASSERT_TRUE(data == data);
+}
 
+TEST_F(MetaData, NonConst) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<clazz>().data("i"_hs);
+    clazz instance{};
+
+    ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
@@ -213,19 +211,6 @@ TEST_F(MetaData, NonConst) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_TRUE(data.set(instance, 1));
     ASSERT_EQ(data.get(instance).cast<int>(), 1);
-
-    for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, 3u);
-        ASSERT_EQ(curr.second.value(), 0);
-    }
-
-    ASSERT_FALSE(data.prop(2));
-    ASSERT_FALSE(data.prop('c'));
-
-    auto prop = data.prop(3u);
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 0);
 }
 
 TEST_F(MetaData, Const) {
@@ -243,19 +228,6 @@ TEST_F(MetaData, Const) {
     ASSERT_EQ(data.get(instance).cast<int>(), 1);
     ASSERT_FALSE(data.set(instance, 1));
     ASSERT_EQ(data.get(instance).cast<int>(), 1);
-
-    for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, "true"_hs);
-        ASSERT_EQ(curr.second.value(), 1);
-    }
-
-    ASSERT_FALSE(data.prop(false));
-    ASSERT_FALSE(data.prop('c'));
-
-    auto prop = data.prop("true"_hs);
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 1);
 }
 
 TEST_F(MetaData, Static) {
@@ -272,19 +244,6 @@ TEST_F(MetaData, Static) {
     ASSERT_EQ(data.get({}).cast<int>(), 2);
     ASSERT_TRUE(data.set({}, 1));
     ASSERT_EQ(data.get({}).cast<int>(), 1);
-
-    for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::random));
-        ASSERT_EQ(curr.second.value(), 2);
-    }
-
-    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_type::value)));
-    ASSERT_FALSE(data.prop('c'));
-
-    auto prop = data.prop(static_cast<entt::id_type>(property_type::random));
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 2);
 }
 
 TEST_F(MetaData, ConstStatic) {
@@ -301,19 +260,6 @@ TEST_F(MetaData, ConstStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 3);
     ASSERT_FALSE(data.set({}, 1));
     ASSERT_EQ(data.get({}).cast<int>(), 3);
-
-    for(auto curr: data.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::value));
-        ASSERT_EQ(curr.second.value(), 3);
-    }
-
-    ASSERT_FALSE(data.prop(static_cast<entt::id_type>(property_type::random)));
-    ASSERT_FALSE(data.prop('c'));
-
-    auto prop = data.prop(static_cast<entt::id_type>(property_type::value));
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 3);
 }
 
 TEST_F(MetaData, GetMetaAnyArg) {
@@ -622,7 +568,6 @@ TEST_F(MetaData, AsRef) {
     ASSERT_EQ(data.arity(), 1u);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
-    ASSERT_NE(data.prop().cbegin(), data.prop().cend());
     ASSERT_EQ(instance.i, 0);
 
     data.get(instance).cast<int &>() = 3;
@@ -642,7 +587,6 @@ TEST_F(MetaData, AsConstRef) {
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).cast<const int &>(), 0);
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
-    ASSERT_EQ(data.prop().cbegin(), data.prop().cend());
     ASSERT_EQ(instance.i, 0);
 }
 
