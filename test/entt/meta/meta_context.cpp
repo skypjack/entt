@@ -86,7 +86,7 @@ class MetaContext: public ::testing::Test {
 
         entt::meta<clazz>()
             .type("foo"_hs)
-            .prop("prop"_hs, prop_value)
+            .custom<int>(3)
             .ctor<int>()
             .data<&clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
@@ -114,7 +114,7 @@ class MetaContext: public ::testing::Test {
 
         entt::meta<clazz>(context)
             .type("bar"_hs)
-            .prop("prop"_hs, prop_value)
+            .custom<char>('c')
             .base<base>()
             .ctor<char, int>()
             .dtor<&clazz::move_to_bucket>()
@@ -147,7 +147,6 @@ protected:
     static constexpr int global_marker = 1;
     static constexpr int local_marker = 4;
     static constexpr int bucket_value = 2;
-    static constexpr int prop_value = 3;
 
 private:
     entt::meta_ctx context{};
@@ -352,23 +351,17 @@ TEST_F(MetaContext, MetaDtor) {
     ASSERT_NE(clazz::bucket, bucket_value);
 }
 
-TEST_F(MetaContext, MetaProp) {
+TEST_F(MetaContext, MetaCustom) {
     using namespace entt::literals;
 
     const auto global = entt::resolve<clazz>();
     const auto local = entt::resolve<clazz>(ctx());
 
-    ASSERT_TRUE(global.prop("prop"_hs));
-    ASSERT_TRUE(local.prop("prop"_hs));
+    ASSERT_NE(static_cast<const int *>(global.custom()), nullptr);
+    ASSERT_NE(static_cast<const char *>(local.custom()), nullptr);
 
-    ASSERT_EQ(global.prop("prop"_hs).value().type(), entt::resolve<int>());
-    ASSERT_EQ(local.prop("prop"_hs).value().type(), entt::resolve<int>(ctx()));
-
-    ASSERT_EQ(global.prop("prop"_hs).value().cast<int>(), prop_value);
-    ASSERT_EQ(local.prop("prop"_hs).value().cast<int>(), prop_value);
-
-    ASSERT_EQ(global.prop("prop"_hs).value().type().data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.prop("prop"_hs).value().type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(static_cast<int>(global.custom()), 3);
+    ASSERT_EQ(static_cast<char>(local.custom()), 'c');
 }
 
 TEST_F(MetaContext, MetaTemplate) {
