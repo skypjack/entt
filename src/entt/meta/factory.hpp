@@ -98,21 +98,6 @@ protected:
         }
     }
 
-    [[deprecated("use ::custom() instead")]] void prop(meta_prop_node node) {
-        std::vector<meta_prop_node> *container = nullptr;
-
-        if(bucket == parent) {
-            container = &details->prop;
-        } else if(invoke == nullptr) {
-            container = &find_member_or_assert()->prop;
-        } else {
-            container = &find_overload_or_assert()->prop;
-        }
-
-        auto *member = find_member<&meta_prop_node::id>(*container, node.id);
-        (member != nullptr) ? (*member = std::move(node)) : container->emplace_back(std::move(node));
-    }
-
     void traits(const meta_traits value) {
         if(bucket == parent) {
             meta_context::from(*ctx).value[bucket].traits |= value;
@@ -483,27 +468,6 @@ public:
                 &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
-
-        return *this;
-    }
-
-    /**
-     * @brief Assigns a property to the last created meta object.
-     *
-     * Both the key and the value (if any) must be at least copy constructible.
-     *
-     * @tparam Value Optional type of the property value.
-     * @param id Property key.
-     * @param value Optional property value.
-     * @return A meta factory for the parent type.
-     */
-    template<typename... Value>
-    [[deprecated("use ::custom() instead")]] meta_factory prop(id_type id, [[maybe_unused]] Value &&...value) {
-        if constexpr(sizeof...(Value) == 0u) {
-            base_type::prop(internal::meta_prop_node{id, &internal::resolve<void>});
-        } else {
-            base_type::prop(internal::meta_prop_node{id, &internal::resolve<std::decay_t<Value>>..., std::make_shared<std::decay_t<Value>>(std::forward<Value>(value))...});
-        }
 
         return *this;
     }
