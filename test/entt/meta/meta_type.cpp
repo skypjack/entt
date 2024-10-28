@@ -97,10 +97,8 @@ struct overloaded_func {
 };
 
 enum class property_type : entt::id_type {
-    random,
     value,
-    key_only,
-    list
+    other
 };
 
 struct MetaType: ::testing::Test {
@@ -148,26 +146,13 @@ struct MetaType: ::testing::Test {
         entt::meta<property_type>()
             .type("property"_hs)
             .traits(test::meta_traits::two | test::meta_traits::three)
-            .data<property_type::random>("random"_hs)
-            .prop(static_cast<entt::id_type>(property_type::random), 0)
-            .prop(static_cast<entt::id_type>(property_type::value), 3)
             .data<property_type::value>("value"_hs)
-            .prop(static_cast<entt::id_type>(property_type::random), true)
-            .prop(static_cast<entt::id_type>(property_type::value), 0)
-            .prop(static_cast<entt::id_type>(property_type::key_only))
-            .prop(static_cast<entt::id_type>(property_type::list))
-            .data<property_type::key_only>("key_only"_hs)
-            .prop(static_cast<entt::id_type>(property_type::key_only))
-            .data<property_type::list>("list"_hs)
-            .prop(static_cast<entt::id_type>(property_type::random), false)
-            .prop(static_cast<entt::id_type>(property_type::value), 0)
-            .prop(static_cast<entt::id_type>(property_type::key_only))
+            .data<property_type::other>("other"_hs)
             .data<set<property_type>, get<property_type>>("var"_hs);
 
         entt::meta<clazz>()
             .type("class"_hs)
             .custom<char>('c')
-            .prop(static_cast<entt::id_type>(property_type::value), 3)
             .ctor<const base &, int>()
             .data<&clazz::value>("value"_hs)
             .func<&clazz::member>("member"_hs)
@@ -233,7 +218,7 @@ ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<base>().custom(), "");
 }
 
-TEST_F(MetaType, Info) {
+TEST_F(MetaType, IdAndInfo) {
     using namespace entt::literals;
 
     auto type = entt::resolve<clazz>();
@@ -242,19 +227,6 @@ TEST_F(MetaType, Info) {
     ASSERT_NE(type, entt::meta_type{});
     ASSERT_EQ(type.id(), "class"_hs);
     ASSERT_EQ(type.info(), entt::type_id<clazz>());
-
-    for(auto &&curr: type.prop()) {
-        ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_type::value));
-        ASSERT_EQ(curr.second.value(), 3);
-    }
-
-    ASSERT_FALSE(type.prop(static_cast<entt::id_type>(property_type::key_only)));
-    ASSERT_FALSE(type.prop("property"_hs));
-
-    auto prop = type.prop(static_cast<entt::id_type>(property_type::value));
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.value(), 3);
 }
 
 TEST_F(MetaType, SizeOf) {
@@ -616,7 +588,6 @@ TEST_F(MetaType, Reset) {
 
     ASSERT_TRUE(entt::resolve("class"_hs));
     ASSERT_EQ(entt::resolve<clazz>().id(), "class"_hs);
-    ASSERT_TRUE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     ASSERT_TRUE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_TRUE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor
@@ -626,7 +597,6 @@ TEST_F(MetaType, Reset) {
 
     ASSERT_FALSE(entt::resolve("class"_hs));
     ASSERT_NE(entt::resolve<clazz>().id(), "class"_hs);
-    ASSERT_FALSE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_FALSE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor is not cleared
@@ -686,17 +656,20 @@ TEST_F(MetaType, EnumAndNamedConstants) {
 
     auto type = entt::resolve<property_type>();
 
-    ASSERT_TRUE(type.data("random"_hs));
     ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_TRUE(type.data("other"_hs));
 
-    ASSERT_EQ(type.data("random"_hs).type(), type);
     ASSERT_EQ(type.data("value"_hs).type(), type);
+    ASSERT_EQ(type.data("other"_hs).type(), type);
 
-    ASSERT_FALSE(type.data("random"_hs).set({}, property_type::value));
-    ASSERT_FALSE(type.data("value"_hs).set({}, property_type::random));
-
-    ASSERT_EQ(type.data("random"_hs).get({}).cast<property_type>(), property_type::random);
     ASSERT_EQ(type.data("value"_hs).get({}).cast<property_type>(), property_type::value);
+    ASSERT_EQ(type.data("other"_hs).get({}).cast<property_type>(), property_type::other);
+
+    ASSERT_FALSE(type.data("value"_hs).set({}, property_type::other));
+    ASSERT_FALSE(type.data("other"_hs).set({}, property_type::value));
+
+    ASSERT_EQ(type.data("value"_hs).get({}).cast<property_type>(), property_type::value);
+    ASSERT_EQ(type.data("other"_hs).get({}).cast<property_type>(), property_type::other);
 }
 
 TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
@@ -723,15 +696,15 @@ TEST_F(MetaType, Variables) {
     auto p_data = entt::resolve<property_type>().data("var"_hs);
     auto d_data = entt::resolve("double"_hs).data("var"_hs);
 
-    property_type prop{property_type::key_only};
+    property_type prop{property_type::value};
     double value = 3.;
 
-    p_data.set(prop, property_type::random);
+    p_data.set(prop, property_type::other);
     d_data.set(value, 3.);
 
-    ASSERT_EQ(p_data.get(prop).cast<property_type>(), property_type::random);
+    ASSERT_EQ(p_data.get(prop).cast<property_type>(), property_type::other);
     ASSERT_EQ(d_data.get(value).cast<double>(), 3.);
-    ASSERT_EQ(prop, property_type::random);
+    ASSERT_EQ(prop, property_type::other);
     ASSERT_EQ(value, 3.);
 }
 
@@ -757,7 +730,6 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
 
     ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
 
-    ASSERT_FALSE(entt::resolve<clazz>().prop(static_cast<entt::id_type>(property_type::value)));
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz>().construct());
     ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
