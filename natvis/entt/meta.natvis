@@ -139,6 +139,12 @@
 			<Item Name="[data]">data</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::meta_custom">
+		<DisplayString>{ node }</DisplayString>
+		<Expand>
+			<ExpandedItem>node</ExpandedItem>
+		</Expand>
+	</Type>
 	<Type Name="entt::meta_data">
 		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
