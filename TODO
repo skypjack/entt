@@ -43,5 +43,5 @@ TODO:
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
 * bypass vtable in any (improvements available for move/get, add more policy types)
-* natvis: meta_custom
 * dtor, traits and custom should be part of meta descriptor maybe (?)
+* allow attaching const values of non-Type type to meta types
