@@ -67,12 +67,6 @@ struct meta_custom_node {
     std::shared_ptr<void> value{};
 };
 
-struct [[deprecated("no longer required")]] meta_prop_node {
-    id_type id{};
-    meta_type_node (*type)(const meta_context &) noexcept {};
-    std::shared_ptr<void> value{};
-};
-
 struct meta_base_node {
     id_type type{};
     meta_type_node (*resolve)(const meta_context &) noexcept {};
@@ -108,7 +102,6 @@ struct meta_data_node {
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(const meta_ctx &, meta_handle){};
     meta_custom_node custom{};
-    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_func_node {
@@ -122,7 +115,6 @@ struct meta_func_node {
     meta_any (*invoke)(const meta_ctx &, meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next{};
     meta_custom_node custom{};
-    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_template_node {
@@ -139,7 +131,6 @@ struct meta_type_descriptor {
     std::vector<meta_conv_node> conv{};
     std::vector<meta_data_node> data{};
     std::vector<meta_func_node> func{};
-    std::vector<meta_prop_node> prop{};
 };
 
 struct meta_type_node {
