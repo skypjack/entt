@@ -764,68 +764,6 @@ private:
     meta_any any{meta_ctx_arg, locator<meta_ctx>::value_or()};
 };
 
-/*! @brief Opaque wrapper for properties of any type. */
-struct [[deprecated("use meta_custom instead")]] meta_prop {
-    /*! @brief Default constructor. */
-    meta_prop() noexcept = default;
-
-    /**
-     * @brief Context aware constructor for meta objects.
-     * @param area The context from which to search for meta types.
-     * @param curr The underlying node with which to construct the instance.
-     */
-    meta_prop(const meta_ctx &area, internal::meta_prop_node curr) noexcept
-        : node{std::move(curr)},
-          ctx{&area} {}
-
-    /**
-     * @brief Returns the stored value by const reference.
-     * @return A wrapper containing the value stored with the property.
-     */
-    [[nodiscard]] meta_any value() const {
-        return node.value ? node.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, node.value.get()) : meta_any{meta_ctx_arg, *ctx};
-    }
-
-    /**
-     * @brief Returns the stored value by reference.
-     * @return A wrapper containing the value stored with the property.
-     */
-    [[nodiscard]] meta_any value() {
-        return node.value ? node.type(internal::meta_context::from(*ctx)).from_void(*ctx, node.value.get(), nullptr) : meta_any{meta_ctx_arg, *ctx};
-    }
-
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const noexcept {
-        return static_cast<bool>(node.type);
-    }
-
-    /**
-     * @brief Checks if two objects refer to the same type.
-     * @param other The object with which to compare.
-     * @return True if the objects refer to the same type, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const meta_prop &other) const noexcept {
-        return (ctx == other.ctx && node.value == other.node.value);
-    }
-
-private:
-    internal::meta_prop_node node{};
-    const meta_ctx *ctx{};
-};
-
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
-[[nodiscard]] inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 /*! @brief Opaque wrapper for user defined data of any type. */
 struct meta_custom {
     /*! @brief Default constructor. */
