@@ -31,8 +31,12 @@ enum class any_operation : std::uint8_t {
 
 /*! @brief Possible modes of an any object. */
 enum class any_policy : std::uint8_t {
-    /*! @brief Default mode, the object owns the contained element. */
-    owner,
+    /*! @brief Default mode, the object does not own any elements. */
+    empty,
+    /*! @brief Owning mode, the object owns a dynamically allocated element. */
+    dynamic,
+    /*! @brief Owning mode, the object owns an embedded element. */
+    embedded,
     /*! @brief Aliasing mode, the object _points_ to a non-const element. */
     ref,
     /*! @brief Const aliasing mode, the object _points_ to a const element. */
@@ -63,7 +67,7 @@ class basic_any {
         const Type *elem = nullptr;
 
         if constexpr(in_situ<Type>) {
-            elem = (value.mode == any_policy::owner) ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
+            elem = value.owner() ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
         } else {
             elem = static_cast<const Type *>(value.instance);
         }
@@ -75,7 +79,7 @@ class basic_any {
             }
             break;
         case operation::move:
-            ENTT_ASSERT(value.mode == any_policy::owner, "Unexpected mode");
+            ENTT_ASSERT(value.owner(), "Unexpected mode");
 
             if constexpr(in_situ<Type>) {
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
@@ -129,6 +133,8 @@ class basic_any {
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<plain_type>) {
+                mode = any_policy::embedded;
+
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     ::new(&storage) plain_type{std::forward<Args>(args)...};
                 } else {
@@ -136,6 +142,8 @@ class basic_any {
                     ::new(&storage) plain_type(std::forward<Args>(args)...);
                 }
             } else {
+                mode = any_policy::dynamic;
+
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
                     instance = new plain_type{std::forward<Args>(args)...};
                 } else if constexpr(std::is_array_v<plain_type>) {
@@ -175,7 +183,7 @@ public:
         : instance{},
           info{},
           vtable{},
-          mode{any_policy::owner} {
+          mode{any_policy::empty} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -208,8 +216,7 @@ public:
           info{other.info},
           vtable{other.vtable},
           mode{other.mode} {
-        if(other.mode != any_policy::owner) {
-            ENTT_ASSERT(other.mode == any_policy::ref || other.mode == any_policy::cref, "Unexpected mode");
+        if(other.mode == any_policy::ref || other.mode == any_policy::cref) {
             instance = std::exchange(other.instance, nullptr);
         } else if(other.vtable) {
             other.vtable(operation::move, other, this);
@@ -218,7 +225,7 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        if(vtable && (mode == any_policy::owner)) {
+        if(owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
     }
@@ -250,8 +257,7 @@ public:
 
         reset();
 
-        if(other.mode != any_policy::owner) {
-            ENTT_ASSERT(other.mode == any_policy::ref || other.mode == any_policy::cref, "Unexpected mode");
+        if(other.mode == any_policy::ref || other.mode == any_policy::cref) {
             instance = std::exchange(other.instance, nullptr);
         } else if(other.vtable) {
             other.vtable(operation::move, other, this);
@@ -358,7 +364,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-        if(vtable && (mode == any_policy::owner)) {
+        if(owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
 
@@ -366,7 +372,7 @@ public:
         ENTT_ASSERT((instance = nullptr) == nullptr, "");
         info = &type_id<void>();
         vtable = nullptr;
-        mode = any_policy::owner;
+        mode = any_policy::empty;
     }
 
     /**
@@ -410,6 +416,14 @@ public:
     /*! @copydoc as_ref */
     [[nodiscard]] basic_any as_ref() const noexcept {
         return basic_any{*this, any_policy::cref};
+    }
+
+    /**
+     * @brief Returns true if a wrapper owns its object, false otherwise.
+     * @return True if the wrapper owns its object, false otherwise.
+     */
+    [[nodiscard]] bool owner() const noexcept {
+        return (mode == any_policy::dynamic || mode == any_policy::embedded);
     }
 
     /**

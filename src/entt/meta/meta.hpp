@@ -213,7 +213,7 @@ class meta_any {
     }
 
     void release() {
-        if((node.dtor.dtor != nullptr) && (storage.policy() == any_policy::owner)) {
+        if((node.dtor.dtor != nullptr) && storage.owner()) {
             node.dtor.dtor(storage.data());
         }
     }
@@ -471,7 +471,7 @@ public:
      */
     [[nodiscard]] bool allow_cast(const meta_type &type) {
         if(auto other = std::as_const(*this).allow_cast(type); other) {
-            if((other.storage.policy() == any_policy::owner)) {
+            if(other.storage.owner()) {
                 std::swap(*this, other);
             }
 
@@ -602,6 +602,11 @@ public:
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
         return meta_any{*this, storage.as_ref()};
+    }
+
+    /*! @copydoc any::owner */
+    [[nodiscard]] bool owner() const noexcept {
+        return storage.owner();
     }
 
     /**

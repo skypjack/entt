@@ -120,7 +120,8 @@ TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::embedded);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<char>(), 'c');
     ASSERT_NE(any.data(), nullptr);
@@ -133,7 +134,8 @@ TEST_F(MetaAny, NoSBO) {
     entt::meta_any any{instance};
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::dynamic);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<fat>(), instance);
     ASSERT_NE(any.data(), nullptr);
@@ -178,6 +180,7 @@ TEST_F(MetaAny, SBOAsRefConstruction) {
     auto any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::meta_any_policy::ref);
     ASSERT_EQ(any.type(), entt::resolve<int>());
 
@@ -214,6 +217,7 @@ TEST_F(MetaAny, SBOAsConstRefConstruction) {
     auto any = entt::forward_as_meta(value);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::meta_any_policy::cref);
     ASSERT_EQ(any.type(), entt::resolve<int>());
 
@@ -469,6 +473,7 @@ TEST_F(MetaAny, NoSBOAsRefConstruction) {
     auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::meta_any_policy::ref);
     ASSERT_EQ(any.type(), entt::resolve<fat>());
 
@@ -503,6 +508,7 @@ TEST_F(MetaAny, NoSBOAsConstRefConstruction) {
     auto any = entt::forward_as_meta(instance);
 
     ASSERT_TRUE(any);
+    ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::meta_any_policy::cref);
     ASSERT_EQ(any.type(), entt::resolve<fat>());
 
@@ -765,7 +771,8 @@ TEST_F(MetaAny, VoidInPlaceTypeConstruction) {
     entt::meta_any any{std::in_place_type<void>};
 
     ASSERT_TRUE(any);
-    ASSERT_EQ(any.policy(), entt::meta_any_policy::owner);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::meta_any_policy::empty);
     ASSERT_FALSE(any.try_cast<char>());
     ASSERT_EQ(any.data(), nullptr);
     ASSERT_EQ(any.type(), entt::resolve<void>());
