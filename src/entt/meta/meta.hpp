@@ -900,7 +900,7 @@ struct meta_data {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
+        return (ctx != nullptr);
     }
 
     /**
@@ -1030,7 +1030,7 @@ struct meta_func {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
+        return (ctx != nullptr);
     }
 
     /*! @copydoc meta_data::operator== */
@@ -1478,7 +1478,7 @@ public:
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(ctx == nullptr);
+        return (ctx != nullptr);
     }
 
     /*! @copydoc meta_data::operator== */
