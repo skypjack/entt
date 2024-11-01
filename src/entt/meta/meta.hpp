@@ -1652,7 +1652,7 @@ public:
     }
 
 private:
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const meta_ctx *ctx{};
     vtable_type *vtable{};
     any handle{};
 };
@@ -1724,7 +1724,7 @@ public:
     }
 
 private:
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const meta_ctx *ctx{};
     vtable_type *vtable{};
     any handle{};
 };
