@@ -766,7 +766,7 @@ struct meta_handle {
     }
 
 private:
-    meta_any any{meta_ctx_arg, locator<meta_ctx>::value_or()};
+    meta_any any{};
 };
 
 /*! @brief Opaque wrapper for user defined data of any type. */
