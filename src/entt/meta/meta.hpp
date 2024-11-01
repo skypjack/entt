@@ -1636,7 +1636,7 @@ public:
     }
 
     [[nodiscard]] explicit operator bool() const noexcept {
-        return static_cast<bool>(handle);
+        return (vtable != nullptr);
     }
 
     [[nodiscard]] bool operator==(const meta_iterator &other) const noexcept {
@@ -1712,7 +1712,7 @@ public:
     }
 
     [[nodiscard]] explicit operator bool() const noexcept {
-        return static_cast<bool>(handle);
+        return (vtable != nullptr);
     }
 
     [[nodiscard]] bool operator==(const meta_iterator &other) const noexcept {
