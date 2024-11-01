@@ -695,7 +695,7 @@ struct meta_handle {
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value)
-        : meta_handle{locator<meta_ctx>::value_or(), value} {}
+        : any{std::in_place_type<Type &>, value} {}
 
     /**
      * @brief Context aware copy constructor.
