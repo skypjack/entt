@@ -42,31 +42,25 @@ public:
 
     /**
      * @brief Context aware constructor.
-     * @param area The context from which to search for meta types.
-     */
-    meta_sequence_container(const meta_ctx &area) noexcept
-        : ctx{&area} {}
-
-    /**
-     * @brief Rebinds a proxy object to a sequence container type.
      * @tparam Type Type of container to wrap.
+     * @param area The context from which to search for meta types.
      * @param instance The container to wrap.
      */
     template<typename Type>
-    void rebind(Type &instance) noexcept {
-        value_type_node = &internal::resolve<typename Type::value_type>;
-        const_reference_node = &internal::resolve<std::remove_const_t<std::remove_reference_t<typename Type::const_reference>>>;
-        size_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::size;
-        clear_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::clear;
-        reserve_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::reserve;
-        resize_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::resize;
-        begin_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::begin;
-        end_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::end;
-        insert_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::insert;
-        erase_fn = meta_sequence_container_traits<std::remove_const_t<Type>>::erase;
-        const_only = std::is_const_v<Type>;
-        data = &instance;
-    }
+    meta_sequence_container(const meta_ctx &area, Type &instance) noexcept
+        : ctx{&area},
+          value_type_node{&internal::resolve<typename Type::value_type>},
+          const_reference_node{&internal::resolve<std::remove_const_t<std::remove_reference_t<typename Type::const_reference>>>},
+          size_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::size},
+          clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
+          reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
+          resize_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::resize},
+          begin_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::begin},
+          end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::end},
+          insert_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::insert},
+          erase_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::erase},
+          const_only{std::is_const_v<Type>},
+          data{&instance} {}
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
@@ -81,7 +75,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const meta_ctx *ctx{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*const_reference_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *){};
@@ -111,35 +105,28 @@ public:
 
     /**
      * @brief Context aware constructor.
-     * @param area The context from which to search for meta types.
-     */
-    meta_associative_container(const meta_ctx &area) noexcept
-        : ctx{&area} {}
-
-    /**
-     * @brief Rebinds a proxy object to an associative container type.
      * @tparam Type Type of container to wrap.
+     * @param area The context from which to search for meta types.
      * @param instance The container to wrap.
      */
     template<typename Type>
-    void rebind(Type &instance) noexcept {
-        key_type_node = &internal::resolve<typename Type::key_type>;
-        value_type_node = &internal::resolve<typename Type::value_type>;
-
+    meta_associative_container(const meta_ctx &area, Type &instance) noexcept
+        : ctx{&area},
+          key_type_node{&internal::resolve<typename Type::key_type>},
+          value_type_node{&internal::resolve<typename Type::value_type>},
+          size_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::size},
+          clear_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::clear},
+          reserve_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::reserve},
+          begin_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::begin},
+          end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::end},
+          insert_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::insert},
+          erase_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::erase},
+          find_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::find},
+          const_only{std::is_const_v<Type>},
+          data{&instance} {
         if constexpr(!meta_associative_container_traits<std::remove_const_t<Type>>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
-
-        size_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::size;
-        clear_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::clear;
-        reserve_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::reserve;
-        begin_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::begin;
-        end_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::end;
-        insert_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::insert;
-        erase_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::erase;
-        find_fn = &meta_associative_container_traits<std::remove_const_t<Type>>::find;
-        const_only = std::is_const_v<Type>;
-        data = &instance;
     }
 
     [[nodiscard]] inline meta_type key_type() const noexcept;
@@ -156,7 +143,7 @@ public:
     [[nodiscard]] inline explicit operator bool() const noexcept;
 
 private:
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const meta_ctx *ctx{};
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
@@ -200,14 +187,14 @@ class meta_any {
         }
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-            if(req == internal::meta_traits::is_meta_sequence_container) {
-                const_only ? static_cast<meta_sequence_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_sequence_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
+            if(const meta_any *parent = static_cast<const meta_any *>(value); req == internal::meta_traits::is_meta_sequence_container) {
+                *static_cast<meta_sequence_container *>(other) = const_only ? meta_sequence_container{*parent->ctx, *static_cast<const Type *>(parent->data())} : meta_sequence_container{*parent->ctx, *static_cast<Type *>(const_cast<void *>(parent->data()))};
             }
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-            if(req == internal::meta_traits::is_meta_associative_container) {
-                const_only ? static_cast<meta_associative_container *>(other)->rebind(*static_cast<const Type *>(value)) : static_cast<meta_associative_container *>(other)->rebind(*static_cast<Type *>(const_cast<void *>(value)));
+            if(const meta_any *parent = static_cast<const meta_any *>(value); req == internal::meta_traits::is_meta_associative_container) {
+                *static_cast<meta_associative_container *>(other) = const_only ? meta_associative_container{*parent->ctx, *static_cast<const Type *>(parent->data())} : meta_associative_container{*parent->ctx, *static_cast<Type *>(const_cast<void *>(parent->data()))};
             }
         }
     }
@@ -536,15 +523,15 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        meta_sequence_container proxy{*ctx};
-        vtable(internal::meta_traits::is_meta_sequence_container, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
+        meta_sequence_container proxy{};
+        vtable(internal::meta_traits::is_meta_sequence_container, policy() == meta_any_policy::cref, this, &proxy);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
-        meta_sequence_container proxy{*ctx};
-        vtable(internal::meta_traits::is_meta_sequence_container, true, data(), &proxy);
+        meta_sequence_container proxy{};
+        vtable(internal::meta_traits::is_meta_sequence_container, true, this, &proxy);
         return proxy;
     }
 
@@ -553,15 +540,15 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        meta_associative_container proxy{*ctx};
-        vtable(internal::meta_traits::is_meta_associative_container, policy() == meta_any_policy::cref, std::as_const(*this).data(), &proxy);
+        meta_associative_container proxy{};
+        vtable(internal::meta_traits::is_meta_associative_container, policy() == meta_any_policy::cref, this, &proxy);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
-        meta_associative_container proxy{*ctx};
-        vtable(internal::meta_traits::is_meta_associative_container, true, data(), &proxy);
+        meta_associative_container proxy{};
+        vtable(internal::meta_traits::is_meta_associative_container, true, this, &proxy);
         return proxy;
     }
 
@@ -1483,7 +1470,7 @@ public:
 
     /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_type &other) const noexcept {
-        return (ctx == other.ctx) && (((node.info == nullptr) && (other.node.info == nullptr)) || ((node.info != nullptr) && (other.node.info != nullptr) && *node.info == *other.node.info));
+        return (ctx == other.ctx) && (!!node.info == !!other.node.info) && (node.info == nullptr || (*node.info == *other.node.info));
     }
 
 private:
