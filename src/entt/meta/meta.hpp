@@ -49,6 +49,7 @@ public:
     template<typename Type>
     meta_sequence_container(const meta_ctx &area, Type &instance) noexcept
         : ctx{&area},
+          data{&instance},
           value_type_node{&internal::resolve<typename Type::value_type>},
           const_reference_node{&internal::resolve<std::remove_const_t<std::remove_reference_t<typename Type::const_reference>>>},
           size_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::size},
@@ -59,8 +60,7 @@ public:
           end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::end},
           insert_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::erase},
-          const_only{std::is_const_v<Type>},
-          data{&instance} {}
+          const_only{std::is_const_v<Type>} {}
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
@@ -76,6 +76,7 @@ public:
 
 private:
     const meta_ctx *ctx{};
+    const void *data{};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*const_reference_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *){};
@@ -86,7 +87,6 @@ private:
     iterator (*end_fn)(const meta_ctx &, void *, const void *){};
     iterator (*insert_fn)(const meta_ctx &, void *, const void *, const void *, const iterator &){};
     iterator (*erase_fn)(const meta_ctx &, void *, const iterator &){};
-    const void *data{};
     bool const_only{};
 };
 
@@ -112,6 +112,7 @@ public:
     template<typename Type>
     meta_associative_container(const meta_ctx &area, Type &instance) noexcept
         : ctx{&area},
+          data{&instance},
           key_type_node{&internal::resolve<typename Type::key_type>},
           value_type_node{&internal::resolve<typename Type::value_type>},
           size_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::size},
@@ -122,8 +123,7 @@ public:
           insert_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::erase},
           find_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::find},
-          const_only{std::is_const_v<Type>},
-          data{&instance} {
+          const_only{std::is_const_v<Type>} {
         if constexpr(!meta_associative_container_traits<std::remove_const_t<Type>>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
@@ -144,6 +144,7 @@ public:
 
 private:
     const meta_ctx *ctx{};
+    const void *data{};
     internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
     internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
@@ -155,7 +156,6 @@ private:
     bool (*insert_fn)(void *, const void *, const void *){};
     size_type (*erase_fn)(void *, const void *){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, const void *){};
-    const void *data{};
     bool const_only{};
 };
 
