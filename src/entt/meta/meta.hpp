@@ -591,17 +591,20 @@ public:
         return meta_any{*this, storage.as_ref()};
     }
 
-    /*! @copydoc any::owner */
-    [[nodiscard]] bool owner() const noexcept {
-        return storage.owner();
-    }
-
     /**
      * @brief Returns the current mode of a meta any object.
      * @return The current mode of the meta any object.
      */
     [[nodiscard]] meta_any_policy policy() const noexcept {
         return storage.policy();
+    }
+
+    /**
+     * @brief Returns the underlying storage.
+     * @return The underlyig storage.
+     */
+    [[nodiscard]] const any &base() const noexcept {
+        return storage;
     }
 
 private:
