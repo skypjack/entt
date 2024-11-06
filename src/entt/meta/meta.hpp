@@ -160,7 +160,7 @@ private:
 };
 
 /*! @brief Possible modes of a meta any object. */
-using meta_any_policy = any_policy;
+using meta_any_policy [[deprecated("use any_policy instead")]] = any_policy;
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
@@ -524,7 +524,7 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy{};
-        vtable(internal::meta_traits::is_meta_sequence_container, policy() == meta_any_policy::cref, *this, &proxy);
+        vtable(internal::meta_traits::is_meta_sequence_container, storage.policy() == any_policy::cref, *this, &proxy);
         return proxy;
     }
 
@@ -541,7 +541,7 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy{};
-        vtable(internal::meta_traits::is_meta_associative_container, policy() == meta_any_policy::cref, *this, &proxy);
+        vtable(internal::meta_traits::is_meta_associative_container, storage.policy() == any_policy::cref, *this, &proxy);
         return proxy;
     }
 
@@ -595,7 +595,7 @@ public:
      * @brief Returns the current mode of a meta any object.
      * @return The current mode of the meta any object.
      */
-    [[nodiscard]] meta_any_policy policy() const noexcept {
+    [[nodiscard]] [[deprecated("use ::base().policy() instead")]] any_policy policy() const noexcept {
         return storage.policy();
     }
 
