@@ -167,7 +167,9 @@ class meta_any {
     using vtable_type = void(const internal::meta_traits op, const bool, const meta_any &, void *);
 
     template<typename Type>
-    static std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>> basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const bool const_only, [[maybe_unused]] const meta_any &self, [[maybe_unused]] void *other) {
+    static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const bool const_only, [[maybe_unused]] const meta_any &self, [[maybe_unused]] void *other) {
+        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_meta_pointer_like) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
