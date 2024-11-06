@@ -164,25 +164,25 @@ using meta_any_policy [[deprecated("use any_policy instead")]] = any_policy;
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    using vtable_type = void(const internal::meta_traits op, const meta_any &, void *);
+    using vtable_type = void(const internal::meta_traits op, const meta_ctx &, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_any &self, [[maybe_unused]] void *other) {
+    static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_ctx &area, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(!!(req & internal::meta_traits::is_pointer_like)) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                    static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(self.data()));
+                    static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
                 } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                     using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
 
                     if constexpr(std::is_constructible_v<bool, Type>) {
-                        if(const auto &pointer_like = *static_cast<const Type *>(self.data()); pointer_like) {
+                        if(const auto &pointer_like = *static_cast<const Type *>(value); pointer_like) {
                             static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                         }
                     } else {
-                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(self.data())));
+                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
                     }
                 }
             }
@@ -190,13 +190,13 @@ class meta_any {
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_sequence_container)) {
-                *static_cast<meta_sequence_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{*self.ctx, *static_cast<const Type *>(self.data())} : meta_sequence_container{*self.ctx, *static_cast<Type *>(const_cast<void *>(self.data()))};
+                *static_cast<meta_sequence_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{area, *static_cast<const Type *>(value)} : meta_sequence_container{area, *static_cast<Type *>(const_cast<void *>(value))};
             }
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_associative_container)) {
-                *static_cast<meta_associative_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{*self.ctx, *static_cast<const Type *>(self.data())} : meta_associative_container{*self.ctx, *static_cast<Type *>(const_cast<void *>(self.data()))};
+                *static_cast<meta_associative_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{area, *static_cast<const Type *>(value)} : meta_associative_container{area, *static_cast<Type *>(const_cast<void *>(value))};
             }
         }
     }
@@ -525,15 +525,15 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        meta_sequence_container proxy{};
-        vtable(internal::meta_traits::is_sequence_container | (storage.policy() == any_policy::cref ? internal::meta_traits::is_const : internal::meta_traits::is_none), *this, &proxy);
+        meta_sequence_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_sequence_container() : meta_sequence_container{};
+        proxy || (vtable(internal::meta_traits::is_sequence_container, *ctx, storage.data(), &proxy), true);
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{};
-        vtable(internal::meta_traits::is_sequence_container | internal::meta_traits::is_const, *this, &proxy);
+        vtable(internal::meta_traits::is_sequence_container | internal::meta_traits::is_const, *ctx, storage.data(), &proxy);
         return proxy;
     }
 
@@ -542,15 +542,15 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        meta_associative_container proxy{};
-        vtable(internal::meta_traits::is_associative_container | (storage.policy() == any_policy::cref ? internal::meta_traits::is_const : internal::meta_traits::is_none), *this, &proxy);
+        meta_associative_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_associative_container() : meta_associative_container{};
+        proxy || (vtable(internal::meta_traits::is_associative_container, *ctx, storage.data(), &proxy), true);
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{};
-        vtable(internal::meta_traits::is_associative_container | internal::meta_traits::is_const, *this, &proxy);
+        vtable(internal::meta_traits::is_associative_container | internal::meta_traits::is_const, *ctx, storage.data(), &proxy);
         return proxy;
     }
 
@@ -561,7 +561,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        vtable(internal::meta_traits::is_pointer_like, *this, &ret);
+        vtable(internal::meta_traits::is_pointer_like, *ctx, storage.data(), &ret);
         return ret;
     }
 
