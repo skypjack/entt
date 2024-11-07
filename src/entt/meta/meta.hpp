@@ -359,12 +359,12 @@ public:
     [[nodiscard]] inline meta_type type() const noexcept;
 
     /*! @copydoc any::data */
-    [[nodiscard]] const void *data() const noexcept {
+    [[nodiscard]] [[deprecated("use ::base().data() instead")]] const void *data() const noexcept {
         return storage.data();
     }
 
     /*! @copydoc any::data */
-    [[nodiscard]] void *data() noexcept {
+    [[nodiscard]] [[deprecated("no longer supported, use ::base().data() for const access")]] void *data() noexcept {
         return storage.data();
     }
 
@@ -410,7 +410,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
-        return static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, data()));
+        return static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -420,7 +420,7 @@ public:
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
             const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
-            return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, data())));
+            return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data())));
         }
     }
 
@@ -1522,7 +1522,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), data(), [this, &type]([[maybe_unused]] const void *instance, auto &&...args) {
+    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, auto &&...args) {
         if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
             return (args.from_void(*ctx, nullptr, instance), ...);
         } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
@@ -1531,7 +1531,7 @@ bool meta_any::set(const id_type id, Type &&value) {
             // exploits the fact that arithmetic types and enums are also default constructible
             auto other = type.construct();
             const auto value = (args(nullptr, instance), ...);
-            other.node.conversion_helper(other.data(), &value);
+            other.node.conversion_helper(other.storage.data(), &value);
             return other;
         } else {
             // forwards to force a compile-time error in case of available arguments
@@ -1790,7 +1790,7 @@ inline meta_sequence_container::iterator meta_sequence_container::insert(const i
     // this abomination is necessary because only on macos value_type and const_reference are different types for std::vector<bool>
     if(const auto vtype = value_type_node(internal::meta_context::from(*ctx)); !const_only && (value.allow_cast({*ctx, vtype}) || value.allow_cast({*ctx, const_reference_node(internal::meta_context::from(*ctx))}))) {
         const bool is_value_type = (value.type().info() == *vtype.info);
-        return insert_fn(*ctx, const_cast<void *>(data), is_value_type ? std::as_const(value).data() : nullptr, is_value_type ? nullptr : std::as_const(value).data(), it);
+        return insert_fn(*ctx, const_cast<void *>(data), is_value_type ? value.base().data() : nullptr, is_value_type ? nullptr : value.base().data(), it);
     }
 
     return iterator{};
@@ -1879,7 +1879,7 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
     return !const_only && key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))})
            && ((mapped_type_node == nullptr) || value.allow_cast(meta_type{*ctx, mapped_type_node(internal::meta_context::from(*ctx))}))
-           && insert_fn(const_cast<void *>(data), std::as_const(key).data(), std::as_const(value).data());
+           && insert_fn(const_cast<void *>(data), key.base().data(), value.base().data());
 }
 
 /**
@@ -1888,7 +1888,7 @@ inline bool meta_associative_container::insert(meta_any key, meta_any value = {}
  * @return A bool denoting whether the removal took place.
  */
 inline meta_associative_container::size_type meta_associative_container::erase(meta_any key) {
-    return (!const_only && key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))})) ? erase_fn(const_cast<void *>(data), std::as_const(key).data()) : 0u;
+    return (!const_only && key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))})) ? erase_fn(const_cast<void *>(data), key.base().data()) : 0u;
 }
 
 /**
@@ -1897,7 +1897,7 @@ inline meta_associative_container::size_type meta_associative_container::erase(m
  * @return An iterator to the element with the given key, if any.
  */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
-    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) ? find_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, std::as_const(key).data()) : iterator{};
+    return key.allow_cast(meta_type{*ctx, key_type_node(internal::meta_context::from(*ctx))}) ? find_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, key.base().data()) : iterator{};
 }
 
 /**
