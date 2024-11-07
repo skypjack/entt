@@ -1399,7 +1399,7 @@ public:
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(node.details->func, id); elem != nullptr) {
-                if(const auto *candidate = lookup(args, sz, instance && (instance->data() == nullptr), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                if(const auto *candidate = lookup(args, sz, (instance->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
                     return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
                 }
             }
