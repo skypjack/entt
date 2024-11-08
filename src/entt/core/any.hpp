@@ -79,13 +79,11 @@ class basic_any {
             }
             break;
         case operation::move:
-            ENTT_ASSERT(value.owner(), "Unexpected mode");
-
+            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
             if constexpr(in_situ<Type>) {
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
-            } else {
-                return (static_cast<basic_any *>(const_cast<void *>(other))->instance = std::exchange(const_cast<basic_any &>(value).instance, nullptr));
             }
+            break;
         case operation::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
@@ -114,7 +112,11 @@ class basic_any {
                 return (elem == other) ? other : nullptr;
             }
         case operation::get:
-            return elem;
+            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
+            if constexpr(in_situ<Type>) {
+                return elem;
+            }
+            break;
         }
 
         return nullptr;
@@ -216,10 +218,10 @@ public:
           info{other.info},
           vtable{other.vtable},
           mode{other.mode} {
-        if(other.mode == any_policy::ref || other.mode == any_policy::cref) {
-            instance = std::exchange(other.instance, nullptr);
-        } else if(other.vtable) {
+        if(other.mode == any_policy::embedded) {
             other.vtable(operation::move, other, this);
+        } else if(other.mode != any_policy::empty) {
+            instance = std::exchange(other.instance, nullptr);
         }
     }
 
@@ -257,10 +259,10 @@ public:
 
         reset();
 
-        if(other.mode == any_policy::ref || other.mode == any_policy::cref) {
-            instance = std::exchange(other.instance, nullptr);
-        } else if(other.vtable) {
+        if(other.mode == any_policy::embedded) {
             other.vtable(operation::move, other, this);
+        } else if(other.mode != any_policy::empty) {
+            instance = std::exchange(other.instance, nullptr);
         }
 
         info = other.info;
@@ -295,7 +297,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data() const noexcept {
-        return vtable ? vtable(operation::get, *this, nullptr) : nullptr;
+        return (mode == any_policy::embedded) ? vtable(operation::get, *this, nullptr) : instance;
     }
 
     /**
@@ -368,8 +370,7 @@ public:
             vtable(operation::destroy, *this, nullptr);
         }
 
-        // unnecessary but it helps to detect nasty bugs
-        ENTT_ASSERT((instance = nullptr) == nullptr, "");
+        instance = nullptr;
         info = &type_id<void>();
         vtable = nullptr;
         mode = any_policy::empty;
