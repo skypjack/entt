@@ -526,7 +526,7 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_sequence_container() : meta_sequence_container{};
-        proxy || (vtable(internal::meta_traits::is_sequence_container, *ctx, storage.data(), &proxy), true);
+        if(!proxy) { vtable(internal::meta_traits::is_sequence_container, *ctx, storage.data(), &proxy); }
         return proxy;
     }
 
@@ -543,7 +543,7 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_associative_container() : meta_associative_container{};
-        proxy || (vtable(internal::meta_traits::is_associative_container, *ctx, storage.data(), &proxy), true);
+        if(!proxy) { vtable(internal::meta_traits::is_associative_container, *ctx, storage.data(), &proxy); }
         return proxy;
     }
 
