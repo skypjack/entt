@@ -95,10 +95,7 @@ public:
           pools{value},
           filter{excl},
           index{idx} {
-        if constexpr(storage_view_iterator) {
-            ENTT_ASSERT((pools[0u] == nullptr) || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
-        }
-
+        ENTT_ASSERT(!storage_view_iterator || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
         seek_next();
     }
 
@@ -852,8 +849,7 @@ public:
             const auto it = leading ? leading->find(entt) : iterator{};
             return leading && (static_cast<size_type>(it.index()) < leading->free_list()) ? it : iterator{};
         } else {
-            const auto it = leading ? leading->find(entt) : typename common_type::iterator{};
-            return iterator{it, {leading}, {}, 0u};
+            return leading ? iterator{leading->find(entt), {leading}, {}, 0u} : iterator{};
         }
     }
 

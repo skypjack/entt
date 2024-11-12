@@ -34,7 +34,8 @@ TODO:
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
 * after removing meta prop vectors, copy meta objects in their handles directly
 * suppress -Wself-move on CI with g++13
-* view and view iterator specializations for multi, single and filtered elements
+* view specializations for multi, single and filtered elements
+* view iterator specialization for single non-in-place storage (exclude only, no tombstone check required)
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
 * refine the storage fallback mechanism for views (ie alloc?)
