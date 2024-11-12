@@ -304,11 +304,11 @@ private:
     }
 
     void swap_or_move([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) override {
-        static constexpr bool is_pinned_type_v = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
+        static constexpr bool is_pinned_type = !(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>);
         // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
-        ENTT_ASSERT((from + 1u) && !is_pinned_type_v, "Pinned type");
+        ENTT_ASSERT((from + 1u) && !is_pinned_type, "Pinned type");
 
-        if constexpr(!is_pinned_type_v) {
+        if constexpr(!is_pinned_type) {
             auto &elem = element_at(from);
 
             if constexpr(traits_type::in_place_delete) {
