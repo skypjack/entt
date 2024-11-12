@@ -61,10 +61,16 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 
+    static constexpr bool storage_view_iterator = (Get == 1u && Exclude == 0u);
+
     [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
-        return ((Get != 1u) || (entt != tombstone))
-               && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
-               && internal::none_of(filter.begin(), filter.end(), entt);
+        if constexpr(storage_view_iterator) {
+            return (entt != tombstone);
+        } else {
+            return ((Get != 1u) || (entt != tombstone))
+                   && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
+                   && internal::none_of(filter.begin(), filter.end(), entt);
+        }
     }
 
     void seek_next() {
@@ -89,6 +95,10 @@ public:
           pools{value},
           filter{excl},
           index{idx} {
+        if constexpr(storage_view_iterator) {
+            ENTT_ASSERT((pools[0u] == nullptr) || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
+        }
+
         seek_next();
     }
 
