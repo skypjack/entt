@@ -20,7 +20,9 @@ enum class deletion_policy : std::uint8_t {
     /*! @brief In-place deletion policy. */
     in_place = 1u,
     /*! @brief Swap-only deletion policy. */
-    swap_only = 2u
+    swap_only = 2u,
+    /*! @brief Unspecified deletion policy. */
+    unspecified = swap_and_pop
 };
 
 template<typename Entity = entity, typename = std::allocator<Entity>>
