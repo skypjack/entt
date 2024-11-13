@@ -56,7 +56,7 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
     return elem;
 }
 
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
     friend class extended_view_iterator;
@@ -64,16 +64,10 @@ class view_iterator final {
     using iterator_type = typename Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 
-    static constexpr bool storage_view_iterator = (Get == 1u && Exclude == 0u);
-
     [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
-        if constexpr(storage_view_iterator) {
-            return (entt != tombstone);
-        } else {
-            return ((Get != 1u) || (entt != tombstone))
-                   && internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)
-                   && internal::none_of(filter.begin(), filter.end(), entt);
-        }
+        return (!Checked || (entt != tombstone))
+               && ((Get == 1u) || internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt))
+               && ((Exclude == 0u) || internal::none_of(filter.begin(), filter.end(), entt));
     }
 
     void seek_next() {
@@ -98,7 +92,7 @@ public:
           pools{value},
           filter{excl},
           index{idx} {
-        ENTT_ASSERT(!storage_view_iterator || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
+        ENTT_ASSERT((Get != 1u) || (Exclude != 0u) || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
         seek_next();
     }
 
@@ -229,10 +223,11 @@ class basic_view;
  * @brief Basic storage view implementation.
  * @warning For internal use only, backward compatibility not guaranteed.
  * @tparam Type Common type among all storage types.
+ * @tparam Checked True to enable the tombstone check, false otherwise.
  * @tparam Get Number of storage iterated by the view.
  * @tparam Exclude Number of storage used to filter the view.
  */
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
 class basic_common_view {
     static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Unexpected type");
 
@@ -315,7 +310,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Forward iterator type. */
-    using iterator = internal::view_iterator<common_type, Get, Exclude>;
+    using iterator = internal::view_iterator<common_type, Checked, Get, Exclude>;
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
@@ -438,8 +433,8 @@ private:
  */
 template<typename... Get, typename... Exclude>
 class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) != 0u)>>
-    : public basic_common_view<std::common_type_t<typename Get::base_type...>, sizeof...(Get), sizeof...(Exclude)> {
-    using base_type = basic_common_view<std::common_type_t<typename Get::base_type...>, sizeof...(Get), sizeof...(Exclude)>;
+    : public basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
+    using base_type = basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
 
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
@@ -685,7 +680,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = std::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, 1u, 0u>, typename common_type::iterator>;
+    using iterator = std::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, true, 1u, 0u>, typename common_type::iterator>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::conditional_t<Policy == deletion_policy::in_place, void, typename common_type::reverse_iterator>;
 
