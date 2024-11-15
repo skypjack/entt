@@ -66,7 +66,7 @@ class view_iterator final {
 
     [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
         return (!Checked || (entt != tombstone))
-               && ((Get == 1u) || internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt))
+               && ((Get == 1u) || (internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)))
                && ((Exclude == 0u) || internal::none_of(filter.begin(), filter.end(), entt));
     }
 
