@@ -534,6 +534,40 @@ ENTT_DEBUG_TYPED_TEST(ReactiveMixinDeathTest, View) {
     ASSERT_DEATH([[maybe_unused]] const auto cview = std::as_const(pool).view(), "");
 }
 
+TYPED_TEST(ReactiveMixin, AutoDisconnection) {
+    using value_type = typename TestFixture::type;
+
+    entt::registry registry;
+    entt::reactive_mixin<entt::storage<value_type>> pool;
+    const std::array entity{registry.create(), registry.create(), registry.create()};
+
+    ASSERT_TRUE(pool.empty());
+
+    ASSERT_TRUE(registry.on_construct<test::empty>().empty());
+    ASSERT_TRUE(registry.on_update<test::empty>().empty());
+    ASSERT_TRUE(registry.on_destroy<test::empty>().empty());
+
+    pool.bind(registry);
+    pool.template on_construct<test::empty>();
+    pool.template on_update<test::empty>();
+    pool.template on_destroy<test::empty>();
+    registry.emplace<test::empty>(entity[0u]);
+
+    ASSERT_FALSE(pool.empty());
+
+    ASSERT_FALSE(registry.on_construct<test::empty>().empty());
+    ASSERT_FALSE(registry.on_update<test::empty>().empty());
+    ASSERT_FALSE(registry.on_destroy<test::empty>().empty());
+
+    pool.reset();
+
+    ASSERT_FALSE(pool.empty());
+
+    ASSERT_TRUE(registry.on_construct<test::empty>().empty());
+    ASSERT_TRUE(registry.on_update<test::empty>().empty());
+    ASSERT_TRUE(registry.on_destroy<test::empty>().empty());
+}
+
 TYPED_TEST(ReactiveMixin, CustomAllocator) {
     using value_type = typename TestFixture::type;
     using storage_type = entt::reactive_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;

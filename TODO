@@ -44,3 +44,4 @@ TODO:
 * dtor, traits and custom should be part of meta descriptor maybe (?)
 * allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
+* avoid specializations of sigh_type in basic_sigh_mixin due to alloc type

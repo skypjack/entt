@@ -390,7 +390,9 @@ class basic_reactive_mixin final: public Type {
     using underlying_type = Type;
     using owner_type = Registry;
 
+    using alloc_traits = std::allocator_traits<typename underlying_type::allocator_type>;
     using basic_registry_type = basic_registry<typename owner_type::entity_type, typename owner_type::allocator_type>;
+    using container_type = std::vector<connection, typename alloc_traits::template rebind_alloc<connection>>;
 
     static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
 
@@ -429,7 +431,8 @@ public:
      */
     explicit basic_reactive_mixin(const allocator_type &allocator)
         : underlying_type{allocator},
-          owner{} {
+          owner{},
+          conn{allocator} {
     }
 
     /*! @brief Default copy constructor, deleted on purpose. */
@@ -441,7 +444,9 @@ public:
      */
     basic_reactive_mixin(basic_reactive_mixin &&other) noexcept
         : underlying_type{std::move(other)},
-          owner{other.owner} {}
+          owner{other.owner},
+          conn{} {
+    }
 
     /**
      * @brief Allocator-extended move constructor.
@@ -450,7 +455,9 @@ public:
      */
     basic_reactive_mixin(basic_reactive_mixin &&other, const allocator_type &allocator)
         : underlying_type{std::move(other), allocator},
-          owner{other.owner} {}
+          owner{other.owner},
+          conn{allocator} {
+    }
 
     /*! @brief Default destructor. */
     ~basic_reactive_mixin() override = default;
@@ -467,18 +474,8 @@ public:
      * @return This mixin.
      */
     basic_reactive_mixin &operator=(basic_reactive_mixin &&other) noexcept {
-        swap(other);
-        return *this;
-    }
-
-    /**
-     * @brief Exchanges the contents with those of a given storage.
-     * @param other Storage to exchange the content with.
-     */
-    void swap(basic_reactive_mixin &other) noexcept {
-        using std::swap;
-        swap(owner, other.owner);
         underlying_type::swap(other);
+        return *this;
     }
 
     /**
@@ -490,7 +487,8 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_construct(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().template storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
+        auto curr = owner_or_assert().template storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
+        conn.push_back(std::move(curr));
         return *this;
     }
 
@@ -503,7 +501,8 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_update(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().template storage<Clazz>(id).on_update().template connect<Candidate>(*this);
+        auto curr = owner_or_assert().template storage<Clazz>(id).on_update().template connect<Candidate>(*this);
+        conn.push_back(std::move(curr));
         return *this;
     }
 
@@ -516,7 +515,8 @@ public:
      */
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_destroy(const id_type id = type_hash<Clazz>::value()) {
-        owner_or_assert().template storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
+        auto curr = owner_or_assert().template storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
+        conn.push_back(std::move(curr));
         return *this;
     }
 
@@ -564,8 +564,17 @@ public:
         return {*this, parent.template storage<std::remove_const_t<Get>>()..., parent.template storage<std::remove_const_t<Exclude>>()...};
     }
 
+    void reset() {
+        for(auto &&curr: conn) {
+            curr.release();
+        }
+
+        conn.clear();
+    }
+
 private:
     basic_registry_type *owner;
+    container_type conn;
 };
 
 } // namespace entt
