@@ -98,7 +98,7 @@ class basic_any {
             break;
         case operation::destroy:
             if constexpr(in_situ<Type>) {
-                elem->~Type();
+                (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
             } else if constexpr(std::is_array_v<Type>) {
                 delete[] elem;
             } else {
