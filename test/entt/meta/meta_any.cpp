@@ -116,6 +116,25 @@ struct MetaAny: ::testing::Test {
 
 using MetaAnyDeathTest = MetaAny;
 
+TEST_F(MetaAny, Empty) {
+    entt::meta_any any{};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.type());
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_EQ(any, entt::meta_any{});
+    ASSERT_NE(entt::meta_any{'c'}, any);
+
+    ASSERT_FALSE(any.as_ref());
+    ASSERT_FALSE(any.as_sequence_container());
+    ASSERT_FALSE(any.as_associative_container());
+
+    ASSERT_FALSE(std::as_const(any).as_ref());
+    ASSERT_FALSE(std::as_const(any).as_sequence_container());
+    ASSERT_FALSE(std::as_const(any).as_associative_container());
+}
+
 TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 
@@ -141,25 +160,6 @@ TEST_F(MetaAny, NoSBO) {
     ASSERT_NE(any.data(), nullptr);
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(any, fat{});
-}
-
-TEST_F(MetaAny, Empty) {
-    entt::meta_any any{};
-
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.type());
-    ASSERT_FALSE(any.try_cast<std::size_t>());
-    ASSERT_EQ(any.base().data(), nullptr);
-    ASSERT_EQ(any, entt::meta_any{});
-    ASSERT_NE(entt::meta_any{'c'}, any);
-
-    ASSERT_FALSE(any.as_ref());
-    ASSERT_FALSE(any.as_sequence_container());
-    ASSERT_FALSE(any.as_associative_container());
-
-    ASSERT_FALSE(std::as_const(any).as_ref());
-    ASSERT_FALSE(std::as_const(any).as_sequence_container());
-    ASSERT_FALSE(std::as_const(any).as_associative_container());
 }
 
 TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
