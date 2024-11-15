@@ -67,7 +67,7 @@ class basic_any {
         const Type *elem = nullptr;
 
         if constexpr(in_situ<Type>) {
-            elem = value.owner() ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
+            elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
         } else {
             elem = static_cast<const Type *>(value.instance);
         }
