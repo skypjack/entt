@@ -190,6 +190,22 @@ public:
     }
 
     /**
+     * @brief Constructs a wrapper taking ownership of the passed object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value A pointer to an object to take ownership of.
+     */
+    template<typename Type, typename = std::enable_if_t<!std::is_void_v<std::remove_const_t<Type>>>>
+    explicit basic_any(std::in_place_t, Type *value)
+        : instance{value},
+          info{&type_id<std::remove_const_t<Type>>()},
+          vtable{basic_vtable<std::remove_const_t<Type>>},
+          mode{any_policy::dynamic} {
+        if(instance == nullptr) {
+            reset();
+        }
+    }
+
+    /**
      * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.

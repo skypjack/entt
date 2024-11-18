@@ -46,6 +46,17 @@ struct fat {
 
 struct alignas(64u) over_aligned {};
 
+TEST(Any, Empty) {
+    entt::any any{};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(any.data(), nullptr);
+}
+
 TEST(Any, SBO) {
     entt::any any{'c'};
 
@@ -69,15 +80,35 @@ TEST(Any, NoSBO) {
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 }
 
-TEST(Any, Empty) {
-    entt::any any{};
+TEST(Any, SBOInPlaceConstruction) {
+    std::unique_ptr<int> instance = std::make_unique<int>(2);
+    entt::any any{std::in_place, instance.release()};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::dynamic);
+    ASSERT_EQ(any.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<int>(any), 2);
+
+    auto other = any.as_ref();
+
+    ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
+    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_EQ(other.type(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<int>(other), 2);
+    ASSERT_EQ(other.data(), any.data());
+}
+
+TEST(Any, SBOInPlaceNullptrConstruction) {
+    int *instance = nullptr;
+    entt::any any{std::in_place, instance};
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::any_policy::empty);
     ASSERT_EQ(any.type(), entt::type_id<void>());
-    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
-    ASSERT_EQ(any.data(), nullptr);
 }
 
 TEST(Any, SBOInPlaceTypeConstruction) {
@@ -359,6 +390,37 @@ TEST(Any, SBOAsConstRefTransferValue) {
     ASSERT_FALSE(any.assign('c'));
     ASSERT_EQ(entt::any_cast<int>(any), 2);
     ASSERT_EQ(value, 2);
+}
+
+TEST(Any, NoSBOInPlaceConstruction) {
+    std::unique_ptr<fat> instance = std::make_unique<fat>(.1, .2, .3, .4);
+    entt::any any{std::in_place, instance.release()};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::dynamic);
+    ASSERT_EQ(any.type(), entt::type_id<fat>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(entt::any_cast<fat>(any), (fat{.1, .2, .3, .4}));
+
+    auto other = any.as_ref();
+
+    ASSERT_TRUE(other);
+    ASSERT_FALSE(other.owner());
+    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_EQ(other.type(), entt::type_id<fat>());
+    ASSERT_EQ(entt::any_cast<fat>(other), (fat{.1, .2, .3, .4}));
+    ASSERT_EQ(other.data(), any.data());
+}
+
+TEST(Any, NoSBOInPlaceNullptrConstruction) {
+    fat *instance = nullptr;
+    entt::any any{std::in_place, instance};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::type_id<void>());
 }
 
 TEST(Any, NoSBOInPlaceTypeConstruction) {
