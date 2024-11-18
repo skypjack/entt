@@ -68,18 +68,21 @@ entt::any empty{};
 // a container for an int
 entt::any any{0};
 
-// in place construction
-entt::any in_place{std::in_place_type<int>, 42};
+// in place type construction
+entt::any in_place_type{std::in_place_type<int>, 42};
+
+// take ownership of already existing, dynamically allocated objects
+entt::any in_place{std::in_place, std::make_unique<int>(42).release()};
 ```
 
-Alternatively, the `make_any` function serves the same purpose but requires to
-always be explicit about the type:
+Alternatively, the `make_any` function serves the same purpose. It requires to
+always be explicit about the type and doesn't support taking ownership:
 
 ```cpp
 entt::any any = entt::make_any<int>(42);
 ```
 
-In both cases, the `any` class takes the burden of destroying the contained
+In all cases, the `any` class takes the burden of destroying the contained
 element when required, regardless of the storage strategy used for the specific
 object.<br/>
 Furthermore, an instance of `any` isn't tied to an actual type. Therefore, the
