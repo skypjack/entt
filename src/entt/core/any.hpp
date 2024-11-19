@@ -182,10 +182,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
-        : instance{},
-          info{},
-          vtable{},
-          mode{any_policy::empty} {
+        : instance{} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -196,12 +193,10 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_void_v<std::remove_const_t<Type>>>>
     explicit basic_any(std::in_place_t, Type *value)
-        : instance{value},
-          info{&type_id<std::remove_const_t<Type>>()},
-          vtable{basic_vtable<std::remove_const_t<Type>>},
-          mode{any_policy::dynamic} {
-        if(instance == nullptr) {
-            reset();
+        : instance{value} {
+        if(instance != nullptr) {
+            initialize<Type &>(*value);
+            mode = any_policy::dynamic;
         }
     }
 
@@ -456,9 +451,9 @@ private:
         const void *instance;
         storage_type storage;
     };
-    const type_info *info;
-    vtable_type *vtable;
-    any_policy mode;
+    const type_info *info{&type_id<void>()};
+    vtable_type *vtable{};
+    any_policy mode{any_policy::empty};
 };
 
 /**
