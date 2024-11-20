@@ -191,7 +191,7 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value A pointer to an object to take ownership of.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_void_v<std::remove_const_t<Type>>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
     explicit basic_any(std::in_place_t, Type *value)
         : instance{value} {
         if(instance != nullptr) {
