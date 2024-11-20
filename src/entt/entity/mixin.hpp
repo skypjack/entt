@@ -564,6 +564,7 @@ public:
         return {*this, parent.template storage<std::remove_const_t<Get>>()..., parent.template storage<std::remove_const_t<Exclude>>()...};
     }
 
+    /*! @brief Releases all connections to the underlying registry, if any. */
     void reset() {
         for(auto &&curr: conn) {
             curr.release();
