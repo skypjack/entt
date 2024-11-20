@@ -116,7 +116,6 @@ class basic_any {
             if constexpr(in_situ<Type>) {
                 return elem;
             }
-            [[fallthrough]];
         }
 
         return nullptr;
