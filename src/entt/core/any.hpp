@@ -17,12 +17,12 @@ namespace entt {
 namespace internal {
 
 enum class any_operation : std::uint8_t {
-    copy,
-    move,
     transfer,
     assign,
     destroy,
     compare,
+    copy,
+    move,
     get
 };
 
@@ -73,17 +73,6 @@ class basic_any {
         }
 
         switch(op) {
-        case operation::copy:
-            if constexpr(std::is_copy_constructible_v<Type>) {
-                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
-            }
-            break;
-        case operation::move:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
-            if constexpr(in_situ<Type>) {
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
-            }
-            break;
         case operation::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
@@ -111,12 +100,23 @@ class basic_any {
             } else {
                 return (elem == other) ? other : nullptr;
             }
+        case operation::copy:
+            if constexpr(std::is_copy_constructible_v<Type>) {
+                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
+            }
+            break;
+        case operation::move:
+            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
+            if constexpr(in_situ<Type>) {
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
+            }
+            [[fallthrough]];
         case operation::get:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
             if constexpr(in_situ<Type>) {
                 return elem;
             }
-            break;
+            [[fallthrough]];
         }
 
         return nullptr;
