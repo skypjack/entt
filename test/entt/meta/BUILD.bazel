@@ -12,6 +12,7 @@ _TESTS = [
     "meta_custom",
     "meta_data",
     "meta_dtor",
+    "meta_factory",
     "meta_func",
     "meta_handle",
     "meta_pointer",
