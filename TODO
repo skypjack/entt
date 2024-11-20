@@ -42,5 +42,5 @@ TODO:
 * dtor, traits and custom should be part of meta descriptor maybe (?)
 * allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
-* meta_factory() isn't tested (and is broken too)
 * meta_any ownership construction and from_void
+* meta_factory() isn't fully tested yet

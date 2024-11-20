@@ -172,7 +172,7 @@ class meta_factory: private internal::basic_meta_factory {
 public:
     /*! @brief Default constructor. */
     meta_factory() noexcept
-        : internal::basic_meta_factory{type_id<Type>(), locator<meta_ctx>::value_or()} {}
+        : internal::basic_meta_factory{type_id<Type>().hash(), locator<meta_ctx>::value_or()} {}
 
     /**
      * @brief Context aware constructor.
