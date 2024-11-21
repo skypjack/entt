@@ -5,7 +5,15 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-TEST(MetaFactory, Constructors) {
+struct MetaFactory: ::testing::Test {
+    void TearDown() override {
+        entt::meta_reset();
+    }
+};
+
+using MetaFactoryDeathTest = MetaFactory;
+
+TEST_F(MetaFactory, Constructors) {
     entt::meta_ctx ctx{};
 
     ASSERT_EQ(entt::resolve(entt::type_id<int>()), entt::meta_type{});
