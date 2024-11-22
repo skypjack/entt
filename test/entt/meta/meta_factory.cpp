@@ -63,24 +63,27 @@ TEST_F(MetaFactory, Constructors) {
 TEST_F(MetaFactory, Type) {
     using namespace entt::literals;
 
-    entt::meta_factory<int> factory{};
+    auto factory = entt::meta<int>();
 
-    ASSERT_EQ(entt::resolve<int>().id(), entt::id_type{});
+    ASSERT_EQ(entt::resolve("foo"_hs), entt::meta_type{});
 
     factory.type("foo"_hs);
 
+    ASSERT_NE(entt::resolve("foo"_hs), entt::meta_type{});
     ASSERT_EQ(entt::resolve<int>().id(), "foo"_hs);
 
     factory.type("bar"_hs);
 
+    ASSERT_EQ(entt::resolve("foo"_hs), entt::meta_type{});
+    ASSERT_NE(entt::resolve("bar"_hs), entt::meta_type{});
     ASSERT_EQ(entt::resolve<int>().id(), "bar"_hs);
 }
 
 ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
     using namespace entt::literals;
 
-    entt::meta_factory<int> factory{};
-    entt::meta_factory<double> other{};
+    auto factory = entt::meta<int>();
+    auto other = entt::meta<double>();
 
     factory.type("foo"_hs);
 
@@ -88,7 +91,7 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
 }
 
 TEST_F(MetaFactory, Base) {
-    entt::meta_factory<clazz> factory{};
+    auto factory = entt::meta<clazz>();
     decltype(std::declval<entt::meta_type>().base()) range{};
 
     ASSERT_NE(entt::resolve(entt::type_id<clazz>()), entt::meta_type{});
@@ -110,7 +113,7 @@ TEST_F(MetaFactory, Base) {
 
 TEST_F(MetaFactory, Conv) {
     clazz instance{3};
-    entt::meta_factory<clazz> factory{};
+    auto factory = entt::meta<clazz>();
     const entt::meta_any any = entt::forward_as_meta(instance);
 
     ASSERT_FALSE(any.allow_cast<int>());
