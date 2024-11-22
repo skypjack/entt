@@ -1,4 +1,5 @@
 #include <iterator>
+#include <string>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
@@ -12,8 +13,21 @@
 struct base {
 };
 
-struct derived: base {
+struct clazz: base {
+    clazz(int val)
+        : value{val} {}
+
+    explicit operator int() const noexcept {
+        return value;
+    }
+
+private:
+    int value{};
 };
+
+std::string clazz_to_string(const clazz &instance) {
+    return std::to_string(static_cast<int>(instance));
+}
 
 struct MetaFactory: ::testing::Test {
     void TearDown() override {
@@ -74,22 +88,38 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
 }
 
 TEST_F(MetaFactory, Base) {
-    entt::meta_factory<derived> factory{};
+    entt::meta_factory<clazz> factory{};
     decltype(std::declval<entt::meta_type>().base()) range{};
 
-    ASSERT_NE(entt::resolve(entt::type_id<derived>()), entt::meta_type{});
+    ASSERT_NE(entt::resolve(entt::type_id<clazz>()), entt::meta_type{});
     ASSERT_EQ(entt::resolve(entt::type_id<base>()), entt::meta_type{});
 
-    range = entt::resolve<derived>().base();
+    range = entt::resolve<clazz>().base();
 
     ASSERT_EQ(range.begin(), range.end());
 
     factory.base<base>();
-    range = entt::resolve<derived>().base();
+    range = entt::resolve<clazz>().base();
 
     ASSERT_EQ(entt::resolve(entt::type_id<base>()), entt::meta_type{});
     ASSERT_NE(range.begin(), range.end());
     ASSERT_EQ(std::distance(range.begin(), range.end()), 1);
     ASSERT_EQ(range.begin()->first, entt::type_id<base>().hash());
     ASSERT_EQ(range.begin()->second.info(), entt::type_id<base>());
+}
+
+TEST_F(MetaFactory, Conv) {
+    clazz instance{3};
+    entt::meta_factory<clazz> factory{};
+    const entt::meta_any any = entt::forward_as_meta(instance);
+
+    ASSERT_FALSE(any.allow_cast<int>());
+    ASSERT_FALSE(any.allow_cast<std::string>());
+
+    factory.conv<int>().conv<&clazz_to_string>();
+
+    ASSERT_TRUE(any.allow_cast<int>());
+    ASSERT_TRUE(any.allow_cast<std::string>());
+    ASSERT_EQ(any.allow_cast<int>().cast<int>(), static_cast<int>(instance));
+    ASSERT_EQ(any.allow_cast<std::string>().cast<std::string>(), clazz_to_string(instance));
 }
