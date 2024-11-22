@@ -29,6 +29,10 @@ std::string clazz_to_string(const clazz &instance) {
     return std::to_string(static_cast<int>(instance));
 }
 
+clazz string_to_clazz(const std::string &value) {
+    return clazz{std::stoi(value)};
+}
+
 struct MetaFactory: ::testing::Test {
     void TearDown() override {
         entt::meta_reset();
@@ -125,4 +129,24 @@ TEST_F(MetaFactory, Conv) {
     ASSERT_TRUE(any.allow_cast<std::string>());
     ASSERT_EQ(any.allow_cast<int>().cast<int>(), static_cast<int>(instance));
     ASSERT_EQ(any.allow_cast<std::string>().cast<std::string>(), clazz_to_string(instance));
+}
+
+TEST_F(MetaFactory, Ctor) {
+    const int values[]{1, 3};
+    auto factory = entt::meta<clazz>();
+
+    ASSERT_FALSE(entt::resolve<clazz>().construct(values[0u]));
+    ASSERT_FALSE(entt::resolve<clazz>().construct(std::to_string(values[1u])));
+
+    factory.ctor<int>().ctor<&string_to_clazz>();
+
+    const auto instance = entt::resolve<clazz>().construct(values[0u]);
+    const auto other = entt::resolve<clazz>().construct(std::to_string(values[1u]));
+
+    ASSERT_TRUE(instance);
+    ASSERT_TRUE(other);
+    ASSERT_TRUE(instance.allow_cast<clazz>());
+    ASSERT_TRUE(other.allow_cast<clazz>());
+    ASSERT_EQ(static_cast<int>(instance.cast<const clazz &>()), values[0u]);
+    ASSERT_EQ(static_cast<int>(other.cast<const clazz &>()), values[1u]);
 }
