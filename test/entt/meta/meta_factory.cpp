@@ -9,8 +9,10 @@
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
+#include "../../common/meta_traits.h"
 
 struct base {
+    char member{};
 };
 
 struct clazz: base {
@@ -23,6 +25,18 @@ struct clazz: base {
 
 private:
     int value{};
+};
+
+struct dtor_callback {
+    dtor_callback(bool &ref)
+        : cb{&ref} {}
+
+    static void on_destroy(dtor_callback &instance) {
+        *instance.cb = !*instance.cb;
+    }
+
+private:
+    bool *cb;
 };
 
 std::string clazz_to_string(const clazz &instance) {
@@ -149,4 +163,44 @@ TEST_F(MetaFactory, Ctor) {
     ASSERT_TRUE(other.allow_cast<clazz>());
     ASSERT_EQ(static_cast<int>(instance.cast<const clazz &>()), values[0u]);
     ASSERT_EQ(static_cast<int>(other.cast<const clazz &>()), values[1u]);
+}
+
+TEST_F(MetaFactory, Dtor) {
+    bool check = false;
+    auto factory = entt::meta<dtor_callback>();
+    entt::meta_any any{std::in_place_type<dtor_callback>, check};
+
+    any.reset();
+
+    ASSERT_FALSE(check);
+
+    factory.dtor<&dtor_callback::on_destroy>();
+    any.emplace<dtor_callback>(check);
+    any.reset();
+
+    ASSERT_TRUE(check);
+}
+
+TEST_F(MetaFactory, Data) {
+    // TODO
+}
+
+TEST_F(MetaFactory, Func) {
+    // TODO
+}
+
+TEST_F(MetaFactory, Traits) {
+    // TODO
+}
+
+TEST_F(MetaFactory, Custom) {
+    // TODO
+}
+
+TEST_F(MetaFactory, Meta) {
+    // TODO
+}
+
+TEST_F(MetaFactory, MetaReset) {
+    // TODO
 }
