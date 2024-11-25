@@ -181,7 +181,39 @@ TEST_F(MetaFactory, Dtor) {
     ASSERT_TRUE(check);
 }
 
-TEST_F(MetaFactory, Data) {
+TEST_F(MetaFactory, DataMemberObject) {
+    // TODO
+}
+
+TEST_F(MetaFactory, DataPointer) {
+    // TODO
+}
+
+TEST_F(MetaFactory, DataValue) {
+    using namespace entt::literals;
+    constexpr int value = 1;
+
+    auto factory = entt::meta<int>();
+    entt::meta_type type = entt::resolve<int>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    factory.data<value>("value"_hs);
+    type = entt::resolve<int>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ(type.get("value"_hs, {}), value);
+}
+
+TEST_F(MetaFactory, DataReadOnly) {
+    // TODO
+}
+
+TEST_F(MetaFactory, DataSetterGetter) {
+    // TODO
+}
+
+TEST_F(MetaFactory, DataMultiSetterGetter) {
     // TODO
 }
 
