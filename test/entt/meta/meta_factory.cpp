@@ -8,6 +8,7 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
+#include "../../common/boxed_type.h"
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
 
@@ -20,7 +21,27 @@ struct clazz: base {
         : value{val} {}
 
     explicit operator int() const noexcept {
+        return get_int();
+    }
+
+    void set_int(int val) noexcept {
+        value = val;
+    }
+
+    void set_boxed_int(test::boxed_int val) noexcept {
+        value = val.value;
+    }
+
+    int get_int() const noexcept {
         return value;
+    }
+
+    static std::string to_string(const clazz &instance) {
+        return std::to_string(instance.get_int());
+    }
+
+    static clazz from_string(const std::string &value) {
+        return clazz{std::stoi(value)};
     }
 
 private:
@@ -38,14 +59,6 @@ struct dtor_callback {
 private:
     bool *cb;
 };
-
-std::string clazz_to_string(const clazz &instance) {
-    return std::to_string(static_cast<int>(instance));
-}
-
-clazz string_to_clazz(const std::string &value) {
-    return clazz{std::stoi(value)};
-}
 
 struct MetaFactory: ::testing::Test {
     void TearDown() override {
@@ -137,12 +150,12 @@ TEST_F(MetaFactory, Conv) {
     ASSERT_FALSE(any.allow_cast<int>());
     ASSERT_FALSE(any.allow_cast<std::string>());
 
-    factory.conv<int>().conv<&clazz_to_string>();
+    factory.conv<int>().conv<&clazz::to_string>();
 
     ASSERT_TRUE(any.allow_cast<int>());
     ASSERT_TRUE(any.allow_cast<std::string>());
-    ASSERT_EQ(any.allow_cast<int>().cast<int>(), static_cast<int>(instance));
-    ASSERT_EQ(any.allow_cast<std::string>().cast<std::string>(), clazz_to_string(instance));
+    ASSERT_EQ(any.allow_cast<int>().cast<int>(), instance.get_int());
+    ASSERT_EQ(any.allow_cast<std::string>().cast<std::string>(), clazz::to_string(instance));
 }
 
 TEST_F(MetaFactory, Ctor) {
@@ -152,7 +165,7 @@ TEST_F(MetaFactory, Ctor) {
     ASSERT_FALSE(entt::resolve<clazz>().construct(values[0u]));
     ASSERT_FALSE(entt::resolve<clazz>().construct(std::to_string(values[1u])));
 
-    factory.ctor<int>().ctor<&string_to_clazz>();
+    factory.ctor<int>().ctor<&clazz::from_string>();
 
     const auto instance = entt::resolve<clazz>().construct(values[0u]);
     const auto other = entt::resolve<clazz>().construct(std::to_string(values[1u]));
@@ -161,8 +174,8 @@ TEST_F(MetaFactory, Ctor) {
     ASSERT_TRUE(other);
     ASSERT_TRUE(instance.allow_cast<clazz>());
     ASSERT_TRUE(other.allow_cast<clazz>());
-    ASSERT_EQ(static_cast<int>(instance.cast<const clazz &>()), values[0u]);
-    ASSERT_EQ(static_cast<int>(other.cast<const clazz &>()), values[1u]);
+    ASSERT_EQ(instance.cast<const clazz &>().get_int(), values[0u]);
+    ASSERT_EQ(other.cast<const clazz &>().get_int(), values[1u]);
 }
 
 TEST_F(MetaFactory, Dtor) {
@@ -182,17 +195,45 @@ TEST_F(MetaFactory, Dtor) {
 }
 
 TEST_F(MetaFactory, DataMemberObject) {
-    // TODO
+    using namespace entt::literals;
+
+    base instance{'c'};
+    auto factory = entt::meta<base>();
+    entt::meta_type type = entt::resolve<base>();
+
+    ASSERT_FALSE(type.data("member"_hs));
+
+    factory.data<&base::member>("member"_hs);
+    type = entt::resolve<base>();
+
+    ASSERT_TRUE(type.data("member"_hs));
+    ASSERT_EQ(type.get("member"_hs, std::as_const(instance)), instance.member);
+    ASSERT_EQ(type.get("member"_hs, instance), instance.member);
+    ASSERT_FALSE(type.set("member"_hs, std::as_const(instance), instance.member));
+    ASSERT_TRUE(type.set("member"_hs, instance, instance.member));
 }
 
 TEST_F(MetaFactory, DataPointer) {
-    // TODO
+    using namespace entt::literals;
+
+    auto factory = entt::meta<int>();
+    entt::meta_type type = entt::resolve<int>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    static int value = 1;
+    factory.data<&value>("value"_hs);
+    type = entt::resolve<int>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ(type.get("value"_hs, {}), value);
+    ASSERT_TRUE(type.set("value"_hs, {}, value));
 }
 
 TEST_F(MetaFactory, DataValue) {
     using namespace entt::literals;
-    constexpr int value = 1;
 
+    constexpr int value = 1;
     auto factory = entt::meta<int>();
     entt::meta_type type = entt::resolve<int>();
 
@@ -203,21 +244,99 @@ TEST_F(MetaFactory, DataValue) {
 
     ASSERT_TRUE(type.data("value"_hs));
     ASSERT_EQ(type.get("value"_hs, {}), value);
+    ASSERT_FALSE(type.set("value"_hs, {}, value));
 }
 
-TEST_F(MetaFactory, DataReadOnly) {
-    // TODO
+TEST_F(MetaFactory, DataGetterOnly) {
+    using namespace entt::literals;
+
+    clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    factory.data<nullptr, &clazz::get_int>("value"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ(type.get("value"_hs, std::as_const(instance)), instance.get_int());
+    ASSERT_EQ(type.get("value"_hs, instance), instance.get_int());
+    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), instance.get_int()));
+    ASSERT_FALSE(type.set("value"_hs, instance, instance.get_int()));
 }
 
 TEST_F(MetaFactory, DataSetterGetter) {
-    // TODO
+    using namespace entt::literals;
+
+    clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    factory.data<&clazz::set_int, &clazz::get_int>("value"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ(type.get("value"_hs, std::as_const(instance)), instance.get_int());
+    ASSERT_EQ(type.get("value"_hs, instance), instance.get_int());
+    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), instance.get_int()));
+    ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
 }
 
 TEST_F(MetaFactory, DataMultiSetterGetter) {
-    // TODO
+    using namespace entt::literals;
+
+    clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    factory.data<entt::value_list<&clazz::set_int, &clazz::set_boxed_int>, &clazz::get_int>("value"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ(type.get("value"_hs, std::as_const(instance)), instance.get_int());
+    ASSERT_EQ(type.get("value"_hs, instance), instance.get_int());
+    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), instance.get_int()));
+    ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
+    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), test::boxed_int{instance.get_int()}));
+    ASSERT_TRUE(type.set("value"_hs, instance, test::boxed_int{instance.get_int()}));
+}
+
+TEST_F(MetaFactory, DataOverwrite) {
+    using namespace entt::literals;
+
+    clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.data("value"_hs));
+
+    factory.data<nullptr, &clazz::get_int>("value"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_TRUE(type.data("value"_hs).is_const());
+
+    factory.data<&clazz::set_int, &clazz::get_int>("value"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_FALSE(type.data("value"_hs).is_const());
 }
 
 TEST_F(MetaFactory, Func) {
+    // TODO
+}
+
+TEST_F(MetaFactory, FuncOverwrite) {
+    // TODO
+}
+
+TEST_F(MetaFactory, FuncOverload) {
     // TODO
 }
 
