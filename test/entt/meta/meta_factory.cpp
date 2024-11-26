@@ -1,3 +1,4 @@
+#include <array>
 #include <iterator>
 #include <string>
 #include <utility>
@@ -159,7 +160,7 @@ TEST_F(MetaFactory, Conv) {
 }
 
 TEST_F(MetaFactory, Ctor) {
-    const int values[]{1, 3};
+    const std::array values{1, 3};
     auto factory = entt::meta<clazz>();
 
     ASSERT_FALSE(entt::resolve<clazz>().construct(values[0u]));
