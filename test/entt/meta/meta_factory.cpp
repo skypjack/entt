@@ -374,7 +374,36 @@ TEST_F(MetaFactory, FuncOverload) {
 }
 
 TEST_F(MetaFactory, Traits) {
-    // TODO
+    using namespace entt::literals;
+
+    entt::meta<clazz>()
+        .data<&base::member>("member"_hs)
+        .func<&clazz::set_int>("func"_hs)
+        .func<&clazz::set_boxed_int>("func"_hs);
+
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(type.data("member"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(type.func("func"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(type.func("func"_hs).next().traits<test::meta_traits>(), test::meta_traits::none);
+
+    entt::meta<clazz>()
+        .traits(test::meta_traits::one | test::meta_traits::three)
+        .data<&base::member>("member"_hs)
+        .traits(test::meta_traits::one)
+        .func<&clazz::set_int>("func"_hs)
+        .traits(test::meta_traits::two)
+        .func<&clazz::set_boxed_int>("func"_hs)
+        .traits(test::meta_traits::three);
+
+    // traits are copied and never refreshed (yet)
+    type = entt::resolve<clazz>();
+
+    ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::three);
+    ASSERT_EQ(type.data("member"_hs).traits<test::meta_traits>(), test::meta_traits::one);
+    ASSERT_EQ(type.func("func"_hs).traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(type.func("func"_hs).next().traits<test::meta_traits>(), test::meta_traits::three);
 }
 
 TEST_F(MetaFactory, Custom) {
