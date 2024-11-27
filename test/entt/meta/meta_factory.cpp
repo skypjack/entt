@@ -144,7 +144,7 @@ TEST_F(MetaFactory, Base) {
 }
 
 TEST_F(MetaFactory, Conv) {
-    clazz instance{3};
+    const clazz instance{3};
     auto factory = entt::meta<clazz>();
     const entt::meta_any any = entt::forward_as_meta(instance);
 
@@ -310,7 +310,6 @@ TEST_F(MetaFactory, DataMultiSetterGetter) {
 TEST_F(MetaFactory, DataOverwrite) {
     using namespace entt::literals;
 
-    clazz instance{1};
     auto factory = entt::meta<clazz>();
     entt::meta_type type = entt::resolve<clazz>();
 
@@ -330,15 +329,48 @@ TEST_F(MetaFactory, DataOverwrite) {
 }
 
 TEST_F(MetaFactory, Func) {
-    // TODO
-}
+    using namespace entt::literals;
 
-TEST_F(MetaFactory, FuncOverwrite) {
-    // TODO
+    const clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.func("func"_hs));
+
+    factory.func<&clazz::get_int>("func"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_TRUE(type.invoke("func"_hs, instance));
+    ASSERT_EQ(type.invoke("func"_hs, instance).cast<int>(), instance.get_int());
+    ASSERT_FALSE(type.invoke("func"_hs, {}));
 }
 
 TEST_F(MetaFactory, FuncOverload) {
-    // TODO
+    using namespace entt::literals;
+
+    clazz instance{1};
+    auto factory = entt::meta<clazz>();
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.func("func"_hs));
+
+    factory.func<&clazz::set_int>("func"_hs);
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_FALSE(type.func("func"_hs).next());
+
+    factory.func<&clazz::set_boxed_int>("func"_hs);
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_TRUE(type.func("func"_hs).next());
+    ASSERT_FALSE(type.func("func"_hs).next().next());
+
+    ASSERT_TRUE(type.invoke("func"_hs, instance, 2));
+    ASSERT_EQ(instance.get_int(), 2);
+
+    ASSERT_TRUE(type.invoke("func"_hs, instance, test::boxed_int{3}));
+    ASSERT_EQ(instance.get_int(), 3);
 }
 
 TEST_F(MetaFactory, Traits) {
