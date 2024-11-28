@@ -459,5 +459,55 @@ TEST_F(MetaFactory, Meta) {
 }
 
 TEST_F(MetaFactory, MetaReset) {
-    // TODO
+    using namespace entt::literals;
+
+    entt::meta_ctx ctx{};
+
+    entt::meta<int>().type("global"_hs);
+    entt::meta<int>(ctx).type("local"_hs);
+
+    ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset();
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset(ctx);
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta<int>().type("global"_hs);
+    entt::meta<int>(ctx).type("local"_hs);
+
+    ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset<int>();
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset<int>(ctx);
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta<int>().type("global"_hs);
+    entt::meta<int>(ctx).type("local"_hs);
+
+    ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset("global"_hs);
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset(ctx, "local"_hs);
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
 }
