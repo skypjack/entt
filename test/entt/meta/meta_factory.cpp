@@ -451,11 +451,11 @@ TEST_F(MetaFactory, Meta) {
     ASSERT_EQ(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
     ASSERT_TRUE(entt::resolve(entt::type_id<int>()).is_integral());
 
-    factory = entt::meta_factory<int>{ctx};
+    factory = entt::meta<int>(ctx);
 
     ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
     ASSERT_NE(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
 }
 
 TEST_F(MetaFactory, MetaReset) {
