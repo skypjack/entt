@@ -397,7 +397,7 @@ TEST_F(MetaFactory, Traits) {
         .func<&clazz::set_boxed_int>("func"_hs)
         .traits(test::meta_traits::three);
 
-    // traits are copied and never refreshed (yet)
+    // traits are copied and never refreshed
     type = entt::resolve<clazz>();
 
     ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::one | test::meta_traits::three);
@@ -407,7 +407,36 @@ TEST_F(MetaFactory, Traits) {
 }
 
 TEST_F(MetaFactory, Custom) {
-    // TODO
+    using namespace entt::literals;
+
+    entt::meta<clazz>()
+        .data<&base::member>("member"_hs)
+        .func<&clazz::set_int>("func"_hs)
+        .func<&clazz::set_boxed_int>("func"_hs);
+
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_EQ(static_cast<const int *>(type.custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(type.data("member"_hs).custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(type.func("func"_hs).custom()), nullptr);
+    ASSERT_EQ(static_cast<const int *>(type.func("func"_hs).next().custom()), nullptr);
+
+    entt::meta<clazz>()
+        .custom<int>(0)
+        .data<&base::member>("member"_hs)
+        .custom<int>(1)
+        .func<&clazz::set_int>("func"_hs)
+        .custom<int>(2)
+        .func<&clazz::set_boxed_int>("func"_hs)
+        .custom<int>(3);
+
+    // custom data pointers are copied and never refreshed
+    type = entt::resolve<clazz>();
+
+    ASSERT_EQ(static_cast<int>(type.custom()), 0);
+    ASSERT_EQ(static_cast<int>(type.data("member"_hs).custom()), 1);
+    ASSERT_EQ(static_cast<int>(type.func("func"_hs).custom()), 2);
+    ASSERT_EQ(static_cast<int>(type.func("func"_hs).next().custom()), 3);
 }
 
 TEST_F(MetaFactory, Meta) {
