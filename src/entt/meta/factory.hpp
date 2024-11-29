@@ -119,17 +119,16 @@ protected:
     }
 
 public:
-    basic_meta_factory(const id_type id, meta_ctx &area)
+    basic_meta_factory(meta_ctx &area, meta_type_node node)
         : ctx{&area},
-          parent{id},
-          bucket{id} {
-        auto &&elem = meta_context::from(*ctx).value[parent];
-
-        if(!elem.details) {
-            elem.details = std::make_shared<meta_type_descriptor>();
+          parent{node.info->hash()},
+          bucket{parent} {
+        if(!node.details) {
+            node.details = std::make_shared<meta_type_descriptor>();
         }
 
-        details = elem.details.get();
+        details = node.details.get();
+        meta_context::from(*ctx).value.try_emplace(parent, std::move(node));
     }
 
 private:
@@ -172,14 +171,14 @@ class meta_factory: private internal::basic_meta_factory {
 public:
     /*! @brief Default constructor. */
     meta_factory() noexcept
-        : internal::basic_meta_factory{type_id<Type>().hash(), locator<meta_ctx>::value_or()} {}
+        : meta_factory{locator<meta_ctx>::value_or()} {}
 
     /**
      * @brief Context aware constructor.
      * @param area The context into which to construct meta types.
      */
     meta_factory(meta_ctx &area) noexcept
-        : internal::basic_meta_factory{type_id<Type>().hash(), area} {}
+        : base_type{area, internal::resolve<Type>(internal::meta_context::from(area))} {}
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
