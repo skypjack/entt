@@ -49,13 +49,13 @@ identifier is required, it's likely that a user defined literal is used as
 follows:
 
 ```cpp
-auto factory = entt::meta<my_type>().type("reflected_type"_hs);
+entt::meta_factory<my_type>{}.type("reflected_type"_hs);
 ```
 
 For what it's worth, this is completely equivalent to:
 
 ```cpp
-auto factory = entt::meta<my_type>().type(42u);
+entt::meta_factory<my_type>{}.type(42u);
 ```
 
 Obviously, human-readable identifiers are more convenient to use and highly
@@ -65,10 +65,10 @@ recommended.
 
 Reflection always starts from actual C++ types. Users cannot reflect _imaginary_
 types.<br/>
-The `meta` function is where it all starts:
+The `meta_factory` class is where it all starts:
 
 ```cpp
-auto factory = entt::meta<my_type>();
+entt::meta_factory<my_type> factory{};
 ```
 
 The returned value is a _factory object_ to use to continue building the meta
@@ -79,7 +79,7 @@ runtime type identification system built-in in `EnTT`.<br/>
 However, it's also possible to assign custom identifiers to meta types:
 
 ```cpp
-auto factory = entt::meta<my_type>().type("reflected_type"_hs);
+entt::meta_factory<my_type>{}.type("reflected_type"_hs);
 ```
 
 Identifiers are used to _retrieve_ meta types at runtime by _name_ other than by
@@ -98,7 +98,7 @@ generally used to create the following:
   function or an actual constructor:
 
   ```cpp
-  entt::meta<my_type>().ctor<int, char>().ctor<&factory>();
+  entt::meta_factory<my_type>{}.ctor<int, char>().ctor<&factory>();
   ```
 
   Meta default constructors are implicitly generated, if possible.
@@ -106,7 +106,7 @@ generally used to create the following:
 * _Destructors_. Both free functions and member functions are valid destructors:
 
   ```cpp
-  entt::meta<my_type>().dtor<&destroy>();
+  entt::meta_factory<my_type>{}.dtor<&destroy>();
   ```
 
   The purpose is to offer the possibility to free up resources that require
@@ -120,7 +120,7 @@ generally used to create the following:
   type appear as if they were part of the type itself:
 
   ```cpp
-  entt::meta<my_type>()
+  entt::meta_factory<my_type>{}
       .data<&my_type::static_variable>("static"_hs)
       .data<&my_type::data_member>("member"_hs)
       .data<&global_variable>("global"_hs);
@@ -133,13 +133,13 @@ generally used to create the following:
   convenient to create read-only properties from a non-const data member:
 
   ```cpp
-  entt::meta<my_type>().data<nullptr, &my_type::data_member>("member"_hs);
+  entt::meta_factory<my_type>{}.data<nullptr, &my_type::data_member>("member"_hs);
   ```
 
   Multiple setters are also supported by means of a `value_list` object:
 
   ```cpp
-  entt::meta<my_type>().data<entt::value_list<&from_int, &from_string>, &my_type::data_member>("member"_hs);
+  entt::meta_factory<my_type>{}.data<entt::value_list<&from_int, &from_string>, &my_type::data_member>("member"_hs);
   ```
 
 * _Member functions_. Meta member functions are actual member functions of the
@@ -148,7 +148,7 @@ generally used to create the following:
   were part of the type itself:
 
   ```cpp
-  entt::meta<my_type>()
+  entt::meta_factory<my_type>{}
       .func<&my_type::static_function>("static"_hs)
       .func<&my_type::member_function>("member"_hs)
       .func<&free_function>("free"_hs);
@@ -163,7 +163,7 @@ generally used to create the following:
   derived from it:
 
   ```cpp
-  entt::meta<derived_type>().base<base_type>();
+  entt::meta_factory<derived_type>{}.base<base_type>();
   ```
 
   The reflection system tracks the relationship and allows for implicit casts at
@@ -174,7 +174,7 @@ generally used to create the following:
   that are implicitly performed by the reflection system when required:
 
   ```cpp
-  entt::meta<double>().conv<int>();
+  entt::meta_factory<double>{}.conv<int>();
   ```
 
 This is everything users need to create meta types. Refer to the inline
@@ -669,7 +669,7 @@ If this were to be translated into explicit registrations with the reflection
 system, it would result in a long series of instructions such as the following:
 
 ```cpp
-entt::meta<int>()
+entt::meta_factory<int>{}
     .conv<bool>()
     .conv<char>()
     // ...
@@ -683,7 +683,7 @@ underlying types and offers what it takes to do the same for scoped enums. It
 would result in the following if it were to be done explicitly:
 
 ```cpp
-entt::meta<my_enum>()
+entt::meta_factory<my_enum>{}
     .conv<std::underlying_type_t<my_enum>>();
 ```
 
@@ -776,7 +776,7 @@ There are a few alternatives available at the moment:
   thus making it appear as if its type were `void`:
 
   ```cpp
-  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
+  entt::meta_factory<my_type>{}.func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
 
   If the use with functions is obvious, perhaps less so is use with constructors
@@ -792,7 +792,7 @@ There are a few alternatives available at the moment:
   the wrapper itself:
 
   ```cpp
-  entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
+  entt::meta_factory<my_type>{}.data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
 
   These policies work with constructors (for example, when objects are taken
@@ -819,11 +819,11 @@ between enums and classes in C++ directly in the space of the reflected types.
 Exposing constant values or elements from an enum is quite simple:
 
 ```cpp
-entt::meta<my_enum>()
+entt::meta_factory<my_enum>{}
     .data<my_enum::a_value>("a_value"_hs)
     .data<my_enum::another_value>("another_value"_hs);
 
-entt::meta<int>().data<2048>("max_int"_hs);
+entt::meta_factory<int>{}.data<2048>("max_int"_hs);
 ```
 
 Accessing them is trivial as well. It's a matter of doing the following, as with
@@ -859,7 +859,7 @@ and meta functions.
 User-defined traits are set via a meta factory:
 
 ```cpp
-entt::meta<my_type>().traits(my_traits::required | my_traits::hidden);
+entt::meta_factory<my_type>{}.traits(my_traits::required | my_traits::hidden);
 ```
 
 In the example above, `EnTT` bitmask enum support is used but any integral value
@@ -872,7 +872,7 @@ Likewise, users can also set traits on meta objects later if needed, as long as
 the factory is reset to the meta object of interest:
 
 ```cpp
-entt::meta<my_type>()
+entt::meta_factory<my_type>{}
     .data<&my_type::data_member, entt::as_ref_t>("member"_hs)
     .traits(my_traits::internal);
 ```
@@ -893,7 +893,7 @@ correctly.
 Custom arbitrary data are set via a meta factory:
 
 ```cpp
-entt::meta<my_type>().custom<type_data>("name");
+entt::meta_factory<my_type>{}.custom<type_data>("name");
 ```
 
 The way to do this is by specifying the data type to the `custom` function and
@@ -906,7 +906,7 @@ Likewise, users can also set custom data on meta objects later if needed, as
 long as the factory is reset to the meta object of interest:
 
 ```cpp
-entt::meta<my_type>()
+entt::meta_factory<my_type>{}
     .func<&my_type::member_function>("member"_hs)
     .custom<function_data>("tooltip");
 ```
@@ -976,11 +976,11 @@ If _replacing_ the default context isn't enough, `EnTT` also offers the ability
 to use multiple and externally managed contexts with the runtime reflection
 system.<br/>
 For example, to create new meta types within a context other than the default
-one, simply pass it as an argument to the `meta` call:
+one, simply pass it as an argument to the `meta_factory` constructor:
 
 ```cpp
 entt::meta_ctx context{};
-auto factory = entt::meta<my_type>(context).type("reflected_type"_hs);
+entt::meta_factory<my_type>{context}.type("reflected_type"_hs);
 ```
 
 By doing so, the new meta type isn't available in the default context but is
