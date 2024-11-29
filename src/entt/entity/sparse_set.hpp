@@ -164,7 +164,8 @@ class basic_sparse_set {
 
     static constexpr auto max_size = static_cast<std::size_t>(traits_type::to_entity(null));
 
-    [[nodiscard]] auto policy_to_head() const noexcept {
+    // it could be auto but gcc complains and emits a warning due to a false positive
+    [[nodiscard]] std::size_t policy_to_head() const noexcept {
         return static_cast<size_type>(max_size * static_cast<decltype(max_size)>(mode != deletion_policy::swap_only));
     }
 
