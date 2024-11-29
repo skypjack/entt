@@ -91,18 +91,18 @@ struct MetaData: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<base>()
+        entt::meta_factory<base>{}
             .type("base"_hs)
             .dtor<base::destroy>()
             .data<&base::value>("value"_hs);
 
-        entt::meta<derived>()
+        entt::meta_factory<derived>{}
             .type("derived"_hs)
             .base<base>()
             .dtor<derived::destroy>()
             .data<&base::value>("value_from_base"_hs);
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("clazz"_hs)
             .data<&clazz::i, entt::as_ref_t>("i"_hs)
             .custom<char>('c')
@@ -118,7 +118,7 @@ struct MetaData: ::testing::Test {
             .data<&clazz::i, entt::as_void_t>("void"_hs)
             .conv<int>();
 
-        entt::meta<setter_getter>()
+        entt::meta_factory<setter_getter>{}
             .type("setter_getter"_hs)
             .data<&setter_getter::static_setter, &setter_getter::static_getter>("x"_hs)
             .data<&setter_getter::setter, &setter_getter::getter>("y"_hs)
@@ -127,11 +127,11 @@ struct MetaData: ::testing::Test {
             .data<nullptr, &setter_getter::getter>("z_ro"_hs)
             .data<nullptr, &setter_getter::value>("value"_hs);
 
-        entt::meta<multi_setter>()
+        entt::meta_factory<multi_setter>{}
             .type("multi_setter"_hs)
             .data<entt::value_list<&multi_setter::from_double, &multi_setter::from_string>, &multi_setter::value>("value"_hs);
 
-        entt::meta<array>()
+        entt::meta_factory<array>{}
             .type("array"_hs)
             .data<&array::global>("global"_hs)
             .data<&array::local>("local"_hs);
@@ -163,7 +163,7 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, UserTraits) {
 
     using traits_type = entt::internal::meta_traits;
     constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
-    ASSERT_DEATH(entt::meta<clazz>().data<&clazz::i>("j"_hs).traits(value), "");
+    ASSERT_DEATH(entt::meta_factory<clazz>{}.data<&clazz::i>("j"_hs).traits(value), "");
 }
 
 TEST_F(MetaData, Custom) {
@@ -640,14 +640,14 @@ TEST_F(MetaData, ReRegistration) {
     ASSERT_EQ(node.details->data.size(), 1u);
     ASSERT_TRUE(type.data("value"_hs));
 
-    entt::meta<base>().data<&base::value>("field"_hs);
+    entt::meta_factory<base>{}.data<&base::value>("field"_hs);
 
     ASSERT_TRUE(node.details);
     ASSERT_EQ(node.details->data.size(), 2u);
     ASSERT_TRUE(type.data("value"_hs));
     ASSERT_TRUE(type.data("field"_hs));
 
-    entt::meta<base>()
+    entt::meta_factory<base>{}
         .data<&base::value>("field"_hs)
         .traits(test::meta_traits::one)
         .custom<int>(3)
@@ -665,8 +665,8 @@ TEST_F(MetaData, CollisionAndReuse) {
     ASSERT_FALSE(entt::resolve<clazz>().data("cj"_hs));
     ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs).is_const());
 
-    ASSERT_NO_THROW(entt::meta<clazz>().data<&clazz::i>("j"_hs));
-    ASSERT_NO_THROW(entt::meta<clazz>().data<&clazz::j>("cj"_hs));
+    ASSERT_NO_THROW(entt::meta_factory<clazz>{}.data<&clazz::i>("j"_hs));
+    ASSERT_NO_THROW(entt::meta_factory<clazz>{}.data<&clazz::j>("cj"_hs));
 
     ASSERT_TRUE(entt::resolve<clazz>().data("j"_hs));
     ASSERT_TRUE(entt::resolve<clazz>().data("cj"_hs));

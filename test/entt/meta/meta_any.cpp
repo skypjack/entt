@@ -89,16 +89,16 @@ struct MetaAny: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<empty>()
+        entt::meta_factory<empty>{}
             .type("empty"_hs)
             .dtor<empty::destroy>();
 
-        entt::meta<fat>()
+        entt::meta_factory<fat>{}
             .type("fat"_hs)
             .base<empty>()
             .dtor<fat::destroy>();
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("clazz"_hs)
             .data<&clazz::value>("value"_hs)
             .func<&clazz::member>("member"_hs)

@@ -79,23 +79,19 @@ TEST_F(MetaFactory, Constructors) {
 
     ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
     ASSERT_EQ(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-
-    // this is because of entt::meta, which should be deprecated nowadays
-    ASSERT_FALSE(entt::resolve(entt::type_id<int>()).is_integral());
+    ASSERT_TRUE(entt::resolve(entt::type_id<int>()).is_integral());
 
     factory = entt::meta_factory<int>{ctx};
 
     ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
     ASSERT_NE(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-
-    // this is because of entt::meta, which should be deprecated nowadays
-    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
 }
 
 TEST_F(MetaFactory, Type) {
     using namespace entt::literals;
 
-    auto factory = entt::meta<int>();
+    entt::meta_factory<int> factory{};
 
     ASSERT_EQ(entt::resolve("foo"_hs), entt::meta_type{});
 
@@ -114,8 +110,8 @@ TEST_F(MetaFactory, Type) {
 ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
     using namespace entt::literals;
 
-    auto factory = entt::meta<int>();
-    auto other = entt::meta<double>();
+    entt::meta_factory<int> factory{};
+    entt::meta_factory<double> other{};
 
     factory.type("foo"_hs);
 
@@ -123,7 +119,7 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
 }
 
 TEST_F(MetaFactory, Base) {
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     decltype(std::declval<entt::meta_type>().base()) range{};
 
     ASSERT_NE(entt::resolve(entt::type_id<clazz>()), entt::meta_type{});
@@ -145,7 +141,7 @@ TEST_F(MetaFactory, Base) {
 
 TEST_F(MetaFactory, Conv) {
     const clazz instance{3};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     const entt::meta_any any = entt::forward_as_meta(instance);
 
     ASSERT_FALSE(any.allow_cast<int>());
@@ -161,7 +157,7 @@ TEST_F(MetaFactory, Conv) {
 
 TEST_F(MetaFactory, Ctor) {
     const std::array values{1, 3};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
 
     ASSERT_FALSE(entt::resolve<clazz>().construct(values[0u]));
     ASSERT_FALSE(entt::resolve<clazz>().construct(std::to_string(values[1u])));
@@ -181,7 +177,7 @@ TEST_F(MetaFactory, Ctor) {
 
 TEST_F(MetaFactory, Dtor) {
     bool check = false;
-    auto factory = entt::meta<dtor_callback>();
+    entt::meta_factory<dtor_callback> factory{};
     entt::meta_any any{std::in_place_type<dtor_callback>, check};
 
     any.reset();
@@ -199,7 +195,7 @@ TEST_F(MetaFactory, DataMemberObject) {
     using namespace entt::literals;
 
     base instance{'c'};
-    auto factory = entt::meta<base>();
+    entt::meta_factory<base> factory{};
     entt::meta_type type = entt::resolve<base>();
 
     ASSERT_FALSE(type.data("member"_hs));
@@ -217,7 +213,7 @@ TEST_F(MetaFactory, DataMemberObject) {
 TEST_F(MetaFactory, DataPointer) {
     using namespace entt::literals;
 
-    auto factory = entt::meta<int>();
+    entt::meta_factory<int> factory{};
     entt::meta_type type = entt::resolve<int>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -235,7 +231,7 @@ TEST_F(MetaFactory, DataValue) {
     using namespace entt::literals;
 
     constexpr int value = 1;
-    auto factory = entt::meta<int>();
+    entt::meta_factory<int> factory{};
     entt::meta_type type = entt::resolve<int>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -252,7 +248,7 @@ TEST_F(MetaFactory, DataGetterOnly) {
     using namespace entt::literals;
 
     clazz instance{1};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -271,7 +267,7 @@ TEST_F(MetaFactory, DataSetterGetter) {
     using namespace entt::literals;
 
     clazz instance{1};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -290,7 +286,7 @@ TEST_F(MetaFactory, DataMultiSetterGetter) {
     using namespace entt::literals;
 
     clazz instance{1};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -310,7 +306,7 @@ TEST_F(MetaFactory, DataMultiSetterGetter) {
 TEST_F(MetaFactory, DataOverwrite) {
     using namespace entt::literals;
 
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.data("value"_hs));
@@ -332,7 +328,7 @@ TEST_F(MetaFactory, Func) {
     using namespace entt::literals;
 
     const clazz instance{1};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.func("func"_hs));
@@ -350,7 +346,7 @@ TEST_F(MetaFactory, FuncOverload) {
     using namespace entt::literals;
 
     clazz instance{1};
-    auto factory = entt::meta<clazz>();
+    entt::meta_factory<clazz> factory{};
     entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.func("func"_hs));
@@ -376,7 +372,7 @@ TEST_F(MetaFactory, FuncOverload) {
 TEST_F(MetaFactory, Traits) {
     using namespace entt::literals;
 
-    entt::meta<clazz>()
+    entt::meta_factory<clazz>{}
         .data<&base::member>("member"_hs)
         .func<&clazz::set_int>("func"_hs)
         .func<&clazz::set_boxed_int>("func"_hs);
@@ -388,7 +384,7 @@ TEST_F(MetaFactory, Traits) {
     ASSERT_EQ(type.func("func"_hs).traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(type.func("func"_hs).next().traits<test::meta_traits>(), test::meta_traits::none);
 
-    entt::meta<clazz>()
+    entt::meta_factory<clazz>{}
         .traits(test::meta_traits::one | test::meta_traits::three)
         .data<&base::member>("member"_hs)
         .traits(test::meta_traits::one)
@@ -409,7 +405,7 @@ TEST_F(MetaFactory, Traits) {
 TEST_F(MetaFactory, Custom) {
     using namespace entt::literals;
 
-    entt::meta<clazz>()
+    entt::meta_factory<clazz>{}
         .data<&base::member>("member"_hs)
         .func<&clazz::set_int>("func"_hs)
         .func<&clazz::set_boxed_int>("func"_hs);
@@ -421,7 +417,7 @@ TEST_F(MetaFactory, Custom) {
     ASSERT_EQ(static_cast<const int *>(type.func("func"_hs).custom()), nullptr);
     ASSERT_EQ(static_cast<const int *>(type.func("func"_hs).next().custom()), nullptr);
 
-    entt::meta<clazz>()
+    entt::meta_factory<clazz>{}
         .custom<int>(0)
         .data<&base::member>("member"_hs)
         .custom<int>(1)
@@ -463,8 +459,8 @@ TEST_F(MetaFactory, MetaReset) {
 
     entt::meta_ctx ctx{};
 
-    entt::meta<int>().type("global"_hs);
-    entt::meta<int>(ctx).type("local"_hs);
+    entt::meta_factory<int>{}.type("global"_hs);
+    entt::meta_factory<int>{ctx}.type("local"_hs);
 
     ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
     ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
@@ -479,8 +475,8 @@ TEST_F(MetaFactory, MetaReset) {
     ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
     ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
 
-    entt::meta<int>().type("global"_hs);
-    entt::meta<int>(ctx).type("local"_hs);
+    entt::meta_factory<int>{}.type("global"_hs);
+    entt::meta_factory<int>{ctx}.type("local"_hs);
 
     ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
     ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
@@ -495,8 +491,8 @@ TEST_F(MetaFactory, MetaReset) {
     ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
     ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
 
-    entt::meta<int>().type("global"_hs);
-    entt::meta<int>(ctx).type("local"_hs);
+    entt::meta_factory<int>{}.type("global"_hs);
+    entt::meta_factory<int>{ctx}.type("local"_hs);
 
     ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
     ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));

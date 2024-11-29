@@ -29,7 +29,7 @@ meta_mixin<Type>::meta_mixin(const allocator_type &allocator)
     : Type{allocator} {
     using namespace entt::literals;
 
-    entt::meta<element_type>()
+    entt::meta_factory<element_type>{}
         // cross registry, same type
         .template func<entt::overload<entt::storage_for_t<element_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<element_type>), entt::as_ref_t>("storage"_hs)
         // cross registry, different types

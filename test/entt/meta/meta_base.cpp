@@ -37,18 +37,18 @@ struct MetaBase: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<base_1>()
+        entt::meta_factory<base_1>{}
             .data<&base_1::value_1>("value_1"_hs);
 
-        entt::meta<base_2>()
+        entt::meta_factory<base_2>{}
             .conv<int>()
             .data<&base_2::value_2>("value_2"_hs);
 
-        entt::meta<base_3>()
+        entt::meta_factory<base_3>{}
             .base<base_2>()
             .data<&base_3::value_3>("value_3"_hs);
 
-        entt::meta<derived>()
+        entt::meta_factory<derived>{}
             .type("derived"_hs)
             .base<base_1>()
             .base<base_3>()
