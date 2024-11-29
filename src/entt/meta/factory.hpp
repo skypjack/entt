@@ -514,10 +514,7 @@ public:
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] auto meta(meta_ctx &ctx) noexcept {
-    auto &&context = internal::meta_context::from(ctx);
-    // make sure the type exists in the context before returning a factory
-    context.value.try_emplace(type_id<Type>().hash(), internal::resolve<Type>(context));
+[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta(meta_ctx &ctx) noexcept {
     return meta_factory<Type>{ctx};
 }
 
@@ -533,7 +530,7 @@ template<typename Type>
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] auto meta() noexcept {
+[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta() noexcept {
     return meta<Type>(locator<meta_ctx>::value_or());
 }
 
