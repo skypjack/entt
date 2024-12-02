@@ -123,12 +123,15 @@ public:
         : ctx{&area},
           parent{node.info->hash()},
           bucket{parent} {
-        if(!node.details) {
+        if(node.details) {
+            ENTT_ASSERT(meta_context::from(*ctx).value.contains(parent), "Expected element not available");
+            details = node.details.get();
+        } else {
             node.details = std::make_shared<meta_type_descriptor>();
+            [[maybe_unused]] const auto [it, res] = meta_context::from(*ctx).value.try_emplace(parent, std::move(node));
+            ENTT_ASSERT(res, "Unexpected element in the context");
+            details = it->second.details.get();
         }
-
-        details = node.details.get();
-        meta_context::from(*ctx).value.try_emplace(parent, std::move(node));
     }
 
 private:
