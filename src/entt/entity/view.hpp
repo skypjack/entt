@@ -647,10 +647,12 @@ public:
      * @note This function only supports adding one storage, use @ref operator| to join two views instead.
      * @sa operator|
      */
-    template<typename OGet>
-    [[nodiscard]] auto join(OGet &other) const noexcept {
-        return internal::view_pack<basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>>>(
-            *this, basic_view<get_t<OGet>, exclude_t<>>{other}, std::index_sequence_for<Get...>{}, std::index_sequence_for<Exclude...>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
+    template<typename OGet, typename = std::enable_if_t<std::is_lvalue_reference_v<OGet>>>
+    [[nodiscard]] auto join(OGet &&other) const noexcept {
+        using oget_noref = std::remove_reference_t<OGet>;
+
+        return internal::view_pack<basic_view<get_t<Get..., oget_noref>, exclude_t<Exclude...>>>(
+            *this, basic_view<get_t<oget_noref>, exclude_t<>>{other}, std::index_sequence_for<Get...>{}, std::index_sequence_for<Exclude...>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
     }
 
     /**
@@ -1092,10 +1094,12 @@ public:
      * @note This function only supports adding one storage, use @ref operator| to join two views instead.
      * @sa operator|
      */
-    template<typename OGet>
-    [[nodiscard]] auto join(OGet &other) const noexcept {
-        return internal::view_pack<basic_view<get_t<Get, OGet>, exclude_t<>>>(
-            *this, basic_view<get_t<OGet>, exclude_t<>>{other}, std::index_sequence_for<Get>{}, std::index_sequence_for<>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
+    template<typename OGet, typename = std::enable_if_t<std::is_lvalue_reference_v<OGet>>>
+    [[nodiscard]] auto join(OGet &&other) const noexcept {
+        using oget_noref = std::remove_reference_t<OGet>;
+
+        return internal::view_pack<basic_view<get_t<Get, oget_noref>, exclude_t<>>>(
+            *this, basic_view<get_t<oget_noref>, exclude_t<>>{other}, std::index_sequence_for<Get>{}, std::index_sequence_for<>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
     }
 
     /**
