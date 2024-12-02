@@ -78,13 +78,13 @@ class MetaContext: public ::testing::Test {
     static void init_global_context() {
         using namespace entt::literals;
 
-        entt::meta<int>()
+        entt::meta_factory<int>{}
             .data<global_marker>("marker"_hs);
 
-        entt::meta<argument>()
+        entt::meta_factory<argument>{}
             .conv<&argument::get>();
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("foo"_hs)
             .custom<int>(3)
             .ctor<int>()
@@ -92,27 +92,27 @@ class MetaContext: public ::testing::Test {
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::func>("func"_hs);
 
-        entt::meta<template_clazz<int>>()
+        entt::meta_factory<template_clazz<int>>{}
             .type("template"_hs);
     }
 
     void init_local_context() {
         using namespace entt::literals;
 
-        entt::meta<int>(context)
+        entt::meta_factory<int>{context}
             .data<local_marker>("marker"_hs);
 
-        entt::meta<test::empty>(context)
+        entt::meta_factory<test::empty>{context}
             .type("quux"_hs);
 
-        entt::meta<argument>(context)
+        entt::meta_factory<argument>{context}
             .conv<&argument::get_mul>();
 
-        entt::meta<base>(context)
+        entt::meta_factory<base>{context}
             .data<&base::value>("char"_hs)
             .func<&base::get>("get"_hs);
 
-        entt::meta<clazz>(context)
+        entt::meta_factory<clazz>{context}
             .type("bar"_hs)
             .custom<char>('c')
             .base<base>()
@@ -122,7 +122,7 @@ class MetaContext: public ::testing::Test {
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::cfunc>("func"_hs);
 
-        entt::meta<template_clazz<int, char>>(context)
+        entt::meta_factory<template_clazz<int, char>>{context}
             .type("template"_hs);
     }
 

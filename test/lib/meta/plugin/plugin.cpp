@@ -15,12 +15,12 @@ test::boxed_int create_boxed_int(int value) {
 void set_up() {
     using namespace entt::literals;
 
-    entt::meta<test::boxed_int>()
+    entt::meta_factory<test::boxed_int>{}
         .type("boxed_int"_hs)
         .ctor<&create_boxed_int>()
         .data<&test::boxed_int::value>("value"_hs);
 
-    entt::meta<test::empty>()
+    entt::meta_factory<test::empty>{}
         .type("empty"_hs)
         .ctor<>();
 }

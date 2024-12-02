@@ -105,37 +105,37 @@ struct MetaType: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>()
+        entt::meta_factory<double>{}
             .type("double"_hs)
             .traits(test::meta_traits::one)
             .data<set<double>, get<double>>("var"_hs);
 
-        entt::meta<unsigned int>()
+        entt::meta_factory<unsigned int>{}
             .type("unsigned int"_hs)
             .traits(test::meta_traits::two)
             .data<0u>("min"_hs)
             .data<128u>("max"_hs);
 
-        entt::meta<base>()
+        entt::meta_factory<base>{}
             .type("base"_hs)
             .data<&base::value>("value"_hs);
 
-        entt::meta<derived>()
+        entt::meta_factory<derived>{}
             .type("derived"_hs)
             .traits(test::meta_traits::one | test::meta_traits::three)
             .base<base>();
 
-        entt::meta<abstract>()
+        entt::meta_factory<abstract>{}
             .type("abstract"_hs)
             .func<&abstract::func>("func"_hs)
             .func<&abstract::base_only>("base_only"_hs);
 
-        entt::meta<concrete>()
+        entt::meta_factory<concrete>{}
             .type("concrete"_hs)
             .base<base>()
             .base<abstract>();
 
-        entt::meta<overloaded_func>()
+        entt::meta_factory<overloaded_func>{}
             .type("overloaded_func"_hs)
             .func<entt::overload<int(const base &, int, int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int, int)>(&overloaded_func::f)>("f"_hs)
@@ -143,14 +143,14 @@ struct MetaType: ::testing::Test {
             .func<entt::overload<int(int) const>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs);
 
-        entt::meta<property_type>()
+        entt::meta_factory<property_type>{}
             .type("property"_hs)
             .traits(test::meta_traits::two | test::meta_traits::three)
             .data<property_type::value>("value"_hs)
             .data<property_type::other>("other"_hs)
             .data<set<property_type>, get<property_type>>("var"_hs);
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("class"_hs)
             .custom<char>('c')
             .ctor<const base &, int>()
@@ -202,7 +202,7 @@ TEST_F(MetaType, UserTraits) {
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, UserTraits) {
     using traits_type = entt::internal::meta_traits;
     constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
-    ASSERT_DEATH(entt::meta<clazz>().traits(value), "");
+    ASSERT_DEATH(entt::meta_factory<clazz>{}.traits(value), "");
 }
 
 TEST_F(MetaType, Custom) {
@@ -602,7 +602,7 @@ TEST_F(MetaType, Reset) {
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz>().construct());
 
-    entt::meta<clazz>().type("class"_hs);
+    entt::meta_factory<clazz>{}.type("class"_hs);
 
     ASSERT_TRUE(entt::resolve("class"_hs));
 }
@@ -735,7 +735,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz>().func("member"_hs));
 
-    entt::meta<double>().type("double"_hs);
+    entt::meta_factory<double>{}.type("double"_hs);
     entt::meta_any any{3.};
 
     ASSERT_TRUE(any);
@@ -745,14 +745,14 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    entt::meta<base>()
+    entt::meta_factory<base>{}
         .traits(test::meta_traits::one)
         .custom<int>(3)
         // this should not overwrite traits and custom data
         .type("base"_hs);
 
     // this should not overwrite traits and custom data
-    [[maybe_unused]] auto factory = entt::meta<base>();
+    [[maybe_unused]] entt::meta_factory<base> factory{};
 
     ASSERT_EQ(entt::resolve<base>().traits<test::meta_traits>(), test::meta_traits::one);
     ASSERT_NE(static_cast<const int *>(entt::resolve("base"_hs).custom()), nullptr);
@@ -776,13 +776,13 @@ TEST_F(MetaType, ReRegistration) {
     ASSERT_EQ(count, 0);
     ASSERT_TRUE(entt::resolve("double"_hs));
 
-    entt::meta<double>()
+    entt::meta_factory<double>{}
         .type("real"_hs)
         .traits(test::meta_traits::one)
         .custom<int>(3);
 
     // this should not overwrite traits and custom data
-    entt::meta<double>().type("real"_hs);
+    entt::meta_factory<double>{}.type("real"_hs);
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs));
@@ -795,10 +795,10 @@ TEST_F(MetaType, ReRegistration) {
 TEST_F(MetaType, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_NO_THROW(entt::meta<clazz>().type("class"_hs));
+    ASSERT_NO_THROW(entt::meta_factory<clazz>{}.type("class"_hs));
     ASSERT_TRUE(entt::resolve("class"_hs));
 
-    ASSERT_NO_THROW(entt::meta<clazz>().type("quux"_hs));
+    ASSERT_NO_THROW(entt::meta_factory<clazz>{}.type("quux"_hs));
     ASSERT_FALSE(entt::resolve("class"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }
@@ -806,5 +806,5 @@ TEST_F(MetaType, NameCollision) {
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_DEATH(entt::meta<clazz>().type("abstract"_hs), "");
+    ASSERT_DEATH(entt::meta_factory<clazz>{}.type("abstract"_hs), "");
 }

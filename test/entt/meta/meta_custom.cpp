@@ -22,7 +22,7 @@ struct MetaCustom: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("clazz"_hs)
             .custom<char>('c')
             .data<&clazz::i>("i"_hs)
@@ -132,7 +132,7 @@ TEST_F(MetaCustom, ReRegistration) {
     ASSERT_NE(static_cast<const char *>(type.custom()), nullptr);
     ASSERT_EQ(*static_cast<const char *>(type.custom()), 'c');
 
-    entt::meta<clazz>().custom<int>(1);
+    entt::meta_factory<clazz>{}.custom<int>(1);
     type = entt::resolve<clazz>();
 
     ASSERT_NE(static_cast<const int *>(type.custom()), nullptr);

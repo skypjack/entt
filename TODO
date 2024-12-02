@@ -39,9 +39,8 @@ TODO:
 * refine the storage fallback mechanism for views (ie alloc?)
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
-* dtor, traits and custom should be part of meta descriptor maybe (?)
+* dtor, traits and custom should be part of meta descriptor (update meta_factory tests then)
 * allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
 * meta_any ownership construction and from_void
-* meta_factory() isn't fully tested yet
-* entt::meta isn't required anymore, we can do everything with entt::meta_factory and avoid symbol duplication
+* sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)

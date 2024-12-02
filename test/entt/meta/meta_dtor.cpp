@@ -29,7 +29,7 @@ struct MetaDtor: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<clazz>()
+        entt::meta_factory<clazz>{}
             .type("clazz"_hs)
             .ctor<int &>()
             .dtor<clazz::destroy_decr>();
@@ -108,7 +108,7 @@ TEST_F(MetaDtor, ReRegistration) {
 
     ASSERT_NE(node.dtor.dtor, nullptr);
 
-    entt::meta<clazz>().dtor<&clazz::destroy_incr>();
+    entt::meta_factory<clazz>{}.dtor<&clazz::destroy_incr>();
     entt::resolve<clazz>().construct(entt::forward_as_meta(counter)).reset();
 
     ASSERT_EQ(counter, 2);

@@ -18,16 +18,16 @@ ENTT_API void share(const entt::locator<entt::meta_ctx>::node_type &handle) {
 ENTT_API void set_up() {
     using namespace entt::literals;
 
-    entt::meta<test::boxed_int>()
+    entt::meta_factory<test::boxed_int>{}
         .type("boxed_int"_hs)
         .ctor<&create_boxed_int>()
         .data<&test::boxed_int::value>("value"_hs);
 
-    entt::meta<test::empty>()
+    entt::meta_factory<test::empty>{}
         .type("empty"_hs)
         .ctor<>();
 
-    static_cast<void>(entt::meta<double>());
+    static_cast<void>(entt::meta_factory<double>{});
 }
 
 ENTT_API void tear_down() {

@@ -93,24 +93,24 @@ struct MetaFunc: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
 
-        entt::meta<double>()
+        entt::meta_factory<double>{}
             .type("double"_hs)
             .func<&double_member>("member"_hs);
 
-        entt::meta<base>()
+        entt::meta_factory<base>{}
             .type("base"_hs)
             .func<&base::setter>("setter"_hs)
             .func<fake_member>("fake_member"_hs)
             .func<fake_const_member>("fake_const_member"_hs);
 
-        entt::meta<derived>()
+        entt::meta_factory<derived>{}
             .type("derived"_hs)
             .base<base>()
             .func<&base::setter>("setter_from_base"_hs)
             .func<&base::getter>("getter_from_base"_hs)
             .func<&base::static_setter>("static_setter_from_base"_hs);
 
-        entt::meta<function>()
+        entt::meta_factory<function>{}
             .type("func"_hs)
             .func<&entt::registry::emplace_or_replace<function>, entt::as_ref_t>("emplace"_hs)
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
@@ -175,7 +175,7 @@ ENTT_DEBUG_TEST_F(MetaFuncDeathTest, UserTraits) {
 
     using traits_type = entt::internal::meta_traits;
     constexpr auto value = traits_type{static_cast<std::underlying_type_t<traits_type>>(traits_type::_user_defined_traits) + 1u};
-    ASSERT_DEATH(entt::meta<function>().func<&function::g>("g"_hs).traits(value), "");
+    ASSERT_DEATH(entt::meta_factory<function>{}.func<&function::g>("g"_hs).traits(value), "");
 }
 
 TEST_F(MetaFunc, Custom) {
@@ -591,7 +591,7 @@ TEST_F(MetaFunc, Overloaded) {
 
     ASSERT_FALSE(type.func("f2"_hs).next());
 
-    entt::meta<function>()
+    entt::meta_factory<function>{}
         // this should not overwrite traits and custom data
         .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
         // this should put traits and custom data on the new overload instead
@@ -615,7 +615,7 @@ TEST_F(MetaFunc, Overloaded) {
 TEST_F(MetaFunc, OverloadedOrder) {
     using namespace entt::literals;
 
-    entt::meta<function>()
+    entt::meta_factory<function>{}
         .func<entt::overload<int(int, int)>(&function::f)>("f2"_hs)
         .func<entt::overload<int(int) const>(&function::f)>("f2"_hs);
 
@@ -655,7 +655,7 @@ TEST_F(MetaFunc, ReRegistration) {
     ASSERT_TRUE(type.invoke("f1"_hs, instance, 0));
     ASSERT_FALSE(type.invoke("f1"_hs, instance, 0, 0));
 
-    entt::meta<function>()
+    entt::meta_factory<function>{}
         .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
         .func<entt::overload<int(int) const>(&function::f)>("f"_hs);
 
@@ -666,7 +666,7 @@ TEST_F(MetaFunc, ReRegistration) {
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0));
     ASSERT_TRUE(type.invoke("f"_hs, instance, 0, 0));
 
-    entt::meta<function>()
+    entt::meta_factory<function>{}
         .func<entt::overload<int(int, int)>(&function::f)>("f"_hs)
         .traits(test::meta_traits::one)
         .custom<int>(3)
