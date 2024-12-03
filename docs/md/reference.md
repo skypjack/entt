@@ -49,8 +49,8 @@ details.
     inspired archetype ECS with optional multithreading. 
   * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
     C# and Unity, where _reactive systems_ were invented.
-  * [Friflo Engine ECS](https://github.com/friflo/Friflo.Json.Fliox/blob/main/Engine/README.md):
-    an archetype ECS with focus on performance, cache locality and DX.
+  * [Friflo ECS](https://github.com/friflo/Friflo.Engine.ECS): an archetype ECS
+    with focus on performance and minimal GC allocations.
   * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
     Component System framework.
   * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
