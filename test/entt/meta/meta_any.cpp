@@ -162,6 +162,41 @@ TEST_F(MetaAny, NoSBO) {
     ASSERT_NE(any, fat{});
 }
 
+TEST_F(MetaAny, SBOInPlaceConstruction) {
+    std::unique_ptr<int> elem = std::make_unique<int>(2);
+    entt::meta_any any{std::in_place, elem.release()};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.base().owner());
+    ASSERT_EQ(any.base().policy(), entt::any_policy::dynamic);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<int>(), 2);
+    ASSERT_NE(any.base().data(), nullptr);
+    ASSERT_EQ(any, entt::meta_any{2});
+    ASSERT_NE(entt::meta_any{0}, any);
+
+    auto other = any.as_ref();
+
+    ASSERT_TRUE(other);
+    ASSERT_FALSE(other.base().owner());
+    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_FALSE(other.try_cast<std::size_t>());
+    ASSERT_EQ(other.cast<int>(), 2);
+    ASSERT_NE(other.base().data(), nullptr);
+    ASSERT_EQ(other, entt::meta_any{2});
+    ASSERT_NE(entt::meta_any{0}, other);
+}
+
+TEST_F(MetaAny, SBOInPlaceNullptrConstruction) {
+    int *instance = nullptr;
+    entt::meta_any any{std::in_place, instance};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.base().owner());
+    ASSERT_FALSE(any.try_cast<int>());
+    ASSERT_EQ(any.base().data(), nullptr);
+}
+
 TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
     entt::meta_any any{std::in_place_type<int>, 3};
 
@@ -451,6 +486,42 @@ TEST_F(MetaAny, SBOAsConstRefTransferValue) {
     ASSERT_FALSE(any.assign(empty{}));
     ASSERT_EQ(any.cast<int>(), 3);
     ASSERT_EQ(value, 3);
+}
+
+TEST_F(MetaAny, NoSBOInPlaceConstruction) {
+    const fat instance{.1, .2, .3, .4};
+    std::unique_ptr<fat> elem = std::make_unique<fat>(instance);
+    entt::meta_any any{std::in_place, elem.release()};
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.base().owner());
+    ASSERT_EQ(any.base().policy(), entt::any_policy::dynamic);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<fat>(), instance);
+    ASSERT_NE(any.base().data(), nullptr);
+    ASSERT_EQ(any, entt::meta_any{instance});
+    ASSERT_NE(any, fat{});
+
+    auto other = any.as_ref();
+
+    ASSERT_TRUE(other);
+    ASSERT_FALSE(other.base().owner());
+    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_FALSE(other.try_cast<std::size_t>());
+    ASSERT_EQ(other.cast<fat>(), instance);
+    ASSERT_NE(other.base().data(), nullptr);
+    ASSERT_EQ(any, entt::meta_any{instance});
+    ASSERT_NE(any, fat{});
+}
+
+TEST_F(MetaAny, NoSBOInPlaceNullptrConstruction) {
+    fat *instance = nullptr;
+    entt::meta_any any{std::in_place, instance};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.base().owner());
+    ASSERT_FALSE(any.try_cast<fat>());
+    ASSERT_EQ(any.base().data(), nullptr);
 }
 
 TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {

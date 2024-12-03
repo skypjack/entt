@@ -44,3 +44,4 @@ TODO:
 * built-in no-pagination storage - no_pagination page size as limits::max
 * meta_any ownership construction and from_void
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
+* meta_any: avoid initializing members with global context an void vtable
