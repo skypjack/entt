@@ -137,7 +137,7 @@ I hope the following lists can grow much more in the future.
     build your own car and go racing.
   * [Lichgate](https://buas.itch.io/lichgate): top-down action rogue-like where
     users unlock abilities to fight horde of enemies in an endless world.
-  * [Letalka](https://github.com/dviglo2d-learn/mini_games/tree/main/letalka):
+  * [Letalka](https://github.com/dviglo2d/dviglo2d/tree/main/games/letalka):
     small demo game with ships and bullets flying everywhere on the screen.
 
 ## Engines and the like:
