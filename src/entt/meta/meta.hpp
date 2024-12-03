@@ -249,6 +249,32 @@ public:
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
     /**
+     * @brief Constructs a wrapper taking ownership of the passed object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value A pointer to an object to take ownership of.
+     */
+    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
+    explicit meta_any(std::in_place_t, Type *value)
+        : meta_any{locator<meta_ctx>::value_or(), std::in_place, value} {}
+
+    /**
+     * @brief Constructs a wrapper taking ownership of the passed object.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param area The context from which to search for meta types.
+     * @param value A pointer to an object to take ownership of.
+     */
+    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
+    explicit meta_any(const meta_ctx &area, std::in_place_t, Type *value)
+        : storage{std::in_place, value},
+          ctx{&area} {
+        if(storage) {
+            ctx = &area;
+            node = internal::resolve<Type>(internal::meta_context::from(*ctx));
+            vtable = &basic_vtable<Type>;
+        }
+    }
+
+    /**
      * @brief Constructs a wrapper from a given value.
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
