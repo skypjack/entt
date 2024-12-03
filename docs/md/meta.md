@@ -195,7 +195,8 @@ pointer-like types, while `any` doesn't.<br/>
 Similar to `any`, this class is also used to create _aliases_ for unmanaged
 objects either with `forward_as_meta` or using the `std::in_place_type<T &>`
 disambiguation tag, as well as from an existing object by means of the `as_ref`
-member function.<br/>
+member function. Additionally, it can take ownership of pointers passed as
+arguments along with `std::in_place`.<br/>
 Unlike `any` instead, `meta_any` treats an empty instance and one initialized
 with `void` differently:
 
