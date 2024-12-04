@@ -209,9 +209,12 @@ class meta_any {
 
     meta_any(const meta_any &other, any ref) noexcept
         : storage{std::move(ref)},
-          ctx{other.ctx},
-          node{storage ? other.node : internal::meta_type_node{}},
-          vtable{storage ? other.vtable : &basic_vtable<void>} {}
+          ctx{other.ctx} {
+        if(storage) {
+            node = other.node;
+            vtable = other.vtable;
+        }
+    }
 
 public:
     /*! Default constructor. */
