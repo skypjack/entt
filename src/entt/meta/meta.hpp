@@ -271,7 +271,6 @@ public:
         : storage{std::in_place, value},
           ctx{&area} {
         if(storage) {
-            ctx = &area;
             node = internal::resolve<Type>(internal::meta_context::from(*ctx));
             vtable = &basic_vtable<Type>;
         }
