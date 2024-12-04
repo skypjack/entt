@@ -218,7 +218,8 @@ class meta_any {
 
 public:
     /*! Default constructor. */
-    meta_any() = default;
+    meta_any()
+        : meta_any{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
 
     /**
      * @brief Context aware constructor.
@@ -639,7 +640,7 @@ public:
 
 private:
     any storage{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const meta_ctx *ctx{};
     internal::meta_type_node node{};
     vtable_type *vtable{};
 };
