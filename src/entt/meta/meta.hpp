@@ -668,12 +668,7 @@ template<typename Type>
     return forward_as_meta(locator<meta_ctx>::value_or(), std::forward<Type>(value));
 }
 
-/**
- * @brief Opaque pointers to instances of any type.
- *
- * A handle doesn't perform copies and isn't responsible for the contained
- * object. It doesn't prolong the lifetime of the pointed instance.
- */
+/*! @brief Opaque pointers to instances of any type. */
 struct meta_handle {
     /*! Default constructor. */
     meta_handle() = default;
