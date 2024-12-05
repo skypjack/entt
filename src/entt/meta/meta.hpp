@@ -202,7 +202,7 @@ class meta_any {
     }
 
     void release() {
-        if((node.dtor.dtor != nullptr) && storage.owner()) {
+        if(storage.owner() && (node.dtor.dtor != nullptr)) {
             node.dtor.dtor(storage.data());
         }
     }
