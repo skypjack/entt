@@ -29,20 +29,6 @@ enum class any_operation : std::uint8_t {
 } // namespace internal
 /*! @endcond */
 
-/*! @brief Possible modes of an any object. */
-enum class any_policy : std::uint8_t {
-    /*! @brief Default mode, the object does not own any elements. */
-    empty,
-    /*! @brief Owning mode, the object owns a dynamically allocated element. */
-    dynamic,
-    /*! @brief Owning mode, the object owns an embedded element. */
-    embedded,
-    /*! @brief Aliasing mode, the object _points_ to a non-const element. */
-    ref,
-    /*! @brief Const aliasing mode, the object _points_ to a const element. */
-    cref
-};
-
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
