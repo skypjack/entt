@@ -2,9 +2,24 @@
 #define ENTT_CORE_FWD_HPP
 
 #include <cstddef>
+#include <cstdint>
 #include "../config/config.h"
 
 namespace entt {
+
+/*! @brief Possible modes of an any object. */
+enum class any_policy : std::uint8_t {
+    /*! @brief Default mode, the object does not own any elements. */
+    empty,
+    /*! @brief Owning mode, the object owns a dynamically allocated element. */
+    dynamic,
+    /*! @brief Owning mode, the object owns an embedded element. */
+    embedded,
+    /*! @brief Aliasing mode, the object _points_ to a non-const element. */
+    ref,
+    /*! @brief Const aliasing mode, the object _points_ to a const element. */
+    cref
+};
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
