@@ -1355,9 +1355,6 @@ public:
 
     /**
      * @brief Lookup utility for meta functions (bases are also visited).
-     *
-     * In case of overloaded functions, a random one is returned.
-     *
      * @param id Unique identifier.
      * @return The registered meta function for the given identifier, if any.
      */
