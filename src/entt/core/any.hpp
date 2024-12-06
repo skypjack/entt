@@ -16,7 +16,7 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-enum class any_operation : std::uint8_t {
+enum class any_request : std::uint8_t {
     transfer,
     assign,
     destroy,
@@ -36,8 +36,8 @@ enum class any_operation : std::uint8_t {
  */
 template<std::size_t Len, std::size_t Align>
 class basic_any {
-    using operation = internal::any_operation;
-    using vtable_type = const void *(const operation, const basic_any &, const void *);
+    using request = internal::any_request;
+    using vtable_type = const void *(const request, const basic_any &, const void *);
 
     struct storage_type {
         // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -48,7 +48,7 @@ class basic_any {
     static constexpr bool in_situ = (Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
-    static const void *basic_vtable(const operation op, const basic_any &value, const void *other) {
+    static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
         static_assert(!std::is_void_v<Type> && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
         const Type *elem = nullptr;
 
@@ -58,20 +58,20 @@ class basic_any {
             elem = static_cast<const Type *>(value.instance);
         }
 
-        switch(op) {
-        case operation::transfer:
+        switch(req) {
+        case request::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
             }
             [[fallthrough]];
-        case operation::assign:
+        case request::assign:
             if constexpr(std::is_copy_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
                 return other;
             }
             break;
-        case operation::destroy:
+        case request::destroy:
             if constexpr(in_situ<Type>) {
                 (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
             } else if constexpr(std::is_array_v<Type>) {
@@ -80,24 +80,24 @@ class basic_any {
                 delete elem;
             }
             break;
-        case operation::compare:
+        case request::compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
                 return *elem == *static_cast<const Type *>(other) ? other : nullptr;
             } else {
                 return (elem == other) ? other : nullptr;
             }
-        case operation::copy:
+        case request::copy:
             if constexpr(std::is_copy_constructible_v<Type>) {
                 static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
             }
             break;
-        case operation::move:
+        case request::move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
-        case operation::get:
+        case request::get:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 return elem;
@@ -201,7 +201,7 @@ public:
     basic_any(const basic_any &other)
         : basic_any{} {
         if(other.vtable) {
-            other.vtable(operation::copy, other, this);
+            other.vtable(request::copy, other, this);
         }
     }
 
@@ -215,7 +215,7 @@ public:
           vtable{other.vtable},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
-            other.vtable(operation::move, other, this);
+            other.vtable(request::move, other, this);
         } else if(other.mode != any_policy::empty) {
             instance = std::exchange(other.instance, nullptr);
         }
@@ -224,7 +224,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
         if(owner()) {
-            vtable(operation::destroy, *this, nullptr);
+            vtable(request::destroy, *this, nullptr);
         }
     }
 
@@ -238,7 +238,7 @@ public:
             reset();
 
             if(other.vtable) {
-                other.vtable(operation::copy, other, this);
+                other.vtable(request::copy, other, this);
             }
         }
 
@@ -256,7 +256,7 @@ public:
         reset();
 
         if(other.mode == any_policy::embedded) {
-            other.vtable(operation::move, other, this);
+            other.vtable(request::move, other, this);
         } else if(other.mode != any_policy::empty) {
             instance = std::exchange(other.instance, nullptr);
         }
@@ -293,7 +293,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data() const noexcept {
-        return (mode == any_policy::embedded) ? vtable(operation::get, *this, nullptr) : instance;
+        return (mode == any_policy::embedded) ? vtable(request::get, *this, nullptr) : instance;
     }
 
     /**
@@ -341,7 +341,7 @@ public:
      */
     bool assign(const basic_any &other) {
         if(vtable && mode != any_policy::cref && *info == *other.info) {
-            return (vtable(operation::assign, *this, other.data()) != nullptr);
+            return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
         return false;
@@ -351,10 +351,10 @@ public:
     bool assign(basic_any &&other) {
         if(vtable && mode != any_policy::cref && *info == *other.info) {
             if(auto *val = other.data(); val) {
-                return (vtable(operation::transfer, *this, val) != nullptr);
+                return (vtable(request::transfer, *this, val) != nullptr);
             }
 
-            return (vtable(operation::assign, *this, std::as_const(other).data()) != nullptr);
+            return (vtable(request::assign, *this, std::as_const(other).data()) != nullptr);
         }
 
         return false;
@@ -363,7 +363,7 @@ public:
     /*! @brief Destroys contained object */
     void reset() {
         if(owner()) {
-            vtable(operation::destroy, *this, nullptr);
+            vtable(request::destroy, *this, nullptr);
         }
 
         instance = nullptr;
@@ -387,7 +387,7 @@ public:
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
         if(vtable && *info == *other.info) {
-            return (vtable(operation::compare, *this, other.data()) != nullptr);
+            return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
         return (!vtable && !other.vtable);
