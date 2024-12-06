@@ -92,13 +92,13 @@ class basic_any {
             }
             break;
         case operation::move:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
+            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
         case operation::get:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy type");
+            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 return elem;
             }
