@@ -109,9 +109,9 @@ class basic_any {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
-
         if constexpr(!std::is_void_v<Type>) {
+            using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
+
             info = &type_id<plain_type>();
             vtable = basic_vtable<plain_type>;
 
@@ -178,10 +178,10 @@ public:
      */
     template<typename Type>
     explicit basic_any(std::in_place_t, Type *value)
-        : instance{value} {
+        : instance{} {
         static_assert(!std::is_const_v<Type> && !std::is_void_v<Type>, "Non-const non-void pointer required");
 
-        if(instance != nullptr) {
+        if(value != nullptr) {
             initialize<Type &>(*value);
             mode = any_policy::dynamic;
         }
