@@ -176,9 +176,11 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value A pointer to an object to take ownership of.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
+    template<typename Type>
     explicit basic_any(std::in_place_t, Type *value)
         : instance{value} {
+        static_assert(!std::is_const_v<Type> && !std::is_void_v<Type>, "Non-const non-void pointer required");
+
         if(instance != nullptr) {
             initialize<Type &>(*value);
             mode = any_policy::dynamic;

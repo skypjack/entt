@@ -257,7 +257,7 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @param value A pointer to an object to take ownership of.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
+    template<typename Type>
     explicit meta_any(std::in_place_t, Type *value)
         : meta_any{locator<meta_ctx>::value_or(), std::in_place, value} {}
 
@@ -267,7 +267,7 @@ public:
      * @param area The context from which to search for meta types.
      * @param value A pointer to an object to take ownership of.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_const_v<Type> && !std::is_void_v<Type>>>
+    template<typename Type>
     explicit meta_any(const meta_ctx &area, std::in_place_t, Type *value)
         : storage{std::in_place, value},
           ctx{&area} {
