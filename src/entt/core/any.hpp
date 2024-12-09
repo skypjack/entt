@@ -287,7 +287,7 @@ public:
      * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] const type_info &type() const noexcept {
-        return *info;
+        return (info == nullptr) ? type_id<void>() : *info;
     }
 
     /**
@@ -304,7 +304,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data(const type_info &req) const noexcept {
-        return *info == req ? data() : nullptr;
+        return (type() == req) ? data() : nullptr;
     }
 
     /**
@@ -342,7 +342,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && mode != any_policy::cref && *info == *other.info) {
+        if(vtable && mode != any_policy::cref && *info == other.type()) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -351,7 +351,7 @@ public:
 
     /*! @copydoc assign */
     bool assign(basic_any &&other) {
-        if(vtable && mode != any_policy::cref && *info == *other.info) {
+        if(vtable && mode != any_policy::cref && *info == other.type()) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
@@ -369,7 +369,7 @@ public:
         }
 
         instance = nullptr;
-        info = &type_id<void>();
+        info = nullptr;
         vtable = nullptr;
         mode = any_policy::empty;
     }
@@ -388,7 +388,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
-        if(vtable && *info == *other.info) {
+        if(vtable && *info == other.type()) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
@@ -438,7 +438,7 @@ private:
         const void *instance;
         storage_type storage;
     };
-    const type_info *info{&type_id<void>()};
+    const type_info *info{};
     vtable_type *vtable{};
     any_policy mode{any_policy::empty};
 };
