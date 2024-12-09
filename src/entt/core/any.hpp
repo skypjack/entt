@@ -110,9 +110,9 @@ class basic_any {
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
         using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
-        info = &type_id<plain_type>();
 
         if constexpr(!std::is_void_v<Type>) {
+            info = &type_id<plain_type>();
             vtable = basic_vtable<plain_type>;
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
