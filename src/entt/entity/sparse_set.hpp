@@ -165,20 +165,28 @@ class basic_sparse_set {
     static constexpr auto max_size = static_cast<std::size_t>(traits_type::to_entity(null));
 
     // it could be auto but gcc complains and emits a warning due to a false positive
-    [[nodiscard]] std::size_t policy_to_head() const noexcept {
+    [[nodiscard]] auto policy_to_head() const noexcept {
         return static_cast<size_type>(max_size * static_cast<decltype(max_size)>(mode != deletion_policy::swap_only));
     }
 
+    [[nodiscard]] auto entity_to_pos(const Entity entt) const noexcept {
+        return static_cast<size_type>(traits_type::to_entity(entt));
+    }
+
+    [[nodiscard]] auto pos_to_page(const std::size_t pos) const noexcept {
+        return static_cast<size_type>(pos / traits_type::page_size);
+    }
+
     [[nodiscard]] auto sparse_ptr(const Entity entt) const {
-        const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
-        const auto page = pos / traits_type::page_size;
+        const auto pos = entity_to_pos(entt);
+        const auto page = pos_to_page(pos);
         return (page < sparse.size() && sparse[page]) ? (sparse[page] + fast_mod(pos, traits_type::page_size)) : nullptr;
     }
 
     [[nodiscard]] auto &sparse_ref(const Entity entt) const {
         ENTT_ASSERT(sparse_ptr(entt), "Invalid element");
-        const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
-        return sparse[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
+        const auto pos = entity_to_pos(entt);
+        return sparse[pos_to_page(pos)][fast_mod(pos, traits_type::page_size)];
     }
 
     [[nodiscard]] auto to_iterator(const Entity entt) const {
@@ -186,8 +194,8 @@ class basic_sparse_set {
     }
 
     [[nodiscard]] auto &assure_at_least(const Entity entt) {
-        const auto pos = static_cast<size_type>(traits_type::to_entity(entt));
-        const auto page = pos / traits_type::page_size;
+        const auto pos = entity_to_pos(entt);
+        const auto page = pos_to_page(pos);
 
         if(!(page < sparse.size())) {
             sparse.resize(page + 1u, nullptr);
@@ -272,7 +280,7 @@ protected:
      */
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
-        const auto pos = static_cast<size_type>(traits_type::to_entity(std::exchange(sparse_ref(*it), null)));
+        const auto pos = entity_to_pos(std::exchange(sparse_ref(*it), null));
         packed[pos] = traits_type::combine(static_cast<typename traits_type::entity_type>(std::exchange(head, pos)), tombstone);
     }
 
@@ -343,7 +351,7 @@ protected:
                 pos = head;
                 ENTT_ASSERT(elem == null, "Slot not available");
                 elem = traits_type::combine(static_cast<typename traits_type::entity_type>(head), traits_type::to_integral(entt));
-                head = static_cast<size_type>(traits_type::to_entity(std::exchange(packed[pos], entt)));
+                head = entity_to_pos(std::exchange(packed[pos], entt));
                 break;
             }
             [[fallthrough]];
@@ -357,12 +365,12 @@ protected:
                 packed.push_back(entt);
                 elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             } else {
-                ENTT_ASSERT(!(static_cast<size_type>(traits_type::to_entity(elem)) < head), "Slot not available");
+                ENTT_ASSERT(!(entity_to_pos(elem) < head), "Slot not available");
                 bump(entt);
             }
 
             pos = head++;
-            swap_at(static_cast<size_type>(traits_type::to_entity(elem)), pos);
+            swap_at(entity_to_pos(elem), pos);
             break;
         }
 
@@ -713,7 +721,7 @@ public:
      */
     [[nodiscard]] size_type index(const entity_type entt) const noexcept {
         ENTT_ASSERT(contains(entt), "Set does not contain entity");
-        return static_cast<size_type>(traits_type::to_entity(sparse_ref(entt)));
+        return entity_to_pos(sparse_ref(entt));
     }
 
     /**
@@ -799,7 +807,7 @@ public:
         auto &elem = sparse_ref(entt);
         ENTT_ASSERT(entt != null && elem != tombstone, "Cannot set the required version");
         elem = traits_type::combine(traits_type::to_integral(elem), traits_type::to_integral(entt));
-        packed[static_cast<size_type>(traits_type::to_entity(elem))] = entt;
+        packed[entity_to_pos(elem)] = entt;
         return traits_type::to_version(entt);
     }
 
@@ -890,7 +898,7 @@ public:
             for(; from && packed[from - 1u] == tombstone; --from) {}
 
             while(pos != max_size) {
-                if(const auto to = std::exchange(pos, static_cast<size_type>(traits_type::to_entity(packed[pos]))); to < from) {
+                if(const auto to = std::exchange(pos, entity_to_pos(packed[pos])); to < from) {
                     --from;
                     swap_or_move(from, to);
 
