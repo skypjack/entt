@@ -314,9 +314,9 @@ protected:
         switch(mode) {
         case deletion_policy::in_place:
             if(head != max_size) {
-                for(auto first = begin(); !(first.index() < 0); ++first) {
-                    if(*first != tombstone) {
-                        sparse_ref(*first) = null;
+                for(auto &&elem: packed) {
+                    if(elem != tombstone) {
+                        sparse_ref(elem) = null;
                     }
                 }
                 break;
@@ -324,8 +324,8 @@ protected:
             [[fallthrough]];
         case deletion_policy::swap_only:
         case deletion_policy::swap_and_pop:
-            for(auto first = begin(); !(first.index() < 0); ++first) {
-                sparse_ref(*first) = null;
+            for(auto &&elem: packed) {
+                sparse_ref(elem) = null;
             }
             break;
         }
