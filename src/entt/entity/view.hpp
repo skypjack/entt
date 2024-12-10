@@ -436,6 +436,9 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
     : public basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
 
+    template<std::size_t Index>
+    using element_at = type_list_element_t<Index, type_list<Get..., Exclude...>>;
+
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
@@ -541,8 +544,7 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
-        return static_cast<type *>(const_cast<constness_as_t<common_type, type> *>(base_type::storage(Index)));
+        return static_cast<element_at<Index> *>(const_cast<constness_as_t<common_type, element_at<Index>> *>(base_type::storage(Index)));
     }
 
     /**
@@ -563,7 +565,7 @@ public:
      */
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
-        static_assert(std::is_convertible_v<Type &, type_list_element_t<Index, type_list<Get..., Exclude...>> &>, "Unexpected type");
+        static_assert(std::is_convertible_v<Type &, element_at<Index> &>, "Unexpected type");
         base_type::storage(Index, &elem);
     }
 
