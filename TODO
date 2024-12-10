@@ -42,7 +42,6 @@ TODO:
 * dtor, traits and custom should be part of meta descriptor (update meta_factory tests then)
 * allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
-* meta_any ownership construction and from_void
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * track meta context on meta elements
