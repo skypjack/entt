@@ -270,27 +270,19 @@ protected:
         return pools[pos];
     }
 
-    [[nodiscard]] const Type *storage(const std::size_t pos) const noexcept {
-        if(pos < Get) {
-            return pools[pos];
-        }
-
-        if(const auto idx = pos - Get; filter[idx] != internal::view_placeholder<Type>()) {
-            return filter[idx];
-        }
-
-        return nullptr;
+    void pool_at(const std::size_t pos, const Type *elem) noexcept {
+        ENTT_ASSERT(elem != nullptr, "Unexpected element");
+        pools[pos] = elem;
+        refresh();
     }
 
-    void storage(const std::size_t pos, const Type *elem) noexcept {
-        ENTT_ASSERT(elem != nullptr, "Unexpected element");
+    [[nodiscard]] const Type *filter_at(const std::size_t pos) const noexcept {
+        return (filter[pos] == internal::view_placeholder<Type>()) ? nullptr : filter[pos];
+    }
 
-        if(pos < Get) {
-            pools[pos] = elem;
-            refresh();
-        } else {
-            filter[pos - Get] = elem;
-        }
+    void filter_at(const std::size_t pos, const Type *elem) noexcept {
+        ENTT_ASSERT(elem != nullptr, "Unexpected element");
+        filter[pos] = elem;
     }
 
     [[nodiscard]] bool none_of(const typename Type::entity_type entt) const noexcept {
@@ -544,7 +536,11 @@ public:
      */
     template<std::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
-        return static_cast<element_at<Index> *>(const_cast<constness_as_t<common_type, element_at<Index>> *>(base_type::storage(Index)));
+        if constexpr(Index < sizeof...(Get)) {
+            return static_cast<element_at<Index> *>(const_cast<constness_as_t<common_type, element_at<Index>> *>(base_type::pool_at(Index)));
+        } else {
+            return static_cast<element_at<Index> *>(const_cast<constness_as_t<common_type, element_at<Index>> *>(base_type::filter_at(Index - sizeof...(Get))));
+        }
     }
 
     /**
@@ -566,7 +562,12 @@ public:
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         static_assert(std::is_convertible_v<Type &, element_at<Index> &>, "Unexpected type");
-        base_type::storage(Index, &elem);
+
+        if constexpr(Index < sizeof...(Get)) {
+            base_type::pool_at(Index, &elem);
+        } else {
+            base_type::filter_at(Index - sizeof...(Get), &elem);
+        }
     }
 
     /**
