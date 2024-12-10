@@ -289,7 +289,9 @@ template<typename Type>
 
     if constexpr(!std::is_void_v<Type> && !std::is_function_v<Type>) {
         node.from_void = +[](const meta_ctx &ctx, void *elem, const void *celem) {
-            if(elem) {
+            if(elem && celem) { // ownership construction request
+                return meta_any{ctx, std::in_place, static_cast<std::decay_t<Type> *>(elem)};
+            } else if(elem) {
                 return meta_any{ctx, std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(elem)};
             }
 

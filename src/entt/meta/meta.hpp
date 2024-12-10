@@ -1398,10 +1398,11 @@ public:
     /**
      * @brief Wraps an opaque element of the underlying type.
      * @param elem A valid pointer to an element of the underlying type.
+     * @param transfer_ownership True to transfer ownership, false otherwise.
      * @return A wrapper that references the given instance.
      */
-    [[nodiscard]] meta_any from_void(void *elem) const {
-        return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, elem, nullptr) : meta_any{meta_ctx_arg, *ctx};
+    [[nodiscard]] meta_any from_void(void *elem, bool transfer_ownership = false) const {
+        return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, elem, transfer_ownership ? elem : nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc from_void */

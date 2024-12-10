@@ -96,6 +96,18 @@ struct overloaded_func {
     int value{};
 };
 
+struct from_void_callback {
+    from_void_callback(bool &ref)
+        : cb{&ref} {}
+
+    ~from_void_callback() {
+        *cb = !*cb;
+    }
+
+private:
+    bool *cb;
+};
+
 enum class property_type : entt::id_type {
     value,
     other
@@ -558,12 +570,12 @@ TEST_F(MetaType, FromVoid) {
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<double *>(nullptr)));
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<const double *>(nullptr)));
 
-    auto type = entt::resolve<double>();
     double value = 4.2;
 
     ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<void *>(&value)));
     ASSERT_FALSE(entt::resolve<void>().from_void(static_cast<const void *>(&value)));
 
+    auto type = entt::resolve<double>();
     auto as_void = type.from_void(static_cast<void *>(&value));
     auto as_const_void = type.from_void(static_cast<const void *>(&value));
 
@@ -581,6 +593,28 @@ TEST_F(MetaType, FromVoid) {
 
     ASSERT_EQ(as_void.cast<double>(), as_const_void.cast<double>());
     ASSERT_EQ(as_void.cast<double>(), 1.2);
+}
+
+TEST_F(MetaType, FromVoidOwnership) {
+    bool check = false;
+    auto type = entt::resolve<from_void_callback>();
+    auto instance = std::make_unique<from_void_callback>(check);
+
+    auto any = type.from_void(static_cast<void *>(instance.get()));
+    auto other = type.from_void(static_cast<void *>(instance.release()), true);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
+
+    ASSERT_FALSE(check);
+
+    any.reset();
+
+    ASSERT_FALSE(check);
+
+    other.reset();
+
+    ASSERT_TRUE(check);
 }
 
 TEST_F(MetaType, Reset) {
