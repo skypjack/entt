@@ -1405,7 +1405,11 @@ public:
         return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, elem, transfer_ownership ? elem : nullptr) : meta_any{meta_ctx_arg, *ctx};
     }
 
-    /*! @copydoc from_void */
+    /**
+     * @brief Wraps an opaque element of the underlying type.
+     * @param elem A valid pointer to an element of the underlying type.
+     * @return A wrapper that references the given instance.
+     */
     [[nodiscard]] meta_any from_void(const void *elem) const {
         return ((elem != nullptr) && (node.from_void != nullptr)) ? node.from_void(*ctx, nullptr, elem) : meta_any{meta_ctx_arg, *ctx};
     }
