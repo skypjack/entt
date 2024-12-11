@@ -169,6 +169,9 @@ if(ENTT_BUILD_LIB)
 
     SETUP_LIB_SHARED_TEST(registry shared)
     SETUP_LIB_PLUGIN_TEST(registry plugin)
+
+    SETUP_LIB_SHARED_TEST(view shared)
+    SETUP_LIB_PLUGIN_TEST(view plugin)
 endif()
 
 # Test snapshot
