@@ -198,8 +198,8 @@ template<typename... Args>
     return value(context);
 }
 
-[[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const meta_type_node &to, const void *instance) noexcept {
-    if((from.info != nullptr) && (to.info != nullptr) && *from.info == *to.info) {
+[[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const type_info *to, const void *instance) noexcept {
+    if((from.info != nullptr) && (to != nullptr) && *from.info == *to) {
         return instance;
     }
 
