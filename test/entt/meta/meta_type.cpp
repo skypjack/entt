@@ -100,6 +100,9 @@ struct from_void_callback {
     from_void_callback(bool &ref)
         : cb{&ref} {}
 
+    from_void_callback(const from_void_callback &) = delete;
+    from_void_callback &operator=(const from_void_callback &) = delete;
+
     ~from_void_callback() {
         *cb = !*cb;
     }
