@@ -1422,6 +1422,7 @@ public:
      * @param sz Number of parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
         if(node.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(node.details->func, id); elem != nullptr) {
@@ -1464,6 +1465,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
+    // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(const id_type id, meta_handle instance, Type &&value) const {
         const auto candidate = data(id);
         return candidate && candidate.set(std::move(instance), std::forward<Type>(value));
