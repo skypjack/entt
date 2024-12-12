@@ -605,6 +605,7 @@ TYPED_TEST(ReactiveMixin, CustomAllocator) {
     ASSERT_NE(pool.capacity(), 0u);
     ASSERT_EQ(pool.size(), 2u);
 
+    other = {};
     pool.swap(other);
     pool = std::move(other);
     test::is_initialized(other);

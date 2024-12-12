@@ -2026,6 +2026,7 @@ TYPED_TEST(SparseSet, CustomAllocator) {
         ASSERT_EQ(set.capacity(), 2u);
         ASSERT_EQ(set.size(), 2u);
 
+        other = {};
         set.swap(other);
         set = std::move(other);
         test::is_initialized(other);

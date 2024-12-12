@@ -508,6 +508,7 @@ TEST(Table, CustomAllocator) {
     ASSERT_NE(table.capacity(), 0u);
     ASSERT_EQ(table.size(), 2u);
 
+    other = {};
     table.swap(other);
     table = std::move(other);
     test::is_initialized(other);
