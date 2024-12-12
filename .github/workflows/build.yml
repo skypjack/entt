@@ -5,51 +5,18 @@ on: [push, pull_request]
 jobs:
 
   linux:
-    timeout-minutes: 15
-
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04]
         compiler:
-          - { pkg: g++, exe: 'g++', version: 9 }
-          - { pkg: g++, exe: 'g++', version: 10 }
-          - { pkg: g++, exe: 'g++', version: 11 }
           - { pkg: g++, exe: 'g++', version: 12 }
           - { pkg: g++, exe: 'g++', version: 13 }
           - { pkg: g++, exe: 'g++', version: 14 }
-          - { pkg: clang, exe: 'clang++', version: 13 }
-          - { pkg: clang, exe: 'clang++', version: 14 }
-          - { pkg: clang, exe: 'clang++', version: 15 }
           - { pkg: clang, exe: 'clang++', version: 16 }
           - { pkg: clang, exe: 'clang++', version: 17 }
           - { pkg: clang, exe: 'clang++', version: 18 }
-        exclude:
-          - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 12 }
-          - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 13 }
-          - os: ubuntu-latest
-            compiler: { pkg: g++, exe: 'g++', version: 14 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 16 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 17 }
-          - os: ubuntu-latest
-            compiler: { pkg: clang, exe: 'clang++', version: 18 }
-          - os: ubuntu-24.04
-            compiler: { pkg: g++, exe: 'g++', version: 9 }
-          - os: ubuntu-24.04
-            compiler: { pkg: g++, exe: 'g++', version: 10 }
-          - os: ubuntu-24.04
-            compiler: { pkg: g++, exe: 'g++', version: 11 }
-          - os: ubuntu-24.04
-            compiler: { pkg: clang, exe: 'clang++', version: 13 }
-          - os: ubuntu-24.04
-            compiler: { pkg: clang, exe: 'clang++', version: 14 }
-          - os: ubuntu-24.04
-            compiler: { pkg: clang, exe: 'clang++', version: 15 }
 
-    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -71,8 +38,6 @@ jobs:
       run: ctest -C Debug -j4
 
   windows:
-    timeout-minutes: 15
-
     strategy:
       matrix:
         toolset: [default, v142, clang-cl]
@@ -82,6 +47,7 @@ jobs:
           - toolset: clang-cl
             toolset_option: -T"ClangCl"
 
+    timeout-minutes: 15
     runs-on: windows-latest
 
     steps:
@@ -115,14 +81,13 @@ jobs:
       run: ctest -C Debug -j4
 
   extra:
-    timeout-minutes: 15
-
     strategy:
       matrix:
         os: [windows-latest, macOS-latest, ubuntu-latest]
         id_type: ["std::uint32_t", "std::uint64_t"]
         cxx_std: [cxx_std_17, cxx_std_20]
 
+    timeout-minutes: 15
     runs-on: ${{ matrix.os }}
 
     steps:
