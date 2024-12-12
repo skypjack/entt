@@ -438,7 +438,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
+        const auto &other = type_id<std::remove_cv_t<Type>>();
         return static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data()));
     }
 
@@ -448,7 +448,7 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
-            const auto other = internal::resolve<std::remove_cv_t<Type>>(internal::meta_context::from(*ctx));
+            const auto &other = type_id<std::remove_cv_t<Type>>();
             return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data())));
         }
     }
@@ -1304,7 +1304,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return (internal::try_cast(internal::meta_context::from(*ctx), node, other.node, this) != nullptr);
+        return (other.node.info != nullptr) && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
     }
 
     /**
