@@ -601,10 +601,10 @@ TEST_F(MetaType, FromVoid) {
 TEST_F(MetaType, FromVoidOwnership) {
     bool check = false;
     auto type = entt::resolve<from_void_callback>();
-    auto instance = std::make_unique<from_void_callback>(check);
+    void *instance = std::make_unique<from_void_callback>(check).release();
 
-    auto any = type.from_void(static_cast<void *>(instance.get()));
-    auto other = type.from_void(static_cast<void *>(instance.release()), true);
+    auto any = type.from_void(instance);
+    auto other = type.from_void(instance, true);
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(other);
