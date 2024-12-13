@@ -1304,7 +1304,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return (other.node.info != nullptr) && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
+        return other && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
     }
 
     /**
