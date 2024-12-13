@@ -448,7 +448,7 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
-            const auto &other = type_id<std::remove_cv_t<Type>>();
+            const auto &other = type_id<Type>();
             return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data())));
         }
     }
