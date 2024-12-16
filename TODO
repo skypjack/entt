@@ -36,7 +36,6 @@ TODO:
 * view specializations for multi, single and filtered elements
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
-* refine the storage fallback mechanism for views (ie alloc?)
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
 * dtor, traits and custom should be part of meta descriptor (update meta_factory tests then)

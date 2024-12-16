@@ -41,8 +41,8 @@ template<typename It, typename Entity>
 }
 
 template<typename It>
-[[nodiscard]] bool fully_initialized(It first, const It last) noexcept {
-    for(const auto *placeholder = view_placeholder<std::remove_const_t<std::remove_pointer_t<typename std::iterator_traits<It>::value_type>>>(); (first != last) && *first != placeholder; ++first) {}
+[[nodiscard]] bool fully_initialized(It first, const It last, const std::remove_pointer_t<typename std::iterator_traits<It>::value_type> *placeholder) noexcept {
+    for(; (first != last) && *first != placeholder; ++first) {}
     return first == last;
 }
 
@@ -255,7 +255,7 @@ protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept {
         for(size_type pos{}; pos < Exclude; ++pos) {
-            filter[pos] = internal::view_placeholder<Type>();
+            filter[pos] = placeholder;
         }
     }
 
@@ -277,7 +277,7 @@ protected:
     }
 
     [[nodiscard]] const Type *filter_at(const std::size_t pos) const noexcept {
-        return (filter[pos] == internal::view_placeholder<Type>()) ? nullptr : filter[pos];
+        return (filter[pos] == placeholder) ? nullptr : filter[pos];
     }
 
     void filter_at(const std::size_t pos, const Type *elem) noexcept {
@@ -390,7 +390,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (index != Get) && internal::fully_initialized(filter.begin(), filter.end());
+        return (index != Get) && internal::fully_initialized(filter.begin(), filter.end(), placeholder);
     }
 
     /**
@@ -408,6 +408,7 @@ public:
 private:
     std::array<const common_type *, Get> pools{};
     std::array<const common_type *, Exclude> filter{};
+    const common_type *placeholder{internal::view_placeholder<common_type>()};
     size_type index{Get};
 };
 

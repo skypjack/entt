@@ -1,9 +1,12 @@
 #include <gtest/gtest.h>
 #include <entt/core/attribute.h>
+#include "../types.h"
 
-ENTT_API void do_nothing();
+ENTT_API const void *filter(const view_type &);
 
 TEST(Lib, View) {
-    do_nothing();
-	// TODO
+    view_type view{};
+    const void *storage = filter(view);
+
+    ASSERT_EQ(storage, nullptr);
 }
