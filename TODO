@@ -31,16 +31,15 @@ TODO:
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * entity based component_traits
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
-* after removing meta prop vectors, copy meta objects in their handles directly
 * suppress -Wself-move on CI with g++13
 * view specializations for multi, single and filtered elements
 * organizer support to groups
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
-* dtor, traits and custom should be part of meta descriptor (update meta_factory tests then)
 * allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * track meta context on meta elements
+* safer meta_data/meta_func (no blind indirections)
