@@ -643,6 +643,21 @@ public:
     }
 
     /**
+     * @brief Attaches a storage to the end of the view for iterating.
+     *
+     * @tparam OGet The type of the storage to attach to the view.
+     * @param other The storage to attach to the view.
+     * @return A new view with the given storage attached.
+     * @note This function only supports adding one storage, use @ref operator| to join two views instead.
+     * @sa operator|
+     */
+    template<typename OGet>
+    [[nodiscard]] auto join(OGet &other) const noexcept {
+        return internal::view_pack<basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>>>(
+            *this, basic_view<get_t<OGet>, exclude_t<>>{other}, std::index_sequence_for<Get...>{}, std::index_sequence_for<Exclude...>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
+    }
+
+    /**
      * @brief Combines two views in a _more specific_ one.
      * @tparam OGet Element list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
@@ -1070,6 +1085,21 @@ public:
             static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
             return iterable{base_type::begin(), base_type::end()};
         }
+    }
+
+    /**
+     * @brief Attaches a storage to the end of the view for iterating.
+     *
+     * @tparam OGet The type of the storage to attach to the view.
+     * @param other The storage to attach to the view.
+     * @return A new view with the given storage attached.
+     * @note This function only supports adding one storage, use @ref operator| to join two views instead.
+     * @sa operator|
+     */
+    template<typename OGet>
+    [[nodiscard]] auto join(OGet &other) const noexcept {
+        return internal::view_pack<basic_view<get_t<Get, OGet>, exclude_t<>>>(
+            *this, basic_view<get_t<OGet>, exclude_t<>>{other}, std::index_sequence_for<Get>{}, std::index_sequence_for<>{}, std::index_sequence_for<OGet>{}, std::index_sequence_for<>{});
     }
 
     /**
