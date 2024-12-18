@@ -43,3 +43,4 @@ TODO:
 * any cdynamic to support const ownership construction
 * track meta context on meta elements
 * safer meta_data/meta_func (no blind indirections)
+* review tests, write doc for view::join and decide whether I like it or prefer operator| for consistency :)
