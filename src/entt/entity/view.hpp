@@ -643,13 +643,10 @@ public:
     }
 
     /**
-     * @brief Attaches a storage to the end of the view for iterating.
-     *
-     * @tparam OGet The type of the storage to attach to the view.
-     * @param other The storage to attach to the view.
-     * @return A new view with the given storage attached.
-     * @note This function only supports adding one storage, use @ref operator| to join two views instead.
-     * @sa operator|
+     * @brief Combines a view and a storage in _more specific_ view.
+     * @tparam OGet Type of storage to join the view with.
+     * @param other The storage for the type to join the view with.
+     * @return A more specific view.
      */
     template<typename OGet>
     [[nodiscard]] auto join(OGet &other) const noexcept {
@@ -1088,13 +1085,10 @@ public:
     }
 
     /**
-     * @brief Attaches a storage to the end of the view for iterating.
-     *
-     * @tparam OGet The type of the storage to attach to the view.
-     * @param other The storage to attach to the view.
-     * @return A new view with the given storage attached.
-     * @note This function only supports adding one storage, use @ref operator| to join two views instead.
-     * @sa operator|
+     * @brief Combines a view and a storage in _more specific_ view.
+     * @tparam OGet Type of storage to join the view with.
+     * @param other The storage for the type to join the view with.
+     * @return A more specific view.
      */
     template<typename OGet>
     [[nodiscard]] auto join(OGet &other) const noexcept {
