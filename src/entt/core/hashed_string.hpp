@@ -105,7 +105,7 @@ public:
      */
     template<std::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-    [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) noexcept {
+    [[nodiscard]] static ENTT_CONSTEVAL hash_type value(const value_type (&str)[N]) noexcept {
         return basic_hashed_string{str};
     }
 
@@ -137,7 +137,7 @@ public:
      */
     template<std::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-    constexpr basic_hashed_string(const value_type (&str)[N]) noexcept
+    ENTT_CONSTEVAL basic_hashed_string(const value_type (&str)[N]) noexcept
         : base_type{helper({static_cast<const value_type *>(str)})} {}
 
     /**
@@ -291,7 +291,7 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr hashed_string operator""_hs(const char *str, std::size_t) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL hashed_string operator""_hs(const char *str, std::size_t) noexcept {
     return hashed_string{str};
 }
 
@@ -300,7 +300,7 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] constexpr hashed_wstring operator""_hws(const wchar_t *str, std::size_t) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL hashed_wstring operator""_hws(const wchar_t *str, std::size_t) noexcept {
     return hashed_wstring{str};
 }
 
