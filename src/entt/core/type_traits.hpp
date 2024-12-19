@@ -675,17 +675,22 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
 
-/*! @copydoc is_iterator */
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename, typename = void>
+struct has_iterator_category: std::false_type {};
+
 template<typename Type>
-struct is_iterator<const Type>: is_iterator<Type> {};
+struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
+
+} // namespace internal
+/*! @endcond */
 
 /*! @copydoc is_iterator */
-template<>
-struct is_iterator<void *>: std::false_type {};
-
-/*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
+struct is_iterator<Type, std::enable_if_t<!std::is_void_v<std::remove_cv_t<std::remove_pointer_t<Type>>>>>
+    : internal::has_iterator_category<Type> {};
 
 /**
  * @brief Helper variable template.
