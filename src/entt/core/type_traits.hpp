@@ -753,7 +753,7 @@ template<typename, typename = void>
 struct has_void_element_type: std::false_type {};
 
 template<typename Type>
-struct has_void_element_type<Type, typename std::pointer_traits<Type>::element_type>: std::true_type {};
+struct has_void_element_type<Type, std::remove_const_t<typename std::pointer_traits<Type>::element_type>>: std::true_type {};
 
 template<typename>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable();
