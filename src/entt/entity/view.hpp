@@ -650,6 +650,7 @@ public:
      */
     template<typename OGet>
     [[nodiscard]] auto join(OGet &other) const noexcept {
+        static_assert(std::is_base_of_v<common_type, OGet>, "Unexpected storage type");
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
@@ -1091,6 +1092,7 @@ public:
      */
     template<typename OGet>
     [[nodiscard]] auto join(OGet &other) const noexcept {
+        static_assert(std::is_base_of_v<common_type, OGet>, "Unexpected storage type");
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
