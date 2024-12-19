@@ -749,12 +749,6 @@ struct has_value_type: std::false_type {};
 template<typename Type>
 struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
 
-template<typename, typename = void>
-struct has_void_element_type: std::false_type {};
-
-template<typename Type>
-struct has_void_element_type<Type, std::remove_const_t<typename std::pointer_traits<Type>::element_type>>: std::true_type {};
-
 template<typename>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable();
 
@@ -776,19 +770,19 @@ template<typename Type>
 template<typename Type>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
     // NOLINTBEGIN(modernize-use-transparent-functors)
-    if constexpr(std::is_array_v<Type> || has_void_element_type<Type>::value) {
+    if constexpr(std::is_array_v<Type>) {
         return false;
-    } else if constexpr(!is_iterator_v<Type> && has_value_type<Type>::value) {
-        if constexpr(std::is_same_v<typename Type::value_type, Type> || dispatch_is_equality_comparable<typename Type::value_type>()) {
-            return maybe_equality_comparable<Type>(0);
-        } else {
-            return false;
-        }
     } else if constexpr(is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
             return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
         } else {
             return maybe_equality_comparable<Type>(0);
+        }
+    } else if constexpr(has_value_type<Type>::value) {
+        if constexpr(is_iterator_v<Type> || std::is_same_v<typename Type::value_type, Type> || dispatch_is_equality_comparable<typename Type::value_type>()) {
+            return maybe_equality_comparable<Type>(0);
+        } else {
+            return false;
         }
     } else {
         return maybe_equality_comparable<Type>(0);
