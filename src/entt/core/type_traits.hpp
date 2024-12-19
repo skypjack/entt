@@ -677,6 +677,14 @@ struct is_iterator: std::false_type {};
 
 /*! @copydoc is_iterator */
 template<typename Type>
+struct is_iterator<const Type>: is_iterator<Type> {};
+
+/*! @copydoc is_iterator */
+template<>
+struct is_iterator<void *>: std::false_type {};
+
+/*! @copydoc is_iterator */
+template<typename Type>
 struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
 
 /**
