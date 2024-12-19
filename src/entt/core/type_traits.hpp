@@ -675,22 +675,9 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
 
-/*! @cond TURN_OFF_DOXYGEN */
-namespace internal {
-
-template<typename, typename = void>
-struct has_iterator_category: std::false_type {};
-
-template<typename Type>
-struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
-
-} // namespace internal
-/*! @endcond */
-
 /*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::enable_if_t<!std::is_void_v<std::remove_cv_t<std::remove_pointer_t<Type>>>>>
-    : internal::has_iterator_category<Type> {};
+struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
 
 /**
  * @brief Helper variable template.
@@ -749,6 +736,12 @@ struct has_value_type: std::false_type {};
 template<typename Type>
 struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
 
+template<typename, typename = void>
+struct has_void_element_type: std::false_type {};
+
+template<typename Type>
+struct has_void_element_type<Type, typename std::pointer_traits<Type>::element_type>: std::true_type {};
+
 template<typename>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable();
 
@@ -770,7 +763,7 @@ template<typename Type>
 template<typename Type>
 [[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
     // NOLINTBEGIN(modernize-use-transparent-functors)
-    if constexpr(std::is_array_v<Type>) {
+    if constexpr(std::is_array_v<Type> || has_void_element_type<Type>::value) {
         return false;
     } else if constexpr(!is_iterator_v<Type> && has_value_type<Type>::value) {
         if constexpr(std::is_same_v<typename Type::value_type, Type> || dispatch_is_equality_comparable<typename Type::value_type>()) {
