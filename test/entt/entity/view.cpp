@@ -1541,8 +1541,9 @@ TEST(View, Pipe) {
     entt::basic_view view3{std::get<2>(storage)};
     entt::basic_view view4{std::as_const(std::get<3>(storage))};
 
-    testing::StaticAssertTypeEq<decltype(view1.join(std::get<2>(storage))), decltype(view1 | view3)>();
-    testing::StaticAssertTypeEq<decltype(view1.join(std::get<3>(std::as_const(storage)))), decltype(view1 | view4)>();
+    testing::StaticAssertTypeEq<decltype(view1 | std::get<2>(storage)), decltype(view1 | view3)>();
+    testing::StaticAssertTypeEq<decltype(view1 | std::get<3>(std::as_const(storage))), decltype(view1 | view4)>();
+    testing::StaticAssertTypeEq<decltype(view1 | std::get<2>(storage) | view4), decltype(view1 | view3 | view4)>();
 
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<entt::storage<int>, const entt::storage<int>>, entt::exclude_t<const entt::storage<double>, entt::storage<float>>>, decltype(view1 | view2)>();
     testing::StaticAssertTypeEq<entt::basic_view<entt::get_t<const entt::storage<int>, entt::storage<int>>, entt::exclude_t<entt::storage<float>, const entt::storage<double>>>, decltype(view2 | view1)>();

@@ -644,13 +644,12 @@ public:
 
     /**
      * @brief Combines a view and a storage in _more specific_ view.
-     * @tparam OGet Type of storage to join the view with.
-     * @param other The storage for the type to join the view with.
+     * @tparam OGet Type of storage to combine the view with.
+     * @param other The storage for the type to combine the view with.
      * @return A more specific view.
      */
     template<typename OGet>
-    [[nodiscard]] auto join(OGet &other) const noexcept {
-        static_assert(std::is_base_of_v<common_type, OGet>, "Unexpected storage type");
+    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>>> operator|(OGet &other) const noexcept {
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
@@ -1086,13 +1085,12 @@ public:
 
     /**
      * @brief Combines a view and a storage in _more specific_ view.
-     * @tparam OGet Type of storage to join the view with.
-     * @param other The storage for the type to join the view with.
+     * @tparam OGet Type of storage to combine the view with.
+     * @param other The storage for the type to combine the view with.
      * @return A more specific view.
      */
     template<typename OGet>
-    [[nodiscard]] auto join(OGet &other) const noexcept {
-        static_assert(std::is_base_of_v<common_type, OGet>, "Unexpected storage type");
+    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get, OGet>, exclude_t<>>> operator|(OGet &other) const noexcept {
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
