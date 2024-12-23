@@ -316,12 +316,14 @@ private:
                     allocator_type allocator{get_allocator()};
                     entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
                     alloc_traits::destroy(allocator, std::addressof(elem));
-                    return;
+                } else {
+                    using std::swap;
+                    swap(elem, element_at(to));
                 }
+            } else {
+                using std::swap;
+                swap(elem, element_at(to));
             }
-
-            using std::swap;
-            swap(elem, element_at(to));
         }
     }
 
