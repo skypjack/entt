@@ -146,6 +146,22 @@ struct MetaData: ::testing::Test {
 
 using MetaDataDeathTest = MetaData;
 
+TEST_F(MetaData, SafeWhenEmpty) {
+    entt::meta_data data{};
+
+    ASSERT_FALSE(data);
+    ASSERT_EQ(data, entt::meta_data{});
+    ASSERT_EQ(data.arity(), 0u);
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.type(), entt::meta_type{});
+    ASSERT_FALSE(data.set({}, 0));
+    ASSERT_FALSE(data.get({}));
+    ASSERT_EQ(data.arg(0u), entt::meta_type{});
+    ASSERT_EQ(data.traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(static_cast<const char *>(data.custom()), nullptr);
+}
+
 TEST_F(MetaData, UserTraits) {
     using namespace entt::literals;
 
