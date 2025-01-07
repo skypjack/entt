@@ -176,7 +176,7 @@ TEST_F(MetaFunc, SafeWhenEmpty) {
     ASSERT_FALSE(func.invoke({}, 'c'));
     ASSERT_EQ(func.traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(static_cast<const char *>(func.custom()), nullptr);
-    ASSERT_EQ(func.next(), entt::meta_func{});
+    ASSERT_EQ(func.next(), func);
 }
 
 TEST_F(MetaFunc, UserTraits) {
