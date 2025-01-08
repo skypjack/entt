@@ -42,5 +42,5 @@ TODO:
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * track meta context on meta elements
-* safer meta_type (no blind indirections)
 * no context-less meta_any{} from meta objects if possible
+* auto-context in meta objects to avoid checks on contexts

@@ -1152,7 +1152,7 @@ public:
      * @return The type info object of the underlying type.
      */
     [[nodiscard]] const type_info &info() const noexcept {
-        return *node.info;
+        return node.info ? *node.info : type_id<void>();
     }
 
     /**
@@ -1234,7 +1234,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return {*ctx, node.remove_pointer(internal::meta_context::from(*ctx))};
+        return (ctx != nullptr) ? meta_type{*ctx, node.remove_pointer(internal::meta_context::from(*ctx))} : *this;
     }
 
     /**
@@ -1303,7 +1303,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return other && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
+        return (ctx != nullptr) && other && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
     }
 
     /**
@@ -1312,7 +1312,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return (internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
+        return (ctx != nullptr) && (internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
     }
 
     /**
