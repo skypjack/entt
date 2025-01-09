@@ -439,7 +439,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto &other = type_id<std::remove_cv_t<Type>>();
-        return static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data()));
+        return static_cast<const Type *>(internal::try_cast(ctx, node, other, storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -449,7 +449,7 @@ public:
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
             const auto &other = type_id<Type>();
-            return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data())));
+            return static_cast<Type *>(const_cast<void *>(internal::try_cast(ctx, node, other, storage.data())));
         }
     }
 
@@ -1303,7 +1303,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return (ctx != nullptr) && other && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
+        return other && (internal::try_cast(ctx, node, *other.node.info, this) != nullptr);
     }
 
     /**
@@ -1312,7 +1312,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return (ctx != nullptr) && (internal::try_convert(internal::meta_context::from(*ctx), node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
+        return (internal::try_convert(ctx, node, other.info(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
     }
 
     /**
@@ -1547,7 +1547,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
+    return internal::try_convert(ctx, node, type.info(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
         if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
             return (args.from_void(*ctx, nullptr, instance), ...);
         } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
