@@ -1234,7 +1234,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return (ctx != nullptr) ? meta_type{*ctx, node.remove_pointer(internal::meta_context::from(*ctx))} : *this;
+        return (node.remove_pointer != nullptr) ? meta_type{*ctx, node.remove_pointer(internal::meta_context::from(*ctx))} : *this;
     }
 
     /**
@@ -1579,7 +1579,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return (ctx != nullptr) ? meta_type{*ctx, node.type(internal::meta_context::from(*ctx))} : meta_type{};
+    return (node.type != nullptr) ? meta_type{*ctx, node.type(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1587,7 +1587,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return (ctx != nullptr) ? meta_type{*ctx, node.ret(internal::meta_context::from(*ctx))} : meta_type{};
+    return (node.ret != nullptr) ? meta_type{*ctx, node.ret(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
