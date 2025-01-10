@@ -883,7 +883,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return (node.set != nullptr) ? node.get(*ctx, meta_handle{*ctx, std::move(instance)}) : meta_any{};
+        return (node.get != nullptr) ? node.get(*ctx, meta_handle{*ctx, std::move(instance)}) : meta_any{};
     }
 
     /**
