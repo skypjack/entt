@@ -43,4 +43,3 @@ TODO:
 * any cdynamic to support const ownership construction
 * track meta context on meta elements
 * no context-less meta_any{} from meta objects if possible
-* auto-context in meta objects to avoid checks on contexts

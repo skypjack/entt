@@ -198,15 +198,14 @@ template<typename... Args>
     return value(context);
 }
 
-[[nodiscard]] inline const void *try_cast(const meta_ctx *context, const meta_type_node &from, const type_info &to, const void *instance) noexcept {
+[[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const type_info &to, const void *instance) noexcept {
     if((from.info != nullptr) && *from.info == to) {
         return instance;
     }
 
     if(from.details) {
         for(auto &&curr: from.details->base) {
-            ENTT_ASSERT(context != nullptr, "Null context not allowed");
-            if(const void *elem = try_cast(context, curr.resolve(meta_context::from(*context)), to, curr.cast(instance)); elem) {
+            if(const void *elem = try_cast(context, curr.resolve(context), to, curr.cast(instance)); elem) {
                 return elem;
             }
         }
@@ -216,7 +215,7 @@ template<typename... Args>
 }
 
 template<typename Func>
-[[nodiscard]] inline auto try_convert(const meta_ctx *context, const meta_type_node &from, const type_info &to, const bool arithmetic_or_enum, const void *instance, Func func) {
+[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const type_info &to, const bool arithmetic_or_enum, const void *instance, Func func) {
     if(from.info && *from.info == to) {
         return func(instance, from);
     }
@@ -229,8 +228,7 @@ template<typename Func>
         }
 
         for(auto &&curr: from.details->base) {
-            ENTT_ASSERT(context != nullptr, "Null context not allowed");
-            if(auto other = try_convert(context, curr.resolve(meta_context::from(*context)), to, arithmetic_or_enum, curr.cast(instance), func); other) {
+            if(auto other = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); other) {
                 return other;
             }
         }
