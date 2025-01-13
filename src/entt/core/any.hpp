@@ -249,12 +249,14 @@ public:
 
     /**
      * @brief Move assignment operator.
+     *
+     * @warning
+     * Self-moving puts objects in a safe but unspecified state.
+     *
      * @param other The instance to move from.
      * @return This any object.
      */
     basic_any &operator=(basic_any &&other) noexcept {
-        ENTT_ASSERT(this != &other, "Self move assignment");
-
         reset();
 
         if(other.mode == any_policy::embedded) {

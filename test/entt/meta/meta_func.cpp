@@ -158,6 +158,27 @@ struct MetaFunc: ::testing::Test {
 
 using MetaFuncDeathTest = MetaFunc;
 
+TEST_F(MetaFunc, SafeWhenEmpty) {
+    entt::meta_func func{};
+    entt::meta_any *args = nullptr;
+
+    ASSERT_FALSE(func);
+    ASSERT_EQ(func, entt::meta_func{});
+    ASSERT_EQ(func.arity(), 0u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_FALSE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::meta_type{});
+    ASSERT_EQ(func.arg(0u), entt::meta_type{});
+    ASSERT_EQ(func.arg(1u), entt::meta_type{});
+    ASSERT_FALSE(func.invoke({}, args, 0u));
+    ASSERT_FALSE(func.invoke({}, args, 1u));
+    ASSERT_FALSE(func.invoke({}));
+    ASSERT_FALSE(func.invoke({}, 'c'));
+    ASSERT_EQ(func.traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(static_cast<const char *>(func.custom()), nullptr);
+    ASSERT_EQ(func.next(), func);
+}
+
 TEST_F(MetaFunc, UserTraits) {
     using namespace entt::literals;
 

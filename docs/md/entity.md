@@ -1833,23 +1833,26 @@ the `my_type` component, regardless of what other components they have.
 
 ### View pack
 
-Views are combined with each other to create new and more specific queries.<br/>
-The type returned when combining multiple views together is itself a view, more
-in general a multi component one.
+Views are combined with storage objects and with each other to create new, more
+specific _queries_.<br/>
+The type returned when combining multiple elements together is itself a view,
+more in general a multi component one.
 
-Combining different views tries to mimic C++20 ranges:
+Combining different elements tries to mimic C++20 ranges:
 
 ```cpp
 auto view = registry.view<position>();
 auto other = registry.view<velocity>();
+const auto &storage = registry.storage<renderable>();
 
-auto pack = view | other;
+auto pack = view | other | renderable;
 ```
 
 The constness of the types is preserved and their order depends on the order in
-which the views are combined. For example, the pack above returns an instance of
-`position` first and then one of `velocity`.<br/>
-Since combining views generates views, a chain can be of arbitrary length and
+which the views are combined. For example, the above _pack_ first returns an
+instance of `position`, then one of `velocity`, and finally one of
+`renderable`.<br/>
+Since combining elements generates views, a chain can be of arbitrary length and
 the above type order rules apply sequentially.
 
 ### Iteration order

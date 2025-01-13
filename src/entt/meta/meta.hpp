@@ -218,8 +218,7 @@ class meta_any {
 
 public:
     /*! Default constructor. */
-    meta_any()
-        : meta_any{meta_ctx_arg, locator<meta_ctx>::value_or()} {}
+    meta_any() = default;
 
     /**
      * @brief Context aware constructor.
@@ -358,13 +357,15 @@ public:
 
     /**
      * @brief Move assignment operator.
+     *
+     * @warning
+     * Self-moving puts objects in a safe but unspecified state.
+     *
      * @param other The instance to move from.
      * @return This meta any object.
      */
     meta_any &operator=(meta_any &&other) noexcept {
-        ENTT_ASSERT(this != &other, "Self move assignment");
-
-        release();
+        reset();
         storage = std::move(other.storage);
         ctx = other.ctx;
         node = std::exchange(other.node, internal::meta_type_node{});
@@ -640,7 +641,7 @@ public:
 
 private:
     any storage{};
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     internal::meta_type_node node{};
     vtable_type *vtable{};
 };
@@ -874,7 +875,7 @@ struct meta_data {
     template<typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(meta_handle instance, Type &&value) const {
-        return node.set && node.set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+        return (node.set != nullptr) && node.set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
@@ -883,7 +884,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node.get(*ctx, meta_handle{*ctx, std::move(instance)});
+        return (node.get != nullptr) ? node.get(*ctx, meta_handle{*ctx, std::move(instance)}) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -916,7 +917,7 @@ struct meta_data {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (ctx != nullptr);
+        return (node.get != nullptr);
     }
 
     /**
@@ -930,7 +931,7 @@ struct meta_data {
 
 private:
     internal::meta_data_node node{};
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /**
@@ -1005,7 +1006,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return sz == arity() ? node.invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return ((node.invoke != nullptr) && (sz == arity())) ? node.invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1018,8 +1019,7 @@ struct meta_func {
     template<typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
-        return invoke(std::move(instance), arguments.data(), sizeof...(Args));
+        return invoke(std::move(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::traits */
@@ -1038,7 +1038,7 @@ struct meta_func {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return node.next ? meta_func{*ctx, *node.next} : meta_func{};
+        return (node.next != nullptr) ? meta_func{*ctx, *node.next} : meta_func{};
     }
 
     /**
@@ -1046,7 +1046,7 @@ struct meta_func {
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (ctx != nullptr);
+        return (node.invoke != nullptr);
     }
 
     /*! @copydoc meta_data::operator== */
@@ -1056,7 +1056,7 @@ struct meta_func {
 
 private:
     internal::meta_func_node node{};
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /**
@@ -1153,7 +1153,7 @@ public:
      * @return The type info object of the underlying type.
      */
     [[nodiscard]] const type_info &info() const noexcept {
-        return *node.info;
+        return node.info ? *node.info : type_id<void>();
     }
 
     /**
@@ -1235,7 +1235,7 @@ public:
      * doesn't refer to a pointer type.
      */
     [[nodiscard]] meta_type remove_pointer() const noexcept {
-        return {*ctx, node.remove_pointer(internal::meta_context::from(*ctx))};
+        return (node.remove_pointer != nullptr) ? meta_type{*ctx, node.remove_pointer(internal::meta_context::from(*ctx))} : *this;
     }
 
     /**
@@ -1391,8 +1391,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
-        return construct(arguments.data(), sizeof...(Args));
+        return construct(std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /**
@@ -1452,8 +1451,7 @@ public:
     template<typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{meta_any{*ctx, std::forward<Args>(args)}...};
-        return invoke(id, std::move(instance), arguments.data(), sizeof...(Args));
+        return invoke(id, std::move(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /**
@@ -1498,7 +1496,7 @@ public:
      * @return True if the object is valid, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (ctx != nullptr);
+        return (node.info != nullptr);
     }
 
     /*! @copydoc meta_data::operator== */
@@ -1508,7 +1506,7 @@ public:
 
 private:
     internal::meta_type_node node{};
-    const meta_ctx *ctx{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /**
@@ -1550,7 +1548,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, auto &&...args) {
+    return internal::try_convert(internal::meta_context::from(*ctx), node, type.info(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
         if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
             return (args.from_void(*ctx, nullptr, instance), ...);
         } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
@@ -1582,7 +1580,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return meta_type{*ctx, node.type(internal::meta_context::from(*ctx))};
+    return (node.type != nullptr) ? meta_type{*ctx, node.type(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
@@ -1590,7 +1588,7 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return meta_type{*ctx, node.ret(internal::meta_context::from(*ctx))};
+    return (node.ret != nullptr) ? meta_type{*ctx, node.ret(internal::meta_context::from(*ctx))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {

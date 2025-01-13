@@ -282,11 +282,17 @@ TEST(Any, SBOMoveAssignment) {
     ASSERT_EQ(entt::any_cast<int>(other), 2);
 }
 
-ENTT_DEBUG_TEST(AnyDeathTest, SBOSelfMoveAssignment) {
+TEST(AnyDeathTest, SBOSelfMoveAssignment) {
     entt::any any{2};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(any.data(), nullptr);
 }
 
 TEST(Any, SBODirectAssignment) {
@@ -600,12 +606,18 @@ TEST(Any, NoSBOMoveAssignment) {
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
 }
 
-ENTT_DEBUG_TEST(AnyDeathTest, NoSBOSelfMoveAssignment) {
+TEST(AnyDeathTest, NoSBOSelfMoveAssignment) {
     const fat instance{.1, .2, .3, .4};
     entt::any any{instance};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(any.data(), nullptr);
 }
 
 TEST(Any, NoSBODirectAssignment) {
@@ -808,11 +820,17 @@ TEST(Any, VoidMoveAssignment) {
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
 
-ENTT_DEBUG_TEST(AnyDeathTest, VoidSelfMoveAssignment) {
+TEST(AnyDeathTest, VoidSelfMoveAssignment) {
     entt::any any{std::in_place_type<void>};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(any.data(), nullptr);
 }
 
 TEST(Any, SBOMoveValidButUnspecifiedState) {

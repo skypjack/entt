@@ -298,6 +298,18 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         payload.resize(from);
     }
 
+    void swap_at(const std::size_t from, const std::size_t to) {
+        using std::swap;
+        swap(element_at(from), element_at(to));
+    }
+
+    void move_to(const std::size_t from, const std::size_t to) {
+        auto &elem = element_at(from);
+        allocator_type allocator{get_allocator()};
+        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
+        alloc_traits::destroy(allocator, std::addressof(elem));
+    }
+
 private:
     [[nodiscard]] const void *get_at(const std::size_t pos) const final {
         return std::addressof(element_at(pos));
@@ -309,19 +321,11 @@ private:
         ENTT_ASSERT((from + 1u) && !is_pinned_type, "Pinned type");
 
         if constexpr(!is_pinned_type) {
-            auto &elem = element_at(from);
-
             if constexpr(traits_type::in_place_delete) {
-                if(base_type::operator[](to) == tombstone) {
-                    allocator_type allocator{get_allocator()};
-                    entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
-                    alloc_traits::destroy(allocator, std::addressof(elem));
-                    return;
-                }
+                (base_type::operator[](to) == tombstone) ? move_to(from, to) : swap_at(from, to);
+            } else {
+                swap_at(from, to);
             }
-
-            using std::swap;
-            swap(elem, element_at(to));
         }
     }
 

@@ -643,6 +643,17 @@ public:
     }
 
     /**
+     * @brief Combines a view and a storage in _more specific_ view.
+     * @tparam OGet Type of storage to combine the view with.
+     * @param other The storage for the type to combine the view with.
+     * @return A more specific view.
+     */
+    template<typename OGet>
+    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>>> operator|(OGet &other) const noexcept {
+        return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
+    }
+
+    /**
      * @brief Combines two views in a _more specific_ one.
      * @tparam OGet Element list of the view to combine with.
      * @tparam OExclude Filter list of the view to combine with.
@@ -1070,6 +1081,17 @@ public:
             static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
             return iterable{base_type::begin(), base_type::end()};
         }
+    }
+
+    /**
+     * @brief Combines a view and a storage in _more specific_ view.
+     * @tparam OGet Type of storage to combine the view with.
+     * @param other The storage for the type to combine the view with.
+     * @return A more specific view.
+     */
+    template<typename OGet>
+    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get, OGet>, exclude_t<>>> operator|(OGet &other) const noexcept {
+        return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
     /**
