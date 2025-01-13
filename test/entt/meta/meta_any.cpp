@@ -356,11 +356,15 @@ TEST_F(MetaAny, SBOMoveAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-ENTT_DEBUG_TEST_F(MetaAnyDeathTest, SBOSelfMoveAssignment) {
+TEST_F(MetaAnyDeathTest, SBOSelfMoveAssignment) {
     entt::meta_any any{3};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.base().data(), nullptr);
 }
 
 TEST_F(MetaAny, SBODirectAssignment) {
@@ -685,12 +689,16 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
     ASSERT_NE(other, fat{});
 }
 
-ENTT_DEBUG_TEST_F(MetaAnyDeathTest, NoSBOSelfMoveAssignment) {
+TEST_F(MetaAnyDeathTest, NoSBOSelfMoveAssignment) {
     const fat instance{.1, .2, .3, .4};
     entt::meta_any any{instance};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.base().data(), nullptr);
 }
 
 TEST_F(MetaAny, NoSBODirectAssignment) {
@@ -908,11 +916,15 @@ TEST_F(MetaAny, VoidMoveAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-ENTT_DEBUG_TEST_F(MetaAnyDeathTest, VoidSelfMoveAssignment) {
+TEST_F(MetaAnyDeathTest, VoidSelfMoveAssignment) {
     entt::meta_any any{std::in_place_type<void>};
 
     // avoid warnings due to self-assignment
-    ASSERT_DEATH(any = std::move(*&any), "");
+    any = std::move(*&any);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.base().data(), nullptr);
 }
 
 TEST_F(MetaAny, SBOMoveInvalidate) {
