@@ -222,76 +222,82 @@ if(ENTT_HAS_LIBCPP)
     target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
 endif()
 
-# Install pkg-config file
+# Install EnTT and all related files
 
-include(JoinPaths)
+option(ENTT_INSTALL "Install EnTT and all related files." OFF)
 
-set(EnTT_PKGCONFIG ${CMAKE_CURRENT_BINARY_DIR}/entt.pc)
+if(ENTT_INSTALL)
+    # Install pkg-config file
 
-join_paths(EnTT_PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+    include(JoinPaths)
 
-configure_file(
-    ${EnTT_SOURCE_DIR}/cmake/in/entt.pc.in
-    ${EnTT_PKGCONFIG}
-    @ONLY
-)
+    set(EnTT_PKGCONFIG ${CMAKE_CURRENT_BINARY_DIR}/entt.pc)
 
-install(
-    FILES ${EnTT_PKGCONFIG}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-)
+    join_paths(EnTT_PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 
-# Install EnTT
+    configure_file(
+        ${EnTT_SOURCE_DIR}/cmake/in/entt.pc.in
+        ${EnTT_PKGCONFIG}
+        @ONLY
+    )
 
-include(CMakePackageConfigHelpers)
+    install(
+        FILES ${EnTT_PKGCONFIG}
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    )
 
-install(
-    TARGETS EnTT
-    EXPORT EnTTTargets
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+    # Install EnTT
 
-write_basic_package_version_file(
-    EnTTConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
+    include(CMakePackageConfigHelpers)
 
-configure_package_config_file(
-    ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
-    EnTTConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
-)
+    install(
+        TARGETS EnTT
+        EXPORT EnTTTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 
-export(
-    EXPORT EnTTTargets
-    FILE ${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake
-    NAMESPACE EnTT::
-)
+    write_basic_package_version_file(
+        EnTTConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY AnyNewerVersion
+    )
 
-install(
-    EXPORT EnTTTargets
-    FILE EnTTTargets.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
-    NAMESPACE EnTT::
-)
+    configure_package_config_file(
+        ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
+        EnTTConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+    )
 
-install(
-    FILES
-        ${PROJECT_BINARY_DIR}/EnTTConfig.cmake
-        ${PROJECT_BINARY_DIR}/EnTTConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
-)
+    export(
+        EXPORT EnTTTargets
+        FILE ${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake
+        NAMESPACE EnTT::
+    )
 
-install(
-    DIRECTORY src/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "*.hpp"
-)
+    install(
+        EXPORT EnTTTargets
+        FILE EnTTTargets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+        NAMESPACE EnTT::
+    )
 
-export(PACKAGE EnTT)
+    install(
+        FILES
+            ${PROJECT_BINARY_DIR}/EnTTConfig.cmake
+            ${PROJECT_BINARY_DIR}/EnTTConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+    )
+
+    install(
+        DIRECTORY src/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+    )
+
+    export(PACKAGE EnTT)
+endif()
 
 # Tests
 
