@@ -27,7 +27,6 @@ TODO:
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
-* improve front (no multiple checks) and back (ie no contains) for multi-type view
 * cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * entity based component_traits
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)

@@ -368,7 +368,7 @@ public:
         if(index != Get) {
             auto it = pools[index]->rbegin();
             const auto last = it + static_cast<typename iterator::difference_type>(offset());
-            for(; it != last && !contains(*it); ++it) {}
+            for(; it != last && !(internal::all_of(pools.begin(), pools.begin() + index, *it) && internal::all_of(pools.begin() + index + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
             return it == last ? null : *it;
         }
 
