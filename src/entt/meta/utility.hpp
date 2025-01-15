@@ -224,32 +224,30 @@ template<typename Type>
  */
 template<typename Type, auto Data>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
-    if constexpr(!std::is_same_v<decltype(Data), Type> && !std::is_same_v<decltype(Data), std::nullptr_t>) {
-        if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-            using descriptor = meta_function_helper_t<Type, decltype(Data)>;
-            using data_type = type_list_element_t<descriptor::is_static, typename descriptor::args_type>;
+    if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
+        using descriptor = meta_function_helper_t<Type, decltype(Data)>;
+        using data_type = type_list_element_t<descriptor::is_static, typename descriptor::args_type>;
 
+        if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
+            std::invoke(Data, *clazz, value.cast<data_type>());
+            return true;
+        }
+    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+        using data_type = std::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
+
+        if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
             if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
-                std::invoke(Data, *clazz, value.cast<data_type>());
+                std::invoke(Data, *clazz) = value.cast<data_type>();
                 return true;
             }
-        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-            using data_type = std::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
+        }
+    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+        using data_type = std::remove_reference_t<decltype(*Data)>;
 
-            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
-                if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
-                    std::invoke(Data, *clazz) = value.cast<data_type>();
-                    return true;
-                }
-            }
-        } else {
-            using data_type = std::remove_reference_t<decltype(*Data)>;
-
-            if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
-                if(value.allow_cast<data_type>()) {
-                    *Data = value.cast<data_type>();
-                    return true;
-                }
+        if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+            if(value.allow_cast<data_type>()) {
+                *Data = value.cast<data_type>();
+                return true;
             }
         }
     }

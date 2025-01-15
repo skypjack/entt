@@ -353,7 +353,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    ((std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<data_type>>> || std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                    ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
                     &meta_arg<type_list<std::remove_cv_t<std::remove_reference_t<data_type>>>>,

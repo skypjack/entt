@@ -114,6 +114,7 @@ struct MetaData: ::testing::Test {
             .traits(test::meta_traits::two)
             .data<&clazz::k>("k"_hs)
             .traits(test::meta_traits::three)
+            .data<'c'>("l"_hs)
             .data<&clazz::instance>("base"_hs)
             .data<&clazz::i, entt::as_void_t>("void"_hs)
             .conv<int>();
@@ -276,6 +277,22 @@ TEST_F(MetaData, ConstStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 3);
     ASSERT_FALSE(data.set({}, 1));
     ASSERT_EQ(data.get({}).cast<int>(), 3);
+}
+
+TEST_F(MetaData, Literal) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<clazz>().data("l"_hs);
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.arity(), 1u);
+    ASSERT_EQ(data.type(), entt::resolve<char>());
+    ASSERT_EQ(data.arg(0u), entt::resolve<char>());
+    ASSERT_TRUE(data.is_const());
+    ASSERT_TRUE(data.is_static());
+    ASSERT_EQ(data.get({}).cast<char>(), 'c');
+    ASSERT_FALSE(data.set({}, 'a'));
+    ASSERT_EQ(data.get({}).cast<char>(), 'c');
 }
 
 TEST_F(MetaData, GetMetaAnyArg) {
