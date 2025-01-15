@@ -10,7 +10,6 @@ DOC:
 * bump entities, reserved bits on identifiers
 
 TODO:
-* deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * view: reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too, define storage ::at and ::at_as_tuple)
@@ -27,7 +26,6 @@ TODO:
 * storage entity: no emplace/insert, rename and add a fast range-push from above
 * table: pop back to support swap and pop, single column access, empty type optimization
 * checkout tools workflow
-* cleanup common view from tricks to handle single swap-only and in-place, if constexpr branches
 * entity based component_traits
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
 * suppress -Wself-move on CI with g++13
@@ -36,8 +34,7 @@ TODO:
 * meta range: move id to meta objects and return plain types (?), then remove id from meta base and meta ctor too
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
-* allow attaching const values of non-Type type to meta types
 * built-in no-pagination storage - no_pagination page size as limits::max
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
-* track meta context on meta elements
+* return meta context from meta objects
