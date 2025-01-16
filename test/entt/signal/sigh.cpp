@@ -2,6 +2,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
+#include "../../common/config.h"
 #include "../../common/linter.hpp"
 
 struct sigh_listener {
@@ -50,6 +51,25 @@ void connect_and_auto_disconnect(entt::sigh<void(int &)> &sigh, const int &) {
     entt::sink sink{sigh};
     sink.connect<sigh_listener::f>();
     sink.disconnect<&connect_and_auto_disconnect>(sigh);
+}
+
+ENTT_DEBUG_TEST(SinkDeathTest, Invalid) {
+    sigh_listener listener;
+    entt::sigh<void(int &)> sigh;
+    entt::sink<entt::sigh<void(int &)>> sink{};
+
+    ASSERT_FALSE(sink);
+
+    ASSERT_DEATH([[maybe_unused]] bool empty = sink.empty(), "");
+    ASSERT_DEATH(sink.connect<&sigh_listener::f>(), "");
+    ASSERT_DEATH(sink.disconnect<&sigh_listener::f>(), "");
+    ASSERT_DEATH(sink.disconnect(&listener), "");
+    ASSERT_DEATH(sink.disconnect(), "");
+
+    sink = entt::sink{sigh};
+
+    ASSERT_TRUE(sink);
+    ASSERT_TRUE(sink.empty());
 }
 
 TEST(SigH, Lifetime) {

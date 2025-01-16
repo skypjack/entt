@@ -374,15 +374,26 @@ class sink<sigh<Ret(Args...), Allocator>> {
 
     template<typename Func>
     void disconnect_if(Func callback) {
-        for(auto pos = signal->calls.size(); pos; --pos) {
-            if(auto &elem = signal->calls[pos - 1u]; callback(elem)) {
-                elem = std::move(signal->calls.back());
-                signal->calls.pop_back();
+        auto &ref = signal_or_assert();
+
+        for(auto pos = ref.calls.size(); pos; --pos) {
+            if(auto &elem = ref.calls[pos - 1u]; callback(elem)) {
+                elem = std::move(ref.calls.back());
+                ref.calls.pop_back();
             }
         }
     }
 
+    [[nodiscard]] auto &signal_or_assert() const noexcept {
+        ENTT_ASSERT(signal != nullptr, "Invalid pointer to signal");
+        return *signal;
+    }
+
 public:
+    /*! @brief Constructs an invalid sink. */
+    sink() noexcept
+        : signal{} {}
+
     /**
      * @brief Constructs a sink that is allowed to modify a given signal.
      * @param ref A valid reference to a signal object.
@@ -395,7 +406,7 @@ public:
      * @return True if the sink has no listeners connected, false otherwise.
      */
     [[nodiscard]] bool empty() const noexcept {
-        return signal->calls.empty();
+        return signal_or_assert().calls.empty();
     }
 
     /**
@@ -412,7 +423,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance...);
-        signal->calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(std::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type...>>(value_or_instance...);
@@ -445,7 +456,15 @@ public:
 
     /*! @brief Disconnects all the listeners from a signal. */
     void disconnect() {
-        signal->calls.clear();
+        signal_or_assert().calls.clear();
+    }
+
+    /**
+     * @brief Returns true if a sink is correctly initialized, false otherwise.
+     * @return True if a sink is correctly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return signal != nullptr;
     }
 
 private:
