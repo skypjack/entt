@@ -17,6 +17,18 @@
 #    define ENTT_CATCH if(false)
 #endif
 
+#if __has_include(<version>)
+#    include <version>
+#
+#    if defined(__cpp_consteval)
+#        define ENTT_CONSTEVAL consteval
+#    endif
+#endif
+
+#ifndef ENTT_CONSTEVAL
+#    define ENTT_CONSTEVAL constexpr
+#endif
+
 #ifdef ENTT_USE_ATOMIC
 #    include <atomic>
 #    define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
