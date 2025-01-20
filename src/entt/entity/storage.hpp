@@ -296,6 +296,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         }
 
         payload.resize(from);
+        payload.shrink_to_fit();
     }
 
     void swap_at(const std::size_t from, const std::size_t to) {
