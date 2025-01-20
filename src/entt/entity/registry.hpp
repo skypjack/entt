@@ -497,7 +497,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create() {
-        return entities.emplace();
+        return entities.generate();
     }
 
     /**
@@ -510,7 +510,7 @@ public:
      * @return A valid identifier.
      */
     [[nodiscard]] entity_type create(const entity_type hint) {
-        return entities.emplace(hint);
+        return entities.generate(hint);
     }
 
     /**
@@ -524,7 +524,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        entities.insert(std::move(first), std::move(last));
+        entities.generate(std::move(first), std::move(last));
     }
 
     /**

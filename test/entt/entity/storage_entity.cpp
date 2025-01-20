@@ -32,7 +32,7 @@ TEST(StorageEntity, Move) {
     entt::storage<entt::entity> pool;
     const std::array entity{entt::entity{3}, entt::entity{2}};
 
-    pool.emplace(entity[0u]);
+    pool.generate(entity[0u]);
 
     static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
     static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
@@ -68,7 +68,7 @@ TEST(StorageEntity, Move) {
     ASSERT_EQ(pool.index(entity[0u]), 0u);
 
     other = entt::storage<entt::entity>{};
-    other.emplace(entity[1u]);
+    other.generate(entity[1u]);
     other = std::move(pool);
     test::is_initialized(pool);
 
@@ -86,10 +86,10 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.type(), entt::type_id<void>());
     ASSERT_EQ(other.type(), entt::type_id<void>());
 
-    pool.emplace(entt::entity{4});
+    pool.generate(entt::entity{4});
 
-    other.emplace(entt::entity{2});
-    other.emplace(entt::entity{1});
+    other.generate(entt::entity{2});
+    other.generate(entt::entity{1});
     other.erase(entt::entity{2});
 
     ASSERT_EQ(pool.size(), 1u);
@@ -111,7 +111,7 @@ TEST(StorageEntity, Getters) {
     entt::storage<entt::entity> pool;
     const entt::entity entity{4};
 
-    pool.emplace(entity);
+    pool.generate(entity);
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), void>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), void>();
@@ -137,18 +137,18 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Getters) {
     ASSERT_DEATH([[maybe_unused]] const auto value = std::as_const(pool).get_as_tuple(entity), "");
 }
 
-TEST(StorageEntity, Emplace) {
+TEST(StorageEntity, Generate) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::storage<entt::entity> pool;
     std::array<entt::entity, 2u> entity{};
 
     ASSERT_EQ(pool.emplace(), entt::entity{0});
-    ASSERT_EQ(pool.emplace(entt::null), entt::entity{1});
-    ASSERT_EQ(pool.emplace(entt::tombstone), entt::entity{2});
+    ASSERT_EQ(pool.generate(entt::null), entt::entity{1});
+    ASSERT_EQ(pool.generate(entt::tombstone), entt::entity{2});
     ASSERT_EQ(pool.emplace(entt::entity{0}), entt::entity{3});
-    ASSERT_EQ(pool.emplace(traits_type::construct(1, 1)), entt::entity{4});
-    ASSERT_EQ(pool.emplace(traits_type::construct(6, 3)), traits_type::construct(6, 3));
+    ASSERT_EQ(pool.generate(traits_type::construct(1, 1)), entt::entity{4});
+    ASSERT_EQ(pool.generate(traits_type::construct(6, 3)), traits_type::construct(6, 3));
 
     ASSERT_LT(pool.index(entt::entity{0}), pool.free_list());
     ASSERT_LT(pool.index(entt::entity{1}), pool.free_list());
@@ -158,15 +158,15 @@ TEST(StorageEntity, Emplace) {
     ASSERT_EQ(pool.current(entt::entity{5}), traits_type::to_version(entt::tombstone));
     ASSERT_LT(pool.index(traits_type::construct(6, 3)), pool.free_list());
 
-    ASSERT_EQ(pool.emplace(traits_type::construct(5, 2)), traits_type::construct(5, 2));
-    ASSERT_EQ(pool.emplace(traits_type::construct(5, 3)), entt::entity{7});
+    ASSERT_EQ(pool.generate(traits_type::construct(5, 2)), traits_type::construct(5, 2));
+    ASSERT_EQ(pool.generate(traits_type::construct(5, 3)), entt::entity{7});
 
     pool.erase(entt::entity{2});
 
-    ASSERT_EQ(pool.emplace(), traits_type::construct(2, 1));
+    ASSERT_EQ(pool.generate(), traits_type::construct(2, 1));
 
     pool.erase(traits_type::construct(2, 1));
-    pool.insert(entity.begin(), entity.end());
+    pool.generate(entity.begin(), entity.end());
 
     ASSERT_EQ(entity[0u], traits_type::construct(2, 2));
     ASSERT_EQ(entity[1u], entt::entity{8});
@@ -177,15 +177,15 @@ TEST(StorageEntity, EmplaceInUse) {
     std::array<entt::entity, 2u> entity{};
     const entt::entity other{1};
 
-    ASSERT_EQ(pool.emplace(other), other);
-    ASSERT_EQ(pool.emplace(), entt::entity{0});
-    ASSERT_EQ(pool.emplace(), entt::entity{2});
+    ASSERT_EQ(pool.generate(other), other);
+    ASSERT_EQ(pool.generate(), entt::entity{0});
+    ASSERT_EQ(pool.generate(), entt::entity{2});
 
     pool.clear();
 
-    ASSERT_EQ(pool.emplace(other), other);
+    ASSERT_EQ(pool.generate(other), other);
 
-    pool.insert(entity.begin(), entity.end());
+    pool.generate(entity.begin(), entity.end());
 
     ASSERT_EQ(entity[0u], entt::entity{0});
     ASSERT_EQ(entity[1u], entt::entity{2});
@@ -255,7 +255,7 @@ TEST(StorageEntity, TryEmplaceInUse) {
 
 TEST(StorageEntity, Patch) {
     entt::storage<entt::entity> pool;
-    const auto entity = pool.emplace();
+    const auto entity = pool.generate();
 
     int counter = 0;
     auto callback = [&counter]() { ++counter; };
@@ -294,7 +294,7 @@ TEST(StorageEntity, Insert) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.free_list(), 0u);
 
-    pool.insert(entity.begin(), entity.begin() + 1u);
+    pool.generate(entity.begin(), entity.begin() + 1u);
 
     ASSERT_TRUE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
@@ -333,7 +333,7 @@ TEST(StorageEntity, Pack) {
 TEST(StorageEntity, FreeList) {
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{0});
+    pool.generate(entt::entity{0});
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(pool.free_list(), 1u);
@@ -352,7 +352,7 @@ TEST(StorageEntity, FreeList) {
 ENTT_DEBUG_TEST(StorageEntityDeathTest, FreeList) {
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{0});
+    pool.generate(entt::entity{0});
 
     ASSERT_DEATH(pool.free_list(2u), "");
 }
@@ -366,9 +366,9 @@ TEST(StorageEntity, Iterable) {
 
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{1});
-    pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{4});
+    pool.generate(entt::entity{1});
+    pool.generate(entt::entity{3});
+    pool.generate(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -410,9 +410,9 @@ TEST(StorageEntity, ConstIterable) {
 
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{1});
-    pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{4});
+    pool.generate(entt::entity{1});
+    pool.generate(entt::entity{3});
+    pool.generate(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -447,7 +447,7 @@ TEST(StorageEntity, ConstIterable) {
 
 TEST(StorageEntity, IterableIteratorConversion) {
     entt::storage<entt::entity> pool;
-    pool.emplace(entt::entity{3});
+    pool.generate(entt::entity{3});
 
     const typename entt::storage<entt::entity>::iterable::iterator it = pool.each().begin();
     typename entt::storage<entt::entity>::const_iterable::iterator cit = it;
@@ -461,7 +461,7 @@ TEST(StorageEntity, IterableIteratorConversion) {
 
 TEST(StorageEntity, IterableAlgorithmCompatibility) {
     entt::storage<entt::entity> pool;
-    pool.emplace(entt::entity{3});
+    pool.generate(entt::entity{3});
 
     const auto iterable = pool.each();
     const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
@@ -478,9 +478,9 @@ TEST(StorageEntity, ReverseIterable) {
 
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{1});
-    pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{4});
+    pool.generate(entt::entity{1});
+    pool.generate(entt::entity{3});
+    pool.generate(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -522,9 +522,9 @@ TEST(StorageEntity, ReverseConstIterable) {
 
     entt::storage<entt::entity> pool;
 
-    pool.emplace(entt::entity{1});
-    pool.emplace(entt::entity{3});
-    pool.emplace(entt::entity{4});
+    pool.generate(entt::entity{1});
+    pool.generate(entt::entity{3});
+    pool.generate(entt::entity{4});
 
     pool.erase(entt::entity{3});
 
@@ -559,7 +559,7 @@ TEST(StorageEntity, ReverseConstIterable) {
 
 TEST(StorageEntity, ReverseIterableIteratorConversion) {
     entt::storage<entt::entity> pool;
-    pool.emplace(entt::entity{3});
+    pool.generate(entt::entity{3});
 
     const typename entt::storage<entt::entity>::reverse_iterable::iterator it = pool.reach().begin();
     typename entt::storage<entt::entity>::const_reverse_iterable::iterator cit = it;
@@ -573,7 +573,7 @@ TEST(StorageEntity, ReverseIterableIteratorConversion) {
 
 TEST(StorageEntity, ReverseIterableAlgorithmCompatibility) {
     entt::storage<entt::entity> pool;
-    pool.emplace(entt::entity{3});
+    pool.generate(entt::entity{3});
 
     const auto iterable = pool.reach();
     const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });

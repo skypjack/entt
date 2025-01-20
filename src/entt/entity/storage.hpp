@@ -1007,7 +1007,7 @@ protected:
      * @return Iterator pointing to the emplaced element.
      */
     underlying_iterator try_emplace(const Entity hint, const bool, const void *) override {
-        return base_type::find(emplace(hint));
+        return base_type::find(generate(hint));
     }
 
 public:
@@ -1113,7 +1113,7 @@ public:
      * @brief Creates a new identifier or recycles a destroyed one.
      * @return A valid identifier.
      */
-    entity_type emplace() {
+    entity_type generate() {
         const auto len = base_type::free_list();
         const auto entt = (len == base_type::size()) ? next() : base_type::data()[len];
         return *base_type::try_emplace(entt, true);
@@ -1128,14 +1128,52 @@ public:
      * @param hint Required identifier.
      * @return A valid identifier.
      */
-    entity_type emplace(const entity_type hint) {
+    entity_type generate(const entity_type hint) {
         if(hint != null && hint != tombstone) {
             if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || !(base_type::index(curr) < base_type::free_list())) {
                 return *base_type::try_emplace(hint, true);
             }
         }
 
-        return emplace();
+        return generate();
+    }
+
+    /**
+     * @brief Assigns each element in a range an identifier.
+     * @tparam It Type of mutable forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     */
+    template<typename It>
+    void generate(It first, It last) {
+        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
+            *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
+        }
+
+        for(; first != last; ++first) {
+            *first = *base_type::try_emplace(next(), true);
+        }
+    }
+
+    /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     * @return A valid identifier.
+     */
+    [[deprecated("use ::generate() instead")]] entity_type emplace() {
+        return generate();
+    }
+
+    /**
+     * @brief Creates a new identifier or recycles a destroyed one.
+     *
+     * If the requested identifier isn't in use, the suggested one is used.
+     * Otherwise, a new identifier is returned.
+     *
+     * @param hint Required identifier.
+     * @return A valid identifier.
+     */
+    [[deprecated("use ::generate(hint) instead")]] entity_type emplace(const entity_type hint) {
+        return generate(hint);
     }
 
     /**
@@ -1157,14 +1195,8 @@ public:
      * @param last An iterator past the last element of the range to generate.
      */
     template<typename It>
-    void insert(It first, It last) {
-        for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
-            *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
-        }
-
-        for(; first != last; ++first) {
-            *first = *base_type::try_emplace(next(), true);
-        }
+    [[deprecated("use ::generate(first, last) instead")]] void insert(It first, It last) {
+        generate(std::move(first), std::move(last));
     }
 
     /**

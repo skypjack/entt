@@ -543,7 +543,7 @@ TEST(SingleStorageView, SwapStorage) {
 TEST(SingleStorageView, StorageEntity) {
     entt::storage<entt::entity> storage{};
     entt::basic_view<entt::get_t<entt::storage<entt::entity>>, entt::exclude_t<>> view{};
-    const std::array entity{storage.emplace(), storage.emplace()};
+    const std::array entity{storage.generate(), storage.generate()};
 
     ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
     ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
@@ -1426,7 +1426,7 @@ TEST(MultiStorageView, SwapStorage) {
 TEST(MultiStorageView, StorageEntity) {
     std::tuple<entt::storage<entt::entity>, entt::storage<char>> storage{};
     entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
-    const std::array entity{std::get<0>(storage).emplace(), std::get<0>(storage).emplace()};
+    const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[0u]);
     std::get<1>(storage).emplace(entity[1u]);
@@ -1459,7 +1459,7 @@ TEST(MultiStorageView, StorageEntity) {
 TEST(MultiStorageView, StorageEntityWithExclude) {
     std::tuple<entt::storage<entt::entity>, entt::storage<int>, entt::storage<char>> storage{};
     entt::basic_view view{std::forward_as_tuple(std::get<0>(storage), std::get<1>(storage)), std::forward_as_tuple(std::get<2>(storage))};
-    const std::array entity{std::get<0>(storage).emplace(), std::get<0>(storage).emplace(), std::get<0>(storage).emplace()};
+    const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[0u]);
     std::get<1>(storage).emplace(entity[1u]);
@@ -1496,7 +1496,7 @@ TEST(MultiStorageView, StorageEntityWithExclude) {
 TEST(MultiStorageView, StorageEntityExcludeOnly) {
     std::tuple<entt::storage<entt::entity>, entt::storage<int>> storage{};
     entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
-    const std::array entity{std::get<0>(storage).emplace(), std::get<0>(storage).emplace(), std::get<0>(storage).emplace()};
+    const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[2u]);
 
