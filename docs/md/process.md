@@ -29,7 +29,7 @@ to _override_ the default behavior):
 
   This is invoked once per tick until a process is explicitly aborted or ends
   either with or without errors. Even though it's not mandatory to declare this
-  member function, as a rule of thumb each process should at least define it to
+  member function. As a rule of thumb, each process should at least define it to
   work _properly_. The `void *` parameter is an opaque pointer to user data (if
   any) forwarded directly to the process during an update.
 
@@ -110,21 +110,21 @@ Parameters have the following meaning:
 Both `succeed` and `fail` accept no parameters at all.
 
 Note that usually users shouldn't worry about creating adaptors at all. A
-scheduler creates them internally each and every time a lambda or a functor is
+scheduler creates them internally, each and every time a lambda or a functor is
 used as a process.
 
 # The scheduler
 
-A cooperative scheduler runs different processes and helps managing their life
+A cooperative scheduler runs different processes and helps manage their life
 cycles.
 
 Each process is invoked once per tick. If it terminates, it's removed
-automatically from the scheduler and it's never invoked again. Otherwise, it's
-a good candidate to run one more time the next tick.<br/>
+automatically from the scheduler, and it's never invoked again. Otherwise,
+it's a good candidate to run one more time the next tick.<br/>
 A process can also have a _child_. In this case, the parent process is replaced
 with its child when it terminates and only if it returns with success. In case
 of errors, both the parent process and its child are discarded. This way, it's
-easy to create chain of processes to run sequentially.
+easy to create a chain of processes to run sequentially.
 
 Using a scheduler is straightforward. To create it, users must provide only the
 type for the elapsed times and no arguments at all:
@@ -154,7 +154,7 @@ entt::scheduler::size_type size = scheduler.size();
 scheduler.clear();
 ```
 
-To attach a process to a scheduler there are mainly two ways:
+To attach a process to a scheduler, there are mainly two ways:
 
 * If the process inherits from the `process` class template, it's enough to
   indicate its type and submit all the parameters required to construct it to
