@@ -60,7 +60,7 @@ ENTT_DEBUG_TEST(SinkDeathTest, Invalid) {
 
     ASSERT_FALSE(sink);
 
-    ASSERT_DEATH([[maybe_unused]] bool empty = sink.empty(), "");
+    ASSERT_DEATH([[maybe_unused]] const bool empty = sink.empty(), "");
     ASSERT_DEATH(sink.connect<&sigh_listener::f>(), "");
     ASSERT_DEATH(sink.disconnect<&sigh_listener::f>(), "");
     ASSERT_DEATH(sink.disconnect(&listener), "");

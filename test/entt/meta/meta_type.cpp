@@ -285,8 +285,8 @@ TEST_F(MetaType, Custom) {
 }
 
 ENTT_DEBUG_TEST_F(MetaTypeDeathTest, Custom) {
-    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().custom(), "");
-    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<base>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const int value = entt::resolve<clazz>().custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<base>().custom(), "");
 }
 
 TEST_F(MetaType, IdAndInfo) {
@@ -845,7 +845,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
         .type("base"_hs);
 
     // this should not overwrite traits and custom data
-    [[maybe_unused]] entt::meta_factory<base> factory{};
+    [[maybe_unused]] const entt::meta_factory<base> factory{};
 
     ASSERT_EQ(entt::resolve<base>().traits<test::meta_traits>(), test::meta_traits::one);
     ASSERT_NE(static_cast<const int *>(entt::resolve("base"_hs).custom()), nullptr);
