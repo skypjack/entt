@@ -250,7 +250,7 @@ private:
 template<typename Type>
 [[nodiscard]] const type_info &type_id() noexcept {
     if constexpr(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>) {
-        static type_info instance{std::in_place_type<Type>};
+        static const type_info instance{std::in_place_type<Type>};
         return instance;
     } else {
         return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
