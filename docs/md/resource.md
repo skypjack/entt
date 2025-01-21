@@ -31,7 +31,7 @@ The _resource_ is an image, an audio, a video or any other type:
 struct my_resource { const int value; };
 ```
 
-The _loader_ is a callable type the aim of which is to load a specific resource:
+The _loader_ is a callable type, the aim of which is to load a specific resource:
 
 ```cpp
 struct my_loader final {
@@ -180,6 +180,6 @@ It's worth mentioning that the iterators of a cache as well as its indexing
 operators return resource handles rather than instances of the mapped type.<br/>
 Since the cache has no control over the loader and a resource isn't required to
 also be convertible to bool, these handles can be invalid. This usually means an
-error in the user logic but it may also be an _expected_ event.<br/>
+error in the user logic, but it may also be an _expected_ event.<br/>
 It's therefore recommended to verify handles validity with a check in debug (for
 example, when loading) or an appropriate logic in retail.
