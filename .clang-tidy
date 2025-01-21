@@ -24,6 +24,10 @@ CheckOptions:
       value: true
     - key: cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
       value: true
+    - key: cppcoreguidelines-rvalue-reference-param-not-moved.AllowPartialMove
+      value: true
+    - key: cppcoreguidelines-rvalue-reference-param-not-moved.IgnoreUnnamedParams
+      value: true
     - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
       value: true
     - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
