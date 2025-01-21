@@ -19,7 +19,7 @@ in general.<br/>
 They help to decouple the various parts of a system while allowing them to
 communicate with each other somehow.
 
-The so called _modern C++_ comes with a tool that can be useful in this regard,
+The so-called _modern C++_ comes with a tool that can be useful in this regard,
 the `std::function`. As an example, it can be used to create delegates.<br/>
 However, there is no guarantee that an `std::function` doesn't perform
 allocations under the hood and this could be problematic sometimes. Furthermore,
@@ -75,7 +75,7 @@ function type of the delegate is such that the parameter list is empty and the
 value of the data member is at least convertible to the return type.
 
 Free functions having type equivalent to `void(T &, args...)` are accepted as
-well. The first argument `T &` is considered a payload and the function will
+well. The first argument `T &` is considered a payload, and the function will
 receive it back every time it's invoked. In other terms, this works just fine
 with the above definition:
 
@@ -107,7 +107,7 @@ In fact, this filtering works both ways. The class tries to pass its first
 _count_ arguments **first**, then the last _count_. Watch out for conversion
 rules if in doubt when connecting a listener!<br/>
 Arbitrary functions that pull random arguments from the delegate list aren't
-supported instead. Other feature were preferred, such as support for functions
+supported instead. Other features were preferred, such as support for functions
 with compatible argument lists although not equal to those of the delegate.
 
 To create and initialize a delegate at once, there are a few specialized
@@ -143,7 +143,7 @@ fine.
 
 As a side note, members of classes may or may not be associated with instances.
 If they are not, the first argument of the function type must be that of the
-class on which the members operate and an instance of this class must obviously
+class on which the members operate, and an instance of this class must obviously
 be passed when invoking the delegate:
 
 ```cpp
@@ -252,12 +252,12 @@ particular delegate through its descriptive _traits_ instead.
 
 # Signals
 
-Signal handlers work with references to classes, function pointers and pointers
-to members. Listeners can be any kind of objects and users are in charge of
+Signal handlers work with references to classes, function pointers, and pointers
+to members. Listeners can be any kind of objects, and users are in charge of
 connecting and disconnecting them from a signal to avoid crashes due to
 different lifetimes. On the other side, performance shouldn't be affected that
 much by the presence of such a signal handler.<br/>
-Signals make use of delegates internally and therefore they undergo the same
+Signals make use of delegates internally, and therefore they undergo the same
 rules and offer similar functionalities. It may be a good idea to consult the
 documentation of the `delegate` class for further information.
 
@@ -476,7 +476,7 @@ parameter for it but rather a different function:
 dispatcher.enqueue_hint<an_event>("custom"_hs, 42);
 ```
 
-This is mainly due to the template argument deduction rules and unfortunately
+This is mainly due to the template argument deduction rules, and unfortunately, 
 there is no real (elegant) way to avoid it.
 
 # Event emitter
@@ -556,4 +556,4 @@ if(emitter.contains<my_event>()) {
 
 This class introduces a _nice-to-have_ model based on events and listeners.<br/>
 More in general, it's a handy tool when the derived classes _wrap_ asynchronous
-operations but it's not limited to such uses.
+operations, but it's not limited to such uses.
