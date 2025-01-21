@@ -240,7 +240,7 @@ compressed_pair(Type &&, Other &&) -> compressed_pair<std::decay_t<Type>, std::d
  * @param rhs A valid compressed pair object.
  */
 template<typename First, typename Second>
-inline constexpr void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
+constexpr void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, Second> &rhs) {
     lhs.swap(rhs);
 }
 
