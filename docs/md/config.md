@@ -60,7 +60,7 @@ default type if necessary.
 It's known that the ECS module of `EnTT` is based on _sparse sets_. What is less
 known perhaps is that the sparse arrays are paged to reduce memory usage.<br/>
 Default size of pages (that is, the number of elements they contain) is 4096 but
-users can adjust it if appropriate. In all case, the chosen value **must** be a
+users can adjust it if appropriate. In all cases, the chosen value **must** be a
 power of 2.
 
 ## ENTT_PACKED_PAGE
@@ -69,7 +69,7 @@ As it happens with sparse arrays, packed arrays are also paginated. However, in
 this case the aim isn't to reduce memory usage but to have pointer stability
 upon component creation.<br/>
 Default size of pages (that is, the number of elements they contain) is 1024 but
-users can adjust it if appropriate. In all case, the chosen value **must** be a
+users can adjust it if appropriate. In all cases, the chosen value **must** be a
 power of 2.
 
 ## ENTT_ASSERT
