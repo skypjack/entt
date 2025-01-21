@@ -643,7 +643,7 @@ public:
     }
 
 private:
-    any storage{};
+    any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     internal::meta_type_node node{};
     vtable_type *vtable{};
@@ -786,7 +786,7 @@ struct meta_handle {
     }
 
 private:
-    meta_any any{};
+    meta_any any;
 };
 
 /*! @brief Opaque wrapper for user defined data of any type. */
