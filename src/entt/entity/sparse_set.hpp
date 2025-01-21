@@ -268,6 +268,7 @@ protected:
         sparse_ref(packed.back()) = traits_type::combine(entt, traits_type::to_integral(packed.back()));
         packed[static_cast<size_type>(entt)] = packed.back();
         // unnecessary but it helps to detect nasty bugs
+        // NOLINTNEXTLINE(bugprone-assert-side-effect)
         ENTT_ASSERT((packed.back() = null, true), "");
         // lazy self-assignment guard
         self = null;
