@@ -12,16 +12,16 @@
 # Introduction
 
 The standard C++ library offers a wide range of containers and adaptors already.
-It's really difficult to do better (although it's very easy to do worse, as many
+It is really difficult to do better (although it is very easy to do worse, as many
 examples available online demonstrate).<br/>
-`EnTT` doesn't try in any way to replace what is offered by the standard. Quite
+`EnTT` does not try in any way to replace what is offered by the standard. Quite
 the opposite, given the widespread use that is made of standard containers.<br/>
 However, the library also tries to fill a gap in features and functionalities by
 making available some containers and adaptors initially developed for internal
 use.
 
 This section of the library is likely to grow larger over time. However, for the
-moment it's quite small and mainly aimed at satisfying some internal needs.<br/>
+moment it is quite small and mainly aimed at satisfying some internal needs.<br/>
 For all containers and adaptors made available, full test coverage and stability
 over time is guaranteed as usual.
 

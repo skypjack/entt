@@ -14,16 +14,16 @@
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
 ago. Fortunately, there are also people who took the time to implement open
-source projects based on `EnTT` and didn't hold back when it came to documenting
+source projects based on `EnTT` and did not hold back when it came to documenting
 them.
 
 Below an incomplete list of games, applications and articles that can be used as
 a reference.<br/>
 Where I put the word _apparently_ means that the use of `EnTT` is documented but
-the authors didn't make explicit announcements or contacted me directly.
+the authors did not make explicit announcements or contacted me directly.
 
 If you know of other resources out there that are about `EnTT`, feel free to
-open an issue or a PR. I'll be glad to add them to this page.<br/>
+open an issue or a PR. I will be glad to add them to this page.<br/>
 I hope the following lists can grow much more in the future.
 
 # EnTT in Action
@@ -109,7 +109,7 @@ I hope the following lists can grow much more in the future.
   * [PokeMaster](https://github.com/utilForever/PokeMaster): Pokémon Battle
     simulator using C++ with some reinforcement learning.
   * [HomeHearth](https://youtu.be/GrEWl8npL9Y): choose your hero, protect the
-    town, before it's too late.
+    town, before it is too late.
   * [City Builder Game](https://github.com/PhiGei2000/CityBuilderGame): a simple
     city-building game using C++ and OpenGL.
   * [BattleSub](https://github.com/bfeldpw/battlesub): two player 2D submarine
@@ -277,7 +277,7 @@ I hope the following lists can grow much more in the future.
     by [linkdd](https://github.com/linkdd): an interesting walkthrough of
     developing a game (also) with EnTT.
   * [Use EnTT When You Need An ECS](https://www.codingwiththomas.com/blog/use-entt-when-you-need-an-ecs)
-    by [Thomas](https://www.codingwiththomas.com/): I couldn't have said it
+    by [Thomas](https://www.codingwiththomas.com/): I could not have said it
     better.
   * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
     huge space battle built entirely from scratch.
@@ -309,7 +309,7 @@ I hope the following lists can grow much more in the future.
 
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
     [Esri](https://www.esri.com/): they use `EnTT` for the internal ECS and the
-    cross-platform C++ rendering engine. The SDKs are utilized by a lot of
+    cross-platform C++ rendering engine. The SDKs are used by a lot of
     enterprise custom apps, as well as by Esri for its own public applications
     such as
     [Explorer](https://play.google.com/store/apps/details?id=com.esri.explorer),

@@ -74,7 +74,7 @@ used mostly in game development.
 
 ## Type-less and bitset-free
 
-The library implements a sparse set based model that doesn't require users to
+The library implements a sparse set-based model that does not require users to
 specify the set of components neither at compile-time nor at runtime.<br/>
 This is why users can instantiate the core class simply like:
 
@@ -88,18 +88,18 @@ In place of its more annoying and error-prone counterpart:
 entt::registry<comp_0, comp_1, ..., comp_n> registry;
 ```
 
-Furthermore, it isn't necessary to announce the existence of a component type.
-When the time comes, just use it and that's all.
+Furthermore, it is not necessary to announce the existence of a component type.
+When the time comes, just use it and that is all.
 
 ## Build your own
 
 The ECS module (as well as the rest of the library) is designed as a set of
 containers that are used as needed, just like a vector or any other container.
-It doesn't attempt in any way to take over on the user codebase, nor to control
+It does not attempt in any way to take over on the user codebase, nor to control
 its main loop or process scheduling.<br/>
 Unlike other more or less well known models, it also makes use of independent
 pools that are extended via _static mixins_. The built-in signal support is an
-example of this flexible design: defined as a mixin, it's easily disabled if not
+example of this flexible design: defined as a mixin, it is easily disabled if not
 needed. Similarly, the storage class has a specialization that shows how
 everything is customizable down to the smallest detail.
 
@@ -112,7 +112,7 @@ When it comes to using an entity-component system, the tradeoff is usually
 between performance and memory usage. The faster it is, the more memory it uses.
 Even worse, some approaches tend to heavily affect other functionalities like
 the construction and destruction of components to favor iterations, even when it
-isn't strictly required. In fact, slightly worse performance along non-critical
+is not strictly required. In fact, slightly worse performance along non-critical
 paths are the right price to pay to reduce memory usage and have overall better
 performance.<br/>
 `EnTT` follows a completely different approach. It gets the best out from the
@@ -130,12 +130,12 @@ designed around this need and give the possibility to get this information.
 # Vademecum
 
 The `entt::entity` type implements the concept of _entity identifier_. An entity
-(the _E_ of an _ECS_) is an opaque element to use as-is. Inspecting it isn't
+(the _E_ of an _ECS_) is an opaque element to use as-is. Inspecting it is not
 recommended since its format can change in future.<br/>
 Components (the _C_ of an _ECS_) are of any type, without any constraints, not
 even that of being movable. No need to register them nor their types.<br/>
 Systems (the _S_ of an _ECS_) are plain functions, functors, lambdas and so on.
-It's not required to announce them in any case and have no requirements.
+It is not required to announce them in any case and have no requirements.
 
 The next sections go into detail on how to use the entity-component system part
 of the `EnTT` library.<br/>
@@ -177,7 +177,7 @@ registry.destroy(view.begin(), view.end());
 
 In addition to offering an overload to force the version upon destruction.<br/>
 This function removes all components from an entity before releasing it. There
-also exists a _lighter_ alternative that doesn't query component pools, for use
+also exists a _lighter_ alternative that does not query component pools, for use
 with orphaned entities:
 
 ```cpp
@@ -186,7 +186,7 @@ registry.release(entity);
 ```
 
 As with the `destroy` function, also in this case entity ranges are supported
-and it's possible to force a _version_.
+and it is possible to force a _version_.
 
 In both cases, when an identifier is released, the registry can freely reuse it
 internally. In particular, the version of an entity is increased (unless the
@@ -226,7 +226,7 @@ vel.dy = 0.;
 
 The default storage _detects_ aggregate types internally and exploits aggregate
 initialization when possible.<br/>
-Therefore, it's not strictly necessary to define a constructor for each type.
+Therefore, it is not strictly necessary to define a constructor for each type.
 
 The `insert` member function works with _ranges_ and is used to:
 
@@ -260,7 +260,7 @@ registry.patch<position>(entity, [](auto &pos) { pos.x = pos.y = 0.; });
 registry.replace<position>(entity, 0., 0.);
 ```
 
-When it's unknown whether an entity already owns an instance of a component,
+When it is unknown whether an entity already owns an instance of a component,
 `emplace_or_replace` is the function to use instead:
 
 ```cpp
@@ -331,7 +331,7 @@ const auto [cpos, cvel] = cregistry.get<position, velocity>(entity);
 auto [pos, vel] = registry.get<position, velocity>(entity);
 ```
 
-If the existence of the component isn't certain, `try_get` is the more suitable
+If the existence of the component is not certain, `try_get` is the more suitable
 function instead.
 
 ## Observe changes
@@ -394,7 +394,7 @@ There are also some limitations on what a listener can and cannot do:
   listener should be avoided. It can lead to undefined behavior in some cases.
 
 * Removing the component from within the body of a listener that observes the
-  construction or update of instances of a given type isn't allowed.
+  construction or update of instances of a given type is not allowed.
 
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
@@ -404,9 +404,9 @@ There are also some limitations on what a listener can and cannot do:
 
 Please, refer to the documentation of the signal class to know about all the
 features it offers.<br/>
-There are many useful but less known functionalities that aren't described here,
+There are many useful but less known functionalities that are not described here,
 such as the connection objects or the possibility to attach listeners with a
-list of parameters that is shorter than that of the signal itself.
+list of parameters that are shorter than that of the signal itself.
 
 ### Entity lifecycle
 
@@ -417,11 +417,11 @@ type instead of the component type:
 registry.on_construct<entt::entity>().connect<&my_listener>();
 ```
 
-Since entity storage is unique within a registry, if a _name_ is provided it's
+Since entity storage is unique within a registry, if a _name_ is provided it is
 ignored and therefore discarded.<br/>
 As for the function signature, this is exactly the same as the components.
 
-Entities support all types of signals: construct, destroy and update. The latter
+Entities support all types of signals: construct, destroy, and update. The latter
 is perhaps ambiguous as an entity is not truly _updated_. Rather, its identifier
 is created and finally released.<br/>
 Indeed, the update signal is meant to send _general notifications_ regarding an
@@ -443,12 +443,12 @@ making it difficult for the user to write component listeners.
 
 The destruction order of the storage classes and therefore the disconnection of
 the listeners is completely random.<br/>
-There are no guarantees today and while a logic is easily discerned, it's not
+There are no guarantees today, and while the logic is easily discerned, it is not
 guaranteed that it will remain so in the future.
 
 For example, a listener getting disconnected after a component is discarded as a
 result of pool destruction is most likely a recipe for problems.<br/>
-Rather, it's advisable to invoke the `clear` function of the registry before
+Rather, it is advisable to invoke the `clear` function of the registry before
 destroying it. This forces the deletion of all components and entities without
 ever discarding the pools.<br/>
 As a result, a listener that wants to access components, entities, or pools can
@@ -457,14 +457,14 @@ the various elements as appropriate.
 
 ## They call me reactive storage
 
-Signals are the basic tools to construct reactive systems, even if they aren't
+Signals are the basic tools to construct reactive systems, even if they are not
 enough on their own. `EnTT` tries to take another step in that direction with
 its _reactive mixin_.<br/>
 In order to explain what reactive systems are, this is a slightly revised quote
 from the documentation of the library that first introduced this tool,
 [Entitas](https://github.com/sschmid/Entitas-CSharp):
 
-> Imagine you have 100 fighting units on the battlefield but only 10 of them
+> Imagine you have 100 fighting units on the battlefield, but only 10 of them
 > changed their positions. Instead of using a normal system and updating all 100
 > entities depending on the position, you can use a reactive system which will
 > only update the 10 changed units. So efficient.
@@ -489,7 +489,7 @@ storage.bind(registry);
 
 In this case, it must be provided with a reference registry for subsequent
 operations.<br/>
-Alternatively, when using the value type provided by `EnTT`, it's also possible
+Alternatively, when using the value type provided by `EnTT`, it is also possible
 to create a reactive storage directly inside a registry:
 
 ```cpp
@@ -497,9 +497,9 @@ entt::registry registry{};
 auto &storage = registry.storage<entt::reactive>("observer"_hs);
 ```
 
-In the latter case there is the advantage that, in the event of destruction of
+In the latter case, there is the advantage that, in the event of destruction of
 an entity, this storage is also automatically cleaned up.<br/>
-Also note that, unlike all other storage, these classes don't support signals by
+Also note that, unlike all other storage, these classes do not support signals by
 default (although they can be enabled if necessary).
 
 Once it has been created and associated with a registry, the reactive mixin
@@ -517,7 +517,7 @@ storage
     .on_destroy<renderable>();
 ```
 
-It goes without saying that it's possible to observe multiple events of the same
+It goes without saying that it is possible to observe multiple events of the same
 type or of different types with the same storage.<br/>
 For example, to know which entities have been assigned or updated a component of
 a certain type:
@@ -572,7 +572,7 @@ options:
 As highlighted in the last example, the reactive mixin tracks the entities that
 match the given conditions and saves them aside. However, this behavior can be
 changed.<br/>
-For example, it's possible to _capture_ all and only the entities for which a
+For example, it is possible to _capture_ all and only the entities for which a
 certain component has been updated but only if a specific value is within a
 given range:
 
@@ -592,7 +592,7 @@ storage.on_update<position, &callback>();
 
 This makes reactive storage extremely flexible and usable in a large number of
 cases.<br/>
-Finally, once the entities of interest have been collected, it's possible to
+Finally, once the entities of interest have been collected, it is possible to
 _visit_ the storage like any other:
 
 ```cpp
@@ -625,7 +625,7 @@ available via the `registry` function.
 It should be noted that a reactive storage never deletes its entities (and
 elements, if any). To process and then discard entities at regular intervals,
 refer to the `clear` function available by default for each storage type.<br/>
-Similarly, the reactive mixin doesn't disconnect itself from observed storages
+Similarly, the reactive mixin does not disconnect itself from observed storages
 upon destruction. Therefore, users have to do this themselves:
 
 ```cpp
@@ -641,7 +641,7 @@ result in undefined behavior.
 ## Sorting: is it possible?
 
 Sorting entities and components is possible using an in-place algorithm that
-doesn't require memory allocations and is therefore quite convenient.<br/>
+does not require memory allocations and is therefore quite convenient.<br/>
 There are two functions that respond to slightly different needs:
 
 * Components are sorted either directly:
@@ -677,7 +677,7 @@ components. Refer to the specific documentation for more details.
 
 ## Helpers
 
-The so called _helpers_ are small classes and functions mainly designed to offer
+The so-called _helpers_ are small classes and functions mainly designed to offer
 built-in support for the most basic functionalities.
 
 ### Null entity
@@ -689,7 +689,7 @@ The library guarantees that the following expression always returns false:
 registry.valid(entt::null);
 ```
 
-A registry rejects the null entity in all cases because it isn't considered
+A registry rejects the null entity in all cases because it is not considered
 valid. It also means that the null entity cannot own components.<br/>
 The type of the null entity is internal and should not be used for any purpose
 other than defining the null entity itself. However, there exist implicit
@@ -709,8 +709,8 @@ const bool null = (entity == entt::null);
 As for its integral form, the null entity only affects the entity part of an
 identifier and is instead completely transparent to its version.
 
-Be aware that `entt::null` and entity 0 aren't the same thing. Likewise, a zero
-initialized entity isn't the same as `entt::null`. Therefore, although
+Be aware that `entt::null` and entity 0 are different. Likewise, a zero
+initialized entity is not the same as `entt::null`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them are used
 to create a null entity.
 
@@ -749,8 +749,8 @@ const auto entity = registry.create();
 const bool tombstone = (entity == entt::tombstone);
 ```
 
-Be aware that `entt::tombstone` and entity 0 aren't the same thing. Likewise, a
-zero initialized entity isn't the same as `entt::tombstone`. Therefore, although
+Be aware that `entt::tombstone` and entity 0 are different. Likewise, a
+zero initialized entity is not the same as `entt::tombstone`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them are used
 to create tombstones.
 
@@ -764,7 +764,7 @@ const auto entity = entt::to_entity(registry.storage<position>(), instance);
 ```
 
 Where `instance` is a component of type `position`. A null entity is returned in
-case the instance doesn't belong to the registry.
+case the instance does not belong to the registry.
 
 ### Dependencies
 
@@ -823,7 +823,7 @@ entt::sigh_helper{registry}
 Runtime pools are also supported by providing an identifier when calling `with`,
 as shown in the previous snippet. Refer to the following sections for more
 information about runtime pools.<br/>
-Obviously, this helper doesn't make the code disappear but it should at least
+Obviously, this helper does not make the code disappear but it should at least
 reduce the boilerplate in the most complex cases.
 
 ### Handle
@@ -831,11 +831,11 @@ reduce the boilerplate in the most complex cases.
 A handle is a thin wrapper around an entity and a registry. It _replicates_ the
 API of a registry by offering functions such as `get` or `emplace`. The
 difference being that the entity is implicitly passed to the registry.<br/>
-It's default constructible as an invalid handle that contains a null registry
+It is default-constructible as an invalid handle that contains a null registry
 and a null entity. When it contains a null registry, calling functions that
-delegate execution to the registry causes undefined behavior. It's recommended
+delegate execution to the registry causes undefined behavior. It is recommended
 to test for validity with its implicit cast to `bool` if in doubt.<br/>
-A handle is also non-owning, meaning that it's freely copied and moved around
+A handle is also non-owning, meaning that it is freely copied and moved around
 without affecting its entity (in fact, handles happen to be trivially copyable).
 An implication of this is that mutability becomes part of the type.
 
@@ -859,7 +859,7 @@ users might want to consider using handles, either const or non-const.
 
 The `organizer` class template offers support for creating an execution graph
 from a set of functions and their requirements on resources.<br/>
-The resulting tasks aren't executed in any case. This isn't the goal of this
+The resulting tasks are not executed in any case. This is not the goal of this
 tool. Instead, they are returned to the user in the form of a graph that allows
 for safe execution.
 
@@ -894,7 +894,7 @@ clazz instance;
 organizer.emplace(+[](const void *, entt::registry &) { /* ... */ }, &instance);
 ```
 
-In all cases, it's also possible to associate a name with the task when creating
+In all cases, it is also possible to associate a name with the task when creating
 it. For example:
 
 ```cpp
@@ -906,12 +906,12 @@ considered a _resource_ (views are _unpacked_ and their types are treated as
 resources). The _constness_ of a type also dictates its access mode (RO/RW). In
 turn, this affects the resulting graph, since it influences the possibility of
 launching tasks in parallel.<br/>
-As for the registry, if a function doesn't explicitly request it or requires a
-constant reference to it, it's considered a read-only access. Otherwise, it's
+As for the registry, if a function does not explicitly request it or requires a
+constant reference to it, it is considered a read-only access. Otherwise, it is
 considered as read-write access. All functions have the registry among their
 resources.
 
-When registering a function, users can also require resources that aren't in the
+When registering a function, users can also require resources that are not in the
 list of parameters of the function itself. These are declared as template
 parameters:
 
@@ -927,7 +927,7 @@ organizer.emplace<&free_function, const renderable>("func");
 ```
 
 In this case, even if `renderable` appears among the parameters of the function
-as not constant, it's treated as constant as regards the generation of the task
+as not constant, it is treated as constant as regards the generation of the task
 graph.
 
 To generate the task graph, the organizer offers the `graph` member function:
@@ -961,7 +961,7 @@ following features:
 * `children`: the vertices reachable from the given node, in the form of indices
   within the adjacency list.
 
-Since the creation of pools and resources within the registry isn't necessarily
+Since the creation of pools and resources within the registry is not necessarily
 thread safe, each vertex also offers a `prepare` function which is used to setup
 a registry for execution with the created graph:
 
@@ -980,8 +980,8 @@ use the preferred tool.
 ## Context variables
 
 Each registry has a _context_ associated with it, which is an `any` object map
-accessible by both type and _name_ for convenience. The _name_ isn't really a
-name though. In fact, it's a numeric id of type `id_type` used as a key for the
+accessible by both type and _name_ for convenience. The _name_ is not really a
+name though. In fact, it is a numeric id of type `id_type` used as a key for the
 variable. Any value is accepted, even runtime ones.<br/>
 The context is returned via the `ctx` functions and offers a minimal set of
 features including the following:
@@ -1013,9 +1013,9 @@ registry.ctx().erase<my_type>("my_variable"_hs);
 ```
 
 A context variable must be both default constructible and movable. If the
-supplied type doesn't match that of the variable when using a _name_, the
+supplied type does not match that of the variable when using a _name_, the
 operation fails.<br/>
-For all users who want to use the context but don't want to create elements, the
+For all users who want to use the context but do not want to create elements, the
 `contains` and `find` functions are also available:
 
 ```cpp
@@ -1028,7 +1028,7 @@ the variable to look up, as does `at`.
 
 ### Aliased properties
 
-A context also supports creating _aliases_ for existing variables that aren't
+A context also supports creating _aliases_ for existing variables that are not
 directly managed by the registry. Const and therefore read-only variables are
 also accepted.<br/>
 To do that, the type used upon construction must be a reference type and an
@@ -1045,14 +1045,14 @@ Read-only aliased properties are created using const types instead:
 registry.ctx().emplace<const time &>(clock);
 ```
 
-Note that `insert_or_assign` doesn't support aliased properties and users must
+Note that `insert_or_assign` does not support aliased properties and users must
 necessarily use `emplace` or `emplace_as` for this purpose.<br/>
 When `insert_or_assign` is used to update an aliased property, it _converts_
 the property itself into a non-aliased one.
 
 From the point of view of the user, there are no differences between a variable
 that is managed by the registry and an aliased property. However, read-only
-variables aren't accessible as non-const references:
+variables are not accessible as non-const references:
 
 ```cpp
 // read-only variables only support const access
@@ -1061,12 +1061,12 @@ const my_type &var = registry.ctx().get<const my_type>();
 ```
 
 Aliased properties are erased as it happens with any other variable. Similarly,
-it's also possible to assign them a _name_.
+it is also possible to assign them a _name_.
 
 ## Snapshot: complete vs continuous
 
-This module comes with bare minimum support to serialization.<br/>
-It doesn't convert components to bytes directly, there wasn't the need of
+This module comes with bare minimum support for serialization.<br/>
+It does not convert components to bytes directly, there was not the need of
 another tool for serialization out there. Instead, it accepts an opaque object
 with a suitable interface (namely an _archive_) to serialize its internal data
 structures and restore them later. The way types and instances are converted to
@@ -1091,12 +1091,12 @@ entt::snapshot{registry}
     .get<another_component>(output);
 ```
 
-It isn't necessary to invoke all functions each and every time. What functions
+It is not necessary to invoke all functions each and every time. What functions
 to use in which case mostly depends on the goal.
 
 When _getting_ an entity type, the snapshot class serializes all entities along
 with their versions.<br/>
-In all other case, entities and components from a given storage are passed to
+In all other cases, entities and components from a given storage are passed to
 the archive. Named pools are also supported:
 
 ```cpp
@@ -1105,7 +1105,7 @@ entt::snapshot{registry}.get<a_component>(output, "other"_hs);
 
 There exists another version of the `get` member function that accepts a range
 of entities to serialize. It can be used to _filter_ out those entities that
-shouldn't be serialized for some reasons:
+should not be serialized for some reasons:
 
 ```cpp
 const auto view = registry.view<serialize>();
@@ -1136,7 +1136,7 @@ entt::snapshot_loader{registry}
     .orphans();
 ```
 
-It isn't necessary to invoke all functions each and every time. What functions
+It is not necessary to invoke all functions each and every time. What functions
 to use in which case mostly depends on the goal.<br/>
 For obvious reasons, what is important is that the data are restored in exactly
 the same order in which they were serialized.
@@ -1144,7 +1144,7 @@ the same order in which they were serialized.
 When _getting_ an entity type, a snapshot loader restores all entities with the
 versions that they originally had at the source.<br/>
 In all other cases, entities and components are restored in a given storage. If
-the registry doesn't contain the entity, it's also created accordingly. As for
+the registry does not contain the entity, it is also created accordingly. As for
 the snapshot class, named pools are supported too:
 
 ```cpp
@@ -1189,7 +1189,7 @@ loader
     .orphans();
 ```
 
-It isn't necessary to invoke all functions each and every time. What functions
+It is not necessary to invoke all functions each and every time. What functions
 to use in which case mostly depends on the goal.<br/>
 For obvious reasons, what is important is that the data are restored in exactly
 the same order in which they were serialized.
@@ -1199,7 +1199,7 @@ each entity to a local counterpart when required. For each remote identifier not
 yet registered by the loader, a local identifier is created so as to keep the
 local entity in sync with the remote one.<br/>
 In all other cases, entities and components are restored in a given storage. If
-the registry doesn't contain the entity, it's also tracked accordingly. As for
+the registry does not contain the entity, it is also tracked accordingly. As for
 the snapshot class, named pools are supported too:
 
 ```cpp
@@ -1242,7 +1242,7 @@ In particular:
   ```
 
   The output archive can freely decide how to serialize the data. The registry
-  isn't affected at all by the decision.
+  is not affected at all by the decision.
 
 * An input archive (the one used when restoring a snapshot) exposes a function
   call operator with the following signature to load entities:
@@ -1280,7 +1280,7 @@ a well known library for serialization as an archive. It uses
 [`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
 because I wanted to learn how it works at the time I was writing the code.
 
-The code **isn't** production-ready and it isn't neither the only nor (probably)
+The code **is not** production-ready and it is not neither the only nor (probably)
 the best way to do it. However, feel free to use it at your own risk.<br/>
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
@@ -1289,7 +1289,7 @@ everything back to the registry with different loaders.
 
 Pools of components are _specialized versions_ of the sparse set class. Each
 pool contains all the instances of a single component type and all the entities
-to which it's assigned.<br/>
+to which it is assigned.<br/>
 Sparse arrays are _paged_ to avoid wasting memory. Packed arrays of components
 are also paged to have pointer stability upon additions. Packed arrays of
 entities are not instead.<br/>
@@ -1326,7 +1326,7 @@ struct transform {
 
 The `component_traits` class template takes care of _extracting_ the properties
 from the supplied type.<br/>
-Plus, it's _sfinae-friendly_ and also supports feature-based specializations.
+Plus, it is _sfinae-friendly_ and also supports feature-based specializations.
 
 ## Empty type optimization
 
@@ -1336,13 +1336,13 @@ the same types for which _empty base optimization_ (EBO) is possible.<br/>
 performance and memory usage. However, this also has consequences that are worth
 mentioning.
 
-When an empty type is detected, it's not instantiated by default. Therefore,
-only the entities to which it's assigned are made available. There doesn't exist
+When an empty type is detected, it is not instantiated by default. Therefore,
+only the entities to which it is assigned are made available. There does not exist
 a way to _get_ empty types from a storage or a registry. Views and groups never
 return their instances too (for example, during a call to `each`).<br/>
 On the other hand, iterations are faster because only the entities to which the
 type is assigned are considered. Moreover, less memory is used, mainly because
-there doesn't exist any instance of the component, no matter how many entities
+there does not exist any instance of the component, no matter how many entities
 it is assigned to.
 
 More in general, none of the feature offered by the library is affected, but for
@@ -1357,12 +1357,12 @@ optimization selectively rather than globally.
 A void storage (or `entt::storage<void>` or `entt::basic_storage<Type, void>`),
 is a fully functional storage type used to create pools not associated with a
 particular component type.<br/>
-From a technical point of view, it's in all respects similar to a storage for
+From a technical point of view, it is in all respects similar to a storage for
 empty types when their optimization is enabled. Pagination is disabled as well
 as pointer stability (as not necessary).<br/>
 However, this should be preferred to using a simple sparse set. In particular,
 a void storage offers all those feature normally offered by other storage types.
-Therefore, it's a perfectly valid pool for use with views and groups or within a
+Therefore, it is a perfectly valid pool for use with views and groups or within a
 registry.
 
 ## Entity storage
@@ -1382,7 +1382,7 @@ fact, entities are subject to different rules with respect to components
   to existing entities.
 
 * The `each` function iterates only the entities _in use_, that is, those not
-  marked as _ready for reuse_. To iterate all the entities it's necessary to
+  marked as _ready for reuse_. To iterate all the entities it is necessary to
   iterate the underlying sparse set instead.
 
 This kind of storage is designed to be used where any other storage is fine and
@@ -1392,7 +1392,7 @@ can therefore be combined with views, groups and so on.
 
 Within the registry, an entity storage is treated in all respects like any other
 storage.<br/>
-Therefore, it's possible to add mixins to it as well as retrieve it via the
+Therefore, it is possible to add mixins to it as well as retrieve it via the
 `storage` function. It can also be used as storage in a view (for exclude-only
 views for example):
 
@@ -1400,10 +1400,10 @@ views for example):
 auto view = registry.view<entt::entity>(entt::exclude<my_type>);
 ```
 
-However, it's also subject to a couple of exceptions, partly out of necessity
+However, it is also subject to a couple of exceptions, partly out of necessity
 and partly for ease of use.
 
-In particular, it's not possible to create multiple elements of this type.<br/>
+In particular, it is not possible to create multiple elements of this type.<br/>
 This means that the _name_ used to retrieve this kind of storage is ignored and
 the registry will only ever return the same element to the caller. For example:
 
@@ -1418,7 +1418,7 @@ equivalent to the following:
 auto &storage = registry.storage<entt::entity>();
 ```
 
-Because entity storage doesn't have a name, it can't be retrieved via the opaque
+Because entity storage does not have a name, it cannot be retrieved via the opaque
 `storage` function either.<br/>
 It would make no sense to try anyway, given that the type of the registry and
 therefore its entity type are known regardless.
@@ -1433,7 +1433,7 @@ for(auto [id, storage]: registry.storage()) {
 ```
 
 Entity storage is never returned. This simplifies many tasks (such as copying an
-entity) and fits perfectly with the fact that this type of storage doesn't have
+entity) and fits perfectly with the fact that this type of storage does not have
 an identifier inside the registry.
 
 ## Pointer stability
@@ -1441,9 +1441,9 @@ an identifier inside the registry.
 The ability to achieve pointer stability for one, several or all components is a
 direct consequence of the design of `EnTT` and of its default storage.<br/>
 In fact, although it contains what is commonly referred to as a _packed array_,
-the default storage is paged and doesn't suffer from invalidation of references
+the default storage is paged and does not suffer from invalidation of references
 when it runs out of space and has to reallocate.<br/>
-However, this isn't enough to ensure pointer stability in case of deletion. For
+However, this is not enough to ensure pointer stability in case of deletion. For
 this reason, a _stable_ deletion method is also offered. This one is such that
 the position of the elements is preserved by creating tombstones upon deletion
 rather than trying to fill the holes that are created.
@@ -1470,11 +1470,11 @@ deletion policy than the default. In particular:
 In other words, the more generic version of a view is provided in case of stable
 storage, even for a single type view.<br/>
 In no case a tombstone is returned from the view itself. Likewise, non-existent
-components aren't returned, which could otherwise result in an UB.
+components are not returned, which could otherwise result in an UB.
 
 ### Hierarchies and the like
 
-`EnTT` doesn't attempt in any way to offer built-in methods with hidden or
+`EnTT` does not attempt in any way to offer built-in methods with hidden or
 unclear costs to facilitate the creation of hierarchies.<br/>
 There are various solutions to the problem, such as using the following class:
 
@@ -1505,9 +1505,9 @@ struct transform {
 };
 ```
 
-Furthermore, it's quite common for a group of elements to be created close in
+Furthermore, it is quite common for a group of elements to be created close in
 time and therefore fallback into adjacent positions, thus favoring locality even
-on random accesses. Locality that isn't sacrificed over time given the stability
+on random accesses. Locality that is not sacrificed over time given the stability
 of storage positions, with undoubted performance advantages.
 
 # Meet the runtime
@@ -1515,8 +1515,8 @@ of storage positions, with undoubted performance advantages.
 `EnTT` takes advantage of what the language offers at compile-time. However,
 this can have its downsides (well known to those familiar with type erasure
 techniques).<br/>
-To fill the gap, the library also provides a bunch of utilities and feature that
-are very useful to handle types and pools at runtime.
+To fill the gap, the library also provides a bunch of utilities and features that
+are invaluable to handle types and pools at runtime.
 
 ## A base class to rule them all
 
@@ -1527,7 +1527,7 @@ The aim is to limit the need for customizations as much as possible, offering
 what is usually necessary for the vast majority of cases.
 
 When a storage is used through its base class (for example, when its actual type
-isn't known), there is always the possibility of receiving a `type_info` object
+is not known), there is always the possibility of receiving a `type_info` object
 for the type of elements associated with the entities (if any):
 
 ```cpp
@@ -1568,7 +1568,7 @@ pointer and behaves differently depending on the case:
 * When the pointer is not null, the function tries to copy-construct an instance
   of the object to bind to the entity and returns true on success.
 
-This means that, starting from a reference to the base, it's possible to bind
+This means that, starting from a reference to the base, it is possible to bind
 components with entities without knowing their actual type and even initialize
 them by copy if needed:
 
@@ -1595,9 +1595,9 @@ using namespace entt::literals;
 auto &&storage = registry.storage<velocity>("second pool"_hs);
 ```
 
-If a name isn't provided, the default storage associated with the given type is
+If a name is not provided, the default storage associated with the given type is
 always returned.<br/>
-Since the storage are also self-contained, the registry doesn't _duplicate_ its
+Since the storage are also self-contained, the registry does not _duplicate_ its
 own API for them. However, there is still no limit to the possibilities of use:
 
 ```cpp
@@ -1647,8 +1647,8 @@ runtime (also known as `runtime_view`).<br/>
 The former requires a compile-time list of component (or storage) types and can
 make several optimizations because of that. The latter is constructed at runtime
 using numerical type identifiers instead and is a bit slower to iterate.<br/>
-In both cases, creating and destroying views isn't expensive at all since they
-don't have any type of initialization.
+In both cases, creating and destroying views is not expensive at all since they
+do not have any type of initialization.
 
 Groups come in three different flavors: _full-owning groups_, _partial-owning
 groups_ and _non-owning groups_. The main difference between them is in terms of
@@ -1665,7 +1665,7 @@ different APIs.
 Single type views are specialized to give a performance boost in all cases.
 There is nothing as fast as a single type view. They just walk through packed
 (actually paged) arrays of elements and return them directly.<br/>
-This kind of views also allow to get the exact number of elements they are going
+This kind of views also allows getting the exact number of elements they are going
 to return.<br/>
 Refer to the inline documentation for all the details.
 
@@ -1676,7 +1676,7 @@ This kind of views only allow to get the estimated number of elements they are
 going to return.<br/>
 Refer to the inline documentation for all the details.
 
-Storing aside views isn't required as they are extremely cheap to construct. In
+Storing aside views is not required as they are extremely cheap to construct. In
 fact, this is even discouraged when creating a view from a const registry. Since
 all storage are lazily initialized, they may not exist when the view is created.
 Thus, while perfectly usable, the view may contain pending references that are
@@ -1736,12 +1736,12 @@ for(auto &&[entity, pos, vel]: registry.view<position, velocity>().each()) {
 Note that entities can also be excluded from the parameter list when received
 through a callback and this can improve even further the performance during
 iterations.<br/>
-Since they aren't explicitly instantiated, empty components aren't returned in
+Since they are not explicitly instantiated, empty components are not returned in
 any case.
 
-As a side note, in the case of single type views, `get` accepts but doesn't
+As a side note, in the case of single type views, `get` accepts but does not
 strictly require a template parameter, since the type is implicitly defined.
-However, when the type isn't specified, the instance is returned using a tuple
+However, when the type is not specified, the instance is returned using a tuple
 for consistency with multi type views:
 
 ```cpp
@@ -1760,7 +1760,7 @@ registry during iterations to get the types iterated by the view itself.
 
 Views support lazy initialization as well as _storage swapping_.<br/>
 An empty (or partially initialized) view is such that it returns false when
-converted to bool (to let the user know that it isn't fully initialized) but it
+converted to bool (to let the user know that it is not fully initialized) but it
 also works as-is like any other view.
 
 In order to initialize a view one piece at a time, it allows users to inject
@@ -1773,7 +1773,7 @@ entt::view<entt::get_t<position, velocity>> view{};
 view.storage(storage);
 ```
 
-If there are multiple storages of the same type, it's possible to disambiguate
+If there are multiple storages of the same type, it is possible to disambiguate
 using the _index_ of the element to be replaced:
 
 ```cpp
@@ -1810,25 +1810,25 @@ Finally, it should be noted that the lack of a storage is treated to all intents
 and purposes as if it were an _empty_ element.<br/>
 Thus, a _get_ storage (as in `entt::get_t`) makes the view empty automatically
 while an _exclude_ storage (as in `entt::exclude_t`) is ignored as if that part
-of the filter didn't exist.
+of the filter did not exist.
 
 ### Exclude-only
 
-_Exclude-only_ views aren't really a thing in `EnTT`.<br/>
+_Exclude-only_ views are not really a thing in `EnTT`.<br/>
 However, the same result can be achieved by combining the right storage into a
 simple view.
 
 If one gets to the root of the problem, the purpose of an exclude-only view is
-to return entities that don't meet certain requirements.<br/>
+to return entities that do not meet certain requirements.<br/>
 Since entity storage, unlike exclude-only views, **is** a thing in `EnTT`, users
-can leverage it for these kinds of queries. It's also guaranteed to be unique
+can leverage it for these kinds of queries. It is also guaranteed to be unique
 within a registry and is always accessible when creating a view:
 
 ```cpp
 auto view = registry.view<entt::entity>(entt::exclude<my_type>);
 ```
 
-The returned view is such that it will return only the entities that don't have
+The returned view is such that it will return only the entities that do not have
 the `my_type` component, regardless of what other components they have.
 
 ### View pack
@@ -1866,9 +1866,9 @@ for(auto entity: registry.view<positon, velocity>()) {
 }
 ```
 
-Moreover, the order of types when constructing a view doesn't matter. Neither
+Moreover, the order of types when constructing a view does not matter. Neither
 does the order of views in a view pack.<br/>
-However, it's possible to _enforce_ iteration of a view by given component order
+However, it is possible to _enforce_ iteration of a view by given component order
 by means of the `use` function:
 
 ```cpp
@@ -1891,8 +1891,8 @@ for(auto it = view.rbegin(), last = view.rend(); it != last; ++iter) {
 }
 ```
 
-Unfortunately, multi type views don't offer reverse iterators. Therefore, in
-this case it's a must to implement this functionality manually or to use single
+Unfortunately, multi type views do not offer reverse iterators. Therefore, in
+this case it is a must to implement this functionality manually or to use single
 type views to lead the iteration.
 
 ### Runtime views
@@ -1901,7 +1901,7 @@ Multi type views iterate entities that have at least all the given components.
 During construction, they look at the number of elements available in each pool
 and use the smallest set in order to speed up iterations.<br/>
 They offer more or less the same functionalities of a multi type view. However,
-they don't expose a `get` member function and users should refer to the registry
+they do not expose a `get` member function and users should refer to the registry
 that generated the view to access components.<br/>
 Refer to the inline documentation for all the details.
 
@@ -1938,7 +1938,7 @@ entt::runtime_view view{};
 view.iterate(registry.storage<position>()).exclude(registry.storage<velocity>());
 ```
 
-Runtime views are meant for when users don't know at compile-time what types to
+Runtime views are meant for when users do not know at compile-time what types to
 _use_ to iterate entities. The `storage` member function of a registry could be
 useful in this regard.
 
@@ -1948,16 +1948,16 @@ Groups are meant to iterate multiple components at once and to offer a faster
 alternative to multi type views.<br/>
 Groups overcome the performance of the other tools available but require to get
 the ownership of components. This sets some constraints on their pools. On the
-other hand, groups aren't an automatism that increases memory consumption,
+other hand, groups are not an automatism that increases memory consumption,
 affects functionalities and tries to optimize iterations for all the possible
 combinations of components. Users can decide when to pay for groups and to what
 extent.<br/>
 The most interesting aspect of groups is that they fit _usage patterns_. Other
 solutions around usually try to optimize everything, because it is known that
 somewhere within the _everything_ there are also our usage patterns. However
-this has a cost that isn't negligible, both in terms of performance and memory
-usage. Ironically, users pay the price also for things they don't want and this
-isn't something I like much. Even worse, one cannot easily disable such a
+this has a cost that is not negligible, both in terms of performance and memory
+usage. Ironically, users pay the price also for things they do not want and this
+is not something I like much. Even worse, one cannot easily disable such a
 behavior. Groups work differently instead and are designed to optimize only the
 real use cases when users find they need to.<br/>
 Another nice-to-have feature of groups is that they have no impact on memory
@@ -1967,13 +1967,13 @@ avoided as long as possible.
 All groups affect to an extent the creation and destruction of their components.
 This is due to the fact that they must _observe_ changes in the pools of
 interest and arrange data _correctly_ when needed for the types they own.<br/>
-In all cases, a group allows to get the exact number of elements it's going to
+In all cases, a group allows to get the exact number of elements it is going to
 return.<br/>
 Refer to the inline documentation for all the details.
 
-Storing aside groups isn't required as they are extremely cheap to create, even
+Storing aside groups is not required as they are extremely cheap to create, even
 though valid groups can be copied without problems and reused freely.<br/>
-A group performs an initialization step the very first time it's requested and
+A group performs an initialization step the very first time it is requested and
 this could be quite costly. To avoid it, consider creating the group when no
 components have been assigned yet. If the registry is empty, preparation is
 extremely fast.
@@ -2016,7 +2016,7 @@ for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).eac
 Note that entities can also be excluded from the parameter list when received
 through a callback and this can improve even further the performance during
 iterations.<br/>
-Since they aren't explicitly instantiated, empty components aren't returned in
+Since they are not explicitly instantiated, empty components are not returned in
 any case.
 
 **Note**: prefer the `get` member function of a group instead of that of a
@@ -2054,9 +2054,9 @@ Sorting a full-owning group affects all its instances.
 
 A partial-owning group works similarly to a full-owning group for the components
 it owns, but relies on indirection to get components owned by other groups.<br/>
-This isn't as fast as a full-owning group, but it's already much faster than a
+This is not as fast as a full-owning group, but it is already much faster than a
 view when there are only one or two free components to retrieve (the most common
-cases likely). In the worst case, it's not slower than views anyway.
+cases likely). In the worst case, it is not slower than views anyway.
 
 A partial-owning group is created as:
 
@@ -2072,7 +2072,7 @@ auto group = registry.group<position>(entt::get<velocity>, entt::exclude<rendera
 
 Once created, the group gets the ownership of all the components specified in
 the template parameter list and arranges their pools as needed. The ownership of
-the types provided via `entt::get` doesn't pass to the group instead.
+the types provided via `entt::get` does not pass to the group instead.
 
 Sorting owned components is no longer allowed once the group has been created.
 However, partial-owning groups are sorted using their `sort` member functions.
@@ -2097,7 +2097,7 @@ Filtering entities by components is also supported:
 auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<renderable>);
 ```
 
-The group doesn't receive the ownership of any type of component in this
+The group does not receive the ownership of any type of component in this
 case. This type of groups is therefore the least performing in general, but also
 the only one that can be used in any situation to slightly improve performance.
 
@@ -2136,7 +2136,7 @@ std::tuple<position &, const velocity &> tup = view.get<position, const velocity
 std::tuple<const position &, const velocity &> ctup = view.get<const position, const velocity>(entity);
 ```
 
-It's not possible to get non-const references to `velocity` components from the
+It is not possible to get non-const references to `velocity` components from the
 same view instead. Therefore, these result in compilation errors:
 
 ```cpp
@@ -2174,7 +2174,7 @@ for(auto entity: registry.view<entt::entity>()) {
 As a rule of thumb, consider using a view or a group if the goal is to iterate
 entities that have a determinate set of components. These tools are usually much
 faster than filtering entities with a bunch of custom tests.<br/>
-In all the other cases, this is the way to go. For example, it's possible to
+In all the other cases, this is the way to go. For example, it is possible to
 combine this view with the `orphan` member function to clean up orphan entities
 (that is, entities that are still in use and have no assigned components):
 
@@ -2188,12 +2188,12 @@ for(auto entity: registry.view<entt::entity>()) {
 
 In general, iterating all entities can result in poor performance. It should not
 be done frequently to avoid the risk of a performance hit.<br/>
-However, it's convenient when initializing an editor or to reclaim pending
+However, it is convenient when initializing an editor or to reclaim pending
 identifiers.
 
 ## What is allowed and what is not
 
-Most of the _ECS_ available out there don't allow to create and destroy entities
+Most of the _ECS_ available out there do not allow to create and destroy entities
 and components during iterations, nor to have pointer stability.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
@@ -2202,7 +2202,7 @@ and components during iterations, nor to have pointer stability.<br/>
 
 * Deleting the current entity or removing its components is allowed during
   iterations but it could invalidate references. For all the other entities,
-  destroying them or removing their iterated components isn't allowed and can
+  destroying them or removing their iterated components is not allowed and can
   result in undefined behavior.
 
 * When pointer stability is enabled for the type leading the iteration, adding
@@ -2214,7 +2214,7 @@ and components during iterations, nor to have pointer stability.<br/>
   under any circumstances. It could quickly lead to undefined behaviors.
 
 In other terms, iterators are rarely invalidated. Also, component references
-aren't invalidated when a new element is added while they could be invalidated
+are not invalidated when a new element is added while they could be invalidated
 upon destruction due to the _swap-and-pop_ policy, unless the type leading the
 iteration undergoes in-place deletion.<br/>
 As an example, consider the following snippet:
@@ -2227,15 +2227,15 @@ registry.view<position>().each([&](const auto entity, auto &pos) {
 });
 ```
 
-The `each` member function won't break (because iterators remain valid) nor will
+The `each` member function will not break (because iterators remain valid) nor will
 any reference be invalidated. Instead, more attention should be paid to the
 destruction of entities or the removal of components.<br/>
 Use a common range-for loop and get components directly from the view or move
 the deletion of entities and components at the end of the function to avoid
 dangling pointers.
 
-For all types that don't offer stable pointers, iterators are also invalidated
-and the behavior is undefined if an entity is modified or destroyed and it's not
+For all types that do not offer stable pointers, iterators are also invalidated
+and the behavior is undefined if an entity is modified or destroyed and it is not
 the one currently returned by the iterator nor a newly created one.<br/>
 To work around it, possible approaches are:
 
@@ -2254,11 +2254,11 @@ Groups are a faster alternative to views. However, the higher the performance,
 the greater the constraints on what is allowed and what is not.<br/>
 In particular, groups add in some rare cases a limitation on the creation of
 components during iterations. It happens in quite particular cases. Given the
-nature and the scope of the groups, it isn't something in which it will happen
-to come across probably, but it's good to know it anyway.
+nature and the scope of the groups, it is not something in which it will happen
+to come across probably, but it is good to know it anyway.
 
 First of all, it must be said that creating components while iterating a group
-isn't a problem at all and is done freely as it happens with the views. The same
+is not a problem at all and is done freely as it happens with the views. The same
 applies to the destruction of components and entities, for which the rules
 mentioned above apply.
 
@@ -2266,7 +2266,7 @@ The additional limitation arises instead when a given component that is owned by
 a group is iterated outside of it. In this case, adding components that are part
 of the group itself may invalidate the iterators. There are no further
 limitations to the destruction of components and entities.<br/>
-Fortunately, this isn't always true. In fact, it almost never is and only
+Fortunately, this is not always true. In fact, it almost never is and only
 happens under certain conditions. In particular:
 
 * Iterating a type of component that is part of a group with a single type view
@@ -2277,9 +2277,9 @@ happens under certain conditions. In particular:
   and adding to an entity all the components required to get it into the group
   can invalidate the iterators, unless users specify another type of component
   to use to induce the order of iteration of the view (in this case, the former
-  is treated as a free type and isn't affected by the limitation).
+  is treated as a free type and is not affected by the limitation).
 
-In other words, the limitation doesn't exist as long as a type is treated as a
+In other words, the limitation does not exist as long as a type is treated as a
 free type (as an example with multi type views and partial- or non-owning
 groups) or iterated with its own group, but it can occur if the type is used as
 a main type to rule on an iteration.<br/>
@@ -2290,12 +2290,12 @@ groups or as free types with multi type views and groups in general.
 
 # Multithreading
 
-In general, the entire registry isn't thread safe as it is. Thread safety isn't
+In general, the entire registry is not thread safe as it is. Thread safety is not
 something that users should want out of the box for several reasons. Just to
 mention one of them: performance.<br/>
 Views, groups and consequently the approach adopted by `EnTT` are the great
-exception to the rule. It's true that views, groups and iterators in general
-aren't thread safe by themselves. Because of this users shouldn't try to iterate
+exception to the rule. It is true that views, groups and iterators in general
+are not thread safe by themselves. Because of this users should not try to iterate
 a set of components and modify the same set concurrently. However:
 
 * As long as a thread iterates the entities that have the component `X` or
@@ -2311,9 +2311,9 @@ a set of components and modify the same set concurrently. However:
   of which will access the components that carry information about velocity and
   position for its entities.
 
-This kind of entity-component systems can be used in single threaded
+This kind of entity-component systems can be used in single-threaded
 applications as well as along with async stuff or multiple threads. Moreover,
-typical thread based models for _ECS_ don't require a fully thread safe registry
+typical thread based models for _ECS_ do not require a fully thread-safe registry
 to work. Actually, users can reach the goal with the registry as it is while
 working with most of the common models.
 
@@ -2324,7 +2324,7 @@ expedients.
 
 Finally, `EnTT` is configured via a few compile-time definitions to make some of
 its parts implicitly thread-safe, roughly speaking only the ones that really
-make sense and can't be turned around.<br/>
+make sense and can not be turned around.<br/>
 In particular, when multiple instances of objects referencing the type index
 generator (such as the `registry` class) are used in different threads, then it
 might be useful to define `ENTT_USE_ATOMIC`.<br/>
@@ -2336,7 +2336,7 @@ A special mention is needed for the iterators returned by views and groups. Most
 of the time they meet the requirements of random access iterators, in all cases
 they meet at least the requirements of forward iterators.<br/>
 In other terms, they are suitable for use with the parallel algorithms of the
-standard library. If it's not clear, this is a great thing.
+standard library. If it is not clear, this is a great thing.
 
 As an example, this kind of iterators are used in combination with
 `std::for_each` and `std::execution::par` to parallelize the visit and therefore
@@ -2360,22 +2360,22 @@ means that the default iterators provided by the library cannot return proxy
 objects as references and **must** return actual reference types instead.<br/>
 This may change in the future and the iterators will almost certainly return
 both the entities and a list of references to their components by default sooner
-or later. Multi-pass guarantee won't break in any case and the performance
+or later. Multi-pass guarantee will not break in any case and the performance
 should even benefit from it further.
 
 ## Const registry
 
-A const registry is also fully thread safe. This means that it's not able to
+A const registry is also fully thread safe. This means that it is not able to
 lazily initialize a missing storage when a view is generated.<br/>
 The reason for this is easy to explain. To avoid requiring types to be
 _announced_ in advance, a registry lazily creates the storage objects for the
-different components. However, this isn't possible for a thread safe const
+different components. However, this is not possible for a thread safe const
 registry.
 
 Returned views are always valid and behave as expected in the context of the
 caller. However, they may contain dangling references to non-existing storage
 when created from a const registry.<br/>
-As a result, such a view may misbehave over time if it's kept aside for a second
+As a result, such a view may misbehave over time if it is kept aside for a second
 use.<br/>
 Therefore, if the general advice is to create views when necessary and discard
 them immediately afterwards, this becomes almost a rule when it comes to views
@@ -2397,5 +2397,5 @@ things could be forgotten, others could have been omitted on purpose to reduce
 the size of this file. Unfortunately, some parts may even be outdated and still
 to be updated.
 
-For further information, it's recommended to refer to the documentation included
+For further information, it is recommended to refer to the documentation included
 in the code itself or join the official channels to ask a question.

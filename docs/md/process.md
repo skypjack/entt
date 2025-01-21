@@ -22,13 +22,13 @@ CRTP idiom. Moreover, derived classes specify what the intended type for elapsed
 times is.
 
 A process should expose publicly the following member functions whether needed
-(note that it isn't required to define a function unless the derived class wants
+(note that it is not required to define a function unless the derived class wants
 to _override_ the default behavior):
 
 * `void update(Delta, void *);`
 
   This is invoked once per tick until a process is explicitly aborted or ends
-  either with or without errors. Even though it's not mandatory to declare this
+  either with or without errors. Even though it is not mandatory to declare this
   member function. As a rule of thumb, each process should at least define it to
   work _properly_. The `void *` parameter is an opaque pointer to user data (if
   any) forwarded directly to the process during an update.
@@ -36,8 +36,8 @@ to _override_ the default behavior):
 * `void init();`
 
   This is invoked when the process joins the running queue of a scheduler. It
-  happens usually as soon as the process is attached to the scheduler if it's a
-  top level one, otherwise when it replaces its parent if it's a _continuation_.
+  happens usually as soon as the process is attached to the scheduler if it is a
+  top level one, otherwise when it replaces its parent if it is a _continuation_.
 
 * `void succeeded();`
 
@@ -87,7 +87,7 @@ private:
 
 ## Adaptor
 
-Lambdas and functors can't be used directly with a scheduler because they aren't
+Lambdas and functors cannot be used directly with a scheduler because they are not
 properly defined processes with managed life cycles.<br/>
 This class helps in filling the gap and turning lambdas and functors into
 full-featured processes usable by a scheduler.
@@ -109,7 +109,7 @@ Parameters have the following meaning:
 
 Both `succeed` and `fail` accept no parameters at all.
 
-Note that usually users shouldn't worry about creating adaptors at all. A
+Note that usually users should not worry about creating adaptors at all. A
 scheduler creates them internally, each and every time a lambda or a functor is
 used as a process.
 
@@ -118,12 +118,12 @@ used as a process.
 A cooperative scheduler runs different processes and helps manage their life
 cycles.
 
-Each process is invoked once per tick. If it terminates, it's removed
-automatically from the scheduler, and it's never invoked again. Otherwise,
-it's a good candidate to run one more time the next tick.<br/>
+Each process is invoked once per tick. If it terminates, it is removed
+automatically from the scheduler, and it is never invoked again. Otherwise,
+it is a good candidate to run one more time the next tick.<br/>
 A process can also have a _child_. In this case, the parent process is replaced
 with its child when it terminates and only if it returns with success. In case
-of errors, both the parent process and its child are discarded. This way, it's
+of errors, both the parent process and its child are discarded. This way, it is
 easy to create a chain of processes to run sequentially.
 
 Using a scheduler is straightforward. To create it, users must provide only the
@@ -156,7 +156,7 @@ scheduler.clear();
 
 To attach a process to a scheduler, there are mainly two ways:
 
-* If the process inherits from the `process` class template, it's enough to
+* If the process inherits from the `process` class template, it is enough to
   indicate its type and submit all the parameters required to construct it to
   the `attach` member function:
 
@@ -164,7 +164,7 @@ To attach a process to a scheduler, there are mainly two ways:
   scheduler.attach<my_process>(1000u);
   ```
 
-* Otherwise, in case of a lambda or a functor, it's enough to provide an
+* Otherwise, in case of a lambda or a functor, it is enough to provide an
   instance of the class to the `attach` member function:
 
   ```cpp
