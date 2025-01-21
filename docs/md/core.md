@@ -10,7 +10,7 @@
 * [Compressed pair](#compressed-pair)
 * [Enum as bitmask](#enum-as-bitmask)
 * [Hashed strings](#hashed-strings)
-  * [Wide characters](wide-characters)
+  * [Wide characters](#wide-characters)
   * [Conflicts](#conflicts)
 * [Iterators](#iterators)
   * [Input iterator pointer](#input-iterator-pointer)
