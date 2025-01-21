@@ -695,7 +695,7 @@ Fortunately, there are several easy ways to deal with this:
 * A fully customized identifier generation policy (based for example on enum
   classes or preprocessing steps) may represent yet another option.
 
-These are just some examples of possible approaches to the problem but there are
+These are just some examples of possible approaches to the problem, but there are
 many others. As already mentioned above, since users have full control over
 their types, this problem is in any case easy to solve and should not worry too
 much.<br/>
@@ -831,7 +831,7 @@ type list:
 * `type_list_transform[_t]` to _transform_ a range and create another type list.
 
 I'm also pretty sure that more and more utilities will be added over time as
-needs become apparent.<br/>
+needs to become apparent.<br/>
 Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
 `value_list_cat[_t]`and so on.
@@ -840,9 +840,9 @@ lists. We therefore have `value_list_element[_v]` as well as
 
 Sometimes it's useful to be able to give unique, sequential numeric identifiers
 to types either at compile-time or runtime.<br/>
-There are plenty of different solutions for this out there and I could have used
+There are plenty of different solutions for this out there, and I could have used
 one of them. However, I decided to spend my time to define a couple of tools
-that fully embraces what the modern C++ has to offer.
+that fully embrace what modern C++ has to offer.
 
 ## Compile-time generator
 
@@ -873,7 +873,7 @@ where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be
 stable across different runs. In case they have been used in a production
-environment and a type has to be removed, one can just use a placeholder to
+environment, and a type has to be removed; one can just use a placeholder to
 leave the other identifiers unchanged:
 
 ```cpp
@@ -886,7 +886,7 @@ using id = entt::ident<
 >;
 ```
 
-Perhaps a bit ugly to see in a codebase but it gets the job done at least.
+Perhaps a bit ugly to see in a codebase, but it gets the job done at least.
 
 ## Runtime generator
 
@@ -979,5 +979,5 @@ life of developers:
   the language doesn't make it possible to do much better.
 
 This is a rundown of the (actually few) utilities made available by `EnTT`. The
-list will probably grow over time but the size of each will remain rather small,
+list will probably grow over time, but the size of each will remain rather small,
 as has been the case so far.
