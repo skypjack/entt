@@ -45,12 +45,12 @@ The ones that I like more are:
   object wrapper.
 
 The former is admittedly an experimental library, with many interesting ideas.
-I've some doubts about the usefulness of some feature in real world projects,
+I've some doubts about the usefulness of some features in real world projects,
 but perhaps my lack of experience comes into play here. In my opinion, its only
-flaw is the API which I find slightly more cumbersome than other solutions.<br/>
-The latter was undoubtedly a source of inspiration for this module, although I
+flaw is the API that I find slightly more cumbersome than other solutions.<br/>
+The latter was undoubtedly a source of inspiration for this module. Although I
 opted for different choices in the implementation of both the final API and some
-feature.
+features.
 
 Either way, the authors are gurus of the C++ community, people I only have to
 learn from.
@@ -63,7 +63,7 @@ types will have to adhere to.<br/>
 For this purpose, the library offers a single class that supports both deduced
 and fully defined interfaces. Although having interfaces deduced automatically
 is convenient and allows users to write less code in most cases, it has some
-limitations and it's therefore useful to be able to get around the deduction by
+limitations. It's therefore useful to be able to get around the deduction by
 providing a custom definition for the static virtual table.
 
 Once the interface is defined, a generic implementation is needed to fulfill the
@@ -342,7 +342,7 @@ entt::basic_poly<Drawable, sizeof(double[4]), alignof(double[4])>
 
 The default size is `sizeof(double[2])`, which seems like a good compromise
 between a buffer that is too large and one unable to hold anything larger than
-an integer. The alignment requirement is optional and by default such that it's
+an integer. The alignment requirement is optional, and by default such that it's
 the most stringent (the largest) for any object whose size is at most equal to
 the one provided.<br/>
 It's worth noting that providing a size of 0 (which is an accepted value in all
