@@ -1672,7 +1672,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle{};
+    any handle;
 };
 
 class meta_associative_container::meta_iterator final {
@@ -1744,7 +1744,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle{};
+    any handle;
 };
 /*! @endcond */
 
