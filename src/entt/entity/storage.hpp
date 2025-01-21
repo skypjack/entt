@@ -299,15 +299,15 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         payload.shrink_to_fit();
     }
 
-    void swap_at(const std::size_t from, const std::size_t to) {
+    void swap_at(const std::size_t lhs, const std::size_t rhs) {
         using std::swap;
-        swap(element_at(from), element_at(to));
+        swap(element_at(lhs), element_at(rhs));
     }
 
-    void move_to(const std::size_t from, const std::size_t to) {
-        auto &elem = element_at(from);
+    void move_to(const std::size_t lhs, const std::size_t rhs) {
+        auto &elem = element_at(lhs);
         allocator_type allocator{get_allocator()};
-        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(to)), allocator, std::move(elem));
+        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(rhs)), allocator, std::move(elem));
         alloc_traits::destroy(allocator, std::addressof(elem));
     }
 
