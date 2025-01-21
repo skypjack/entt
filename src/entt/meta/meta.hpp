@@ -1284,7 +1284,7 @@ public:
      * @brief Returns a tag for the class template of the underlying type.
      * @return The tag for the class template of the underlying type.
      */
-    [[nodiscard]] inline meta_type template_type() const noexcept {
+    [[nodiscard]] meta_type template_type() const noexcept {
         return (node.templ.resolve != nullptr) ? meta_type{*ctx, node.templ.resolve(internal::meta_context::from(*ctx))} : meta_type{};
     }
 
@@ -1293,7 +1293,7 @@ public:
      * @param index Index of the template argument of which to return the type.
      * @return The type of the i-th template argument of a type.
      */
-    [[nodiscard]] inline meta_type template_arg(const size_type index) const noexcept {
+    [[nodiscard]] meta_type template_arg(const size_type index) const noexcept {
         return index < template_arity() ? meta_type{*ctx, node.templ.arg(internal::meta_context::from(*ctx), index)} : meta_type{};
     }
 
