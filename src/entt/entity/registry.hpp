@@ -64,7 +64,7 @@ public:
     }
 
     constexpr registry_storage_iterator operator++(int) noexcept {
-        registry_storage_iterator orig = *this;
+        const registry_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -73,7 +73,7 @@ public:
     }
 
     constexpr registry_storage_iterator operator--(int) noexcept {
-        registry_storage_iterator orig = *this;
+        const registry_storage_iterator orig = *this;
         return operator--(), orig;
     }
 
