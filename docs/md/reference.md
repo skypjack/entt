@@ -14,7 +14,7 @@ Others developed different architectures from scratch and therefore offer
 alternative solutions with their pros and cons.
 
 If you know of other similar projects out there, feel free to open an issue or a
-PR and I'll be glad to add them to this page.<br/>
+PR, and I'll be glad to add them to this page.<br/>
 I hope the following lists can grow much more in the future.
 
 # Similar projects
@@ -34,12 +34,12 @@ details.
   * [lent](https://github.com/nem0/lent): the Donald Trump of the ECS libraries.
 
 * C++:
-  * [decs](https://github.com/vblanco20-1/decs): a chunk based archetype ECS.
+  * [decs](https://github.com/vblanco20-1/decs): a chunk-based archetype ECS.
   * [ecst](https://github.com/SuperV1234/ecst): a multithreaded compile-time
     ECS that uses sparse sets to keep track of entities in systems.
   * [EntityX](https://github.com/alecthomas/entityx): a bitset based ECS that
     uses a single large matrix of components indexed with entities.
-  * [Gaia-ECS](https://github.com/richardbiely/gaia-ecs): a chunk based
+  * [Gaia-ECS](https://github.com/richardbiely/gaia-ecs): a chunk-based
     archetype ECS.
   * [Polypropylene](https://github.com/pmbittner/Polypropylene): a hybrid
     solution between an ECS and dynamic mixins.
@@ -53,10 +53,10 @@ details.
     with focus on performance and minimal GC allocations.
   * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
     Component System framework.
-  * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
+  * [Massive ECS](https://github.com/nilpunch/massive): sparse set-based ECS
     featuring rollbacks.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
-    platform agnostic and table based ECS framework.
+    platform-agnostic- and table-based ECS framework.
 
 * Go:
   * [gecs](https://github.com/tutumagi/gecs): a sparse sets based ECS inspired 
@@ -79,7 +79,7 @@ details.
 * Rust:
   * [Shipyard](https://github.com/leudz/shipyard): it borrows some ideas from
     `EnTT` and offers a sparse sets based ECS with grouping functionalities.
-  * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set based ECS
+  * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set-based ECS
     written in Rust.
   * [Specs](https://github.com/amethyst/specs): a parallel ECS based mainly on
     hierarchical bitsets that allows different types of storage as needed.
