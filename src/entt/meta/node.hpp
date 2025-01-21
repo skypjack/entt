@@ -64,7 +64,7 @@ struct meta_type_node;
 
 struct meta_custom_node {
     id_type type{};
-    std::shared_ptr<void> value{};
+    std::shared_ptr<void> value;
 };
 
 struct meta_base_node {
@@ -113,7 +113,7 @@ struct meta_func_node {
     meta_type_node (*ret)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     meta_any (*invoke)(const meta_ctx &, meta_handle, meta_any *const){};
-    std::shared_ptr<meta_func_node> next{};
+    std::shared_ptr<meta_func_node> next;
     meta_custom_node custom{};
 };
 
@@ -126,11 +126,11 @@ struct meta_template_node {
 };
 
 struct meta_type_descriptor {
-    std::vector<meta_ctor_node> ctor{};
-    std::vector<meta_base_node> base{};
-    std::vector<meta_conv_node> conv{};
-    std::vector<meta_data_node> data{};
-    std::vector<meta_func_node> func{};
+    std::vector<meta_ctor_node> ctor;
+    std::vector<meta_base_node> base;
+    std::vector<meta_conv_node> conv;
+    std::vector<meta_data_node> data;
+    std::vector<meta_func_node> func;
 };
 
 struct meta_type_node {
@@ -148,7 +148,7 @@ struct meta_type_node {
     meta_template_node templ{};
     meta_dtor_node dtor{};
     meta_custom_node custom{};
-    std::shared_ptr<meta_type_descriptor> details{};
+    std::shared_ptr<meta_type_descriptor> details;
 };
 
 template<auto Member, typename Type, typename Value>
