@@ -43,7 +43,7 @@ public:
     }
 
     constexpr table_iterator operator++(int) noexcept {
-        table_iterator orig = *this;
+        const table_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -52,7 +52,7 @@ public:
     }
 
     constexpr table_iterator operator--(int) noexcept {
-        table_iterator orig = *this;
+        const table_iterator orig = *this;
         return operator--(), orig;
     }
 

@@ -49,7 +49,7 @@ public:
     }
 
     constexpr dense_set_iterator operator++(int) noexcept {
-        dense_set_iterator orig = *this;
+        const dense_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -58,7 +58,7 @@ public:
     }
 
     constexpr dense_set_iterator operator--(int) noexcept {
-        dense_set_iterator orig = *this;
+        const dense_set_iterator orig = *this;
         return operator--(), orig;
     }
 
@@ -170,7 +170,7 @@ public:
     }
 
     constexpr dense_set_local_iterator operator++(int) noexcept {
-        dense_set_local_iterator orig = *this;
+        const dense_set_local_iterator orig = *this;
         return ++(*this), orig;
     }
 
