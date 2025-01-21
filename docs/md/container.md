@@ -78,7 +78,7 @@ The internal implementation is purposely supported by a tuple of containers
 rather than a container of tuples. The purpose is to allow efficient access to
 single columns and not just access to the entire data set of the table.
 
-When a row is accessed, all data are returned in the form of a tuple containing
+When a row is accessed, all data is returned in the form of a tuple containing
 (possibly const) references to the elements of the row itself.<br/>
 Similarly, when a table is iterated, tuples of references to table elements are
 returned for each row.
