@@ -38,4 +38,3 @@ TODO:
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * return meta context from meta objects
-* review sigh_mixin::insert, maybe bugged (ie with pointer stability enabled)

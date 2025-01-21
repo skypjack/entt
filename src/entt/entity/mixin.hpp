@@ -374,6 +374,7 @@ public:
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 
         if(auto &reg = owner_or_assert(); !construction.empty()) {
+            // fine as long as insert passes force_back true to try_emplace
             for(const auto to = underlying_type::size(); from != to; ++from) {
                 construction.publish(reg, underlying_type::operator[](from));
             }
