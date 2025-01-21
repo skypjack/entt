@@ -190,12 +190,14 @@ class meta_any {
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_sequence_container)) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *static_cast<meta_sequence_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{area, *static_cast<const Type *>(value)} : meta_sequence_container{area, *static_cast<Type *>(const_cast<void *>(value))};
             }
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_associative_container)) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *static_cast<meta_associative_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{area, *static_cast<const Type *>(value)} : meta_associative_container{area, *static_cast<Type *>(const_cast<void *>(value))};
             }
         }
@@ -450,6 +452,7 @@ public:
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
             const auto &other = type_id<Type>();
+            // NOLINTNEXTLINE(bugprone-casting-through-void)
             return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, other, storage.data())));
         }
     }

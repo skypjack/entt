@@ -61,6 +61,7 @@ class basic_any {
         switch(req) {
         case request::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
             }
@@ -88,12 +89,14 @@ class basic_any {
             }
         case request::copy:
             if constexpr(std::is_copy_constructible_v<Type>) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
             }
             break;
         case request::move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
