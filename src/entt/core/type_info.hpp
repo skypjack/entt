@@ -24,7 +24,7 @@ struct ENTT_API type_index final {
 template<typename Type>
 [[nodiscard]] constexpr auto stripped_type_name() noexcept {
 #if defined ENTT_PRETTY_FUNCTION
-    std::string_view pretty_function{static_cast<const char *>(ENTT_PRETTY_FUNCTION)};
+    const std::string_view pretty_function{static_cast<const char *>(ENTT_PRETTY_FUNCTION)};
     auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
     auto value = pretty_function.substr(first, pretty_function.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
