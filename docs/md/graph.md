@@ -24,7 +24,7 @@ some tools such as the _flow builder_.
 
 As anticipated in the introduction, the aim isn't to offer all possible data
 structures suitable for representing and working with graphs. Many will likely
-be added or refined over time. However I want to discourage anyone expecting
+be added or refined over time. However, I want to discourage anyone expecting
 tight scheduling on the subject.<br/>
 The data structures presented in this section are mainly useful for the
 development and support of some tools which are also part of the same submodule.
@@ -108,7 +108,7 @@ Both the functions expect the vertex to visit (that is, to return the in- or
 out-edges for) as an argument.<br/>
 Finally, the adjacency matrix is an allocator-aware container and offers most of
 the functionalities one would expect from this type of containers, such as
-`clear` or 'get_allocator` and so on.
+`clear` or 'get_allocator' and so on.
 
 ## Graphviz dot language
 
@@ -165,7 +165,7 @@ particular data structure. On the other hand, it requires the user to keep track
 of the association between identifiers and operations or actual data.
 
 Once a flow builder is created (which requires no constructor arguments), the
-first thing to do is to bind a task. This tells to the builder _who_ intends to
+first thing to do is to bind a task. This tells the builder _who_ intends to
 consume the resources that are specified immediately after:
 
 ```cpp
@@ -194,7 +194,7 @@ builder
         .rw("resource_2"_hs)
 ```
 
-As mentioned, many functions return the builder itself and it's therefore easy
+As mentioned, many functions return the builder itself, and it's therefore easy
 to concatenate the different calls.<br/>
 Also in the case of resources, they are identified by numeric values of type
 `id_type`. As above, the choice is not entirely random. This goes well with the
@@ -274,7 +274,7 @@ loop between the two tasks.
 As a general rule, rebinding resources and tasks is highly discouraged because
 it could lead to subtle bugs if users don't know what they're doing.<br/>
 However, once the mechanisms of resource-based graph generation are understood,
-it can offer to the expert user a flexibility and a range of possibilities
+it can offer to the expert user flexibility and a range of possibilities
 otherwise inaccessible.
 
 ## Fake resources and order of execution
@@ -322,7 +322,7 @@ builder
 
 In this case, since there are a number of processes that want to read a specific
 resource, they will do so in parallel by forcing `task_3` to run after all the
-others tasks.
+other tasks.
 
 ## Sync points
 
@@ -335,7 +335,7 @@ builder, then the `sync` function is invoked:
 builder.bind("sync_point"_hs).sync();
 ```
 
-The choice to assign an _identity_ to this type of nodes lies in the fact that,
+The choice to assign an _identity_ to this type of node lies in the fact that,
 more often than not, they also perform operations on resources.<br/>
 If this isn't the case, it will still be possible to create no-op vertices to
 which empty tasks are assigned.
