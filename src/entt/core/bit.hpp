@@ -41,6 +41,7 @@ template<typename Type>
  */
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, Type> next_power_of_two(const Type value) noexcept {
+    // NOLINTNEXTLINE(bugprone-assert-side-effect)
     ENTT_ASSERT_CONSTEXPR(value < (Type{1u} << (std::numeric_limits<Type>::digits - 1)), "Numeric limits exceeded");
     Type curr = value - (value != 0u);
 
