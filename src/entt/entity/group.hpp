@@ -57,7 +57,7 @@ public:
     }
 
     extended_group_iterator operator++(int) noexcept {
-        extended_group_iterator orig = *this;
+        const extended_group_iterator orig = *this;
         return ++(*this), orig;
     }
 
