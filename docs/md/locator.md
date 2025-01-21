@@ -8,8 +8,8 @@
 
 # Introduction
 
-Usually, service locators are tightly bound to the services they expose and it's
-hard to define a general purpose solution.<br/>
+Usually, service locators are tightly bound to the services they expose.
+It's hard to define a general purpose solution.<br/>
 This tiny class tries to fill the gap and gets rid of the burden of defining a
 different specific locator for each application.
 
@@ -74,9 +74,9 @@ and use them with other locators. Of course, all a user will get is to have an
 uninitialized service elsewhere as well.
 
 Note that exporting a service allows users to _share_ the object currently set
-in a locator. Replacing it won't replace the element even where a service has
+in a locator. Replacing it won't replace the element, even where a service has
 been configured with a handle to the previous item.<br/>
 In other words, if an audio service is replaced with a null object to silence an
 application and the original service was shared, this operation won't propagate
-to the other locators. Therefore, a module that share the ownership of the
+to the other locators. Therefore, a module that shares the ownership of the
 original audio service is still able to emit sounds.
