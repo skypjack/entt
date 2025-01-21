@@ -56,7 +56,7 @@ public:
     }
 
     runtime_view_iterator operator++(int) {
-        runtime_view_iterator orig = *this;
+        const runtime_view_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -67,7 +67,7 @@ public:
     }
 
     runtime_view_iterator operator--(int) {
-        runtime_view_iterator orig = *this;
+        const runtime_view_iterator orig = *this;
         return operator--(), orig;
     }
 
