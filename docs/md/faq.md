@@ -16,7 +16,7 @@
 
 This is a constantly updated section where I'm trying to put the answers to the
 most frequently asked questions.<br/>
-If you don't find your answer here, there are two cases: nobody has done it yet
+If you don't find your answer here, there are two cases: nobody has done it yet, 
 or this section needs updating. In both cases, you can
 [open a new issue](https://github.com/skypjack/entt/issues/new) or enter either
 the [gitter channel](https://gitter.im/skypjack/entt) or the
@@ -34,7 +34,7 @@ likely that some classes you're working with are using standard containers under
 the hood.<br/>
 Unfortunately, it's known that the standard containers aren't particularly
 performing in debugging (the reasons for this go beyond this document) and are
-even less so on Windows apparently. Fortunately this can also be mitigated a
+even less so on Windows, apparently. Fortunately, this can also be mitigated a
 lot, achieving good results in many cases.
 
 First of all, there are two things to do in a Windows project:
@@ -53,7 +53,7 @@ macro to disable internal debug checks in `EnTT`:
 #define ENTT_ASSERT(...) ((void)0)
 ```
 
-These asserts are introduced to help the users but they require to access to the
+These asserts are introduced to help the users, but they require access to the
 underlying containers and therefore risk ruining the performance in some cases.
 
 With these changes, debug performance should increase enough in most cases. If
@@ -64,7 +64,7 @@ preferably `O1`.
 
 This is one of the first questions that anyone makes when starting to work with
 the entity-component-system architectural pattern.<br/>
-There are several approaches to the problem and the best one depends mainly on
+There are several approaches to the problem, and the best one depends mainly on
 the real problem one is facing. In all cases, how to do it doesn't strictly
 depend on the library in use, but the latter certainly allows or not different
 techniques depending on how the data are laid out.
@@ -72,7 +72,7 @@ techniques depending on how the data are laid out.
 I tried to describe some of the approaches that fit well with the model of
 `EnTT`. [This](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
 first post of a series that tries to _explore_ the problem. More will probably
-come in future.<br/>
+come in the future.<br/>
 In addition, `EnTT` also offers the possibility to create stable storage types
 and therefore have pointer stability for one, all or some components. This is by
 far the most convenient solution when it comes to creating hierarchies and
@@ -184,7 +184,7 @@ owned by the entity that is destroyed.
 
 ## Duplicate storage for the same component
 
-It's rare but you can see double sometimes, especially when it comes to storage.
+It's rare, but you can see double sometimes, especially when it comes to storage.
 This can be caused by a conflict in the hash assigned to the various component
 types (one of a kind) or by bugs in your compiler
 ([more common](https://github.com/skypjack/entt/issues/1063) apparently).<br/>
