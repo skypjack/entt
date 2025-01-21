@@ -246,8 +246,8 @@ builder
 ```
 
 What happens here is that the resource first _sees_ a read-only access request
-from the first task, then a read-write request from the second task and finally
-a new read-only request from the first task.<br/>
+from the first task, then a read-only request from the second task and finally
+a read-write request from the first task.<br/>
 Although this definition would probably be counted as an error, the resulting
 graph may be unexpected. This in fact consists of a single edge outgoing from
 the second task and directed to the first task.<br/>
