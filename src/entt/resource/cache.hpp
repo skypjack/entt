@@ -49,7 +49,7 @@ public:
     }
 
     constexpr resource_cache_iterator operator++(int) noexcept {
-        resource_cache_iterator orig = *this;
+        const resource_cache_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -58,7 +58,7 @@ public:
     }
 
     constexpr resource_cache_iterator operator--(int) noexcept {
-        resource_cache_iterator orig = *this;
+        const resource_cache_iterator orig = *this;
         return operator--(), orig;
     }
 
