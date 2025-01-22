@@ -47,12 +47,12 @@ public:
     }
 
     constexpr handle_storage_iterator &operator++() noexcept {
-        while(++it != last && !it->second.contains(entt)) {}
+        for(++it; it != last && !it->second.contains(entt); ++it) {}
         return *this;
     }
 
     constexpr handle_storage_iterator operator++(int) noexcept {
-        handle_storage_iterator orig = *this;
+        const handle_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
