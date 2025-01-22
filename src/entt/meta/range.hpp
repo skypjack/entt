@@ -37,7 +37,7 @@ struct meta_range_iterator final {
     }
 
     constexpr meta_range_iterator operator++(int) noexcept {
-        meta_range_iterator orig = *this;
+        const meta_range_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -46,7 +46,7 @@ struct meta_range_iterator final {
     }
 
     constexpr meta_range_iterator operator--(int) noexcept {
-        meta_range_iterator orig = *this;
+        const meta_range_iterator orig = *this;
         return operator--(), orig;
     }
 
