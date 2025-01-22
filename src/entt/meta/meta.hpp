@@ -1156,7 +1156,7 @@ public:
      * @return The type info object of the underlying type.
      */
     [[nodiscard]] const type_info &info() const noexcept {
-        return node.info ? *node.info : type_id<void>();
+        return (node.info != nullptr) ? *node.info : type_id<void>();
     }
 
     /**
