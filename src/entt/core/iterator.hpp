@@ -92,7 +92,7 @@ public:
      * @return This iota iterator.
      */
     constexpr iota_iterator operator++(int) noexcept {
-        iota_iterator orig = *this;
+        const iota_iterator orig = *this;
         return ++(*this), orig;
     }
 
