@@ -57,7 +57,7 @@ public:
     }
 
     constexpr storage_iterator operator++(int) noexcept {
-        storage_iterator orig = *this;
+        const storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -66,7 +66,7 @@ public:
     }
 
     constexpr storage_iterator operator--(int) noexcept {
-        storage_iterator orig = *this;
+        const storage_iterator orig = *this;
         return operator--(), orig;
     }
 
@@ -175,7 +175,7 @@ public:
     }
 
     constexpr extended_storage_iterator operator++(int) noexcept {
-        extended_storage_iterator orig = *this;
+        const extended_storage_iterator orig = *this;
         return ++(*this), orig;
     }
 
