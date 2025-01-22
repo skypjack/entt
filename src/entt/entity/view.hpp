@@ -103,7 +103,7 @@ public:
     }
 
     view_iterator operator++(int) noexcept {
-        view_iterator orig = *this;
+        const view_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -162,7 +162,7 @@ public:
     }
 
     extended_view_iterator operator++(int) noexcept {
-        extended_view_iterator orig = *this;
+        const extended_view_iterator orig = *this;
         return ++(*this), orig;
     }
 
