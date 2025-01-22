@@ -103,7 +103,7 @@ TEST(Any, SBOInPlaceConstruction) {
 
 TEST(Any, SBOInPlaceNullptrConstruction) {
     int *instance = nullptr;
-    entt::any any{std::in_place, instance};
+    const entt::any any{std::in_place, instance};
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(any.owner());
@@ -421,7 +421,7 @@ TEST(Any, NoSBOInPlaceConstruction) {
 
 TEST(Any, NoSBOInPlaceNullptrConstruction) {
     fat *instance = nullptr;
-    entt::any any{std::in_place, instance};
+    const entt::any any{std::in_place, instance};
 
     ASSERT_FALSE(any);
     ASSERT_FALSE(any.owner());

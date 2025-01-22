@@ -148,7 +148,7 @@ struct MetaData: ::testing::Test {
 using MetaDataDeathTest = MetaData;
 
 TEST_F(MetaData, SafeWhenEmpty) {
-    entt::meta_data data{};
+    const entt::meta_data data{};
 
     ASSERT_FALSE(data);
     ASSERT_EQ(data, entt::meta_data{});
@@ -196,8 +196,8 @@ TEST_F(MetaData, Custom) {
 ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
     using namespace entt::literals;
 
-    ASSERT_DEATH([[maybe_unused]] int value = entt::resolve<clazz>().data("i"_hs).custom(), "");
-    ASSERT_DEATH([[maybe_unused]] char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const int value = entt::resolve<clazz>().data("i"_hs).custom(), "");
+    ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
 }
 
 TEST_F(MetaData, Comparison) {

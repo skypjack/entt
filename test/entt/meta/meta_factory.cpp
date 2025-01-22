@@ -347,7 +347,7 @@ TEST_F(MetaFactory, FuncOverload) {
 
     clazz instance{1};
     entt::meta_factory<clazz> factory{};
-    entt::meta_type type = entt::resolve<clazz>();
+    const entt::meta_type type = entt::resolve<clazz>();
 
     ASSERT_FALSE(type.func("func"_hs));
 

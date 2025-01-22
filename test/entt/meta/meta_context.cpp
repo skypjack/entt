@@ -306,7 +306,7 @@ TEST_F(MetaContext, MetaCtor) {
     ASSERT_EQ(any.cast<const clazz &>().value, 0);
     ASSERT_EQ(other.cast<const clazz &>().value, 0);
 
-    argument argument{2};
+    const argument argument{2};
 
     any = global.construct(argument);
     other = local.construct(argument);

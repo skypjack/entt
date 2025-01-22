@@ -14,8 +14,8 @@
 
 TEST(SingleStorageView, Functionalities) {
     entt::storage<char> storage{};
-    entt::basic_view view{storage};
-    entt::basic_view cview{std::as_const(storage)};
+    const entt::basic_view view{storage};
+    const entt::basic_view cview{std::as_const(storage)};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     ASSERT_TRUE(view.empty());
@@ -113,7 +113,7 @@ TEST(SingleStorageView, Constructors) {
 
 TEST(SingleStorageView, Handle) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
     const entt::entity entity{0};
 
     const auto *handle = view.handle();
@@ -133,8 +133,8 @@ TEST(SingleStorageView, Handle) {
 
 TEST(SingleStorageView, ElementAccess) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
-    entt::basic_view cview{std::as_const(storage)};
+    const entt::basic_view view{storage};
+    const entt::basic_view cview{std::as_const(storage)};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     storage.emplace(entity[0u], 4);
@@ -146,7 +146,7 @@ TEST(SingleStorageView, ElementAccess) {
 
 TEST(SingleStorageView, Contains) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     storage.emplace(entity[0u]);
@@ -160,7 +160,7 @@ TEST(SingleStorageView, Contains) {
 
 TEST(SingleStorageView, Empty) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
 
     ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(view.begin(), view.end());
@@ -169,8 +169,8 @@ TEST(SingleStorageView, Empty) {
 
 TEST(SingleStorageView, Each) {
     std::tuple<entt::storage<int>, entt::storage<double>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
-    entt::basic_view cview{std::as_const(std::get<0>(storage))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
+    const entt::basic_view cview{std::as_const(std::get<0>(storage))};
     const std::array entity{entt::entity{0}, entt::entity{1}};
 
     std::get<0>(storage).emplace(entity[0u], 0);
@@ -214,8 +214,8 @@ TEST(SingleStorageView, Each) {
 
 TEST(SingleStorageView, ConstNonConstAndAllInBetween) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
-    entt::basic_view cview{std::as_const(storage)};
+    const entt::basic_view view{storage};
+    const entt::basic_view cview{std::as_const(storage)};
     const entt::entity entity{0};
 
     ASSERT_EQ(view.size(), 0u);
@@ -255,8 +255,8 @@ TEST(SingleStorageView, ConstNonConstAndAllInBetween) {
 
 TEST(SingleStorageView, ConstNonConstAndAllInBetweenWithEmptyType) {
     entt::storage<test::empty> storage{};
-    entt::basic_view view{storage};
-    entt::basic_view cview{std::as_const(storage)};
+    const entt::basic_view view{storage};
+    const entt::basic_view cview{std::as_const(storage)};
     const entt::entity entity{0};
 
     ASSERT_EQ(view.size(), 0u);
@@ -281,7 +281,7 @@ TEST(SingleStorageView, ConstNonConstAndAllInBetweenWithEmptyType) {
 
 TEST(SingleStorageView, Find) {
     entt::storage<int> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
 
     storage.emplace(entity[0u]);
@@ -303,7 +303,7 @@ TEST(SingleStorageView, Find) {
 
 TEST(SingleStorageView, EmptyType) {
     entt::storage<test::empty> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
     const entt::entity entity{0};
 
     storage.emplace(entity);
@@ -325,7 +325,7 @@ TEST(SingleStorageView, EmptyType) {
 
 TEST(SingleStorageView, FrontBack) {
     entt::storage<char> storage{};
-    entt::basic_view view{std::as_const(storage)};
+    const entt::basic_view view{std::as_const(storage)};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
@@ -619,8 +619,8 @@ TEST(SingleStorageView, StorageEntity) {
 
 TEST(MultiStorageView, Functionalities) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
-    entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     std::get<1>(storage).emplace(entity[0u], '1');
@@ -759,7 +759,7 @@ TEST(MultiStorageView, Handle) {
 
 TEST(MultiStorageView, Iterator) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
     const std::array entity{entt::entity{0}, entt::entity{1}};
 
     std::get<0>(storage).insert(entity.begin(), entity.end());
@@ -787,8 +787,8 @@ TEST(MultiStorageView, Iterator) {
 
 TEST(MultiStorageView, ElementAccess) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
-    entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     std::get<0>(storage).emplace(entity[0u], 4);
@@ -803,7 +803,7 @@ TEST(MultiStorageView, ElementAccess) {
 
 TEST(MultiStorageView, Contains) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
     std::get<0>(storage).emplace(entity[0u]);
@@ -872,8 +872,8 @@ TEST(MultiStorageView, UseAndRefresh) {
 
 TEST(MultiStorageView, Each) {
     std::tuple<entt::storage<int>, entt::storage<char>, entt::storage<double>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage), std::get<1>(storage)), std::forward_as_tuple(std::get<2>(storage))};
-    entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage), std::get<1>(storage)), std::forward_as_tuple(std::get<2>(storage))};
+    const entt::basic_view cview{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
     const std::array entity{entt::entity{0}, entt::entity{1}};
 
     std::get<0>(storage).emplace(entity[0u], 0);
@@ -976,7 +976,7 @@ TEST(MultiStorageView, EachWithSuggestedType) {
 
 TEST(MultiStorageView, EachWithHoles) {
     std::tuple<entt::storage<char>, entt::storage<test::boxed_int>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
 
     std::get<0>(storage).emplace(entity[0u], '0');
@@ -1000,7 +1000,7 @@ TEST(MultiStorageView, EachWithHoles) {
 
 TEST(MultiStorageView, ConstNonConstAndAllInBetween) {
     std::tuple<entt::storage<int>, entt::storage<test::empty>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage), std::as_const(std::get<2>(storage))};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage), std::as_const(std::get<2>(storage))};
     const entt::entity entity{0};
 
     ASSERT_EQ(view.size_hint(), 0u);
@@ -1035,7 +1035,7 @@ TEST(MultiStorageView, ConstNonConstAndAllInBetween) {
 
 TEST(MultiStorageView, Find) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::get<0>(storage), std::as_const(std::get<1>(storage))};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
 
     std::get<0>(storage).emplace(entity[0u]);
@@ -1061,7 +1061,7 @@ TEST(MultiStorageView, Find) {
 
 TEST(MultiStorageView, Exclude) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}, entt::entity{3}};
 
     std::get<0>(storage).emplace(entity[0u], 0);
@@ -1137,7 +1137,7 @@ TEST(MultiStorageView, EmptyType) {
 
 TEST(MultiStorageView, FrontBack) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
 
     ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
@@ -1186,7 +1186,7 @@ TEST(MultiStorageView, DeductionGuide) {
 
 TEST(MultiStorageView, IterableViewAlgorithmCompatibility) {
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
+    const entt::basic_view view{std::as_const(std::get<0>(storage)), std::as_const(std::get<1>(storage))};
     const entt::entity entity{0};
 
     std::get<0>(storage).emplace(entity);
@@ -1248,7 +1248,7 @@ TEST(MultiStorageView, StableType) {
 
 TEST(MultiStorageView, StableTypeWithExclude) {
     std::tuple<entt::storage<test::pointer_stable>, entt::storage<int>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
     const std::array entity{entt::entity{1}, entt::entity{3}};
     const entt::entity tombstone = entt::tombstone;
 
@@ -1425,7 +1425,7 @@ TEST(MultiStorageView, SwapStorage) {
 
 TEST(MultiStorageView, StorageEntity) {
     std::tuple<entt::storage<entt::entity>, entt::storage<char>> storage{};
-    entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
+    const entt::basic_view view{std::get<0>(storage), std::get<1>(storage)};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[0u]);
@@ -1458,7 +1458,7 @@ TEST(MultiStorageView, StorageEntity) {
 
 TEST(MultiStorageView, StorageEntityWithExclude) {
     std::tuple<entt::storage<entt::entity>, entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage), std::get<1>(storage)), std::forward_as_tuple(std::get<2>(storage))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage), std::get<1>(storage)), std::forward_as_tuple(std::get<2>(storage))};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[0u]);
@@ -1495,7 +1495,7 @@ TEST(MultiStorageView, StorageEntityWithExclude) {
 
 TEST(MultiStorageView, StorageEntityExcludeOnly) {
     std::tuple<entt::storage<entt::entity>, entt::storage<int>> storage{};
-    entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
+    const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
 
     std::get<1>(storage).emplace(entity[2u]);
@@ -1537,9 +1537,9 @@ TEST(View, Pipe) {
     std::get<3>(storage).emplace(entity[1u]);
 
     entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
-    entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<0>(storage))), std::forward_as_tuple(std::get<4>(storage))};
+    const entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<0>(storage))), std::forward_as_tuple(std::get<4>(storage))};
     entt::basic_view view3{std::get<2>(storage)};
-    entt::basic_view view4{std::as_const(std::get<3>(storage))};
+    const entt::basic_view view4{std::as_const(std::get<3>(storage))};
 
     testing::StaticAssertTypeEq<decltype(view1 | std::get<2>(storage)), decltype(view1 | view3)>();
     testing::StaticAssertTypeEq<decltype(view1 | std::get<3>(std::as_const(storage))), decltype(view1 | view4)>();
