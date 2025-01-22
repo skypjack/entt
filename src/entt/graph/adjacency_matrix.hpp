@@ -46,7 +46,7 @@ public:
     }
 
     constexpr edge_iterator operator++(int) noexcept {
-        edge_iterator orig = *this;
+        const edge_iterator orig = *this;
         return ++(*this), orig;
     }
 
