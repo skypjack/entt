@@ -41,7 +41,7 @@ struct sparse_set_iterator final {
     }
 
     constexpr sparse_set_iterator operator++(int) noexcept {
-        sparse_set_iterator orig = *this;
+        const sparse_set_iterator orig = *this;
         return ++(*this), orig;
     }
 
@@ -50,7 +50,7 @@ struct sparse_set_iterator final {
     }
 
     constexpr sparse_set_iterator operator--(int) noexcept {
-        sparse_set_iterator orig = *this;
+        const sparse_set_iterator orig = *this;
         return operator--(), orig;
     }
 
