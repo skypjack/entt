@@ -3,7 +3,7 @@
 
 #include "macro.h"
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+// NOLINTBEGIN(cppcoreguidelines-macro-*,modernize-macro-*)
 
 #define ENTT_VERSION_MAJOR 3
 #define ENTT_VERSION_MINOR 15
@@ -13,6 +13,6 @@
     ENTT_XSTR(ENTT_VERSION_MAJOR) \
     "." ENTT_XSTR(ENTT_VERSION_MINOR) "." ENTT_XSTR(ENTT_VERSION_PATCH)
 
-// NOLINTEND(cppcoreguidelines-macro-usage)
+// NOLINTEND(cppcoreguidelines-macro-*,modernize-macro-*)
 
 #endif
