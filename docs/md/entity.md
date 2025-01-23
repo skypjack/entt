@@ -2324,7 +2324,7 @@ expedients.
 
 Finally, `EnTT` is configured via a few compile-time definitions to make some of
 its parts implicitly thread-safe, roughly speaking only the ones that really
-make sense and can not be turned around.<br/>
+make sense and cannot be turned around.<br/>
 In particular, when multiple instances of objects referencing the type index
 generator (such as the `registry` class) are used in different threads, then it
 might be useful to define `ENTT_USE_ATOMIC`.<br/>
