@@ -111,7 +111,7 @@ class process {
     }
 
     template<typename... Args>
-    void next(Args &&...) const noexcept {}
+    void next(Args...) const noexcept {}
 
 protected:
     /**
