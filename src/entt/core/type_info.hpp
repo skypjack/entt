@@ -259,6 +259,7 @@ template<typename Type>
 
 /*! @copydoc type_id */
 template<typename Type>
+// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 [[nodiscard]] const type_info &type_id(Type &&) noexcept {
     return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
 }
