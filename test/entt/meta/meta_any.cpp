@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
@@ -65,7 +66,7 @@ struct fat: empty {
     std::array<double, 4u> value{};
 };
 
-enum class enum_class : unsigned short int {
+enum class enum_class : std::uint8_t {
     foo = 0u,
     bar = 1u
 };

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <utility>
@@ -111,7 +112,7 @@ private:
     bool *cb;
 };
 
-enum class property_type : entt::id_type {
+enum class property_type : std::uint8_t {
     value,
     other
 };
