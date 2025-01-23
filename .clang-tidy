@@ -40,6 +40,8 @@ CheckOptions:
       value: true
     - key: modernize-avoid-c-arrays.AllowStringArrays
       value: true
+    - key: performance-enum-size.EnumIgnoreList
+      value: meta_traits
     - key: readability-function-cognitive-complexity.IgnoreMacros
       value: true
     - key: readability-identifier-length.MinimumParameterNameLength
