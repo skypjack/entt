@@ -1,5 +1,7 @@
 Checks: >
     bugprone-*,
+    clang-analyzer-*,
+    -clang-analyzer-optin.core.EnumCastOutOfRange,
     concurrency-*,
     cppcoreguidelines-*,
     -cppcoreguidelines-owning-memory,
