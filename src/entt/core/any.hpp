@@ -355,6 +355,7 @@ public:
     }
 
     /*! @copydoc assign */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
         if(vtable && mode != any_policy::cref && *info == other.type()) {
             if(auto *val = other.data(); val) {
@@ -474,6 +475,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
+// NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
