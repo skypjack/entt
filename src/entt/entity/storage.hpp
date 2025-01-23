@@ -907,6 +907,7 @@ public:
      * @param entt A valid identifier.
      */
     template<typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
     void emplace(const entity_type entt, Args &&...) {
         base_type::try_emplace(entt, false);
     }
@@ -931,6 +932,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It, typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
     void insert(It first, It last, Args &&...) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
