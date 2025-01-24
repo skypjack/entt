@@ -82,6 +82,7 @@ TEST(Any, NoSBO) {
 
 TEST(Any, SBOInPlaceConstruction) {
     std::unique_ptr<int> elem = std::make_unique<int>(2);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     entt::any any{std::in_place, elem.release()};
 
     ASSERT_TRUE(any);
@@ -400,6 +401,7 @@ TEST(Any, SBOAsConstRefTransferValue) {
 
 TEST(Any, NoSBOInPlaceConstruction) {
     std::unique_ptr<fat> elem = std::make_unique<fat>(.1, .2, .3, .4);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     entt::any any{std::in_place, elem.release()};
 
     ASSERT_TRUE(any);

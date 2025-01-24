@@ -165,6 +165,7 @@ TEST_F(MetaAny, NoSBO) {
 
 TEST_F(MetaAny, SBOInPlaceConstruction) {
     std::unique_ptr<int> elem = std::make_unique<int>(2);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     entt::meta_any any{std::in_place, elem.release()};
 
     ASSERT_TRUE(any);
@@ -496,6 +497,7 @@ TEST_F(MetaAny, SBOAsConstRefTransferValue) {
 TEST_F(MetaAny, NoSBOInPlaceConstruction) {
     const fat instance{.1, .2, .3, .4};
     std::unique_ptr<fat> elem = std::make_unique<fat>(instance);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     entt::meta_any any{std::in_place, elem.release()};
 
     ASSERT_TRUE(any);
