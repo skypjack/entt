@@ -25,15 +25,15 @@ struct auto_signal final {
           updated{&uflag},
           destroyed{&dflag} {}
 
-    inline static void on_construct(entt::registry &registry, const entt::entity entt) {
+    static void on_construct(entt::registry &registry, const entt::entity entt) {
         *registry.get<auto_signal>(entt).created = true;
     }
 
-    inline static void on_update(entt::registry &registry, const entt::entity entt) {
+    static void on_update(entt::registry &registry, const entt::entity entt) {
         *registry.get<auto_signal>(entt).updated = true;
     }
 
-    inline static void on_destroy(entt::registry &registry, const entt::entity entt) {
+    static void on_destroy(entt::registry &registry, const entt::entity entt) {
         *registry.get<auto_signal>(entt).destroyed = true;
     }
 
