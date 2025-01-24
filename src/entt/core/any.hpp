@@ -83,7 +83,7 @@ class basic_any {
             break;
         case request::compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return *elem == *static_cast<const Type *>(other) ? other : nullptr;
+                return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
             } else {
                 return (elem == other) ? other : nullptr;
             }
@@ -97,13 +97,13 @@ class basic_any {
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
+                return static_cast<const void *>(::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))});
             }
             [[fallthrough]];
         case request::get:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
-                return elem;
+                return static_cast<const void *>(elem);
             }
         }
 
