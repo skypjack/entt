@@ -350,7 +350,7 @@ TEST(SingleStorageView, DeductionGuide) {
 
 TEST(SingleStorageView, IterableViewAlgorithmCompatibility) {
     entt::storage<char> storage{};
-    entt::basic_view view{storage};
+    const entt::basic_view view{storage};
     const entt::entity entity{0};
 
     storage.emplace(entity);
