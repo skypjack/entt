@@ -45,6 +45,7 @@ class basic_any {
     };
 
     template<typename Type>
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static constexpr bool in_situ = (Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
 
     template<typename Type>
