@@ -345,6 +345,7 @@ struct type_list_transform;
 template<typename... Type, template<typename...> class Op>
 struct type_list_transform<type_list<Type...>, Op> {
     /*! @brief Resulting type list after applying the transform function. */
+    // NOLINTNEXTLINE(modernize-type-traits)
     using type = type_list<typename Op<Type>::type...>;
 };
 
