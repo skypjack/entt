@@ -166,7 +166,7 @@ class basic_sparse_set {
 
     // it could be auto but gcc complains and emits a warning due to a false positive
     [[nodiscard]] std::size_t policy_to_head() const noexcept {
-        return static_cast<size_type>(max_size * static_cast<decltype(max_size)>(mode != deletion_policy::swap_only));
+        return static_cast<size_type>(max_size * static_cast<std::remove_const_t<decltype(max_size)>>(mode != deletion_policy::swap_only));
     }
 
     [[nodiscard]] auto entity_to_pos(const Entity entt) const noexcept {
