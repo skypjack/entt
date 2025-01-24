@@ -123,7 +123,7 @@ public:
      * @param value An instance of the given type of event.
      */
     template<typename Type>
-    void publish(Type &&value) {
+    void publish(Type value) {
         if(const auto id = type_id<Type>().hash(); handlers.first().contains(id)) {
             handlers.first()[id](&value);
         }
