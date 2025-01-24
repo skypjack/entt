@@ -450,7 +450,7 @@ public:
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)},
+        : base_type{static_cast<base_type &&>(other)},
           payload{std::move(other.payload)} {}
 
     /**
@@ -459,7 +459,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator)
-        : base_type{std::move(other), allocator},
+        : base_type{static_cast<base_type &&>(other), allocator},
           payload{std::move(other.payload), allocator} {
         // NOLINTNEXTLINE(bugprone-use-after-move)
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
@@ -1056,7 +1056,7 @@ public:
      * @param other The instance to move from.
      */
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)},
+        : base_type{static_cast<base_type &&>(other)},
           placeholder{other.placeholder} {}
 
     /**
@@ -1065,7 +1065,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator)
-        : base_type{std::move(other), allocator},
+        : base_type{static_cast<base_type &&>(other), allocator},
           placeholder{other.placeholder} {}
 
     /*! @brief Default destructor. */

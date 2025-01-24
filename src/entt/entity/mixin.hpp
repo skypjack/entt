@@ -177,7 +177,7 @@ public:
      * @param other The instance to move from.
      */
     basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
-        : underlying_type{std::move(other)},
+        : underlying_type{static_cast<underlying_type &&>(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
           destruction{std::move(other.destruction)},
@@ -189,7 +189,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator)
-        : underlying_type{std::move(other), allocator},
+        : underlying_type{static_cast<underlying_type &&>(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
           destruction{std::move(other.destruction), allocator},
