@@ -661,6 +661,7 @@ TEST_F(MetaType, FromVoidOwnership) {
     void *instance = std::make_unique<from_void_callback>(check).release();
 
     auto any = type.from_void(instance);
+    // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto other = type.from_void(instance, true);
 
     ASSERT_TRUE(any);
