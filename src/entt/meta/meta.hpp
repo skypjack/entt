@@ -827,7 +827,7 @@ struct meta_data {
     using size_type = typename internal::meta_data_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_data() noexcept = default;
+    meta_data() noexcept(false) = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -950,7 +950,7 @@ struct meta_func {
     using size_type = typename internal::meta_func_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_func() noexcept = default;
+    meta_func() noexcept(false) = default;
 
     /**
      * @brief Context aware constructor for meta objects.
@@ -1129,7 +1129,7 @@ public:
     using size_type = typename internal::meta_type_node::size_type;
 
     /*! @brief Default constructor. */
-    meta_type() noexcept = default;
+    meta_type() noexcept(false) = default;
 
     /**
      * @brief Context aware constructor for meta objects.
