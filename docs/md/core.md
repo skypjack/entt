@@ -873,7 +873,7 @@ where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be
 stable across different runs. In case they have been used in a production
-environment, and a type has to be removed; one can just use a placeholder to
+environment, and a type has to be removed. One can just use a placeholder to
 leave the other identifiers unchanged:
 
 ```cpp
