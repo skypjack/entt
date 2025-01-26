@@ -108,7 +108,7 @@ Both the functions expect the vertex to visit (that is, to return the in- or
 out-edges for) as an argument.<br/>
 Finally, the adjacency matrix is an allocator-aware container and offers most of
 the functionalities one would expect from this type of containers, such as
-`clear` or 'get_allocator' and so on.
+`clear` or `get_allocator` and so on.
 
 ## Graphviz dot language
 
