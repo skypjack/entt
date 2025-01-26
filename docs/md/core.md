@@ -831,7 +831,7 @@ type list:
 * `type_list_transform[_t]` to _transform_ a range and create another type list.
 
 I am also pretty sure that more and more utilities will be added over time as
-needs to become apparent.<br/>
+needs become apparent.<br/>
 Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
 `value_list_cat[_t]`and so on.
