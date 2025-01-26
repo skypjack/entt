@@ -28,10 +28,10 @@ to _override_ the default behavior):
 * `void update(Delta, void *);`
 
   This is invoked once per tick until a process is explicitly aborted or ends
-  either with or without errors. Even though it is not mandatory to declare this
-  member function. As a rule of thumb, each process should at least define it to
-  work _properly_. The `void *` parameter is an opaque pointer to user data (if
-  any) forwarded directly to the process during an update.
+  either with or without errors. Technically speaking, this member function is 
+  not strictly required. However, each process should at least define it to work
+  _properly_. The `void *` parameter is an opaque pointer to user data (if any)
+  forwarded directly to the process during an update.
 
 * `void init();`
 
