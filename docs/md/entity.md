@@ -74,7 +74,7 @@ used mostly in game development.
 
 ## Type-less and bitset-free
 
-The library implements a sparse set-based model that does not require users to
+The library implements a sparse set based model that does not require users to
 specify the set of components neither at compile-time nor at runtime.<br/>
 This is why users can instantiate the core class simply like:
 

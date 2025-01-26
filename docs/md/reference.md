@@ -53,7 +53,7 @@ details.
     with focus on performance and minimal GC allocations.
   * [LeoECS](https://github.com/Leopotam/ecs): simple lightweight C# Entity
     Component System framework.
-  * [Massive ECS](https://github.com/nilpunch/massive): sparse set-based ECS
+  * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
     featuring rollbacks.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
     platform-agnostic- and table-based ECS framework.
@@ -79,7 +79,7 @@ details.
 * Rust:
   * [Shipyard](https://github.com/leudz/shipyard): it borrows some ideas from
     `EnTT` and offers a sparse sets based ECS with grouping functionalities.
-  * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set-based ECS
+  * [Sparsey](https://github.com/LechintanTudor/sparsey): sparse set based ECS
     written in Rust.
   * [Specs](https://github.com/amethyst/specs): a parallel ECS based mainly on
     hierarchical bitsets that allows different types of storage as needed.
