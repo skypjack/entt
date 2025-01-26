@@ -831,7 +831,7 @@ reduce the boilerplate in the most complex cases.
 A handle is a thin wrapper around an entity and a registry. It _replicates_ the
 API of a registry by offering functions such as `get` or `emplace`. The
 difference being that the entity is implicitly passed to the registry.<br/>
-It is default-constructible as an invalid handle that contains a null registry
+It is default constructible as an invalid handle that contains a null registry
 and a null entity. When it contains a null registry, calling functions that
 delegate execution to the registry causes undefined behavior. It is recommended
 to test for validity with its implicit cast to `bool` if in doubt.<br/>

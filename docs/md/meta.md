@@ -713,13 +713,13 @@ always preferred over the automatic ones.
 
 ## Implicitly generated default constructor
 
-Creating objects of default-constructible types through the reflection system
+Creating objects of default constructible types through the reflection system
 while not having to explicitly register the meta-type or its default constructor
 is also possible.<br/>
 For example, in the case of primitive types like `int` or `char`, but not just
 them.
 
-For default-constructible types only, default constructors are automatically
+For default constructible types only, default constructors are automatically
 defined and associated with their meta-types, whether they are explicitly or
 implicitly generated.<br/>
 Therefore, this is all needed to construct an integer from its meta-type:
