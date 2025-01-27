@@ -97,14 +97,15 @@ class basic_any {
         case request::move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                return static_cast<const void *>(::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))});
+                // NOLINTNEXTLINE(bugprone-casting-through-void,bugprone-multi-level-implicit-pointer-conversion)
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
         case request::get:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
-                return static_cast<const void *>(elem);
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
+                return elem;
             }
         }
 
@@ -122,6 +123,7 @@ class basic_any {
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<plain_type>) {
                 mode = any_policy::embedded;
