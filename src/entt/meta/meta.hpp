@@ -1505,6 +1505,7 @@ public:
 
     /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_type &other) const noexcept {
+        // NOLINTNEXTLINE(clang-analyzer-core.NonNullParamChecker)
         return (ctx == other.ctx) && ((node.info == nullptr) == (other.node.info == nullptr)) && (node.info == nullptr || (*node.info == *other.node.info));
     }
 
