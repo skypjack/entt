@@ -454,22 +454,26 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
+    // NOLINTBEGIN(bugprone-use-after-move)
     basic_reactive_mixin(basic_reactive_mixin &&other) noexcept
         : underlying_type{std::move(other)},
           owner{other.owner},
           conn{} {
     }
+    // NOLINTEND(bugprone-use-after-move)
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
+    // NOLINTBEGIN(bugprone-use-after-move)
     basic_reactive_mixin(basic_reactive_mixin &&other, const allocator_type &allocator)
         : underlying_type{std::move(other), allocator},
           owner{other.owner},
           conn{allocator} {
     }
+    // NOLINTEND(bugprone-use-after-move)
 
     /*! @brief Default destructor. */
     ~basic_reactive_mixin() override = default;
