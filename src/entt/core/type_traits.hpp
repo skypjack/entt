@@ -63,6 +63,7 @@ struct size_of: std::integral_constant<std::size_t, 0u> {};
 /*! @copydoc size_of */
 template<typename Type>
 struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     : std::integral_constant<std::size_t, sizeof(Type)> {};
 
 /**
