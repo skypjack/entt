@@ -38,3 +38,4 @@ TODO:
 * sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * return meta context from meta objects
+* allow passing arguments to meta setter/getter (we can fallback on meta invoke for everything probably)
