@@ -322,7 +322,15 @@ TYPED_TEST(SparseSet, Pagination) {
 
         set.shrink_to_fit();
 
-        ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+        switch(policy) {
+        case entt::deletion_policy::swap_and_pop:
+        case entt::deletion_policy::in_place: {
+            ASSERT_EQ(set.extent(), 0u);
+        } break;
+        case entt::deletion_policy::swap_only: {
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+        } break;
+        }
     }
 }
 

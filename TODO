@@ -35,7 +35,6 @@ TODO:
 * don't pass reactive storage by default to callback
 * runtime types support for meta for types that aren't backed by C++ types
 * built-in no-pagination storage - no_pagination page size as limits::max
-* sparse_set shrink_to_fit argument for sparse array shrink policy (none, empty, deep, whatever)
 * any cdynamic to support const ownership construction
 * return meta context from meta objects
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke for everything probably)

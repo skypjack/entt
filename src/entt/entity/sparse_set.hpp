@@ -556,6 +556,32 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     virtual void shrink_to_fit() {
+        sparse_container_type other{sparse.get_allocator()};
+        const auto len = sparse.size();
+        size_type cnt{};
+
+        other.reserve(len);
+
+        for(auto &&elem: std::as_const(packed)) {
+            // also skip tombstones, if any
+            if(const auto page = pos_to_page(entity_to_pos(elem)); page < len && sparse[page] != nullptr) {
+                if(const auto sz = page + 1u; sz > other.size()) {
+                    other.resize(sz, nullptr);
+                }
+
+                other[page] = std::exchange(sparse[page], nullptr);
+
+                if(++cnt == len) {
+                    // early exit due to lack of pages
+                    break;
+                }
+            }
+        }
+
+        release_sparse_pages();
+        sparse.swap(other);
+
+        sparse.shrink_to_fit();
         packed.shrink_to_fit();
     }
 
