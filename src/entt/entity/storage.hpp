@@ -988,13 +988,17 @@ class basic_storage<Entity, Entity, Allocator>
     using underlying_iterator = typename basic_sparse_set<Entity, Allocator>::basic_iterator;
     using traits_type = entt_traits<Entity>;
 
-    auto next() noexcept {
-        entity_type entt = null;
+    auto from_placeholder() noexcept {
+        ENTT_ASSERT(placeholder < traits_type::to_entity(null), "No more entities available");
+        return traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder++), {});
+    }
 
-        do {
-            ENTT_ASSERT(placeholder < traits_type::to_entity(null), "No more entities available");
-            entt = traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder++), {});
-        } while(base_type::current(entt) != traits_type::to_version(tombstone) && entt != null);
+    auto next() noexcept {
+        entity_type entt = from_placeholder();
+
+        while(base_type::current(entt) != traits_type::to_version(tombstone) && entt != null) {
+            entt = from_placeholder();
+        }
 
         return entt;
     }
