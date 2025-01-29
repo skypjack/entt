@@ -23,10 +23,10 @@ jobs:
       # see: https://apt.llvm.org/
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-$LLVM main"
+        sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-$LLVM main"
         sudo apt update
         sudo apt remove -y "llvm*"
-        sudo apt remove -y "libclang-dev*"
+        sudo apt remove -y "libclang*"
         sudo apt remove -y "clang*"
         sudo apt install -y llvm-$LLVM-dev
         sudo apt install -y libclang-$LLVM-dev
