@@ -1,7 +1,6 @@
 #include <array>
 #include <type_traits>
 #include <gtest/gtest.h>
-#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
 

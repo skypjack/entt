@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
-#include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
