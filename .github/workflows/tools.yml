@@ -82,8 +82,3 @@ jobs:
               -DENTT_USE_CLANG_TIDY=ON \
               ..
         make -j4
-    - name: Run tests
-      working-directory: build
-      env:
-        CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
