@@ -410,37 +410,123 @@ public:
     }
 
     /**
-     * @brief Connects a free function (with or without payload), a bound or an
-     * unbound member to a signal.
+     * @brief Connects a free function or an unbound member to a signal.
      * @tparam Candidate Function or member to connect to the signal.
-     * @tparam Type Type of class or type of payload, if any.
-     * @param value_or_instance A valid object that fits the purpose, if any.
      * @return A properly initialized connection object.
      */
-    template<auto Candidate, typename... Type>
-    connection connect(Type &&...value_or_instance) {
-        disconnect<Candidate>(value_or_instance...);
+    template<auto Candidate>
+    connection connect() {
+        disconnect<Candidate>();
 
         delegate_type call{};
-        call.template connect<Candidate>(value_or_instance...);
+        call.template connect<Candidate>();
         signal_or_assert().calls.push_back(std::move(call));
 
         delegate<void(void *)> conn{};
-        conn.template connect<&release<Candidate, Type...>>(value_or_instance...);
+        conn.template connect<&release<Candidate>>();
         return {conn, signal};
     }
 
     /**
-     * @brief Disconnects a free function (with or without payload), a bound or
-     * an unbound member from a signal.
+     * @brief Connects a free function with payload or a bound member to a
+     * signal.
+     *
+     * The signal isn't responsible for the connected object or the payload.
+     * Users must always guarantee that the lifetime of the instance overcomes
+     * the one of the signal.<br/>
+     * When used to connect a free function with payload, its signature must be
+     * such that the instance is the first argument before the ones used to
+     * define the signal itself.
+     *
+     * @tparam Candidate Function or member to connect to the signal.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid reference that fits the purpose.
+     * @return A properly initialized connection object.
+     */
+    template<auto Candidate, typename Type>
+    connection connect(Type &value_or_instance) {
+        disconnect<Candidate>(value_or_instance);
+
+        delegate_type call{};
+        call.template connect<Candidate>(value_or_instance);
+        signal_or_assert().calls.push_back(std::move(call));
+
+        delegate<void(void *)> conn{};
+        conn.template connect<&release<Candidate, Type &>>(value_or_instance);
+        return {conn, signal};
+    }
+
+    /**
+     * @brief Connects a free function with payload or a bound member to a
+     * signal.
+     *
+     * @sa connect(Type &)
+     *
+     * @tparam Candidate Function or member to connect to the signal.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     * @return A properly initialized connection object.
+     */
+    template<auto Candidate, typename Type>
+    connection connect(Type *value_or_instance) {
+        disconnect<Candidate>(value_or_instance);
+
+        delegate_type call{};
+        call.template connect<Candidate>(value_or_instance);
+        signal_or_assert().calls.push_back(std::move(call));
+
+        delegate<void(void *)> conn{};
+        conn.template connect<&release<Candidate, Type *>>(value_or_instance);
+        return {conn, signal};
+    }
+
+    /**
+     * @brief Disconnects a free function or an unbound member from a signal.
+     * @tparam Candidate Function or member to disconnect from the signal.
+     */
+    template<auto Candidate>
+    void disconnect() {
+        delegate_type call{};
+        call.template connect<Candidate>();
+        disconnect_if([&call](const auto &elem) { return elem == call; });
+    }
+
+    /**
+     * @brief Disconnects a free function with payload or a bound member from a
+     * signal.
+     *
+     * The signal isn't responsible for the connected object or the payload.
+     * Users must always guarantee that the lifetime of the instance overcomes
+     * the one of the signal.<br/>
+     * When used to connect a free function with payload, its signature must be
+     * such that the instance is the first argument before the ones used to
+     * define the signal itself.
+     *
      * @tparam Candidate Function or member to disconnect from the signal.
      * @tparam Type Type of class or type of payload, if any.
-     * @param value_or_instance A valid object that fits the purpose, if any.
+     * @param value_or_instance A valid reference that fits the purpose.
      */
-    template<auto Candidate, typename... Type>
-    void disconnect(Type &&...value_or_instance) {
+    template<auto Candidate, typename Type>
+    void disconnect(Type &value_or_instance) {
         delegate_type call{};
-        call.template connect<Candidate>(value_or_instance...);
+        call.template connect<Candidate>(value_or_instance);
+        disconnect_if([&call](const auto &elem) { return elem == call; });
+    }
+
+    /**
+     * @brief Disconnects a free function with payload or a bound member from a
+     * signal.
+     *
+     * @sa disconnect(Type &)
+     *
+     * @tparam Candidate Function or member to disconnect from the signal.
+     * @tparam Type Type of class or type of payload, if any.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    template<auto Candidate, typename Type>
+    void disconnect(Type *value_or_instance) {
+        delegate_type call{};
+        call.template connect<Candidate>(value_or_instance);
         disconnect_if([&call](const auto &elem) { return elem == call; });
     }
 
