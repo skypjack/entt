@@ -276,6 +276,12 @@ TYPED_TEST(RuntimeView, Empty) {
     ASSERT_FALSE(view.contains(entity));
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ((std::find(view.begin(), view.end(), entity)), view.end());
+
+    storage.emplace(entity);
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE((std::find(view.begin(), view.end(), entity)), view.end());
 }
 
 TYPED_TEST(RuntimeView, Each) {
