@@ -1477,6 +1477,7 @@ TEST(Registry, GetOrEmplace) {
     const auto value = registry.get_or_emplace<int>(entity, 3);
 
     // get_or_emplace must work for empty types
+    // NOLINTNEXTLINE(readability-redundant-casting)
     static_cast<void>(registry.get_or_emplace<test::empty>(entity));
 
     ASSERT_TRUE((registry.all_of<int, test::empty>(entity)));
