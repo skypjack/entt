@@ -106,7 +106,7 @@ struct radix_sort {
                 constexpr auto mask = (1 << Bit) - 1;
                 constexpr auto buckets = 1 << Bit;
 
-                // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+                // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, misc-const-correctness)
                 std::size_t count[buckets]{};
 
                 for(auto it = from; it != to; ++it) {
