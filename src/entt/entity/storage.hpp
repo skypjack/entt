@@ -989,8 +989,10 @@ class basic_storage<Entity, Entity, Allocator>
     using traits_type = entt_traits<Entity>;
 
     auto from_placeholder() noexcept {
-        ENTT_ASSERT(placeholder < traits_type::to_entity(null), "No more entities available");
-        return traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder++), {});
+        const auto entt = traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder), {});
+        ENTT_ASSERT(entt != null, "No more entities available");
+        placeholder += static_cast<size_type>(entt != null);
+        return entt;
     }
 
     auto next() noexcept {
