@@ -97,7 +97,7 @@ class basic_any {
         case request::move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void,bugprone-multi-level-implicit-pointer-conversion)
+                // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
