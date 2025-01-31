@@ -19,6 +19,7 @@ namespace entt {
 namespace internal {
 
 template<typename... Type>
+// NOLINTNEXTLINE(misc-redundant-expression)
 static constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
 
 template<typename Type>
