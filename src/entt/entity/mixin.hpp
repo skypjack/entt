@@ -576,7 +576,7 @@ public:
     template<typename... Get, typename... Exclude>
     [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) {
-        owner_type &parent = owner_or_assert();
+        std::conditional_t<((std::is_const_v<Get> && ...) && (std::is_const_v<Exclude> && ...)), const owner_type, owner_type> &parent = owner_or_assert();
         return {*this, parent.template storage<std::remove_const_t<Get>>()..., parent.template storage<std::remove_const_t<Exclude>>()...};
     }
 
