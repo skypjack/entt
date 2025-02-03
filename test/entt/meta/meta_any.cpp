@@ -858,6 +858,35 @@ TEST_F(MetaAny, VoidInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
+TEST_F(MetaAny, VoidAsRefConstruction) {
+    entt::meta_any any{std::in_place_type<void>};
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.base().owner());
+    ASSERT_EQ(any.base().policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.base().data(), nullptr);
+
+    ASSERT_EQ(any, entt::meta_any{std::in_place_type<void>});
+    ASSERT_EQ(entt::meta_any{std::in_place_type<void>}, any);
+    ASSERT_NE(entt::meta_any{3}, any);
+
+    any = entt::meta_any{std::in_place_type<void>};
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+    ASSERT_EQ(any.base().data(), nullptr);
+
+    auto other = any.as_ref();
+
+    ASSERT_TRUE(other);
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_EQ(other.base().data(), any.base().data());
+}
+
 TEST_F(MetaAny, VoidCopyConstruction) {
     const entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{any};
@@ -1201,8 +1230,8 @@ TEST_F(MetaAny, AsRef) {
     cref = std::as_const(any).as_ref();
 
     ASSERT_TRUE(any);
-    ASSERT_FALSE(ref);
-    ASSERT_FALSE(cref);
+    ASSERT_TRUE(ref);
+    ASSERT_TRUE(cref);
 }
 
 ENTT_DEBUG_TEST_F(MetaAnyDeathTest, AsRef) {

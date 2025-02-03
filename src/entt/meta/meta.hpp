@@ -212,7 +212,7 @@ class meta_any {
     meta_any(const meta_any &other, any ref) noexcept
         : storage{std::move(ref)},
           ctx{other.ctx} {
-        if(storage) {
+        if(storage || !other.storage) {
             node = other.node;
             vtable = other.vtable;
         }
