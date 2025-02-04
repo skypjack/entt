@@ -789,6 +789,30 @@ private:
     meta_any any;
 };
 
+/*! @brief Common base class for meta context holders. */
+struct meta_basic_object {
+    /*! @brief Default constructor. */
+    meta_basic_object() noexcept = default;
+
+    /**
+     * @brief Context aware constructor for meta objects.
+     * @param area The context from which to search for meta types.
+     */
+    meta_basic_object(const meta_ctx &area) noexcept
+        : ctx{&area} {}
+
+    /**
+     * @brief Returns the underlying meta context.
+     * @return The underlying meta context.
+     */
+    const meta_ctx &context() const noexcept {
+        return *ctx;
+    }
+
+private:
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+};
+
 /*! @brief Opaque wrapper for user defined data of any type. */
 struct meta_custom {
     /*! @brief Default constructor. */
