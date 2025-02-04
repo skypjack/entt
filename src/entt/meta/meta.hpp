@@ -849,7 +849,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for data members. */
-struct meta_data {
+struct meta_data: meta_basic_object {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_data_node::size_type;
 
@@ -862,8 +862,8 @@ struct meta_data {
      * @param curr The underlying node with which to construct the instance.
      */
     meta_data(const meta_ctx &area, internal::meta_data_node curr) noexcept
-        : node{std::move(curr)},
-          ctx{&area} {}
+        : meta_basic_object{area},
+          node{std::move(curr)} {}
 
     /**
      * @brief Returns the number of setters available.
@@ -902,7 +902,7 @@ struct meta_data {
     template<typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(meta_handle instance, Type &&value) const {
-        return (node.set != nullptr) && node.set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+        return (node.set != nullptr) && node.set(meta_handle{context(), std::move(instance)}, meta_any{context(), std::forward<Type>(value)});
     }
 
     /**
@@ -911,7 +911,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return (node.get != nullptr) ? node.get(*ctx, meta_handle{*ctx, std::move(instance)}) : meta_any{meta_ctx_arg, *ctx};
+        return (node.get != nullptr) ? node.get(context(), meta_handle{context(), std::move(instance)}) : meta_any{meta_ctx_arg, context()};
     }
 
     /**
@@ -953,12 +953,11 @@ struct meta_data {
      * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_data &other) const noexcept {
-        return (ctx == other.ctx) && (node.set == other.node.set) && (node.get == other.node.get);
+        return (&context() == &other.context()) && (node.set == other.node.set) && (node.get == other.node.get);
     }
 
 private:
     internal::meta_data_node node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /**
@@ -1609,11 +1608,11 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return (node.type != nullptr) ? meta_type{*ctx, node.type(internal::meta_context::from(*ctx))} : meta_type{};
+    return (node.type != nullptr) ? meta_type{context(), node.type(internal::meta_context::from(context()))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    return index < arity() ? node.arg(*ctx, index) : meta_type{};
+    return index < arity() ? node.arg(context(), index) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
