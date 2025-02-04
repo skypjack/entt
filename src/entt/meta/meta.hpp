@@ -971,7 +971,7 @@ private:
 }
 
 /*! @brief Opaque wrapper for member functions. */
-struct meta_func {
+struct meta_func: meta_basic_object {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_func_node::size_type;
 
@@ -984,8 +984,8 @@ struct meta_func {
      * @param curr The underlying node with which to construct the instance.
      */
     meta_func(const meta_ctx &area, internal::meta_func_node curr) noexcept
-        : node{std::move(curr)},
-          ctx{&area} {}
+        : meta_basic_object{area},
+          node{std::move(curr)} {}
 
     /**
      * @brief Returns the number of arguments accepted by a member function.
@@ -1032,7 +1032,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return ((node.invoke != nullptr) && (sz == arity())) ? node.invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return ((node.invoke != nullptr) && (sz == arity())) ? node.invoke(context(), meta_handle{context(), std::move(instance)}, args) : meta_any{meta_ctx_arg, context()};
     }
 
     /**
@@ -1045,7 +1045,7 @@ struct meta_func {
     template<typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(meta_handle instance, Args &&...args) const {
-        return invoke(std::move(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return invoke(std::move(instance), std::array<meta_any, sizeof...(Args)>{meta_any{context(), std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::traits */
@@ -1064,7 +1064,7 @@ struct meta_func {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return (node.next != nullptr) ? meta_func{*ctx, *node.next} : meta_func{};
+        return (node.next != nullptr) ? meta_func{context(), *node.next} : meta_func{};
     }
 
     /**
@@ -1077,12 +1077,11 @@ struct meta_func {
 
     /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_func &other) const noexcept {
-        return (ctx == other.ctx) && (node.invoke == other.node.invoke);
+        return (&context() == &other.context()) && (node.invoke == other.node.invoke);
     }
 
 private:
     internal::meta_func_node node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /**
@@ -1616,11 +1615,11 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return (node.ret != nullptr) ? meta_type{*ctx, node.ret(internal::meta_context::from(*ctx))} : meta_type{};
+    return (node.ret != nullptr) ? meta_type{context(), node.ret(internal::meta_context::from(context()))} : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    return index < arity() ? node.arg(*ctx, index) : meta_type{};
+    return index < arity() ? node.arg(context(), index) : meta_type{};
 }
 
 /*! @cond TURN_OFF_DOXYGEN */

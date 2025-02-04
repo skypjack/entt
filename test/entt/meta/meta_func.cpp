@@ -5,6 +5,8 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/locator/locator.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/policy.hpp>
@@ -157,6 +159,19 @@ struct MetaFunc: ::testing::Test {
 };
 
 using MetaFuncDeathTest = MetaFunc;
+
+TEST_F(MetaFunc, Context) {
+    entt::meta_func func{};
+    entt::meta_ctx ctx{};
+
+    ASSERT_EQ(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_NE(&func.context(), &ctx);
+
+    func = entt::meta_func{ctx, entt::internal::meta_func_node{}};
+
+    ASSERT_NE(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&func.context(), &ctx);
+}
 
 TEST_F(MetaFunc, SafeWhenEmpty) {
     const entt::meta_func func{};
