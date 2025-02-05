@@ -646,7 +646,7 @@ public:
      * @brief Returns the underlying meta context.
      * @return The underlying meta context.
      */
-    const meta_ctx &context() const noexcept {
+    [[nodiscard]] const meta_ctx &context() const noexcept {
         return *ctx;
     }
 
