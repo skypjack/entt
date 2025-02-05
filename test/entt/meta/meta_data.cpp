@@ -147,19 +147,6 @@ struct MetaData: ::testing::Test {
 
 using MetaDataDeathTest = MetaData;
 
-TEST_F(MetaData, Context) {
-    entt::meta_data data{};
-    entt::meta_ctx ctx{};
-
-    ASSERT_EQ(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_NE(&data.context(), &ctx);
-
-    data = entt::meta_data{ctx, entt::internal::meta_data_node{}};
-
-    ASSERT_NE(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_EQ(&data.context(), &ctx);
-}
-
 TEST_F(MetaData, SafeWhenEmpty) {
     const entt::meta_data data{};
 
@@ -174,6 +161,19 @@ TEST_F(MetaData, SafeWhenEmpty) {
     ASSERT_EQ(data.arg(0u), entt::meta_type{});
     ASSERT_EQ(data.traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(static_cast<const char *>(data.custom()), nullptr);
+}
+
+TEST_F(MetaData, Context) {
+    entt::meta_data data{};
+    entt::meta_ctx ctx{};
+
+    ASSERT_EQ(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_NE(&data.context(), &ctx);
+
+    data = entt::meta_data{ctx, entt::internal::meta_data_node{}};
+
+    ASSERT_NE(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&data.context(), &ctx);
 }
 
 TEST_F(MetaData, UserTraits) {

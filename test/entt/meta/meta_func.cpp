@@ -160,19 +160,6 @@ struct MetaFunc: ::testing::Test {
 
 using MetaFuncDeathTest = MetaFunc;
 
-TEST_F(MetaFunc, Context) {
-    entt::meta_func func{};
-    entt::meta_ctx ctx{};
-
-    ASSERT_EQ(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_NE(&func.context(), &ctx);
-
-    func = entt::meta_func{ctx, entt::internal::meta_func_node{}};
-
-    ASSERT_NE(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_EQ(&func.context(), &ctx);
-}
-
 TEST_F(MetaFunc, SafeWhenEmpty) {
     const entt::meta_func func{};
     entt::meta_any *args = nullptr;
@@ -192,6 +179,19 @@ TEST_F(MetaFunc, SafeWhenEmpty) {
     ASSERT_EQ(func.traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(static_cast<const char *>(func.custom()), nullptr);
     ASSERT_EQ(func.next(), func);
+}
+
+TEST_F(MetaFunc, Context) {
+    entt::meta_func func{};
+    entt::meta_ctx ctx{};
+
+    ASSERT_EQ(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_NE(&func.context(), &ctx);
+
+    func = entt::meta_func{ctx, entt::internal::meta_func_node{}};
+
+    ASSERT_NE(&func.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&func.context(), &ctx);
 }
 
 TEST_F(MetaFunc, UserTraits) {

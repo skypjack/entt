@@ -205,19 +205,6 @@ TEST_F(MetaType, Resolve) {
     ASSERT_TRUE(found);
 }
 
-TEST_F(MetaType, Context) {
-    entt::meta_type type{};
-    entt::meta_ctx ctx{};
-
-    ASSERT_EQ(&type.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_NE(&type.context(), &ctx);
-
-    type = entt::meta_type{ctx, entt::internal::meta_type_node{}};
-
-    ASSERT_NE(&type.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_EQ(&type.context(), &ctx);
-}
-
 TEST_F(MetaType, SafeWhenEmpty) {
     using namespace entt::literals;
 
@@ -272,6 +259,19 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_FALSE(type.get("data"_hs, {}));
     ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(static_cast<const char *>(type.custom()), nullptr);
+}
+
+TEST_F(MetaType, Context) {
+    entt::meta_type type{};
+    entt::meta_ctx ctx{};
+
+    ASSERT_EQ(&type.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_NE(&type.context(), &ctx);
+
+    type = entt::meta_type{ctx, entt::internal::meta_type_node{}};
+
+    ASSERT_NE(&type.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&type.context(), &ctx);
 }
 
 TEST_F(MetaType, UserTraits) {
