@@ -136,6 +136,19 @@ TEST_F(MetaAny, Empty) {
     ASSERT_FALSE(std::as_const(any).as_associative_container());
 }
 
+TEST_F(MetaAny, Context) {
+    entt::meta_any any{};
+    entt::meta_ctx ctx{};
+
+    ASSERT_EQ(&any.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_NE(&any.context(), &ctx);
+
+    any = entt::meta_any{entt::meta_ctx_arg, ctx};
+
+    ASSERT_NE(&any.context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&any.context(), &ctx);
+}
+
 TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 

@@ -642,6 +642,14 @@ public:
         return storage;
     }
 
+    /**
+     * @brief Returns the underlying meta context.
+     * @return The underlying meta context.
+     */
+    const meta_ctx &context() const noexcept {
+        return *ctx;
+    }
+
 private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
@@ -916,14 +924,6 @@ struct meta_data {
     }
 
     /**
-     * @brief Returns the underlying meta context.
-     * @return The underlying meta context.
-     */
-    const meta_ctx &context() const noexcept {
-        return *ctx;
-    }
-
-    /**
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
@@ -1042,11 +1042,6 @@ struct meta_func {
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
         return {node.custom};
-    }
-
-    /*! @copydoc meta_data::context */
-    const meta_ctx &context() const noexcept {
-        return *ctx;
     }
 
     /**
@@ -1506,11 +1501,6 @@ public:
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
         return {node.custom};
-    }
-
-    /*! @copydoc meta_data::context */
-    const meta_ctx &context() const noexcept {
-        return *ctx;
     }
 
     /**

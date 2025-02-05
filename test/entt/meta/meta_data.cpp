@@ -163,19 +163,6 @@ TEST_F(MetaData, SafeWhenEmpty) {
     ASSERT_EQ(static_cast<const char *>(data.custom()), nullptr);
 }
 
-TEST_F(MetaData, Context) {
-    entt::meta_data data{};
-    entt::meta_ctx ctx{};
-
-    ASSERT_EQ(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_NE(&data.context(), &ctx);
-
-    data = entt::meta_data{ctx, entt::internal::meta_data_node{}};
-
-    ASSERT_NE(&data.context(), &entt::locator<entt::meta_ctx>::value_or());
-    ASSERT_EQ(&data.context(), &ctx);
-}
-
 TEST_F(MetaData, UserTraits) {
     using namespace entt::literals;
 
