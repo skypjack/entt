@@ -484,16 +484,20 @@ TEST(Registry, Storage) {
     const auto entity = registry.create();
 
     testing::StaticAssertTypeEq<decltype(registry.storage<test::empty>()), entt::storage_type_t<test::empty> &>();
+    testing::StaticAssertTypeEq<decltype(registry.storage<const test::empty>()), const entt::storage_type_t<test::empty> &>();
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).storage<test::empty>()), const entt::storage_type_t<test::empty> *>();
+    testing::StaticAssertTypeEq<decltype(std::as_const(registry).storage<const test::empty>()), const entt::storage_type_t<test::empty> *>();
 
     testing::StaticAssertTypeEq<decltype(registry.storage("other"_hs)), entt::storage_type_t<test::empty>::base_type *>();
     testing::StaticAssertTypeEq<decltype(std::as_const(registry).storage("other"_hs)), const entt::storage_type_t<test::empty>::base_type *>();
 
+    ASSERT_EQ(&registry.storage<test::empty>("other"_hs), &storage);
+    ASSERT_EQ(&registry.storage<const test::empty>("other"_hs), &storage);
+    ASSERT_NE(std::as_const(registry).storage<test::empty>(), &storage);
+    ASSERT_NE(std::as_const(registry).storage<const test::empty>(), &storage);
+
     ASSERT_NE(registry.storage("other"_hs), nullptr);
     ASSERT_EQ(std::as_const(registry).storage("rehto"_hs), nullptr);
-
-    ASSERT_EQ(&registry.storage<test::empty>("other"_hs), &storage);
-    ASSERT_NE(std::as_const(registry).storage<test::empty>(), &storage);
 
     ASSERT_FALSE(registry.any_of<test::empty>(entity));
     ASSERT_FALSE(storage.contains(entity));

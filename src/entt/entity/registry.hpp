@@ -449,7 +449,7 @@ public:
      */
     template<typename Type>
     storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) {
-        return assure<Type>(id);
+        return assure<std::remove_const_t<Type>>(id);
     }
 
     /**
@@ -460,7 +460,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
-        return assure<Type>(id);
+        return assure<std::remove_const_t<Type>>(id);
     }
 
     /**
