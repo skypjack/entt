@@ -138,7 +138,7 @@ TEST_F(MetaAny, Empty) {
 
 TEST_F(MetaAny, Context) {
     entt::meta_any any{};
-    entt::meta_ctx ctx{};
+    const entt::meta_ctx ctx{};
 
     ASSERT_EQ(&any.context(), &entt::locator<entt::meta_ctx>::value_or());
     ASSERT_NE(&any.context(), &ctx);
