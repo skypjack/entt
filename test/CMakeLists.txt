@@ -70,6 +70,7 @@ function(SETUP_TARGET TARGET_NAME)
                 -fvisibility=hidden
                 -pedantic
                 -Wall
+                -Wconversion
                 -Wno-deprecated-declarations
                 -Wshadow
                 $<$<CONFIG:Debug>:-O0 -g>
