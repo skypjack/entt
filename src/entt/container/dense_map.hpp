@@ -670,7 +670,7 @@ public:
         const auto dist = first - cbegin();
 
         for(auto from = last - cbegin(); from != dist; --from) {
-            erase(packed.first()[from - 1].element.first);
+            erase(packed.first()[static_cast<size_type>(from) - 1u].element.first);
         }
 
         return (begin() + dist);
