@@ -73,7 +73,7 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return (*packed)[index() - value];
+        return (*packed)[static_cast<typename Container::size_type>(index() - value)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -190,7 +190,7 @@ class basic_sparse_set {
     }
 
     [[nodiscard]] auto to_iterator(const Entity entt) const {
-        return --(end() - index(entt));
+        return --(end() - static_cast<typename const_iterator::difference_type>(index(entt)));
     }
 
     [[nodiscard]] auto &assure_at_least(const Entity entt) {
@@ -646,7 +646,7 @@ public:
      * @return An iterator to the first entity of the sparse set.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        const auto pos = static_cast<typename iterator::difference_type>(packed.size());
+        const auto pos = static_cast<typename const_iterator::difference_type>(packed.size());
         return iterator{packed, pos};
     }
 
@@ -998,7 +998,7 @@ public:
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
 
-        algo(packed.rend() - length, packed.rend(), std::move(compare), std::forward<Args>(args)...);
+        algo(packed.rend() - static_cast<typename packed_container_type::difference_type>(length), packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos{}; pos < length; ++pos) {
             auto curr = pos;

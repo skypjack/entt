@@ -560,7 +560,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
-        const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
+        const auto pos = static_cast<typename const_iterator::difference_type>(base_type::size());
         return const_iterator{&payload, pos};
     }
 
