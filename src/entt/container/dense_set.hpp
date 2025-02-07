@@ -247,7 +247,7 @@ class dense_set {
     [[nodiscard]] auto constrained_find(const Other &value, std::size_t bucket) const {
         for(auto it = cbegin(bucket), last = cend(bucket); it != last; ++it) {
             if(packed.second()(*it, value)) {
-                return cbegin() + static_cast<typename iterator::difference_type>(it.index());
+                return cbegin() + static_cast<typename const_iterator::difference_type>(it.index());
             }
         }
 
@@ -599,7 +599,7 @@ public:
         const auto dist = first - cbegin();
 
         for(auto from = last - cbegin(); from != dist; --from) {
-            erase(packed.first()[from - 1u].second);
+            erase(packed.first()[static_cast<size_type>(from) - 1u].second);
         }
 
         return (begin() + dist);
