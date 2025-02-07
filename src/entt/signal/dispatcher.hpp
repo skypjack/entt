@@ -50,7 +50,7 @@ public:
             signal.publish(events[pos]);
         }
 
-        events.erase(events.cbegin(), events.cbegin() + length);
+        events.erase(events.cbegin(), events.cbegin() + static_cast<typename container_type::iterator::difference_type>(length));
     }
 
     void disconnect(void *instance) override {
