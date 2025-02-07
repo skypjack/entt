@@ -152,6 +152,8 @@ class basic_table {
 public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Input iterator type. */
     using iterator = internal::table_iterator<typename Container::iterator...>;
     /*! @brief Constant input iterator type. */

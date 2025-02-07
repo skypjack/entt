@@ -295,6 +295,8 @@ public:
     using value_type = Type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Type of function to use to hash the elements. */
     using hasher = Hash;
     /*! @brief Type of function to use to compare the elements for equality. */
