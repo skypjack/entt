@@ -417,7 +417,7 @@ public:
      */
     void erase(const size_type pos) {
         ENTT_ASSERT(pos < size(), "Index out of bounds");
-        erase(begin() + static_cast<typename const_iterator::difference_type>(pos));
+        erase(begin() + static_cast<typename iterator::difference_type>(pos));
     }
 
     /**
