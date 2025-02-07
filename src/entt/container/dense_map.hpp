@@ -204,7 +204,7 @@ public:
           offset{other.offset} {}
 
     constexpr dense_map_local_iterator &operator++() noexcept {
-        return offset = it[offset].next, *this;
+        return (offset = it[static_cast<typename It::difference_type>(offset)].next), *this;
     }
 
     constexpr dense_map_local_iterator operator++(int) noexcept {
@@ -217,7 +217,8 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        return {it[offset].element.first, it[offset].element.second};
+        const auto idx = static_cast<typename It::difference_type>(offset);
+        return {it[idx].element.first, it[idx].element.second};
     }
 
     [[nodiscard]] constexpr std::size_t index() const noexcept {
@@ -669,7 +670,7 @@ public:
         const auto dist = first - cbegin();
 
         for(auto from = last - cbegin(); from != dist; --from) {
-            erase(packed.first()[from - 1u].element.first);
+            erase(packed.first()[from - 1].element.first);
         }
 
         return (begin() + dist);
