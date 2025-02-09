@@ -1228,7 +1228,8 @@ public:
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
         const auto it = base_type::cend();
-        return const_iterable{it - base_type::free_list(), it};
+        const auto offset = static_cast<typename const_iterable::iterator::difference_type>(base_type::free_list());
+        return const_iterable{it - offset, it};
     }
 
     /**
@@ -1245,7 +1246,8 @@ public:
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
         const auto it = base_type::crbegin();
-        return const_reverse_iterable{it, it + base_type::free_list()};
+        const auto offset = static_cast<typename const_reverse_iterable::iterator::difference_type>(base_type::free_list());
+        return const_reverse_iterable{it, it + offset};
     }
 
 private:

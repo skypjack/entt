@@ -131,7 +131,7 @@ class group_handler final: public group_descriptor {
 
     void common_setup() {
         // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-        for(auto first = pools[0u]->rbegin(), last = first + pools[0u]->size(); first != last; ++first) {
+        for(auto first = pools[0u]->rbegin(), last = first + static_cast<typename decltype(pools)::difference_type>(pools[0u]->size()); first != last; ++first) {
             push_on_construct(*first);
         }
     }
@@ -465,7 +465,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return begin()[pos];
+        return begin()[static_cast<typename iterator::difference_type>(pos)];
     }
 
     /**

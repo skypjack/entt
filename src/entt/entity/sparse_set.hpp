@@ -937,7 +937,7 @@ public:
                 }
             }
 
-            packed.erase(packed.begin() + from, packed.end());
+            packed.erase(packed.begin() + static_cast<typename packed_container_type::difference_type>(from), packed.end());
         }
     }
 
