@@ -384,7 +384,7 @@ TEST(StorageEntity, Iterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.free_list());
+    ASSERT_EQ(begin.base(), pool.end() - static_cast<typename iterator::difference_type>(pool.free_list()));
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
@@ -428,7 +428,7 @@ TEST(StorageEntity, ConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - pool.free_list());
+    ASSERT_EQ(begin.base(), pool.end() - static_cast<typename iterator::difference_type>(pool.free_list()));
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
@@ -496,7 +496,7 @@ TEST(StorageEntity, ReverseIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.free_list());
+    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<typename iterator::difference_type>(pool.free_list()));
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
@@ -540,7 +540,7 @@ TEST(StorageEntity, ReverseConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + pool.free_list());
+    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<typename iterator::difference_type>(pool.free_list()));
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
