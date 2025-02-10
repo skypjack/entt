@@ -302,6 +302,8 @@ public:
     using entity_type = typename Type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Forward iterator type. */
     using iterator = internal::view_iterator<common_type, Checked, Get, Exclude>;
 
@@ -339,7 +341,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end() - static_cast<typename iterator::difference_type>(offset()), pools, filter, index} : iterator{};
+        return (index != Get) ? iterator{pools[index]->end() - static_cast<difference_type>(offset()), pools, filter, index} : iterator{};
     }
 
     /**
@@ -368,7 +370,7 @@ public:
     [[nodiscard]] entity_type back() const noexcept {
         if(index != Get) {
             auto it = pools[index]->rbegin();
-            const auto last = it + static_cast<typename iterator::difference_type>(offset());
+            const auto last = it + static_cast<difference_type>(offset());
             for(; it != last && !(internal::all_of(pools.begin(), pools.begin() + index, *it) && internal::all_of(pools.begin() + index + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
             return it == last ? null : *it;
         }
@@ -477,6 +479,8 @@ public:
     using entity_type = typename base_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename base_type::size_type;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Forward iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Iterable view type. */
@@ -695,6 +699,8 @@ public:
     using entity_type = typename common_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Random access iterator type. */
     using iterator = std::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, true, 1u, 0u>, typename common_type::iterator>;
     /*! @brief Reverse iterator type. */
@@ -759,7 +765,7 @@ public:
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->begin() : iterator{};
         } else if constexpr(Policy == deletion_policy::swap_only) {
-            return leading ? (leading->end() - leading->free_list()) : iterator{};
+            return leading ? (leading->end() - static_cast<difference_type>(leading->free_list())) : iterator{};
         } else {
             static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
             return leading ? iterator{leading->begin(), {leading}, {}, 0u} : iterator{};
@@ -805,7 +811,7 @@ public:
             return leading ? leading->rend() : reverse_iterator{};
         } else {
             static_assert(Policy == deletion_policy::swap_only, "Unexpected storage policy");
-            return leading ? (leading->rbegin() + leading->free_list()) : reverse_iterator{};
+            return leading ? (leading->rbegin() + static_cast<difference_type>(leading->free_list())) : reverse_iterator{};
         }
     }
 
@@ -818,7 +824,7 @@ public:
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return empty() ? null : *leading->begin();
         } else if constexpr(Policy == deletion_policy::swap_only) {
-            return empty() ? null : *(leading->end() - leading->free_list());
+            return empty() ? null : *(leading->end() - static_cast<difference_type>(leading->free_list()));
         } else {
             static_assert(Policy == deletion_policy::in_place, "Unexpected storage policy");
             const auto it = begin();
@@ -913,6 +919,8 @@ public:
     using entity_type = typename base_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename base_type::size_type;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Random access iterator type. */
     using iterator = typename base_type::iterator;
     /*! @brief Reverse iterator type. */
@@ -1051,7 +1059,7 @@ public:
                     func();
                 }
             } else {
-                if(const auto len = base_type::size(); len != 0u) {
+                if(const auto len = static_cast<difference_type>(base_type::size()); len != 0) {
                     for(auto last = storage()->end(), first = last - len; first != last; ++first) {
                         func(*first);
                     }

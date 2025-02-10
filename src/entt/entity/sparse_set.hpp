@@ -190,7 +190,7 @@ class basic_sparse_set {
     }
 
     [[nodiscard]] auto to_iterator(const Entity entt) const {
-        return --(end() - static_cast<typename const_iterator::difference_type>(index(entt)));
+        return --(end() - static_cast<difference_type>(index(entt)));
     }
 
     [[nodiscard]] auto &assure_at_least(const Entity entt) {
@@ -375,7 +375,7 @@ protected:
             break;
         }
 
-        return --(end() - static_cast<typename iterator::difference_type>(pos));
+        return --(end() - static_cast<difference_type>(pos));
     }
 
     /*! @brief Forwards variables to derived classes, if any. */
@@ -391,6 +391,8 @@ public:
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained entities. */
     using pointer = typename packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
@@ -646,7 +648,7 @@ public:
      * @return An iterator to the first entity of the sparse set.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        const auto pos = static_cast<typename const_iterator::difference_type>(packed.size());
+        const auto pos = static_cast<difference_type>(packed.size());
         return iterator{packed, pos};
     }
 
@@ -937,7 +939,7 @@ public:
                 }
             }
 
-            packed.erase(packed.begin() + static_cast<typename packed_container_type::difference_type>(from), packed.end());
+            packed.erase(packed.begin() + static_cast<difference_type>(from), packed.end());
         }
     }
 
@@ -998,7 +1000,7 @@ public:
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
 
-        algo(packed.rend() - static_cast<typename packed_container_type::difference_type>(length), packed.rend(), std::move(compare), std::forward<Args>(args)...);
+        algo(packed.rend() - static_cast<difference_type>(length), packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos{}; pos < length; ++pos) {
             auto curr = pos;
@@ -1051,7 +1053,7 @@ public:
     iterator sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         const size_type len = (mode == deletion_policy::swap_only) ? head : packed.size();
-        auto it = end() - static_cast<typename iterator::difference_type>(len);
+        auto it = end() - static_cast<difference_type>(len);
 
         for(const auto other = end(); (it != other) && (first != last); ++first) {
             if(const auto curr = *first; contains(curr)) {

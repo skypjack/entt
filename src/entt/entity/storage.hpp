@@ -407,6 +407,8 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained elements. */
     using pointer = typename container_type::pointer;
     /*! @brief Constant pointer type to contained elements. */
@@ -560,7 +562,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
-        const auto pos = static_cast<typename const_iterator::difference_type>(base_type::size());
+        const auto pos = static_cast<difference_type>(base_type::size());
         return const_iterator{&payload, pos};
     }
 
@@ -571,7 +573,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() noexcept {
-        const auto pos = static_cast<typename iterator::difference_type>(base_type::size());
+        const auto pos = static_cast<difference_type>(base_type::size());
         return iterator{&payload, pos};
     }
 
@@ -808,6 +810,8 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
@@ -1034,6 +1038,8 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
@@ -1228,7 +1234,7 @@ public:
     /*! @copydoc each */
     [[nodiscard]] const_iterable each() const noexcept {
         const auto it = base_type::cend();
-        const auto offset = static_cast<typename const_iterable::iterator::difference_type>(base_type::free_list());
+        const auto offset = static_cast<difference_type>(base_type::free_list());
         return const_iterable{it - offset, it};
     }
 
@@ -1246,7 +1252,7 @@ public:
     /*! @copydoc reach */
     [[nodiscard]] const_reverse_iterable reach() const noexcept {
         const auto it = base_type::crbegin();
-        const auto offset = static_cast<typename const_reverse_iterable::iterator::difference_type>(base_type::free_list());
+        const auto offset = static_cast<difference_type>(base_type::free_list());
         return const_reverse_iterable{it, it + offset};
     }
 

@@ -576,7 +576,7 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         const auto to = entities.sort_as(first, last);
-        const auto from = entities.cend() - entities.free_list();
+        const auto from = entities.cend() - static_cast<typename common_type::difference_type>(entities.free_list());
 
         for(auto &&curr: pools) {
             curr.second->remove(from, to);

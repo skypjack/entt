@@ -297,6 +297,8 @@ public:
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */
@@ -465,7 +467,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return begin()[static_cast<typename iterator::difference_type>(pos)];
+        return begin()[static_cast<difference_type>(pos)];
     }
 
     /**
@@ -711,6 +713,8 @@ public:
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */
@@ -794,7 +798,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (handle().end() - static_cast<typename iterator::difference_type>(descriptor->length())) : iterator{};
+        return *this ? (handle().end() - static_cast<difference_type>(descriptor->length())) : iterator{};
     }
 
     /**
@@ -824,7 +828,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (handle().rbegin() + static_cast<typename reverse_iterator::difference_type>(descriptor->length())) : reverse_iterator{};
+        return *this ? (handle().rbegin() + static_cast<difference_type>(descriptor->length())) : reverse_iterator{};
     }
 
     /**
@@ -864,7 +868,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return begin()[static_cast<typename iterator::difference_type>(pos)];
+        return begin()[static_cast<difference_type>(pos)];
     }
 
     /**
