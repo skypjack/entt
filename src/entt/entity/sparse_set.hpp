@@ -904,7 +904,7 @@ public:
                     ++first;
                 }
 
-                count += std::distance(it, first);
+                count += static_cast<size_type>(std::distance(it, first));
                 erase(it, first);
             }
         } else {

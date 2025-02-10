@@ -960,7 +960,7 @@ public:
     void clear() {
         if constexpr(sizeof...(Type) == 0u) {
             for(size_type pos = pools.size(); pos; --pos) {
-                pools.begin()[pos - 1u].second->clear();
+                pools.begin()[static_cast<typename pool_container_type::difference_type>(pos - 1u)].second->clear();
             }
 
             const auto elem = entities.each();

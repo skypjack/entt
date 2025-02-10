@@ -794,7 +794,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return *this ? (handle().end() - descriptor->length()) : iterator{};
+        return *this ? (handle().end() - static_cast<typename iterator::difference_type>(descriptor->length())) : iterator{};
     }
 
     /**
@@ -824,7 +824,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return *this ? (handle().rbegin() + descriptor->length()) : reverse_iterator{};
+        return *this ? (handle().rbegin() + static_cast<typename reverse_iterator::difference_type>(descriptor->length())) : reverse_iterator{};
     }
 
     /**
@@ -864,7 +864,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
-        return begin()[pos];
+        return begin()[static_cast<typename iterator::difference_type>(pos)];
     }
 
     /**
