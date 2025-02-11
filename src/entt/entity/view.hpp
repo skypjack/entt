@@ -92,7 +92,7 @@ public:
         : it{first},
           pools{value},
           filter{excl},
-          index{idx} {
+          index{static_cast<difference_type>(idx)} {
         ENTT_ASSERT((Get != 1u) || (Exclude != 0u) || pools[0u]->policy() == deletion_policy::in_place, "Non in-place storage view iterator");
         seek_next();
     }
@@ -123,7 +123,7 @@ private:
     iterator_type it;
     std::array<const Type *, Get> pools;
     std::array<const Type *, Exclude> filter;
-    std::size_t index;
+    difference_type index;
 };
 
 template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
@@ -371,7 +371,7 @@ public:
         if(index != Get) {
             auto it = pools[index]->rbegin();
             const auto last = it + static_cast<difference_type>(offset());
-            for(; it != last && !(internal::all_of(pools.begin(), pools.begin() + index, *it) && internal::all_of(pools.begin() + index + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
+            for(const auto idx = static_cast<difference_type>(index); it != last && !(internal::all_of(pools.begin(), pools.begin() + idx, *it) && internal::all_of(pools.begin() + idx + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
             return it == last ? null : *it;
         }
 
