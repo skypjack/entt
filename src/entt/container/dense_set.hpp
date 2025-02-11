@@ -281,8 +281,8 @@ class dense_set {
     }
 
     void rehash_if_required() {
-        if(size() > (bucket_count() * max_load_factor())) {
-            rehash(bucket_count() * 2u);
+        if(const auto bc = bucket_count(); size() > static_cast<size_type>(static_cast<float>(bc) * max_load_factor())) {
+            rehash(bc * 2u);
         }
     }
 
@@ -847,7 +847,7 @@ public:
      * @return The average number of elements per bucket.
      */
     [[nodiscard]] float load_factor() const {
-        return size() / static_cast<float>(bucket_count());
+        return static_cast<float>(size()) / static_cast<float>(bucket_count());
     }
 
     /**
@@ -875,7 +875,7 @@ public:
      */
     void rehash(const size_type cnt) {
         auto value = cnt > minimum_capacity ? cnt : minimum_capacity;
-        const auto cap = static_cast<size_type>(size() / max_load_factor());
+        const auto cap = static_cast<size_type>(static_cast<float>(size()) / max_load_factor());
         value = value > cap ? value : cap;
 
         if(const auto sz = next_power_of_two(value); sz != bucket_count()) {
@@ -899,7 +899,7 @@ public:
      */
     void reserve(const size_type cnt) {
         packed.first().reserve(cnt);
-        rehash(static_cast<size_type>(std::ceil(cnt / max_load_factor())));
+        rehash(static_cast<size_type>(std::ceil(static_cast<float>(cnt) / max_load_factor())));
     }
 
     /**
