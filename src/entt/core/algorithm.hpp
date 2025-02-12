@@ -100,6 +100,7 @@ struct radix_sort {
             constexpr auto passes = N / Bit;
 
             using value_type = typename std::iterator_traits<It>::value_type;
+            using difference_type = typename std::iterator_traits<It>::difference_type;
             std::vector<value_type> aux(static_cast<std::size_t>(std::distance(first, last)));
 
             auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {
@@ -121,11 +122,12 @@ struct radix_sort {
                 }
 
                 for(auto it = from; it != to; ++it) {
-                    out[index[(getter(*it) >> start) & mask]++] = std::move(*it);
+                    const auto pos = index[(getter(*it) >> start) & mask]++;
+                    out[static_cast<difference_type>(pos)] = std::move(*it);
                 }
             };
 
-            for(std::size_t pass = 0; pass < (passes & ~1); pass += 2) {
+            for(std::size_t pass = 0; pass < (passes & ~1u); pass += 2) {
                 part(first, last, aux.begin(), pass * Bit);
                 part(aux.begin(), aux.end(), first, (pass + 1) * Bit);
             }
