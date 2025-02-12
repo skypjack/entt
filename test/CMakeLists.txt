@@ -50,6 +50,7 @@ function(SETUP_TARGET TARGET_NAME)
                     -Wdocumentation
                     -Wno-deprecated-declarations
                     -Wno-exceptions
+                    -Wconversion
                 >
                 /EHsc /wd4324 /wd4996
                 # disabling INCREMENTAL is required by SizeBench
@@ -118,6 +119,8 @@ function(SETUP_LIB_PLUGIN_TEST TEST_NAME SUB_PATH)
     set_target_properties(lib_${TARGET_NAME} PROPERTIES CXX_CLANG_TIDY "")
     target_include_directories(_${TARGET_NAME} PRIVATE ${cr_INCLUDE_DIR})
     target_include_directories(lib_${TARGET_NAME} PRIVATE ${cr_INCLUDE_DIR})
+    target_compile_options(_${TARGET_NAME} PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
+    target_compile_options(lib_${TARGET_NAME} PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
     target_link_libraries(lib_${TARGET_NAME} PRIVATE ${CMAKE_DL_LIBS})
     add_dependencies(lib_${TARGET_NAME} _${TARGET_NAME})
 endfunction()
@@ -196,6 +199,7 @@ if(ENTT_BUILD_SNAPSHOT)
 
     set_target_properties(cereal PROPERTIES CXX_CLANG_TIDY "")
     target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
+    target_compile_options(cereal PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
 endif()
 
 # Test config
