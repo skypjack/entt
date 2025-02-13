@@ -102,7 +102,7 @@ TEST(DenseMap, Constructors) {
     map = entt::dense_map<int, int>{2u * minimum_bucket_count, std::allocator<float>{}};
     map = entt::dense_map<int, int>{4u * minimum_bucket_count, std::hash<int>(), std::allocator<double>{}};
 
-    map.emplace(3u, 2u);
+    map.emplace(std::int8_t{3}, std::int8_t{2});
 
     entt::dense_map<int, int> temp{map, map.get_allocator()};
     const entt::dense_map<int, int> other{std::move(temp), map.get_allocator()};
@@ -492,7 +492,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 64);
 
-    std::tie(it, result) = map.insert_or_assign(4, 8u);
+    std::tie(it, result) = map.insert_or_assign(4, std::int8_t{8});
 
     ASSERT_TRUE(result);
     ASSERT_EQ(map.size(), 3u);
@@ -502,7 +502,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it->first, 4);
     ASSERT_EQ(it->second, 8);
 
-    std::tie(it, result) = map.insert_or_assign(4, 64u);
+    std::tie(it, result) = map.insert_or_assign(4, std::int8_t{64});
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 3u);
