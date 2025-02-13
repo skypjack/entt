@@ -62,7 +62,7 @@ template<typename Type>
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, Type> fast_mod(const Type value, const std::size_t mod) noexcept {
     ENTT_ASSERT_CONSTEXPR(has_single_bit(mod), "Value must be a power of two");
-    return value & (mod - 1u);
+    return static_cast<Type>(value & (mod - 1u));
 }
 
 } // namespace entt
