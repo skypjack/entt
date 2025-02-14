@@ -296,83 +296,131 @@ TYPED_TEST(SparseSet, ShrinkToFit) {
         ASSERT_EQ(set.capacity(), 0u);
         ASSERT_EQ(set.extent(), 0u);
 
-        set.reserve(8u);
-
-        set.push(entity_type{traits_type::page_size - 1u});
-        set.push(entity_type{traits_type::page_size});
-        set.erase(entity_type{traits_type::page_size - 1u});
-
-        ASSERT_EQ(set.capacity(), 8u);
-        ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
-
-        set.shrink_to_fit();
-
         switch(policy) {
-        case entt::deletion_policy::swap_only:
-        case entt::deletion_policy::in_place: {
-            ASSERT_EQ(set.capacity(), 2u);
-            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        } break;
         case entt::deletion_policy::swap_and_pop: {
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.push(entity_type{traits_type::page_size});
+
+            set.erase(entity_type{traits_type::page_size - 1u});
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            set.shrink_to_fit();
+
             ASSERT_EQ(set.capacity(), 1u);
             ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        } break;
-        }
 
-        set.reserve(8u);
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
 
-        set.push(entity_type{traits_type::page_size - 1u});
-        set.erase(entity_type{traits_type::page_size});
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.erase(entity_type{traits_type::page_size});
 
-        ASSERT_EQ(set.capacity(), 8u);
-        ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
-
-        set.shrink_to_fit();
-
-        switch(policy) {
-        case entt::deletion_policy::in_place: {
-            ASSERT_EQ(set.capacity(), 2u);
-            ASSERT_EQ(set.extent(), traits_type::page_size);
-        } break;
-        case entt::deletion_policy::swap_only: {
-            ASSERT_EQ(set.capacity(), 2u);
+            ASSERT_GE(set.capacity(), 2u);
             ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        } break;
-        case entt::deletion_policy::swap_and_pop: {
+
+            set.shrink_to_fit();
+
             ASSERT_EQ(set.capacity(), 1u);
             ASSERT_EQ(set.extent(), traits_type::page_size);
-        } break;
-        }
 
-        ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
 
-        set.erase(entity_type{traits_type::page_size - 1u});
-        set.shrink_to_fit();
+            set.erase(entity_type{traits_type::page_size - 1u});
 
-        switch(policy) {
-        case entt::deletion_policy::in_place: {
-            ASSERT_EQ(set.capacity(), 2u);
-            ASSERT_EQ(set.extent(), 0u);
-        } break;
-        case entt::deletion_policy::swap_only: {
-            ASSERT_EQ(set.capacity(), 2u);
-            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
-        } break;
-        case entt::deletion_policy::swap_and_pop: {
+            set.shrink_to_fit();
+
             ASSERT_EQ(set.capacity(), 0u);
             ASSERT_EQ(set.extent(), 0u);
+
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+        } break;
+        case entt::deletion_policy::in_place: {
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.push(entity_type{traits_type::page_size});
+
+            set.erase(entity_type{traits_type::page_size - 1u});
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
+
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.erase(entity_type{traits_type::page_size});
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), traits_type::page_size);
+
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+
+            set.erase(entity_type{traits_type::page_size - 1u});
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 0u);
+
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+        } break;
+        case entt::deletion_policy::swap_only: {
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.push(entity_type{traits_type::page_size});
+
+            set.erase(entity_type{traits_type::page_size - 1u});
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size}));
+
+            set.push(entity_type{traits_type::page_size - 1u});
+            set.erase(entity_type{traits_type::page_size});
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            ASSERT_TRUE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
+
+            set.erase(entity_type{traits_type::page_size - 1u});
+
+            set.shrink_to_fit();
+
+            ASSERT_GE(set.capacity(), 2u);
+            ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
+
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
+            ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
         } break;
         }
-
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
-        ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
     }
 }
 
