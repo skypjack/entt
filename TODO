@@ -25,7 +25,6 @@ TODO:
   - documentation for reserved entities
 * storage entity: fast range-push from above
 * table: pop back to support swap and pop, single column access, empty type optimization
-* checkout tools workflow
 * entity based component_traits
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
 * suppress -Wself-move on CI with g++13
@@ -38,6 +37,3 @@ TODO:
 * any cdynamic to support const ownership construction
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke for everything probably)
 * delegate/sigh: forward connect/disconnect from & to *
-* a few more tests on the improved shrink_to_fit for sparse arrays
-* sparse_set/storage/...: difference_type (?)
-* -Wextra

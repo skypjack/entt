@@ -565,17 +565,18 @@ public:
         other.reserve(len);
 
         for(auto &&elem: std::as_const(packed)) {
-            // also skip tombstones, if any
-            if(const auto page = pos_to_page(entity_to_pos(elem)); page < len && sparse[page] != nullptr) {
-                if(const auto sz = page + 1u; sz > other.size()) {
-                    other.resize(sz, nullptr);
-                }
+            if(elem != tombstone) {
+                if(const auto page = pos_to_page(entity_to_pos(elem)); sparse[page] != nullptr) {
+                    if(const auto sz = page + 1u; sz > other.size()) {
+                        other.resize(sz, nullptr);
+                    }
 
-                other[page] = std::exchange(sparse[page], nullptr);
+                    other[page] = std::exchange(sparse[page], nullptr);
 
-                if(++cnt == len) {
-                    // early exit due to lack of pages
-                    break;
+                    if(++cnt == len) {
+                        // early exit due to lack of pages
+                        break;
+                    }
                 }
             }
         }
@@ -591,9 +592,8 @@ public:
      * @brief Returns the extent of a sparse set.
      *
      * The extent of a sparse set is also the size of the internal sparse array.
-     * There is no guarantee that the internal packed array has the same size.
-     * Usually the size of the internal sparse array is equal or greater than
-     * the one of the internal packed array.
+     * There is no guarantee that all pages have been allocated, nor that the
+     * internal packed array is be the same size.
      *
      * @return Extent of the sparse set.
      */
