@@ -445,6 +445,7 @@ TYPED_TEST(SparseSet, Contiguous) {
         set.erase(entity);
 
         switch(policy) {
+        case entt::deletion_policy::swap_only:
         case entt::deletion_policy::swap_and_pop: {
             ASSERT_TRUE(set.contiguous());
 
@@ -463,13 +464,6 @@ TYPED_TEST(SparseSet, Contiguous) {
             set.erase(entity);
 
             ASSERT_FALSE(set.contiguous());
-
-            set.clear();
-
-            ASSERT_TRUE(set.contiguous());
-        } break;
-        case entt::deletion_policy::swap_only: {
-            ASSERT_TRUE(set.contiguous());
 
             set.clear();
 
