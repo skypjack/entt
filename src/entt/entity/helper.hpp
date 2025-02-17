@@ -124,7 +124,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  */
 template<typename... Args>
 typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
-    using traits_type = component_traits<typename basic_storage<Args...>::value_type>;
+    using traits_type = component_traits_deprecated<typename basic_storage<Args...>::value_type>;
     static_assert(traits_type::page_size != 0u, "Unexpected page size");
     const typename basic_storage<Args...>::base_type &base = storage;
     const auto *addr = std::addressof(instance);

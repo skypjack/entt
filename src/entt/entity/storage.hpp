@@ -90,7 +90,7 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = static_cast<typename Container::size_type>(index() - value);
-        constexpr auto page_size = component_traits<value_type>::page_size;
+        constexpr auto page_size = component_traits_deprecated<value_type>::page_size;
         return (*payload)[pos / page_size][fast_mod(static_cast<std::size_t>(pos), page_size)];
     }
 
@@ -233,7 +233,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = typename underlying_type::basic_iterator;
-    using traits_type = component_traits<Type>;
+    using traits_type = component_traits_deprecated<Type>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
         return payload[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
@@ -791,11 +791,11 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Type, typename Entity, typename Allocator>
-class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<Type>::page_size == 0u>>
+class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits_deprecated<Type>::page_size == 0u>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using traits_type = component_traits<Type>;
+    using traits_type = component_traits_deprecated<Type>;
 
 public:
     /*! @brief Allocator type. */

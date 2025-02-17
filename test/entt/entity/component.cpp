@@ -13,49 +13,49 @@ struct self_contained {
 struct traits_based {};
 
 template<>
-struct entt::component_traits<traits_based> {
+struct entt::component_traits_deprecated<traits_based> {
     using type = traits_based;
     static constexpr auto in_place_delete = false;
     static constexpr auto page_size = 8u;
 };
 
 TEST(Component, VoidType) {
-    using traits_type = entt::component_traits<void>;
+    using traits_type = entt::component_traits_deprecated<void>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 0u);
 }
 
 TEST(Component, Empty) {
-    using traits_type = entt::component_traits<test::empty>;
+    using traits_type = entt::component_traits_deprecated<test::empty>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 0u);
 }
 
 TEST(Component, NonEmpty) {
-    using traits_type = entt::component_traits<test::boxed_int>;
+    using traits_type = entt::component_traits_deprecated<test::boxed_int>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
 }
 
 TEST(Component, NonMovable) {
-    using traits_type = entt::component_traits<test::non_movable>;
+    using traits_type = entt::component_traits_deprecated<test::non_movable>;
 
     ASSERT_TRUE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
 }
 
 TEST(Component, SelfContained) {
-    using traits_type = entt::component_traits<self_contained>;
+    using traits_type = entt::component_traits_deprecated<self_contained>;
 
     ASSERT_TRUE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 4u);
 }
 
 TEST(Component, TraitsBased) {
-    using traits_type = entt::component_traits<traits_based>;
+    using traits_type = entt::component_traits_deprecated<traits_based>;
 
     ASSERT_TRUE(!traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 8u);

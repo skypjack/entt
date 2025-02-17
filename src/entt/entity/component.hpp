@@ -39,7 +39,7 @@ struct page_size<Type, std::void_t<decltype(Type::page_size)>>
  * @tparam Type Type of component.
  */
 template<typename Type, typename = void>
-struct component_traits {
+struct component_traits_deprecated {
     static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
 
     /*! @brief Component type. */

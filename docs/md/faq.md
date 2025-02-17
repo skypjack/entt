@@ -77,7 +77,7 @@ In addition, `EnTT` also offers the possibility to create stable storage types
 and therefore have pointer stability for one, all or some components. This is by
 far the most convenient solution when it comes to creating hierarchies and
 whatnot. See the documentation for the ECS part of the library and in particular
-what concerns the `component_traits` class for further details.
+what concerns the `component_traits_deprecated` class for further details.
 
 ## Custom entity identifiers: yay or nay?
 

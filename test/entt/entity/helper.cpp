@@ -62,7 +62,7 @@ TEST(Invoke, Functionalities) {
 
 TYPED_TEST(ToEntity, Functionalities) {
     using value_type = typename TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using traits_type = entt::component_traits_deprecated<value_type>;
 
     entt::registry registry;
     const entt::entity null = entt::null;
