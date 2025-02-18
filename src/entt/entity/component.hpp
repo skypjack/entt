@@ -36,14 +36,17 @@ struct page_size<Type, std::void_t<decltype(Type::page_size)>>
 
 /**
  * @brief Common way to access various properties of components.
- * @tparam Type Type of component.
+ * @tparam Type Element type.
+ * @tparam Entity A valid entity type.
  */
-template<typename Type, typename = void>
-struct component_traits_deprecated {
+template<typename Type, typename Entity, typename>
+struct component_traits {
     static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
 
-    /*! @brief Component type. */
-    using type = Type;
+    /*! @brief Element type. */
+    using element_type = Type;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
 
     /*! @brief Pointer stability, default is `false`. */
     static constexpr bool in_place_delete = internal::in_place_delete<Type>::value;

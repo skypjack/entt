@@ -49,7 +49,7 @@ TYPED_TEST_SUITE(ReactiveMixinDeathTest, ReactiveMixinTypes, );
 
 TYPED_TEST(ReactiveMixin, Constructors) {
     using value_type = typename TestFixture::type;
-    using traits_type = entt::component_traits_deprecated<value_type>;
+    using traits_type = entt::component_traits<value_type>;
 
     entt::reactive_mixin<entt::storage<value_type>> pool;
 

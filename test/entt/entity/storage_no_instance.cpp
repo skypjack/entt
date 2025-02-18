@@ -17,7 +17,7 @@
 
 template<typename Type>
 struct StorageNoInstance: testing::Test {
-    static_assert(entt::component_traits_deprecated<Type>::page_size == 0u, "Non-empty type not allowed");
+    static_assert(entt::component_traits<Type>::page_size == 0u, "Non-empty type not allowed");
 
     using type = Type;
 

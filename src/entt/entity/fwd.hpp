@@ -25,6 +25,9 @@ enum class deletion_policy : std::uint8_t {
     unspecified = swap_and_pop
 };
 
+template<typename Type, typename Entity = entity, typename = void>
+struct component_traits;
+
 template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 

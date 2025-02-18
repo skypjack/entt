@@ -23,9 +23,9 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename Container>
+template<typename Container, auto Page>
 class storage_iterator final {
-    friend storage_iterator<const Container>;
+    friend storage_iterator<const Container, Page>;
 
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
@@ -49,7 +49,7 @@ public:
           offset{idx} {}
 
     template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
-    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>> &other) noexcept
+    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>, Page> &other) noexcept
         : storage_iterator{other.payload, other.offset} {}
 
     constexpr storage_iterator &operator++() noexcept {
@@ -90,8 +90,7 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = static_cast<typename Container::size_type>(index() - value);
-        constexpr auto page_size = component_traits_deprecated<value_type>::page_size;
-        return (*payload)[pos / page_size][fast_mod(static_cast<std::size_t>(pos), page_size)];
+        return (*payload)[pos / Page][fast_mod(static_cast<std::size_t>(pos), Page)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -111,38 +110,38 @@ private:
     difference_type offset;
 };
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return rhs.index() - lhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return lhs.index() == rhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return !(lhs == rhs);
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return rhs < lhs;
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return !(lhs > rhs);
 }
 
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs> &lhs, const storage_iterator<Rhs> &rhs) noexcept {
+template<typename Lhs, typename Rhs, auto Page>
+[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return !(lhs < rhs);
 }
 
@@ -233,7 +232,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = typename underlying_type::basic_iterator;
-    using traits_type = component_traits_deprecated<Type>;
+    using traits_type = component_traits<Type, Entity>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
         return payload[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
@@ -414,9 +413,9 @@ public:
     /*! @brief Constant pointer type to contained elements. */
     using const_pointer = typename alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
     /*! @brief Random access iterator type. */
-    using iterator = internal::storage_iterator<container_type>;
+    using iterator = internal::storage_iterator<container_type, traits_type::page_size>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::storage_iterator<const container_type>;
+    using const_iterator = internal::storage_iterator<const container_type, traits_type::page_size>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
@@ -791,11 +790,11 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Type, typename Entity, typename Allocator>
-class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits_deprecated<Type>::page_size == 0u>>
+class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<Type, Entity>::page_size == 0u>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using traits_type = component_traits_deprecated<Type>;
+    using traits_type = component_traits<Type, Entity>;
 
 public:
     /*! @brief Allocator type. */
