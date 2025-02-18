@@ -1300,12 +1300,11 @@ packed and maximize performance, unless full pointer stability is enabled.
 
 In `EnTT`, almost everything is customizable. Pools are no exception.<br/>
 In this case, the _standardized_ way to access all component properties is the
-`component_traits_deprecated` class.
+`component_traits` class.
 
 Various parts of the library access component properties through this class. It
 makes it possible to use any type as a component, as long as its specialization
-of `component_traits_deprecated` implements all the required
-functionalities.<br/>
+of `component_traits` implements all the required functionalities.<br/>
 The non-specialized version of this class contains the following members:
 
 * `in_place_delete`: `Type::in_place_delete` if present, true for non-movable
@@ -1325,8 +1324,8 @@ struct transform {
 };
 ```
 
-The `component_traits_deprecated` class template takes care of _extracting_ the
-properties from the supplied type.<br/>
+The `component_traits` class template takes care of _extracting_ the properties
+from the supplied type.<br/>
 Plus, it's _sfinae-friendly_ and also supports feature-based specializations.
 
 ## Empty type optimization
@@ -1350,8 +1349,8 @@ More in general, none of the feature offered by the library is affected, but for
 the ones that require to return actual instances.<br/>
 This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
 empty types are treated like all other types. Setting a page size at component
-level via the `component_traits_deprecated` class template is another way to
-disable this optimization selectively rather than globally.
+level via the `component_traits` class template is another way to disable this
+optimization selectively rather than globally.
 
 ## Void storage
 
@@ -1458,8 +1457,8 @@ In other words, pointer stability is not automatic but is enabled on request.
 
 The library offers out of the box support for in-place deletion, thus offering
 storage with completely stable pointers. This is achieved by specializing the
-`component_traits_deprecated` class or by adding the required properties to the
-component definition when needed.<br/>
+`component_traits` class or by adding the required properties to the component
+definition when needed.<br/>
 Views and groups adapt accordingly when they detect a storage with a different
 deletion policy than the default. In particular:
 
