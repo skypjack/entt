@@ -36,4 +36,3 @@ TODO:
 * any cdynamic to support const ownership construction
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke for everything probably)
 * delegate/sigh: forward connect/disconnect from & to *
-* entity based component_traits, add tests for different entities
