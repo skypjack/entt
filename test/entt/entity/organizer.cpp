@@ -7,7 +7,7 @@
 #include <entt/entity/registry.hpp>
 
 void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
-void ro_char_rw_int(entt::view<entt::get_t<int, const char>>) {}
+void ro_char_rw_int(entt::group<entt::owned_t<int>, entt::get_t<const char>>) {}
 void ro_char_rw_double(entt::view<entt::get_t<const char>>, double &) {}
 void ro_int_double(entt::view<entt::get_t<const int>>, const double &) {}
 void sync_point(entt::registry &, entt::view<entt::get_t<const int>>) {}
@@ -19,7 +19,7 @@ struct clazz {
     void rw_int_char_double(entt::view<entt::get_t<int, char>>, double &) {}
 
     static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
-    static void ro_char_with_payload(const clazz &, entt::view<entt::get_t<const char>>) {}
+    static void ro_char_with_payload(const clazz &, entt::group<entt::owned_t<const char>>) {}
     static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
 };
 

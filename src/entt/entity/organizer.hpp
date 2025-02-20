@@ -27,6 +27,15 @@ struct is_view<basic_view<Args...>>: std::true_type {};
 template<typename Type>
 inline constexpr bool is_view_v = is_view<Type>::value;
 
+template<typename>
+struct is_group: std::false_type {};
+
+template<typename... Args>
+struct is_group<basic_group<Args...>>: std::true_type {};
+
+template<typename Type>
+inline constexpr bool is_group_v = is_group<Type>::value;
+
 template<typename Type, typename Override>
 struct unpack_type {
     using ro = std::conditional_t<
@@ -59,6 +68,16 @@ struct unpack_type<basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<O
 template<typename... Get, typename... Exclude, typename... Override>
 struct unpack_type<const basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>>
     : unpack_type<basic_view<get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {};
+
+template<typename... Owned, typename... Get, typename... Exclude, typename... Override>
+struct unpack_type<basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {
+    using ro = type_list_cat_t<type_list<typename Exclude::element_type...>, typename unpack_type<constness_as_t<typename Get::element_type, Get>, type_list<Override...>>::ro..., typename unpack_type<constness_as_t<typename Owned::element_type, Owned>, type_list<Override...>>::ro...>;
+    using rw = type_list_cat_t<typename unpack_type<constness_as_t<typename Get::element_type, Get>, type_list<Override...>>::rw..., typename unpack_type<constness_as_t<typename Owned::element_type, Owned>, type_list<Override...>>::rw...>;
+};
+
+template<typename... Owned, typename... Get, typename... Exclude, typename... Override>
+struct unpack_type<const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>>
+    : unpack_type<basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {};
 
 template<typename, typename>
 struct resource_traits;
@@ -119,6 +138,8 @@ class basic_organizer final {
             return reg;
         } else if constexpr(internal::is_view_v<Type>) {
             return static_cast<Type>(as_view{reg});
+        } else if constexpr(internal::is_group_v<Type>) {
+            return static_cast<Type>(as_group{reg});
         } else {
             return reg.ctx().template emplace<std::remove_reference_t<Type>>();
         }
