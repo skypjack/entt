@@ -130,7 +130,12 @@ private:
     }
 
     void bind_any(any value) noexcept final {
-        owner = internal::any_to_owner<registry_type>(value);
+        if(auto *registry = any_cast<owner_type>(&value)) {
+            owner = registry;
+        }
+        else if(auto *base_registry = any_cast<basic_registry_type>(&value)) {
+            owner = reinterpret_cast<owner_type *>(base_registry);
+        }
         underlying_type::bind_any(std::move(value));
     }
 
@@ -386,7 +391,7 @@ public:
     }
 
 private:
-    basic_registry_type *owner;
+    owner_type *owner;
     sigh_type construction;
     sigh_type destruction;
     sigh_type update;
@@ -421,7 +426,12 @@ class basic_reactive_mixin final: public Type {
 
 private:
     void bind_any(any value) noexcept final {
-        owner = internal::any_to_owner<registry_type>(value);
+        if(auto *registry = any_cast<owner_type>(&value)) {
+            owner = registry;
+        }
+        else if(auto *base_registry = any_cast<basic_registry_type>(&value)) {
+            owner = reinterpret_cast<owner_type *>(base_registry);
+        }
         underlying_type::bind_any(std::move(value));
     }
 
@@ -590,7 +600,7 @@ public:
     }
 
 private:
-    basic_registry_type *owner;
+    owner_type *owner;
     container_type conn;
 };
 
