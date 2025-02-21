@@ -52,7 +52,8 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
     elem.pools = {view.template storage<GLhs>()..., other.template storage<GRhs>()...};
-    elem.filter = {view.template storage<sizeof...(GLhs) + ELhs>()..., other.template storage<sizeof...(GRhs) + ERhs>()...};
+    auto filter_or_placeholder = [placeholder = elem.placeholder](auto *value) { return (value == nullptr) ? placeholder : value; };
+    elem.filter = {filter_or_placeholder(view.template storage<sizeof...(GLhs) + ELhs>())..., filter_or_placeholder(other.template storage<sizeof...(GRhs) + ERhs>())...};
     elem.refresh();
     return elem;
 }
@@ -255,7 +256,7 @@ class basic_common_view {
 protected:
     /*! @cond TURN_OFF_DOXYGEN */
     basic_common_view() noexcept {
-        for(size_type pos{}; pos < Exclude; ++pos) {
+        for(size_type pos{}, last = filter.size(); pos < last; ++pos) {
             filter[pos] = placeholder;
         }
     }

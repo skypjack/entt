@@ -1393,7 +1393,7 @@ TEST(MultiStorageView, Storage) {
 
 TEST(MultiStorageView, SwapStorage) {
     std::tuple<entt::storage<int>, entt::storage<char>, entt::storage<int>, entt::storage<char>> storage{};
-    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<const entt::storage<char>>> view;
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<const entt::storage<char>>> view{};
     const entt::entity entity{0};
 
     ASSERT_FALSE(view);
@@ -1582,4 +1582,30 @@ TEST(View, Pipe) {
     ASSERT_EQ(pack32.storage<test::empty>(), nullptr);
     ASSERT_NE(pack32.storage<const int>(), nullptr);
     ASSERT_NE(pack32.storage<float>(), nullptr);
+}
+
+TEST(View, PipeWithPlaceholder) {
+    entt::storage<void> storage{};
+    const entt::entity entity{0};
+
+    const entt::basic_view view{storage};
+    entt::basic_view<entt::get_t<entt::storage<void>>, entt::exclude_t<entt::storage<int>>> other{};
+
+    other.storage(storage);
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_FALSE(other.contains(entity));
+
+    auto pack = view | other;
+
+    ASSERT_FALSE(pack.contains(entity));
+
+    storage.emplace(entity);
+
+    ASSERT_TRUE(view.contains(entity));
+    ASSERT_TRUE(other.contains(entity));
+
+    pack = view | other;
+
+    ASSERT_TRUE(pack.contains(entity));
 }
