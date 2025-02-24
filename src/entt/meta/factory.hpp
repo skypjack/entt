@@ -151,6 +151,7 @@ class meta_factory: private internal::basic_meta_factory {
     using base_type = internal::basic_meta_factory;
 
     template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
+    [[nodiscard]] [[deprecated("use variant types or conversion support")]]
     void data(const id_type id, std::index_sequence<Index...>) noexcept {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
@@ -436,6 +437,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Setter, auto Getter, typename Policy = as_is_t>
+    [[nodiscard]] [[deprecated("use variant types or conversion support")]]
     meta_factory data(const id_type id) noexcept {
         data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
         return *this;
