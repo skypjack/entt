@@ -146,18 +146,18 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString Condition="node.get != nullptr">{ node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem Condition="node.get != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
-		<DisplayString Condition="node != nullptr">{ *node }</DisplayString>
+		<DisplayString Condition="node.invoke != nullptr">{ node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<ExpandedItem Condition="node.invoke != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
