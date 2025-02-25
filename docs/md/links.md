@@ -14,16 +14,16 @@
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
 ago. Fortunately, there are also people who took the time to implement open
-source projects based on `EnTT` and didn't hold back when it came to documenting
+source projects based on `EnTT` and did not hold back when it came to documenting
 them.
 
 Below an incomplete list of games, applications and articles that can be used as
 a reference.<br/>
 Where I put the word _apparently_ means that the use of `EnTT` is documented but
-the authors didn't make explicit announcements or contacted me directly.
+the authors did not make explicit announcements or contacted me directly.
 
 If you know of other resources out there that are about `EnTT`, feel free to
-open an issue or a PR and I'll be glad to add them to this page.<br/>
+open an issue or a PR. I will be glad to add them to this page.<br/>
 I hope the following lists can grow much more in the future.
 
 # EnTT in Action
@@ -48,7 +48,7 @@ I hope the following lists can grow much more in the future.
   * [Apparently](https://www.youtube.com/watch?v=P8xvOA3ikrQ&t=1105s)
     [Call of Duty: Vanguard](https://www.callofduty.com/vanguard) by
     [Sledgehammer Games](https://www.sledgehammergames.com/): I can neither
-    confirm nor deny but there is a license I know in the credits.
+    confirm nor deny, but there is a license I know in the credits.
   * Apparently [D&D Dark Alliance](https://darkalliance.wizards.com) by
     [Wizards of the Coast](https://company.wizards.com): your party, their
     funeral.
@@ -97,20 +97,19 @@ I hope the following lists can grow much more in the future.
     by Quake.
   * [Destroid](https://github.com/tyrannicaltoucan/destroid): _one-bazillionth_
     arcade game about shooting dirty rocks in space, inspired by Asteroids.
-  * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D exploration
-    based indie game.
-  * [Spelunky� Classic remake](https://github.com/dbeef/spelunky-psp): a truly
+  * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D exploration-based indie game.
+  * [Spelunky® Classic remake](https://github.com/dbeef/spelunky-psp): a truly
     multiplatform experience with a rewrite from scratch.
   * [CubbyTower](https://github.com/utilForever/CubbyTower): a simple tower
     defense game using C++ with Entity Component System (ECS).
   * [Runeterra](https://github.com/utilForever/Runeterra): Legends of Runeterra
     simulator using C++ with some reinforcement learning.
   * [Black Sun](https://store.steampowered.com/app/1670930/Black_Sun/): fly your
-    space ship through a large 2D open world.
-  * [PokeMaster](https://github.com/utilForever/PokeMaster): Pokemon Battle
+    spaceship through a large 2D open world.
+  * [PokeMaster](https://github.com/utilForever/PokeMaster): Pokémon Battle
     simulator using C++ with some reinforcement learning.
   * [HomeHearth](https://youtu.be/GrEWl8npL9Y): choose your hero, protect the
-    town, before it's too late.
+    town, before it is too late.
   * [City Builder Game](https://github.com/PhiGei2000/CityBuilderGame): a simple
     city-building game using C++ and OpenGL.
   * [BattleSub](https://github.com/bfeldpw/battlesub): two player 2D submarine
@@ -190,7 +189,7 @@ I hope the following lists can grow much more in the future.
     framework in C++17 for backend development.
   * [Unity/EnTT](https://github.com/TongTungGiang/unity-entt): tech demo of a
     native simulation layer using `EnTT` and `Unity` as a rendering engine.
-  * [OverEngine](https://github.com/OverShifted/OverEngine): an over-engineered
+  * [OverEngine](https://github.com/OverShifted/OverEngine): an overengineered
     game engine.
   * [Electro](https://github.com/Electro-Technologies/Electro): high performance
     3D game engine with a high emphasis on rendering.
@@ -199,13 +198,13 @@ I hope the following lists can grow much more in the future.
   * [Becketron](https://github.com/Doctor-Foxling/Becketron): a game engine
     written mostly in C++.
   * [Spatial Engine](https://github.com/luizgabriel/Spatial.Engine): a
-    cross-platform engine created on top of google's filament rendering engine.
+    cross-platform engine created on top of Google's filament rendering engine.
   * [Kaguya](https://github.com/KaiH0717/Kaguya): D3D12 Rendering Engine.
   * [OpenAWE](https://github.com/OpenAWE-Project/OpenAWE): open implementation
     of the Alan Wake Engine.
   * [Nazara Engine](https://github.com/DigitalPulseSoftware/NazaraEngine): fast,
     cross-platform, object-oriented API to help in daily developer life.
-  * [Billy Engine](https://github.com/billy4479/BillyEngine): some kind of a 2D
+  * [Billy Engine](https://github.com/billy4479/BillyEngine): some kind of 2D
     engine based on `SDL2` and `EnTT`.
   * [Ducktape](https://github.com/DucktapeEngine/Ducktape): an open source C++
     2D & 3D game engine that focuses on being fast and powerful.
@@ -278,7 +277,7 @@ I hope the following lists can grow much more in the future.
     by [linkdd](https://github.com/linkdd): an interesting walkthrough of
     developing a game (also) with EnTT.
   * [Use EnTT When You Need An ECS](https://www.codingwiththomas.com/blog/use-entt-when-you-need-an-ecs)
-    by [Thomas](https://www.codingwiththomas.com/): I couldn't have said it
+    by [Thomas](https://www.codingwiththomas.com/): I could not have said it
     better.
   * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
     huge space battle built entirely from scratch.
@@ -310,7 +309,7 @@ I hope the following lists can grow much more in the future.
 
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
     [Esri](https://www.esri.com/): they use `EnTT` for the internal ECS and the
-    cross platform C++ rendering engine. The SDKs are utilized by a lot of
+    cross-platform C++ rendering engine. The SDKs are used by a lot of
     enterprise custom apps, as well as by Esri for its own public applications
     such as
     [Explorer](https://play.google.com/store/apps/details?id=com.esri.explorer),
@@ -326,7 +325,7 @@ I hope the following lists can grow much more in the future.
   * [Project Lagrange](https://github.com/adobe/lagrange): a robust geometry
     processing library by [Adobe](https://github.com/adobe).
   * [AtomicDEX](https://github.com/KomodoPlatform/atomicDEX-Desktop): a secure
-    wallet and non-custodial decentralized exchange rolled into one application.
+    wallet and noncustodial decentralized exchange rolled into one application.
   * [Apparently](https://www.linkedin.com/in/skypjack/)
     [NIO](https://www.nio.io/): there was a collaboration to make some changes
     to `EnTT`, at the time used for internal projects.

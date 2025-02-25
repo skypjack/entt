@@ -8,8 +8,8 @@
 
 # Introduction
 
-Usually, service locators are tightly bound to the services they expose and it's
-hard to define a general purpose solution.<br/>
+Usually, service locators are tightly bound to the services they expose.
+It is hard to define a general purpose solution.<br/>
 This tiny class tries to fill the gap and gets rid of the burden of defining a
 different specific locator for each application.
 
@@ -27,7 +27,7 @@ entt::locator<interface>::allocate_emplace<service>(allocator, argument);
 
 The difference is that the latter expects an allocator as the first argument and
 uses it to allocate the service itself.<br/>
-Once a service is set up, it's retrieved using the `value` function:
+Once a service is set up, it is retrieved using the `value` function:
 
 ```cpp
 interface &service = entt::locator<interface>::value();
@@ -45,17 +45,17 @@ if(entt::locator<interface>::has_value()) {
 interface &service = entt::locator<interface>::value_or<fallback_impl>(argument);
 ```
 
-All arguments are used only if necessary, that is, if a service doesn't already
+All arguments are used only if necessary, that is, if a service does not already
 exist and therefore the fallback service is constructed and returned. In all
 other cases, they are discarded.<br/>
 Finally, to reset a service, use the `reset` function.
 
 ## Opaque handles
 
-Sometimes it's useful to _transfer_ a copy of a service to another locator. For
-example, when working across boundaries it's common to _share_ a service with a
+Sometimes it is useful to _transfer_ a copy of a service to another locator. For
+example, when working across boundaries it is common to _share_ a service with a
 dynamically loaded module.<br/>
-Options aren't much in this case. Among these is the possibility of _exporting_
+Options are not much in this case. Among these is the possibility of _exporting_
 services and assigning them to a different locator.
 
 This is what the `handle` and `reset` functions are meant for.<br/>
@@ -69,14 +69,14 @@ auto handle = entt::locator<interface>::handle();
 entt::locator<interface>::reset(handle);
 ```
 
-It's worth noting that it's possible to get handles for uninitialized services
+It is worth noting that it is possible to get handles for uninitialized services
 and use them with other locators. Of course, all a user will get is to have an
 uninitialized service elsewhere as well.
 
 Note that exporting a service allows users to _share_ the object currently set
-in a locator. Replacing it won't replace the element even where a service has
+in a locator. Replacing it will not replace the element, even where a service has
 been configured with a handle to the previous item.<br/>
 In other words, if an audio service is replaced with a null object to silence an
-application and the original service was shared, this operation won't propagate
-to the other locators. Therefore, a module that share the ownership of the
+application and the original service was shared, this operation will not propagate
+to the other locators. Therefore, a module that shares the ownership of the
 original audio service is still able to emit sounds.

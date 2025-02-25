@@ -12,16 +12,16 @@
 # Introduction
 
 The standard C++ library offers a wide range of containers and adaptors already.
-It's really difficult to do better (although it's very easy to do worse, as many
+It is really difficult to do better (although it is very easy to do worse, as many
 examples available online demonstrate).<br/>
-`EnTT` doesn't try in any way to replace what is offered by the standard. Quite
+`EnTT` does not try in any way to replace what is offered by the standard. Quite
 the opposite, given the widespread use that is made of standard containers.<br/>
 However, the library also tries to fill a gap in features and functionalities by
 making available some containers and adaptors initially developed for internal
 use.
 
 This section of the library is likely to grow larger over time. However, for the
-moment it's quite small and mainly aimed at satisfying some internal needs.<br/>
+moment it is quite small and mainly aimed at satisfying some internal needs.<br/>
 For all containers and adaptors made available, full test coverage and stability
 over time is guaranteed as usual.
 
@@ -78,7 +78,7 @@ The internal implementation is purposely supported by a tuple of containers
 rather than a container of tuples. The purpose is to allow efficient access to
 single columns and not just access to the entire data set of the table.
 
-When a row is accessed, all data are returned in the form of a tuple containing
+When a row is accessed, all data is returned in the form of a tuple containing
 (possibly const) references to the elements of the row itself.<br/>
 Similarly, when a table is iterated, tuples of references to table elements are
 returned for each row.

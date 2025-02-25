@@ -17,7 +17,7 @@ requirements of the piece of software in which they are used.<br/>
 Examples are loading everything on start, loading on request, predictive
 loading, and so on.
 
-`EnTT` doesn't pretend to offer a _one-fits-all_ solution for the different
+`EnTT` does not pretend to offer a _one-fits-all_ solution for the different
 cases.<br/>
 Instead, the library comes with a minimal, general purpose resource cache that
 might be useful in many cases.
@@ -31,7 +31,7 @@ The _resource_ is an image, an audio, a video or any other type:
 struct my_resource { const int value; };
 ```
 
-The _loader_ is a callable type the aim of which is to load a specific resource:
+The _loader_ is a callable type, the aim of which is to load a specific resource:
 
 ```cpp
 struct my_loader final {
@@ -68,9 +68,9 @@ discarded when a player leaves it.
 
 ## Resource handle
 
-Resources aren't returned directly to the caller. Instead, they are wrapped in a
+Resources are not returned directly to the caller. Instead, they are wrapped in a
 _resource handle_, an instance of the `entt::resource` class template.<br/>
-For those who know the _flyweight design pattern_ already, that's exactly what
+For those who know the _flyweight design pattern_ already, that is exactly what
 it is. To all others, this is the time to brush up on some notions instead.
 
 A shared pointer could have been used as a resource handle. In fact, the default
@@ -84,21 +84,21 @@ more or all resource types could help over time.
 ## Loaders
 
 A loader is responsible for _loading_ resources (quite obviously).<br/>
-By default, it's just a callable object that forwards its arguments to the
+By default, it is just a callable object that forwards its arguments to the
 resource itself. That is, a _passthrough type_. All the work is demanded to the
 constructor(s) of the resource itself.<br/>
 Loaders also are fully customizable as expected.
 
 A custom loader is a class with at least one function call operator and a member
 type named `result_type`.<br/>
-The loader isn't required to return a resource handle. As long as `return_type`
-is suitable for constructing a handle, that's fine.
+The loader is not required to return a resource handle. As long as `return_type`
+is suitable for constructing a handle, that is fine.
 
 When using the default handle, it expects a resource type which is convertible
 to or suitable for constructing an `std::shared_ptr<Type>` (where `Type` is the
 actual resource type).<br/>
 In other terms, the loader should return shared pointers to the given resource
-type. However, this isn't mandatory. Users can easily get around this constraint
+type. However, this is not mandatory. Users can easily get around this constraint
 by specializing both the handle and the loader.
 
 A cache forwards all its arguments to the loader if required. This means that
@@ -139,7 +139,7 @@ entt::resource_cache<my_resource, my_loader> cache{};
 Under the hood, a cache is nothing more than a map where the key value has type
 `entt::id_type` while the mapped value is whatever type its loader returns.<br/>
 For this reason, it offers most of the functionalities a user would expect from
-a map, such as `empty` or `size` and so on. Similarly, it's an iterable type
+a map, such as `empty` or `size` and so on. Similarly, it is an iterable type
 that also supports indexing by resource id:
 
 ```cpp
@@ -158,7 +158,7 @@ functions (such as `contains` or `erase`).
 Set aside the part of the API that this class _shares_ with a map, it also adds
 something on top of it in order to address the most common requirements of a
 resource cache.<br/>
-In particular, it doesn't have an `emplace` member function which is replaced by
+In particular, it does not have an `emplace` member function which is replaced by
 `load` and `force_load` instead (where the former loads a new resource only if
 not present while the second triggers a forced loading in any case):
 
@@ -176,10 +176,10 @@ Note that the hashed string is used for convenience in the example above.<br/>
 Resource identifiers are nothing more than integral values. Therefore, plain
 numbers as well as non-class enum value are accepted.
 
-It's worth mentioning that the iterators of a cache as well as its indexing
+It is worth mentioning that the iterators of a cache as well as its indexing
 operators return resource handles rather than instances of the mapped type.<br/>
-Since the cache has no control over the loader and a resource isn't required to
+Since the cache has no control over the loader and a resource is not required to
 also be convertible to bool, these handles can be invalid. This usually means an
-error in the user logic but it may also be an _expected_ event.<br/>
-It's therefore recommended to verify handles validity with a check in debug (for
+error in the user logic, but it may also be an _expected_ event.<br/>
+It is therefore recommended to verify handles validity with a check in debug (for
 example, when loading) or an appropriate logic in retail.

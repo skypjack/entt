@@ -10,7 +10,7 @@
 * [Compressed pair](#compressed-pair)
 * [Enum as bitmask](#enum-as-bitmask)
 * [Hashed strings](#hashed-strings)
-  * [Wide characters](wide-characters)
+  * [Wide characters](#wide-characters)
   * [Conflicts](#conflicts)
 * [Iterators](#iterators)
   * [Input iterator pointer](#input-iterator-pointer)
@@ -41,7 +41,7 @@
 
 `EnTT` comes with a bunch of core functionalities mostly used by the other parts
 of the library.<br/>
-Many of these tools are also useful in everyday work. Therefore, it's worth
+Many of these tools are also useful in everyday work. Therefore, it is worth
 describing them so as not to reinvent the wheel in case of need.
 
 # Any as in any type
@@ -49,7 +49,7 @@ describing them so as not to reinvent the wheel in case of need.
 `EnTT` offers its own `any` type. It may seem redundant considering that C++17
 introduced `std::any`, but it is not (hopefully).<br/>
 First of all, the _type_ returned by an `std::any` is a const reference to an
-`std::type_info`, an implementation defined class that's not something everyone
+`std::type_info`, an implementation defined class that is not something everyone
 wants to see in a software. Furthermore, there is no way to bind it to the type
 system of the library and therefore with its integrated RTTI support.
 
@@ -76,7 +76,7 @@ entt::any in_place{std::in_place, std::make_unique<int>(42).release()};
 ```
 
 Alternatively, the `make_any` function serves the same purpose. It requires to
-always be explicit about the type and doesn't support taking ownership:
+always be explicit about the type and does not support taking ownership:
 
 ```cpp
 entt::any any = entt::make_any<int>(42);
@@ -85,8 +85,8 @@ entt::any any = entt::make_any<int>(42);
 In all cases, the `any` class takes the burden of destroying the contained
 element when required, regardless of the storage strategy used for the specific
 object.<br/>
-Furthermore, an instance of `any` isn't tied to an actual type. Therefore, the
-wrapper is reconfigured when it's assigned a new object of a type other than
+Furthermore, an instance of `any` is not tied to an actual type. Therefore, the
+wrapper is reconfigured when it is assigned a new object of a type other than
 the one it contains.
 
 There is also a way to directly assign a value to the variable contained by an
@@ -118,7 +118,7 @@ The type is also used internally when comparing two `any` objects:
 if(any == empty) { /* ... */ }
 ```
 
-In this case, before proceeding with a comparison, it's verified that the _type_
+In this case, before proceeding with a comparison, it is verified that the _type_
 of the two objects is actually the same.<br/>
 Refer to the `EnTT` type system documentation for more details about how
 `type_info` works and the possible risks of a comparison.
@@ -138,9 +138,9 @@ any.emplace<const int &>(value);
 
 In other words, whenever `any` is explicitly told to construct an _alias_, it
 acts as a pointer to the original instance rather than making a copy of it or
-moving it internally. The contained object is never destroyed and users must
+moving it internally. The contained object is never destroyed, and users must
 ensure that its lifetime exceeds that of the container.<br/>
-Similarly, it's possible to create non-owning copies of `any` from an existing
+Similarly, it is possible to create non-owning copies of `any` from an existing
 object:
 
 ```cpp
@@ -148,12 +148,12 @@ object:
 entt::any ref = other.as_ref();
 ```
 
-In this case, it doesn't matter if the original container actually holds an
+In this case, it does not matter if the original container actually holds an
 object or is as a reference for unmanaged elements already. The new instance
-thus created doesn't create copies and only serves as a reference for the
+thus created does not create copies and only serves as a reference for the
 original item.
 
-It's worth mentioning that, while everything works transparently when it comes
+It is worth mentioning that, while everything works transparently when it comes
 to non-const references, there are some exceptions when it comes to const
 references.<br/>
 In particular, the `data` member function invoked on a non-const instance of
@@ -161,7 +161,7 @@ In particular, the `data` member function invoked on a non-const instance of
 
 To cast an instance of `any` to a type, the library offers a set of `any_cast`
 functions in all respects similar to their most famous counterparts.<br/>
-The only difference is that, in the case of `EnTT`, they won't raise exceptions
+The only difference is that, in the case of `EnTT`, they will not raise exceptions
 but will only trigger an assert in debug mode, otherwise resulting in undefined
 behavior in case of misuse in release mode.
 
@@ -188,7 +188,7 @@ and always dynamically allocates objects (except for aliasing cases).
 
 The alignment requirement is optional and by default the most stringent (the
 largest) for any object whose size is at most equal to the one provided.<br/>
-It's provided as an optional second parameter following the desired size for the
+It is provided as an optional second parameter following the desired size for the
 internal storage:
 
 ```cpp
@@ -234,16 +234,16 @@ entt::compressed_pair pair{0, 3.};
 pair.first() = 42;
 ```
 
-There isn't much to describe then. It's recommended to rely on documentation and
-intuition. At the end of the day, it's just a pair and nothing more.
+There is not much to describe then. It is recommended to rely on documentation and
+intuition. At the end of the day, it is just a pair and nothing more.
 
 # Enum as bitmask
 
-Sometimes it's useful to be able to use enums as bitmasks. However, enum classes
-aren't really suitable for the purpose. Main problem is that they don't convert
+Sometimes it is useful to be able to use enums as bitmasks. However, enum classes
+are not really suitable for the purpose. Main problem is that they do not convert
 implicitly to their underlying type.<br/>
 The choice is then between using old-fashioned enums (with all their problems
-that I don't want to discuss here) or writing _ugly_ code.
+that I do not want to discuss here) or writing _ugly_ code.
 
 Fortunately, there is also a third way: adding enough operators in the global
 scope to treat enum classes as bitmasks transparently.<br/>
@@ -276,7 +276,7 @@ struct entt::enum_as_bitmask<my_flag>
 ```
 
 This is handy when dealing with enum classes defined by third party libraries
-and over which the user has no control. However, it's also verbose and can be
+and over which the user has no control. However, it is also verbose and can be
 avoided by adding a specific value to the enum class itself:
 
 ```cpp
@@ -339,7 +339,7 @@ entt::hashed_string str{orig.c_str()};
 const auto hash = entt::hashed_string::value(orig.c_str());
 ```
 
-This possibility shouldn't be exploited in tight loops, since the computation
+This possibility should not be exploited in tight loops, since the computation
 takes place at runtime and no longer at compile-time. It could therefore affect
 performance to some degrees.
 
@@ -362,16 +362,16 @@ The hash type of `hashed_wstring` is the same as its counterpart.
 The hashed string class uses FNV-1a internally to hash strings. Because of the
 _pigeonhole principle_, conflicts are possible. This is a fact.<br/>
 There is no silver bullet to solve the problem of conflicts when dealing with
-hashing functions. In this case, the best solution is likely to give up. That's
+hashing functions. In this case, the best solution is likely to give up. That is
 all.<br/>
-After all, human-readable unique identifiers aren't something strictly defined
+After all, human-readable unique identifiers are not something strictly defined
 and over which users have not the control. Choosing a slightly different
 identifier is probably the best solution to make the conflict disappear in this
 case.
 
 # Iterators
 
-Writing and working with iterators isn't always easy. More often than not it
+Writing and working with iterators is not always easy. More often than not it
 also leads to duplicated code.<br/>
 `EnTT` tries to overcome this problem by offering some utilities designed to
 make this hard work easier.
@@ -379,12 +379,12 @@ make this hard work easier.
 ## Input iterator pointer
 
 When writing an input iterator that returns in-place constructed values if
-dereferenced, it's not always straightforward to figure out what `value_type` is
+dereferenced, it is not always straightforward to figure out what `value_type` is
 and how to make it behave like a full-fledged pointer.<br/>
 Conversely, it would be very useful to have an `operator->` available on the
 iterator itself that always works without too much complexity.
 
-The input iterator pointer is meant for this. It's a small class that wraps the
+The input iterator pointer is meant for this. It is a small class that wraps the
 in-place constructed value and adds some functions on top of it to make it
 suitable for use with input iterators: 
 
@@ -436,7 +436,7 @@ _iterable_ object with all the expected methods like `begin`, `end` and whatnot.
 
 The library uses this class extensively.<br/>
 Think for example of views, which can be iterated to access entities but also
-offer a method of obtaining an iterable object that returns tuples of entities
+offer a method for obtaining an iterable object that returns tuples of entities
 and components at once.<br/>
 Another example is the registry class which allows users to iterate its storage
 by returning an iterable object for the purpose.
@@ -452,13 +452,13 @@ everyday problems.
 The former are very specific and for niche problems. These are tools designed to
 unwrap fancy or plain pointers (`to_address`) or to help forget the meaning of
 acronyms like _POCCA_, _POCMA_ or _POCS_.<br/>
-I won't describe them here in detail. Instead, I recommend reading the inline
+I will not describe them here in detail. Instead, I recommend reading the inline
 documentation to those interested in the subject.
 
 ## Allocator aware unique pointers
 
 A nasty thing in C++ (at least up to C++20) is the fact that shared pointers
-support allocators while unique pointers don't.<br/>
+support allocators while unique pointers do not.<br/>
 There is a proposal at the moment that also shows (among the other things) how
 this can be implemented without any compiler support.
 
@@ -509,9 +509,9 @@ library or that will never be.
 
 Runtime type identification support (or RTTI) is one of the most frequently
 disabled features in the C++ world, especially in the gaming sector. Regardless
-of the reasons for this, it's often a shame not to be able to rely on opaque
+of the reasons for this, it is often a shame not to be able to rely on opaque
 type information at runtime.<br/>
-The library tries to fill this gap by offering a built-in system that doesn't
+The library tries to fill this gap by offering a built-in system that does not
 serve as a replacement but comes very close to being one and offers similar
 information to that provided by its counterpart.
 
@@ -523,7 +523,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   auto index = entt::type_index<a_type>::value();
   ```
 
-  The returned value isn't guaranteed to be stable across different runs.<br/>
+  The returned value is not guaranteed to be stable across different runs.<br/>
   However, it can be very useful as index in associative and unordered
   associative containers or for positional accesses in a vector or an array.
   
@@ -551,7 +551,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   ```
 
   In general, the `value` function exposed by `type_hash` is also `constexpr`
-  but this isn't guaranteed for all compilers and platforms (although it's valid
+  but this is not guaranteed for all compilers and platforms (although it is valid
   with the most well-known and popular ones).
 
   This function **can** use non-standard features of the language for its own
@@ -574,7 +574,7 @@ Basically, the whole system relies on a handful of classes. In particular:
 
   This value is extracted from some information generally made available by the
   compiler in use. Therefore, it may differ depending on the compiler and may be
-  empty in the event that this information isn't available.<br/>
+  empty in the event that this information is not available.<br/>
   For example, given the following class:
 
   ```cpp
@@ -586,7 +586,7 @@ Basically, the whole system relies on a handful of classes. In particular:
   Most of the time the name is also retrieved at compile-time and is therefore
   always returned through an `std::string_view`. Users can easily access it and
   modify it as needed, for example by removing the word `struct` to normalize
-  the result. `EnTT` doesn't do this for obvious reasons, since it would be
+  the result. `EnTT` does not do this for obvious reasons, since it would be
   creating a new string at runtime otherwise.
 
   This function **can** use non-standard features of the language for its own
@@ -602,8 +602,8 @@ similar to that made available by the standard library.
 
 ### Type info
 
-The `type_info` class isn't a drop-in replacement for `std::type_info` but can
-provide similar information which are not implementation defined and don't
+The `type_info` class is not a drop-in replacement for `std::type_info` but can
+provide similar information which are not implementation defined and do not
 require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
@@ -676,7 +676,7 @@ described above.
 Since the default non-standard, compile-time implementation of `type_hash` makes
 use of hashed strings, it may happen that two types are assigned the same hash
 value.<br/>
-In fact, although this is quite rare, it's not entirely excluded.
+In fact, although this is quite rare, it is not entirely excluded.
 
 Another case where two types are assigned the same identifier is when classes
 from different contexts (for example two or more libraries loaded at runtime)
@@ -685,8 +685,8 @@ value for the two types.<br/>
 Fortunately, there are several easy ways to deal with this:
 
 * The most trivial one is to define the `ENTT_STANDARD_CPP` macro. Runtime
-  identifiers don't suffer from the same problem in fact. However, this solution
-  doesn't work well with a plugin system, where the libraries aren't linked.
+  identifiers do not suffer from the same problem in fact. However, this solution
+  does not work well with a plugin system, where the libraries are not linked.
 
 * Another possibility is to specialize the `type_name` class for one of the
   conflicting types, in order to assign it a custom identifier. This is probably
@@ -695,7 +695,7 @@ Fortunately, there are several easy ways to deal with this:
 * A fully customized identifier generation policy (based for example on enum
   classes or preprocessing steps) may represent yet another option.
 
-These are just some examples of possible approaches to the problem but there are
+These are just some examples of possible approaches to the problem, but there are
 many others. As already mentioned above, since users have full control over
 their types, this problem is in any case easy to solve and should not worry too
 much.<br/>
@@ -712,10 +712,10 @@ offered by this module.
 ### Size of
 
 The standard operator `sizeof` complains if users provide it with functions or
-incomplete types. On the other hand, it's guaranteed that its result is always
+incomplete types. On the other hand, it is guaranteed that its result is always
 non-zero, even if applied to an empty class type.<br/>
 This small class combines the two and offers an alternative to `sizeof` that
-works under all circumstances, returning zero if the type isn't supported:
+works under all circumstances, returning zero if the type is not supported:
 
 ```cpp
 const auto size = entt::size_of_v<void>;
@@ -750,7 +750,7 @@ using type = entt::constness_as_t<dst_type, const src_type>;
 ```
 
 The trait is subject to the rules of the language. For example, _transferring_
-constness between references won't give the desired effect.
+constness between references will not give the desired effect.
 
 ### Member class type
 
@@ -808,7 +808,7 @@ where types would be required otherwise. As an example:
 registry.emplace<entt::tag<"enemy"_hs>>(entity);
 ```
 
-However, this isn't the only permitted use. Literally any value convertible to
+However, this is not the only permitted use. Literally any value convertible to
 `id_type` is a good candidate, such as the named constants of an unscoped enum.
 
 ### Type list and value list
@@ -830,7 +830,7 @@ type list:
 * `type_list_diff[_t]` to remove types from type lists.
 * `type_list_transform[_t]` to _transform_ a range and create another type list.
 
-I'm also pretty sure that more and more utilities will be added over time as
+I am also pretty sure that more and more utilities will be added over time as
 needs become apparent.<br/>
 Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
@@ -838,11 +838,11 @@ lists. We therefore have `value_list_element[_v]` as well as
 
 # Unique sequential identifiers
 
-Sometimes it's useful to be able to give unique, sequential numeric identifiers
+Sometimes it is useful to be able to give unique, sequential numeric identifiers
 to types either at compile-time or runtime.<br/>
-There are plenty of different solutions for this out there and I could have used
+There are plenty of different solutions for this out there, and I could have used
 one of them. However, I decided to spend my time to define a couple of tools
-that fully embraces what the modern C++ has to offer.
+that fully embrace what modern C++ has to offer.
 
 ## Compile-time generator
 
@@ -873,7 +873,7 @@ where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be
 stable across different runs. In case they have been used in a production
-environment and a type has to be removed, one can just use a placeholder to
+environment, and a type has to be removed. One can just use a placeholder to
 leave the other identifiers unchanged:
 
 ```cpp
@@ -886,7 +886,7 @@ using id = entt::ident<
 >;
 ```
 
-Perhaps a bit ugly to see in a codebase but it gets the job done at least.
+Perhaps a bit ugly to see in a codebase, but it gets the job done at least.
 
 ## Runtime generator
 
@@ -908,17 +908,17 @@ numeric identifier for the given type.<br/>
 The generator is customizable, so as to get different _sequences_ for different
 purposes if needed.
 
-Identifiers aren't guaranteed to be stable across different runs. Indeed it
+Identifiers are not guaranteed to be stable across different runs. Indeed it
 mostly depends on the flow of execution.
 
 # Utilities
 
-It's not possible to escape the temptation to add utilities of some kind to a
+It is not possible to escape the temptation to add utilities of some kind to a
 library. In fact, `EnTT` also provides a handful of tools to simplify the
 life of developers:
 
 * `entt::identity`: the identity function object that will be available with
-  C++20. It returns its argument unchanged and nothing more. It's useful as a
+  C++20. It returns its argument unchanged and nothing more. It is useful as a
   sort of _do nothing_ function in template programming.
 
 * `entt::overload`: a tool to disambiguate different overloads from their
@@ -964,7 +964,7 @@ life of developers:
   callable object that supports multiple types at once.
 
 * `entt::y_combinator`: this is a C++ implementation of **the** _y-combinator_.
-  If it's not clear what it is, there is probably no need for this utility.<br/>
+  If it is not clear what it is, there is probably no need for this utility.<br/>
   Below is a small example to show its use:
 
   ```cpp
@@ -975,9 +975,9 @@ life of developers:
   const auto result = gauss(3u);
   ```
 
-  Maybe convoluted at a first glance but certainly effective. Unfortunately,
-  the language doesn't make it possible to do much better.
+  Maybe convoluted at first glance but certainly effective. Unfortunately,
+  the language does not make it possible to do much better.
 
 This is a rundown of the (actually few) utilities made available by `EnTT`. The
-list will probably grow over time but the size of each will remain rather small,
+list will probably grow over time, but the size of each will remain rather small,
 as has been the case so far.

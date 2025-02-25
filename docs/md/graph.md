@@ -14,7 +14,7 @@
 
 # Introduction
 
-`EnTT` doesn't aim to offer everything one needs to work with graphs. Therefore,
+`EnTT` does not aim to offer everything one needs to work with graphs. Therefore,
 anyone looking for this in the _graph_ submodule will be disappointed.<br/>
 Quite the opposite is true though. This submodule is minimal and contains only
 the data structures and algorithms strictly necessary for the development of
@@ -22,12 +22,12 @@ some tools such as the _flow builder_.
 
 # Data structures
 
-As anticipated in the introduction, the aim isn't to offer all possible data
+As anticipated in the introduction, the aim is not to offer all possible data
 structures suitable for representing and working with graphs. Many will likely
-be added or refined over time. However I want to discourage anyone expecting
+be added or refined over time. However, I want to discourage anyone expecting
 tight scheduling on the subject.<br/>
 The data structures presented in this section are mainly useful for the
-development and support of some tools which are also part of the same submodule.
+development and support of some tools that are also part of the same submodule.
 
 ## Adjacency matrix
 
@@ -108,11 +108,11 @@ Both the functions expect the vertex to visit (that is, to return the in- or
 out-edges for) as an argument.<br/>
 Finally, the adjacency matrix is an allocator-aware container and offers most of
 the functionalities one would expect from this type of containers, such as
-`clear` or 'get_allocator` and so on.
+`clear` or `get_allocator` and so on.
 
 ## Graphviz dot language
 
-As it's one of the most popular formats, the library offers minimal support for
+As it is one of the most popular formats, the library offers minimal support for
 converting a graph to a Graphviz dot snippet.<br/>
 The simplest way is to pass both an output stream and a graph to the `dot`
 function:
@@ -122,7 +122,7 @@ std::ostringstream output{};
 entt::dot(output, adjacency_matrix);
 ```
 
-It's also possible to provide a callback to which the vertices are passed and
+It is also possible to provide a callback to which the vertices are passed and
 which can be used to add (`dot`) properties to the output as needed:
 
 ```cpp
@@ -139,7 +139,7 @@ externally managed data to the graph being converted.
 # Flow builder
 
 A flow builder is used to create execution graphs from tasks and resources.<br/>
-The implementation is as generic as possible and doesn't bind to any other part
+The implementation is as generic as possible and does not bind to any other part
 of the library.
 
 This class is designed as a sort of _state machine_ to which a specific task is
@@ -165,7 +165,7 @@ particular data structure. On the other hand, it requires the user to keep track
 of the association between identifiers and operations or actual data.
 
 Once a flow builder is created (which requires no constructor arguments), the
-first thing to do is to bind a task. This tells to the builder _who_ intends to
+first thing to do is to bind a task. This tells the builder _who_ intends to
 consume the resources that are specified immediately after:
 
 ```cpp
@@ -175,14 +175,14 @@ builder.bind("task_1"_hs);
 
 The example uses the `EnTT` hashed string to generate an identifier for the
 task.<br/>
-Indeed, the use of `id_type` as an identifier type isn't by accident. In fact,
-it matches well with the internal hashed string class. Moreover, it's also the
+Indeed, the use of `id_type` as an identifier type is not by accident. In fact,
+it matches well with the internal hashed string class. Moreover, it is also the
 same type returned by the hash function of the internal RTTI system, in case the
 user wants to rely on that.<br/>
 However, being an integral value, it leaves the user full freedom to rely on his
 own tools if necessary.
 
-Once a task is associated with the flow builder, it's also assigned read-only or
+Once a task is associated with the flow builder, it has also assigned read-only or
 read-write resources as appropriate:
 
 ```cpp
@@ -194,7 +194,7 @@ builder
         .rw("resource_2"_hs)
 ```
 
-As mentioned, many functions return the builder itself and it's therefore easy
+As mentioned, many functions return the builder itself, and it is therefore easy
 to concatenate the different calls.<br/>
 Also in the case of resources, they are identified by numeric values of type
 `id_type`. As above, the choice is not entirely random. This goes well with the
@@ -208,13 +208,13 @@ pair of iterators, so that one can pass a range of resources in one go.
 The `flow` class is resource based rather than task based. This means that graph
 generation is driven by resources and not by the order of _appearance_ of tasks
 during flow definition.<br/>
-Although this concept is particularly important, it's almost irrelevant for the
+Although this concept is particularly important, it is almost irrelevant for the
 vast majority of cases. However, it becomes relevant when _rebinding_ resources
 or tasks.
 
 In fact, nothing prevents rebinding elements to a flow.<br/>
 However, the behavior changes slightly from case to case and has some nuances
-that it's worth knowing about.
+that it is worth knowing about.
 
 Directly rebinding a resource without the task being replaced trivially results
 in the task's access mode for that resource being updated:
@@ -225,7 +225,7 @@ builder.bind("task"_hs).rw("resource"_hs).ro("resource"_hs)
 
 In this case, the resource is accessed in read-only mode, regardless of the
 first call to `rw`.<br/>
-Behind the scenes, the call doesn't actually _replace_ the previous one but is
+Behind the scenes, the call does not actually _replace_ the previous one but is
 queued after it instead, overwriting it when generating the graph. Thus, a large
 number of resource rebindings may even impact processing times (very difficult
 to observe but theoretically possible).
@@ -249,9 +249,9 @@ What happens here is that the resource first _sees_ a read-only access request
 from the first task, then a read-only request from the second task and finally
 a read-write request from the first task.<br/>
 Although this definition would probably be counted as an error, the resulting
-graph may be unexpected. This in fact consists of a single edge outgoing from
+graph may be unexpected. This, in fact, consists of a single edge outgoing from
 the second task and directed to the first task.<br/>
-To intuitively understand what happens, it's enough to think of the fact that a
+To intuitively understand what happens, it is enough to think of the fact that a
 task never has an edge pointing to itself.
 
 While not obvious, this approach has its pros and cons like any other solution.
@@ -272,21 +272,21 @@ As expected, this definition leads to the creation of two edges that define a
 loop between the two tasks.
 
 As a general rule, rebinding resources and tasks is highly discouraged because
-it could lead to subtle bugs if users don't know what they're doing.<br/>
+it could lead to subtle bugs if users do not know what they are doing.<br/>
 However, once the mechanisms of resource-based graph generation are understood,
-it can offer to the expert user a flexibility and a range of possibilities
+it can offer to the expert user flexibility and a range of possibilities
 otherwise inaccessible.
 
 ## Fake resources and order of execution
 
-The flow builder doesn't offer the ability to specify when a task should execute
+The flow builder does not offer the ability to specify when a task should execute
 before or after another task.<br/>
 In fact, the order of _registration_ on the resources also determines the order
 in which the tasks are processed during the generation of the execution graph.
 
 However, there is a way to _force_ the execution order of two processes.<br/>
 Briefly, since accessing a resource in opposite modes requires sequential rather
-than parallel scheduling, it's possible to make use of fake resources to rule on
+than parallel scheduling, it is possible to make use of fake resources to rule on
 the execution order:
 
 ```cpp
@@ -305,7 +305,7 @@ builder
 This snippet forces the execution of `task_1` **before** `task_2` and `task_3`.
 This is due to the fact that the former sets a read-write requirement on a fake
 resource that the other tasks also want to access in read-only mode.<br/>
-Similarly, it's possible to force a task to run **after** a certain group:
+Similarly, it is possible to force a task to run **after** a certain group:
 
 ```cpp
 builder
@@ -322,22 +322,22 @@ builder
 
 In this case, since there are a number of processes that want to read a specific
 resource, they will do so in parallel by forcing `task_3` to run after all the
-others tasks.
+other tasks.
 
 ## Sync points
 
-Sometimes it's useful to assign the role of _sync point_ to a node.<br/>
+Sometimes it is useful to assign the role of _sync point_ to a node.<br/>
 Whether it accesses new resources or is simply a watershed, the procedure for
-assigning this role to a vertex is always the same. First it's tied to the flow
+assigning this role to a vertex is always the same. First it is tied to the flow
 builder, then the `sync` function is invoked:
 
 ```cpp
 builder.bind("sync_point"_hs).sync();
 ```
 
-The choice to assign an _identity_ to this type of nodes lies in the fact that,
+The choice to assign an _identity_ to this type of node lies in the fact that,
 more often than not, they also perform operations on resources.<br/>
-If this isn't the case, it will still be possible to create no-op vertices to
+If this is not the case, it will still be possible to create no-op vertices to
 which empty tasks are assigned.
 
 ## Execution graph
@@ -361,6 +361,6 @@ for(auto &&vertex: graph) {
 }
 ```
 
-Then it's possible to instantiate an execution graph by means of other functions
+Then it is possible to instantiate an execution graph by means of other functions
 such as `out_edges` to retrieve the children of a given task or `edges` to get
 the identifiers.

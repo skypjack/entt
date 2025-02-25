@@ -14,13 +14,13 @@ Others developed different architectures from scratch and therefore offer
 alternative solutions with their pros and cons.
 
 If you know of other similar projects out there, feel free to open an issue or a
-PR and I'll be glad to add them to this page.<br/>
+PR, and I will be glad to add them to this page.<br/>
 I hope the following lists can grow much more in the future.
 
 # Similar projects
 
-Below an incomplete list of similar projects that I've come across so far.<br/>
-If some terms or designs aren't clear, I recommend referring to the
+Below an incomplete list of similar projects that I have come across so far.<br/>
+If some terms or designs are not clear, I recommend referring to the
 [_ECS Back and Forth_](https://skypjack.github.io/tags/#ecs) series for all the
 details.
 
@@ -34,12 +34,12 @@ details.
   * [lent](https://github.com/nem0/lent): the Donald Trump of the ECS libraries.
 
 * C++:
-  * [decs](https://github.com/vblanco20-1/decs): a chunk based archetype ECS.
+  * [decs](https://github.com/vblanco20-1/decs): a chunk-based archetype ECS.
   * [ecst](https://github.com/SuperV1234/ecst): a multithreaded compile-time
     ECS that uses sparse sets to keep track of entities in systems.
   * [EntityX](https://github.com/alecthomas/entityx): a bitset based ECS that
     uses a single large matrix of components indexed with entities.
-  * [Gaia-ECS](https://github.com/richardbiely/gaia-ecs): a chunk based
+  * [Gaia-ECS](https://github.com/richardbiely/gaia-ecs): a chunk-based
     archetype ECS.
   * [Polypropylene](https://github.com/pmbittner/Polypropylene): a hybrid
     solution between an ECS and dynamic mixins.
@@ -56,7 +56,7 @@ details.
   * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
     featuring rollbacks.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
-    platform agnostic and table based ECS framework.
+    platform-agnostic- and table-based ECS framework.
 
 * Go:
   * [gecs](https://github.com/tutumagi/gecs): a sparse sets based ECS inspired 
@@ -65,7 +65,7 @@ details.
 * Javascript:
   * [\@javelin/ecs](https://github.com/3mcd/javelin/tree/master/packages/ecs):
     an archetype ECS in TypeScript.
-  * [ecsy](https://github.com/MozillaReality/ecsy): I haven't had the time to
+  * [ecsy](https://github.com/MozillaReality/ecsy): I have not had the time to
     investigate the underlying design of `ecsy` but it looks cool anyway.
 
 * Perl:
