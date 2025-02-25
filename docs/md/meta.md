@@ -136,12 +136,6 @@ generally used to create the following:
   entt::meta_factory<my_type>{}.data<nullptr, &my_type::data_member>("member"_hs);
   ```
 
-  Multiple setters are also supported by means of a `value_list` object:
-
-  ```cpp
-  entt::meta_factory<my_type>{}.data<entt::value_list<&from_int, &from_string>, &my_type::data_member>("member"_hs);
-  ```
-
 * _Member functions_. Meta member functions are actual member functions of the
   underlying type but also plain free functions. From the point of view of the
   client, all the functions associated with the reflected type appear as if they
