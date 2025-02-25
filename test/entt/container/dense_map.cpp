@@ -492,7 +492,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it, --map.end());
     ASSERT_EQ(it->second, 64);
 
-    std::tie(it, result) = map.insert_or_assign(4, std::int8_t{8});
+    std::tie(it, result) = map.insert_or_assign(4, std::int16_t{8});
 
     ASSERT_TRUE(result);
     ASSERT_EQ(map.size(), 3u);
@@ -502,7 +502,7 @@ TEST(DenseMap, InsertOrAssign) {
     ASSERT_EQ(it->first, 4);
     ASSERT_EQ(it->second, 8);
 
-    std::tie(it, result) = map.insert_or_assign(4, std::int8_t{64});
+    std::tie(it, result) = map.insert_or_assign(4, std::int16_t{64});
 
     ASSERT_FALSE(result);
     ASSERT_EQ(map.size(), 3u);
