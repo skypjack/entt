@@ -35,4 +35,5 @@ TODO:
 * any cdynamic to support const ownership construction
 * delegate/sigh: forward connect/disconnect from & to *
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke probably)
-* meta: remove ctx arg from utilities (handle/any), container ctors/funcs (it), data getter (handle), ctor and func invoke (any, with check)
+* meta: remove ctx arg from utilities (handle/any), container ctors/funcs (it), func invoke (any, with check)
+* meta: remove ctx member from meta_data, meta_func, ... (use handles and the like)
