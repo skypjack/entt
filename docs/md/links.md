@@ -14,8 +14,8 @@
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
 ago. Fortunately, there are also people who took the time to implement open
-source projects based on `EnTT` and did not hold back when it came to documenting
-them.
+source projects based on `EnTT` and did not hold back when it came to
+documenting them.
 
 Below an incomplete list of games, applications and articles that can be used as
 a reference.<br/>
@@ -97,7 +97,8 @@ I hope the following lists can grow much more in the future.
     by Quake.
   * [Destroid](https://github.com/tyrannicaltoucan/destroid): _one-bazillionth_
     arcade game about shooting dirty rocks in space, inspired by Asteroids.
-  * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D exploration-based indie game.
+  * [Wanderer](https://github.com/albin-johansson/wanderer): a 2D
+    exploration-based indie game.
   * [Spelunky® Classic remake](https://github.com/dbeef/spelunky-psp): a truly
     multiplatform experience with a rewrite from scratch.
   * [CubbyTower](https://github.com/utilForever/CubbyTower): a simple tower

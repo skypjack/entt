@@ -476,8 +476,8 @@ parameter for it but rather a different function:
 dispatcher.enqueue_hint<an_event>("custom"_hs, 42);
 ```
 
-This is mainly due to the template argument deduction rules, and unfortunately, 
-there is no real (elegant) way to avoid it.
+This is mainly due to the template argument deduction rules, and there is no
+real (elegant) way to avoid it.
 
 # Event emitter
 

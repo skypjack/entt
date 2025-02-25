@@ -22,8 +22,8 @@ respects. These variables are just one of the many ways to customize how it
 works.<br/>
 In the vast majority of cases, users will have no interest in changing the
 default parameters. For all other cases, the list of possible configurations
-with which it is possible to adjust the behavior of the library at runtime can be
-found below.
+with which it is possible to adjust the behavior of the library at runtime can
+be found below.
 
 # Definitions
 
@@ -57,8 +57,9 @@ default type if necessary.
 
 ## ENTT_SPARSE_PAGE
 
-It is known that the ECS module of `EnTT` is based on _sparse sets_. What is less
-known perhaps is that the sparse arrays are paged to reduce memory usage.<br/>
+It is known that the ECS module of `EnTT` is based on _sparse sets_. What is
+less known perhaps is that the sparse arrays are paged to reduce memory
+usage.<br/>
 Default size of pages (that is, the number of elements they contain) is 4096 but
 users can adjust it if appropriate. In all cases, the chosen value **must** be a
 power of 2.

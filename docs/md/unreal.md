@@ -37,8 +37,8 @@ this point, C++17 support should be in place.<br/>
 Try to compile the project to ensure it works as expected before following
 further steps.
 
-Note that updating a *project* to C++17 does not necessarily mean that the IDE in
-use will also start to recognize its syntax.<br/>
+Note that updating a *project* to C++17 does not necessarily mean that the IDE
+in use will also start to recognize its syntax.<br/>
 If the plan is to use C++17 in the project too, check the specific instructions
 for the IDE in use.
 
@@ -62,8 +62,8 @@ Source
       \---entt (GitHub repository content inside)
 ```
 
-To make this happen, create the folder `ThirdParty` under `Source` if it does not
-exist already. Then, add an `EnTT` folder under `ThirdParty`.<br/>
+To make this happen, create the folder `ThirdParty` under `Source` if it does
+not exist already. Then, add an `EnTT` folder under `ThirdParty`.<br/>
 Within the latter, create a new file `EnTT.Build.cs` with the following content:
 
 ```cs

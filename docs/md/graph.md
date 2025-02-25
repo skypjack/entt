@@ -14,8 +14,9 @@
 
 # Introduction
 
-`EnTT` does not aim to offer everything one needs to work with graphs. Therefore,
-anyone looking for this in the _graph_ submodule will be disappointed.<br/>
+`EnTT` does not aim to offer everything one needs to work with graphs.
+Therefore, anyone looking for this in the _graph_ submodule will be
+disappointed.<br/>
 Quite the opposite is true though. This submodule is minimal and contains only
 the data structures and algorithms strictly necessary for the development of
 some tools such as the _flow builder_.
@@ -182,8 +183,8 @@ user wants to rely on that.<br/>
 However, being an integral value, it leaves the user full freedom to rely on his
 own tools if necessary.
 
-Once a task is associated with the flow builder, it has also assigned read-only or
-read-write resources as appropriate:
+Once a task is associated with the flow builder, it has also assigned read-only
+or read-write resources as appropriate:
 
 ```cpp
 builder
@@ -249,7 +250,7 @@ What happens here is that the resource first _sees_ a read-only access request
 from the first task, then a read-only request from the second task and finally
 a read-write request from the first task.<br/>
 Although this definition would probably be counted as an error, the resulting
-graph may be unexpected. This, in fact, consists of a single edge outgoing from
+graph may be unexpected. In fact, this consists of a single edge outgoing from
 the second task and directed to the first task.<br/>
 To intuitively understand what happens, it is enough to think of the fact that a
 task never has an edge pointing to itself.
@@ -279,15 +280,15 @@ otherwise inaccessible.
 
 ## Fake resources and order of execution
 
-The flow builder does not offer the ability to specify when a task should execute
+The flow builder does not offer the ability to specify when a task should run
 before or after another task.<br/>
 In fact, the order of _registration_ on the resources also determines the order
 in which the tasks are processed during the generation of the execution graph.
 
 However, there is a way to _force_ the execution order of two processes.<br/>
 Briefly, since accessing a resource in opposite modes requires sequential rather
-than parallel scheduling, it is possible to make use of fake resources to rule on
-the execution order:
+than parallel scheduling, it is possible to make use of fake resources to rule
+on the execution order:
 
 ```cpp
 builder
@@ -361,6 +362,6 @@ for(auto &&vertex: graph) {
 }
 ```
 
-Then it is possible to instantiate an execution graph by means of other functions
-such as `out_edges` to retrieve the children of a given task or `edges` to get
-the identifiers.
+Then it is possible to instantiate an execution graph by means of other
+functions such as `out_edges` to retrieve the children of a given task or
+`edges` to get the identifiers.

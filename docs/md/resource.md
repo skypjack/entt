@@ -31,7 +31,8 @@ The _resource_ is an image, an audio, a video or any other type:
 struct my_resource { const int value; };
 ```
 
-The _loader_ is a callable type, the aim of which is to load a specific resource:
+The _loader_ is a callable type, the aim of which is to load a specific
+resource:
 
 ```cpp
 struct my_loader final {
@@ -68,8 +69,8 @@ discarded when a player leaves it.
 
 ## Resource handle
 
-Resources are not returned directly to the caller. Instead, they are wrapped in a
-_resource handle_, an instance of the `entt::resource` class template.<br/>
+Resources are not returned directly to the caller. Instead, they are wrapped in
+a _resource handle_, an instance of the `entt::resource` class template.<br/>
 For those who know the _flyweight design pattern_ already, that is exactly what
 it is. To all others, this is the time to brush up on some notions instead.
 
@@ -98,8 +99,8 @@ When using the default handle, it expects a resource type which is convertible
 to or suitable for constructing an `std::shared_ptr<Type>` (where `Type` is the
 actual resource type).<br/>
 In other terms, the loader should return shared pointers to the given resource
-type. However, this is not mandatory. Users can easily get around this constraint
-by specializing both the handle and the loader.
+type. However, this is not mandatory. Users can easily get around this
+constraint by specializing both the handle and the loader.
 
 A cache forwards all its arguments to the loader if required. This means that
 loaders can also support tag dispatching to offer different loading policies:
@@ -158,9 +159,9 @@ functions (such as `contains` or `erase`).
 Set aside the part of the API that this class _shares_ with a map, it also adds
 something on top of it in order to address the most common requirements of a
 resource cache.<br/>
-In particular, it does not have an `emplace` member function which is replaced by
-`load` and `force_load` instead (where the former loads a new resource only if
-not present while the second triggers a forced loading in any case):
+In particular, it does not have an `emplace` member function which is replaced
+by `load` and `force_load` instead (where the former loads a new resource only
+if not present while the second triggers a forced loading in any case):
 
 ```cpp
 auto ret = cache.load("resource/id"_hs);
@@ -181,5 +182,5 @@ operators return resource handles rather than instances of the mapped type.<br/>
 Since the cache has no control over the loader and a resource is not required to
 also be convertible to bool, these handles can be invalid. This usually means an
 error in the user logic, but it may also be an _expected_ event.<br/>
-It is therefore recommended to verify handles validity with a check in debug (for
-example, when loading) or an appropriate logic in retail.
+It is therefore recommended to verify handles validity with a check in debug
+(for example, when loading) or an appropriate logic in retail.

@@ -22,8 +22,8 @@ CRTP idiom. Moreover, derived classes specify what the intended type for elapsed
 times is.
 
 A process should expose publicly the following member functions whether needed
-(note that it is not required to define a function unless the derived class wants
-to _override_ the default behavior):
+(note that it is not required to define a function unless the derived class
+wants to _override_ the default behavior):
 
 * `void update(Delta, void *);`
 
@@ -36,8 +36,8 @@ to _override_ the default behavior):
 * `void init();`
 
   This is invoked when the process joins the running queue of a scheduler. It
-  happens usually as soon as the process is attached to the scheduler if it is a
-  top level one, otherwise when it replaces its parent if it is a _continuation_.
+  happens usually when the process is attached to the scheduler if it is a top
+  level one, or when it replaces its parent if it is a _continuation_.
 
 * `void succeeded();`
 
@@ -87,8 +87,8 @@ private:
 
 ## Adaptor
 
-Lambdas and functors cannot be used directly with a scheduler because they are not
-properly defined processes with managed life cycles.<br/>
+Lambdas and functors cannot be used directly with a scheduler because they are
+not properly defined processes with managed life cycles.<br/>
 This class helps in filling the gap and turning lambdas and functors into
 full-featured processes usable by a scheduler.
 

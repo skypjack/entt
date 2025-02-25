@@ -118,8 +118,8 @@ The type is also used internally when comparing two `any` objects:
 if(any == empty) { /* ... */ }
 ```
 
-In this case, before proceeding with a comparison, it is verified that the _type_
-of the two objects is actually the same.<br/>
+In this case, before proceeding with a comparison, it is verified that the
+_type_ of the two objects is actually the same.<br/>
 Refer to the `EnTT` type system documentation for more details about how
 `type_info` works and the possible risks of a comparison.
 
@@ -161,9 +161,9 @@ In particular, the `data` member function invoked on a non-const instance of
 
 To cast an instance of `any` to a type, the library offers a set of `any_cast`
 functions in all respects similar to their most famous counterparts.<br/>
-The only difference is that, in the case of `EnTT`, they will not raise exceptions
-but will only trigger an assert in debug mode, otherwise resulting in undefined
-behavior in case of misuse in release mode.
+The only difference is that, in the case of `EnTT`, they will not raise
+exceptions but will only trigger an assert in debug mode, otherwise resulting in
+undefined behavior in case of misuse in release mode.
 
 ## Small buffer optimization
 
@@ -188,8 +188,8 @@ and always dynamically allocates objects (except for aliasing cases).
 
 The alignment requirement is optional and by default the most stringent (the
 largest) for any object whose size is at most equal to the one provided.<br/>
-It is provided as an optional second parameter following the desired size for the
-internal storage:
+It is provided as an optional second parameter following the desired size for
+the internal storage:
 
 ```cpp
 using my_any = entt::basic_any<sizeof(double[4]), alignof(double[4])>;
@@ -234,14 +234,14 @@ entt::compressed_pair pair{0, 3.};
 pair.first() = 42;
 ```
 
-There is not much to describe then. It is recommended to rely on documentation and
-intuition. At the end of the day, it is just a pair and nothing more.
+There is not much to describe then. It is recommended to rely on documentation
+and intuition. At the end of the day, it is just a pair and nothing more.
 
 # Enum as bitmask
 
-Sometimes it is useful to be able to use enums as bitmasks. However, enum classes
-are not really suitable for the purpose. Main problem is that they do not convert
-implicitly to their underlying type.<br/>
+Sometimes it is useful to be able to use enums as bitmasks. However, enum
+classes are not really suitable for the purpose. Main problem is that they do
+not convert implicitly to their underlying type.<br/>
 The choice is then between using old-fashioned enums (with all their problems
 that I do not want to discuss here) or writing _ugly_ code.
 
@@ -379,8 +379,8 @@ make this hard work easier.
 ## Input iterator pointer
 
 When writing an input iterator that returns in-place constructed values if
-dereferenced, it is not always straightforward to figure out what `value_type` is
-and how to make it behave like a full-fledged pointer.<br/>
+dereferenced, it is not always straightforward to figure out what `value_type`
+is and how to make it behave like a full-fledged pointer.<br/>
 Conversely, it would be very useful to have an `operator->` available on the
 iterator itself that always works without too much complexity.
 
@@ -551,8 +551,8 @@ Basically, the whole system relies on a handful of classes. In particular:
   ```
 
   In general, the `value` function exposed by `type_hash` is also `constexpr`
-  but this is not guaranteed for all compilers and platforms (although it is valid
-  with the most well-known and popular ones).
+  but this is not guaranteed for all compilers and platforms (although it is
+  valid with the most well-known and popular ones).
 
   This function **can** use non-standard features of the language for its own
   purposes. This makes it possible to provide compile-time identifiers that
@@ -685,8 +685,9 @@ value for the two types.<br/>
 Fortunately, there are several easy ways to deal with this:
 
 * The most trivial one is to define the `ENTT_STANDARD_CPP` macro. Runtime
-  identifiers do not suffer from the same problem in fact. However, this solution
-  does not work well with a plugin system, where the libraries are not linked.
+  identifiers do not suffer from the same problem in fact. However, this
+  solution does not work well with a plugin system, where the libraries are not
+  linked.
 
 * Another possibility is to specialize the `type_name` class for one of the
   conflicting types, in order to assign it a custom identifier. This is probably
@@ -695,8 +696,8 @@ Fortunately, there are several easy ways to deal with this:
 * A fully customized identifier generation policy (based for example on enum
   classes or preprocessing steps) may represent yet another option.
 
-These are just some examples of possible approaches to the problem, but there are
-many others. As already mentioned above, since users have full control over
+These are just some examples of possible approaches to the problem, but there
+are many others. As already mentioned above, since users have full control over
 their types, this problem is in any case easy to solve and should not worry too
 much.<br/>
 In all likelihood, it will never happen to run into a conflict anyway.
@@ -840,9 +841,9 @@ lists. We therefore have `value_list_element[_v]` as well as
 
 Sometimes it is useful to be able to give unique, sequential numeric identifiers
 to types either at compile-time or runtime.<br/>
-There are plenty of different solutions for this out there, and I could have used
-one of them. However, I decided to spend my time to define a couple of tools
-that fully embrace what modern C++ has to offer.
+There are plenty of different solutions for this out there, and I could have
+used one of them. However, I decided to spend my time to define a couple of
+tools that fully embrace what modern C++ has to offer.
 
 ## Compile-time generator
 
@@ -872,12 +873,13 @@ contains a numeric identifier for the given type. It can be used in any context
 where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be
-stable across different runs. In case they have been used in a production
-environment, and a type has to be removed. One can just use a placeholder to
-leave the other identifiers unchanged:
+stable across different runs. If used in a production environment where a type
+needs to be removed, a placeholder can help to leave the other identifiers the
+same:
 
 ```cpp
-template<typename> struct ignore_type {};
+template<typename>
+struct ignore_type {};
 
 using id = entt::ident<
     a_type_still_valid,
@@ -964,7 +966,8 @@ life of developers:
   callable object that supports multiple types at once.
 
 * `entt::y_combinator`: this is a C++ implementation of **the** _y-combinator_.
-  If it is not clear what it is, there is probably no need for this utility.<br/>
+  If it is not clear what it is, there is probably no need for this
+  utility.<br/>
   Below is a small example to show its use:
 
   ```cpp
@@ -979,5 +982,5 @@ life of developers:
   the language does not make it possible to do much better.
 
 This is a rundown of the (actually few) utilities made available by `EnTT`. The
-list will probably grow over time, but the size of each will remain rather small,
-as has been the case so far.
+list will probably grow over time, but the size of each will remain rather
+small, as has been the case so far.

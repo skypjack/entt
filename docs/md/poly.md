@@ -253,8 +253,8 @@ in appending the new functions to the previous list.
 
 As for a defined concept instead, the list of types is _extended_ in a similar
 way to what is shown for the implementation of the above concept.<br/>
-To do this, it is useful to declare a function that allows to convert a _concept_
-into its underlying `type_list` object:
+To do this, it is useful to declare a function that allows to convert a
+_concept_ into its underlying `type_list` object:
 
 ```cpp
 template<typename... Type>
@@ -320,7 +320,8 @@ drawable other = instance.as_ref();
 ```
 
 In both cases, although the interface of the `poly` object does not change, it
-does not construct any element or take care of destroying the referenced objects.
+does not construct any element or take care of destroying the referenced
+objects.
 
 Note also how the underlying concept is accessed via a call to `operator->` and
 not directly as `instance.draw()`.<br/>
@@ -342,9 +343,9 @@ entt::basic_poly<Drawable, sizeof(double[4]), alignof(double[4])>
 
 The default size is `sizeof(double[2])`, which seems like a good compromise
 between a buffer that is too large and one unable to hold anything larger than
-an integer. The alignment requirement is optional, and by default such that it is
-the most stringent (the largest) for any object whose size is at most equal to
-the one provided.<br/>
+an integer. The alignment requirement is optional, and by default such that it
+is the most stringent (the largest) for any object whose size is at most equal
+to the one provided.<br/>
 It is worth noting that providing a size of 0 (which is an accepted value in all
 respects) will force the system to dynamically allocate the contained objects in
 all cases.

@@ -16,8 +16,8 @@
 
 This is a constantly updated section where I am trying to put the answers to the
 most frequently asked questions.<br/>
-If you do not find your answer here, there are two cases: nobody has done it yet, 
-or this section needs updating. In both cases, you can
+If you do not find your answer here, there are two cases: nobody has done it
+yet, or this section needs updating. In both cases, you can
 [open a new issue](https://github.com/skypjack/entt/issues/new) or enter either
 the [gitter channel](https://gitter.im/skypjack/entt) or the
 [discord server](https://discord.gg/5BjPWBd) to ask for help.<br/>
@@ -30,8 +30,8 @@ part of the documentation.
 
 `EnTT` is an experimental project that I also use to keep me up-to-date with the
 latest revision of the language and the standard library. For this reason, it is
-likely that some classes you are working with are using standard containers under
-the hood.<br/>
+likely that some classes you are working with are using standard containers
+under the hood.<br/>
 Unfortunately, it is known that the standard containers are not particularly
 performing in debugging (the reasons for this go beyond this document) and are
 even less so on Windows, apparently. Fortunately, this can also be mitigated a
@@ -119,9 +119,9 @@ more details.
 ## The standard and the non-copyable types
 
 `EnTT` uses internally the trait `std::is_copy_constructible_v` to check if a
-component is actually copyable. However, this trait does not really check whether
-a type is actually copyable. Instead, it just checks that a suitable copy
-constructor and copy operator exist.<br/>
+component is actually copyable. However, this trait does not really check
+whether a type is actually copyable. Instead, it just checks that a suitable
+copy constructor and copy operator exist.<br/>
 This can lead to surprising results due to some idiosyncrasies of the standard.
 
 For example, `std::vector` defines a copy constructor that is conditionally
@@ -184,9 +184,9 @@ owned by the entity that is destroyed.
 
 ## Duplicate storage for the same component
 
-It is rare, but you can see double sometimes, especially when it comes to storage.
-This can be caused by a conflict in the hash assigned to the various component
-types (one of a kind) or by bugs in your compiler
+It is rare, but you can see double sometimes, especially when it comes to
+storage. This can be caused by a conflict in the hash assigned to the various
+component types (one of a kind) or by bugs in your compiler
 ([more common](https://github.com/skypjack/entt/issues/1063) apparently).<br/>
 Regardless of the cause, `EnTT` offers a customization point that also serves as
 a solution in this case:

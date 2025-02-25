@@ -99,8 +99,8 @@ It does not attempt in any way to take over on the user codebase, nor to control
 its main loop or process scheduling.<br/>
 Unlike other more or less well known models, it also makes use of independent
 pools that are extended via _static mixins_. The built-in signal support is an
-example of this flexible design: defined as a mixin, it is easily disabled if not
-needed. Similarly, the storage class has a specialization that shows how
+example of this flexible design: defined as a mixin, it is easily disabled if
+not needed. Similarly, the storage class has a specialization that shows how
 everything is customizable down to the smallest detail.
 
 ## Pay per use
@@ -404,9 +404,9 @@ There are also some limitations on what a listener can and cannot do:
 
 Please, refer to the documentation of the signal class to know about all the
 features it offers.<br/>
-There are many useful but less known functionalities that are not described here,
-such as the connection objects or the possibility to attach listeners with a
-list of parameters that are shorter than that of the signal itself.
+There are many useful but less known functionalities that are not described
+here, such as the connection objects or the possibility to attach listeners with
+a list of parameters that is shorter than that of the signal itself.
 
 ### Entity lifecycle
 
@@ -421,9 +421,9 @@ Since entity storage is unique within a registry, if a _name_ is provided it is
 ignored and therefore discarded.<br/>
 As for the function signature, this is exactly the same as the components.
 
-Entities support all types of signals: construct, destroy, and update. The latter
-is perhaps ambiguous as an entity is not truly _updated_. Rather, its identifier
-is created and finally released.<br/>
+Entities support all types of signals: construct, destroy, and update. The
+latter is perhaps ambiguous as an entity is not truly _updated_. Rather, its
+identifier is created and finally released.<br/>
 Indeed, the update signal is meant to send _general notifications_ regarding an
 entity. It can be triggered via the `patch` function, as is the case with
 components:
@@ -443,8 +443,8 @@ making it difficult for the user to write component listeners.
 
 The destruction order of the storage classes and therefore the disconnection of
 the listeners is completely random.<br/>
-There are no guarantees today, and while the logic is easily discerned, it is not
-guaranteed that it will remain so in the future.
+There are no guarantees today, and while the logic is easily discerned, it is
+not guaranteed that it will remain so in the future.
 
 For example, a listener getting disconnected after a component is discarded as a
 result of pool destruction is most likely a recipe for problems.<br/>
@@ -499,8 +499,8 @@ auto &storage = registry.storage<entt::reactive>("observer"_hs);
 
 In the latter case, there is the advantage that, in the event of destruction of
 an entity, this storage is also automatically cleaned up.<br/>
-Also note that, unlike all other storage, these classes do not support signals by
-default (although they can be enabled if necessary).
+Also note that, unlike all other storage, these classes do not support signals
+by default (although they can be enabled if necessary).
 
 Once it has been created and associated with a registry, the reactive mixin
 needs to be informed about what it should _observe_.<br/>
@@ -517,8 +517,8 @@ storage
     .on_destroy<renderable>();
 ```
 
-It goes without saying that it is possible to observe multiple events of the same
-type or of different types with the same storage.<br/>
+It goes without saying that it is possible to observe multiple events of the
+same type or of different types with the same storage.<br/>
 For example, to know which entities have been assigned or updated a component of
 a certain type:
 
@@ -749,8 +749,8 @@ const auto entity = registry.create();
 const bool tombstone = (entity == entt::tombstone);
 ```
 
-Be aware that `entt::tombstone` and entity 0 are different. Likewise, a
-zero initialized entity is not the same as `entt::tombstone`. Therefore, although
+Be aware that `entt::tombstone` and entity 0 are different. Likewise, a zero
+initialized entity is not the same as `entt::tombstone`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them are used
 to create tombstones.
 
@@ -894,8 +894,8 @@ clazz instance;
 organizer.emplace(+[](const void *, entt::registry &) { /* ... */ }, &instance);
 ```
 
-In all cases, it is also possible to associate a name with the task when creating
-it. For example:
+In all cases, it is also possible to associate a name with the task when
+creating it. For example:
 
 ```cpp
 organizer.emplace<&free_function>("func");
@@ -911,8 +911,8 @@ constant reference to it, it is considered a read-only access. Otherwise, it is
 considered as read-write access. All functions have the registry among their
 resources.
 
-When registering a function, users can also require resources that are not in the
-list of parameters of the function itself. These are declared as template
+When registering a function, users can also require resources that are not in
+the list of parameters of the function itself. These are declared as template
 parameters:
 
 ```cpp
@@ -1015,8 +1015,8 @@ registry.ctx().erase<my_type>("my_variable"_hs);
 A context variable must be both default constructible and movable. If the
 supplied type does not match that of the variable when using a _name_, the
 operation fails.<br/>
-For all users who want to use the context but do not want to create elements, the
-`contains` and `find` functions are also available:
+For all users who want to use the context but do not want to create elements,
+the `contains` and `find` functions are also available:
 
 ```cpp
 const bool contains = registry.ctx().contains<my_type>();
@@ -1280,8 +1280,9 @@ a well known library for serialization as an archive. It uses
 [`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
 because I wanted to learn how it works at the time I was writing the code.
 
-The code **is not** production-ready and it is not neither the only nor (probably)
-the best way to do it. However, feel free to use it at your own risk.<br/>
+The code **is not** production-ready and it is not neither the only nor
+(probably) the best way to do it. However, feel free to use it at your own
+risk.<br/>
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
 
@@ -1337,9 +1338,9 @@ performance and memory usage. However, this also has consequences that are worth
 mentioning.
 
 When an empty type is detected, it is not instantiated by default. Therefore,
-only the entities to which it is assigned are made available. There does not exist
-a way to _get_ empty types from a storage or a registry. Views and groups never
-return their instances too (for example, during a call to `each`).<br/>
+only the entities to which it is assigned are made available. There does not
+exist a way to _get_ empty types from a storage or a registry. Views and groups
+never return their instances too (for example, during a call to `each`).<br/>
 On the other hand, iterations are faster because only the entities to which the
 type is assigned are considered. Moreover, less memory is used, mainly because
 there does not exist any instance of the component, no matter how many entities
@@ -1362,8 +1363,8 @@ empty types when their optimization is enabled. Pagination is disabled as well
 as pointer stability (as not necessary).<br/>
 However, this should be preferred to using a simple sparse set. In particular,
 a void storage offers all those feature normally offered by other storage types.
-Therefore, it is a perfectly valid pool for use with views and groups or within a
-registry.
+Therefore, it is a perfectly valid pool for use with views and groups or within
+a registry.
 
 ## Entity storage
 
@@ -1418,8 +1419,8 @@ equivalent to the following:
 auto &storage = registry.storage<entt::entity>();
 ```
 
-Because entity storage does not have a name, it cannot be retrieved via the opaque
-`storage` function either.<br/>
+Because entity storage does not have a name, it cannot be retrieved via the
+opaque `storage` function either.<br/>
 It would make no sense to try anyway, given that the type of the registry and
 therefore its entity type are known regardless.
 
@@ -1507,16 +1508,16 @@ struct transform {
 
 Furthermore, it is quite common for a group of elements to be created close in
 time and therefore fallback into adjacent positions, thus favoring locality even
-on random accesses. Locality that is not sacrificed over time given the stability
-of storage positions, with undoubted performance advantages.
+on random accesses. Locality that is not sacrificed over time given the
+stability of storage positions, with undoubted performance advantages.
 
 # Meet the runtime
 
 `EnTT` takes advantage of what the language offers at compile-time. However,
 this can have its downsides (well known to those familiar with type erasure
 techniques).<br/>
-To fill the gap, the library also provides a bunch of utilities and features that
-are invaluable to handle types and pools at runtime.
+To fill the gap, the library also provides a bunch of utilities and features
+that are invaluable to handle types and pools at runtime.
 
 ## A base class to rule them all
 
@@ -1665,8 +1666,8 @@ different APIs.
 Single type views are specialized to give a performance boost in all cases.
 There is nothing as fast as a single type view. They just walk through packed
 (actually paged) arrays of elements and return them directly.<br/>
-This kind of views also allows getting the exact number of elements they are going
-to return.<br/>
+This kind of views also allows getting the exact number of elements they are
+going to return.<br/>
 Refer to the inline documentation for all the details.
 
 Multi type views iterate entities that have at least all the given components.
@@ -1871,8 +1872,8 @@ for(auto entity: registry.view<positon, velocity>()) {
 
 Moreover, the order of types when constructing a view does not matter. Neither
 does the order of views in a view pack.<br/>
-However, it is possible to _enforce_ iteration of a view by given component order
-by means of the `use` function:
+However, it is possible to _enforce_ iteration of a view by given component
+order by means of the `use` function:
 
 ```cpp
 auto view = registry.view<position, velocity>();
@@ -1904,8 +1905,8 @@ Multi type views iterate entities that have at least all the given components.
 During construction, they look at the number of elements available in each pool
 and use the smallest set in order to speed up iterations.<br/>
 They offer more or less the same functionalities of a multi type view. However,
-they do not expose a `get` member function and users should refer to the registry
-that generated the view to access components.<br/>
+they do not expose a `get` member function and users should refer to the
+registry that generated the view to access components.<br/>
 Refer to the inline documentation for all the details.
 
 Runtime views are pretty cheap to construct and should not be stored aside in
@@ -2196,8 +2197,8 @@ identifiers.
 
 ## What is allowed and what is not
 
-Most of the _ECS_ available out there do not allow to create and destroy entities
-and components during iterations, nor to have pointer stability.<br/>
+Most of the _ECS_ available out there do not allow to create and destroy
+entities and components during iterations, nor to have pointer stability.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
 * Creating entities and components is allowed during iterations in most cases
@@ -2230,16 +2231,16 @@ registry.view<position>().each([&](const auto entity, auto &pos) {
 });
 ```
 
-The `each` member function will not break (because iterators remain valid) nor will
-any reference be invalidated. Instead, more attention should be paid to the
+The `each` member function will not break (because iterators remain valid) nor
+will any reference be invalidated. Instead, more attention should be paid to the
 destruction of entities or the removal of components.<br/>
 Use a common range-for loop and get components directly from the view or move
 the deletion of entities and components at the end of the function to avoid
 dangling pointers.
 
 For all types that do not offer stable pointers, iterators are also invalidated
-and the behavior is undefined if an entity is modified or destroyed and it is not
-the one currently returned by the iterator nor a newly created one.<br/>
+and the behavior is undefined if an entity is modified or destroyed and it is
+not the one currently returned by the iterator nor a newly created one.<br/>
 To work around it, possible approaches are:
 
 * Store aside the entities and the components to be removed and perform the
@@ -2261,8 +2262,8 @@ nature and the scope of the groups, it is not something in which it will happen
 to come across probably, but it is good to know it anyway.
 
 First of all, it must be said that creating components while iterating a group
-is not a problem at all and is done freely as it happens with the views. The same
-applies to the destruction of components and entities, for which the rules
+is not a problem at all and is done freely as it happens with the views. The
+same applies to the destruction of components and entities, for which the rules
 mentioned above apply.
 
 The additional limitation arises instead when a given component that is owned by
@@ -2293,13 +2294,13 @@ groups or as free types with multi type views and groups in general.
 
 # Multithreading
 
-In general, the entire registry is not thread safe as it is. Thread safety is not
-something that users should want out of the box for several reasons. Just to
+In general, the entire registry is not thread safe as it is. Thread safety is
+not something that users should want out of the box for several reasons. Just to
 mention one of them: performance.<br/>
 Views, groups and consequently the approach adopted by `EnTT` are the great
 exception to the rule. It is true that views, groups and iterators in general
-are not thread safe by themselves. Because of this users should not try to iterate
-a set of components and modify the same set concurrently. However:
+are not thread safe by themselves. Because of this users should not try to
+iterate a set of components and modify the same set concurrently. However:
 
 * As long as a thread iterates the entities that have the component `X` or
   assign and removes that component from a set of entities, another thread can
@@ -2316,9 +2317,9 @@ a set of components and modify the same set concurrently. However:
 
 This kind of entity-component systems can be used in single-threaded
 applications as well as along with async stuff or multiple threads. Moreover,
-typical thread based models for _ECS_ do not require a fully thread-safe registry
-to work. Actually, users can reach the goal with the registry as it is while
-working with most of the common models.
+typical thread based models for _ECS_ do not require a fully thread-safe
+registry to work. Actually, users can reach the goal with the registry as it is
+while working with most of the common models.
 
 Because of the few reasons mentioned above and many others not mentioned, users
 are completely responsible for synchronization whether required. On the other
@@ -2378,8 +2379,8 @@ registry.
 Returned views are always valid and behave as expected in the context of the
 caller. However, they may contain dangling references to non-existing storage
 when created from a const registry.<br/>
-As a result, such a view may misbehave over time if it is kept aside for a second
-use.<br/>
+As a result, such a view may misbehave over time if it is kept aside for a
+second use.<br/>
 Therefore, if the general advice is to create views when necessary and discard
 them immediately afterwards, this becomes almost a rule when it comes to views
 generated from a const registry.
@@ -2400,5 +2401,5 @@ things could be forgotten, others could have been omitted on purpose to reduce
 the size of this file. Unfortunately, some parts may even be outdated and still
 to be updated.
 
-For further information, it is recommended to refer to the documentation included
-in the code itself or join the official channels to ask a question.
+For further information, it is recommended to refer to the documentation
+included in the code itself or join the official channels to ask a question.

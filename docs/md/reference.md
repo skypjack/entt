@@ -19,7 +19,8 @@ I hope the following lists can grow much more in the future.
 
 # Similar projects
 
-Below an incomplete list of similar projects that I have come across so far.<br/>
+Below an incomplete list of similar projects that I have come across so
+far.<br/>
 If some terms or designs are not clear, I recommend referring to the
 [_ECS Back and Forth_](https://skypjack.github.io/tags/#ecs) series for all the
 details.
@@ -56,7 +57,7 @@ details.
   * [Massive ECS](https://github.com/nilpunch/massive): sparse set based ECS
     featuring rollbacks.
   * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
-    platform-agnostic- and table-based ECS framework.
+    platform-agnostic and table-based ECS framework.
 
 * Go:
   * [gecs](https://github.com/tutumagi/gecs): a sparse sets based ECS inspired 
