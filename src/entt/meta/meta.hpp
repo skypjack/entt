@@ -1017,7 +1017,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return ((node.invoke != nullptr) && (sz == arity())) ? node.invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return ((node.invoke != nullptr) && (sz == arity())) ? node.invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1438,7 +1438,7 @@ public:
         if(node.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(node.details->func, id); elem != nullptr) {
                 if(const auto *candidate = lookup(args, sz, (instance->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(*ctx, meta_handle{*ctx, std::move(instance)}, args);
+                    return candidate->invoke(meta_handle{*ctx, std::move(instance)}, args);
                 }
             }
         }

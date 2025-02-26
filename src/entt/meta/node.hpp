@@ -112,7 +112,7 @@ struct meta_func_node {
     size_type arity{0u};
     meta_type_node (*ret)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
-    meta_any (*invoke)(const meta_ctx &, meta_handle, meta_any *const){};
+    meta_any (*invoke)(meta_handle, meta_any *const){};
     std::shared_ptr<meta_func_node> next;
     meta_custom_node custom{};
 };
