@@ -307,49 +307,6 @@ template<typename Type, auto Data>
 
 /**
  * @brief Gets the value of a given variable.
- *
- * @warning
- * The context provided is used only for the return type.<br/>
- * It's up to the caller to bind the arguments to the right context(s).
- *
- * @tparam Type Reflected type to which the variable is associated.
- * @tparam Data The actual variable to get.
- * @tparam Policy Optional policy (no policy set by default).
- * @param ctx The context from which to search for meta types.
- * @param instance An opaque instance of the underlying type, if required.
- * @return A meta any containing the value of the underlying variable.
- */
-template<typename Type, auto Data, typename Policy = as_is_t>
-[[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_getter(const meta_ctx &ctx, [[maybe_unused]] meta_handle instance) {
-    if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-        if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
-            if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
-                if(auto *clazz = instance->try_cast<Type>(); clazz) {
-                    return meta_dispatch<Policy>(ctx, std::invoke(Data, *clazz));
-                }
-            }
-
-            if constexpr(std::is_invocable_v<decltype(Data), const Type &>) {
-                if(auto *fallback = instance->try_cast<const Type>(); fallback) {
-                    return meta_dispatch<Policy>(ctx, std::invoke(Data, *fallback));
-                }
-            }
-        }
-
-        return meta_any{meta_ctx_arg, ctx};
-    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
-        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
-            return meta_any{meta_ctx_arg, ctx};
-        } else {
-            return meta_dispatch<Policy>(ctx, *Data);
-        }
-    } else {
-        return meta_dispatch<Policy>(ctx, Data);
-    }
-}
-
-/**
- * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
@@ -358,7 +315,45 @@ template<typename Type, auto Data, typename Policy = as_is_t>
  */
 template<typename Type, auto Data, typename Policy = as_is_t>
 [[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_getter(meta_handle instance) {
-    return meta_getter<Type, Data, Policy>(locator<meta_ctx>::value_or(), std::move(instance));
+    if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
+        if constexpr(!std::is_array_v<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
+            if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
+                if(auto *clazz = instance->try_cast<Type>(); clazz) {
+                    return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *clazz));
+                }
+            }
+
+            if constexpr(std::is_invocable_v<decltype(Data), const Type &>) {
+                if(auto *fallback = instance->try_cast<const Type>(); fallback) {
+                    return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *fallback));
+                }
+            }
+        }
+
+        return meta_any{meta_ctx_arg, instance->context()};
+    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
+            return meta_any{meta_ctx_arg, instance->context()};
+        } else {
+            return meta_dispatch<Policy>(instance->context(), *Data);
+        }
+    } else {
+        return meta_dispatch<Policy>(instance->context(), Data);
+    }
+}
+
+/**
+ * @brief Gets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to get.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param ctx The context from which to search for meta types.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @return A meta any containing the value of the underlying variable.
+ */
+template<typename Type, auto Data, typename Policy = as_is_t>
+[[deprecated("a context is no longer required, it is inferred from the meta_handle")]] [[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_getter(const meta_ctx &ctx, meta_handle instance) {
+    return meta_getter<Type, Data, Policy>(meta_handle{ctx, std::move(instance)});
 }
 
 /**

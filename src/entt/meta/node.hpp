@@ -100,7 +100,7 @@ struct meta_data_node {
     meta_type_node (*type)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     bool (*set)(meta_handle, meta_any){};
-    meta_any (*get)(const meta_ctx &, meta_handle){};
+    meta_any (*get)(meta_handle){};
     meta_custom_node custom{};
 };
 
