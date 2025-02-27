@@ -33,8 +33,5 @@ TODO:
 * runtime types support for meta for types that aren't backed by C++ types
 * built-in no-pagination storage - no_pagination page size as limits::max
 * any cdynamic to support const ownership construction
-* delegate/sigh: forward connect/disconnect from & to *
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke probably)
-* meta: remove ctx arg from utilities (handle/any), container ctors/funcs (it), func invoke (any, with check)
-* meta: remove ctx member from meta_data, meta_func, ... (use handles and the like)
-* meta: do not rebind args or instances internally
+* meta: review/update rebind policy for handles and arguments
