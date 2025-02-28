@@ -650,16 +650,6 @@ public:
         return *ctx;
     }
 
-    /**
-     * @brief Returns the underlying meta context.
-     * @return The underlying meta context.
-     */
-    void context(const meta_ctx &area) noexcept {
-        if(ctx = &area; node.resolve != nullptr) {
-            node = node.resolve(internal::meta_context::from(*ctx));
-        }
-    }
-
 private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
