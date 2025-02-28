@@ -35,3 +35,4 @@ TODO:
 * any cdynamic to support const ownership construction
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke probably)
 * meta: review/update rebind policy for handles and arguments
+* meta: deprecate rebinding ctors for meta any/handle

@@ -137,14 +137,18 @@ TEST_F(MetaAny, Empty) {
 }
 
 TEST_F(MetaAny, Context) {
-    entt::meta_any any{};
+    using namespace entt::literals;
+
+    entt::meta_any any{std::in_place_type<clazz>};
     const entt::meta_ctx ctx{};
 
+    ASSERT_TRUE(any.type().data("value"_hs));
     ASSERT_EQ(&any.context(), &entt::locator<entt::meta_ctx>::value_or());
     ASSERT_NE(&any.context(), &ctx);
 
-    any = entt::meta_any{entt::meta_ctx_arg, ctx};
+    any.context(ctx);
 
+    ASSERT_FALSE(any.type().data("value"_hs));
     ASSERT_NE(&any.context(), &entt::locator<entt::meta_ctx>::value_or());
     ASSERT_EQ(&any.context(), &ctx);
 }
