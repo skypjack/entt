@@ -13,8 +13,12 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/group.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/storage.hpp>
 #include <entt/entity/view.hpp>
+#include <entt/signal/sigh.hpp>
 #include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/empty.h"

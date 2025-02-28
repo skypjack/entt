@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 #include "../../../common/boxed_type.h"

@@ -4,8 +4,12 @@
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
+#include <entt/core/algorithm.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
+#include <entt/entity/storage.hpp>
+#include <entt/entity/view.hpp>
 
 struct position {
     std::uint64_t x;

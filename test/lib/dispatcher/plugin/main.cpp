@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/signal/dispatcher.hpp>
+#include <entt/signal/sigh.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/listener.h"
 

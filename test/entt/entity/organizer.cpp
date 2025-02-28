@@ -3,8 +3,11 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
+#include <entt/entity/group.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/organizer.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 
 void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
 void ro_char_rw_int(entt::group<entt::owned_t<int>, entt::get_t<const char>>) {}

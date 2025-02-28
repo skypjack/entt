@@ -6,6 +6,7 @@
 #include <entt/core/enum.hpp>
 #include <entt/core/fwd.hpp>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 

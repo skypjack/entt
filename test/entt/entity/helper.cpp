@@ -3,7 +3,11 @@
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/helper.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/storage.hpp>
+#include <entt/entity/view.hpp>
+#include <entt/signal/sigh.hpp>
 #include "../../common/pointer_stable.h"
 
 struct clazz {

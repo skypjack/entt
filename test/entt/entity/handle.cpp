@@ -7,7 +7,9 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/handle.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/storage.hpp>
 #include "../../common/config.h"
 
 template<typename Type>

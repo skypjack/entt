@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>

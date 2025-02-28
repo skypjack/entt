@@ -10,6 +10,7 @@
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/storage.hpp>
+#include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
 #include "../../common/empty.h"
 #include "../../common/entity.h"

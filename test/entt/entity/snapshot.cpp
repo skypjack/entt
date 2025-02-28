@@ -7,6 +7,7 @@
 #include <entt/core/any.hpp>
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 #include <entt/signal/sigh.hpp>
