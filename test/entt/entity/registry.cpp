@@ -967,6 +967,19 @@ TEST(Registry, Emplace) {
     ASSERT_EQ(ref, 4);
 }
 
+TEST(Registry, EmplaceAggregate) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    ASSERT_FALSE(registry.all_of<test::aggregate>(entity));
+
+    const auto &ref = registry.emplace<test::aggregate>(entity, 4);
+
+    ASSERT_TRUE(registry.all_of<test::aggregate>(entity));
+    ASSERT_EQ(registry.get<test::aggregate>(entity).value, ref.value);
+    ASSERT_EQ(ref.value, 4);
+}
+
 TEST(Registry, EmplaceTypesFromStandardTemplateLibrary) {
     // see #37 - the test shouldn't crash, that's all
     entt::registry registry{};
