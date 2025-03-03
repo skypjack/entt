@@ -967,6 +967,17 @@ TEST(Registry, Emplace) {
     ASSERT_EQ(ref, 4);
 }
 
+TEST(Registry, EmplaceEmpty) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    ASSERT_FALSE(registry.all_of<test::empty>(entity));
+
+    registry.emplace<test::empty>(entity, 4);
+
+    ASSERT_TRUE(registry.all_of<test::empty>(entity));
+}
+
 TEST(Registry, EmplaceAggregate) {
     entt::registry registry{};
     const auto entity = registry.create();
