@@ -1100,6 +1100,21 @@ TEST(Registry, EmplaceOrReplace) {
     ASSERT_EQ(ref, 0);
 }
 
+TEST(Registry, EmplaceOrReplaceEmpty) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    ASSERT_FALSE(registry.all_of<test::empty>(entity));
+
+    registry.emplace_or_replace<test::empty>(entity);
+
+    ASSERT_TRUE(registry.all_of<test::empty>(entity));
+
+    registry.emplace_or_replace<test::empty>(entity);
+
+    ASSERT_EQ(registry.storage<test::empty>().size(), 1u);
+}
+
 TEST(Registry, EmplaceOrReplaceAggregate) {
     entt::registry registry{};
     const auto entity = registry.create();
