@@ -1506,15 +1506,27 @@ TEST(Registry, Get) {
 TEST(Registry, GetOrEmplace) {
     entt::registry registry{};
     const auto entity = registry.create();
-    const auto value = registry.get_or_emplace<int>(entity, 3);
+    const auto value = 3;
+    const auto other = 1.;
+
+    ASSERT_EQ(registry.get_or_emplace<int>(entity, value), value);
+    ASSERT_EQ(registry.get_or_emplace<double>(entity, other), other);
+
+    ASSERT_TRUE((registry.all_of<int, double>(entity)));
+
+    ASSERT_EQ(registry.get<int>(entity), value);
+    ASSERT_EQ(registry.get<double>(entity), other);
+}
+
+TEST(Registry, GetOrEmplaceEmpty) {
+    entt::registry registry{};
+    const auto entity = registry.create();
 
     // get_or_emplace must work for empty types
     // NOLINTNEXTLINE(readability-redundant-casting)
     static_cast<void>(registry.get_or_emplace<test::empty>(entity));
 
-    ASSERT_TRUE((registry.all_of<int, test::empty>(entity)));
-    ASSERT_EQ(registry.get<int>(entity), value);
-    ASSERT_EQ(registry.get<int>(entity), 3);
+    ASSERT_TRUE((registry.all_of<test::empty>(entity)));
 }
 
 ENTT_DEBUG_TEST(RegistryDeathTest, GetOrEmplace) {
