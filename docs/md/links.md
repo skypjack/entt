@@ -139,6 +139,8 @@ I hope the following lists can grow much more in the future.
     users unlock abilities to fight horde of enemies in an endless world.
   * [Letalka](https://github.com/dviglo2d/dviglo2d/tree/main/games/letalka):
     small demo game with ships and bullets flying everywhere on the screen.
+  * [Lichgate](https://buas.itch.io/lichgate): step into the robes of a powerful
+    mage determined to halt the relentless hordes of undead.
 
 ## Engines and the like:
 
@@ -237,6 +239,8 @@ I hope the following lists can grow much more in the future.
   * [Star Engine](https://github.com/HODAKdev/StarEngine): an Advanced C++
     DirectX 11 game engine.
   * [Darmok](https://github.com/miguelibero/darmok): another C++ game engine.
+  * [Magique](https://github.com/gk646/magique): 2D game engine for programmers
+    (or those yet to be).
 
 ## Articles, videos and blog posts:
 
