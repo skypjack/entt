@@ -400,6 +400,17 @@ public:
     dense_set &operator=(dense_set &&) noexcept = default;
 
     /**
+     * @brief Exchanges the contents with those of a given container.
+     * @param other Container to exchange the content with.
+     */
+    void swap(dense_set &other) noexcept {
+        using std::swap;
+        swap(sparse, other.sparse);
+        swap(packed, other.packed);
+        swap(threshold, other.threshold);
+    }
+
+    /**
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
@@ -623,17 +634,6 @@ public:
         }
 
         return 0u;
-    }
-
-    /**
-     * @brief Exchanges the contents with those of a given container.
-     * @param other Container to exchange the content with.
-     */
-    void swap(dense_set &other) noexcept {
-        using std::swap;
-        swap(sparse, other.sparse);
-        swap(packed, other.packed);
-        swap(threshold, other.threshold);
     }
 
     /**

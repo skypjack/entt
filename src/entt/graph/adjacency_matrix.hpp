@@ -181,6 +181,16 @@ public:
     adjacency_matrix &operator=(adjacency_matrix &&) noexcept = default;
 
     /**
+     * @brief Exchanges the contents with those of a given adjacency matrix.
+     * @param other Adjacency matrix to exchange the content with.
+     */
+    void swap(adjacency_matrix &other) noexcept {
+        using std::swap;
+        swap(matrix, other.matrix);
+        swap(vert, other.vert);
+    }
+
+    /**
      * @brief Returns the associated allocator.
      * @return The associated allocator.
      */
@@ -192,16 +202,6 @@ public:
     void clear() noexcept {
         matrix.clear();
         vert = {};
-    }
-
-    /**
-     * @brief Exchanges the contents with those of a given adjacency matrix.
-     * @param other Adjacency matrix to exchange the content with.
-     */
-    void swap(adjacency_matrix &other) noexcept {
-        using std::swap;
-        swap(matrix, other.matrix);
-        swap(vert, other.vert);
     }
 
     /**
