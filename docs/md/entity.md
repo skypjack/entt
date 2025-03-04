@@ -1377,14 +1377,12 @@ fact, entities are subject to different rules with respect to components
 * Entities are never truly _deleted_. They are moved out of the list of entities
   _in use_ and their versions are updated automatically.
 
-* `emplace` as well as `insert` have a slightly different meaning than their
-  counterparts for components. In the case of an entity storage, these functions
-  _generate_ or _recycle_ identifiers rather than allowing them to be _assigned_
-  to existing entities.
+* There are no `emplace` or `insert` functions in its interface. Instead, a
+  range of `generate` functions are provided for creating or recycling entities.
 
-* The `each` function iterates only the entities _in use_, that is, those not
-  marked as _ready for reuse_. To iterate all the entities it is necessary to
-  iterate the underlying sparse set instead.
+* The `each` function returns an iterable object to visit the entities _in use_,
+  that is, those not marked as _ready for reuse_. To iterate all the entities it
+  is necessary to iterate the underlying sparse set instead.
 
 This kind of storage is designed to be used where any other storage is fine and
 can therefore be combined with views, groups and so on.
