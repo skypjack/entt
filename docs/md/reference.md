@@ -50,7 +50,7 @@ details.
     inspired archetype ECS with optional multithreading. 
   * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
     C# and Unity, where _reactive systems_ were invented.
-  * [Fennecs](#https://github.com/outfox/fennecs): the little archetype ECS that
+  * [Fennecs](https://github.com/outfox/fennecs): the little archetype ECS that
     loves you back.
   * [Friflo ECS](https://github.com/friflo/Friflo.Engine.ECS): an archetype ECS
     with focus on performance and minimal GC allocations.
