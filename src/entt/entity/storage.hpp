@@ -1255,6 +1255,17 @@ public:
         return const_reverse_iterable{it, it + offset};
     }
 
+    /**
+     * @brief Sets the starting identifier for generation.
+     *
+     * The version is ignored, regardless of the value.
+     *
+     * @param hint A valid identifier.
+     */
+    void start_from(const entity_type hint) {
+        placeholder = static_cast<size_type>(traits_type::to_entity(hint));
+    }
+
 private:
     size_type placeholder{};
 };
