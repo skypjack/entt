@@ -36,6 +36,7 @@
   * [Empty type optimization](#empty-type-optimization)
   * [Void storage](#void-storage)
   * [Entity storage](#entity-storage)
+    * [Reserved identifiers](#reserved-identifiers)
     * [One of a kind to the registry](#one-of-a-kind-to-the-registry)
   * [Pointer stability](#pointer-stability)
     * [In-place delete](#in-place-delete)
@@ -1386,6 +1387,23 @@ fact, entities are subject to different rules with respect to components
 
 This kind of storage is designed to be used where any other storage is fine and
 can therefore be combined with views, groups and so on.
+
+### Reserved identifiers
+
+Since the entity storage is the one in charge of generating identifiers, it is
+also possible to request that some of them be reserved and never returned.<br/>
+By doing so, users can then generate and manage them autonomously, as needed.
+
+To set a starting identifier, the `start_from` function is invoked as follows:
+
+```cpp
+storage.start_from(entt::entity{100});
+```
+
+Note that the version is irrelevant and is ignored in all cases. Identifiers are
+always generated with default version.<br/>
+By calling `start_from` as above, the first 100 elements are discarded and the
+first identifier returned is the one with entity 100 and version 0.
 
 ### One of a kind to the registry
 

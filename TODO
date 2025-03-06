@@ -19,10 +19,6 @@ TODO:
 * self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
 * test: push sharing types further
-* after non-continuous generation for entity storage:
-  - get/reset placeholder to position after saving/loading (avoid long lookup)
-  - allow skipping/reserving entity identifiers
-  - documentation for reserved entities
 * storage entity: fast range-push from above
 * table: pop back to support swap and pop, single column access, empty type optimization
 * review cmake warning about FetchContent_Populate (need .28 and EXCLUDE_FROM_ALL for FetchContent)
@@ -35,3 +31,4 @@ TODO:
 * any cdynamic to support const ownership construction
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke probably)
 * meta: review/update rebind policy for handles and arguments
+* try to specialize things like is_pointer_like from the type directly if possible
