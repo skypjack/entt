@@ -231,6 +231,7 @@ public:
 
         if constexpr(std::is_same_v<Type, entity_type>) {
             typename traits_type::entity_type count{};
+            entity_type placeholder{};
 
             storage.reserve(length);
             archive(count);
@@ -238,8 +239,10 @@ public:
             for(entity_type entity = null; length; --length) {
                 archive(entity);
                 storage.generate(entity);
+                placeholder = (entity > placeholder) ? entity : placeholder;
             }
 
+            storage.start_from(traits_type::next(placeholder));
             storage.free_list(count);
         } else {
             auto &other = reg->template storage<entity_type>();
