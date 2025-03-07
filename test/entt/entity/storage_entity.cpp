@@ -173,8 +173,6 @@ TEST(StorageEntity, Generate) {
 }
 
 TEST(StorageEntity, GenerateFrom) {
-    using traits_type = entt::entt_traits<entt::entity>;
-
     entt::storage<entt::entity> pool;
     std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
 
