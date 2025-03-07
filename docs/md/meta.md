@@ -541,6 +541,14 @@ some common classes. In particular:
 
 * All types of raw pointers.
 * `std::unique_ptr` and `std::shared_ptr`.
+* All classes that _export_ a type member called `is_meta_pointer_like`:
+  ```cpp
+  struct smart_pointer {
+      using is_meta_pointer_like = void;
+      // ...
+  };
+  ```
+  The actual type is irrelevant and will not be used in any way.
 
 It is important to include the header file `pointer.hpp` to make these
 specializations available to the compiler when needed.<br/>

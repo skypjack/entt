@@ -46,6 +46,14 @@ template<typename Type, typename... Args>
 struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
     : std::true_type {};
 
+/**
+ * @brief Specialization for self-proclaimed meta pointer like types.
+ * @tparam Type Element type.
+ */
+template<typename Type>
+struct is_meta_pointer_like<Type, std::void_t<typename Type::is_meta_pointer_like>>
+    : std::true_type {};
+
 } // namespace entt
 
 #endif

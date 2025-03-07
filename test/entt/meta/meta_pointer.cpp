@@ -49,16 +49,14 @@ struct proxy_ptr {
 };
 
 template<typename Type>
-struct adl_wrapped_shared_ptr: wrapped_shared_ptr<Type> {};
+struct adl_wrapped_shared_ptr: wrapped_shared_ptr<Type> {
+    using is_meta_pointer_like = void;
+};
 
 template<typename Type>
-struct spec_wrapped_shared_ptr: wrapped_shared_ptr<Type> {};
-
-template<typename Type>
-struct entt::is_meta_pointer_like<adl_wrapped_shared_ptr<Type>>: std::true_type {};
-
-template<typename Type>
-struct entt::is_meta_pointer_like<spec_wrapped_shared_ptr<Type>>: std::true_type {};
+struct spec_wrapped_shared_ptr: wrapped_shared_ptr<Type> {
+    using is_meta_pointer_like = void;
+};
 
 template<>
 struct entt::is_meta_pointer_like<self_ptr>: std::true_type {};
