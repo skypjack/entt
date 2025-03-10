@@ -51,8 +51,10 @@ if(DOXYGEN_FOUND)
             doxy.in
     )
 
+    if(ENTT_INSTALL)
     install(
         DIRECTORY ${DOXY_OUTPUT_DIRECTORY}/html
         DESTINATION share/${PROJECT_NAME}-${PROJECT_VERSION}/
     )
+endif()
 endif()
