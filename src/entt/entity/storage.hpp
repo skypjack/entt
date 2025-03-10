@@ -649,7 +649,16 @@ public:
         return element_at(base_type::index(entt));
     }
 
-    /*! @copydoc get */
+    /**
+     * @brief Returns the object assigned to an entity.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.
+     *
+     * @param entt A valid identifier.
+     * @return The object assigned to the entity.
+     */
     [[nodiscard]] value_type &get(const entity_type entt) noexcept {
         return const_cast<value_type &>(std::as_const(*this).get(entt));
     }
