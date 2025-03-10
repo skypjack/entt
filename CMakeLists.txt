@@ -81,20 +81,6 @@ endif()
 
 # Add EnTT target
 
-option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
-option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
-
-if(ENTT_INCLUDE_NATVIS)
-    if(MSVC)
-        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
-        mark_as_advanced(ENTT_HAS_NATVIS)
-    endif()
-
-    if(NOT ENTT_HAS_NATVIS)
-        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
-    endif()
-endif()
-
 include(GNUInstallDirs)
 
 add_library(EnTT INTERFACE)
@@ -108,6 +94,35 @@ target_include_directories(
 )
 
 target_compile_features(EnTT INTERFACE cxx_std_17)
+
+if(ENTT_HAS_LIBCPP)
+    target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
+endif()
+
+if(ENTT_HAS_SANITIZER)
+    target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+    target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+endif()
+
+if(ENTT_CLANG_TIDY_EXECUTABLE)
+    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
+endif()
+
+# Add EnTT goodies
+
+option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
+option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
+
+if(ENTT_INCLUDE_NATVIS)
+    if(MSVC)
+        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
+        mark_as_advanced(ENTT_HAS_NATVIS)
+    endif()
+
+    if(NOT ENTT_HAS_NATVIS)
+        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
+    endif()
+endif()
 
 if(ENTT_INCLUDE_HEADERS)
     target_sources(
@@ -209,19 +224,6 @@ if(ENTT_HAS_NATVIS)
     )
 endif()
 
-if(ENTT_HAS_SANITIZER)
-    target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
-    target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
-endif()
-
-if(ENTT_CLANG_TIDY_EXECUTABLE)
-    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
-endif()
-
-if(ENTT_HAS_LIBCPP)
-    target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
-endif()
-
 # Install EnTT and all related files
 
 option(ENTT_INSTALL "Install EnTT and all related files." OFF)
@@ -316,14 +318,6 @@ if(ENTT_BUILD_TESTING)
     include(CTest)
     enable_testing()
     add_subdirectory(test)
-endif()
-
-# Tools
-
-option(ENTT_BUILD_TOOLS "Enable building tools." OFF)
-
-if(ENTT_BUILD_TOOLS)
-    add_subdirectory(tools)
 endif()
 
 # Documentation
