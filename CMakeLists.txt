@@ -326,9 +326,5 @@ endif()
 option(ENTT_BUILD_DOCS "Enable building with documentation." OFF)
 
 if(ENTT_BUILD_DOCS)
-    find_package(Doxygen 1.10)
-
-    if(DOXYGEN_FOUND)
-        add_subdirectory(docs)
-    endif()
+    add_subdirectory(docs)
 endif()
