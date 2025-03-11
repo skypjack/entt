@@ -32,7 +32,6 @@ if(DOXYGEN_FOUND)
         WORKING_DIRECTORY ${EnTT_SOURCE_DIR}
         VERBATIM
         SOURCES
-            dox/extra.dox
             md/config.md
             md/container.md
             md/core.md

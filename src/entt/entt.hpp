@@ -1,3 +1,6 @@
+/*! @brief `EnTT` default namespace. */
+namespace entt {}
+
 // IWYU pragma: begin_exports
 #include "config/config.h"
 #include "config/macro.h"
