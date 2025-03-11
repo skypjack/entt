@@ -1,6 +1,6 @@
 # Doxygen configuration (documentation)
 
-find_package(Doxygen 1.10)
+find_package(Doxygen 1.13)
 
 if(DOXYGEN_FOUND)
     include(FetchContent)
@@ -51,9 +51,9 @@ if(DOXYGEN_FOUND)
     )
 
     if(ENTT_INSTALL)
-    install(
-        DIRECTORY ${DOXY_OUTPUT_DIRECTORY}/html
-        DESTINATION share/${PROJECT_NAME}-${PROJECT_VERSION}/
-    )
-endif()
+        install(
+            DIRECTORY ${DOXY_OUTPUT_DIRECTORY}/html
+            DESTINATION share/${PROJECT_NAME}-${PROJECT_VERSION}/
+        )
+    endif()
 endif()
