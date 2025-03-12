@@ -96,7 +96,8 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(*storage.entt::sparse_set::rbegin(), entity);
     ASSERT_EQ(&*(storage.rbegin() + traits_type::page_size - (1u + traits_type::in_place_delete)), &storage.get(other));
 
-    registry.destroy(other);
+    // erase in the middle
+    storage.erase(other);
 
     ASSERT_EQ(entt::to_entity(storage, storage.get(entity)), entity);
     ASSERT_EQ(entt::to_entity(storage, storage.get(next)), next);
@@ -105,6 +106,18 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(&*(storage.rbegin() + traits_type::page_size - 1u), &storage.get(next));
 
     ASSERT_EQ(entt::to_entity(storage, value), null);
+
+    storage.clear();
+
+    storage.emplace(entity);
+    storage.emplace(other);
+    storage.emplace(next);
+
+    // erase first
+    storage.erase(entity);
+
+    ASSERT_EQ(entt::to_entity(storage, value), null);
+    ASSERT_EQ(entt::to_entity(storage, storage.get(other)), other);
 }
 
 TEST(SighHelper, Functionalities) {
