@@ -514,8 +514,8 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return meta_any{meta_ctx_arg, *ctx};
         } else {
-            auto other = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
-            return allow_cast(meta_type{*ctx, other});
+            // also support early return for performance reasons
+            return ((node.info != nullptr) && (*node.info == entt::type_id<Type>())) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -526,8 +526,9 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        auto other = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
-        return allow_cast(meta_type{*ctx, other}) && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
+        // also support early return for performance reasons
+        return (((node.info != nullptr) && (*node.info == entt::type_id<Type>())) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))}))
+               && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
     }
 
     /*! @copydoc any::emplace */
