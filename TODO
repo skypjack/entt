@@ -31,5 +31,5 @@ TODO:
 * allow passing arguments to meta setter/getter (we can fallback on meta invoke probably)
 * FetchContent_Populate -> FetchContent_MakeAvailable warnings
 * doc: IMPLICIT_DIR_DOCS for dir docs or \dir
-* meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed
+* meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * improve non-const allow cast with in-place switch

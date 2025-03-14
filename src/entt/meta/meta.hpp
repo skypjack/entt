@@ -526,9 +526,12 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        // also support early return for performance reasons
-        return (((node.info != nullptr) && (*node.info == entt::type_id<Type>())) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))}))
-               && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
+            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
+        } else {
+            // also support early return for performance reasons
+            return ((node.info != nullptr) && (*node.info == entt::type_id<Type>())) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+        }
     }
 
     /*! @copydoc any::emplace */
