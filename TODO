@@ -10,6 +10,7 @@ DOC:
 * bump entities, reserved bits on identifiers
 
 TODO:
+* review all NOLINT
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * view: reduce inst due to/improve perf with index-based approach in dispatch_get/pick_and_each/each (single type too, define storage ::at and ::at_as_tuple)
