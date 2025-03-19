@@ -23240,14 +23240,15 @@ template<typename... Args>
 typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
     using traits_type = component_traits<typename basic_storage<Args...>::value_type, typename basic_storage<Args...>::entity_type>;
     static_assert(traits_type::page_size != 0u, "Unexpected page size");
-    const typename basic_storage<Args...>::base_type &base = storage;
     const auto *page = storage.raw();
 
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     for(std::size_t pos{}, count = storage.size(); pos < count; pos += traits_type::page_size, ++page) {
         if(const auto dist = (std::addressof(instance) - *page); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
-            return *(base.rbegin() + static_cast<decltype(dist)>(pos) + dist);
+            return *(static_cast<const typename basic_storage<Args...>::base_type &>(storage).rbegin() + static_cast<decltype(dist)>(pos) + dist);
         }
     }
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     return null;
 }
@@ -34373,14 +34374,15 @@ template<typename... Args>
 typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
     using traits_type = component_traits<typename basic_storage<Args...>::value_type, typename basic_storage<Args...>::entity_type>;
     static_assert(traits_type::page_size != 0u, "Unexpected page size");
-    const typename basic_storage<Args...>::base_type &base = storage;
     const auto *page = storage.raw();
 
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     for(std::size_t pos{}, count = storage.size(); pos < count; pos += traits_type::page_size, ++page) {
         if(const auto dist = (std::addressof(instance) - *page); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
-            return *(base.rbegin() + static_cast<decltype(dist)>(pos) + dist);
+            return *(static_cast<const typename basic_storage<Args...>::base_type &>(storage).rbegin() + static_cast<decltype(dist)>(pos) + dist);
         }
     }
+    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     return null;
 }
