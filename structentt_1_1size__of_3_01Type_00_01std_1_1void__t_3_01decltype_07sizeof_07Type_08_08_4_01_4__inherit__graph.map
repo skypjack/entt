@@ -1,5 +1,7 @@
 <map id="entt::size_of&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;" name="entt::size_of&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;">
-<area shape="rect" id="Node000001" title="A type&#45;only sizeof wrapper that returns 0 where sizeof complains." alt="" coords="5,108,152,163"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,152,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,74,81,108,76,108,76,74"/>
+<area shape="rect" id="Node000001" title="A type&#45;only sizeof wrapper that returns 0 where sizeof complains." alt="" coords="200,34,347,89"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,152,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,39,200,45,199,50,165,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,70,152,125"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,79,199,72,200,78,166,84"/>
 </map>

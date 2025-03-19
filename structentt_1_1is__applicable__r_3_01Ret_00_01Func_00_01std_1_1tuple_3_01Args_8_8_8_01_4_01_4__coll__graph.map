@@ -1,5 +1,7 @@
 <map id="entt::is_applicable_r&lt; Ret, Func, std::tuple&lt; Args... &gt; &gt;" name="entt::is_applicable_r&lt; Ret, Func, std::tuple&lt; Args... &gt; &gt;">
-<area shape="rect" id="Node000001" title="Same as std::is_invocable_r, but with tuples for arguments." alt="" coords="13,93,149,148"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,156,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,59,83,93,78,93,78,59"/>
+<area shape="rect" id="Node000001" title="Same as std::is_invocable_r, but with tuples for arguments." alt="" coords="67,93,203,148"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,13,112,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,47,115,91,111,95,75,50"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="137,5,287,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,58,158,95,154,92,186,54"/>
 </map>

@@ -1,5 +1,5 @@
-<map id="entt::is_meta_pointer_like&lt; typename &gt;" name="entt::is_meta_pointer_like&lt; typename &gt;">
-<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is a pointer&#45;like type from the point of v..." alt="" coords="5,79,149,119"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="24,5,131,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,44,80,79,75,79,75,44"/>
+<map id="entt::is_meta_pointer_like&lt; typename, typename &gt;" name="entt::is_meta_pointer_like&lt; typename, typename &gt;">
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is a pointer&#45;like type from the point of v..." alt="" coords="5,79,200,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="49,5,156,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,44,105,79,100,79,100,44"/>
 </map>

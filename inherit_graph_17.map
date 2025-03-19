@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classentt_1_1basic__common__view.html" title="Basic storage view implementation." alt="" coords="5,5,195,45"/>
+<area shape="rect" id="Node000000" href="$classentt_1_1basic__entt__traits.html" title="Common basic entity traits implementation." alt="" coords="5,49,153,89"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="201,5,344,60"/>
+<area shape="poly" id="edge7_Node000000_Node000001" title=" " alt="" coords="167,50,201,43,202,49,168,55"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="213,85,332,125"/>
+<area shape="poly" id="edge8_Node000000_Node000002" title=" " alt="" coords="168,82,213,91,212,96,167,88"/>
 </map>

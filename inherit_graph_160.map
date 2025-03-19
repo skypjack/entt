@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1value__list__cat_3_01value__list_3_01Value_8_8_8_01_4_01_4.html" title="Concatenates multiple value lists." alt="" coords="5,5,173,45"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="58,13,109,38"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1forward__apply.html" title="Utility class to forward&#45;and&#45;apply tuple objects." alt="" coords="218,5,349,45"/>
+<area shape="poly" id="edge42_Node000000_Node000001" title=" " alt="" coords="122,23,218,23,218,28,122,28"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1process__adaptor.html" title="Adaptor for lambdas and functors to turn them into processes." alt="" coords="209,69,357,109"/>
+<area shape="poly" id="edge43_Node000000_Node000002" title=" " alt="" coords="123,34,162,47,223,67,221,72,161,52,121,39"/>
+<area shape="rect" id="Node000003" href="$classentt_1_1process.html" title=" " alt="" coords="5,62,161,117"/>
+<area shape="poly" id="edge44_Node000003_Node000002" title=" " alt="" coords="175,87,209,87,209,92,175,92"/>
 </map>

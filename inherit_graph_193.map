@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,45,56,70"/>
-<area shape="rect" id="Node000001" href="$classentt_1_1basic__reactive__mixin.html" title="Mixin type used to add reactive support to storage types." alt="" coords="104,5,272,45"/>
-<area shape="poly" id="edge81_Node000000_Node000001" title=" " alt="" coords="69,47,103,40,104,45,70,52"/>
-<area shape="rect" id="Node000002" href="$classentt_1_1basic__sigh__mixin.html" title="Mixin type used to add signal support to storage types." alt="" coords="112,69,264,109"/>
-<area shape="poly" id="edge82_Node000000_Node000002" title=" " alt="" coords="70,62,112,71,111,76,69,68"/>
-</map>

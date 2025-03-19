@@ -1,5 +1,7 @@
 <map id="entt::enum_as_bitmask&lt; Type, std::void_t&lt; decltype(Type::_entt_enum_as_bitmask)&gt; &gt;" name="entt::enum_as_bitmask&lt; Type, std::void_t&lt; decltype(Type::_entt_enum_as_bitmask)&gt; &gt;">
-<area shape="rect" id="Node000001" title="Enable bitmask support for enum classes." alt="" coords="5,79,164,148"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="10,5,159,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,44,87,79,82,79,82,44"/>
+<area shape="rect" id="Node000001" title="Enable bitmask support for enum classes." alt="" coords="55,79,214,148"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,112,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,39,109,77,105,80,75,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="136,5,285,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,43,164,80,160,77,191,39"/>
 </map>

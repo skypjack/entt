@@ -1,7 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classentt_1_1basic__sparse__set.html" title="Sparse set implementation." alt="" coords="5,81,169,121"/>
-<area shape="rect" id="Node000001" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="217,5,412,104"/>
-<area shape="poly" id="edge16_Node000000_Node000001" title=" " alt="" coords="182,79,216,72,218,77,183,84"/>
-<area shape="rect" id="Node000002" href="$classentt_1_1basic__storage_3_01Entity_00_01Entity_00_01Allocator_01_4.html" title="Swap&#45;only entity storage specialization." alt="" coords="224,128,405,168"/>
-<area shape="poly" id="edge17_Node000000_Node000002" title=" " alt="" coords="184,118,225,127,223,132,183,124"/>
+<area shape="rect" id="Node000000" href="$structentt_1_1choice__t.html" title="Utility class to disambiguate overloaded functions." alt="" coords="5,5,140,31"/>
 </map>

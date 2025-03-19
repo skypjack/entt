@@ -32,6 +32,7 @@ html {
     --primary-color: #1779c4;
     --primary-dark-color: #335c80;
     --primary-light-color: #70b1e9;
+    --on-primary-color: #ffffff;
 
     /* page base colors */
     --page-background-color: #ffffff;
@@ -113,7 +114,7 @@ html {
      */
     --menu-display: block;
 
-    --menu-focus-foreground: var(--page-background-color);
+    --menu-focus-foreground: var(--on-primary-color);
     --menu-focus-background: var(--primary-color);
     --menu-selected-background: rgba(0,0,0,.05);
 
@@ -944,6 +945,7 @@ td.memSeparator {
 
 span.mlabel {
     background: var(--primary-color);
+    color: var(--on-primary-color);
     border: none;
     padding: 4px 9px;
     border-radius: 12px;

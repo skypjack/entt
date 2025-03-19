@@ -1,5 +1,7 @@
 <map id="entt::is_complete&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;" name="entt::is_complete&lt; Type, std::void_t&lt; decltype(sizeof(Type))&gt; &gt;">
-<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="5,79,179,133"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="41,5,143,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,44,95,79,89,79,89,44"/>
+<area shape="rect" id="Node000001" title="Provides the member constant value to true if a given type is complete, false otherwise." alt="" coords="36,79,209,133"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,112,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,40,105,77,101,80,73,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="137,5,239,31"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,43,145,80,140,77,169,40"/>
 </map>

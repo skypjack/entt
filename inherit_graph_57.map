@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1component__traits.html" title="Common way to access various properties of components." alt="" coords="5,5,157,45"/>
+<area shape="rect" id="Node000000" href="$structentt_1_1directed__tag.html" title="Undirected graph category tag." alt="" coords="5,5,128,31"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1undirected__tag.html" title="Directed graph category tag." alt="" coords="176,5,313,31"/>
+<area shape="poly" id="edge25_Node000000_Node000001" title=" " alt="" coords="142,15,176,15,176,21,142,21"/>
 </map>

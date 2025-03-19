@@ -1,5 +1,7 @@
 <map id="entt::is_applicable&lt; Func, const Tuple&lt; Args... &gt; &gt;" name="entt::is_applicable&lt; Func, const Tuple&lt; Args... &gt; &gt;">
-<area shape="rect" id="Node000001" title="Same as std::is_invocable, but with tuples." alt="" coords="5,93,144,148"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="11,5,138,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,59,77,93,72,93,72,59"/>
+<area shape="rect" id="Node000001" title="Same as std::is_invocable, but with tuples." alt="" coords="60,93,199,148"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,13,112,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="78,47,111,91,107,95,74,51"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="137,5,263,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,58,151,95,147,92,175,55"/>
 </map>
