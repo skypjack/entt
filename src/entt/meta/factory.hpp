@@ -461,39 +461,6 @@ public:
 };
 
 /**
- * @brief Utility function to use for reflection.
- *
- * This is the point from which everything starts.<br/>
- * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach meta objects through a
- * dedicated factory.
- *
- * @tparam Type Type to reflect.
- * @param ctx The context into which to construct meta types.
- * @return A meta factory for the given type.
- */
-template<typename Type>
-[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta(meta_ctx &ctx) noexcept {
-    return meta_factory<Type>{ctx};
-}
-
-/**
- * @brief Utility function to use for reflection.
- *
- * This is the point from which everything starts.<br/>
- * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach meta objects through a
- * dedicated factory.
- *
- * @tparam Type Type to reflect.
- * @return A meta factory for the given type.
- */
-template<typename Type>
-[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta() noexcept {
-    return meta<Type>(locator<meta_ctx>::value_or());
-}
-
-/**
  * @brief Resets a type and all its parts.
  *
  * Resets a type and all its data members, member functions and properties, as
