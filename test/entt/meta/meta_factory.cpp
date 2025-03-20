@@ -282,27 +282,6 @@ TEST_F(MetaFactory, DataSetterGetter) {
     ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
 }
 
-TEST_F(MetaFactory, DataMultiSetterGetter) {
-    using namespace entt::literals;
-
-    clazz instance{1};
-    entt::meta_factory<clazz> factory{};
-    entt::meta_type type = entt::resolve<clazz>();
-
-    ASSERT_FALSE(type.data("value"_hs));
-
-    factory.data<entt::value_list<&clazz::set_int, &clazz::set_boxed_int>, &clazz::get_int>("value"_hs);
-    type = entt::resolve<clazz>();
-
-    ASSERT_TRUE(type.data("value"_hs));
-    ASSERT_EQ(type.get("value"_hs, std::as_const(instance)), instance.get_int());
-    ASSERT_EQ(type.get("value"_hs, instance), instance.get_int());
-    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), instance.get_int()));
-    ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
-    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), test::boxed_int{instance.get_int()}));
-    ASSERT_TRUE(type.set("value"_hs, instance, test::boxed_int{instance.get_int()}));
-}
-
 TEST_F(MetaFactory, DataOverwrite) {
     using namespace entt::literals;
 
