@@ -143,10 +143,10 @@ TEST(StorageEntity, Generate) {
     entt::storage<entt::entity> pool;
     std::array<entt::entity, 2u> entity{};
 
-    ASSERT_EQ(pool.emplace(), entt::entity{0});
+    ASSERT_EQ(pool.generate(), entt::entity{0});
     ASSERT_EQ(pool.generate(entt::null), entt::entity{1});
     ASSERT_EQ(pool.generate(entt::tombstone), entt::entity{2});
-    ASSERT_EQ(pool.emplace(entt::entity{0}), entt::entity{3});
+    ASSERT_EQ(pool.generate(entt::entity{0}), entt::entity{3});
     ASSERT_EQ(pool.generate(traits_type::construct(1, 1)), entt::entity{4});
     ASSERT_EQ(pool.generate(traits_type::construct(6, 3)), traits_type::construct(6, 3));
 
@@ -170,6 +170,35 @@ TEST(StorageEntity, Generate) {
 
     ASSERT_EQ(entity[0u], traits_type::construct(2, 2));
     ASSERT_EQ(entity[1u], entt::entity{8});
+}
+
+TEST(StorageEntity, GenerateRange) {
+    entt::storage<entt::entity> pool;
+    std::array<entt::entity, 2u> entity{};
+
+    pool.generate(entity.begin(), entity.end());
+
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 2u);
+
+    pool.erase(entity.begin(), entity.end());
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 0u);
+
+    pool.generate(entity.begin(), entity.begin() + 1u);
+
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 TEST(StorageEntity, GenerateFrom) {
@@ -285,35 +314,6 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
     entt::storage<entt::entity> pool;
 
     ASSERT_DEATH(pool.patch(entt::null), "");
-}
-
-TEST(StorageEntity, Insert) {
-    entt::storage<entt::entity> pool;
-    std::array<entt::entity, 2u> entity{};
-
-    pool.insert(entity.begin(), entity.end());
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_TRUE(pool.contains(entity[1u]));
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 2u);
-
-    pool.erase(entity.begin(), entity.end());
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 0u);
-
-    pool.generate(entity.begin(), entity.begin() + 1u);
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_FALSE(pool.contains(entity[1u]));
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 TEST(StorageEntity, Pack) {

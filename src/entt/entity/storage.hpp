@@ -1176,27 +1176,6 @@ public:
     }
 
     /**
-     * @brief Creates a new identifier or recycles a destroyed one.
-     * @return A valid identifier.
-     */
-    [[deprecated("use ::generate() instead")]] entity_type emplace() {
-        return generate();
-    }
-
-    /**
-     * @brief Creates a new identifier or recycles a destroyed one.
-     *
-     * If the requested identifier isn't in use, the suggested one is used.
-     * Otherwise, a new identifier is returned.
-     *
-     * @param hint Required identifier.
-     * @return A valid identifier.
-     */
-    [[deprecated("use ::generate(hint) instead")]] entity_type emplace(const entity_type hint) {
-        return generate(hint);
-    }
-
-    /**
      * @brief Updates a given identifier.
      * @tparam Func Types of the function objects to invoke.
      * @param entt A valid identifier.
@@ -1206,17 +1185,6 @@ public:
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
         ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
         (std::forward<Func>(func)(), ...);
-    }
-
-    /**
-     * @brief Assigns each element in a range an identifier.
-     * @tparam It Type of mutable forward iterator.
-     * @param first An iterator to the first element of the range to generate.
-     * @param last An iterator past the last element of the range to generate.
-     */
-    template<typename It>
-    [[deprecated("use ::generate(first, last) instead")]] void insert(It first, It last) {
-        generate(std::move(first), std::move(last));
     }
 
     /**
