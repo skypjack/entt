@@ -159,9 +159,6 @@ private:
     bool const_only{};
 };
 
-/*! @brief Possible modes of a meta any object. */
-using meta_any_policy [[deprecated("use any_policy instead")]] = any_policy;
-
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
     using vtable_type = void(const internal::meta_traits op, const meta_ctx &, const void *, void *);
