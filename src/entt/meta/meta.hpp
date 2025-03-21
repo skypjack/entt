@@ -387,16 +387,6 @@ public:
     /*! @copydoc any::type */
     [[nodiscard]] inline meta_type type() const noexcept;
 
-    /*! @copydoc any::data */
-    [[nodiscard]] [[deprecated("use ::base().data() instead")]] const void *data() const noexcept {
-        return storage.data();
-    }
-
-    /*! @copydoc any::data */
-    [[nodiscard]] [[deprecated("no longer supported, use ::base().data() for const access")]] void *data() noexcept {
-        return storage.data();
-    }
-
     /**
      * @brief Invokes the underlying function, if possible.
      * @tparam Args Types of arguments to use to invoke the function.
@@ -625,14 +615,6 @@ public:
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
         return meta_any{*this, storage.as_ref()};
-    }
-
-    /**
-     * @brief Returns the current mode of a meta any object.
-     * @return The current mode of the meta any object.
-     */
-    [[nodiscard]] [[deprecated("use ::base().policy() instead")]] any_policy policy() const noexcept {
-        return storage.policy();
     }
 
     /**
