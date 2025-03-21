@@ -162,30 +162,30 @@ TEST_F(MetaUtility, MetaGetter) {
     clazz instance{};
 
     ASSERT_FALSE((entt::meta_getter<clazz, &clazz::static_getter>(invalid)));
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::static_getter>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::static_getter>(instance)).cast<int>(), 0);
 
     ASSERT_FALSE((entt::meta_getter<clazz, &clazz::getter>(invalid)));
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::getter>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::getter>(instance)).cast<int>(), 0);
 
     ASSERT_FALSE((entt::meta_getter<clazz, &clazz::member>(invalid)));
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::member>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::member>(instance)).cast<int>(), 0);
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::member>(std::as_const(instance))).cast<int>(), 0);
 
     ASSERT_FALSE((entt::meta_getter<clazz, &clazz::cmember>(invalid)));
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::cmember>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::cmember>(instance)).cast<int>(), 0);
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cmember>(std::as_const(instance))).cast<int>(), 0);
 
     ASSERT_FALSE((entt::meta_getter<clazz, &clazz::arr>(invalid)));
-    ASSERT_FALSE((entt::meta_getter<clazz, &clazz::arr>(entt::meta_any{}.context(), instance)));
+    ASSERT_FALSE((entt::meta_getter<clazz, &clazz::arr>(instance)));
 
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::value>(invalid)).cast<int>(), 0);
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::value>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::value>(instance)).cast<int>(), 0);
 
     ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(invalid)).cast<int>(), 0);
-    ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(entt::meta_any{}.context(), instance)).cast<int>(), 0);
+    ASSERT_EQ((entt::meta_getter<clazz, &clazz::cvalue>(instance)).cast<int>(), 0);
 
     ASSERT_EQ((entt::meta_getter<clazz, 1>(invalid)).cast<int>(), 1);
-    ASSERT_EQ((entt::meta_getter<clazz, 1>(entt::meta_any{}.context(), instance)).cast<int>(), 1);
+    ASSERT_EQ((entt::meta_getter<clazz, 1>(instance)).cast<int>(), 1);
 }
 
 TEST_F(MetaUtility, MetaInvokeWithCandidate) {
@@ -194,22 +194,22 @@ TEST_F(MetaUtility, MetaInvokeWithCandidate) {
     clazz::value = 3;
 
     ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::setter, std::next(args.data()))));
-    ASSERT_FALSE((entt::meta_invoke<clazz>(entt::meta_any{}.context(), {}, &clazz::getter, nullptr)));
+    ASSERT_FALSE((entt::meta_invoke<clazz>({}, &clazz::getter, nullptr)));
 
     ASSERT_TRUE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, std::next(args.data()))));
-    ASSERT_FALSE((entt::meta_invoke<clazz>(entt::meta_any{}.context(), args[0u], &clazz::setter, args.data())));
+    ASSERT_FALSE((entt::meta_invoke<clazz>(args[0u], &clazz::setter, args.data())));
     ASSERT_EQ((entt::meta_invoke<clazz>(args[0u], &clazz::getter, nullptr)).cast<int>(), 4);
-    ASSERT_FALSE((entt::meta_invoke<clazz>(entt::meta_any{}.context(), args[1u], &clazz::getter, nullptr)));
+    ASSERT_FALSE((entt::meta_invoke<clazz>(args[1u], &clazz::getter, nullptr)));
 
     ASSERT_EQ((entt::meta_invoke<clazz>({}, &clazz::get_value, nullptr)).cast<int>(), 3);
-    ASSERT_TRUE((entt::meta_invoke<clazz>(entt::meta_any{}.context(), {}, &clazz::reset_value, nullptr)));
+    ASSERT_TRUE((entt::meta_invoke<clazz>({}, &clazz::reset_value, nullptr)));
     ASSERT_EQ(args[0u].cast<clazz &>().value, 0);
 
     const auto setter = [](int &value) { value = 3; };
     const auto getter = [](int value) { return value * 2; };
 
     ASSERT_TRUE(entt::meta_invoke<test::empty>({}, setter, std::next(args.data())));
-    ASSERT_EQ(entt::meta_invoke<test::empty>(entt::meta_any{}.context(), {}, getter, std::next(args.data())).cast<int>(), 6);
+    ASSERT_EQ(entt::meta_invoke<test::empty>({}, getter, std::next(args.data())).cast<int>(), 6);
 }
 
 TEST_F(MetaUtility, MetaInvoke) {
@@ -218,15 +218,15 @@ TEST_F(MetaUtility, MetaInvoke) {
     clazz::value = 3;
 
     ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>({}, std::next(args.data()))));
-    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>(entt::meta_any{}.context(), {}, nullptr)));
+    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>({}, nullptr)));
 
     ASSERT_TRUE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], std::next(args.data()))));
-    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>(entt::meta_any{}.context(), args[0u], args.data())));
+    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::setter>(args[0u], args.data())));
     ASSERT_EQ((entt::meta_invoke<clazz, &clazz::getter>(args[0u], nullptr)).cast<int>(), 4);
-    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>(entt::meta_any{}.context(), args[1u], nullptr)));
+    ASSERT_FALSE((entt::meta_invoke<clazz, &clazz::getter>(args[1u], nullptr)));
 
     ASSERT_EQ((entt::meta_invoke<clazz, &clazz::get_value>({}, nullptr)).cast<int>(), 3);
-    ASSERT_TRUE((entt::meta_invoke<clazz, &clazz::reset_value>(entt::meta_any{}.context(), {}, nullptr)));
+    ASSERT_TRUE((entt::meta_invoke<clazz, &clazz::reset_value>({}, nullptr)));
     ASSERT_EQ(args[0u].cast<clazz &>().value, 0);
 }
 
