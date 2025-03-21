@@ -22,7 +22,7 @@ project(
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
-
+    
 message(VERBOSE "*")
 message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2025 Michele Caini <michele.caini@gmail.com>")
@@ -112,17 +112,7 @@ endif()
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
 option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
-
-if(ENTT_INCLUDE_NATVIS)
-    if(MSVC)
-        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
-        mark_as_advanced(ENTT_HAS_NATVIS)
-    endif()
-
-    if(NOT ENTT_HAS_NATVIS)
-        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
-    endif()
-endif()
+option(ENTT_INCLUDE_TOOLS "Add EnTT tools files to the EnTT target." OFF)
 
 if(ENTT_INCLUDE_HEADERS)
     target_sources(
@@ -206,6 +196,17 @@ if(ENTT_INCLUDE_HEADERS)
     )
 endif()
 
+if(ENTT_INCLUDE_NATVIS)
+    if(MSVC)
+        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
+        mark_as_advanced(ENTT_HAS_NATVIS)
+    endif()
+
+    if(NOT ENTT_HAS_NATVIS)
+        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
+    endif()
+endif()
+
 if(ENTT_HAS_NATVIS)
     target_sources(
         EnTT
@@ -221,6 +222,14 @@ if(ENTT_HAS_NATVIS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/process.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/resource.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/signal.natvis>
+    )
+endif()
+
+if(ENTT_INCLUDE_TOOLS)
+    target_sources(
+        EnTT
+        INTERFACE
+            # for example $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools/entt/editor/editor.hpp>
     )
 endif()
 
@@ -319,6 +328,14 @@ if(ENTT_BUILD_TESTING)
     include(CTest)
     enable_testing()
     add_subdirectory(test)
+endif()
+
+# Testbed
+
+option(ENTT_BUILD_TESTBED "Enable building testbed." OFF)
+
+if(ENTT_BUILD_TESTBED)
+    add_subdirectory(testbed)
 endif()
 
 # Documentation
