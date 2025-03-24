@@ -63,6 +63,7 @@ function(SETUP_TARGET TARGET_NAME)
             PRIVATE
                 # disabling INCREMENTAL is required by SizeBench
                 $<$<CONFIG:Debug>:/INCREMENTAL:NO>
+                $<$<CONFIG:Release>:/OPT:NOICF>
         )
     else()
         target_compile_options(
