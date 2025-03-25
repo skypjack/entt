@@ -67,7 +67,7 @@ struct basic_meta_sequence_container_traits {
     /*! @brief Meta iterator type. */
     using iterator = typename meta_sequence_container::iterator;
 
-    /*! @brief True in case of key-only containers, false otherwise. */
+    /*! @brief True in case of fixed size containers, false otherwise. */
     static constexpr bool fixed_size = internal::fixed_size_sequence_container_v<Type>;
 
     /**
