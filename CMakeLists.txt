@@ -312,12 +312,17 @@ endif()
 
 # Tests and testbed
 
-option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 option(ENTT_BUILD_TESTBED "Enable building testbed." OFF)
+option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 
 if(ENTT_BUILD_TESTING OR ENTT_BUILD_TESTBED)
     set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for tests and testbed")
     set(ENTT_CXX_STD cxx_std_17 CACHE STRING "C++ standard revision to use for tests and testbed")
+
+    # Testbed goes first because otherwise SDL gets confused with EnTT tests
+    if(ENTT_BUILD_TESTBED)
+        add_subdirectory(testbed)
+    endif()
 
     if(ENTT_BUILD_TESTING)
         option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
@@ -330,10 +335,6 @@ if(ENTT_BUILD_TESTING OR ENTT_BUILD_TESTBED)
         include(CTest)
         enable_testing()
         add_subdirectory(test)
-    endif()
-
-    if(ENTT_BUILD_TESTBED)
-        add_subdirectory(testbed)
     endif()
 endif()
 

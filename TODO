@@ -35,4 +35,4 @@ TODO:
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * improve non-const allow cast with in-place switch
 * meta fixed_size could return the size directly if present
-* setup testbed workflow on the CI
+* setup testbed workflow on the CI and review build process for testbed (i.e. tests first due to SDL)
