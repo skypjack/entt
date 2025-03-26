@@ -236,9 +236,9 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_TRUE(alias);
     ASSERT_TRUE(value);
 
-    ASSERT_EQ(empty.type(), entt::type_id<void>());
+    ASSERT_EQ(empty.info(), entt::type_id<void>());
     ASSERT_EQ(in_place.type(), entt::type_id<impl>());
-    ASSERT_EQ(alias.type(), entt::type_id<impl>());
+    ASSERT_EQ(alias.info(), entt::type_id<impl>());
     ASSERT_EQ(value.type(), entt::type_id<impl>());
 
     ASSERT_EQ(alias.data(), &instance);
@@ -251,7 +251,7 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_TRUE(empty);
     ASSERT_NE(empty.data(), nullptr);
     ASSERT_NE(std::as_const(empty).data(), nullptr);
-    ASSERT_EQ(empty.type(), entt::type_id<impl>());
+    ASSERT_EQ(empty.info(), entt::type_id<impl>());
     ASSERT_EQ(empty->get(), 0);
 
     empty.template emplace<impl>(3);
@@ -265,7 +265,7 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_NE(ref.data(), nullptr);
     ASSERT_EQ(ref.data(), in_place.data());
     ASSERT_EQ(std::as_const(ref).data(), std::as_const(in_place).data());
-    ASSERT_EQ(ref.type(), entt::type_id<impl>());
+    ASSERT_EQ(ref.info(), entt::type_id<impl>());
     ASSERT_EQ(ref->get(), 3);
 
     poly_type null{};
@@ -288,7 +288,7 @@ TYPED_TEST(Poly, Functionalities) {
     move.reset();
 
     ASSERT_FALSE(move);
-    ASSERT_EQ(move.type(), entt::type_id<void>());
+    ASSERT_EQ(move.info(), entt::type_id<void>());
 }
 
 TYPED_TEST(Poly, Owned) {
