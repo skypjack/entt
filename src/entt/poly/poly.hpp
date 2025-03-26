@@ -227,7 +227,7 @@ public:
      * @return The object type if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] const type_info &type() const noexcept {
-        return storage.type();
+        return storage.info();
     }
 
     /**

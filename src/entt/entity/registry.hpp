@@ -187,7 +187,7 @@ public:
     template<typename Type>
     bool erase(const id_type id = type_id<Type>().hash()) {
         const auto it = ctx.find(id);
-        return it != ctx.end() && it->second.type() == type_id<Type>() ? (ctx.erase(it), true) : false;
+        return it != ctx.end() && it->second.info() == type_id<Type>() ? (ctx.erase(it), true) : false;
     }
 
     template<typename Type>
@@ -215,7 +215,7 @@ public:
     template<typename Type>
     [[nodiscard]] bool contains(const id_type id = type_id<Type>().hash()) const {
         const auto it = ctx.find(id);
-        return it != ctx.cend() && it->second.type() == type_id<Type>();
+        return it != ctx.cend() && it->second.info() == type_id<Type>();
     }
 
 private:
