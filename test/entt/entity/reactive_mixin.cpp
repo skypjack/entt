@@ -56,13 +56,13 @@ TYPED_TEST(ReactiveMixin, Constructors) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
     pool = entt::reactive_mixin<entt::storage<value_type>>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 }
 
 TYPED_TEST(ReactiveMixin, Move) {
@@ -80,7 +80,7 @@ TYPED_TEST(ReactiveMixin, Move) {
     static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
 
     ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
     entt::reactive_mixin<entt::storage<value_type>> other{std::move(pool)};
 
@@ -89,7 +89,7 @@ TYPED_TEST(ReactiveMixin, Move) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(other.index(entity[0u]), 0u);
     ASSERT_EQ(&other.registry(), &registry);
@@ -149,8 +149,8 @@ TYPED_TEST(ReactiveMixin, Swap) {
 
     pool.swap(other);
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u);

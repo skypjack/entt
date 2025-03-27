@@ -251,7 +251,7 @@ class basic_registry {
             using storage_type = storage_for_type<Type>;
 
             if(auto it = pools.find(id); it != pools.cend()) {
-                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                ENTT_ASSERT(it->second->info() == type_id<Type>(), "Unexpected type");
                 return static_cast<storage_type &>(*it->second);
             }
 
@@ -281,7 +281,7 @@ class basic_registry {
             return &entities;
         } else {
             if(const auto it = pools.find(id); it != pools.cend()) {
-                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                ENTT_ASSERT(it->second->info() == type_id<Type>(), "Unexpected type");
                 return static_cast<const storage_for_type<Type> *>(it->second.get());
             }
 

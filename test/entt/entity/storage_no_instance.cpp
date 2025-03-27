@@ -64,13 +64,13 @@ TYPED_TEST(StorageNoInstance, Constructors) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
     pool = entt::storage<value_type>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 }
 
 TYPED_TEST(StorageNoInstance, Move) {
@@ -91,7 +91,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
 
     entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
@@ -101,7 +101,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_FALSE(extended.empty());
 
-    ASSERT_EQ(extended.type(), entt::type_id<value_type>());
+    ASSERT_EQ(extended.info(), entt::type_id<value_type>());
     ASSERT_EQ(extended.index(entity[0u]), 0u);
 
     pool = std::move(extended);
@@ -111,7 +111,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_TRUE(extended.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
     ASSERT_EQ(pool.index(entity[0u]), 0u);
 
     other = entt::storage<value_type>{};
@@ -122,7 +122,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_FALSE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
 }
 
@@ -132,8 +132,8 @@ TYPED_TEST(StorageNoInstance, Swap) {
     entt::storage<value_type> pool;
     entt::storage<value_type> other;
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     pool.emplace(entt::entity{4});
 
@@ -146,8 +146,8 @@ TYPED_TEST(StorageNoInstance, Swap) {
 
     pool.swap(other);
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u);

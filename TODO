@@ -36,4 +36,3 @@ TODO:
 * improve non-const allow cast with in-place switch
 * meta fixed_size could return the size directly if present
 * setup testbed workflow on the CI and review build process for testbed (i.e. tests first due to SDL)
-* type() -> info() for consistency (sparse_set)

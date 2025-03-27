@@ -231,7 +231,7 @@ TEST(SighMixin, VoidType) {
 
     pool.emplace(entity);
 
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
     ASSERT_TRUE(pool.contains(entity));
 
     entt::sigh_mixin<entt::storage<void>> other{std::move(pool)};
@@ -336,7 +336,7 @@ TYPED_TEST(SighMixin, Move) {
     static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
     static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
     entt::sigh_mixin<entt::storage<value_type>> other{std::move(pool)};
 
@@ -345,7 +345,7 @@ TYPED_TEST(SighMixin, Move) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(other.index(entt::entity{3}), 0u);
     ASSERT_EQ(other.get(entt::entity{3}), value_type{3});
@@ -408,8 +408,8 @@ TYPED_TEST(SighMixin, Swap) {
 
     pool.swap(other);
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
     ASSERT_EQ(other.size(), 1u);

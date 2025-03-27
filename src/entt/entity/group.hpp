@@ -151,7 +151,7 @@ public:
 
     [[nodiscard]] bool owned(const id_type hash) const noexcept override {
         for(size_type pos{}; pos < Owned; ++pos) {
-            if(pools[pos]->type().hash() == hash) {
+            if(pools[pos]->info().hash() == hash) {
                 return true;
             }
         }

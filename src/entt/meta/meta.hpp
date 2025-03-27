@@ -384,7 +384,7 @@ public:
         return *this;
     }
 
-    /*! @copydoc any::type */
+    /*! @copydoc any::info */
     [[nodiscard]] inline meta_type type() const noexcept;
 
     /**

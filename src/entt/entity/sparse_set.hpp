@@ -433,7 +433,7 @@ public:
     explicit basic_sparse_set(const type_info &elem, deletion_policy pol = deletion_policy::swap_and_pop, const allocator_type &allocator = {})
         : sparse{allocator},
           packed{allocator},
-          info{&elem},
+          descriptor{&elem},
           mode{pol},
           head{policy_to_head()} {
         ENTT_ASSERT(traits_type::version_mask || mode != deletion_policy::in_place, "Policy does not support zero-sized versions");
@@ -449,7 +449,7 @@ public:
     basic_sparse_set(basic_sparse_set &&other) noexcept
         : sparse{std::move(other.sparse)},
           packed{std::move(other.packed)},
-          info{other.info},
+          descriptor{other.descriptor},
           mode{other.mode},
           head{std::exchange(other.head, policy_to_head())} {}
 
@@ -461,7 +461,7 @@ public:
     basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator)
         : sparse{std::move(other.sparse), allocator},
           packed{std::move(other.packed), allocator},
-          info{other.info},
+          descriptor{other.descriptor},
           mode{other.mode},
           head{std::exchange(other.head, policy_to_head())} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a sparse set is not allowed");
@@ -497,7 +497,7 @@ public:
         using std::swap;
         swap(sparse, other.sparse);
         swap(packed, other.packed);
-        swap(info, other.info);
+        swap(descriptor, other.descriptor);
         swap(mode, other.mode);
         swap(head, other.head);
     }
@@ -1079,11 +1079,16 @@ public:
     }
 
     /**
-     * @brief Returned value type, if any.
-     * @return Returned value type, if any.
+     * @brief Returns a type info object for the value type, if any.
+     * @return A type info object for the value type, if any.
      */
-    [[nodiscard]] const type_info &type() const noexcept {
-        return *info;
+    [[nodiscard]] const type_info &info() const noexcept {
+        return *descriptor;
+    }
+
+    /*! @copydoc info */
+    [[deprecated("use ::info instead")]] const type_info &type() const noexcept {
+        return info();
     }
 
     /**
@@ -1099,7 +1104,7 @@ public:
 private:
     sparse_container_type sparse;
     packed_container_type packed;
-    const type_info *info;
+    const type_info *descriptor;
     deletion_policy mode;
     size_type head;
 };

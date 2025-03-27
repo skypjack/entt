@@ -466,9 +466,9 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>();
 
     ASSERT_EQ(it->first, entt::type_id<int>().hash());
-    ASSERT_EQ((*it).second.type(), entt::type_id<int>());
+    ASSERT_EQ((*it).second.info(), entt::type_id<int>());
     ASSERT_EQ(it->first, cit->first);
-    ASSERT_EQ((*it).second.type(), (*cit).second.type());
+    ASSERT_EQ((*it).second.info(), (*cit).second.info());
 
     ASSERT_EQ(it - cit, 0);
     ASSERT_EQ(cit - it, 0);
@@ -1442,7 +1442,7 @@ TEST(Registry, EraseIf) {
     ASSERT_FALSE(registry.storage<int>("other"_hs).contains(entity));
     ASSERT_TRUE(registry.storage<char>().contains(entity));
 
-    registry.erase_if(entity, [](auto, const auto &storage) { return storage.type() == entt::type_id<char>(); });
+    registry.erase_if(entity, [](auto, const auto &storage) { return storage.info() == entt::type_id<char>(); });
 
     ASSERT_TRUE(registry.storage<int>().contains(entity));
     ASSERT_FALSE(registry.storage<int>("other"_hs).contains(entity));
@@ -2546,8 +2546,8 @@ TEST(Registry, VoidType) {
     ASSERT_FALSE(registry.storage<void>("custom"_hs).empty());
     ASSERT_TRUE(registry.storage<void>("custom"_hs).contains(entity));
 
-    ASSERT_EQ(registry.storage<void>().type(), entt::type_id<void>());
-    ASSERT_EQ(registry.storage<void>("custom"_hs).type(), entt::type_id<void>());
+    ASSERT_EQ(registry.storage<void>().info(), entt::type_id<void>());
+    ASSERT_EQ(registry.storage<void>("custom"_hs).info(), entt::type_id<void>());
 }
 
 TEST(Registry, NoEtoType) {
