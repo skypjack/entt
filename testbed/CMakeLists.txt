@@ -48,6 +48,7 @@ target_sources(
 	PRIVATE
 		testbed.cpp
         app/context.cpp
+        application/context.cpp
         ${imgui_SOURCE_DIR}/imgui.cpp
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
         ${imgui_SOURCE_DIR}/imgui_draw.cpp

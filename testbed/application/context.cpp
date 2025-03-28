@@ -1,21 +1,13 @@
 #include <SDL3/SDL_render.h>
-#include <app/context.h>
+#include <application/context.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
 #include <imgui.h>
 
 namespace testbed {
 
-namespace internal {
-
-static constexpr const char *window_default_title = "testbed";
-static constexpr int window_default_width = 1280;
-static constexpr int window_default_height = 720;
-
-} // namespace internal
-
 context::context()
-    : sdl_window{SDL_CreateWindow(internal::window_default_title, internal::window_default_width, internal::window_default_height, SDL_WINDOW_HIGH_PIXEL_DENSITY)},
+    : sdl_window{SDL_CreateWindow("testbed", 1280, 720, SDL_WINDOW_HIGH_PIXEL_DENSITY)},
       sdl_renderer{SDL_CreateRenderer(sdl_window, nullptr)} {
     SDL_SetRenderVSync(sdl_renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
