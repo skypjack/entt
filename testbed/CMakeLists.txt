@@ -31,24 +31,23 @@ endif()
 
 # Testbed executable
 
-set(ENTT_TESTBED_EXECUTABLE testbed)
+add_executable(testbed)
 
-add_executable(${ENTT_TESTBED_EXECUTABLE})
-
-set_target_properties(${ENTT_TESTBED_EXECUTABLE} PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_features(${ENTT_TESTBED_EXECUTABLE} PUBLIC ${ENTT_CXX_STD})
+set_target_properties(testbed PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(testbed PUBLIC ${ENTT_CXX_STD})
 
 target_compile_definitions(
-    ${ENTT_TESTBED_EXECUTABLE}
+    testbed
     PRIVATE
         ENTT_ID_TYPE=${ENTT_ID_TYPE}
         NOMINMAX
 )
 
 target_sources(
-	${ENTT_TESTBED_EXECUTABLE}
+	testbed
 	PRIVATE
 		testbed.cpp
+        app/context.cpp
         ${imgui_SOURCE_DIR}/imgui.cpp
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
         ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -59,15 +58,15 @@ target_sources(
 )
 
 target_link_libraries(
-    ${ENTT_TESTBED_EXECUTABLE}
+    testbed
     PRIVATE
         EnTT::EnTT
         SDL3::SDL3
 )
 
 target_include_directories(
-    ${ENTT_TESTBED_EXECUTABLE}
+    testbed
     PRIVATE
-        ${testbed_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
         ${imgui_SOURCE_DIR}
 )

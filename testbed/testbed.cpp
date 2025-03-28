@@ -1,6 +1,6 @@
-#include <entt/entt.hpp>
+#include <app/context.h>
 
 int main() {
-    [[maybe_unused]] entt::registry registry;
+    testbed::context ctx{};
     return 0;
 }
