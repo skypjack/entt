@@ -1,6 +1,6 @@
-#include <application/context.h>
+#include <application/application.h>
 
 int main() {
-    testbed::context ctx{};
-    return 0;
+    testbed::application application{};
+    return application.run();
 }
