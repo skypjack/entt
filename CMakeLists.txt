@@ -316,7 +316,7 @@ endif()
 option(ENTT_BUILD_TESTBED "Enable building testbed." OFF)
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 
-if(ENTT_BUILD_TESTING OR ENTT_BUILD_TESTBED)
+if(ENTT_BUILD_TESTBED OR ENTT_BUILD_TESTING)
     set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for tests and testbed")
     set(ENTT_CXX_STD cxx_std_17 CACHE STRING "C++ standard revision to use for tests and testbed")
 
