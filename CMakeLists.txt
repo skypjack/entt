@@ -38,6 +38,8 @@ option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if available." 
 option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if available." OFF)
 option(ENTT_USE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
 
+option(ENTT_MODULES "Build as a module library (requires c++20)" ON)
+
 if(ENTT_USE_LIBCPP)
     if(NOT WIN32)
         include(CheckCXXSourceCompiles)
@@ -224,6 +226,182 @@ if(ENTT_HAS_NATVIS)
     )
 endif()
 
+if(ENTT_MODULES)
+
+message(STATUS "Building with module support")
+
+add_library(EnTTModules)
+add_library(EnTT::Module ALIAS EnTTModules)
+
+target_compile_features(EnTTModules PUBLIC cxx_std_20)
+
+if(ENTT_HAS_LIBCPP)
+    target_compile_options(EnTTModules BEFORE PUBLIC -stdlib=libc++)
+endif()
+
+if(ENTT_HAS_SANITIZER)
+    target_compile_options(EnTTModules INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+    target_link_libraries(EnTTModules INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+endif()
+
+target_sources(EnTTModules
+    PRIVATE FILE_SET CXX_MODULES
+    FILES
+        src/entt.cpp
+
+    PRIVATE FILE_SET HEADERS
+    BASE_DIRS src
+    FILES
+        src/entt/config/config.h
+        src/entt/config/macro.h
+        src/entt/config/version.h
+        src/entt/container/dense_map.hpp
+        src/entt/container/dense_set.hpp
+        src/entt/container/table.hpp
+        src/entt/container/fwd.hpp
+        src/entt/core/algorithm.hpp
+        src/entt/core/any.hpp
+        src/entt/core/attribute.h
+        src/entt/core/bit.hpp
+        src/entt/core/compressed_pair.hpp
+        src/entt/core/enum.hpp
+        src/entt/core/family.hpp
+        src/entt/core/fwd.hpp
+        src/entt/core/hashed_string.hpp
+        src/entt/core/ident.hpp
+        src/entt/core/iterator.hpp
+        src/entt/core/memory.hpp
+        src/entt/core/monostate.hpp
+        src/entt/core/ranges.hpp
+        src/entt/core/tuple.hpp
+        src/entt/core/type_info.hpp
+        src/entt/core/type_traits.hpp
+        src/entt/core/utility.hpp
+        src/entt/entity/component.hpp
+        src/entt/entity/entity.hpp
+        src/entt/entity/fwd.hpp
+        src/entt/entity/group.hpp
+        src/entt/entity/handle.hpp
+        src/entt/entity/mixin.hpp
+        src/entt/entity/helper.hpp
+        src/entt/entity/organizer.hpp
+        src/entt/entity/ranges.hpp
+        src/entt/entity/registry.hpp
+        src/entt/entity/runtime_view.hpp
+        src/entt/entity/snapshot.hpp
+        src/entt/entity/sparse_set.hpp
+        src/entt/entity/storage.hpp
+        src/entt/entity/view.hpp
+        src/entt/graph/adjacency_matrix.hpp
+        src/entt/graph/dot.hpp
+        src/entt/graph/flow.hpp
+        src/entt/graph/fwd.hpp
+        src/entt/locator/locator.hpp
+        src/entt/meta/adl_pointer.hpp
+        src/entt/meta/container.hpp
+        src/entt/meta/context.hpp
+        src/entt/meta/factory.hpp
+        src/entt/meta/fwd.hpp
+        src/entt/meta/meta.hpp
+        src/entt/meta/node.hpp
+        src/entt/meta/pointer.hpp
+        src/entt/meta/policy.hpp
+        src/entt/meta/range.hpp
+        src/entt/meta/resolve.hpp
+        src/entt/meta/template.hpp
+        src/entt/meta/type_traits.hpp
+        src/entt/meta/utility.hpp
+        src/entt/poly/fwd.hpp
+        src/entt/poly/poly.hpp
+        src/entt/process/fwd.hpp
+        src/entt/process/process.hpp
+        src/entt/process/scheduler.hpp
+        src/entt/resource/cache.hpp
+        src/entt/resource/fwd.hpp
+        src/entt/resource/loader.hpp
+        src/entt/resource/resource.hpp
+        src/entt/signal/delegate.hpp
+        src/entt/signal/dispatcher.hpp
+        src/entt/signal/emitter.hpp
+        src/entt/signal/fwd.hpp
+        src/entt/signal/sigh.hpp
+        src/entt/entt.hpp
+        src/entt/fwd.hpp
+
+        src/entt/container/dense_map.inc
+        src/entt/container/dense_set.inc
+        src/entt/container/table.inc
+        src/entt/container/fwd.inc
+        src/entt/core/algorithm.inc
+        src/entt/core/any.inc
+        src/entt/core/attribute.inc
+        src/entt/core/bit.inc
+        src/entt/core/compressed_pair.inc
+        src/entt/core/enum.inc
+        src/entt/core/family.inc
+        src/entt/core/fwd.inc
+        src/entt/core/hashed_string.inc
+        src/entt/core/ident.inc
+        src/entt/core/iterator.inc
+        src/entt/core/memory.inc
+        src/entt/core/monostate.inc
+        src/entt/core/ranges.inc
+        src/entt/core/tuple.inc
+        src/entt/core/type_info.inc
+        src/entt/core/type_traits.inc
+        src/entt/core/utility.inc
+        src/entt/entity/component.inc
+        src/entt/entity/entity.inc
+        src/entt/entity/fwd.inc
+        src/entt/entity/group.inc
+        src/entt/entity/handle.inc
+        src/entt/entity/mixin.inc
+        src/entt/entity/helper.inc
+        src/entt/entity/organizer.inc
+        src/entt/entity/ranges.inc
+        src/entt/entity/registry.inc
+        src/entt/entity/runtime_view.inc
+        src/entt/entity/snapshot.inc
+        src/entt/entity/sparse_set.inc
+        src/entt/entity/storage.inc
+        src/entt/entity/view.inc
+        src/entt/graph/adjacency_matrix.inc
+        src/entt/graph/dot.inc
+        src/entt/graph/flow.inc
+        src/entt/graph/fwd.inc
+        src/entt/locator/locator.inc
+        src/entt/meta/adl_pointer.inc
+        src/entt/meta/container.inc
+        src/entt/meta/context.inc
+        src/entt/meta/factory.inc
+        src/entt/meta/fwd.inc
+        src/entt/meta/meta.inc
+        src/entt/meta/node.inc
+        src/entt/meta/pointer.inc
+        src/entt/meta/policy.inc
+        src/entt/meta/range.inc
+        src/entt/meta/resolve.inc
+        src/entt/meta/template.inc
+        src/entt/meta/type_traits.inc
+        src/entt/meta/utility.inc
+        src/entt/poly/fwd.inc
+        src/entt/poly/poly.inc
+        src/entt/process/fwd.inc
+        src/entt/process/process.inc
+        src/entt/process/scheduler.inc
+        src/entt/resource/cache.inc
+        src/entt/resource/fwd.inc
+        src/entt/resource/loader.inc
+        src/entt/resource/resource.inc
+        src/entt/signal/delegate.inc
+        src/entt/signal/dispatcher.inc
+        src/entt/signal/emitter.inc
+        src/entt/signal/fwd.inc
+        src/entt/signal/sigh.inc
+)
+
+endif()
+
 # Install EnTT and all related files
 
 option(ENTT_INSTALL "Install EnTT and all related files." OFF)
@@ -253,7 +431,7 @@ if(ENTT_INSTALL)
     include(CMakePackageConfigHelpers)
 
     install(
-        TARGETS EnTT
+        TARGETS EnTT EnTTModules
         EXPORT EnTTTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
