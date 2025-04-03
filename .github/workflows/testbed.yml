@@ -62,7 +62,7 @@ jobs:
     - name: Compile testbed
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTBED=ON ..
+        cmake -DENTT_BUILD_TESTBED=ON .. -G Ninja
         cmake --build . -j 4
 
   macos:
