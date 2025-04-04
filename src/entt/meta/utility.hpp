@@ -248,7 +248,7 @@ template<typename Type, typename... Args, std::size_t... Index>
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const meta_ctx &ctx, const std::size_t index) noexcept {
+[[nodiscard]] meta_type meta_arg(const meta_ctx &ctx, const std::size_t index) noexcept {
     auto &&context = internal::meta_context::from(ctx);
     return {ctx, internal::meta_arg_node(context, Type{}, index)};
 }
@@ -260,7 +260,7 @@ template<typename Type>
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] static meta_type meta_arg(const std::size_t index) noexcept {
+[[nodiscard]] meta_type meta_arg(const std::size_t index) noexcept {
     return meta_arg<Type>(locator<meta_ctx>::value_or(), index);
 }
 
