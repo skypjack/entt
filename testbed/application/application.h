@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL_events.h>
+#include <entt/entity/fwd.hpp>
 
 struct SDL_Renderer;
 
@@ -10,8 +11,8 @@ struct config;
 struct context;
 
 class application {
-    void update();
-    void draw(const context &) const;
+    void update(entt::registry &);
+    void draw(entt::registry &, const context &) const;
     void input();
 
 public:

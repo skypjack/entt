@@ -4,23 +4,28 @@
 #include <application/context.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
+#include <entt/entity/registry.hpp>
 #include <imgui.h>
+#include <system/imgui_system.h>
+#include <system/rendering_system.h>
 
 namespace testbed {
 
-void application::update() {
+void application::update(entt::registry &registry) {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
     // update...
+    static_cast<void>(registry);
 }
 
-void application::draw(const context &context) const {
+void application::draw(entt::registry &registry, const context &context) const {
     SDL_SetRenderDrawColor(context, 0u, 0u, 0u, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(context);
 
-    // draw...
+    rendering_system(registry, context);
+    imgui_system(registry);
 
     ImGui::Render();
     ImGuiIO &io = ImGui::GetIO();
@@ -59,12 +64,14 @@ application::~application() {
 }
 
 int application::run() {
+    entt::registry registry{};
     context context{};
+
     quit = false;
 
     while(!quit) {
-        update();
-        draw(context);
+        update(registry);
+        draw(registry, context);
         input();
     }
 
