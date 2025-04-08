@@ -145,7 +145,7 @@ private:
 
 /**
  * @brief Meta factory to be used for reflection purposes.
- * @tparam Type Reflected type for which the factory was created.
+ * @tparam Type Type for which the factory was created.
  */
 template<typename Type>
 class meta_factory: private internal::basic_meta_factory {
