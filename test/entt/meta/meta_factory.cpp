@@ -115,7 +115,7 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
 
     factory.type("foo"_hs);
 
-    ASSERT_DEATH(other.type("foo"_hs);, "");
+    ASSERT_DEATH(other.type("foo"_hs), "");
 }
 
 TEST_F(MetaFactory, Base) {
