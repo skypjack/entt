@@ -151,8 +151,8 @@ class meta_factory: private internal::basic_meta_factory {
     using base_type = internal::basic_meta_factory;
 
 public:
-    /*! @brief Underlying type of the factory. */
-    using type = Type;
+    /*! @brief Type of object for which this factory builds a meta type. */
+    using element_type = Type;
 
     /*! @brief Default constructor. */
     meta_factory() noexcept
