@@ -15,6 +15,7 @@
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
 #include "context.hpp"
+#include "fwd.hpp"
 #include "meta.hpp"
 #include "node.hpp"
 #include "policy.hpp"

@@ -19,6 +19,9 @@ struct meta_func;
 
 class meta_type;
 
+template<typename>
+class meta_factory;
+
 } // namespace entt
 
 #endif
