@@ -421,9 +421,9 @@ template<typename Type, typename Policy = as_is_t, typename Candidate>
     if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<std::remove_cv_t<std::remove_reference_t<Candidate>>>) {
         return internal::meta_invoke<Type, Policy>(meta_handle{meta_ctx_arg, ctx}, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {
-        meta_any handle{ctx, args->as_ref()};
+        meta_any target{ctx, args->as_ref()};
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
-        return internal::meta_invoke<Type, Policy>(handle, std::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+        return internal::meta_invoke<Type, Policy>(target, std::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     }
 }
 
