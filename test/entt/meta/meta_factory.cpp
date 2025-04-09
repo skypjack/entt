@@ -61,19 +61,23 @@ private:
     bool *cb;
 };
 
+namespace test {
+
 template<typename Type>
 // concept-like approach (waiting for C++20 and concepts)
-auto meta_setup(entt::meta_factory<Type> factory) -> decltype(&Type::value, void()) {
+static auto meta_setup(entt::meta_factory<Type> factory) -> decltype(&Type::value, void()) {
     using namespace entt::literals;
     factory.template data<&Type::value>("value"_hs).template conv<decltype(Type::value)>();
 }
 
-void meta_setup(entt::meta_factory<test::boxed_int> factory) {
+static void meta_setup(entt::meta_factory<test::boxed_int> factory) {
     using namespace entt::literals;
     factory.data<&test::boxed_int::value>("value"_hs);
 }
 
-void meta_setup(...) {
+}
+
+inline void meta_setup(...) {
     ENTT_FAIL("oops");
 }
 
