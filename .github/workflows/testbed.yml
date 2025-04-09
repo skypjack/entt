@@ -59,6 +59,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: seanmiddleditch/gha-setup-ninja@master
     - name: Compile testbed
       working-directory: build
       run: |
