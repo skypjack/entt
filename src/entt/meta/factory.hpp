@@ -177,19 +177,6 @@ public:
     }
 
     /**
-     * @brief Invokes a meta setup function for the current factory, if any.
-     *
-     * @warning
-     * The factory is provided in its current state and is not reinitialized.
-     *
-     * @return A meta factory for the parent type.
-     */
-    meta_factory setup() noexcept {
-        meta_setup(*this);
-        return *this;
-    }
-
-    /**
      * @brief Assigns a meta base to a meta type.
      *
      * A reflected base class must be a real base class of the reflected type.
