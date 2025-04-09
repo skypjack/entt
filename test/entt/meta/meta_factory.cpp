@@ -65,7 +65,7 @@ template<typename Type>
 // concept-like approach (waiting for C++20 and concepts)
 auto meta_setup(entt::meta_factory<Type> factory) -> decltype(&Type::value, void()) {
     using namespace entt::literals;
-    factory.data<&Type::value>("value"_hs).conv<decltype(Type::value)>();
+    factory.template data<&Type::value>("value"_hs).template conv<decltype(Type::value)>();
 }
 
 void meta_setup(entt::meta_factory<test::boxed_int> factory) {
