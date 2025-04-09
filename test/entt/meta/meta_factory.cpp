@@ -61,6 +61,22 @@ private:
     bool *cb;
 };
 
+template<typename Type>
+// concept-like approach (waiting for C++20 and concepts)
+auto meta_setup(entt::meta_factory<Type> factory) -> decltype(&Type::value, void()) {
+    using namespace entt::literals;
+    factory.data<&Type::value>("value"_hs).conv<decltype(Type::value)>();
+}
+
+void meta_setup(entt::meta_factory<test::boxed_int> factory) {
+    using namespace entt::literals;
+    factory.data<&test::boxed_int::value>("value"_hs);
+}
+
+void meta_setup(...) {
+    ENTT_FAIL("oops");
+}
+
 struct MetaFactory: ::testing::Test {
     void TearDown() override {
         entt::meta_reset();
@@ -116,6 +132,23 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
     factory.type("foo"_hs);
 
     ASSERT_DEATH(other.type("foo"_hs), "");
+}
+
+TEST_F(MetaFactory, Setup) {
+    using namespace entt::literals;
+
+    entt::meta_factory<test::boxed_int>{}.setup();
+    entt::meta_factory<test::boxed_char>{}.setup();
+
+    ASSERT_TRUE(entt::resolve<test::boxed_int>().data("value"_hs));
+    ASSERT_TRUE(entt::resolve<test::boxed_char>().data("value"_hs));
+
+    ASSERT_FALSE(entt::resolve<test::boxed_int>().can_convert(entt::resolve<int>()));
+    ASSERT_TRUE(entt::resolve<test::boxed_char>().can_convert(entt::resolve<char>()));
+}
+
+ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Setup) {
+    ASSERT_DEATH(entt::meta_factory<int>{}.setup(), "");
 }
 
 TEST_F(MetaFactory, Base) {
