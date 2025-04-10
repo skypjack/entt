@@ -2,8 +2,10 @@
 #define ENTT_DAVEY_DAVEY_HPP
 
 #include <string>
+#include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/sparse_set.hpp>
+#include <entt/entity/storage.hpp>
 #include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/meta.hpp>
