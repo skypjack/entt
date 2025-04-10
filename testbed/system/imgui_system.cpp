@@ -1,15 +1,13 @@
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
 #include <system/imgui_system.h>
+#include <entt/davey/davey.hpp>
 
 namespace testbed {
 
-void imgui_system(entt::registry &registry) {
+void imgui_system(const entt::registry &registry) {
     ImGui::Begin("testbed");
-
-    // ...
-    static_cast<void>(registry);
-
+    entt::davey(registry);
     ImGui::End();
 }
 

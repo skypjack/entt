@@ -4,6 +4,6 @@
 
 namespace testbed {
 
-void imgui_system(entt::registry &);
+void imgui_system(const entt::registry &);
 
 } // namespace testbed
