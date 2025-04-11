@@ -11,6 +11,9 @@ FetchContent_Declare(
     GIT_SHALLOW 1
 )
 
+option(SDL_STATIC "Enable SDL static library" ON)
+option(SDL_SHARED "Disable SDL shared library" OFF)
+
 FetchContent_MakeAvailable(SDL3)
 
 # Fetch ImGui
