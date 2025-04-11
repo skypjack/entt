@@ -23,7 +23,10 @@ static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entit
         if(storage.contains(entt)) {
             if(auto type = entt::resolve(ctx, storage.type()); type) {
                 if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s", info ? info->name : std::string{storage.type().name()}.c_str())) {
-                    // TODO
+                    if(const auto obj = type.from_void(storage.value(entt)); obj) {
+                        // TODO present element
+                    }
+
                     ImGui::TreePop();
                 }
             } else {
@@ -36,7 +39,36 @@ static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entit
 
 template<typename Entity, typename Allocator>
 void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
-    // TODO
+    for([[maybe_unused]] auto [id, storage]: registry.storage()) {
+        if(auto type = entt::resolve(ctx, storage.type()); type) {
+            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s (%d)", info ? info->name : std::string{storage.type().name()}.c_str(), storage.size())) {
+                if(const auto type = entt::resolve(ctx, storage.type()); type) {
+                    for(auto entt: storage) {
+                        ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
+
+                        if(ImGui::TreeNode(&storage.type(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+                            if(const auto obj = type.from_void(storage.value(entt)); obj) {
+                                // TODO present element
+                            }
+
+                            ImGui::TreePop();
+                        }
+
+                        ImGui::PopID();
+                    }
+                } else {
+                    for(auto entt: storage) {
+                        ImGui::Text("%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+                    }
+                }
+
+                ImGui::TreePop();
+            }
+        } else {
+            const std::string name{storage.type().name()};
+            ImGui::Text("%s (%d)", name.c_str(), storage.size());
+        }
+    }
 }
 
 template<typename Entity, typename Allocator>
