@@ -63,9 +63,18 @@ application::~application() {
     SDL_Quit();
 }
 
+static void static_setup_for_dev_purposes(entt::registry &registry) {
+    const auto entt = registry.create();
+
+    registry.emplace<double>(entt, 1.2);
+    registry.emplace<int>(entt, 3);
+}
+
 int application::run() {
     entt::registry registry{};
     context context{};
+
+    static_setup_for_dev_purposes(registry);
 
     quit = false;
 
