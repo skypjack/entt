@@ -22,7 +22,7 @@ struct ENTT_API type_index final {
 };
 
 template<typename Type>
-[[nodiscard]] constexpr const char *full_type_name() noexcept {
+[[nodiscard]] constexpr const char *pretty_function() noexcept {
 #if defined ENTT_PRETTY_FUNCTION
     return static_cast<const char *>(ENTT_PRETTY_FUNCTION);
 #else
@@ -32,7 +32,7 @@ template<typename Type>
 
 template<typename Type>
 [[nodiscard]] constexpr auto stripped_type_name() noexcept {
-    const std::string_view full_name{full_type_name<Type>()};
+    const std::string_view full_name{pretty_function<Type>()};
     auto first = full_name.find_first_not_of(' ', full_name.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX) + 1);
     auto value = full_name.substr(first, full_name.find_last_of(ENTT_PRETTY_FUNCTION_SUFFIX) - first);
     return value;
