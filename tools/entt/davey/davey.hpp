@@ -17,12 +17,14 @@ namespace entt {
 
 namespace internal {
 
+#define DAVEY_OR(type) info ? info->name : std::string{type.name()}.c_str()
+
 template<typename Entity, typename Allocator>
 static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry, const Entity entt) {
     for([[maybe_unused]] auto [id, storage]: registry.storage()) {
         if(storage.contains(entt)) {
             if(auto type = entt::resolve(ctx, storage.type()); type) {
-                if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s", info ? info->name : std::string{storage.type().name()}.c_str())) {
+                if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s", DAVEY_OR(storage.type()))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
                         // TODO present element
                     }
@@ -41,7 +43,7 @@ template<typename Entity, typename Allocator>
 void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     for([[maybe_unused]] auto [id, storage]: registry.storage()) {
         if(auto type = entt::resolve(ctx, storage.type()); type) {
-            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s (%d)", info ? info->name : std::string{storage.type().name()}.c_str(), storage.size())) {
+            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s (%d)", DAVEY_OR(storage.type()), storage.size())) {
                 if(const auto type = entt::resolve(ctx, storage.type()); type) {
                     for(auto entt: storage) {
                         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
