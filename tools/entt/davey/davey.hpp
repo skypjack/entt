@@ -119,8 +119,8 @@ template<typename Entity, typename Allocator>
 static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry, const Entity entt) {
     for([[maybe_unused]] auto [id, storage]: registry.storage()) {
         if(storage.contains(entt)) {
-            if(auto type = entt::resolve(ctx, storage.type()); type) {
-                if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s", DAVEY_OR(storage))) {
+            if(auto type = entt::resolve(ctx, storage.info()); type) {
+                if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
                         present_element<Entity>(obj, [&ctx, &registry](const char *name, const entt::entity other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, entt::to_integral(other), entt::to_entity(other), entt::to_version(other))) {
@@ -133,7 +133,7 @@ static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entit
                     ImGui::TreePop();
                 }
             } else {
-                const std::string name{storage.type().name()};
+                const std::string name{storage.info().name()};
                 ImGui::Text("%s", name.c_str());
             }
         }
@@ -143,13 +143,13 @@ static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entit
 template<typename Entity, typename Allocator>
 void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-        if(auto type = entt::resolve(ctx, storage.type()); type) {
-            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.type(), "%s (%d)", DAVEY_OR(storage), storage.size())) {
-                if(const auto type = entt::resolve(ctx, storage.type()); type) {
+        if(auto type = entt::resolve(ctx, storage.info()); type) {
+            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%d)", DAVEY_OR(storage), storage.size())) {
+                if(const auto type = entt::resolve(ctx, storage.info()); type) {
                     for(auto entt: storage) {
                         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
-                        if(ImGui::TreeNode(&storage.type(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+                        if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
                             if(const auto obj = type.from_void(storage.value(entt)); obj) {
                                 present_element<Entity>(obj, [](const char *name, const entt::entity entt) {
                                     ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
@@ -170,7 +170,7 @@ void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocat
                 ImGui::TreePop();
             }
         } else {
-            const std::string name{storage.type().name()};
+            const std::string name{storage.info().name()};
             ImGui::Text("%s (%d)", name.c_str(), storage.size());
         }
     }
