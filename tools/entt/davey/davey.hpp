@@ -178,7 +178,7 @@ void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocat
 
 template<typename Entity, typename Allocator>
 void entity_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
-    for(const auto [entt]: registry.storage<Entity>()->each()) {
+    for(const auto [entt]: registry.template storage<Entity>()->each()) {
         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
         if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
