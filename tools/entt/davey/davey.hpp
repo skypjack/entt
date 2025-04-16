@@ -48,7 +48,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
             } else if(type.info() == entt::type_id<char>()) {
                 ImGui::Text("%s: %c", DAVEY_OR(type), elem.cast<char>());
             } else if(type.is_integral()) {
-                ImGui::Text("%s: %d", DAVEY_OR(type), elem.allow_cast<std::uint64_t>().cast<std::uint64_t>());
+                ImGui::Text("%s: %zu", DAVEY_OR(type), elem.allow_cast<std::uint64_t>().cast<std::uint64_t>());
             } else {
                 ImGui::Text("%s: %f", DAVEY_OR(type), elem.allow_cast<double>().cast<double>());
             }
@@ -69,7 +69,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 for(std::size_t pos{}, last = view.size(); pos < last; ++pos) {
                     ImGui::PushID(static_cast<int>(pos));
 
-                    if(ImGui::TreeNode(DAVEY_OR(type), "%d", pos)) {
+                    if(ImGui::TreeNode(DAVEY_OR(type), "%zu", pos)) {
                         present_element<Entity>(view[pos], on_entity);
                         ImGui::TreePop();
                     }
@@ -87,7 +87,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 for(std::size_t pos{}, last = view.size(); pos < last; ++pos, ++it) {
                     ImGui::PushID(static_cast<int>(pos));
 
-                    if(ImGui::TreeNode(DAVEY_OR(type), "%d", pos)) {
+                    if(ImGui::TreeNode(DAVEY_OR(type), "%zu", pos)) {
                         const auto [key, value] = *it;
 
                         if(ImGui::TreeNode("key")) {
@@ -144,7 +144,7 @@ template<typename Entity, typename Allocator>
 void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     for([[maybe_unused]] auto [id, storage]: registry.storage()) {
         if(auto type = entt::resolve(ctx, storage.info()); type) {
-            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%d)", DAVEY_OR(storage), storage.size())) {
+            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
                 if(const auto type = entt::resolve(ctx, storage.info()); type) {
                     for(auto entt: storage) {
                         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
@@ -171,7 +171,7 @@ void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocat
             }
         } else {
             const std::string name{storage.info().name()};
-            ImGui::Text("%s (%d)", name.c_str(), storage.size());
+            ImGui::Text("%s (%zu)", name.c_str(), storage.size());
         }
     }
 }
