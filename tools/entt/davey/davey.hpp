@@ -178,14 +178,13 @@ void storage_tab(const meta_ctx &ctx, const It from, const It to) {
     }
 }
 
-template<typename Entity, typename Allocator>
-void entity_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
-    for(const auto [entt]: registry.template storage<Entity>()->each()) {
+template<typename Storage, typename It>
+void entity_tab(const meta_ctx &ctx, const Storage &storage, const It from, const It to) {
+    for(const auto [entt]: storage->each()) {
         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
         if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
-            const auto range = registry.storage();
-            present_entity(ctx, entt, range.begin(), range.end());
+            present_entity(ctx, entt, from, to);
             ImGui::TreePop();
         }
 
@@ -217,7 +216,8 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     }
 
     if(ImGui::BeginTabItem("Entity")) {
-        internal::entity_tab(ctx, registry);
+        const auto range = registry.storage();
+        internal::entity_tab(ctx, registry.template storage<Entity>(), range.begin(), range.end());
         ImGui::EndTabItem();
     }
 
