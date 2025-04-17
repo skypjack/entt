@@ -201,7 +201,7 @@ void davey(const meta_ctx &ctx, const entt::basic_sparse_set<Entity, Allocator> 
 
 template<typename Entity, typename Allocator>
 void davey(const entt::basic_sparse_set<Entity, Allocator> &set) {
-    // TODO
+    davey(locator<meta_ctx>::value_or(), set);
 }
 
 template<typename Entity, typename Allocator>
