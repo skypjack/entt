@@ -140,9 +140,11 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
     }
 }
 
-template<typename Entity, typename Allocator>
-void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
-    for([[maybe_unused]] auto [id, storage]: registry.storage()) {
+template<typename It>
+void storage_tab(const meta_ctx &ctx, const It from, const It to) {
+    for(auto it = from; it != to; ++it) {
+        const auto &storage = it->second;
+
         if(auto type = entt::resolve(ctx, storage.info()); type) {
             if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
                 if(const auto type = entt::resolve(ctx, storage.info()); type) {
@@ -151,7 +153,7 @@ void storage_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocat
 
                         if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
                             if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                                present_element<Entity>(obj, [](const char *name, const entt::entity entt) {
+                                present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
                                     ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
                                 });
                             }
@@ -209,7 +211,8 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     ImGui::BeginTabBar("#tabs");
 
     if(ImGui::BeginTabItem("Storage")) {
-        internal::storage_tab(ctx, registry);
+        const auto range = registry.storage();
+        internal::storage_tab(ctx, range.begin(), range.end());
         ImGui::EndTabItem();
     }
 
