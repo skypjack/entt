@@ -206,7 +206,6 @@ void davey(const entt::basic_sparse_set<Entity, Allocator> &set) {
 
 template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
-    ImGui::Begin("Davey");
     ImGui::BeginTabBar("#tabs");
 
     if(ImGui::BeginTabItem("Storage")) {
@@ -222,7 +221,6 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     }
 
     ImGui::EndTabBar();
-    ImGui::End();
 }
 
 template<typename Entity, typename Allocator>
