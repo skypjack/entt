@@ -115,16 +115,16 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
     }
 }
 
-template<typename Entity, typename Allocator>
-static void present_entity(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry, const Entity entt) {
-    for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-        if(storage.contains(entt)) {
+template<typename Entity, typename It>
+static void present_entity(const meta_ctx &ctx, const Entity entt, const It from, const It to) {
+    for(auto it = from; it != to; ++it) {
+        if(const auto &storage = it->second; storage.contains(entt)) {
             if(auto type = entt::resolve(ctx, storage.info()); type) {
                 if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                        present_element<Entity>(obj, [&ctx, &registry](const char *name, const entt::entity other) {
+                        present_element<Entity>(obj, [&ctx, from, to](const char *name, const entt::entity other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, entt::to_integral(other), entt::to_entity(other), entt::to_version(other))) {
-                                present_entity<Entity>(ctx, registry, other);
+                                present_entity<Entity>(ctx, other, from, to);
                                 ImGui::TreePop();
                             }
                         });
@@ -182,7 +182,8 @@ void entity_tab(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocato
         ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
         if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
-            present_entity(ctx, registry, entt);
+            const auto range = registry.storage();
+            present_entity(ctx, entt, range.begin(), range.end());
             ImGui::TreePop();
         }
 
