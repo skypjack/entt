@@ -31,26 +31,26 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
         const davey_data *info = data.custom();
 
         if(auto type = data.type(); type.info() == entt::type_id<const char *>()) {
-            ImGui::Text("%s: %s", DAVEY_OR(type), elem.cast<const char *>());
+            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const char *>());
         } else if(type.info() == entt::type_id<std::string>()) {
-            ImGui::Text("%s: %s", DAVEY_OR(type), elem.cast<const std::string &>().c_str());
+            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const std::string &>().c_str());
         } else if(type.info() == entt::type_id<Entity>()) {
-            if(const auto entt = elem.cast<Entity>(); entt == entt::null) {
+            if(const auto entt = elem.template cast<Entity>(); entt == entt::null) {
                 ImGui::Text("%s: %s", DAVEY_OR(type), "null");
             } else {
-                on_entity(DAVEY_OR(type), elem.cast<Entity>());
+                on_entity(DAVEY_OR(type), elem.template cast<Entity>());
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == entt::type_id<bool>()) {
                 std::stringstream buffer{};
-                buffer << std::boolalpha << elem.cast<bool>();
+                buffer << std::boolalpha << elem.template cast<bool>();
                 ImGui::Text("%s: %s", DAVEY_OR(type), buffer.str().c_str());
             } else if(type.info() == entt::type_id<char>()) {
-                ImGui::Text("%s: %c", DAVEY_OR(type), elem.cast<char>());
+                ImGui::Text("%s: %c", DAVEY_OR(type), elem.template cast<char>());
             } else if(type.is_integral()) {
-                ImGui::Text("%s: %zu", DAVEY_OR(type), elem.allow_cast<std::uint64_t>().cast<std::uint64_t>());
+                ImGui::Text("%s: %zu", DAVEY_OR(type), elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
             } else {
-                ImGui::Text("%s: %f", DAVEY_OR(type), elem.allow_cast<double>().cast<double>());
+                ImGui::Text("%s: %f", DAVEY_OR(type), elem.template allow_cast<double>().template cast<double>());
             }
         } else if(type.is_pointer_like()) {
             if(ImGui::TreeNode(DAVEY_OR(type))) {
