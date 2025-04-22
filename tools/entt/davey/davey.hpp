@@ -115,6 +115,31 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
     }
 }
 
+template<typename Storage>
+static void present_storage(const meta_ctx &ctx, const Storage &storage) {
+    if(auto type = entt::resolve(ctx, storage.info()); type) {
+        for(auto entt: storage) {
+            ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
+
+            if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+                if(const auto obj = type.from_void(storage.value(entt)); obj) {
+                    present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
+                        ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+                    });
+                }
+
+                ImGui::TreePop();
+            }
+
+            ImGui::PopID();
+        }
+    } else {
+        for(auto entt: storage) {
+            ImGui::Text("%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+        }
+    }
+}
+
 template<typename Entity, typename It>
 static void present_entity(const meta_ctx &ctx, const Entity entt, const It from, const It to) {
     for(auto it = from; it != to; ++it) {
@@ -137,57 +162,6 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
                 ImGui::Text("%s", name.data());
             }
         }
-    }
-}
-
-template<typename It>
-void storage_tab(const meta_ctx &ctx, const It from, const It to) {
-    for(auto it = from; it != to; ++it) {
-        const auto &storage = it->second;
-
-        if(auto type = entt::resolve(ctx, storage.info()); type) {
-            if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
-                for(auto entt: storage) {
-                    ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
-
-                    if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
-                        if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                            present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
-                                ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
-                            });
-                        }
-
-                        ImGui::TreePop();
-                    }
-
-                    ImGui::PopID();
-                }
-
-                ImGui::TreePop();
-            }
-        } else {
-            if(const std::string name{storage.info().name()}; ImGui::TreeNode(&storage.info(), "%s (%zu)", name.data(), storage.size())) {
-                for(auto entt: storage) {
-                    ImGui::Text("%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
-                }
-
-                ImGui::TreePop();
-            }
-        }
-    }
-}
-
-template<typename Storage, typename It>
-void entity_tab(const meta_ctx &ctx, const Storage &storage, const It from, const It to) {
-    for(const auto [entt]: storage->each()) {
-        ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
-
-        if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
-            present_entity(ctx, entt, from, to);
-            ImGui::TreePop();
-        }
-
-        ImGui::PopID();
     }
 }
 
@@ -218,14 +192,31 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     ImGui::BeginTabBar("#tabs");
 
     if(ImGui::BeginTabItem("Storage")) {
-        const auto range = registry.storage();
-        internal::storage_tab(ctx, range.begin(), range.end());
+        for([[maybe_unused]] auto [id, storage]: registry.storage()) {
+            if(const davey_data *info = entt::resolve(ctx, storage.info()).custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
+                internal::present_storage(ctx, storage);
+                ImGui::TreePop();
+            }
+        }
+
         ImGui::EndTabItem();
     }
 
     if(ImGui::BeginTabItem("Entity")) {
-        const auto range = registry.storage();
-        internal::entity_tab(ctx, registry.template storage<Entity>(), range.begin(), range.end());
+        const auto &storage = registry.template storage<Entity>();
+
+        for(const auto [entt]: storage->each()) {
+            ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
+
+            if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+                const auto range = registry.storage();
+                present_entity(ctx, entt, range.begin(), range.end());
+                ImGui::TreePop();
+            }
+
+            ImGui::PopID();
+        }
+
         ImGui::EndTabItem();
     }
 
