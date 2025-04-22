@@ -204,6 +204,16 @@ void davey(const entt::basic_sparse_set<Entity, Allocator> &set) {
     davey(locator<meta_ctx>::value_or(), set);
 }
 
+template<typename... Get, typename... Exclude>
+void davey(const meta_ctx &ctx, const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
+    // TODO
+}
+
+template<typename... Get, typename... Exclude>
+void davey(const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
+    davey(locator<meta_ctx>::value_or(), view);
+}
+
 template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     ImGui::BeginTabBar("#tabs");
