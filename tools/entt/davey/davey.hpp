@@ -115,8 +115,8 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
     }
 }
 
-template<typename Storage>
-static void present_storage(const meta_ctx &ctx, const Storage &storage) {
+template<typename Entity, typename Allocator>
+static void present_storage(const meta_ctx &ctx, const entt::basic_sparse_set<Entity, Allocator> &storage) {
     if(auto type = entt::resolve(ctx, storage.info()); type) {
         for(auto entt: storage) {
             ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
@@ -167,9 +167,9 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
 
 } // namespace internal
 
-template<typename Entity, typename Allocator>
-void davey(const meta_ctx &ctx, const entt::basic_sparse_set<Entity, Allocator> &set) {
-    // TODO
+template<typename Entity, typename Type, typename Allocator>
+void davey(const meta_ctx &ctx, const entt::basic_storage<Entity, Type, Allocator> &storage) {
+    internal::present_storage(ctx, storage);
 }
 
 template<typename Entity, typename Allocator>
