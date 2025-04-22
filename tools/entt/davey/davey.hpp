@@ -22,7 +22,7 @@ namespace entt {
 
 namespace internal {
 
-#define DAVEY_OR(elem) info ? info->name : std::string{elem.info().name()}.c_str()
+#define DAVEY_OR(elem) info ? info->name : std::string{elem.info().name()}.data()
 
 template<typename Entity, typename OnEntity>
 static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
@@ -33,7 +33,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
         if(auto type = data.type(); type.info() == entt::type_id<const char *>()) {
             ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const char *>());
         } else if(type.info() == entt::type_id<std::string>()) {
-            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const std::string &>().c_str());
+            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const std::string &>().data());
         } else if(type.info() == entt::type_id<Entity>()) {
             if(const auto entt = elem.template cast<Entity>(); entt == entt::null) {
                 ImGui::Text("%s: %s", DAVEY_OR(type), "null");
@@ -44,7 +44,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
             if(type.info() == entt::type_id<bool>()) {
                 std::stringstream buffer{};
                 buffer << std::boolalpha << elem.template cast<bool>();
-                ImGui::Text("%s: %s", DAVEY_OR(type), buffer.str().c_str());
+                ImGui::Text("%s: %s", DAVEY_OR(type), buffer.str().data());
             } else if(type.info() == entt::type_id<char>()) {
                 ImGui::Text("%s: %c", DAVEY_OR(type), elem.template cast<char>());
             } else if(type.is_integral()) {
@@ -110,7 +110,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
             }
         } else {
             const std::string underlying_type{data.type().info().name()};
-            ImGui::Text("%s: %s", DAVEY_OR(type), underlying_type.c_str());
+            ImGui::Text("%s: %s", DAVEY_OR(type), underlying_type.data());
         }
     }
 }
@@ -134,7 +134,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
                 }
             } else {
                 const std::string name{storage.info().name()};
-                ImGui::Text("%s", name.c_str());
+                ImGui::Text("%s", name.data());
             }
         }
     }
@@ -147,33 +147,32 @@ void storage_tab(const meta_ctx &ctx, const It from, const It to) {
 
         if(auto type = entt::resolve(ctx, storage.info()); type) {
             if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
-                if(const auto type = entt::resolve(ctx, storage.info()); type) {
-                    for(auto entt: storage) {
-                        ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
+                for(auto entt: storage) {
+                    ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
-                        if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
-                            if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                                present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
-                                    ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
-                                });
-                            }
-
-                            ImGui::TreePop();
+                    if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+                        if(const auto obj = type.from_void(storage.value(entt)); obj) {
+                            present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
+                                ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+                            });
                         }
 
-                        ImGui::PopID();
+                        ImGui::TreePop();
                     }
-                } else {
-                    for(auto entt: storage) {
-                        ImGui::Text("%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
-                    }
+
+                    ImGui::PopID();
                 }
 
                 ImGui::TreePop();
             }
         } else {
-            const std::string name{storage.info().name()};
-            ImGui::Text("%s (%zu)", name.c_str(), storage.size());
+            if(const std::string name{storage.info().name()}; ImGui::TreeNode(&storage.info(), "%s (%zu)", name.data(), storage.size())) {
+                for(auto entt: storage) {
+                    ImGui::Text("%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+                }
+
+                ImGui::TreePop();
+            }
         }
     }
 }
