@@ -172,9 +172,9 @@ void davey(const meta_ctx &ctx, const entt::basic_storage<Entity, Type, Allocato
     internal::present_storage(ctx, storage);
 }
 
-template<typename Entity, typename Allocator>
-void davey(const entt::basic_sparse_set<Entity, Allocator> &set) {
-    davey(locator<meta_ctx>::value_or(), set);
+template<typename Entity, typename Type, typename Allocator>
+void davey(const entt::basic_storage<Entity, Type, Allocator> &storage) {
+    davey(locator<meta_ctx>::value_or(), storage);
 }
 
 template<typename... Get, typename... Exclude>
