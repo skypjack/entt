@@ -210,7 +210,7 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
 
             if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
                 const auto range = registry.storage();
-                present_entity(ctx, entt, range.begin(), range.end());
+                internal::present_entity(ctx, entt, range.begin(), range.end());
                 ImGui::TreePop();
             }
 
