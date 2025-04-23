@@ -179,7 +179,12 @@ void davey(const entt::basic_sparse_set<Entity, Allocator> &set) {
 
 template<typename... Get, typename... Exclude>
 void davey(const meta_ctx &ctx, const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
-    // TODO
+    using view_type = entt::basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+    const std::array<typename view_type::common_type, sizeof...(Get)> range{view.storage<Get>()...};
+
+    for(auto entt: view) {
+        internal::present_entity(ctx, entt, range.begin(), range.end());
+    }
 }
 
 template<typename... Get, typename... Exclude>
