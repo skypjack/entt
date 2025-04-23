@@ -196,17 +196,6 @@ template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     ImGui::BeginTabBar("#tabs");
 
-    if(ImGui::BeginTabItem("Storage")) {
-        for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-            if(const davey_data *info = entt::resolve(ctx, storage.info()).custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
-                internal::present_storage(ctx, storage);
-                ImGui::TreePop();
-            }
-        }
-
-        ImGui::EndTabItem();
-    }
-
     if(ImGui::BeginTabItem("Entity")) {
         const auto &storage = registry.template storage<Entity>();
 
@@ -220,6 +209,17 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
             }
 
             ImGui::PopID();
+        }
+
+        ImGui::EndTabItem();
+    }
+
+    if(ImGui::BeginTabItem("Storage")) {
+        for([[maybe_unused]] auto [id, storage]: registry.storage()) {
+            if(const davey_data *info = entt::resolve(ctx, storage.info()).custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
+                internal::present_storage(ctx, storage);
+                ImGui::TreePop();
+            }
         }
 
         ImGui::EndTabItem();
