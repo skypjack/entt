@@ -6,8 +6,12 @@
 namespace testbed {
 
 void imgui_system(const entt::registry &registry) {
-    ImGui::Begin("Davey");
+    ImGui::Begin("Davey - registry");
     entt::davey(registry);
+    ImGui::End();
+
+    ImGui::Begin("Davey - storage");
+    entt::davey(*registry.storage<int>());
     ImGui::End();
 }
 
