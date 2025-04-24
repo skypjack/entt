@@ -57,11 +57,6 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 present_element<Entity>(*obj, on_entity);
                 ImGui::TreePop();
             }
-        } else if(type.is_class() && entt::resolve(type.info())) {
-            if(ImGui::TreeNode(DAVEY_OR(type))) {
-                present_element<Entity>(elem, on_entity);
-                ImGui::TreePop();
-            }
         } else if(type.is_sequence_container()) {
             if(ImGui::TreeNode(DAVEY_OR(type))) {
                 entt::meta_sequence_container view = elem.as_sequence_container();
@@ -106,6 +101,11 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                     ImGui::PopID();
                 }
 
+                ImGui::TreePop();
+            }
+        } else if(type.is_class()) {
+            if(ImGui::TreeNode(DAVEY_OR(type))) {
+                present_element<Entity>(elem, on_entity);
                 ImGui::TreePop();
             }
         } else {
