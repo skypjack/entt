@@ -123,7 +123,7 @@ static void present_storage(const meta_ctx &ctx, const entt::basic_sparse_set<En
 
             if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
                 if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                    present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const entt::entity entt) {
+                    present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const Entity entt) {
                         ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
                     });
                 }
@@ -200,7 +200,7 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
         for(const auto [entt]: registry.template storage<Entity>()->each()) {
             ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
-            if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+            if(ImGui::TreeNode(&entt::type_id<Entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
                 const auto range = registry.storage();
                 internal::present_entity(ctx, entt, range.begin(), range.end());
                 ImGui::TreePop();
