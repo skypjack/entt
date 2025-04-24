@@ -197,9 +197,7 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     ImGui::BeginTabBar("#tabs");
 
     if(ImGui::BeginTabItem("Entity")) {
-        const auto &storage = registry.template storage<Entity>();
-
-        for(const auto [entt]: storage->each()) {
+        for(const auto [entt]: registry.template storage<Entity>()->each()) {
             ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
 
             if(ImGui::TreeNode(&entt::type_id<entt::entity>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
