@@ -147,7 +147,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
             if(auto type = entt::resolve(ctx, storage.info()); type) {
                 if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                        present_element<Entity>(obj, [&ctx, from, to](const char *name, const entt::entity other) {
+                        present_element<Entity>(obj, [&ctx, from, to](const char *name, const Entity other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, entt::to_integral(other), entt::to_entity(other), entt::to_version(other))) {
                                 present_entity<Entity>(ctx, other, from, to);
                                 ImGui::TreePop();
@@ -165,6 +165,40 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
     }
 }
 
+template<typename... Get, typename... Exclude, std::size_t... Index>
+static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view, std::index_sequence<Index...>) {
+    using view_type = entt::basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+    const std::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
+
+    for(auto tup: view.each()) {
+        const auto entt = std::get<0>(tup);
+        ImGui::PushID(static_cast<int>(entt::to_entity(entt)));
+
+        if(ImGui::TreeNode(&entt::type_id<typename view_type::entity_type>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
+            for(const auto *storage: range) {
+                if(auto type = entt::resolve(ctx, storage->info()); type) {
+                    if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage->info(), "%s", DAVEY_OR((*storage)))) {
+                        if(const auto obj = type.from_void(storage->value(entt)); obj) {
+                            present_element<typename view_type::entity_type>(obj, [](const char *name, const typename view_type::entity_type entt) {
+                                ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
+                            });
+                        }
+
+                        ImGui::TreePop();
+                    }
+                } else {
+                    const std::string name{storage->info().name()};
+                    ImGui::Text("%s", name.data());
+                }
+            }
+
+            ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+    }
+}
+
 } // namespace internal
 
 template<typename Entity, typename Type, typename Allocator>
@@ -179,12 +213,7 @@ void davey(const entt::basic_storage<Entity, Type, Allocator> &storage) {
 
 template<typename... Get, typename... Exclude>
 void davey(const meta_ctx &ctx, const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
-    using view_type = entt::basic_view<get_t<Get...>, exclude_t<Exclude...>>;
-    const std::array<typename view_type::common_type, sizeof...(Get)> range{view.template storage<Get>()...};
-
-    for(auto entt: view) {
-        internal::present_entity(ctx, entt, range.begin(), range.end());
-    }
+    internal::present_view(ctx, view, std::index_sequence_for<Get...>{});
 }
 
 template<typename... Get, typename... Exclude>
