@@ -7,6 +7,7 @@
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
 #include <system/imgui_system.h>
+#include <system/input_system.h>
 #include <system/rendering_system.h>
 
 namespace testbed {
@@ -35,22 +36,13 @@ void application::draw(entt::registry &registry, const context &context) const {
     SDL_RenderPresent(context);
 }
 
-void application::input() {
+void application::input(entt::registry &registry) {
     ImGuiIO &io = ImGui::GetIO();
     SDL_Event event{};
 
     while(SDL_PollEvent(&event)) {
         ImGui_ImplSDL3_ProcessEvent(&event);
-
-        switch(event.type) {
-        case SDL_EVENT_KEY_DOWN:
-            switch(event.key.key) {
-            case SDLK_ESCAPE:
-                quit = true;
-                break;
-            }
-            break;
-        }
+        input_system(registry, event, quit);
     }
 }
 
@@ -81,7 +73,7 @@ int application::run() {
     while(!quit) {
         update(registry);
         draw(registry, context);
-        input();
+        input(registry);
     }
 
     return 0;

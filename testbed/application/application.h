@@ -13,7 +13,7 @@ struct context;
 class application {
     void update(entt::registry &);
     void draw(entt::registry &, const context &) const;
-    void input();
+    void input(entt::registry &);
 
 public:
     application();
