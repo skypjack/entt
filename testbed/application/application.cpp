@@ -6,6 +6,7 @@
 #include <backends/imgui_impl_sdlrenderer3.h>
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
+#include <system/hud_system.h>
 #include <system/imgui_system.h>
 #include <system/input_system.h>
 #include <system/rendering_system.h>
@@ -26,6 +27,7 @@ void application::draw(entt::registry &registry, const context &context) const {
     SDL_RenderClear(context);
 
     rendering_system(registry, context);
+    hud_system(registry, context);
     imgui_system(registry);
 
     ImGui::Render();

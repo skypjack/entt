@@ -51,6 +51,7 @@ target_sources(
 	PRIVATE
         application/application.cpp
         application/context.cpp
+        system/hud_system.cpp
         system/imgui_system.cpp
         system/input_system.cpp
         system/rendering_system.cpp
