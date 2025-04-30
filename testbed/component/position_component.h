@@ -4,8 +4,8 @@
 
 namespace testbed {
 
-struct rect_component {
-    SDL_FRect area;
+struct position_component {
+    SDL_FPoint point;
 };
 
 } // namespace testbed
