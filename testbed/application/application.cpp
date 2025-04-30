@@ -4,6 +4,10 @@
 #include <application/context.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
+#include <component/input_listener_component.h>
+#include <component/position_component.h>
+#include <component/rect_component.h>
+#include <component/renderable_component.h>
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
 #include <system/hud_system.h>
@@ -62,6 +66,11 @@ static void static_setup_for_dev_purposes(entt::registry &registry) {
 
     registry.emplace<double>(entt, 1.2);
     registry.emplace<int>(entt, 3);
+
+    registry.emplace<input_listener_component>(entt);
+    registry.emplace<position_component>(entt, SDL_FPoint{400.f, 400.f});
+    registry.emplace<rect_component>(entt, SDL_FRect{0.f, 0.f, 20.f, 20.f});
+    registry.emplace<renderable_component>(entt);
 }
 
 int application::run() {
