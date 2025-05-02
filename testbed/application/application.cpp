@@ -10,6 +10,7 @@
 #include <component/renderable_component.h>
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
+#include <meta/meta.h>
 #include <system/hud_system.h>
 #include <system/imgui_system.h>
 #include <system/input_system.h>
@@ -64,9 +65,6 @@ application::~application() {
 static void static_setup_for_dev_purposes(entt::registry &registry) {
     const auto entt = registry.create();
 
-    registry.emplace<double>(entt, 1.2);
-    registry.emplace<int>(entt, 3);
-
     registry.emplace<input_listener_component>(entt);
     registry.emplace<position_component>(entt, SDL_FPoint{400.f, 400.f});
     registry.emplace<rect_component>(entt, SDL_FRect{0.f, 0.f, 20.f, 20.f});
@@ -77,6 +75,7 @@ int application::run() {
     entt::registry registry{};
     context context{};
 
+    meta_setup();
     static_setup_for_dev_purposes(registry);
 
     quit = false;

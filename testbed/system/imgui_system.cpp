@@ -1,3 +1,6 @@
+#include <component/input_listener_component.h>
+#include <component/rect_component.h>
+#include <component/renderable_component.h>
 #include <entt/davey/davey.hpp>
 #include <entt/entity/registry.hpp>
 #include <imgui.h>
@@ -11,11 +14,11 @@ void imgui_system(const entt::registry &registry) {
     ImGui::End();
 
     ImGui::Begin("Davey - view");
-    entt::davey(registry.view<int, double>());
+    entt::davey(registry.view<renderable_component, rect_component>());
     ImGui::End();
 
     ImGui::Begin("Davey - storage");
-    entt::davey(*registry.storage<int>());
+    entt::davey(*registry.storage<input_listener_component>());
     ImGui::End();
 }
 
