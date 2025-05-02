@@ -17,7 +17,7 @@ void rendering_system(entt::registry &registry, const context &ctx) {
     SDL_RenderClear(ctx);
 
     for(auto [entt, pos, rect]: registry.view<renderable_component, position_component, rect_component>().each()) {
-        SDL_FRect elem{rect.area.x + pos.point.x, rect.area.y + pos.point.y, rect.area.w, rect.area.h};
+        SDL_FRect elem{rect.x + pos.x, rect.y + pos.y, rect.w, rect.h};
         SDL_SetRenderDrawColor(ctx, 255u, 255u, 255u, SDL_ALPHA_OPAQUE);
         SDL_RenderRect(ctx, &elem);
     }

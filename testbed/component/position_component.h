@@ -4,8 +4,6 @@
 
 namespace testbed {
 
-struct position_component {
-    SDL_FPoint point;
-};
+struct position_component: SDL_FPoint {};
 
 } // namespace testbed
