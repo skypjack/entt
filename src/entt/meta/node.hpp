@@ -140,7 +140,7 @@ struct meta_type_node {
 
     const type_info *info{};
     id_type id{};
-    const char *name{};
+    const char *label{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
     meta_type_node (*resolve)(const meta_context &) noexcept {};

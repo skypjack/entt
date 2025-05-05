@@ -11,6 +11,7 @@
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/fwd.hpp"
+#include "../core/hashed_string.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
@@ -49,10 +50,11 @@ class basic_meta_factory {
     }
 
 protected:
-    void type(const id_type id) noexcept {
+    void type(const id_type id, const char *label) noexcept {
         reset_bucket(parent);
         auto &&elem = meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
+        elem.label = label;
         elem.id = id;
     }
 
@@ -168,11 +170,30 @@ public:
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
+     *
+     * Extended function for hashed string support.<br/>
+     * The identifier is used for the type, while the associated string is used
+     * as the name. The length is ignored.
+     *
+     * @warning
+     * The reflection system expects string literals, does not make copies, and
+     * is not in charge of freeing memory in any case.
+     *
+     * @param id A custom unique identifier.
+     * @return A meta factory for the given type.
+     */
+    meta_factory type(const hashed_string id) noexcept {
+        base_type::type(id.value(), id.data());
+        return *this;
+    }
+
+    /**
+     * @brief Assigns a custom unique identifier to a meta type.
      * @param id A custom unique identifier.
      * @return A meta factory for the given type.
      */
     meta_factory type(const id_type id) noexcept {
-        base_type::type(id);
+        base_type::type(id, nullptr);
         return *this;
     }
 

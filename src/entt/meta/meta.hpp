@@ -1159,6 +1159,14 @@ public:
     }
 
     /**
+     * @brief Returns the label assigned to a type, if any.
+     * @return The label assigned to the type, if any.
+     */
+    [[nodiscard]] const char *label() const noexcept {
+        return node.label;
+    }
+
+    /**
      * @brief Returns the size of the underlying type if known.
      * @return The size of the underlying type if known, 0 otherwise.
      */

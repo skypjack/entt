@@ -301,6 +301,14 @@ TEST_F(MetaType, IdAndInfo) {
     ASSERT_EQ(type.info(), entt::type_id<clazz>());
 }
 
+TEST_F(MetaType, Label) {
+    using namespace entt::literals;
+
+    ASSERT_EQ(entt::resolve<clazz>().label(), std::string_view{"class"});
+    ASSERT_NE(entt::resolve<double>().label(), nullptr);
+    ASSERT_EQ(entt::resolve<int>().label(), nullptr);
+}
+
 TEST_F(MetaType, SizeOf) {
     ASSERT_EQ(entt::resolve<void>().size_of(), 0u);
     ASSERT_EQ(entt::resolve<int>().size_of(), sizeof(int));
