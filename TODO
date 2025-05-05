@@ -37,3 +37,4 @@ TODO:
 * use any for meta_custom_node
 * support names directly on meta nodes
 * fwd meta_ctx (and update testbed)
+* avoid copying meta_type/data/func nodes
