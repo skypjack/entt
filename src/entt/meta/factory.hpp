@@ -320,6 +320,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
+                    nullptr,
                     /* this is never static */
                     std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
@@ -339,6 +340,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
+                    nullptr,
                     ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
@@ -379,6 +381,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
+                    nullptr,
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,
@@ -392,6 +395,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
+                    nullptr,
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
@@ -425,6 +429,7 @@ public:
         base_type::func(
             internal::meta_func_node{
                 id,
+                nullptr,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
                 &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
