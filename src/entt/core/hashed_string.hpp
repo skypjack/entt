@@ -153,7 +153,7 @@ public:
         : base_type{helper({wrapper.repr})} {}
 
     /**
-     * @brief Returns the size a hashed string.
+     * @brief Returns the size of a hashed string.
      * @return The size of the hashed string.
      */
     [[nodiscard]] constexpr size_type size() const noexcept {
