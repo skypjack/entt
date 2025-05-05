@@ -62,14 +62,14 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *str) noexcept
+        constexpr const_wrapper(const typename base_type::value_type *str) noexcept
             : repr{str} {}
 
-        const Char *repr;
+        const typename base_type::value_type *repr;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    [[nodiscard]] static constexpr auto helper(const std::basic_string_view<Char> view) noexcept {
+    [[nodiscard]] static constexpr auto helper(const std::basic_string_view<typename base_type::value_type> view) noexcept {
         base_type base{view.data(), view.size(), params::offset};
 
         for(auto &&curr: view) {
