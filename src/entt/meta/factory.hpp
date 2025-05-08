@@ -183,17 +183,17 @@ public:
      * @return A meta factory for the given type.
      */
     meta_factory type(const hashed_string id) noexcept {
-        base_type::type(id.value(), id.data());
-        return *this;
+        return type(id.value(), id.data());
     }
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
      * @param id A custom unique identifier.
+     * @param label An optional custom name for the type.
      * @return A meta factory for the given type.
      */
-    meta_factory type(const id_type id) noexcept {
-        base_type::type(id, nullptr);
+    meta_factory type(const id_type id, const char *label = nullptr) noexcept {
+        base_type::type(id, label);
         return *this;
     }
 

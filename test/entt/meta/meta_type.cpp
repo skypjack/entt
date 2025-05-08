@@ -304,8 +304,17 @@ TEST_F(MetaType, IdAndInfo) {
 TEST_F(MetaType, Label) {
     using namespace entt::literals;
 
-    ASSERT_EQ(entt::resolve<clazz>().label(), std::string_view{"class"});
-    ASSERT_NE(entt::resolve<double>().label(), nullptr);
+    entt::meta_reset();
+
+    entt::meta_factory<base>().type("base");
+    entt::meta_factory<derived>().type("derived"_hs);
+    entt::meta_factory<double>().type(entt::hashed_string::value("double"));
+    entt::meta_factory<unsigned int>().type("unsigned int"_hs, "uint");
+
+    ASSERT_EQ(entt::resolve<base>().label(), std::string_view{"base"});
+    ASSERT_EQ(entt::resolve<derived>().label(), std::string_view{"derived"});
+    ASSERT_STREQ(entt::resolve<unsigned int>().label(), "uint");
+    ASSERT_STREQ(entt::resolve<double>().label(), nullptr);
     ASSERT_EQ(entt::resolve<int>().label(), nullptr);
 }
 
