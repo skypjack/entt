@@ -216,6 +216,26 @@ ENTT_DEBUG_TEST_F(MetaFuncDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<function>().func("h"_hs).custom(), "");
 }
 
+TEST_F(MetaFunc, Label) {
+    using namespace entt::literals;
+
+    entt::meta_reset<function>();
+
+    entt::meta_factory<function>()
+        .func<&function::g>("g")
+        .func<function::h>("h"_hs)
+        .func<function::k>(entt::hashed_string::value("k"))
+        .func<&function::v>("v"_hs, "w");
+
+    const entt::meta_type type = entt::resolve<function>();
+
+    ASSERT_EQ(type.func("g"_hs).label(), std::string_view{"g"});
+    ASSERT_EQ(type.func("h"_hs).label(), std::string_view{"h"});
+    ASSERT_EQ(type.func("j"_hs).label(), nullptr);
+    ASSERT_EQ(type.func("k"_hs).label(), nullptr);
+    ASSERT_EQ(type.func("v"_hs).label(), std::string_view{"w"});
+}
+
 TEST_F(MetaFunc, Comparison) {
     using namespace entt::literals;
 

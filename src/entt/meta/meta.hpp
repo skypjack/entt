@@ -956,6 +956,14 @@ struct meta_func {
           ctx{&area} {}
 
     /**
+     * @brief Returns the label assigned to a member function, if any.
+     * @return The label assigned to the member function, if any.
+     */
+    [[nodiscard]] const char *label() const noexcept {
+        return node.label;
+    }
+
+    /**
      * @brief Returns the number of arguments accepted by a member function.
      * @return The number of arguments accepted by the member function.
      */

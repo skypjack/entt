@@ -430,6 +430,25 @@ public:
     }
 
     /**
+     * @brief Assigns a custom unique identifier to a meta type.
+     *
+     * Extended function for hashed string support.<br/>
+     * The identifier is used for the type, while the associated string is used
+     * as the name. The length is ignored.
+     *
+     * @warning
+     * The reflection system expects string literals, does not make copies, and
+     * is not in charge of freeing memory in any case.
+     *
+     * @param id A custom unique identifier.
+     * @return A meta factory for the given type.
+     */
+    template<auto Candidate, typename Policy = as_is_t>
+    meta_factory func(const hashed_string id) noexcept {
+        return func<Candidate, Policy>(id.value(), id.data());
+    }
+
+    /**
      * @brief Assigns a meta function to a meta type.
      *
      * Both member functions and free functions can be assigned to a meta
@@ -440,17 +459,18 @@ public:
      * @tparam Candidate The actual function to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
+     * @param label An optional custom name for the type.
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    meta_factory func(const id_type id) noexcept {
+    meta_factory func(const id_type id, const char *label = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         base_type::func(
             internal::meta_func_node{
                 id,
-                nullptr,
+                label,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
                 &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,
