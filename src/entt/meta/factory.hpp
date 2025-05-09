@@ -330,10 +330,11 @@ public:
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
+     * @param label An optional custom name for the type.
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    meta_factory data(const id_type id) noexcept {
+    meta_factory data(const id_type id, const char *label = nullptr) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::invoke_result_t<decltype(Data), Type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -341,7 +342,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    nullptr,
+                    label,
                     /* this is never static */
                     std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
@@ -391,10 +392,11 @@ public:
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
+     * @param label An optional custom name for the type.
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    meta_factory data(const id_type id) noexcept {
+    meta_factory data(const id_type id, const char *label = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Getter)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
@@ -402,7 +404,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    nullptr,
+                    label,
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,

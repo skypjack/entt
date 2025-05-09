@@ -95,7 +95,7 @@ struct meta_data_node {
     using size_type = std::size_t;
 
     id_type id{};
-    const char *name{};
+    const char *label{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
     meta_type_node (*type)(const meta_context &) noexcept {};
