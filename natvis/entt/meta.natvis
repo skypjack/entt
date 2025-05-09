@@ -34,10 +34,12 @@
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
+		<DisplayString Condition="label != nullptr">{{ id={ label,na } }}</DisplayString>
 		<DisplayString Condition="get != nullptr">{{ id={ id } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
+			<Item Name="[label]" Condition="label != nullptr">label,na</Item>
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
@@ -52,10 +54,12 @@
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
+		<DisplayString Condition="label != nullptr">{{ id={ label,na } }}</DisplayString>
 		<DisplayString Condition="invoke != nullptr">{{ id={ id } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
+			<Item Name="[label]" Condition="label != nullptr">label,na</Item>
 			<Item Name="[arity]">arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
@@ -84,10 +88,12 @@
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
 		</Intrinsic>
+		<DisplayString Condition="label != nullptr">{{ type={ label,na } }}</DisplayString>
 		<DisplayString Condition="info != nullptr">{{ type={ info->alias,na } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<Item Name="[id]">id</Item>
+			<Item Name="[label]" Condition="label != nullptr">label,na</Item>
 			<Item Name="[sizeof]">size_of</Item>
 			<Item Name="[is_arithmetic]">has_trait(entt::internal::meta_traits::is_arithmetic)</Item>
 			<Item Name="[is_integral]">has_trait(entt::internal::meta_traits::is_integral)</Item>

@@ -40,5 +40,4 @@ TODO:
 * avoid copying meta_type/data/func nodes
 * review doc for hashed string extended functions in meta factory
 * review tests for hashed string extended functions to avoid meta_reset
-* natvis for meta: add label to type, func, data nodes
 * doc for labels on meta elements
