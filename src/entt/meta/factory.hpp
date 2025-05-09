@@ -430,7 +430,7 @@ public:
     }
 
     /**
-     * @brief Assigns a custom unique identifier to a meta type.
+     * @brief Assigns a meta function to a meta type.
      *
      * Extended function for hashed string support.<br/>
      * The identifier is used for the type, while the associated string is used
@@ -440,6 +440,8 @@ public:
      * The reflection system expects string literals, does not make copies, and
      * is not in charge of freeing memory in any case.
      *
+     * @tparam Candidate The actual function to attach to the meta function.
+     * @tparam Policy Optional policy (no policy set by default).
      * @param id A custom unique identifier.
      * @return A meta factory for the given type.
      */
