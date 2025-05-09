@@ -184,6 +184,40 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
 }
 
+TEST_F(MetaData, Label) {
+    using namespace entt::literals;
+
+    entt::meta_reset<clazz>();
+    entt::meta_reset<setter_getter>();
+
+    entt::meta_factory<clazz>{}
+        .data<&clazz::i, entt::as_ref_t>("i")
+        .data<&clazz::i, entt::as_cref_t>("ci"_hs)
+        .data<&clazz::j>(entt::hashed_string::value("j"))
+        .data<&clazz::h>("h"_hs, "hhh");
+
+    entt::meta_factory<setter_getter>{}
+        .data<&setter_getter::static_setter, &setter_getter::static_getter>("x")
+        .data<&setter_getter::setter, &setter_getter::getter>("y"_hs)
+        .data<nullptr, &setter_getter::getter>(entt::hashed_string::value("z"))
+        .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("h"_hs, "hhh");
+
+    const entt::meta_type type = entt::resolve<clazz>();
+    const entt::meta_type other = entt::resolve<setter_getter>();
+
+    ASSERT_EQ(type.data("i"_hs).label(), std::string_view{"i"});
+    ASSERT_EQ(type.data("ci"_hs).label(), std::string_view{"ci"});
+    ASSERT_EQ(type.data("j"_hs).label(), nullptr);
+    ASSERT_EQ(type.data("k"_hs).label(), nullptr);
+    ASSERT_EQ(type.data("h"_hs).label(), std::string_view{"hhh"});
+
+    ASSERT_EQ(other.data("x"_hs).label(), std::string_view{"x"});
+    ASSERT_EQ(other.data("y"_hs).label(), std::string_view{"y"});
+    ASSERT_EQ(other.data("z"_hs).label(), nullptr);
+    ASSERT_EQ(other.data("v"_hs).label(), nullptr);
+    ASSERT_EQ(other.data("h"_hs).label(), std::string_view{"hhh"});
+}
+
 TEST_F(MetaData, Comparison) {
     using namespace entt::literals;
 

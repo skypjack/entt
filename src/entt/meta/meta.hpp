@@ -833,6 +833,14 @@ struct meta_data {
           ctx{&area} {}
 
     /**
+     * @brief Returns the label assigned to a data member, if any.
+     * @return The label assigned to the data member, if any.
+     */
+    [[nodiscard]] const char *label() const noexcept {
+        return node.label;
+    }
+
+    /**
      * @brief Returns the number of setters available.
      * @return The number of setters available.
      */

@@ -322,6 +322,27 @@ public:
     /**
      * @brief Assigns a meta data to a meta type.
      *
+     * Extended function for hashed string support.<br/>
+     * The identifier is used for the type, while the associated string is used
+     * as the name. The length is ignored.
+     *
+     * @warning
+     * The reflection system expects string literals, does not make copies, and
+     * is not in charge of freeing memory in any case.
+     *
+     * @tparam Data The actual variable to attach to the meta type.
+     * @tparam Policy Optional policy (no policy set by default).
+     * @param id A custom unique identifier.
+     * @return A meta factory for the given type.
+     */
+    template<auto Data, typename Policy = as_is_t>
+    meta_factory data(const hashed_string id) noexcept {
+        return data<Data, Policy>(id.value(), id.data());
+    }
+
+    /**
+     * @brief Assigns a meta data to a meta type.
+     *
      * Both data members and static and global variables, as well as constants
      * of any kind, can be assigned to a meta type.<br/>
      * From a client's point of view, all the variables associated with the
@@ -362,7 +383,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    nullptr,
+                    label,
                     ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
@@ -372,6 +393,29 @@ public:
         }
 
         return *this;
+    }
+
+    /**
+     * @brief Assigns a meta data to a meta type by means of its setter and
+     * getter.
+     *
+     * Extended function for hashed string support.<br/>
+     * The identifier is used for the type, while the associated string is used
+     * as the name. The length is ignored.
+     *
+     * @warning
+     * The reflection system expects string literals, does not make copies, and
+     * is not in charge of freeing memory in any case.
+     *
+     * @tparam Setter The actual function to use as a setter.
+     * @tparam Getter The actual function to use as a getter.
+     * @tparam Policy Optional policy (no policy set by default).
+     * @param id A custom unique identifier.
+     * @return A meta factory for the given type.
+     */
+    template<auto Setter, auto Getter, typename Policy = as_is_t>
+    meta_factory data(const hashed_string id) noexcept {
+        return data<Setter, Getter, Policy>(id.value(), id.data());
     }
 
     /**
@@ -418,7 +462,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    nullptr,
+                    label,
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
