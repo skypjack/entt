@@ -177,7 +177,7 @@ public:
     }
 
     /*! @copydoc data */
-    [[nodiscard]] constexpr operator const value_type *() const noexcept {
+    [[nodiscard]] explicit constexpr operator const value_type *() const noexcept {
         return data();
     }
 
