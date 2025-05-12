@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string_view>
 #include "fwd.hpp"
 
 namespace entt {
@@ -32,9 +31,9 @@ struct basic_hashed_string {
     using size_type = std::size_t;
     using hash_type = id_type;
 
-    const value_type *repr;
-    size_type length;
-    hash_type hash;
+    const value_type *repr{};
+    hash_type hash{fnv_1a_params<>::offset};
+    size_type length{};
 };
 
 } // namespace internal
@@ -67,17 +66,6 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
         const typename base_type::value_type *repr;
     };
-
-    // Fowler–Noll–Vo hash function v. 1a - the good
-    [[nodiscard]] static constexpr auto helper(const std::basic_string_view<typename base_type::value_type> view) noexcept {
-        base_type base{view.data(), view.size(), params::offset};
-
-        for(auto &&curr: view) {
-            base.hash = (base.hash ^ static_cast<id_type>(curr)) * params::prime;
-        }
-
-        return base;
-    }
 
 public:
     /*! @brief Character type. */
@@ -128,7 +116,11 @@ public:
      * @param len Length of the string to hash.
      */
     constexpr basic_hashed_string(const value_type *str, const size_type len) noexcept
-        : base_type{helper({str, len})} {}
+        : base_type{str} {
+        for(; base_type::length < len; ++base_type::length) {
+            base_type::hash = (base_type::hash ^ static_cast<id_type>(str[base_type::length])) * params::prime;
+        }
+    }
 
     /**
      * @brief Constructs a hashed string from an array of const characters.
@@ -138,7 +130,11 @@ public:
     template<std::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     ENTT_CONSTEVAL basic_hashed_string(const value_type (&str)[N]) noexcept
-        : base_type{helper({static_cast<const value_type *>(str)})} {}
+        : base_type{str} {
+        for(; str[base_type::length]; ++base_type::length) {
+            base_type::hash = (base_type::hash ^ static_cast<id_type>(str[base_type::length])) * params::prime;
+        }
+    }
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
@@ -150,7 +146,11 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) noexcept
-        : base_type{helper({wrapper.repr})} {}
+        : base_type{wrapper.repr} {
+        for(; wrapper.repr[base_type::length]; ++base_type::length) {
+            base_type::hash = (base_type::hash ^ static_cast<id_type>(wrapper.repr[base_type::length])) * params::prime;
+        }
+    }
 
     /**
      * @brief Returns the size of a hashed string.
