@@ -59,6 +59,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install Ninja
+      run: winget install --id=Ninja-build.Ninja  -e
+    
     - name: Compile testbed
       working-directory: build
       run: |
