@@ -127,7 +127,7 @@ struct MetaType: ::testing::Test {
             .data<set<double>, get<double>>("var"_hs);
 
         entt::meta_factory<unsigned int>{}
-            .type("unsigned int"_hs)
+            .type("unsigned int"_hs, "uint")
             .traits(test::meta_traits::two)
             .data<0u>("min"_hs)
             .data<128u>("max"_hs);
@@ -137,7 +137,7 @@ struct MetaType: ::testing::Test {
             .data<&base::value>("value"_hs);
 
         entt::meta_factory<derived>{}
-            .type("derived"_hs)
+            .type("derived")
             .traits(test::meta_traits::one | test::meta_traits::three)
             .base<base>();
 
@@ -301,21 +301,13 @@ TEST_F(MetaType, IdAndInfo) {
     ASSERT_EQ(type.info(), entt::type_id<clazz>());
 }
 
-TEST_F(MetaType, Label) {
+TEST_F(MetaType, Name) {
     using namespace entt::literals;
 
-    entt::meta_reset();
-
-    entt::meta_factory<base>().type("base");
-    entt::meta_factory<derived>().type("derived"_hs);
-    entt::meta_factory<double>().type(entt::hashed_string::value("double"));
-    entt::meta_factory<unsigned int>().type("unsigned int"_hs, "uint");
-
-    ASSERT_EQ(entt::resolve<base>().label(), std::string_view{"base"});
-    ASSERT_EQ(entt::resolve<derived>().label(), std::string_view{"derived"});
-    ASSERT_STREQ(entt::resolve<unsigned int>().label(), "uint");
-    ASSERT_STREQ(entt::resolve<double>().label(), nullptr);
-    ASSERT_EQ(entt::resolve<int>().label(), nullptr);
+    ASSERT_EQ(entt::resolve<base>().name(), nullptr);
+    ASSERT_STREQ(entt::resolve<derived>().name(), "derived");
+    ASSERT_STREQ(entt::resolve<unsigned int>().name(), "uint");
+    ASSERT_EQ(entt::resolve<void>().name(), nullptr);
 }
 
 TEST_F(MetaType, SizeOf) {

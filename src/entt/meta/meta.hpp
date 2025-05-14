@@ -833,11 +833,11 @@ struct meta_data {
           ctx{&area} {}
 
     /**
-     * @brief Returns the label assigned to a data member, if any.
-     * @return The label assigned to the data member, if any.
+     * @brief Returns the name assigned to a data member, if any.
+     * @return The name assigned to the data member, if any.
      */
-    [[nodiscard]] const char *label() const noexcept {
-        return node.label;
+    [[nodiscard]] const char *name() const noexcept {
+        return node.name;
     }
 
     /**
@@ -964,11 +964,11 @@ struct meta_func {
           ctx{&area} {}
 
     /**
-     * @brief Returns the label assigned to a member function, if any.
-     * @return The label assigned to the member function, if any.
+     * @brief Returns the name assigned to a member function, if any.
+     * @return The name assigned to the member function, if any.
      */
-    [[nodiscard]] const char *label() const noexcept {
-        return node.label;
+    [[nodiscard]] const char *name() const noexcept {
+        return node.name;
     }
 
     /**
@@ -1175,11 +1175,11 @@ public:
     }
 
     /**
-     * @brief Returns the label assigned to a type, if any.
-     * @return The label assigned to the type, if any.
+     * @brief Returns the name assigned to a type, if any.
+     * @return The name assigned to the type, if any.
      */
-    [[nodiscard]] const char *label() const noexcept {
-        return node.label;
+    [[nodiscard]] const char *name() const noexcept {
+        return node.name;
     }
 
     /**

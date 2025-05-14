@@ -107,8 +107,8 @@ struct MetaFunc: ::testing::Test {
             .type("derived"_hs)
             .base<base>()
             .func<&base::setter>("setter_from_base"_hs)
-            .func<&base::getter>("getter_from_base"_hs)
-            .func<&base::static_setter>("static_setter_from_base"_hs);
+            .func<&base::getter>("getter_from_base")
+            .func<&base::static_setter>("static_setter_from_base"_hs, "static setter");
 
         entt::meta_factory<function>{}
             .type("func"_hs)
@@ -216,24 +216,15 @@ ENTT_DEBUG_TEST_F(MetaFuncDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<function>().func("h"_hs).custom(), "");
 }
 
-TEST_F(MetaFunc, Label) {
+TEST_F(MetaFunc, Name) {
     using namespace entt::literals;
 
-    entt::meta_reset<function>();
+    const entt::meta_type type = entt::resolve<derived>();
 
-    entt::meta_factory<function>()
-        .func<&function::g>("g")
-        .func<function::h>("h"_hs)
-        .func<function::k>(entt::hashed_string::value("k"))
-        .func<&function::v>("v"_hs, "w");
-
-    const entt::meta_type type = entt::resolve<function>();
-
-    ASSERT_EQ(type.func("g"_hs).label(), std::string_view{"g"});
-    ASSERT_EQ(type.func("h"_hs).label(), std::string_view{"h"});
-    ASSERT_EQ(type.func("j"_hs).label(), nullptr);
-    ASSERT_EQ(type.func("k"_hs).label(), nullptr);
-    ASSERT_EQ(type.func("v"_hs).label(), std::string_view{"w"});
+    ASSERT_EQ(type.func("setter_from_base"_hs).name(), nullptr);
+    ASSERT_STREQ(type.func("getter_from_base"_hs).name(), "getter_from_base");
+    ASSERT_STREQ(type.func("static_setter_from_base"_hs).name(), "static setter");
+    ASSERT_EQ(type.func("none"_hs).name(), nullptr);
 }
 
 TEST_F(MetaFunc, Comparison) {

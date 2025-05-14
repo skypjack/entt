@@ -50,11 +50,11 @@ class basic_meta_factory {
     }
 
 protected:
-    void type(const id_type id, const char *label) noexcept {
+    void type(const id_type id, const char *name) noexcept {
         reset_bucket(parent);
         auto &&elem = meta_context::from(*ctx).value[parent];
         ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        elem.label = label;
+        elem.name = name;
         elem.id = id;
     }
 
@@ -170,30 +170,21 @@ public:
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
-     *
-     * Extended function for hashed string support.<br/>
-     * The identifier is used for the type, while the associated string is used
-     * as the name. The length is ignored.
-     *
-     * @warning
-     * The reflection system expects string literals, does not make copies, and
-     * is not in charge of freeing memory in any case.
-     *
-     * @param id A custom unique identifier.
+     * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
-    meta_factory type(const hashed_string id) noexcept {
-        return type(id.value(), id.data());
+    meta_factory type(const char *name) noexcept {
+        return type(entt::hashed_string::value(name), name);
     }
 
     /**
      * @brief Assigns a custom unique identifier to a meta type.
      * @param id A custom unique identifier.
-     * @param label An optional custom name for the type.
+     * @param name An optional name for the type as a **string literal**.
      * @return A meta factory for the given type.
      */
-    meta_factory type(const id_type id, const char *label = nullptr) noexcept {
-        base_type::type(id, label);
+    meta_factory type(const id_type id, const char *name = nullptr) noexcept {
+        base_type::type(id, name);
         return *this;
     }
 
@@ -321,23 +312,14 @@ public:
 
     /**
      * @brief Assigns a meta data to a meta type.
-     *
-     * Extended function for hashed string support.<br/>
-     * The identifier is used for the type, while the associated string is used
-     * as the name. The length is ignored.
-     *
-     * @warning
-     * The reflection system expects string literals, does not make copies, and
-     * is not in charge of freeing memory in any case.
-     *
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param id A custom unique identifier.
+     * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
     template<auto Data, typename Policy = as_is_t>
-    meta_factory data(const hashed_string id) noexcept {
-        return data<Data, Policy>(id.value(), id.data());
+    meta_factory data(const char *name) noexcept {
+        return data<Data, Policy>(entt::hashed_string::value(name), name);
     }
 
     /**
@@ -351,11 +333,11 @@ public:
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @param label An optional custom name for the type.
+     * @param name An optional name for the meta data as a **string literal**.
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    meta_factory data(const id_type id, const char *label = nullptr) noexcept {
+    meta_factory data(const id_type id, const char *name = nullptr) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::invoke_result_t<decltype(Data), Type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -363,7 +345,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    label,
+                    name,
                     /* this is never static */
                     std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
@@ -383,7 +365,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    label,
+                    name,
                     ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
@@ -398,24 +380,15 @@ public:
     /**
      * @brief Assigns a meta data to a meta type by means of its setter and
      * getter.
-     *
-     * Extended function for hashed string support.<br/>
-     * The identifier is used for the type, while the associated string is used
-     * as the name. The length is ignored.
-     *
-     * @warning
-     * The reflection system expects string literals, does not make copies, and
-     * is not in charge of freeing memory in any case.
-     *
      * @tparam Setter The actual function to use as a setter.
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param id A custom unique identifier.
+     * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    meta_factory data(const hashed_string id) noexcept {
-        return data<Setter, Getter, Policy>(id.value(), id.data());
+    meta_factory data(const char *name) noexcept {
+        return data<Setter, Getter, Policy>(entt::hashed_string::value(name), name);
     }
 
     /**
@@ -436,11 +409,11 @@ public:
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @param label An optional custom name for the type.
+     * @param name An optional name for the meta data as a **string literal**.
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    meta_factory data(const id_type id, const char *label = nullptr) noexcept {
+    meta_factory data(const id_type id, const char *name = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Getter)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
@@ -448,7 +421,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    label,
+                    name,
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,
@@ -462,7 +435,7 @@ public:
             base_type::data(
                 internal::meta_data_node{
                     id,
-                    label,
+                    name,
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
@@ -477,23 +450,14 @@ public:
 
     /**
      * @brief Assigns a meta function to a meta type.
-     *
-     * Extended function for hashed string support.<br/>
-     * The identifier is used for the type, while the associated string is used
-     * as the name. The length is ignored.
-     *
-     * @warning
-     * The reflection system expects string literals, does not make copies, and
-     * is not in charge of freeing memory in any case.
-     *
      * @tparam Candidate The actual function to attach to the meta function.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param id A custom unique identifier.
+     * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    meta_factory func(const hashed_string id) noexcept {
-        return func<Candidate, Policy>(id.value(), id.data());
+    meta_factory func(const char *name) noexcept {
+        return func<Candidate, Policy>(entt::hashed_string::value(name), name);
     }
 
     /**
@@ -507,18 +471,18 @@ public:
      * @tparam Candidate The actual function to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
      * @param id Unique identifier.
-     * @param label An optional custom name for the type.
+     * @param name An optional name for the function as a **string literal**.
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    meta_factory func(const id_type id, const char *label = nullptr) noexcept {
+    meta_factory func(const id_type id, const char *name = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
         base_type::func(
             internal::meta_func_node{
                 id,
-                label,
+                name,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
                 &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cv_t<std::remove_reference_t<typename descriptor::return_type>>>>,

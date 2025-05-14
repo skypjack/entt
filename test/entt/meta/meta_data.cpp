@@ -96,9 +96,9 @@ struct MetaData: ::testing::Test {
             .custom<char>('c')
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
             .data<&clazz::i, entt::as_cref_t>("ci"_hs)
-            .data<&clazz::j>("j"_hs)
+            .data<&clazz::j>("j")
             .traits(test::meta_traits::one)
-            .data<&clazz::h>("h"_hs)
+            .data<&clazz::h>("h"_hs, "hhh")
             .traits(test::meta_traits::two)
             .data<&clazz::k>("k"_hs)
             .traits(test::meta_traits::three)
@@ -112,8 +112,8 @@ struct MetaData: ::testing::Test {
             .data<&setter_getter::static_setter, &setter_getter::static_getter>("x"_hs)
             .data<&setter_getter::setter, &setter_getter::getter>("y"_hs)
             .data<&setter_getter::static_setter, &setter_getter::getter>("z"_hs)
-            .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("w"_hs)
-            .data<nullptr, &setter_getter::getter>("z_ro"_hs)
+            .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("w")
+            .data<nullptr, &setter_getter::getter>("z_ro"_hs, "readonly")
             .data<nullptr, &setter_getter::value>("value"_hs);
 
         entt::meta_factory<array>{}
@@ -184,38 +184,21 @@ ENTT_DEBUG_TEST_F(MetaDataDeathTest, Custom) {
     ASSERT_DEATH([[maybe_unused]] const char value = entt::resolve<clazz>().data("j"_hs).custom(), "");
 }
 
-TEST_F(MetaData, Label) {
+TEST_F(MetaData, Name) {
     using namespace entt::literals;
-
-    entt::meta_reset<clazz>();
-    entt::meta_reset<setter_getter>();
-
-    entt::meta_factory<clazz>{}
-        .data<&clazz::i, entt::as_ref_t>("i")
-        .data<&clazz::i, entt::as_cref_t>("ci"_hs)
-        .data<&clazz::j>(entt::hashed_string::value("j"))
-        .data<&clazz::h>("h"_hs, "hhh");
-
-    entt::meta_factory<setter_getter>{}
-        .data<&setter_getter::static_setter, &setter_getter::static_getter>("x")
-        .data<&setter_getter::setter, &setter_getter::getter>("y"_hs)
-        .data<nullptr, &setter_getter::getter>(entt::hashed_string::value("z"))
-        .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("h"_hs, "hhh");
 
     const entt::meta_type type = entt::resolve<clazz>();
     const entt::meta_type other = entt::resolve<setter_getter>();
 
-    ASSERT_EQ(type.data("i"_hs).label(), std::string_view{"i"});
-    ASSERT_EQ(type.data("ci"_hs).label(), std::string_view{"ci"});
-    ASSERT_EQ(type.data("j"_hs).label(), nullptr);
-    ASSERT_EQ(type.data("k"_hs).label(), nullptr);
-    ASSERT_EQ(type.data("h"_hs).label(), std::string_view{"hhh"});
+    ASSERT_EQ(type.data("i"_hs).name(), nullptr);
+    ASSERT_STREQ(type.data("j"_hs).name(), "j");
+    ASSERT_STREQ(type.data("h"_hs).name(), "hhh");
+    ASSERT_EQ(type.data("none"_hs).name(), nullptr);
 
-    ASSERT_EQ(other.data("x"_hs).label(), std::string_view{"x"});
-    ASSERT_EQ(other.data("y"_hs).label(), std::string_view{"y"});
-    ASSERT_EQ(other.data("z"_hs).label(), nullptr);
-    ASSERT_EQ(other.data("v"_hs).label(), nullptr);
-    ASSERT_EQ(other.data("h"_hs).label(), std::string_view{"hhh"});
+    ASSERT_EQ(other.data("z"_hs).name(), nullptr);
+    ASSERT_STREQ(other.data("w"_hs).name(), "w");
+    ASSERT_STREQ(other.data("z_ro"_hs).name(), "readonly");
+    ASSERT_EQ(other.data("none"_hs).name(), nullptr);
 }
 
 TEST_F(MetaData, Comparison) {

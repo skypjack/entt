@@ -95,7 +95,7 @@ struct meta_data_node {
     using size_type = std::size_t;
 
     id_type id{};
-    const char *label{};
+    const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
     meta_type_node (*type)(const meta_context &) noexcept {};
@@ -109,7 +109,7 @@ struct meta_func_node {
     using size_type = std::size_t;
 
     id_type id{};
-    const char *label{};
+    const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
     meta_type_node (*ret)(const meta_context &) noexcept {};
@@ -140,7 +140,7 @@ struct meta_type_node {
 
     const type_info *info{};
     id_type id{};
-    const char *label{};
+    const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
     meta_type_node (*resolve)(const meta_context &) noexcept {};
