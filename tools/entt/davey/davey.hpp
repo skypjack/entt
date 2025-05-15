@@ -16,19 +16,18 @@
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
 #include <imgui.h>
-#include "meta.hpp"
 
 namespace entt {
 
 namespace internal {
 
-#define DAVEY_OR(elem) info ? info->name : std::string{elem.info().name()}.data()
+#define DAVEY_OR(elem) label ? label : std::string{elem.info().name()}.data()
 
 template<typename Entity, typename OnEntity>
 static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
     for([[maybe_unused]] const auto [id, data]: obj.type().data()) {
         const auto elem = data.get(obj);
-        const davey_data *info = data.custom();
+        const char *label = data.name();
 
         if(auto type = data.type(); type.info() == entt::type_id<const char *>()) {
             ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const char *>());
@@ -145,7 +144,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
     for(auto it = from; it != to; ++it) {
         if(const auto &storage = it->second; storage.contains(entt)) {
             if(auto type = entt::resolve(ctx, storage.info()); type) {
-                if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
+                if(const char *label = type.name(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
                         present_element<Entity>(obj, [&ctx, from, to](const char *name, const Entity other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, entt::to_integral(other), entt::to_entity(other), entt::to_version(other))) {
@@ -177,7 +176,7 @@ static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get..
         if(ImGui::TreeNode(&entt::type_id<typename view_type::entity_type>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
             for(const auto *storage: range) {
                 if(auto type = entt::resolve(ctx, storage->info()); type) {
-                    if(const davey_data *info = type.custom(); ImGui::TreeNode(&storage->info(), "%s", DAVEY_OR((*storage)))) {
+                    if(const char *label = type.name(); ImGui::TreeNode(&storage->info(), "%s", DAVEY_OR((*storage)))) {
                         if(const auto obj = type.from_void(storage->value(entt)); obj) {
                             present_element<typename view_type::entity_type>(obj, [](const char *name, const typename view_type::entity_type entt) {
                                 ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
@@ -243,7 +242,7 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
 
     if(ImGui::BeginTabItem("Storage")) {
         for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-            if(const davey_data *info = entt::resolve(ctx, storage.info()).custom(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
+            if(const char *label = entt::resolve(ctx, storage.info()).name(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
                 internal::present_storage(ctx, storage);
                 ImGui::TreePop();
             }
