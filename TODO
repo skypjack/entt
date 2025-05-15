@@ -35,7 +35,6 @@ TODO:
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * review build process for testbed (i.e. tests first due to SDL)
 * use any for meta_custom_node
-* support names directly on meta nodes
 * fwd meta_ctx (and update testbed)
 * avoid copying meta_type/data/func nodes
 * doc for labels on meta elements
