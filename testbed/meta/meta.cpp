@@ -2,15 +2,12 @@
 #include <component/position_component.h>
 #include <component/rect_component.h>
 #include <component/renderable_component.h>
-#include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <meta/meta.h>
 
 namespace testbed {
 
 void meta_setup() {
-    using namespace entt::literals;
-
     entt::meta_factory<input_listener_component>()
         .type("input listener")
         .data<&input_listener_component::command>("command");
