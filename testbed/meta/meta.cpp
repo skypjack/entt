@@ -17,7 +17,15 @@ void meta_setup() {
         .data<&SDL_FPoint::x>("x")
         .data<&SDL_FPoint::y>("y");
 
-    // bind components...
+    entt::meta_factory<rect_component>()
+        .type("rect")
+        .data<&SDL_FRect::x>("x")
+        .data<&SDL_FRect::y>("y")
+        .data<&SDL_FRect::w>("w")
+        .data<&SDL_FRect::h>("h");
+
+    entt::meta_factory<renderable_component>()
+        .type("renderable");
 }
 
 } // namespace testbed
