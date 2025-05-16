@@ -4,10 +4,9 @@
 #include "../container/dense_map.hpp"
 #include "../core/fwd.hpp"
 #include "../core/utility.hpp"
+#include "fwd.hpp"
 
 namespace entt {
-
-class meta_ctx;
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {

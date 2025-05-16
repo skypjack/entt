@@ -3,6 +3,8 @@
 
 namespace entt {
 
+class meta_ctx;
+
 class meta_sequence_container;
 
 class meta_associative_container;
