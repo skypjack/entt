@@ -11,6 +11,7 @@
 * [Vademecum](#vademecum)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
+    * [Auto-binding](#auto-binding)
     * [Entity lifecycle](#entity-lifecycle)
     * [Listeners disconnection](#listeners-disconnection)
   * [They call me reactive storage](#they-call-me-reactive-storage)
@@ -408,6 +409,27 @@ features it offers.<br/>
 There are many useful but less known functionalities that are not described
 here, such as the connection objects or the possibility to attach listeners with
 a list of parameters that is shorter than that of the signal itself.
+
+### Auto-binding
+
+Users don't need to create bindings manually each and every time. For managed
+types, they can have `EnTT` setup listeners automatically.<br/>
+The library searches the types for functions with specific names and signatures,
+as in the following example:
+
+```cpp
+struct my_type {
+    static void on_construct(entt::registry &registry, const entt::entity entt);
+    static void on_update(entt::registry &registry, const entt::entity entt);
+    static void on_destroy(entt::registry &registry, const entt::entity entt);
+
+    // ...
+};
+```
+
+As soon as a storage is created for such a defined type, these functions are
+associated with the respective signals. The function name is self-explanatory of
+the target signal.
 
 ### Entity lifecycle
 

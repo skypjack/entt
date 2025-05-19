@@ -38,4 +38,3 @@ TODO:
 * fwd meta_ctx (and update testbed)
 * avoid copying meta_type/data/func nodes
 * doc for labels on meta elements
-* doc auto-bind mechanism for basic_sigh_mixin
