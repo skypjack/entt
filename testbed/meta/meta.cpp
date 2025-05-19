@@ -8,6 +8,13 @@
 namespace testbed {
 
 void meta_setup() {
+    entt::meta_factory<input_listener_component::type>()
+        .type("command type")
+        .data<input_listener_component::type::UP>("up")
+        .data<input_listener_component::type::DOWN>("down")
+        .data<input_listener_component::type::LEFT>("left")
+        .data<input_listener_component::type::RIGHT>("right");
+
     entt::meta_factory<input_listener_component>()
         .type("input listener")
         .data<&input_listener_component::command>("command");

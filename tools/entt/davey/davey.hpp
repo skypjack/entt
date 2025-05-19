@@ -21,7 +21,7 @@ namespace entt {
 
 namespace internal {
 
-#define DAVEY_OR(elem) label ? label : std::string{elem.info().name()}.data()
+#define LABEL_OR(elem) label ? label : std::string{elem.info().name()}.data()
 
 template<typename Entity, typename OnEntity>
 static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
@@ -30,40 +30,55 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
         const char *label = data.name();
 
         if(auto type = data.type(); type.info() == entt::type_id<const char *>()) {
-            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const char *>());
+            ImGui::Text("%s: %s", LABEL_OR(type), elem.template cast<const char *>());
         } else if(type.info() == entt::type_id<std::string>()) {
-            ImGui::Text("%s: %s", DAVEY_OR(type), elem.template cast<const std::string &>().data());
+            ImGui::Text("%s: %s", LABEL_OR(type), elem.template cast<const std::string &>().data());
         } else if(type.info() == entt::type_id<Entity>()) {
             if(const auto entt = elem.template cast<Entity>(); entt == entt::null) {
-                ImGui::Text("%s: %s", DAVEY_OR(type), "null");
+                ImGui::Text("%s: %s", LABEL_OR(type), "null");
             } else {
-                on_entity(DAVEY_OR(type), elem.template cast<Entity>());
+                on_entity(LABEL_OR(type), elem.template cast<Entity>());
+            }
+        } else if(type.is_enum()) {
+            const char *as_string = nullptr;
+
+            for(auto [id, curr]: type.data()) {
+                if(curr.get({}) == elem) {
+                    as_string = curr.name();
+                    break;
+                }
+            }
+
+            if (as_string) {
+                ImGui::Text("%s: %s", LABEL_OR(type), as_string);
+            } else {
+                ImGui::Text("%s: %zu", LABEL_OR(type), elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == entt::type_id<bool>()) {
                 std::stringstream buffer{};
                 buffer << std::boolalpha << elem.template cast<bool>();
-                ImGui::Text("%s: %s", DAVEY_OR(type), buffer.str().data());
+                ImGui::Text("%s: %s", LABEL_OR(type), buffer.str().data());
             } else if(type.info() == entt::type_id<char>()) {
-                ImGui::Text("%s: %c", DAVEY_OR(type), elem.template cast<char>());
+                ImGui::Text("%s: %c", LABEL_OR(type), elem.template cast<char>());
             } else if(type.is_integral()) {
-                ImGui::Text("%s: %zu", DAVEY_OR(type), elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
+                ImGui::Text("%s: %zu", LABEL_OR(type), elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
             } else {
-                ImGui::Text("%s: %f", DAVEY_OR(type), elem.template allow_cast<double>().template cast<double>());
+                ImGui::Text("%s: %f", LABEL_OR(type), elem.template allow_cast<double>().template cast<double>());
             }
         } else if(type.is_pointer_like()) {
-            if(ImGui::TreeNode(DAVEY_OR(type))) {
+            if(ImGui::TreeNode(LABEL_OR(type))) {
                 present_element<Entity>(*obj, on_entity);
                 ImGui::TreePop();
             }
         } else if(type.is_sequence_container()) {
-            if(ImGui::TreeNode(DAVEY_OR(type))) {
+            if(ImGui::TreeNode(LABEL_OR(type))) {
                 entt::meta_sequence_container view = elem.as_sequence_container();
 
                 for(std::size_t pos{}, last = view.size(); pos < last; ++pos) {
                     ImGui::PushID(static_cast<int>(pos));
 
-                    if(ImGui::TreeNode(DAVEY_OR(type), "%zu", pos)) {
+                    if(ImGui::TreeNode(LABEL_OR(type), "%zu", pos)) {
                         present_element<Entity>(view[pos], on_entity);
                         ImGui::TreePop();
                     }
@@ -74,14 +89,14 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 ImGui::TreePop();
             }
         } else if(type.is_associative_container()) {
-            if(ImGui::TreeNode(DAVEY_OR(type))) {
+            if(ImGui::TreeNode(LABEL_OR(type))) {
                 entt::meta_associative_container view = elem.as_associative_container();
                 auto it = view.begin();
 
                 for(std::size_t pos{}, last = view.size(); pos < last; ++pos, ++it) {
                     ImGui::PushID(static_cast<int>(pos));
 
-                    if(ImGui::TreeNode(DAVEY_OR(type), "%zu", pos)) {
+                    if(ImGui::TreeNode(LABEL_OR(type), "%zu", pos)) {
                         const auto [key, value] = *it;
 
                         if(ImGui::TreeNode("key")) {
@@ -103,13 +118,13 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 ImGui::TreePop();
             }
         } else if(type.is_class()) {
-            if(ImGui::TreeNode(DAVEY_OR(type))) {
+            if(ImGui::TreeNode(LABEL_OR(type))) {
                 present_element<Entity>(elem, on_entity);
                 ImGui::TreePop();
             }
         } else {
             const std::string underlying_type{data.type().info().name()};
-            ImGui::Text("%s: %s", DAVEY_OR(type), underlying_type.data());
+            ImGui::Text("%s: %s", LABEL_OR(type), underlying_type.data());
         }
     }
 }
@@ -144,7 +159,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
     for(auto it = from; it != to; ++it) {
         if(const auto &storage = it->second; storage.contains(entt)) {
             if(auto type = entt::resolve(ctx, storage.info()); type) {
-                if(const char *label = type.name(); ImGui::TreeNode(&storage.info(), "%s", DAVEY_OR(storage))) {
+                if(const char *label = type.name(); ImGui::TreeNode(&storage.info(), "%s", LABEL_OR(storage))) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
                         present_element<Entity>(obj, [&ctx, from, to](const char *name, const Entity other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, entt::to_integral(other), entt::to_entity(other), entt::to_version(other))) {
@@ -176,7 +191,7 @@ static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get..
         if(ImGui::TreeNode(&entt::type_id<typename view_type::entity_type>(), "%d [%d/%d]", entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt))) {
             for(const auto *storage: range) {
                 if(auto type = entt::resolve(ctx, storage->info()); type) {
-                    if(const char *label = type.name(); ImGui::TreeNode(&storage->info(), "%s", DAVEY_OR((*storage)))) {
+                    if(const char *label = type.name(); ImGui::TreeNode(&storage->info(), "%s", LABEL_OR((*storage)))) {
                         if(const auto obj = type.from_void(storage->value(entt)); obj) {
                             present_element<typename view_type::entity_type>(obj, [](const char *name, const typename view_type::entity_type entt) {
                                 ImGui::Text("%s: %d [%d/%d]", name, entt::to_integral(entt), entt::to_entity(entt), entt::to_version(entt));
@@ -242,7 +257,7 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
 
     if(ImGui::BeginTabItem("Storage")) {
         for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-            if(const char *label = entt::resolve(ctx, storage.info()).name(); ImGui::TreeNode(&storage.info(), "%s (%zu)", DAVEY_OR(storage), storage.size())) {
+            if(const char *label = entt::resolve(ctx, storage.info()).name(); ImGui::TreeNode(&storage.info(), "%s (%zu)", LABEL_OR(storage), storage.size())) {
                 internal::present_storage(ctx, storage);
                 ImGui::TreePop();
             }
