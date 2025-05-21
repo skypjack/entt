@@ -44,10 +44,10 @@ also limited to this library only.
 
 In general, `EnTT` does not offer primitives to support multi-threading. Many of
 the features can be split over multiple threads without any explicit control and
-the user is the one who knows if a synchronization point is required.
-However, some internal static data shared between threads *MUST* be made atomic
-when using `EnTT` in multiple threads, even when using local storage.<br/>
-Define this macro without assigning any value to it to make those variables atomic.
+the user is the one who knows if a synchronization point is required.<br/>
+However, some internal static data shared between threads should be atomic when
+using `EnTT` from multiple threads, even when dealing with local storage. Define
+this macro without assigning any value to it to get the job done.
 
 ## ENTT_ID_TYPE
 
