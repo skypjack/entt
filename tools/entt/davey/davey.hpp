@@ -49,7 +49,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 }
             }
 
-            if (as_string) {
+            if(as_string) {
                 ImGui::Text("%s: %s", LABEL_OR(type), as_string);
             } else {
                 ImGui::Text("%s: %zu", LABEL_OR(type), elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
@@ -67,9 +67,13 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
                 ImGui::Text("%s: %f", LABEL_OR(type), elem.template allow_cast<double>().template cast<double>());
             }
         } else if(type.is_pointer_like()) {
-            if(ImGui::TreeNode(LABEL_OR(type))) {
-                present_element<Entity>(*obj, on_entity);
-                ImGui::TreePop();
+            if(auto deref = *obj; deref) {
+                if(ImGui::TreeNode(LABEL_OR(type))) {
+                    present_element<Entity>(*obj, on_entity);
+                    ImGui::TreePop();
+                }
+            } else {
+                ImGui::Text("%s: %s", LABEL_OR(type), "null");
             }
         } else if(type.is_sequence_container()) {
             if(ImGui::TreeNode(LABEL_OR(type))) {
