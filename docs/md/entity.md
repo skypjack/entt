@@ -2366,11 +2366,11 @@ expedients.
 
 Finally, `EnTT` is configured via a few compile-time definitions to make some of
 its parts implicitly thread-safe, roughly speaking only the ones that really
-make sense and cannot be turned around.<br/>
-In particular, when multiple instances of objects referencing the type index
-generator (such as the `registry` class) are used in different threads, then it
-might be useful to define `ENTT_USE_ATOMIC`.<br/>
-See the relevant documentation for more information.
+make sense and cannot be turned around. When using multiple threads with `EnTT`,
+you *MUST* define `ENTT_USE_ATOMIC` unless you know exactly what you are doing.
+This is true even if each thread only uses thread local data.
+For more information, see:
+[configuring `ENTT_USE_ATOMIC`](config.md#entt_use_atomic).
 
 ## Iterators
 
