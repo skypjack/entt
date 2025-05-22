@@ -322,7 +322,7 @@ TYPED_TEST(RuntimeView, EachWithHoles) {
     });
 }
 
-TYPED_TEST(RuntimeView, ExcludedComponents) {
+TYPED_TEST(RuntimeView, Exclude) {
     using runtime_view_type = typename TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
@@ -383,7 +383,7 @@ TYPED_TEST(RuntimeView, StableType) {
     ASSERT_EQ(view.size_hint(), 1u);
 }
 
-TYPED_TEST(RuntimeView, StableTypeWithExcludedComponent) {
+TYPED_TEST(RuntimeView, StableTypeWithExclude) {
     using runtime_view_type = typename TestFixture::type;
 
     constexpr entt::entity tombstone = entt::tombstone;
@@ -416,5 +416,31 @@ TYPED_TEST(RuntimeView, StableTypeWithExcludedComponent) {
     view.each([&](const auto entt) {
         ASSERT_NE(entt, tombstone);
         ASSERT_EQ(entt, entity[1u]);
+    });
+}
+
+TYPED_TEST(RuntimeView, SameStorageTypes) {
+    using runtime_view_type = typename TestFixture::type;
+
+    std::tuple<entt::storage<int>, entt::storage<int>> storage{};
+    const std::array entity{entt::entity{1}, entt::entity{3}};
+    runtime_view_type view{};
+
+    std::get<0>(storage).emplace(entity[0u], 2);
+
+    std::get<1>(storage).emplace(entity[0u], 3);
+    std::get<1>(storage).emplace(entity[1u], 1);
+
+    view.iterate(std::get<0>(storage)).iterate(std::get<1>(storage));
+
+    ASSERT_TRUE(view.contains(entity[0u]));
+    ASSERT_FALSE(view.contains(entity[1u]));
+
+    for(auto entt: view) {
+        ASSERT_EQ(entt, entity[0u]);
+    }
+
+    view.each([&](auto entt) {
+        ASSERT_EQ(entt, entity[0u]);
     });
 }
