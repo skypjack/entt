@@ -73,6 +73,27 @@ TYPED_TEST(RuntimeView, Functionalities) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
+TYPED_TEST(RuntimeView, InvalidView) {
+    using runtime_view_type = typename TestFixture::type;
+
+    runtime_view_type view{};
+
+    ASSERT_FALSE(view);
+
+    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_FALSE(view.contains(entt::null));
+
+    ASSERT_EQ(view.begin(), typename decltype(view)::iterator{});
+    ASSERT_EQ(view.begin(), view.end());
+
+    view.each([](const entt::entity) { FAIL(); });
+
+    entt::storage<int> storage;
+    view.iterate(storage);
+
+    ASSERT_TRUE(view);
+}
+
 TYPED_TEST(RuntimeView, Constructors) {
     using runtime_view_type = typename TestFixture::type;
 
@@ -513,6 +534,39 @@ TYPED_TEST(RuntimeView, StorageEntityWithExclude) {
     }
 
     view.each([&entity](auto entt, auto &&...) {
+        ASSERT_EQ(entt, entity[1u]);
+    });
+}
+
+TYPED_TEST(RuntimeView, StorageEntityExcludeOnly) {
+    using runtime_view_type = typename TestFixture::type;
+
+    std::tuple<entt::storage<entt::entity>, entt::storage<int>> storage{};
+    const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
+    runtime_view_type view{};
+
+    std::get<1>(storage).emplace(entity[2u]);
+
+    std::get<0>(storage).erase(entity[0u]);
+    std::get<0>(storage).bump(entity[0u]);
+
+    view.iterate(std::get<0>(storage)).exclude(std::get<1>(storage));
+
+    ASSERT_FALSE(view.contains(entity[0u]));
+    ASSERT_TRUE(view.contains(entity[1u]));
+    ASSERT_FALSE(view.contains(entity[2u]));
+
+    ASSERT_EQ(view.size_hint(), 2u);
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_EQ(std::distance(view.begin(), view.end()), 1);
+    ASSERT_EQ(*view.begin(), entity[1u]);
+
+    for(auto entt: view) {
+        ASSERT_EQ(entt, entity[1u]);
+    }
+
+    view.each([&entity](auto entt) {
         ASSERT_EQ(entt, entity[1u]);
     });
 }

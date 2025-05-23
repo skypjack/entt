@@ -126,6 +126,12 @@ class basic_runtime_view {
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
     using container_type = std::vector<Type *, Allocator>;
 
+    [[nodiscard]] auto offset() const noexcept {
+        ENTT_ASSERT(!pools.empty(), "Invalid view");
+        const auto &leading = *pools.front();
+        return (leading.policy() == deletion_policy::swap_only) ? leading.free_list() : leading.size();
+    }
+
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
@@ -133,6 +139,8 @@ public:
     using entity_type = typename Type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Bidirectional iterator type. */
@@ -219,10 +227,10 @@ public:
      * @return This runtime view.
      */
     basic_runtime_view &iterate(common_type &base) {
-        if(pools.empty() || !(base.size() < pools[0u]->size())) {
+        if(pools.empty() || !(base.size() < pools.front()->size())) {
             pools.push_back(&base);
         } else {
-            pools.push_back(std::exchange(pools[0u], &base));
+            pools.push_back(std::exchange(pools.front(), &base));
         }
 
         return *this;
@@ -243,7 +251,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const {
-        return pools.empty() ? size_type{} : pools.front()->size();
+        return pools.empty() ? size_type{} : offset();
     }
 
     /**
@@ -255,7 +263,7 @@ public:
      * @return An iterator to the first entity that has the given elements.
      */
     [[nodiscard]] iterator begin() const {
-        return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->begin()};
+        return pools.empty() ? iterator{} : iterator{pools, filter, pools.front()->end() - static_cast<difference_type>(offset())};
     }
 
     /**
@@ -265,7 +273,7 @@ public:
      * given elements.
      */
     [[nodiscard]] iterator end() const {
-        return pools.empty() ? iterator{} : iterator{pools, filter, pools[0]->end()};
+        return pools.empty() ? iterator{} : iterator{pools, filter, pools.front()->end()};
     }
 
     /**
@@ -284,7 +292,8 @@ public:
     [[nodiscard]] bool contains(const entity_type entt) const {
         return !pools.empty()
                && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
-               && std::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); });
+               && std::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); })
+               && pools.front()->index(entt) < offset();
     }
 
     /**
