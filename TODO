@@ -36,4 +36,3 @@ TODO:
 * review build process for testbed (i.e. tests first due to SDL)
 * use any for meta_custom_node
 * avoid copying meta_type/data/func nodes
-* doc for labels on meta elements
