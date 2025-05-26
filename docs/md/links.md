@@ -241,6 +241,8 @@ I hope the following lists can grow much more in the future.
   * [Darmok](https://github.com/miguelibero/darmok): another C++ game engine.
   * [Magique](https://github.com/gk646/magique): 2D game engine for programmers
     (or those yet to be).
+  * [Physecs](https://github.com/thfProjects/Physecs): real-time 3D rigid body
+    physics simulation built on `EnTT`.
 
 ## Articles, videos and blog posts:
 
