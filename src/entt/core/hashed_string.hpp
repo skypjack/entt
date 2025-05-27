@@ -117,9 +117,11 @@ public:
      */
     constexpr basic_hashed_string(const value_type *str, const size_type len) noexcept
         : base_type{str} {
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         for(; base_type::length < len; ++base_type::length) {
             base_type::hash = (base_type::hash ^ static_cast<id_type>(str[base_type::length])) * params::prime;
         }
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 
     /**
@@ -147,9 +149,11 @@ public:
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) noexcept
         : base_type{wrapper.repr} {
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         for(; wrapper.repr[base_type::length]; ++base_type::length) {
             base_type::hash = (base_type::hash ^ static_cast<id_type>(wrapper.repr[base_type::length])) * params::prime;
         }
+        // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 
     /**
