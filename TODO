@@ -36,3 +36,4 @@ TODO:
 * review build process for testbed (i.e. tests first due to SDL)
 * use any for meta_custom_node
 * avoid copying meta_type/data/func nodes
+* deprecate meta_type_node::info and get the storage one in meta_any?
