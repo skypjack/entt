@@ -89,6 +89,8 @@ TYPED_TEST(RuntimeView, InvalidView) {
     view.each([](const entt::entity) { FAIL(); });
 
     entt::storage<int> storage;
+
+    storage.emplace(entt::entity{});
     view.iterate(storage);
 
     ASSERT_TRUE(view);
