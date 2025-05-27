@@ -1087,7 +1087,7 @@ public:
     }
 
     /*! @copydoc info */
-    [[deprecated("use ::info instead")]] const type_info &type() const noexcept {
+    [[deprecated("use ::info instead")]] [[nodiscard]] const type_info &type() const noexcept {
         return info();
     }
 
