@@ -55,7 +55,7 @@ jobs:
               -DENTT_BUILD_EXAMPLE=ON \
               -DENTT_BUILD_LIB=ON \
               -DENTT_BUILD_SNAPSHOT=ON \
-              -ENTT_BUILD_TESTBED=ON \
+              -DENTT_BUILD_TESTBED=ON \
               -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-Xiwyu;--mapping_file=${GITHUB_WORKSPACE}/entt.imp;-Xiwyu;--no_fwd_decls;-Xiwyu;--verbose=1" \
               ..
         make -j4
@@ -78,7 +78,7 @@ jobs:
               -DENTT_BUILD_EXAMPLE=ON \
               -DENTT_BUILD_LIB=ON \
               -DENTT_BUILD_SNAPSHOT=ON \
-              -ENTT_BUILD_TESTBED=ON \
+              -DENTT_BUILD_TESTBED=ON \
               -DENTT_USE_CLANG_TIDY=ON \
               ..
         make -j4
