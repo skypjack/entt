@@ -116,6 +116,7 @@ public:
      * @param len Length of the string to hash.
      */
     constexpr basic_hashed_string(const value_type *str, const size_type len) noexcept
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         : base_type{str} {
         // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         for(; base_type::length < len; ++base_type::length) {
