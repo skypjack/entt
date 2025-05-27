@@ -2,6 +2,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
+#include <entt/entity/group.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
