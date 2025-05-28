@@ -79,27 +79,28 @@ template<typename... Owned, typename... Get, typename... Exclude, typename... Ov
 struct unpack_type<const basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>>
     : unpack_type<basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>>, type_list<Override...>> {};
 
-template<typename, typename>
+template<typename, typename, typename>
 struct resource_traits;
 
-template<typename... Args, typename... Req>
-struct resource_traits<type_list<Args...>, type_list<Req...>> {
+template<typename Registry, typename... Args, typename... Req>
+struct resource_traits<Registry, type_list<Args...>, type_list<Req...>> {
     using args = type_list<std::remove_const_t<Args>...>;
     using ro = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::ro..., typename unpack_type<Req, type_list<>>::ro...>;
     using rw = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::rw..., typename unpack_type<Req, type_list<>>::rw...>;
+    static constexpr auto sync_point = (std::is_same_v<Args, Registry> || ...);
 };
 
-template<typename... Req, typename Ret, typename... Args>
-resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource_traits(Ret (*)(Args...));
+template<typename Registry, typename... Req, typename Ret, typename... Args>
+resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource_traits(Ret (*)(Args...));
 
-template<typename... Req, typename Ret, typename Type, typename... Args>
-resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (*)(Type &, Args...));
+template<typename Registry, typename... Req, typename Ret, typename Type, typename... Args>
+resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (*)(Type &, Args...));
 
-template<typename... Req, typename Ret, typename Class, typename... Args>
-resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...));
+template<typename Registry, typename... Req, typename Ret, typename Class, typename... Args>
+resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...));
 
-template<typename... Req, typename Ret, typename Class, typename... Args>
-resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
+template<typename Registry, typename... Req, typename Ret, typename Class, typename... Args>
+resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
 
 } // namespace internal
 /*! @endcond */
@@ -169,9 +170,9 @@ class basic_organizer final {
     }
 
     template<typename... RO, typename... RW>
-    void track_dependencies(std::size_t index, const bool requires_registry, type_list<RO...>, type_list<RW...>) {
+    void track_dependencies(std::size_t index, const bool sync_point, type_list<RO...>, type_list<RW...>) {
         builder.bind(static_cast<id_type>(index));
-        builder.set(type_hash<Registry>::value(), requires_registry || (sizeof...(RO) + sizeof...(RW) == 0u));
+        builder.set(type_hash<Registry>::value(), sync_point || (sizeof...(RO) + sizeof...(RW) == 0u));
         (builder.ro(type_hash<RO>::value()), ...);
         (builder.rw(type_hash<RW>::value()), ...);
     }
@@ -316,8 +317,7 @@ public:
      */
     template<auto Candidate, typename... Req>
     void emplace(const char *name = nullptr) {
-        using resource_type = decltype(internal::free_function_to_resource_traits<Req...>(Candidate));
-        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
+        using resource_type = decltype(internal::free_function_to_resource_traits<registry_type, Req...>(Candidate));
 
         callback_type *callback = +[](const void *, registry_type &reg) {
             std::apply(Candidate, to_args(reg, typename resource_type::args{}));
@@ -333,7 +333,7 @@ public:
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
     }
 
@@ -348,8 +348,7 @@ public:
      */
     template<auto Candidate, typename... Req, typename Type>
     void emplace(Type &value_or_instance, const char *name = nullptr) {
-        using resource_type = decltype(internal::constrained_function_to_resource_traits<Req...>(Candidate));
-        constexpr auto requires_registry = type_list_contains_v<typename resource_type::args, registry_type>;
+        using resource_type = decltype(internal::constrained_function_to_resource_traits<registry_type, Req...>(Candidate));
 
         callback_type *callback = +[](const void *payload, registry_type &reg) {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
@@ -366,7 +365,7 @@ public:
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
-        track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
+        track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(std::move(vdata));
     }
 
@@ -380,7 +379,7 @@ public:
      */
     template<typename... Req>
     void emplace(function_type *func, const void *payload = nullptr, const char *name = nullptr) {
-        using resource_type = internal::resource_traits<type_list<>, type_list<Req...>>;
+        using resource_type = internal::resource_traits<registry_type, type_list<>, type_list<Req...>>;
         track_dependencies(vertices.size(), true, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertex_data vdata{

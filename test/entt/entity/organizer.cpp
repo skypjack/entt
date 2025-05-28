@@ -24,6 +24,9 @@ struct clazz {
     static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
     static void ro_char_with_payload(const clazz &, entt::group<entt::owned_t<const char>>) {}
     static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
+
+    static void const_registry_first(const entt::registry &, entt::view<entt::get_t<int>>) {}
+    static void const_registry_second(const entt::registry &, entt::view<entt::get_t<double>>) {}
 };
 
 void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &) {
@@ -379,6 +382,30 @@ TEST(Organizer, SyncPoint) {
         typename entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
+}
+
+TEST(Organizer, ConstRegistry) {
+    entt::organizer organizer;
+    entt::registry registry;
+
+    organizer.emplace<&clazz::const_registry_first>("first");
+    organizer.emplace<&clazz::const_registry_second>("second");
+
+    const auto graph = organizer.graph();
+
+    ASSERT_EQ(graph.size(), 2u);
+
+    ASSERT_STREQ(graph[0u].name(), "first");
+    ASSERT_STREQ(graph[1u].name(), "second");
+
+    ASSERT_TRUE(graph[0u].top_level());
+    ASSERT_TRUE(graph[1u].top_level());
+
+    ASSERT_EQ(graph[0u].in_edges().size(), 0u);
+    ASSERT_EQ(graph[1u].in_edges().size(), 0u);
+
+    ASSERT_EQ(graph[0u].out_edges().size(), 0u);
+    ASSERT_EQ(graph[1u].out_edges().size(), 0u);
 }
 
 TEST(Organizer, Override) {
