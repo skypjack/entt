@@ -1746,17 +1746,13 @@ TEST(Any, SboAlignment) {
     std::array<any_type, 2u> sbo = {over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
 
-    // NOLINTBEGIN(*-reinterpret-cast)
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
-    // NOLINTEND(*-reinterpret-cast)
 
     std::swap(sbo[0], sbo[1]);
 
-    // NOLINTBEGIN(*-reinterpret-cast)
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[0u].data()) % alignment) == 0u);
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(sbo[1u].data()) % alignment) == 0u);
-    // NOLINTEND(*-reinterpret-cast)
 
     ASSERT_NE(data, sbo[1].data());
 }
@@ -1768,17 +1764,13 @@ TEST(Any, NoSboAlignment) {
     std::array<any_type, 2u> nosbo = {over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
 
-    // NOLINTBEGIN(*-reinterpret-cast)
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
-    // NOLINTEND(*-reinterpret-cast)
 
     std::swap(nosbo[0], nosbo[1]);
 
-    // NOLINTBEGIN(*-reinterpret-cast)
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[0u].data()) % alignment) == 0u);
     ASSERT_TRUE((reinterpret_cast<std::uintptr_t>(nosbo[1u].data()) % alignment) == 0u);
-    // NOLINTEND(*-reinterpret-cast)
 
     ASSERT_EQ(data, nosbo[1].data());
 }
