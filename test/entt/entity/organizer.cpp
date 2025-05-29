@@ -386,7 +386,6 @@ TEST(Organizer, SyncPoint) {
 
 TEST(Organizer, ConstRegistry) {
     entt::organizer organizer;
-    entt::registry registry;
 
     organizer.emplace<&clazz::const_registry_first>("first");
     organizer.emplace<&clazz::const_registry_second>("second");
