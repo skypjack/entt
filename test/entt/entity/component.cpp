@@ -51,53 +51,47 @@ using EntityTypes = ::testing::Types<entt::entity, test::entity, test::other_ent
 TYPED_TEST_SUITE(Component, EntityTypes, );
 
 TYPED_TEST(Component, VoidType) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<void, entity_type>;
+    using traits_type = entt::component_traits<void, typename TestFixture::entity_type>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 0u);
 }
 
 TYPED_TEST(Component, Empty) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<test::empty, entity_type>;
+    using traits_type = entt::component_traits<test::empty, typename TestFixture::entity_type>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 0u);
 }
 
 TYPED_TEST(Component, NonEmpty) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<test::boxed_int, entity_type>;
+    using traits_type = entt::component_traits<test::boxed_int, typename TestFixture::entity_type>;
 
     ASSERT_FALSE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
 }
 
 TYPED_TEST(Component, NonMovable) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<test::non_movable, entity_type>;
+    using traits_type = entt::component_traits<test::non_movable, typename TestFixture::entity_type>;
 
     ASSERT_TRUE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, ENTT_PACKED_PAGE);
 }
 
 TYPED_TEST(Component, SelfContained) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<self_contained, entity_type>;
+    using traits_type = entt::component_traits<self_contained, typename TestFixture::entity_type>;
 
     ASSERT_TRUE(traits_type::in_place_delete);
     ASSERT_EQ(traits_type::page_size, 4u);
 }
 
 TYPED_TEST(Component, TraitsBased) {
-    using entity_type = typename TestFixture::entity_type;
-    using traits_type = entt::component_traits<traits_based, entity_type>;
+    using traits_type = entt::component_traits<traits_based, typename TestFixture::entity_type>;
 
-    if constexpr(std::is_same_v<entity_type, entt::entity>) {
+    if constexpr(std::is_same_v<typename traits_type::entity_type, entt::entity>) {
         ASSERT_TRUE(traits_type::in_place_delete);
         ASSERT_EQ(traits_type::page_size, 8u);
-    } else if constexpr(std::is_same_v<entity_type, test::entity>) {
+    } else if constexpr(std::is_same_v<typename traits_type::entity_type, test::entity>) {
         ASSERT_FALSE(traits_type::in_place_delete);
         ASSERT_EQ(traits_type::page_size, 16u);
     } else {
