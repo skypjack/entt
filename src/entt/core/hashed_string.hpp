@@ -133,6 +133,7 @@ public:
     template<std::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     ENTT_CONSTEVAL basic_hashed_string(const value_type (&str)[N]) noexcept
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         : base_type{str} {
         for(; str[base_type::length]; ++base_type::length) {
             base_type::hash = (base_type::hash ^ static_cast<id_type>(str[base_type::length])) * params::prime;
