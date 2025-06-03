@@ -164,6 +164,10 @@ public:
     explicit registry_context(const allocator_type &allocator)
         : ctx{allocator} {}
 
+    void clear() noexcept {
+        ctx.clear();
+    }
+
     template<typename Type, typename... Args>
     Type &emplace_as(const id_type id, Args &&...args) {
         return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);

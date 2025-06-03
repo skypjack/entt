@@ -2353,6 +2353,14 @@ TEST(Registry, Context) {
     ASSERT_EQ(ctx.find<const int>(), cctx.find<int>());
     ASSERT_EQ(ctx.get<int>(), cctx.get<const int>());
     ASSERT_EQ(ctx.get<int>(), 0);
+
+    ASSERT_TRUE(ctx.contains<char>());
+    ASSERT_TRUE(ctx.contains<int>());
+
+    ctx.clear();
+
+    ASSERT_FALSE(ctx.contains<char>());
+    ASSERT_FALSE(ctx.contains<int>());
 }
 
 TEST(Registry, ContextHint) {
