@@ -115,10 +115,8 @@ class process {
 
 protected:
     /**
-     * @brief Terminates a process with success if it's still alive.
-     *
-     * The function is idempotent and it does nothing if the process isn't
-     * alive.
+     * @brief Terminates a process with success if it's still alive, otherwise
+     * does nothing.
      */
     void succeed() noexcept {
         if(alive()) {
@@ -127,10 +125,8 @@ protected:
     }
 
     /**
-     * @brief Terminates a process with errors if it's still alive.
-     *
-     * The function is idempotent and it does nothing if the process isn't
-     * alive.
+     * @brief Terminates a process with errors if it's still alive, otherwise
+     * does nothing.
      */
     void fail() noexcept {
         if(alive()) {
@@ -138,24 +134,14 @@ protected:
         }
     }
 
-    /**
-     * @brief Stops a process if it's in a running state.
-     *
-     * The function is idempotent and it does nothing if the process isn't
-     * running.
-     */
+    /*! @brief Stops a process if it's running, otherwise does nothing. */
     void pause() noexcept {
         if(current == state::running) {
             current = state::paused;
         }
     }
 
-    /**
-     * @brief Restarts a process if it's paused.
-     *
-     * The function is idempotent and it does nothing if the process isn't
-     * paused.
-     */
+    /*! @brief Restarts a process if it's paused, otherwise does nothing. */
     void unpause() noexcept {
         if(current == state::paused) {
             current = state::running;
@@ -193,11 +179,7 @@ public:
     }
 
     /**
-     * @brief Aborts a process if it's still alive.
-     *
-     * The function is idempotent and it does nothing if the process isn't
-     * alive.
-     *
+     * @brief Aborts a process if it's still alive, otherwise does nothing.
      * @param immediate Requests an immediate operation.
      */
     void abort(const bool immediate = false) {
