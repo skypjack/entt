@@ -134,20 +134,6 @@ protected:
         }
     }
 
-    /*! @brief Stops a process if it's running, otherwise does nothing. */
-    void pause() noexcept {
-        if(current == state::running) {
-            current = state::paused;
-        }
-    }
-
-    /*! @brief Restarts a process if it's paused, otherwise does nothing. */
-    void unpause() noexcept {
-        if(current == state::paused) {
-            current = state::running;
-        }
-    }
-
 public:
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
@@ -189,6 +175,20 @@ public:
             if(immediate) {
                 tick({});
             }
+        }
+    }
+
+    /*! @brief Stops a process if it's running, otherwise does nothing. */
+    void pause() noexcept {
+        if(current == state::running) {
+            current = state::paused;
+        }
+    }
+
+    /*! @brief Restarts a process if it's paused, otherwise does nothing. */
+    void unpause() noexcept {
+        if(current == state::paused) {
+            current = state::running;
         }
     }
 
