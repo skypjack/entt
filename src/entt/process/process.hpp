@@ -113,27 +113,6 @@ class process {
     template<typename... Args>
     void next(Args...) const noexcept {}
 
-protected:
-    /**
-     * @brief Terminates a process with success if it's still alive, otherwise
-     * does nothing.
-     */
-    void succeed() noexcept {
-        if(alive()) {
-            current = state::succeeded;
-        }
-    }
-
-    /**
-     * @brief Terminates a process with errors if it's still alive, otherwise
-     * does nothing.
-     */
-    void fail() noexcept {
-        if(alive()) {
-            current = state::failed;
-        }
-    }
-
 public:
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
@@ -175,6 +154,26 @@ public:
             if(immediate) {
                 tick({});
             }
+        }
+    }
+
+    /**
+     * @brief Terminates a process with success if it's still alive, otherwise
+     * does nothing.
+     */
+    void succeed() noexcept {
+        if(alive()) {
+            current = state::succeeded;
+        }
+    }
+
+    /**
+     * @brief Terminates a process with errors if it's still alive, otherwise
+     * does nothing.
+     */
+    void fail() noexcept {
+        if(alive()) {
+            current = state::failed;
         }
     }
 

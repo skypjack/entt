@@ -8,14 +8,6 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
     using process_type = entt::process<fake_process<Delta>, Delta>;
     using delta_type = typename process_type::delta_type;
 
-    void succeed() noexcept {
-        process_type::succeed();
-    }
-
-    void fail() noexcept {
-        process_type::fail();
-    }
-
     void init() {
         init_invoked = true;
     }
