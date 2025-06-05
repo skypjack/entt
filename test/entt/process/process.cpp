@@ -16,14 +16,6 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
         process_type::fail();
     }
 
-    void pause() noexcept {
-        process_type::pause();
-    }
-
-    void unpause() noexcept {
-        process_type::unpause();
-    }
-
     void init() {
         init_invoked = true;
     }
