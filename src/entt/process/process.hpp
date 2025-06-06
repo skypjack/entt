@@ -11,13 +11,11 @@ namespace entt {
 /**
  * @brief Base class for processes.
  *
- * This class stays true to the CRTP idiom. Derived classes must specify what's
- * the intended type for elapsed times.<br/>
- * A process should expose publicly the following member functions whether
- * required:
+ * Derived classes must specify what's the intended type for elapsed times.<br/>
+ * A process can implement the following member functions whether required:
  *
  * * @code{.cpp}
- *   void update(Delta, void *);
+ *   void update(Delta, void *) override;
  *   @endcode
  *
  *   It's invoked once per tick until a process is explicitly aborted or it
@@ -28,7 +26,7 @@ namespace entt {
  *   update.
  *
  * * @code{.cpp}
- *   void init();
+ *   void init() override;
  *   @endcode
  *
  *   It's invoked when the process joins the running queue of a scheduler. This
@@ -37,21 +35,21 @@ namespace entt {
  *   continuation.
  *
  * * @code{.cpp}
- *   void succeeded();
+ *   void succeeded() override;
  *   @endcode
  *
  *   It's invoked in case of success, immediately after an update and during the
  *   same tick.
  *
  * * @code{.cpp}
- *   void failed();
+ *   void failed() override;
  *   @endcode
  *
  *   It's invoked in case of errors, immediately after an update and during the
  *   same tick.
  *
  * * @code{.cpp}
- *   void aborted();
+ *   void aborted() override;
  *   @endcode
  *
  *   It's invoked only if a process is explicitly aborted. There is no guarantee
@@ -64,10 +62,9 @@ namespace entt {
  *
  * @sa scheduler
  *
- * @tparam Derived Actual type of process that extends the class template.
  * @tparam Delta Type to use to provide elapsed time.
  */
-template<typename Derived, typename Delta>
+template<typename Delta>
 class process {
     enum class state : std::uint8_t {
         uninitialized = 0,
@@ -80,38 +77,14 @@ class process {
         rejected
     };
 
-    template<typename Target = Derived>
-    auto next(std::integral_constant<state, state::uninitialized>)
-        -> decltype(std::declval<Target>().init(), void()) {
-        static_cast<Target *>(this)->init();
+    virtual void update(const Delta, void *) {
+        abort(true);
     }
 
-    template<typename Target = Derived>
-    auto next(std::integral_constant<state, state::running>, Delta delta, void *data)
-        -> decltype(std::declval<Target>().update(delta, data), void()) {
-        static_cast<Target *>(this)->update(delta, data);
-    }
-
-    template<typename Target = Derived>
-    auto next(std::integral_constant<state, state::succeeded>)
-        -> decltype(std::declval<Target>().succeeded(), void()) {
-        static_cast<Target *>(this)->succeeded();
-    }
-
-    template<typename Target = Derived>
-    auto next(std::integral_constant<state, state::failed>)
-        -> decltype(std::declval<Target>().failed(), void()) {
-        static_cast<Target *>(this)->failed();
-    }
-
-    template<typename Target = Derived>
-    auto next(std::integral_constant<state, state::aborted>)
-        -> decltype(std::declval<Target>().aborted(), void()) {
-        static_cast<Target *>(this)->aborted();
-    }
-
-    template<typename... Args>
-    void next(Args...) const noexcept {}
+    virtual void init() {}
+    virtual void succeeded() {}
+    virtual void failed() {}
+    virtual void aborted() {}
 
 public:
     /*! @brief Type used to provide elapsed time. */
@@ -119,6 +92,9 @@ public:
 
     /*! @brief Default constructor. */
     constexpr process() = default;
+
+    /*! @brief Default destructor. */
+    virtual ~process() = default;
 
     /*! @brief Default copy constructor. */
     process(const process &) = default;
@@ -137,11 +113,6 @@ public:
      * @return This process.
      */
     process &operator=(process &&) noexcept = default;
-
-    /*! @brief Default destructor. */
-    virtual ~process() {
-        static_assert(std::is_base_of_v<process, Derived>, "Incorrect use of the class template");
-    }
 
     /**
      * @brief Aborts a process if it's still alive, otherwise does nothing.
@@ -231,11 +202,11 @@ public:
     void tick(const Delta delta, void *data = nullptr) {
         switch(current) {
         case state::uninitialized:
-            next(std::integral_constant<state, state::uninitialized>{});
+            init();
             current = state::running;
             break;
         case state::running:
-            next(std::integral_constant<state, state::running>{}, delta, data);
+            update(delta, data);
             break;
         default:
             // suppress warnings
@@ -245,15 +216,15 @@ public:
         // if it's dead, it must be notified and removed immediately
         switch(current) {
         case state::succeeded:
-            next(std::integral_constant<state, state::succeeded>{});
+            succeeded();
             current = state::finished;
             break;
         case state::failed:
-            next(std::integral_constant<state, state::failed>{});
+            failed();
             current = state::rejected;
             break;
         case state::aborted:
-            next(std::integral_constant<state, state::aborted>{});
+            aborted();
             current = state::rejected;
             break;
         default:
@@ -306,7 +277,7 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Func, typename Delta>
-struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Func {
+struct process_adaptor: process<Delta>, private Func {
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
      * @tparam Args Types of arguments to use to initialize the actual process.
@@ -321,7 +292,7 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void update(const Delta delta, void *data) {
+    void update(const Delta delta, void *data) override {
         Func::operator()(
             delta,
             data,

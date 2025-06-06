@@ -4,27 +4,24 @@
 #include "../../common/empty.h"
 
 template<typename Delta>
-struct fake_process: entt::process<fake_process<Delta>, Delta> {
-    using process_type = entt::process<fake_process<Delta>, Delta>;
-    using delta_type = typename process_type::delta_type;
-
-    void init() {
+class fake_process: public entt::process<Delta> {
+    void init() override {
         init_invoked = true;
     }
 
-    void succeeded() {
+    void succeeded() override {
         succeeded_invoked = true;
     }
 
-    void failed() {
+    void failed() override {
         failed_invoked = true;
     }
 
-    void aborted() {
+    void aborted() override {
         aborted_invoked = true;
     }
 
-    void update(typename entt::process<fake_process<Delta>, Delta>::delta_type, void *data) {
+    void update(const Delta, void *data) override {
         if(data != nullptr) {
             (*static_cast<int *>(data))++;
         }
@@ -32,6 +29,7 @@ struct fake_process: entt::process<fake_process<Delta>, Delta> {
         update_invoked = true;
     }
 
+public:
     bool init_invoked{};
     bool update_invoked{};
     bool succeeded_invoked{};

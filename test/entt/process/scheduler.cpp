@@ -5,31 +5,33 @@
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
 
-struct foo_process: entt::process<foo_process, entt::scheduler::delta_type> {
-    foo_process(std::function<void()> upd, std::function<void()> abort)
-        : on_update{std::move(upd)}, on_aborted{std::move(abort)} {}
-
-    void update(delta_type, void *) const {
+class foo_process: public entt::process<entt::scheduler::delta_type> {
+    void update(const delta_type, void *) override {
         on_update();
     }
 
-    void aborted() const {
+    void aborted() override {
         on_aborted();
     }
 
+public:
+    foo_process(std::function<void()> upd, std::function<void()> abort)
+        : on_update{std::move(upd)}, on_aborted{std::move(abort)} {}
+
+private:
     std::function<void()> on_update;
     std::function<void()> on_aborted;
 };
 
-struct succeeded_process: entt::process<succeeded_process, entt::scheduler::delta_type> {
-    void update(delta_type, void *data) {
+class succeeded_process: public entt::process<entt::scheduler::delta_type> {
+    void update(const entt::scheduler::delta_type, void *data) override {
         ++static_cast<std::pair<int, int> *>(data)->first;
         succeed();
     }
 };
 
-struct failed_process: entt::process<failed_process, entt::scheduler::delta_type> {
-    void update(delta_type, void *data) {
+class failed_process: public entt::process<entt::scheduler::delta_type> {
+    void update(const entt::scheduler::delta_type, void *data) override {
         ++static_cast<std::pair<int, int> *>(data)->second;
         fail();
     }

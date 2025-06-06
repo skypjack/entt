@@ -219,7 +219,7 @@ public:
      */
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
-        static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
+        static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...));
         // forces the process to exit the uninitialized state
         ref->update({}, nullptr);
@@ -292,7 +292,7 @@ public:
      */
     template<typename Proc, typename... Args>
     basic_scheduler &then(Args &&...args) {
-        static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
+        static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         ENTT_ASSERT(!handlers.first().empty(), "Process not available");
         auto *curr = handlers.first().back().get();
         for(; curr->next; curr = curr->next.get()) {}

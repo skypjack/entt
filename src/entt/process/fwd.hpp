@@ -6,7 +6,7 @@
 
 namespace entt {
 
-template<typename, typename>
+template<typename>
 class process;
 
 template<typename = std::uint32_t, typename = std::allocator<void>>
