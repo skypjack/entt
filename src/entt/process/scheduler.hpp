@@ -17,35 +17,41 @@ namespace entt {
 namespace internal {
 
 template<typename Delta>
-struct basic_process_handler {
+class basic_process_handler {
+protected:
+    basic_process_handler(process<Delta> &elem)
+        : task{&elem} {}
+
+public:
     virtual ~basic_process_handler() = default;
 
-    virtual bool update(Delta, void *) = 0;
-    virtual void abort(bool) = 0;
+    bool update(const Delta delta, void *data) {
+        if(task->tick(delta, data); task->rejected()) {
+            this->next.reset();
+        }
+
+        return (task->rejected() || task->finished());
+    }
+
+    void abort(const bool immediate) {
+        task->abort(immediate);
+    }
 
     // std::shared_ptr because of its type erased allocator which is useful here
-    std::shared_ptr<basic_process_handler> next;
+    std::shared_ptr<basic_process_handler> next{};
+
+private:
+    process<Delta> *task{};
 };
 
 template<typename Delta, typename Type>
 struct process_handler final: basic_process_handler<Delta> {
     template<typename... Args>
     process_handler(Args &&...args)
-        : process{std::forward<Args>(args)...} {}
+        : basic_process_handler<Delta>{proc},
+          proc{std::forward<Args>(args)...} {}
 
-    bool update(const Delta delta, void *data) override {
-        if(process.tick(delta, data); process.rejected()) {
-            this->next.reset();
-        }
-
-        return (process.rejected() || process.finished());
-    }
-
-    void abort(const bool immediate) override {
-        process.abort(immediate);
-    }
-
-    Type process;
+    Type proc;
 };
 
 } // namespace internal
