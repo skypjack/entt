@@ -25,22 +25,8 @@ protected:
 public:
     virtual ~basic_process_handler() = default;
 
-    bool update(const Delta delta, void *data) {
-        if(task->tick(delta, data); task->rejected()) {
-            this->next.reset();
-        }
-
-        return (task->rejected() || task->finished());
-    }
-
-    void abort(const bool immediate) {
-        task->abort(immediate);
-    }
-
     // std::shared_ptr because of its type erased allocator which is useful here
     std::shared_ptr<basic_process_handler> next{};
-
-private:
     process<Delta> *task{};
 };
 
@@ -95,6 +81,14 @@ class basic_scheduler {
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = typename alloc_traits::template rebind_alloc<process_type>;
     using container_type = std::vector<process_type, container_allocator>;
+
+    bool update(internal::basic_process_handler<Delta> &handler, const Delta delta, void *data) {
+        if(handler.task->tick(delta, data); handler.task->rejected()) {
+            handler.next.reset();
+        }
+
+        return (handler.task->rejected() || handler.task->finished());
+    }
 
 public:
     /*! @brief Allocator type. */
@@ -228,7 +222,7 @@ public:
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...));
         // forces the process to exit the uninitialized state
-        ref->update({}, nullptr);
+        update(*ref, {}, nullptr);
         return *this;
     }
 
@@ -331,12 +325,12 @@ public:
      */
     void update(const delta_type delta, void *data = nullptr) {
         for(auto next = handlers.first().size(); next; --next) {
-            if(const auto pos = next - 1u; handlers.first()[pos]->update(delta, data)) {
+            if(const auto pos = next - 1u; update(*handlers.first()[pos], delta, data)) {
                 // updating might spawn/reallocate, cannot hold refs until here
                 if(auto &curr = handlers.first()[pos]; curr->next) {
                     curr = std::move(curr->next);
                     // forces the process to exit the uninitialized state
-                    curr->update({}, nullptr);
+                    update(*curr, {}, nullptr);
                 } else {
                     curr = std::move(handlers.first().back());
                     handlers.first().pop_back();
@@ -357,7 +351,7 @@ public:
      */
     void abort(const bool immediate = false) {
         for(auto &&curr: handlers.first()) {
-            curr->abort(immediate);
+            curr->task->abort(immediate);
         }
     }
 
