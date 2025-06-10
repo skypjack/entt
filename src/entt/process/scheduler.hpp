@@ -17,27 +17,10 @@ namespace entt {
 namespace internal {
 
 template<typename Delta>
-class basic_process_handler {
-protected:
-    basic_process_handler(process<Delta> &elem)
-        : task{&elem} {}
-
-public:
-    virtual ~basic_process_handler() = default;
-
+struct process_handler {
     // std::shared_ptr because of its type erased allocator which is useful here
-    std::shared_ptr<basic_process_handler> next{};
-    process<Delta> *task{};
-};
-
-template<typename Delta, typename Type>
-struct process_handler final: basic_process_handler<Delta> {
-    template<typename... Args>
-    process_handler(Args &&...args)
-        : basic_process_handler<Delta>{proc},
-          proc{std::forward<Args>(args)...} {}
-
-    Type proc;
+    std::shared_ptr<process_handler> next{};
+    std::shared_ptr<process<Delta>> task{};
 };
 
 } // namespace internal
@@ -72,17 +55,15 @@ struct process_handler final: basic_process_handler<Delta> {
  */
 template<typename Delta, typename Allocator>
 class basic_scheduler {
-    template<typename Type>
-    using handler_type = internal::process_handler<Delta, Type>;
-
+    using handler_type = internal::process_handler<Delta>;
     // std::shared_ptr because of its type erased allocator which is useful here
-    using process_type = std::shared_ptr<internal::basic_process_handler<Delta>>;
+    using process_type = std::shared_ptr<handler_type>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = typename alloc_traits::template rebind_alloc<process_type>;
     using container_type = std::vector<process_type, container_allocator>;
 
-    bool update(internal::basic_process_handler<Delta> &handler, const Delta delta, void *data) {
+    bool update(handler_type &handler, const Delta delta, void *data) {
         if(handler.task->tick(delta, data); handler.task->rejected()) {
             handler.next.reset();
         }
@@ -220,7 +201,8 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
-        auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...));
+        auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type>(handlers.second()));
+        ref->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
         // forces the process to exit the uninitialized state
         update(*ref, {}, nullptr);
         return *this;
@@ -296,7 +278,8 @@ public:
         ENTT_ASSERT(!handlers.first().empty(), "Process not available");
         auto *curr = handlers.first().back().get();
         for(; curr->next; curr = curr->next.get()) {}
-        curr->next = std::allocate_shared<handler_type<Proc>>(handlers.second(), std::forward<Args>(args)...);
+        curr->next = std::allocate_shared<handler_type>(handlers.second());
+        curr->next->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
