@@ -117,8 +117,8 @@ class basic_any {
         if constexpr(!std::is_void_v<Type>) {
             using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
 
-            info = &type_id<plain_type>();
             vtable = basic_vtable<plain_type>;
+            descriptor = &type_id<plain_type>();
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
@@ -151,8 +151,8 @@ class basic_any {
 
     basic_any(const basic_any &other, const any_policy pol) noexcept
         : instance{other.data()},
-          info{other.info},
           vtable{other.vtable},
+          descriptor{other.descriptor},
           mode{pol} {}
 
 public:
@@ -219,8 +219,8 @@ public:
      */
     basic_any(basic_any &&other) noexcept
         : instance{},
-          info{other.info},
           vtable{other.vtable},
+          descriptor{other.descriptor},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
@@ -271,8 +271,8 @@ public:
             instance = std::exchange(other.instance, nullptr);
         }
 
-        info = other.info;
         vtable = other.vtable;
+        descriptor = other.descriptor;
         mode = other.mode;
 
         return *this;
@@ -291,11 +291,16 @@ public:
     }
 
     /**
-     * @brief Returns the object type if any, `type_id<void>()` otherwise.
-     * @return The object type if any, `type_id<void>()` otherwise.
+     * @brief Returns the object type info if any, `type_id<void>()` otherwise.
+     * @return The object type info if any, `type_id<void>()` otherwise.
      */
-    [[nodiscard]] const type_info &type() const noexcept {
-        return (info == nullptr) ? type_id<void>() : *info;
+    [[nodiscard]] const type_info &info() const noexcept {
+        return (descriptor == nullptr) ? type_id<void>() : *descriptor;
+    }
+
+    /*! @copydoc info */
+    [[deprecated("use ::info instead")]] [[nodiscard]] const type_info &type() const noexcept {
+        return info();
     }
 
     /**
@@ -312,7 +317,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data(const type_info &req) const noexcept {
-        return (type() == req) ? data() : nullptr;
+        return (info() == req) ? data() : nullptr;
     }
 
     /**
@@ -350,7 +355,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && mode != any_policy::cref && *info == other.type()) {
+        if(vtable && mode != any_policy::cref && *descriptor == other.info()) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -360,7 +365,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
-        if(vtable && mode != any_policy::cref && *info == other.type()) {
+        if(vtable && mode != any_policy::cref && *descriptor == other.info()) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
@@ -378,8 +383,8 @@ public:
         }
 
         instance = nullptr;
-        info = nullptr;
         vtable = nullptr;
+        descriptor = nullptr;
         mode = any_policy::empty;
     }
 
@@ -397,7 +402,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
-        if(vtable && *info == other.type()) {
+        if(vtable && *descriptor == other.info()) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
@@ -447,8 +452,8 @@ private:
         const void *instance;
         storage_type storage;
     };
-    const type_info *info{};
     vtable_type *vtable{};
+    const type_info *descriptor{};
     any_policy mode{any_policy::empty};
 };
 

@@ -93,7 +93,7 @@ TYPED_TEST(BasicHandle, Storage) {
 
     ASSERT_NE(handle.storage().begin(), handle.storage().end());
     ASSERT_EQ(++handle.storage().begin(), handle.storage().end());
-    ASSERT_EQ(handle.storage().begin()->second.type(), entt::type_id<int>());
+    ASSERT_EQ(handle.storage().begin()->second.info(), entt::type_id<int>());
 }
 
 ENTT_DEBUG_TYPED_TEST(BasicHandleDeathTest, Storage) {

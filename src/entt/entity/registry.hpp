@@ -187,7 +187,7 @@ public:
     template<typename Type>
     bool erase(const id_type id = type_id<Type>().hash()) {
         const auto it = ctx.find(id);
-        return it != ctx.end() && it->second.type() == type_id<Type>() ? (ctx.erase(it), true) : false;
+        return it != ctx.end() && it->second.info() == type_id<Type>() ? (ctx.erase(it), true) : false;
     }
 
     template<typename Type>
@@ -215,7 +215,7 @@ public:
     template<typename Type>
     [[nodiscard]] bool contains(const id_type id = type_id<Type>().hash()) const {
         const auto it = ctx.find(id);
-        return it != ctx.cend() && it->second.type() == type_id<Type>();
+        return it != ctx.cend() && it->second.info() == type_id<Type>();
     }
 
 private:
@@ -251,7 +251,7 @@ class basic_registry {
             using storage_type = storage_for_type<Type>;
 
             if(auto it = pools.find(id); it != pools.cend()) {
-                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                ENTT_ASSERT(it->second->info() == type_id<Type>(), "Unexpected type");
                 return static_cast<storage_type &>(*it->second);
             }
 
@@ -281,7 +281,7 @@ class basic_registry {
             return &entities;
         } else {
             if(const auto it = pools.find(id); it != pools.cend()) {
-                ENTT_ASSERT(it->second->type() == type_id<Type>(), "Unexpected type");
+                ENTT_ASSERT(it->second->info() == type_id<Type>(), "Unexpected type");
                 return static_cast<const storage_for_type<Type> *>(it->second.get());
             }
 

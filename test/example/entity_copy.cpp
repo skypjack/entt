@@ -106,7 +106,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
 
             if(!other) {
                 using namespace entt::literals;
-                entt::resolve(storage.type()).invoke("storage"_hs, {}, entt::forward_as_meta(dst), id);
+                entt::resolve(storage.info()).invoke("storage"_hs, {}, entt::forward_as_meta(dst), id);
                 other = dst.storage(id);
             }
 

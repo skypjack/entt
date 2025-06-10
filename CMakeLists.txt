@@ -22,7 +22,7 @@ project(
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
-
+    
 message(VERBOSE "*")
 message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2025 Michele Caini <michele.caini@gmail.com>")
@@ -90,6 +90,7 @@ target_include_directories(
     EnTT
     INTERFACE
         $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -111,18 +112,8 @@ endif()
 # Add EnTT goodies
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
+option(ENTT_INCLUDE_TOOLS "Add EnTT tools files to the EnTT target." OFF)
 option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
-
-if(ENTT_INCLUDE_NATVIS)
-    if(MSVC)
-        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
-        mark_as_advanced(ENTT_HAS_NATVIS)
-    endif()
-
-    if(NOT ENTT_HAS_NATVIS)
-        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
-    endif()
-endif()
 
 if(ENTT_INCLUDE_HEADERS)
     target_sources(
@@ -204,6 +195,25 @@ if(ENTT_INCLUDE_HEADERS)
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entt.hpp>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/fwd.hpp>
     )
+endif()
+
+if(ENTT_INCLUDE_TOOLS)
+    target_sources(
+        EnTT
+        INTERFACE
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools/entt/davey/davey.hpp>
+    )
+endif()
+
+if(ENTT_INCLUDE_NATVIS)
+    if(MSVC)
+        set(ENTT_HAS_NATVIS TRUE CACHE BOOL "" FORCE)
+        mark_as_advanced(ENTT_HAS_NATVIS)
+    endif()
+
+    if(NOT ENTT_HAS_NATVIS)
+        message(VERBOSE "The option ENTT_INCLUDE_NATVIS is set but natvis files are not supported. They will not be added to the target.")
+    endif()
 endif()
 
 if(ENTT_HAS_NATVIS)
@@ -301,24 +311,32 @@ if(ENTT_INSTALL)
     export(PACKAGE EnTT)
 endif()
 
-# Tests
+# Tests and testbed
 
+option(ENTT_BUILD_TESTBED "Enable building testbed." OFF)
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 
-if(ENTT_BUILD_TESTING)
-    option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
+if(ENTT_BUILD_TESTBED OR ENTT_BUILD_TESTING)
+    set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for tests and testbed")
+    set(ENTT_CXX_STD cxx_std_17 CACHE STRING "C++ standard revision to use for tests and testbed")
 
-    option(ENTT_BUILD_BENCHMARK "Build benchmark." OFF)
-    option(ENTT_BUILD_EXAMPLE "Build examples." OFF)
-    option(ENTT_BUILD_LIB "Build lib tests." OFF)
-    option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
+    # Testbed goes first because otherwise SDL gets confused with EnTT tests
+    if(ENTT_BUILD_TESTBED)
+        add_subdirectory(testbed)
+    endif()
 
-    set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for the tests")
-    set(ENTT_CXX_STD cxx_std_17 CACHE STRING "C++ standard revision to use for the tests")
+    if(ENTT_BUILD_TESTING)
+        option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
 
-    include(CTest)
-    enable_testing()
-    add_subdirectory(test)
+        option(ENTT_BUILD_BENCHMARK "Build benchmark." OFF)
+        option(ENTT_BUILD_EXAMPLE "Build examples." OFF)
+        option(ENTT_BUILD_LIB "Build lib tests." OFF)
+        option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
+
+        include(CTest)
+        enable_testing()
+        add_subdirectory(test)
+    endif()
 endif()
 
 # Documentation

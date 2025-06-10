@@ -1548,7 +1548,7 @@ is not known), there is always the possibility of receiving a `type_info` object
 for the type of elements associated with the entities (if any):
 
 ```cpp
-if(entt::type_id<velocity>() == base.type()) {
+if(entt::type_id<velocity>() == base.info()) {
     // ...
 }
 ```

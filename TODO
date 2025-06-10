@@ -34,4 +34,4 @@ TODO:
 * doc: IMPLICIT_DIR_DOCS for dir docs or \dir
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * improve non-const allow cast with in-place switch
-* meta fixed_size could return the size directly if present
+* review build process for testbed (i.e. tests first due to SDL)

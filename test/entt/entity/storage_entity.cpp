@@ -19,13 +19,13 @@ TEST(StorageEntity, Constructors) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_only);
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
 
     pool = entt::storage<entt::entity>{std::allocator<entt::entity>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_only);
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
 }
 
 TEST(StorageEntity, Move) {
@@ -44,7 +44,7 @@ TEST(StorageEntity, Move) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<void>());
+    ASSERT_EQ(other.info(), entt::type_id<void>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
 
     entt::storage<entt::entity> extended{std::move(other), std::allocator<entt::entity>{}};
@@ -54,7 +54,7 @@ TEST(StorageEntity, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_FALSE(extended.empty());
 
-    ASSERT_EQ(extended.type(), entt::type_id<void>());
+    ASSERT_EQ(extended.info(), entt::type_id<void>());
     ASSERT_EQ(extended.index(entity[0u]), 0u);
 
     pool = std::move(extended);
@@ -64,7 +64,7 @@ TEST(StorageEntity, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_TRUE(extended.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
     ASSERT_EQ(pool.index(entity[0u]), 0u);
 
     other = entt::storage<entt::entity>{};
@@ -75,7 +75,7 @@ TEST(StorageEntity, Move) {
     ASSERT_FALSE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<void>());
+    ASSERT_EQ(other.info(), entt::type_id<void>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
 }
 
@@ -83,8 +83,8 @@ TEST(StorageEntity, Swap) {
     entt::storage<entt::entity> pool;
     entt::storage<entt::entity> other;
 
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
-    ASSERT_EQ(other.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
+    ASSERT_EQ(other.info(), entt::type_id<void>());
 
     pool.generate(entt::entity{4});
 
@@ -97,8 +97,8 @@ TEST(StorageEntity, Swap) {
 
     pool.swap(other);
 
-    ASSERT_EQ(pool.type(), entt::type_id<void>());
-    ASSERT_EQ(other.type(), entt::type_id<void>());
+    ASSERT_EQ(pool.info(), entt::type_id<void>());
+    ASSERT_EQ(other.info(), entt::type_id<void>());
 
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(other.size(), 1u);
@@ -143,10 +143,10 @@ TEST(StorageEntity, Generate) {
     entt::storage<entt::entity> pool;
     std::array<entt::entity, 2u> entity{};
 
-    ASSERT_EQ(pool.emplace(), entt::entity{0});
+    ASSERT_EQ(pool.generate(), entt::entity{0});
     ASSERT_EQ(pool.generate(entt::null), entt::entity{1});
     ASSERT_EQ(pool.generate(entt::tombstone), entt::entity{2});
-    ASSERT_EQ(pool.emplace(entt::entity{0}), entt::entity{3});
+    ASSERT_EQ(pool.generate(entt::entity{0}), entt::entity{3});
     ASSERT_EQ(pool.generate(traits_type::construct(1, 1)), entt::entity{4});
     ASSERT_EQ(pool.generate(traits_type::construct(6, 3)), traits_type::construct(6, 3));
 
@@ -170,6 +170,35 @@ TEST(StorageEntity, Generate) {
 
     ASSERT_EQ(entity[0u], traits_type::construct(2, 2));
     ASSERT_EQ(entity[1u], entt::entity{8});
+}
+
+TEST(StorageEntity, GenerateRange) {
+    entt::storage<entt::entity> pool;
+    std::array<entt::entity, 2u> entity{};
+
+    pool.generate(entity.begin(), entity.end());
+
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_TRUE(pool.contains(entity[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 2u);
+
+    pool.erase(entity.begin(), entity.end());
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 0u);
+
+    pool.generate(entity.begin(), entity.begin() + 1u);
+
+    ASSERT_TRUE(pool.contains(entity[0u]));
+    ASSERT_FALSE(pool.contains(entity[1u]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 TEST(StorageEntity, GenerateFrom) {
@@ -285,35 +314,6 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, Patch) {
     entt::storage<entt::entity> pool;
 
     ASSERT_DEATH(pool.patch(entt::null), "");
-}
-
-TEST(StorageEntity, Insert) {
-    entt::storage<entt::entity> pool;
-    std::array<entt::entity, 2u> entity{};
-
-    pool.insert(entity.begin(), entity.end());
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_TRUE(pool.contains(entity[1u]));
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 2u);
-
-    pool.erase(entity.begin(), entity.end());
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 0u);
-
-    pool.generate(entity.begin(), entity.begin() + 1u);
-
-    ASSERT_TRUE(pool.contains(entity[0u]));
-    ASSERT_FALSE(pool.contains(entity[1u]));
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.free_list(), 1u);
 }
 
 TEST(StorageEntity, Pack) {

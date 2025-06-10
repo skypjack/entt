@@ -96,13 +96,13 @@ TYPED_TEST(Storage, Constructors) {
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
     pool = entt::storage<value_type>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 }
 
 TYPED_TEST(Storage, Move) {
@@ -123,7 +123,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_TRUE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
     ASSERT_EQ(other.get(entity[0u]), value_type{3});
 
@@ -134,7 +134,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_FALSE(extended.empty());
 
-    ASSERT_EQ(extended.type(), entt::type_id<value_type>());
+    ASSERT_EQ(extended.info(), entt::type_id<value_type>());
     ASSERT_EQ(extended.index(entity[0u]), 0u);
     ASSERT_EQ(extended.get(entity[0u]), value_type{3});
 
@@ -145,7 +145,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_TRUE(other.empty());
     ASSERT_TRUE(extended.empty());
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
     ASSERT_EQ(pool.index(entity[0u]), 0u);
     ASSERT_EQ(pool.get(entity[0u]), value_type{3});
 
@@ -157,7 +157,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_FALSE(pool.empty());
     ASSERT_FALSE(other.empty());
 
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
     ASSERT_EQ(other.index(entity[0u]), 0u);
     ASSERT_EQ(other.get(entity[0u]), value_type{3});
 }
@@ -169,8 +169,8 @@ TYPED_TEST(Storage, Swap) {
     entt::storage<value_type> pool;
     entt::storage<value_type> other;
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     pool.emplace(entt::entity{4}, 1);
 
@@ -183,8 +183,8 @@ TYPED_TEST(Storage, Swap) {
 
     pool.swap(other);
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(other.type(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
     ASSERT_EQ(other.size(), 1u);
@@ -721,8 +721,8 @@ TEST(Storage, TryEmplaceNonDefaultConstructible) {
     entt::sparse_set &base = pool;
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(pool.type(), base.type());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), base.info());
 
     ASSERT_FALSE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));
@@ -764,8 +764,8 @@ TEST(Storage, TryEmplaceNonCopyConstructible) {
     entt::sparse_set &base = pool;
     const std::array entity{entt::entity{1}, entt::entity{3}};
 
-    ASSERT_EQ(pool.type(), entt::type_id<value_type>());
-    ASSERT_EQ(pool.type(), base.type());
+    ASSERT_EQ(pool.info(), entt::type_id<value_type>());
+    ASSERT_EQ(pool.info(), base.info());
 
     ASSERT_FALSE(pool.contains(entity[0u]));
     ASSERT_FALSE(pool.contains(entity[1u]));

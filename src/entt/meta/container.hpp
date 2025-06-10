@@ -6,6 +6,7 @@
 #include <array>
 #include <deque>
 #include <iterator>
+#include <limits>
 #include <list>
 #include <map>
 #include <set>
@@ -15,23 +16,27 @@
 #include <vector>
 #include "../container/dense_map.hpp"
 #include "../container/dense_set.hpp"
+#include "../core/type_traits.hpp"
 #include "context.hpp"
 #include "meta.hpp"
 #include "type_traits.hpp"
 
 namespace entt {
 
+/*! @brief Used to identicate that a sequence container has not a fixed size. */
+inline constexpr std::size_t meta_dynamic_extent = std::numeric_limits<std::size_t>::max();
+
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename, typename = void>
-struct fixed_size_sequence_container: std::true_type {};
+template<typename Type, typename = void>
+struct sequence_container_extent: integral_constant<meta_dynamic_extent> {};
 
 template<typename Type>
-struct fixed_size_sequence_container<Type, std::void_t<decltype(&Type::clear)>>: std::false_type {};
+struct sequence_container_extent<Type, std::enable_if_t<is_complete_v<std::tuple_size<Type>>>>: integral_constant<std::tuple_size_v<Type>> {};
 
 template<typename Type>
-inline constexpr bool fixed_size_sequence_container_v = fixed_size_sequence_container<Type>::value;
+inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
 
 template<typename, typename = void>
 struct key_only_associative_container: std::true_type {};
@@ -67,8 +72,10 @@ struct basic_meta_sequence_container_traits {
     /*! @brief Meta iterator type. */
     using iterator = typename meta_sequence_container::iterator;
 
-    /*! @brief True in case of key-only containers, false otherwise. */
-    static constexpr bool fixed_size = internal::fixed_size_sequence_container_v<Type>;
+    /*! @brief Number of elements, or `meta_dynamic_extent` if dynamic. */
+    static constexpr std::size_t extent = internal::sequence_container_extent_v<Type>;
+    /*! @brief True in case of fixed size containers, false otherwise. */
+    [[deprecated("use ::extent instead")]] static constexpr bool fixed_size = (extent != meta_dynamic_extent);
 
     /**
      * @brief Returns the number of elements in a container.
@@ -85,11 +92,11 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool clear([[maybe_unused]] void *container) {
-        if constexpr(fixed_size) {
-            return false;
-        } else {
+        if constexpr(extent == meta_dynamic_extent) {
             static_cast<Type *>(container)->clear();
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -115,11 +122,11 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(fixed_size || !std::is_default_constructible_v<typename Type::value_type>) {
-            return false;
-        } else {
+        if constexpr((extent == meta_dynamic_extent) && std::is_default_constructible_v<typename Type::value_type>) {
             static_cast<Type *>(container)->resize(sz);
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -160,13 +167,13 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator to the inserted element.
      */
     [[nodiscard]] static iterator insert([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] const iterator &it) {
-        if constexpr(fixed_size) {
-            return iterator{};
-        } else {
+        if constexpr(extent == meta_dynamic_extent) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->insert(
                               non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
                               (value != nullptr) ? *static_cast<const typename Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref))};
+        } else {
+            return iterator{};
         }
     }
 
@@ -178,11 +185,11 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator following the last removed element.
      */
     [[nodiscard]] static iterator erase([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const iterator &it) {
-        if constexpr(fixed_size) {
-            return iterator{};
-        } else {
+        if constexpr(extent == meta_dynamic_extent) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()))};
+        } else {
+            return iterator{};
         }
     }
 };

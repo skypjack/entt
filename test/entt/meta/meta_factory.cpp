@@ -282,27 +282,6 @@ TEST_F(MetaFactory, DataSetterGetter) {
     ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
 }
 
-TEST_F(MetaFactory, DataMultiSetterGetter) {
-    using namespace entt::literals;
-
-    clazz instance{1};
-    entt::meta_factory<clazz> factory{};
-    entt::meta_type type = entt::resolve<clazz>();
-
-    ASSERT_FALSE(type.data("value"_hs));
-
-    factory.data<entt::value_list<&clazz::set_int, &clazz::set_boxed_int>, &clazz::get_int>("value"_hs);
-    type = entt::resolve<clazz>();
-
-    ASSERT_TRUE(type.data("value"_hs));
-    ASSERT_EQ(type.get("value"_hs, std::as_const(instance)), instance.get_int());
-    ASSERT_EQ(type.get("value"_hs, instance), instance.get_int());
-    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), instance.get_int()));
-    ASSERT_TRUE(type.set("value"_hs, instance, instance.get_int()));
-    ASSERT_FALSE(type.set("value"_hs, std::as_const(instance), test::boxed_int{instance.get_int()}));
-    ASSERT_TRUE(type.set("value"_hs, instance, test::boxed_int{instance.get_int()}));
-}
-
 TEST_F(MetaFactory, DataOverwrite) {
     using namespace entt::literals;
 
@@ -433,25 +412,6 @@ TEST_F(MetaFactory, Custom) {
     ASSERT_EQ(static_cast<int>(type.data("member"_hs).custom()), 1);
     ASSERT_EQ(static_cast<int>(type.func("func"_hs).custom()), 2);
     ASSERT_EQ(static_cast<int>(type.func("func"_hs).next().custom()), 3);
-}
-
-TEST_F(MetaFactory, Meta) {
-    entt::meta_ctx ctx{};
-
-    ASSERT_EQ(entt::resolve(entt::type_id<int>()), entt::meta_type{});
-    ASSERT_EQ(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-
-    auto factory = entt::meta<int>();
-
-    ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
-    ASSERT_EQ(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-    ASSERT_TRUE(entt::resolve(entt::type_id<int>()).is_integral());
-
-    factory = entt::meta<int>(ctx);
-
-    ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
-    ASSERT_NE(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
-    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
 }
 
 TEST_F(MetaFactory, MetaReset) {

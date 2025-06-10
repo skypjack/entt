@@ -154,10 +154,10 @@ TEST_F(MetaAny, SBO) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.base().owner());
-    ASSERT_EQ(any.policy(), entt::meta_any_policy::embedded);
+    ASSERT_EQ(any.base().policy(), entt::any_policy::embedded);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<char>(), 'c');
-    ASSERT_NE(any.data(), nullptr);
+    ASSERT_NE(any.base().data(), nullptr);
     ASSERT_EQ(any, entt::meta_any{'c'});
     ASSERT_NE(entt::meta_any{'h'}, any);
 }
@@ -168,10 +168,10 @@ TEST_F(MetaAny, NoSBO) {
 
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.base().owner());
-    ASSERT_EQ(any.policy(), entt::meta_any_policy::dynamic);
+    ASSERT_EQ(any.base().policy(), entt::any_policy::dynamic);
     ASSERT_FALSE(any.try_cast<std::size_t>());
     ASSERT_EQ(any.cast<fat>(), instance);
-    ASSERT_NE(any.data(), nullptr);
+    ASSERT_NE(any.base().data(), nullptr);
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(any, fat{});
 }
@@ -194,7 +194,7 @@ TEST_F(MetaAny, SBOInPlaceConstruction) {
 
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.base().owner());
-    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_EQ(other.base().policy(), entt::any_policy::ref);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<int>(), 2);
     ASSERT_NE(other.base().data(), nullptr);
@@ -526,7 +526,7 @@ TEST_F(MetaAny, NoSBOInPlaceConstruction) {
 
     ASSERT_TRUE(other);
     ASSERT_FALSE(other.base().owner());
-    ASSERT_EQ(other.policy(), entt::any_policy::ref);
+    ASSERT_EQ(other.base().policy(), entt::any_policy::ref);
     ASSERT_FALSE(other.try_cast<std::size_t>());
     ASSERT_EQ(other.cast<fat>(), instance);
     ASSERT_NE(other.base().data(), nullptr);

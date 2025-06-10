@@ -223,11 +223,16 @@ public:
         : basic_poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)} {}
 
     /**
-     * @brief Returns the object type if any, `type_id<void>()` otherwise.
-     * @return The object type if any, `type_id<void>()` otherwise.
+     * @brief Returns the object type info if any, `type_id<void>()` otherwise.
+     * @return The object type info if any, `type_id<void>()` otherwise.
      */
-    [[nodiscard]] const type_info &type() const noexcept {
-        return storage.type();
+    [[nodiscard]] const type_info &info() const noexcept {
+        return storage.info();
+    }
+
+    /*! @copydoc info */
+    [[deprecated("use ::info instead")]] [[nodiscard]] const type_info &type() const noexcept {
+        return info();
     }
 
     /**

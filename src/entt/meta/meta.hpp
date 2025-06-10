@@ -159,9 +159,6 @@ private:
     bool const_only{};
 };
 
-/*! @brief Possible modes of a meta any object. */
-using meta_any_policy [[deprecated("use any_policy instead")]] = any_policy;
-
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
     using vtable_type = void(const internal::meta_traits op, const meta_ctx &, const void *, void *);
@@ -387,18 +384,8 @@ public:
         return *this;
     }
 
-    /*! @copydoc any::type */
+    /*! @copydoc any::info */
     [[nodiscard]] inline meta_type type() const noexcept;
-
-    /*! @copydoc any::data */
-    [[nodiscard]] [[deprecated("use ::base().data() instead")]] const void *data() const noexcept {
-        return storage.data();
-    }
-
-    /*! @copydoc any::data */
-    [[nodiscard]] [[deprecated("no longer supported, use ::base().data() for const access")]] void *data() noexcept {
-        return storage.data();
-    }
 
     /**
      * @brief Invokes the underlying function, if possible.
@@ -628,14 +615,6 @@ public:
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
         return meta_any{*this, storage.as_ref()};
-    }
-
-    /**
-     * @brief Returns the current mode of a meta any object.
-     * @return The current mode of the meta any object.
-     */
-    [[nodiscard]] [[deprecated("use ::base().policy() instead")]] any_policy policy() const noexcept {
-        return storage.policy();
     }
 
     /**

@@ -150,25 +150,6 @@ template<typename Type>
 class meta_factory: private internal::basic_meta_factory {
     using base_type = internal::basic_meta_factory;
 
-    template<typename Setter, auto Getter, typename Policy, std::size_t... Index>
-    [[deprecated("use variant types or conversion support")]]
-    void data(const id_type id, std::index_sequence<Index...>) noexcept {
-        using data_type = std::invoke_result_t<decltype(Getter), Type &>;
-        using args_type = type_list<typename meta_function_helper_t<Type, decltype(value_list_element_v<Index, Setter>)>::args_type...>;
-        static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
-
-        base_type::data(
-            internal::meta_data_node{
-                id,
-                /* this is never static */
-                (std::is_member_object_pointer_v<decltype(value_list_element_v<Index, Setter>)> && ... && std::is_const_v<std::remove_reference_t<data_type>>) ? internal::meta_traits::is_const : internal::meta_traits::is_none,
-                Setter::size,
-                &internal::resolve<std::remove_cv_t<std::remove_reference_t<data_type>>>,
-                &meta_arg<type_list<type_list_element_t<static_cast<std::size_t>(type_list_element_t<Index, args_type>::size != 1u), type_list_element_t<Index, args_type>>...>>,
-                +[](meta_handle instance, meta_any value) { return (meta_setter<Type, value_list_element_v<Index, Setter>>(*instance.operator->(), value.as_ref()) || ...); },
-                &meta_getter<Type, Getter, Policy>});
-    }
-
 public:
     /*! @brief Default constructor. */
     meta_factory() noexcept
@@ -420,30 +401,6 @@ public:
     }
 
     /**
-     * @brief Assigns a meta data to a meta type by means of its setters and
-     * getter.
-     *
-     * Multi-setter support for meta data members. All setters are tried in the
-     * order of definition before returning to the caller.<br/>
-     * Setters can be either free functions, member functions or a mix of them
-     * and are provided via a `value_list` type.
-     *
-     * @sa data
-     *
-     * @tparam Setter The actual functions to use as setters.
-     * @tparam Getter The actual getter function.
-     * @tparam Policy Optional policy (no policy set by default).
-     * @param id Unique identifier.
-     * @return A meta factory for the parent type.
-     */
-    template<typename Setter, auto Getter, typename Policy = as_is_t>
-    [[deprecated("use variant types or conversion support")]]
-    meta_factory data(const id_type id) noexcept {
-        data<Setter, Getter, Policy>(id, std::make_index_sequence<Setter::size>{});
-        return *this;
-    }
-
-    /**
      * @brief Assigns a meta function to a meta type.
      *
      * Both member functions and free functions can be assigned to a meta
@@ -502,39 +459,6 @@ public:
         return *this;
     }
 };
-
-/**
- * @brief Utility function to use for reflection.
- *
- * This is the point from which everything starts.<br/>
- * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach meta objects through a
- * dedicated factory.
- *
- * @tparam Type Type to reflect.
- * @param ctx The context into which to construct meta types.
- * @return A meta factory for the given type.
- */
-template<typename Type>
-[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta(meta_ctx &ctx) noexcept {
-    return meta_factory<Type>{ctx};
-}
-
-/**
- * @brief Utility function to use for reflection.
- *
- * This is the point from which everything starts.<br/>
- * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach meta objects through a
- * dedicated factory.
- *
- * @tparam Type Type to reflect.
- * @return A meta factory for the given type.
- */
-template<typename Type>
-[[nodiscard]] [[deprecated("use meta_factory directly instead")]] auto meta() noexcept {
-    return meta<Type>(locator<meta_ctx>::value_or());
-}
 
 /**
  * @brief Resets a type and all its parts.

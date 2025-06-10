@@ -70,18 +70,6 @@ struct setter_getter {
     int value{0};
 };
 
-struct multi_setter {
-    void from_double(double val) {
-        value = static_cast<int>(val);
-    }
-
-    void from_string(const char *val) {
-        value = std::atoi(val);
-    }
-
-    int value{0};
-};
-
 struct array {
     inline static int global[2]; // NOLINT
     int local[4];                // NOLINT
@@ -127,10 +115,6 @@ struct MetaData: ::testing::Test {
             .data<&setter_getter::setter_with_ref, &setter_getter::getter_with_ref>("w"_hs)
             .data<nullptr, &setter_getter::getter>("z_ro"_hs)
             .data<nullptr, &setter_getter::value>("value"_hs);
-
-        entt::meta_factory<multi_setter>{}
-            .type("multi_setter"_hs)
-            .data<entt::value_list<&multi_setter::from_double, &multi_setter::from_string>, &multi_setter::value>("value"_hs);
 
         entt::meta_factory<array>{}
             .type("array"_hs)
@@ -488,30 +472,6 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_FALSE(data.set(instance, 1));
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
-}
-
-TEST_F(MetaData, MultiSetter) {
-    using namespace entt::literals;
-
-    auto data = entt::resolve<multi_setter>().data("value"_hs);
-    multi_setter instance{};
-
-    ASSERT_TRUE(data);
-    ASSERT_EQ(data.arity(), 2u);
-    ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.arg(0u), entt::resolve<double>());
-    ASSERT_EQ(data.arg(1u), entt::resolve<const char *>());
-    ASSERT_EQ(data.arg(2u), entt::meta_type{});
-    ASSERT_FALSE(data.is_const());
-    ASSERT_FALSE(data.is_static());
-    ASSERT_EQ(data.get(instance).cast<int>(), 0);
-    ASSERT_TRUE(data.set(instance, 1));
-    ASSERT_EQ(data.get(instance).cast<int>(), 1);
-    ASSERT_TRUE(data.set(instance, 2.));
-    ASSERT_EQ(data.get(instance).cast<int>(), 2);
-    ASSERT_FALSE(data.set(instance, std::string{"3"}));
-    ASSERT_TRUE(data.set(instance, std::string{"3"}.c_str()));
-    ASSERT_EQ(data.get(instance).cast<int>(), 3);
 }
 
 TEST_F(MetaData, ConstInstance) {

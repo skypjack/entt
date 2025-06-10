@@ -855,19 +855,19 @@ TEST(MultiStorageView, UseAndRefresh) {
 
     view.use<int>();
 
-    ASSERT_EQ(view.handle()->type(), entt::type_id<int>());
+    ASSERT_EQ(view.handle()->info(), entt::type_id<int>());
     ASSERT_EQ(view.front(), entity[1u]);
     ASSERT_EQ(view.back(), entity[0u]);
 
     view.use<char>();
 
-    ASSERT_EQ(view.handle()->type(), entt::type_id<char>());
+    ASSERT_EQ(view.handle()->info(), entt::type_id<char>());
     ASSERT_EQ(view.front(), entity[0u]);
     ASSERT_EQ(view.back(), entity[1u]);
 
     view.refresh();
 
-    ASSERT_EQ(view.handle()->type(), entt::type_id<int>());
+    ASSERT_EQ(view.handle()->info(), entt::type_id<int>());
 }
 
 TEST(MultiStorageView, Each) {

@@ -8,20 +8,20 @@
 struct base {
     virtual ~base() = default;
 
-    [[nodiscard]] virtual const entt::type_info &type() const noexcept {
+    [[nodiscard]] virtual const entt::type_info &info() const noexcept {
         return entt::type_id<base>();
     }
 };
 
 struct derived: base {
-    [[nodiscard]] const entt::type_info &type() const noexcept override {
+    [[nodiscard]] const entt::type_info &info() const noexcept override {
         return entt::type_id<derived>();
     }
 };
 
 template<typename Type, typename Other>
 entt::resource<Type> dynamic_resource_cast(const entt::resource<Other> &other) {
-    if(other->type() == entt::type_id<Type>()) {
+    if(other->info() == entt::type_id<Type>()) {
         return entt::resource<Type>{other, static_cast<Type &>(*other)};
     }
 
