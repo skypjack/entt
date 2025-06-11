@@ -203,8 +203,6 @@ public:
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type>(handlers.second()));
         ref->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
-        // forces the process to exit the uninitialized state
-        update(*ref, {}, nullptr);
         return *this;
     }
 
@@ -312,8 +310,6 @@ public:
                 // updating might spawn/reallocate, cannot hold refs until here
                 if(auto &curr = handlers.first()[pos]; curr->next) {
                     curr = std::move(curr->next);
-                    // forces the process to exit the uninitialized state
-                    update(*curr, {}, nullptr);
                 } else {
                     curr = std::move(handlers.first().back());
                     handlers.first().pop_back();
