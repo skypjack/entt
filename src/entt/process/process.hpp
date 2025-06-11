@@ -26,15 +26,6 @@ namespace entt {
  *   update.
  *
  * * @code{.cpp}
- *   void init() override;
- *   @endcode
- *
- *   It's invoked when the process joins the running queue of a scheduler. This
- *   happens as soon as it's attached to the scheduler if the process is a top
- *   level one, otherwise when it replaces its parent if the process is a
- *   continuation.
- *
- * * @code{.cpp}
  *   void succeeded() override;
  *   @endcode
  *
@@ -67,7 +58,7 @@ namespace entt {
 template<typename Delta>
 class process {
     enum class state : std::uint8_t {
-        uninitialized = 0,
+        idle = 0,
         running,
         paused,
         succeeded,
@@ -81,7 +72,6 @@ class process {
         abort(true);
     }
 
-    virtual void init() {}
     virtual void succeeded() {}
     virtual void failed() {}
     virtual void aborted() {}
@@ -201,11 +191,9 @@ public:
      */
     void tick(const Delta delta, void *data = nullptr) {
         switch(current) {
-        case state::uninitialized:
-            init();
-            current = state::running;
-            break;
+        case state::idle:
         case state::running:
+            current = state::running;
             update(delta, data);
             break;
         default:
@@ -234,7 +222,7 @@ public:
     }
 
 private:
-    state current{state::uninitialized};
+    state current{state::idle};
 };
 
 /**
