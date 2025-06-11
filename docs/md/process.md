@@ -33,12 +33,6 @@ wants to _override_ the default behavior):
   _properly_. The `void *` parameter is an opaque pointer to user data (if any)
   forwarded directly to the process during an update.
 
-* `void init();`
-
-  This is invoked when the process joins the running queue of a scheduler. It
-  happens usually when the process is attached to the scheduler if it is a top
-  level one, or when it replaces its parent if it is a _continuation_.
-
 * `void succeeded();`
 
   This is invoked in case of success, immediately after an update and during the
