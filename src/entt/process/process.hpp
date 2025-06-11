@@ -140,14 +140,14 @@ public:
 
     /*! @brief Stops a process if it's running, otherwise does nothing. */
     void pause() noexcept {
-        if(current == state::running) {
+        if(alive()) {
             current = state::paused;
         }
     }
 
     /*! @brief Restarts a process if it's paused, otherwise does nothing. */
     void unpause() noexcept {
-        if(current == state::paused) {
+        if(alive()) {
             current = state::running;
         }
     }
