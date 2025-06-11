@@ -158,7 +158,7 @@ TEST(Process, AbortNextTick) {
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
-    ASSERT_FALSE(process.update_invoked);
+    ASSERT_TRUE(process.update_invoked);
     ASSERT_FALSE(process.succeeded_invoked);
     ASSERT_FALSE(process.failed_invoked);
     ASSERT_TRUE(process.aborted_invoked);
@@ -175,7 +175,7 @@ TEST(Process, AbortImmediately) {
     ASSERT_FALSE(process.paused());
     ASSERT_TRUE(process.rejected());
 
-    ASSERT_FALSE(process.update_invoked);
+    ASSERT_TRUE(process.update_invoked);
     ASSERT_FALSE(process.succeeded_invoked);
     ASSERT_FALSE(process.failed_invoked);
     ASSERT_TRUE(process.aborted_invoked);
@@ -225,7 +225,6 @@ TEST(ProcessAdaptor, Data) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
-    process.tick(0);
     process.tick(0, &value);
 
     ASSERT_TRUE(process.finished());
