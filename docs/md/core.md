@@ -466,7 +466,7 @@ The `allocate_unique` function follows this proposal, making a virtue out of
 necessity:
 
 ```cpp
-std::unique_ptr<my_type, entt::allocation_deleter<my_type>> ptr = entt::allocate_unique<my_type>(allocator, arguments);
+std::unique_ptr<my_type, entt::allocation_deleter<allocator_type>> ptr = entt::allocate_unique<my_type>(allocator, arguments);
 ```
 
 Although the internal implementation is slightly different from what is proposed
