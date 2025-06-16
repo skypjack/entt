@@ -61,11 +61,15 @@ class basic_scheduler {
     using container_type = std::vector<handler_type, container_allocator>;
 
     bool update(const std::size_t pos, const Delta delta, void *data) {
-        if(handlers.first()[pos].task->tick(delta, data); handlers.first()[pos].task->rejected()) {
-            handlers.first()[pos].next.reset();
+        handlers.first()[pos].task->tick(delta, data);
+        // callbacks can insert or erase tasks, invalidating the reference
+        auto &elem = handlers.first()[pos];
+
+        if(elem.task->rejected()) {
+            elem.next.reset();
         }
 
-        return (handlers.first()[pos].task->rejected() || handlers.first()[pos].task->finished());
+        return (elem.task->rejected() || elem.task->finished());
     }
 
 public:
