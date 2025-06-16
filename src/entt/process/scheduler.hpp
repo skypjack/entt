@@ -56,19 +56,16 @@ struct process_handler {
 template<typename Delta, typename Allocator>
 class basic_scheduler {
     using handler_type = internal::process_handler<Delta>;
-    // std::shared_ptr because of its type erased allocator which is useful here
-    using process_type = std::shared_ptr<handler_type>;
-
     using alloc_traits = std::allocator_traits<Allocator>;
-    using container_allocator = typename alloc_traits::template rebind_alloc<process_type>;
-    using container_type = std::vector<process_type, container_allocator>;
+    using container_allocator = typename alloc_traits::template rebind_alloc<handler_type>;
+    using container_type = std::vector<handler_type, container_allocator>;
 
-    bool update(handler_type &handler, const Delta delta, void *data) {
-        if(handler.task->tick(delta, data); handler.task->rejected()) {
-            handler.next.reset();
+    bool update(const std::size_t pos, const Delta delta, void *data) {
+        if(handlers.first()[pos].task->tick(delta, data); handlers.first()[pos].task->rejected()) {
+            handlers.first()[pos].next.reset();
         }
 
-        return (handler.task->rejected() || handler.task->finished());
+        return (handlers.first()[pos].task->rejected() || handlers.first()[pos].task->finished());
     }
 
 public:
@@ -201,8 +198,7 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
-        auto &ref = handlers.first().emplace_back(std::allocate_shared<handler_type>(handlers.second()));
-        ref->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
+        handlers.first().emplace_back().task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -274,7 +270,7 @@ public:
     basic_scheduler &then(Args &&...args) {
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         ENTT_ASSERT(!handlers.first().empty(), "Process not available");
-        auto *curr = handlers.first().back().get();
+        auto *curr = &handlers.first().back();
         for(; curr->next; curr = curr->next.get()) {}
         curr->next = std::allocate_shared<handler_type>(handlers.second());
         curr->next->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
@@ -306,10 +302,11 @@ public:
      */
     void update(const delta_type delta, void *data = nullptr) {
         for(auto next = handlers.first().size(); next; --next) {
-            if(const auto pos = next - 1u; update(*handlers.first()[pos], delta, data)) {
+            if(const auto pos = next - 1u; update(pos, delta, data)) {
                 // updating might spawn/reallocate, cannot hold refs until here
-                if(auto &curr = handlers.first()[pos]; curr->next) {
-                    curr = std::move(curr->next);
+                if(auto &curr = handlers.first()[pos]; curr.next) {
+                    auto next = curr.next;
+                    curr = std::move(*next);
                 } else {
                     curr = std::move(handlers.first().back());
                     handlers.first().pop_back();
@@ -330,7 +327,7 @@ public:
      */
     void abort(const bool immediate = false) {
         for(auto &&curr: handlers.first()) {
-            curr->task->abort(immediate);
+            curr.task->abort(immediate);
         }
     }
 
