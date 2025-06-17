@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 #include "../../common/empty.h"
@@ -35,7 +36,7 @@ public:
 };
 
 TEST(Process, Basics) {
-    auto process = entt::process<int>::create<test_process<int>>();
+    auto process = entt::process<int>::allocate<test_process<int>>(std::allocator<void>{});
 
     ASSERT_FALSE(process->alive());
     ASSERT_FALSE(process->finished());
@@ -90,7 +91,7 @@ TEST(Process, Basics) {
 }
 
 TEST(Process, Succeeded) {
-    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
+    auto process = entt::process<test::empty>::allocate<test_process<test::empty>>(std::allocator<void>{});
 
     process->tick({});
     process->tick({});
@@ -109,7 +110,7 @@ TEST(Process, Succeeded) {
 }
 
 TEST(Process, Fail) {
-    auto process = entt::process<int>::create<test_process<int>>();
+    auto process = entt::process<int>::allocate<test_process<int>>(std::allocator<void>{});
 
     process->tick(0);
     process->tick(0);
@@ -128,7 +129,7 @@ TEST(Process, Fail) {
 }
 
 TEST(Process, Data) {
-    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
+    auto process = entt::process<test::empty>::allocate<test_process<test::empty>>(std::allocator<void>{});
     int value = 0;
 
     process->tick({});
@@ -149,7 +150,7 @@ TEST(Process, Data) {
 }
 
 TEST(Process, AbortNextTick) {
-    auto process = entt::process<int>::create<test_process<int>>();
+    auto process = entt::process<int>::allocate<test_process<int>>(std::allocator<void>{});
 
     process->tick(0);
     process->abort();
@@ -167,7 +168,7 @@ TEST(Process, AbortNextTick) {
 }
 
 TEST(Process, AbortImmediately) {
-    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
+    auto process = entt::process<test::empty>::allocate<test_process<test::empty>>(std::allocator<void>{});
 
     process->tick({});
     process->abort(true);
@@ -191,7 +192,7 @@ TEST(ProcessAdaptor, Resolved) {
         resolve();
     };
 
-    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
+    auto process = entt::process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
 
     process->tick(0);
     process->tick(0);
@@ -208,7 +209,7 @@ TEST(ProcessAdaptor, Rejected) {
         rejected();
     };
 
-    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
+    auto process = entt::process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
 
     process->tick(0);
     process->tick(0);
@@ -224,7 +225,7 @@ TEST(ProcessAdaptor, Data) {
         resolve();
     };
 
-    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
+    auto process = entt::process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
 
     process->tick(0, &value);
 

@@ -116,18 +116,6 @@ public:
     /**
      * @brief Factory method.
      * @tparam Type Type of process to create.
-     * @tparam Args Types of arguments to use to initialize the process.
-     * @param args Parameters to use to initialize the process.
-     * @return A properly initialized process.
-     */
-    template<typename Type, typename... Args>
-    static std::shared_ptr<Type> create(Args &&...args) {
-        return std::make_shared<Type>(process_arg_t{}, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Factory method.
-     * @tparam Type Type of process to create.
      * @tparam Allocator Type of allocator used to manage memory and elements.
      * @tparam Args Types of arguments to use to initialize the process.
      * @param alloc The allocator to use.
@@ -135,7 +123,7 @@ public:
      * @return A properly initialized process.
      */
     template<typename Type, typename Allocator, typename... Args>
-    static std::shared_ptr<Type> create_with_allocator(std::allocator_arg_t, const Allocator &alloc, Args &&...args) {
+    static std::shared_ptr<Type> allocate(const Allocator &alloc, Args &&...args) {
         return std::allocate_shared<Type>(alloc, process_arg_t{}, std::forward<Args>(args)...);
     }
 
