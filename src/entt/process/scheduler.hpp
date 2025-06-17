@@ -309,8 +309,8 @@ public:
             if(const auto pos = next - 1u; update(pos, delta, data)) {
                 // updating might spawn/reallocate, cannot hold refs until here
                 if(auto &curr = handlers.first()[pos]; curr.next) {
-                    auto next = curr.next;
-                    curr = std::move(*next);
+                    auto elem = curr.next;
+                    curr = std::move(*elem);
                 } else {
                     curr = std::move(handlers.first().back());
                     handlers.first().pop_back();
