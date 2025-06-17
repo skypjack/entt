@@ -202,7 +202,7 @@ public:
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
         static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
-        handlers.first().emplace_back().task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
+        handlers.first().emplace_back().task = process<Delta>::create_with_allocator<Proc>(std::allocator_arg, handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -277,7 +277,7 @@ public:
         auto *curr = &handlers.first().back();
         for(; curr->next; curr = curr->next.get()) {}
         curr->next = std::allocate_shared<handler_type>(handlers.second());
-        curr->next->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
+        curr->next->task = process<Delta>::create_with_allocator<Proc>(std::allocator_arg, handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 

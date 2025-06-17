@@ -5,6 +5,8 @@
 
 template<typename Delta>
 class test_process: public entt::process<Delta> {
+    using entt::process<Delta>::process;
+
     void succeeded() override {
         succeeded_invoked = true;
     }
@@ -33,152 +35,152 @@ public:
 };
 
 TEST(Process, Basics) {
-    test_process<int> process{};
+    auto process = entt::process<int>::create<test_process<int>>();
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.succeed();
-    process.fail();
-    process.abort();
-    process.pause();
-    process.unpause();
+    process->succeed();
+    process->fail();
+    process->abort();
+    process->pause();
+    process->unpause();
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.tick(0);
+    process->tick(0);
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_TRUE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.pause();
+    process->pause();
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_TRUE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_TRUE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_TRUE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.unpause();
+    process->unpause();
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_TRUE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.fail();
+    process->fail();
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    process.tick(0);
+    process->tick(0);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_TRUE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_TRUE(process->rejected());
 }
 
 TEST(Process, Succeeded) {
-    test_process<test::empty> process{};
+    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
 
-    process.tick({});
-    process.tick({});
-    process.succeed();
-    process.tick({});
+    process->tick({});
+    process->tick({});
+    process->succeed();
+    process->tick({});
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_TRUE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_TRUE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+    ASSERT_TRUE(process->update_invoked);
+    ASSERT_TRUE(process->succeeded_invoked);
+    ASSERT_FALSE(process->failed_invoked);
+    ASSERT_FALSE(process->aborted_invoked);
 }
 
 TEST(Process, Fail) {
-    test_process<int> process{};
+    auto process = entt::process<int>::create<test_process<int>>();
 
-    process.tick(0);
-    process.tick(0);
-    process.fail();
-    process.tick(0);
+    process->tick(0);
+    process->tick(0);
+    process->fail();
+    process->tick(0);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_TRUE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_TRUE(process->rejected());
 
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_TRUE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+    ASSERT_TRUE(process->update_invoked);
+    ASSERT_FALSE(process->succeeded_invoked);
+    ASSERT_TRUE(process->failed_invoked);
+    ASSERT_FALSE(process->aborted_invoked);
 }
 
 TEST(Process, Data) {
-    test_process<test::empty> process{};
+    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
     int value = 0;
 
-    process.tick({});
-    process.tick({}, &value);
-    process.succeed();
-    process.tick({}, &value);
+    process->tick({});
+    process->tick({}, &value);
+    process->succeed();
+    process->tick({}, &value);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_FALSE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_TRUE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_FALSE(process->rejected());
 
     ASSERT_EQ(value, 1);
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_TRUE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+    ASSERT_TRUE(process->update_invoked);
+    ASSERT_TRUE(process->succeeded_invoked);
+    ASSERT_FALSE(process->failed_invoked);
+    ASSERT_FALSE(process->aborted_invoked);
 }
 
 TEST(Process, AbortNextTick) {
-    test_process<int> process{};
+    auto process = entt::process<int>::create<test_process<int>>();
 
-    process.tick(0);
-    process.abort();
-    process.tick(0);
+    process->tick(0);
+    process->abort();
+    process->tick(0);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_TRUE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_TRUE(process->rejected());
 
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_TRUE(process.aborted_invoked);
+    ASSERT_TRUE(process->update_invoked);
+    ASSERT_FALSE(process->succeeded_invoked);
+    ASSERT_FALSE(process->failed_invoked);
+    ASSERT_TRUE(process->aborted_invoked);
 }
 
 TEST(Process, AbortImmediately) {
-    test_process<test::empty> process{};
+    auto process = entt::process<test::empty>::create<test_process<test::empty>>();
 
-    process.tick({});
-    process.abort(true);
+    process->tick({});
+    process->abort(true);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.finished());
-    ASSERT_FALSE(process.paused());
-    ASSERT_TRUE(process.rejected());
+    ASSERT_FALSE(process->alive());
+    ASSERT_FALSE(process->finished());
+    ASSERT_FALSE(process->paused());
+    ASSERT_TRUE(process->rejected());
 
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_TRUE(process.aborted_invoked);
+    ASSERT_TRUE(process->update_invoked);
+    ASSERT_FALSE(process->succeeded_invoked);
+    ASSERT_FALSE(process->failed_invoked);
+    ASSERT_TRUE(process->aborted_invoked);
 }
 
 TEST(ProcessAdaptor, Resolved) {
@@ -189,12 +191,12 @@ TEST(ProcessAdaptor, Resolved) {
         resolve();
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
+    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
 
-    process.tick(0);
-    process.tick(0);
+    process->tick(0);
+    process->tick(0);
 
-    ASSERT_TRUE(process.finished());
+    ASSERT_TRUE(process->finished());
     ASSERT_TRUE(updated);
 }
 
@@ -206,27 +208,26 @@ TEST(ProcessAdaptor, Rejected) {
         rejected();
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
+    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
 
-    process.tick(0);
-    process.tick(0);
+    process->tick(0);
+    process->tick(0);
 
-    ASSERT_TRUE(process.rejected());
+    ASSERT_TRUE(process->rejected());
     ASSERT_TRUE(updated);
 }
 
 TEST(ProcessAdaptor, Data) {
     int value = 0;
-
     auto lambda = [](std::uint64_t, void *data, auto resolve, auto) {
         *static_cast<int *>(data) = 2;
         resolve();
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
+    auto process = entt::process<std::uint64_t>::create<entt::process_adaptor<decltype(lambda), std::uint64_t>>(lambda);
 
-    process.tick(0, &value);
+    process->tick(0, &value);
 
-    ASSERT_TRUE(process.finished());
+    ASSERT_TRUE(process->finished());
     ASSERT_EQ(value, 2);
 }

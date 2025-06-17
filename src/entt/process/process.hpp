@@ -2,6 +2,7 @@
 #define ENTT_PROCESS_PROCESS_HPP
 
 #include <cstdint>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include "fwd.hpp"
@@ -56,7 +57,12 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class process {
+class process: private std::enable_shared_from_this<process<Delta>> {
+    class process_arg_t {
+        friend class process<Delta>;
+        explicit process_arg_t() = default;
+    };
+
     enum class state : std::uint8_t {
         idle = 0,
         running,
@@ -77,11 +83,14 @@ class process {
     virtual void aborted() {}
 
 public:
+    /*! @brief Process constructor token. */
+    using token_type = process_arg_t;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
 
     /*! @brief Default constructor. */
-    constexpr process() = default;
+    constexpr process(token_type)
+        : current{state::idle} {}
 
     /*! @brief Default destructor. */
     virtual ~process() = default;
@@ -103,6 +112,32 @@ public:
      * @return This process.
      */
     process &operator=(process &&) noexcept = default;
+
+    /**
+     * @brief Factory method.
+     * @tparam Type Type of process to create.
+     * @tparam Args Types of arguments to use to initialize the process.
+     * @param args Parameters to use to initialize the process.
+     * @return A properly initialized process.
+     */
+    template<typename Type, typename... Args>
+    static std::shared_ptr<Type> create(Args &&...args) {
+        return std::make_shared<Type>(process_arg_t{}, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Factory method.
+     * @tparam Type Type of process to create.
+     * @tparam Allocator Type of allocator used to manage memory and elements.
+     * @tparam Args Types of arguments to use to initialize the process.
+     * @param alloc The allocator to use.
+     * @param args Parameters to use to initialize the process.
+     * @return A properly initialized process.
+     */
+    template<typename Type, typename Allocator, typename... Args>
+    static std::shared_ptr<Type> create_with_allocator(std::allocator_arg_t, const Allocator &alloc, Args &&...args) {
+        return std::allocate_shared<Type>(alloc, process_arg_t{}, std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Aborts a process if it's still alive, otherwise does nothing.
@@ -222,7 +257,7 @@ public:
     }
 
 private:
-    state current{state::idle};
+    state current;
 };
 
 /**
@@ -265,22 +300,29 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Func, typename Delta>
-struct process_adaptor: process<Delta>, private Func {
+struct process_adaptor: public process<Delta>, private Func {
+    /*! @brief Process constructor token. */
+    using token_type = typename process<Delta>::token_type;
+    /*! @brief Type used to provide elapsed time. */
+    using delta_type = typename process<Delta>::delta_type;
+
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
      * @tparam Args Types of arguments to use to initialize the actual process.
+     * @param token Process constructor token.
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
-    process_adaptor(Args &&...args)
-        : Func{std::forward<Args>(args)...} {}
+    process_adaptor(const token_type token, Args &&...args)
+        : process<Delta>{token},
+          Func{std::forward<Args>(args)...} {}
 
     /**
      * @brief Updates a process and its internal state if required.
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void update(const Delta delta, void *data) override {
+    void update(const delta_type delta, void *data) override {
         Func::operator()(
             delta,
             data,
