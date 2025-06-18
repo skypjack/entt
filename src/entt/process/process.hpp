@@ -57,9 +57,9 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class process: private std::enable_shared_from_this<process<Delta>> {
+class basic_process: private std::enable_shared_from_this<basic_process<Delta>> {
     class process_arg_t {
-        friend class process<Delta>;
+        friend class basic_process<Delta>;
         explicit process_arg_t() = default;
     };
 
@@ -89,29 +89,29 @@ public:
     using delta_type = Delta;
 
     /*! @brief Default constructor. */
-    constexpr process(token_type)
+    constexpr basic_process(token_type)
         : current{state::idle} {}
 
     /*! @brief Default destructor. */
-    virtual ~process() = default;
+    virtual ~basic_process() = default;
 
     /*! @brief Default copy constructor. */
-    process(const process &) = default;
+    basic_process(const basic_process &) = default;
 
     /*! @brief Default move constructor. */
-    process(process &&) noexcept = default;
+    basic_process(basic_process &&) noexcept = default;
 
     /**
      * @brief Default copy assignment operator.
      * @return This process.
      */
-    process &operator=(const process &) = default;
+    basic_process &operator=(const basic_process &) = default;
 
     /**
      * @brief Default move assignment operator.
      * @return This process.
      */
-    process &operator=(process &&) noexcept = default;
+    basic_process &operator=(basic_process &&) noexcept = default;
 
     /**
      * @brief Factory method.
@@ -288,11 +288,11 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Func, typename Delta>
-struct process_adaptor: public process<Delta>, private Func {
+struct process_adaptor: public basic_process<Delta>, private Func {
     /*! @brief Process constructor token. */
-    using token_type = typename process<Delta>::token_type;
+    using token_type = typename basic_process<Delta>::token_type;
     /*! @brief Type used to provide elapsed time. */
-    using delta_type = typename process<Delta>::delta_type;
+    using delta_type = typename basic_process<Delta>::delta_type;
 
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
@@ -302,7 +302,7 @@ struct process_adaptor: public process<Delta>, private Func {
      */
     template<typename... Args>
     process_adaptor(const token_type token, Args &&...args)
-        : process<Delta>{token},
+        : basic_process<Delta>{token},
           Func{std::forward<Args>(args)...} {}
 
     /**

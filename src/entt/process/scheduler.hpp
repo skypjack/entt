@@ -16,11 +16,11 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename Delta>
+template<typename Type>
 struct process_handler {
     // std::shared_ptr because of its type erased allocator which is useful here
     std::shared_ptr<process_handler> next{};
-    std::shared_ptr<process<Delta>> task{};
+    std::shared_ptr<Type> task{};
 };
 
 } // namespace internal
@@ -55,8 +55,9 @@ struct process_handler {
  */
 template<typename Delta, typename Allocator>
 class basic_scheduler {
-    using handler_type = internal::process_handler<Delta>;
+    using process_type = basic_process<Delta>;
     using alloc_traits = std::allocator_traits<Allocator>;
+    using handler_type = internal::process_handler<process_type>;
     using container_allocator = typename alloc_traits::template rebind_alloc<handler_type>;
     using container_type = std::vector<handler_type, container_allocator>;
 
@@ -201,8 +202,7 @@ public:
      */
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
-        static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
-        handlers.first().emplace_back().task = process<Delta>::allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
+        handlers.first().emplace_back().task = process_type::template allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -272,12 +272,11 @@ public:
      */
     template<typename Proc, typename... Args>
     basic_scheduler &then(Args &&...args) {
-        static_assert(std::is_base_of_v<process<Delta>, Proc>, "Invalid process type");
         ENTT_ASSERT(!handlers.first().empty(), "Process not available");
         auto *curr = &handlers.first().back();
         for(; curr->next; curr = curr->next.get()) {}
         curr->next = std::allocate_shared<handler_type>(handlers.second());
-        curr->next->task = process<Delta>::allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
+        curr->next->task = process_type::template allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 

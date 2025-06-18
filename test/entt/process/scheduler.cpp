@@ -5,9 +5,8 @@
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
 
-class foo_process: public entt::process<entt::scheduler::delta_type> {
-    using base_type = entt::process<entt::scheduler::delta_type>;
-    using token_type = typename base_type::token_type;
+class foo_process: public entt::process {
+    using token_type = typename entt::process::token_type;
 
     void update(const delta_type, void *) override {
         on_update();
@@ -19,7 +18,7 @@ class foo_process: public entt::process<entt::scheduler::delta_type> {
 
 public:
     foo_process(const token_type token, std::function<void()> upd, std::function<void()> abort)
-        : base_type{token},
+        : entt::process{token},
           on_update{std::move(upd)},
           on_aborted{std::move(abort)} {}
 
@@ -28,24 +27,24 @@ private:
     std::function<void()> on_aborted;
 };
 
-class succeeded_process: public entt::process<entt::scheduler::delta_type> {
-    void update(const entt::scheduler::delta_type, void *data) override {
+class succeeded_process: public entt::process {
+    void update(const delta_type, void *data) override {
         ++static_cast<std::pair<int, int> *>(data)->first;
         succeed();
     }
 
 public:
-    using entt::process<entt::scheduler::delta_type>::process;
+    using entt::process::process;
 };
 
-class failed_process: public entt::process<entt::scheduler::delta_type> {
-    void update(const entt::scheduler::delta_type, void *data) override {
+class failed_process: public entt::process {
+    void update(const delta_type, void *data) override {
         ++static_cast<std::pair<int, int> *>(data)->second;
         fail();
     }
 
 public:
-    using entt::process<entt::scheduler::delta_type>::process;
+    using entt::process::process;
 };
 
 TEST(Scheduler, Functionalities) {

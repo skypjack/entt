@@ -37,6 +37,5 @@ TODO:
 * use any for meta_custom_node
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
-* basic_process vs process with default delta type
+* basic_process_adaptor vs process_adaptor with default delta type
 * update process/scheduler natvis and doc after rework
-* process test with allocator_arg
