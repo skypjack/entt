@@ -287,7 +287,7 @@ private:
  * @tparam Func Actual type of process.
  * @tparam Delta Type to use to provide elapsed time.
  */
-template<typename Func, typename Delta>
+template<typename Delta, typename Func>
 struct process_adaptor: public basic_process<Delta>, private Func {
     /*! @brief Process constructor token. */
     using token_type = typename basic_process<Delta>::token_type;

@@ -192,7 +192,7 @@ TEST(ProcessAdaptor, Resolved) {
         resolve();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
 
     process->tick(0);
     process->tick(0);
@@ -209,7 +209,7 @@ TEST(ProcessAdaptor, Rejected) {
         rejected();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
 
     process->tick(0);
     process->tick(0);
@@ -225,7 +225,7 @@ TEST(ProcessAdaptor, Data) {
         resolve();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<decltype(lambda), std::uint64_t>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
 
     process->tick(0, &value);
 
