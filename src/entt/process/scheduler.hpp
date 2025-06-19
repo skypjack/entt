@@ -259,7 +259,7 @@ public:
      */
     template<typename Func>
     basic_scheduler &attach(Func &&func) {
-        using Proc = process_adaptor<Delta, std::decay_t<Func>>;
+        using Proc = basic_process_adaptor<Delta, std::decay_t<Func>>;
         return attach<Proc>(std::forward<Func>(func));
     }
 
@@ -288,7 +288,7 @@ public:
      */
     template<typename Func>
     basic_scheduler &then(Func &&func) {
-        using Proc = process_adaptor<Delta, std::decay_t<Func>>;
+        using Proc = basic_process_adaptor<Delta, std::decay_t<Func>>;
         return then<Proc>(std::forward<Func>(func));
     }
 

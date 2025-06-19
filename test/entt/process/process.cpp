@@ -186,16 +186,16 @@ TEST(Process, AbortImmediately) {
 
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
-    auto lambda = [&updated](std::uint64_t, void *, auto resolve, auto) {
+    auto lambda = [&updated](std::uint32_t, void *, auto resolve, auto) {
         ASSERT_FALSE(updated);
         updated = true;
         resolve();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint32_t>::allocate<entt::process_adaptor<decltype(lambda)>>(std::allocator<void>{}, lambda);
 
-    process->tick(0);
-    process->tick(0);
+    process->tick(0u);
+    process->tick(0u);
 
     ASSERT_TRUE(process->finished());
     ASSERT_TRUE(updated);
@@ -203,16 +203,16 @@ TEST(ProcessAdaptor, Resolved) {
 
 TEST(ProcessAdaptor, Rejected) {
     bool updated = false;
-    auto lambda = [&updated](std::uint64_t, void *, auto, auto rejected) {
+    auto lambda = [&updated](std::uint32_t, void *, auto, auto rejected) {
         ASSERT_FALSE(updated);
         updated = true;
         rejected();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint32_t>::allocate<entt::process_adaptor<decltype(lambda)>>(std::allocator<void>{}, lambda);
 
-    process->tick(0);
-    process->tick(0);
+    process->tick(0u);
+    process->tick(0u);
 
     ASSERT_TRUE(process->rejected());
     ASSERT_TRUE(updated);
@@ -220,14 +220,14 @@ TEST(ProcessAdaptor, Rejected) {
 
 TEST(ProcessAdaptor, Data) {
     int value = 0;
-    auto lambda = [](std::uint64_t, void *data, auto resolve, auto) {
+    auto lambda = [](std::uint32_t, void *data, auto resolve, auto) {
         *static_cast<int *>(data) = 2;
         resolve();
     };
 
-    auto process = entt::basic_process<std::uint64_t>::allocate<entt::process_adaptor<std::uint64_t, decltype(lambda)>>(std::allocator<void>{}, lambda);
+    auto process = entt::basic_process<std::uint32_t>::allocate<entt::process_adaptor<decltype(lambda)>>(std::allocator<void>{}, lambda);
 
-    process->tick(0, &value);
+    process->tick(0u, &value);
 
     ASSERT_TRUE(process->finished());
     ASSERT_EQ(value, 2);

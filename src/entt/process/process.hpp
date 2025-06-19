@@ -288,7 +288,7 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta, typename Func>
-struct process_adaptor: public basic_process<Delta>, private Func {
+struct basic_process_adaptor: public basic_process<Delta>, private Func {
     /*! @brief Process constructor token. */
     using token_type = typename basic_process<Delta>::token_type;
     /*! @brief Type used to provide elapsed time. */
@@ -301,7 +301,7 @@ struct process_adaptor: public basic_process<Delta>, private Func {
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
-    process_adaptor(const token_type token, Args &&...args)
+    basic_process_adaptor(const token_type token, Args &&...args)
         : basic_process<Delta>{token},
           Func{std::forward<Args>(args)...} {}
 
