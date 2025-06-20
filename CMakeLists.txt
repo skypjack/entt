@@ -220,17 +220,17 @@ if(ENTT_HAS_NATVIS)
     target_sources(
         EnTT
         INTERFACE
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/config.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/container.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/core.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/entity.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/graph.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/locator.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/meta.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/poly.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/process.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/resource.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/natvis/entt/signal.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/config.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/container.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/core.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/entity.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/graph.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/locator.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/meta.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/poly.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/process.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/resource.natvis>
+            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/signal.natvis>
     )
 endif()
 
@@ -306,13 +306,7 @@ if(ENTT_INSTALL)
         FILES_MATCHING
         PATTERN "*.h"
         PATTERN "*.hpp"
-    )
-
-    install(
-        DIRECTORY natvis/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis
-        FILES_MATCHING
-        PATTERN "*.nativs"
+        PATTERN "*.natvis"
     )
 
     export(PACKAGE EnTT)
