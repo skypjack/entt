@@ -221,16 +221,27 @@ if(ENTT_HAS_NATVIS)
         EnTT
         INTERFACE
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/config.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/config.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/container.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/container.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/core.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/core.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/entity.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/entity.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/graph.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/graph.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/locator.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/locator.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/meta.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/meta.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/poly.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/poly.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/process.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/process.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/resource.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/resource.natvis>
             $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/signal.natvis>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/signal.natvis>
     )
 endif()
 
