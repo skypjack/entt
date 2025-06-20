@@ -308,6 +308,13 @@ if(ENTT_INSTALL)
         PATTERN "*.hpp"
     )
 
+    install(
+        DIRECTORY natvis/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis
+        FILES_MATCHING
+        PATTERN "*.nativs"
+    )
+
     export(PACKAGE EnTT)
 endif()
 

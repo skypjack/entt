@@ -38,3 +38,4 @@ TODO:
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
 * update process/scheduler natvis and doc after rework
+* move natvis files to the source dir and install with the same command as it should be
