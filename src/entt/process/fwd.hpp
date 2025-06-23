@@ -10,7 +10,7 @@ template<typename>
 class basic_process;
 
 template<typename, typename>
-class basic_process_adaptor;
+struct basic_process_adaptor;
 
 /*! @brief Alias declaration for the most common use case. */
 using process = basic_process<std::uint32_t>;
