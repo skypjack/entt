@@ -39,4 +39,3 @@ TODO:
 * paged vector as a standalone class
 * update process/scheduler natvis and doc after rework
 * move tools under the entt dir
-* ENTT_INCLUDE_HEADERS install inteface (see natvis files)
