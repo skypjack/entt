@@ -1,21 +1,21 @@
-#ifndef ENTT_DAVEY_DAVEY_HPP
-#define ENTT_DAVEY_DAVEY_HPP
+#ifndef ENTT_TOOLS_DAVEY_HPP
+#define ENTT_TOOLS_DAVEY_HPP
 
 #include <cstdint>
 #include <ios>
 #include <sstream>
 #include <string>
-#include <entt/entity/mixin.hpp>
-#include <entt/entity/registry.hpp>
-#include <entt/entity/sparse_set.hpp>
-#include <entt/entity/storage.hpp>
-#include <entt/locator/locator.hpp>
-#include <entt/meta/container.hpp>
-#include <entt/meta/context.hpp>
-#include <entt/meta/meta.hpp>
-#include <entt/meta/pointer.hpp>
-#include <entt/meta/resolve.hpp>
 #include <imgui.h>
+#include "../entity/mixin.hpp"
+#include "../entity/registry.hpp"
+#include "../entity/sparse_set.hpp"
+#include "../entity/storage.hpp"
+#include "../locator/locator.hpp"
+#include "../meta/container.hpp"
+#include "../meta/context.hpp"
+#include "../meta/meta.hpp"
+#include "../meta/pointer.hpp"
+#include "../meta/resolve.hpp"
 
 namespace entt {
 

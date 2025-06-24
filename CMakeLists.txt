@@ -90,7 +90,6 @@ target_include_directories(
     EnTT
     INTERFACE
         $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -112,7 +111,6 @@ endif()
 # Add EnTT goodies
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
-option(ENTT_INCLUDE_TOOLS "Add EnTT tools files to the EnTT target." OFF)
 option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
 
 if(ENTT_INCLUDE_HEADERS)
@@ -191,8 +189,10 @@ if(ENTT_INCLUDE_HEADERS)
         signal/emitter.hpp
         signal/fwd.hpp
         signal/sigh.hpp
+        tools/davey.hpp
         entt.hpp
         fwd.hpp
+        tools.hpp
     )
 
     list(TRANSFORM HEADERS_FILES APPEND ">" OUTPUT_VARIABLE HEADERS_BUILD_INTERFACE)
@@ -202,14 +202,6 @@ if(ENTT_INCLUDE_HEADERS)
     list(TRANSFORM HEADERS_INSTALL_INTERFACE PREPEND "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/")
 
     target_sources(EnTT INTERFACE ${HEADERS_BUILD_INTERFACE} ${HEADERS_INSTALL_INTERFACE})
-endif()
-
-if(ENTT_INCLUDE_TOOLS)
-    target_sources(
-        EnTT
-        INTERFACE
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools/entt/davey/davey.hpp>
-    )
 endif()
 
 if(ENTT_INCLUDE_NATVIS)
