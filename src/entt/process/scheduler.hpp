@@ -330,7 +330,11 @@ public:
      */
     void abort(const bool immediate = false) {
         for(auto &&curr: handlers.first()) {
-            curr.task->abort(immediate);
+            curr.task->abort();
+
+            if (immediate) {
+                curr.task->tick({});
+            }
         }
     }
 

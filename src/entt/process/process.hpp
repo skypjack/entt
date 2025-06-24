@@ -75,7 +75,7 @@ class basic_process: private std::enable_shared_from_this<basic_process<Delta>> 
     };
 
     virtual void update(const Delta, void *) {
-        abort(true);
+        abort();
     }
 
     virtual void succeeded() {}
@@ -127,17 +127,10 @@ public:
         return std::allocate_shared<Type>(alloc, process_arg_t{}, std::forward<Args>(args)...);
     }
 
-    /**
-     * @brief Aborts a process if it's still alive, otherwise does nothing.
-     * @param immediate Requests an immediate operation.
-     */
-    void abort(const bool immediate = false) {
+    /*! @brief Aborts a process if it's still alive, otherwise does nothing. */
+    void abort() {
         if(alive()) {
             current = state::aborted;
-
-            if(immediate) {
-                tick({});
-            }
         }
     }
 

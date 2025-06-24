@@ -171,7 +171,8 @@ TEST(Process, AbortImmediately) {
     auto process = entt::basic_process<test::empty>::allocate<test_process<test::empty>>(std::allocator<void>{});
 
     process->tick({});
-    process->abort(true);
+    process->abort();
+    process->tick({});
 
     ASSERT_FALSE(process->alive());
     ASSERT_FALSE(process->finished());
