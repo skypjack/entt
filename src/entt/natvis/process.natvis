@@ -4,4 +4,15 @@
 		<DisplayString>{{ state={ current,en } }}</DisplayString>
 		<Expand/>
 	</Type>
+	<Type Name="entt::basic_scheduler&lt;*&gt;">
+		<Intrinsic Name="size" Expression="handlers.first_base::value.size()"/>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]" ExcludeView="simple">handlers.first_base::value.capacity()</Item>
+			<IndexListItems>
+				<Size>size()</Size>
+				<ValueNode>*handlers.first_base::value[$i].task</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>
