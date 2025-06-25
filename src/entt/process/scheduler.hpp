@@ -202,7 +202,7 @@ public:
      */
     template<typename Proc, typename... Args>
     basic_scheduler &attach(Args &&...args) {
-        handlers.first().emplace_back().task = process_type::template allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
+        handlers.first().emplace_back().task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -276,7 +276,7 @@ public:
         auto *curr = &handlers.first().back();
         for(; curr->next; curr = curr->next.get()) {}
         curr->next = std::allocate_shared<handler_type>(handlers.second());
-        curr->next->task = process_type::template allocate<Proc>(handlers.second(), std::forward<Args>(args)...);
+        curr->next->task = std::allocate_shared<Proc>(handlers.second(), std::forward<Args>(args)...);
         return *this;
     }
 
@@ -332,7 +332,7 @@ public:
         for(auto &&curr: handlers.first()) {
             curr.task->abort();
 
-            if (immediate) {
+            if(immediate) {
                 curr.task->tick({});
             }
         }

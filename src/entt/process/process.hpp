@@ -58,11 +58,6 @@ namespace entt {
  */
 template<typename Delta>
 class basic_process: private std::enable_shared_from_this<basic_process<Delta>> {
-    class process_arg_t {
-        friend class basic_process<Delta>;
-        explicit process_arg_t() = default;
-    };
-
     enum class state : std::uint8_t {
         idle = 0,
         running,
@@ -83,13 +78,11 @@ class basic_process: private std::enable_shared_from_this<basic_process<Delta>> 
     virtual void aborted() {}
 
 public:
-    /*! @brief Process constructor token. */
-    using token_type = process_arg_t;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
 
     /*! @brief Default constructor. */
-    constexpr basic_process(token_type)
+    constexpr basic_process()
         : current{state::idle} {}
 
     /*! @brief Default destructor. */
@@ -112,20 +105,6 @@ public:
      * @return This process.
      */
     basic_process &operator=(basic_process &&) noexcept = default;
-
-    /**
-     * @brief Factory method.
-     * @tparam Type Type of process to create.
-     * @tparam Allocator Type of allocator used to manage memory and elements.
-     * @tparam Args Types of arguments to use to initialize the process.
-     * @param alloc The allocator to use.
-     * @param args Parameters to use to initialize the process.
-     * @return A properly initialized process.
-     */
-    template<typename Type, typename Allocator, typename... Args>
-    static std::shared_ptr<Type> allocate(const Allocator &alloc, Args &&...args) {
-        return std::allocate_shared<Type>(alloc, process_arg_t{}, std::forward<Args>(args)...);
-    }
 
     /*! @brief Aborts a process if it's still alive, otherwise does nothing. */
     void abort() {
@@ -282,8 +261,6 @@ private:
  */
 template<typename Delta, typename Func>
 struct basic_process_adaptor: public basic_process<Delta>, private Func {
-    /*! @brief Process constructor token. */
-    using token_type = typename basic_process<Delta>::token_type;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = typename basic_process<Delta>::delta_type;
 
@@ -294,8 +271,8 @@ struct basic_process_adaptor: public basic_process<Delta>, private Func {
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
-    basic_process_adaptor(const token_type token, Args &&...args)
-        : basic_process<Delta>{token},
+    basic_process_adaptor(Args &&...args)
+        : basic_process<Delta>{},
           Func{std::forward<Args>(args)...} {}
 
     /**

@@ -6,8 +6,6 @@
 #include <entt/process/scheduler.hpp>
 
 class foo_process: public entt::process {
-    using token_type = typename entt::process::token_type;
-
     void update(const delta_type, void *) override {
         on_update();
     }
@@ -17,8 +15,8 @@ class foo_process: public entt::process {
     }
 
 public:
-    foo_process(const token_type token, std::function<void()> upd, std::function<void()> abort)
-        : entt::process{token},
+    foo_process(std::function<void()> upd, std::function<void()> abort)
+        : entt::process{},
           on_update{std::move(upd)},
           on_aborted{std::move(abort)} {}
 
