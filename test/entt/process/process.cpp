@@ -185,6 +185,22 @@ TEST(Process, AbortImmediately) {
     ASSERT_TRUE(process.aborted_invoked);
 }
 
+TEST(ProcessAdaptor, ThenReleasePeek) {
+    test_process<int> process{};
+
+    ASSERT_FALSE(process.peek());
+
+    process.then(std::make_shared<test_process<int>>());
+
+    ASSERT_TRUE(process.peek());
+    // peek does not release ownership
+    ASSERT_TRUE(process.peek());
+
+    auto other = process.release();
+
+    ASSERT_FALSE(process.peek());
+}
+
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
     auto lambda = [&updated](std::uint32_t, void *, auto resolve, auto) {

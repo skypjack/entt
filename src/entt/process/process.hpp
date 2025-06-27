@@ -83,7 +83,8 @@ public:
 
     /*! @brief Default constructor. */
     constexpr basic_process()
-        : current{state::idle} {}
+        : next{},
+          current{state::idle} {}
 
     /*! @brief Default destructor. */
     virtual ~basic_process() = default;
@@ -180,6 +181,30 @@ public:
     }
 
     /**
+     * @brief Assigns a child process to run in case of success.
+     * @param child A child process to run in case of success.
+     */
+    void then(std::shared_ptr<basic_process> child) {
+        next = std::move(child);
+    }
+
+    /**
+     * @brief Releases ownership of the child process, if any.
+     * @return The child process attached to the object, if any.
+     */
+    std::shared_ptr<basic_process> release() {
+        return std::move(next);
+    }
+
+    /**
+     * @brief Returns the child process without releasing ownership, if any.
+     * @return The child process attached to the object, if any.
+     */
+    std::shared_ptr<basic_process> peek() {
+        return next;
+    }
+
+    /**
      * @brief Updates a process and its internal state if required.
      * @param delta Elapsed time.
      * @param data Optional data.
@@ -217,6 +242,7 @@ public:
     }
 
 private:
+    std::shared_ptr<basic_process> next;
     state current;
 };
 
