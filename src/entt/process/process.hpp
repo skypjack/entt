@@ -293,7 +293,6 @@ struct basic_process_adaptor: public basic_process<Delta>, private Func {
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
      * @tparam Args Types of arguments to use to initialize the actual process.
-     * @param token Process constructor token.
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
