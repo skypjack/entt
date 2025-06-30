@@ -197,7 +197,7 @@ public:
     }
 
     /**
-     * @brief Updates a process and its internal state if required.
+     * @brief Updates a process and its internal state, if required.
      * @param delta Elapsed time.
      * @param data Optional data.
      */
