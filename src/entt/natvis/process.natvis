@@ -2,7 +2,10 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::basic_process&lt;*&gt;">
 		<DisplayString>{{ state={ current,en } }}</DisplayString>
-		<Expand/>
+		<Expand>
+			<Item Name="[state]">current,en</Item>
+			<Item Name="[child]">next != nullptr</Item>
+		</Expand>
 	</Type>
 	<Type Name="entt::basic_scheduler&lt;*&gt;">
 		<Intrinsic Name="size" Expression="handlers.first_base::value.size()"/>
@@ -11,7 +14,7 @@
 			<Item Name="[capacity]" ExcludeView="simple">handlers.first_base::value.capacity()</Item>
 			<IndexListItems>
 				<Size>size()</Size>
-				<ValueNode>*handlers.first_base::value[$i].task</ValueNode>
+				<ValueNode>*handlers.first_base::value[$i]</ValueNode>
 			</IndexListItems>
 		</Expand>
 	</Type>
