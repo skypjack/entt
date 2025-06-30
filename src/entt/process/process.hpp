@@ -57,7 +57,7 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class basic_process: private std::enable_shared_from_this<basic_process<Delta>> {
+class basic_process {
     enum class state : std::uint8_t {
         idle = 0,
         running,
