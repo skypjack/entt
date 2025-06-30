@@ -47,6 +47,8 @@ class basic_scheduler {
     using container_type = std::vector<std::shared_ptr<basic_process<Delta>>, container_allocator>;
 
 public:
+    /*! @brief Process type. */
+    using type = basic_process<Delta>;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
