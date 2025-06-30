@@ -185,7 +185,7 @@ TEST(Process, AbortImmediately) {
     ASSERT_TRUE(process.aborted_invoked);
 }
 
-TEST(ProcessAdaptor, ThenReleasePeek) {
+TEST(ProcessAdaptor, ThenPeek) {
     test_process<int> process{};
 
     ASSERT_FALSE(process.peek());
@@ -195,10 +195,6 @@ TEST(ProcessAdaptor, ThenReleasePeek) {
     ASSERT_TRUE(process.peek());
     // peek does not release ownership
     ASSERT_TRUE(process.peek());
-
-    auto other = process.release();
-
-    ASSERT_FALSE(process.peek());
 }
 
 TEST(ProcessAdaptor, Resolved) {

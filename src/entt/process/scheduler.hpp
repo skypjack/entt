@@ -287,7 +287,7 @@ public:
             auto &elem = handlers.first()[pos];
 
             if(elem->finished()) {
-                elem = std::move(elem->release());
+                elem = elem->peek();
             }
 
             if(!elem || elem->rejected()) {

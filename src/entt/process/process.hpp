@@ -189,14 +189,6 @@ public:
     }
 
     /**
-     * @brief Releases ownership of the child process, if any.
-     * @return The child process attached to the object, if any.
-     */
-    std::shared_ptr<basic_process> release() {
-        return std::move(next);
-    }
-
-    /**
      * @brief Returns the child process without releasing ownership, if any.
      * @return The child process attached to the object, if any.
      */
