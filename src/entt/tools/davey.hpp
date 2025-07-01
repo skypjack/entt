@@ -19,6 +19,7 @@
 
 namespace entt {
 
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 #define LABEL_OR(elem) label ? label : std::string{elem.info().name()}.data()
@@ -218,6 +219,7 @@ static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get..
 }
 
 } // namespace internal
+/*! @endcond */
 
 template<typename Entity, typename Type, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_storage<Entity, Type, Allocator> &storage) {
