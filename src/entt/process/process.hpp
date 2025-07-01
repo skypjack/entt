@@ -57,7 +57,7 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class basic_process {
+class basic_process: public std::enable_shared_from_this<basic_process<Delta>> {
     enum class state : std::uint8_t {
         idle = 0,
         running,
@@ -185,9 +185,9 @@ public:
      * @param child A child process to run in case of success.
      * @return The newly assigned child process.
      */
-    basic_process& then(std::shared_ptr<basic_process> child) {
+    std::shared_ptr<basic_process> then(std::shared_ptr<basic_process> child) {
         next = std::move(child);
-        return *next;
+        return shared_from_this();
     }
 
     /**
