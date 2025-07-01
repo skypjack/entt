@@ -187,7 +187,7 @@ public:
      */
     std::shared_ptr<basic_process> then(std::shared_ptr<basic_process> child) {
         next = std::move(child);
-        return shared_from_this();
+        return this->shared_from_this();
     }
 
     /**
