@@ -223,11 +223,15 @@ static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get..
 
 template<typename Entity, typename Type, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_storage<Entity, Type, Allocator> &storage) {
+template<typename Type, typename Entity, typename Allocator>
+void davey(const meta_ctx &ctx, const entt::basic_storage<Type, Entity, Allocator> &storage) {
     internal::present_storage(ctx, storage);
 }
 
 template<typename Entity, typename Type, typename Allocator>
 void davey(const entt::basic_storage<Entity, Type, Allocator> &storage) {
+template<typename Type, typename Entity, typename Allocator>
+void davey(const entt::basic_storage<Type, Entity, Allocator> &storage) {
     davey(locator<meta_ctx>::value_or(), storage);
 }
 
