@@ -37,4 +37,5 @@ TODO:
 * use any for meta_custom_node
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
-* update process/scheduler natvis and doc after rework
+* process: doc and natvis
+* scheduler: remove attach and then
