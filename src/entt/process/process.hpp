@@ -280,7 +280,7 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta, typename Func>
-struct basic_process_adaptor: public basic_process<Delta>, private Func {
+struct basic_process_adaptor: public basic_process<Delta> {
     /*! @brief Type used to provide elapsed time. */
     using delta_type = typename basic_process<Delta>::delta_type;
 
@@ -292,7 +292,7 @@ struct basic_process_adaptor: public basic_process<Delta>, private Func {
     template<typename... Args>
     basic_process_adaptor(Args &&...args)
         : basic_process<Delta>{},
-          Func{std::forward<Args>(args)...} {}
+          func{std::forward<Args>(args)...} {}
 
     /**
      * @brief Updates a process and its internal state if required.
@@ -300,12 +300,11 @@ struct basic_process_adaptor: public basic_process<Delta>, private Func {
      * @param data Optional data.
      */
     void update(const delta_type delta, void *data) override {
-        Func::operator()(
-            delta,
-            data,
-            [this]() { this->succeed(); },
-            [this]() { this->fail(); });
+        func(delta, data, [this]() { this->succeed(); }, [this]() { this->fail(); });
     }
+
+private:
+    Func func;
 };
 
 } // namespace entt
