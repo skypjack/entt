@@ -300,7 +300,7 @@ struct basic_process_adaptor: public basic_process<Delta> {
      * @param data Optional data.
      */
     void update(const delta_type delta, void *data) override {
-        func(delta, data, [this]() { this->succeed(); }, [this]() { this->fail(); });
+        func(delta, data, *this);
     }
 
 private:

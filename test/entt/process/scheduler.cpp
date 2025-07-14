@@ -138,19 +138,19 @@ TEST(Scheduler, Functor) {
     bool first_functor = false;
     bool second_functor = false;
 
-    auto attach = [&first_functor](auto, void *, auto resolve, auto) {
+    auto attach = [&first_functor](auto, void *, auto &proc) {
         ASSERT_FALSE(first_functor);
         first_functor = true;
-        resolve();
+        proc.succeed();
     };
 
-    auto then = [&second_functor](auto, void *, auto, auto reject) {
+    auto then = [&second_functor](auto, void *, auto &proc) {
         ASSERT_FALSE(second_functor);
         second_functor = true;
-        reject();
+        proc.fail();
     };
 
-    scheduler.attach(std::move(attach)).then(std::move(then)).then([](auto...) { FAIL(); });
+    scheduler.attach(std::move(attach)).then(std::move(then)).then([](auto &&...) { FAIL(); });
 
     while(!scheduler.empty()) {
         scheduler.update(0);
@@ -165,9 +165,9 @@ TEST(Scheduler, SpawningProcess) {
     entt::scheduler scheduler{};
     std::pair<int, int> counter{};
 
-    scheduler.attach([&scheduler](auto, void *, auto resolve, auto) {
+    scheduler.attach([&scheduler](auto, void *, auto &proc) {
         scheduler.attach<succeeded_process>().then<failed_process>();
-        resolve();
+        proc.succeed();
     });
 
     while(!scheduler.empty()) {
