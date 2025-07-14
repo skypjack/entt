@@ -185,7 +185,7 @@ TEST(Process, AbortImmediately) {
     ASSERT_TRUE(process.aborted_invoked);
 }
 
-TEST(ProcessAdaptor, ThenPeek) {
+TEST(Process, ThenPeek) {
     auto process = std::make_shared<test_process<int>>();
 
     ASSERT_FALSE(process->peek());
