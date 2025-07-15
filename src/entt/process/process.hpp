@@ -281,7 +281,7 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta, typename Func>
-struct basic_process_adaptor: public basic_process<Delta> {
+struct process_adaptor: public basic_process<Delta> {
     /*! @brief Type used to provide elapsed time. */
     using delta_type = typename basic_process<Delta>::delta_type;
 
@@ -289,7 +289,7 @@ struct basic_process_adaptor: public basic_process<Delta> {
      * @brief Constructs a process adaptor from a lambda or a functor.
      * @param proc Actual process to use under the hood.
      */
-    basic_process_adaptor(Func proc)
+    process_adaptor(Func proc)
         : basic_process<Delta>{},
           func{std::move(proc)} {}
 
@@ -311,7 +311,7 @@ private:
  * @tparam Func Actual type of process.
  */
 template<typename Func>
-basic_process_adaptor(Func) -> basic_process_adaptor<nth_argument_t<0u, Func>, Func>;
+process_adaptor(Func) -> process_adaptor<nth_argument_t<0u, Func>, Func>;
 
 } // namespace entt
 

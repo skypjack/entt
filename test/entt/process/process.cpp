@@ -207,7 +207,7 @@ TEST(ProcessAdaptor, Resolved) {
         proc.succeed();
     };
 
-    entt::basic_process_adaptor process{lambda};
+    entt::process_adaptor process{lambda};
 
     process.tick(0u);
     process.tick(0u);
@@ -224,7 +224,7 @@ TEST(ProcessAdaptor, Rejected) {
         proc.fail();
     };
 
-    entt::basic_process_adaptor process{lambda};
+    entt::process_adaptor process{lambda};
 
     process.tick(0u);
     process.tick(0u);
@@ -240,7 +240,7 @@ TEST(ProcessAdaptor, Data) {
         proc.succeed();
     };
 
-    entt::basic_process_adaptor process{lambda};
+    entt::process_adaptor process{lambda};
 
     process.tick(0u, &value);
 
