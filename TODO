@@ -39,3 +39,4 @@ TODO:
 * paged vector as a standalone class
 * process: doc and natvis
 * scheduler: remove attach and then
+* process_adaptor: add watchdog to avoid circular calls, write more tests for plain funcs and the like
