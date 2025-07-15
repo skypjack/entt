@@ -299,7 +299,7 @@ struct process_adaptor: public basic_process<Delta> {
      * @param data Optional data.
      */
     void update(const delta_type delta, void *data) override {
-        func(delta, data, *this);
+        func(*this, delta, data);
     }
 
 private:
@@ -311,7 +311,7 @@ private:
  * @tparam Func Actual type of process.
  */
 template<typename Func>
-process_adaptor(Func) -> process_adaptor<nth_argument_t<0u, Func>, Func>;
+process_adaptor(Func) -> process_adaptor<nth_argument_t<1u, Func>, Func>;
 
 } // namespace entt
 

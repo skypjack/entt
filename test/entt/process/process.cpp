@@ -201,7 +201,7 @@ TEST(Process, ThenPeek) {
 
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
-    auto lambda = [&updated](std::uint32_t, void *, entt::process &proc) {
+    auto lambda = [&updated](entt::process &proc, std::uint32_t, void *) {
         ASSERT_FALSE(updated);
         updated = true;
         proc.succeed();
@@ -218,7 +218,7 @@ TEST(ProcessAdaptor, Resolved) {
 
 TEST(ProcessAdaptor, Rejected) {
     bool updated = false;
-    auto lambda = [&updated](std::uint32_t, void *, entt::process &proc) {
+    auto lambda = [&updated](entt::process &proc, std::uint32_t, void *) {
         ASSERT_FALSE(updated);
         updated = true;
         proc.fail();
@@ -235,7 +235,7 @@ TEST(ProcessAdaptor, Rejected) {
 
 TEST(ProcessAdaptor, Data) {
     int value = 0;
-    auto lambda = [](std::uint32_t, void *data, entt::process &proc) {
+    auto lambda = [](entt::process &proc, std::uint32_t, void *data) {
         *static_cast<int *>(data) = 2;
         proc.succeed();
     };
