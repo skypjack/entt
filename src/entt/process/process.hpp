@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "../core/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -286,13 +287,11 @@ struct basic_process_adaptor: public basic_process<Delta> {
 
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
-     * @tparam Args Types of arguments to use to initialize the actual process.
-     * @param args Parameters to use to initialize the actual process.
+     * @param proc Actual process to use under the hood.
      */
-    template<typename... Args>
-    basic_process_adaptor(Args &&...args)
+    basic_process_adaptor(Func proc)
         : basic_process<Delta>{},
-          func{std::forward<Args>(args)...} {}
+          func{std::move(proc)} {}
 
     /**
      * @brief Updates a process and its internal state if required.
@@ -306,6 +305,13 @@ struct basic_process_adaptor: public basic_process<Delta> {
 private:
     Func func;
 };
+
+/**
+ * @brief Deduction guide.
+ * @tparam Func Actual type of process.
+ */
+template<typename Func>
+basic_process_adaptor(Func) -> basic_process_adaptor<nth_argument_t<0u, Func>, Func>;
 
 } // namespace entt
 

@@ -201,13 +201,13 @@ TEST(Process, ThenPeek) {
 
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
-    auto lambda = [&updated](std::uint32_t, void *, auto &proc) {
+    auto lambda = [&updated](std::uint32_t, void *, entt::process &proc) {
         ASSERT_FALSE(updated);
         updated = true;
         proc.succeed();
     };
 
-    entt::process_adaptor<decltype(lambda)> process{lambda};
+    entt::basic_process_adaptor process{lambda};
 
     process.tick(0u);
     process.tick(0u);
@@ -218,13 +218,13 @@ TEST(ProcessAdaptor, Resolved) {
 
 TEST(ProcessAdaptor, Rejected) {
     bool updated = false;
-    auto lambda = [&updated](std::uint32_t, void *, auto &proc) {
+    auto lambda = [&updated](std::uint32_t, void *, entt::process &proc) {
         ASSERT_FALSE(updated);
         updated = true;
         proc.fail();
     };
 
-    entt::process_adaptor<decltype(lambda)> process{lambda};
+    entt::basic_process_adaptor process{lambda};
 
     process.tick(0u);
     process.tick(0u);
@@ -235,12 +235,12 @@ TEST(ProcessAdaptor, Rejected) {
 
 TEST(ProcessAdaptor, Data) {
     int value = 0;
-    auto lambda = [](std::uint32_t, void *data, auto &proc) {
+    auto lambda = [](std::uint32_t, void *data, entt::process &proc) {
         *static_cast<int *>(data) = 2;
         proc.succeed();
     };
 
-    entt::process_adaptor<decltype(lambda)> process{lambda};
+    entt::basic_process_adaptor process{lambda};
 
     process.tick(0u, &value);
 
