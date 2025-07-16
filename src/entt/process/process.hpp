@@ -282,6 +282,8 @@ private:
  */
 template<typename Delta, typename Func>
 struct process_adaptor: public basic_process<Delta> {
+    /*! @brief Base type. */
+    using base_type = basic_process<Delta>;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = typename basic_process<Delta>::delta_type;
 
