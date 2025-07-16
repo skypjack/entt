@@ -38,6 +38,6 @@ TODO:
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
 * operator bool to meta custom
-* process: doc and natvis
+* process: doc
 * scheduler: remove attach and then
 * process_adaptor: add watchdog to avoid circular calls, write more tests for plain funcs and the like
