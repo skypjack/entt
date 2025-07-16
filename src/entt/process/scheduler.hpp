@@ -152,6 +152,18 @@ public:
 
     /**
      * @brief Schedules a process for the next tick.
+     * @tparam Proc Type of process to schedule.
+     * @param proc The actual process to schedule.
+     * @return This process scheduler.
+     */
+    template<typename Proc>
+    basic_scheduler &attach(std::shared_ptr<Proc> proc) {
+        handlers.first().emplace_back(std::move(proc));
+        return *this;
+    }
+
+    /**
+     * @brief Schedules a process for the next tick.
      *
      * Returned value can be used to attach a continuation for the last process.
      * The continutation is scheduled automatically when the process terminates

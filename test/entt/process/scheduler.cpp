@@ -112,10 +112,7 @@ TEST(Scheduler, Then) {
 
     scheduler
         // failing process with successor
-        .attach<succeeded_process>()
-        .then<succeeded_process>()
-        .then<failed_process>()
-        .then<succeeded_process>()
+        .attach(std::make_shared<succeeded_process>()->then(std::make_shared<succeeded_process>()->then(std::make_shared<failed_process>()->then(std::make_shared<succeeded_process>()))))
         // failing process without successor
         .attach<succeeded_process>()
         .then<succeeded_process>()
