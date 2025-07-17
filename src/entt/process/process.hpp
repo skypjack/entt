@@ -253,7 +253,7 @@ private:
  * following:
  *
  * @code{.cpp}
- * void(auto &process, Delta delta, void *data);
+ * void(basic_process<Delta> &process, Delta delta, void *data);
  * @endcode
  *
  * Where:
