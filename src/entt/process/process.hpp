@@ -50,8 +50,8 @@ namespace entt {
  *   process is aborted immediately or not.
  *
  * Derived classes can change the internal state of a process by invoking the
- * `succeed` and `fail` protected member functions and even pause or unpause the
- * process itself.
+ * `succeed` and `fail` member functions and even pause or unpause the process
+ * itself.
  *
  * @sa scheduler
  *
@@ -253,32 +253,20 @@ private:
  * following:
  *
  * @code{.cpp}
- * void(Delta delta, void *data, auto succeed, auto fail);
+ * void(auto &process, Delta delta, void *data);
  * @endcode
  *
  * Where:
  *
+ * * `process` is a reference to the handler on the library side.
  * * `delta` is the elapsed time.
  * * `data` is an opaque pointer to user data if any, `nullptr` otherwise.
- * * `succeed` is a function to call when a process terminates with success.
- * * `fail` is a function to call when a process terminates with errors.
- *
- * The signature of the function call operator of both `succeed` and `fail`
- * is equivalent to the following:
- *
- * @code{.cpp}
- * void();
- * @endcode
- *
- * Usually users shouldn't worry about creating adaptors. A scheduler will
- * create them internally each and avery time a lambda or a functor is used as
- * a process.
  *
  * @sa process
  * @sa scheduler
  *
- * @tparam Func Actual type of process.
  * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Func Actual type of process.
  */
 template<typename Delta, typename Func>
 struct process_adaptor: public basic_process<Delta> {
