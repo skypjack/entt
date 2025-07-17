@@ -24,14 +24,6 @@ namespace entt {
  * its child when it terminates if it returns with success. In case of errors,
  * both the process and its child are discarded.
  *
- * Example of use (pseudocode):
- *
- * @code{.cpp}
- * scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
- *     // code
- * }).then<my_process>(arguments...);
- * @endcode
- *
  * In order to invoke all scheduled processes, call the `update` member function
  * passing it the elapsed time to forward to the tasks.
  *
