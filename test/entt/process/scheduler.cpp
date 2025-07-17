@@ -57,9 +57,7 @@ TEST(Scheduler, Functionalities) {
     ASSERT_EQ(scheduler.size(), 0u);
     ASSERT_TRUE(scheduler.empty());
 
-    scheduler.attach<foo_process>(
-        [&updated]() { updated = true; },
-        [&aborted]() { aborted = true; });
+    scheduler.attach(std::make_shared<foo_process>([&updated]() { updated = true; }, [&aborted]() { aborted = true; }));
 
     ASSERT_NE(scheduler.size(), 0u);
     ASSERT_FALSE(scheduler.empty());
@@ -114,12 +112,9 @@ TEST(Scheduler, Then) {
         // failing process with successor
         .attach(std::make_shared<succeeded_process>()->then(std::make_shared<succeeded_process>()->then(std::make_shared<failed_process>()->then(std::make_shared<succeeded_process>()))))
         // failing process without successor
-        .attach<succeeded_process>()
-        .then<succeeded_process>()
-        .then<failed_process>()
+        .attach(std::make_shared<succeeded_process>()->then(std::make_shared<succeeded_process>()->then(std::make_shared<failed_process>())))
         // non-failing process
-        .attach<succeeded_process>()
-        .then<succeeded_process>();
+        .attach(std::make_shared<succeeded_process>()->then(std::make_shared<succeeded_process>()));
 
     while(!scheduler.empty()) {
         scheduler.update(0, &counter);
@@ -163,7 +158,7 @@ TEST(Scheduler, SpawningProcess) {
     std::pair<int, int> counter{};
 
     scheduler.attach([&scheduler](auto &proc, auto, void *) {
-        scheduler.attach<succeeded_process>().then<failed_process>();
+        scheduler.attach(std::make_shared<succeeded_process>()->then(std::make_shared<failed_process>()));
         proc.succeed();
     });
 
