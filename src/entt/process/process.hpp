@@ -303,6 +303,32 @@ private:
 template<typename Func>
 process_adaptor(Func) -> process_adaptor<nth_argument_t<1u, Func>, Func>;
 
+/**
+ * @brief Utility function to create shared processes from lambdas or functors.
+ * @tparam Func Actual type of process.
+ * @param func Actual process to use under the hood.
+ * @return A properly initialized shared process.
+ */
+template<typename Func>
+auto process_from(Func func) {
+    using type = process_adaptor<nth_argument_t<1u, Func>, Func>;
+    return std::make_shared<type>(std::move(func));
+}
+
+/**
+ * @brief Utility function to create shared processes from lambdas or functors.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Func Actual type of process.
+ * @param allocator The allocator to use.
+ * @param func Actual process to use under the hood.
+ * @return A properly initialized shared process.
+ */
+template<typename Allocator, typename Func>
+auto process_from(const Allocator &allocator, Func func) {
+    using type = process_adaptor<nth_argument_t<1u, Func>, Func>;
+    return std::allocate_shared<type>(allocator, std::move(func));
+}
+
 } // namespace entt
 
 #endif
