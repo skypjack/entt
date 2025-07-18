@@ -41,3 +41,5 @@ TODO:
 * process: doc
 * scheduler: remove attach and then
 * process_adaptor: add watchdog to avoid circular calls, write more tests for plain funcs and the like
+* test shared_process_from
+* refine process API for attach/then/whatever, I don't quite like the current one
