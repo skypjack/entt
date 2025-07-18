@@ -82,7 +82,7 @@ TEST(Scheduler, Swap) {
     entt::scheduler other{};
     int counter{};
 
-    scheduler.attach([&counter](auto &&...) { ++counter; });
+    scheduler.attach(entt::process_from([&counter](entt::process &, std::uint32_t, void *) { ++counter; }));
 
     ASSERT_EQ(scheduler.size(), 1u);
     ASSERT_EQ(other.size(), 0u);
@@ -130,19 +130,19 @@ TEST(Scheduler, Functor) {
     bool first_functor = false;
     bool second_functor = false;
 
-    auto attach = [&first_functor](auto &proc, auto, void *) {
+    auto attach = [&first_functor](entt::process &proc, std::uint32_t, void *) {
         ASSERT_FALSE(first_functor);
         first_functor = true;
         proc.succeed();
     };
 
-    auto then = [&second_functor](auto &proc, auto, void *) {
+    auto then = [&second_functor](entt::process &proc, std::uint32_t, void *) {
         ASSERT_FALSE(second_functor);
         second_functor = true;
         proc.fail();
     };
 
-    scheduler.attach(std::move(attach)).then(std::move(then)).then([](auto &&...) { FAIL(); });
+    scheduler.attach(entt::process_from(std::move(attach))->then(entt::process_from(std::move(then))->then(entt::process_from([](entt::process &, std::uint32_t, void *) { FAIL(); }))));
 
     while(!scheduler.empty()) {
         scheduler.update(0);
@@ -157,10 +157,10 @@ TEST(Scheduler, SpawningProcess) {
     entt::scheduler scheduler{};
     std::pair<int, int> counter{};
 
-    scheduler.attach([&scheduler](auto &proc, auto, void *) {
+    scheduler.attach(entt::process_from([&scheduler](entt::process &proc, std::uint32_t, void *) {
         scheduler.attach(std::make_shared<succeeded_process>()->then(std::make_shared<failed_process>()));
         proc.succeed();
-    });
+    }));
 
     while(!scheduler.empty()) {
         scheduler.update(0, &counter);
@@ -177,7 +177,7 @@ TEST(Scheduler, CustomAllocator) {
     ASSERT_EQ(scheduler.get_allocator(), allocator);
     ASSERT_FALSE(scheduler.get_allocator() != allocator);
 
-    scheduler.attach([](auto &&...) {});
+    scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *) {}));
     const decltype(scheduler) other{std::move(scheduler), allocator};
 
     ASSERT_EQ(other.size(), 1u);
