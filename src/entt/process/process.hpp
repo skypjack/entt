@@ -187,8 +187,7 @@ public:
      * @return The newly assigned child process.
      */
     std::shared_ptr<basic_process> then(std::shared_ptr<basic_process> child) {
-        next = std::move(child);
-        return this->shared_from_this();
+        return (next = std::move(child));
     }
 
     /**
