@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
+#include "../../common/config.h"
 
 class foo_process: public entt::process {
     void update(const delta_type, void *) override {
@@ -104,7 +105,7 @@ TEST(Scheduler, Swap) {
     ASSERT_EQ(counter, 2);
 }
 
-TEST(Scheduler, Then) {
+TEST(Scheduler, AttachThen) {
     entt::scheduler scheduler{};
     std::pair<int, int> counter{};
 
@@ -129,6 +130,12 @@ TEST(Scheduler, Then) {
 
     ASSERT_EQ(counter.first, 6u);
     ASSERT_EQ(counter.second, 2u);
+}
+
+ENTT_DEBUG_TEST(SchedulerDeathTest, Attach) {
+    entt::scheduler scheduler{};
+
+    ASSERT_DEATH(scheduler.attach<succeeded_process>(nullptr), "");
 }
 
 TEST(Scheduler, Functor) {

@@ -2,6 +2,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
+#include "../../common/config.h"
 #include "../../common/empty.h"
 
 template<typename Delta>
@@ -197,6 +198,12 @@ TEST(Process, ThenPeek) {
     ASSERT_FALSE(process->peek()->peek()->peek());
     // peek does not release ownership
     ASSERT_TRUE(process->peek());
+}
+
+ENTT_DEBUG_TEST(ProcessDeathTest, Then) {
+    auto process = std::make_shared<test_process<int>>();
+
+    ASSERT_DEATH(process->then(nullptr), "");
 }
 
 TEST(ProcessAdaptor, Resolved) {

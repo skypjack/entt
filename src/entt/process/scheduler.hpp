@@ -150,6 +150,7 @@ public:
      */
     template<typename Proc>
     type &attach(std::shared_ptr<Proc> proc) {
+        ENTT_ASSERT(proc, "Null process not allowed");
         return *handlers.first().emplace_back(std::move(proc));
     }
 

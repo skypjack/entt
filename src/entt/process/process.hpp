@@ -186,7 +186,8 @@ public:
      * @param child A child process to run in case of success.
      * @return A reference to the newly assigned child process.
      */
-    basic_process &then(std::shared_ptr<basic_process> child){
+    basic_process &then(std::shared_ptr<basic_process> child) {
+        ENTT_ASSERT(child, "Null process not allowed");
         return *(next = std::move(child));
     }
 
