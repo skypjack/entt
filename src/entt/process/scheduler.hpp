@@ -146,11 +146,11 @@ public:
      * @brief Schedules a process for the next tick.
      * @tparam Proc Type of process to schedule.
      * @param proc The actual process to schedule.
-     * @return The newly assigned child process.
+     * @return A reference to the newly assigned process.
      */
     template<typename Proc>
-    std::shared_ptr<type> attach(std::shared_ptr<Proc> proc) {
-        return handlers.first().emplace_back(std::move(proc));
+    type &attach(std::shared_ptr<Proc> proc) {
+        return *handlers.first().emplace_back(std::move(proc));
     }
 
     /**

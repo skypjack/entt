@@ -110,18 +110,18 @@ TEST(Scheduler, Then) {
 
     // failing process with successor
     scheduler.attach(std::make_shared<succeeded_process>())
-        ->then(std::make_shared<succeeded_process>())
-        ->then(std::make_shared<failed_process>())
-        ->then(std::make_shared<succeeded_process>());
+        .then(std::make_shared<succeeded_process>())
+        .then(std::make_shared<failed_process>())
+        .then(std::make_shared<succeeded_process>());
 
     // failing process without successor
     scheduler.attach(std::make_shared<succeeded_process>())
-        ->then(std::make_shared<succeeded_process>())
-        ->then(std::make_shared<failed_process>());
+        .then(std::make_shared<succeeded_process>())
+        .then(std::make_shared<failed_process>());
 
     // non-failing process
     scheduler.attach(std::make_shared<succeeded_process>())
-        ->then(std::make_shared<succeeded_process>());
+        .then(std::make_shared<succeeded_process>());
 
     while(!scheduler.empty()) {
         scheduler.update(0, &counter);
@@ -150,8 +150,8 @@ TEST(Scheduler, Functor) {
     };
 
     scheduler.attach(entt::process_from(std::move(attach)))
-        ->then(entt::process_from(std::move(then)))
-        ->then(entt::process_from([](entt::process &, std::uint32_t, void *) { FAIL(); }));
+        .then(entt::process_from(std::move(then)))
+        .then(entt::process_from([](entt::process &, std::uint32_t, void *) { FAIL(); }));
 
     while(!scheduler.empty()) {
         scheduler.update(0);
@@ -167,7 +167,7 @@ TEST(Scheduler, SpawningProcess) {
     std::pair<int, int> counter{};
 
     scheduler.attach(entt::process_from([&scheduler](entt::process &proc, std::uint32_t, void *) {
-        scheduler.attach(std::make_shared<succeeded_process>())->then(std::make_shared<failed_process>());
+        scheduler.attach(std::make_shared<succeeded_process>()).then(std::make_shared<failed_process>());
         proc.succeed();
     }));
 

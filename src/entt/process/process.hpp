@@ -184,10 +184,10 @@ public:
     /**
      * @brief Assigns a child process to run in case of success.
      * @param child A child process to run in case of success.
-     * @return The newly assigned child process.
+     * @return A reference to the newly assigned child process.
      */
-    std::shared_ptr<basic_process> then(std::shared_ptr<basic_process> child) {
-        return (next = std::move(child));
+    basic_process &then(std::shared_ptr<basic_process> child){
+        return *(next = std::move(child));
     }
 
     /**

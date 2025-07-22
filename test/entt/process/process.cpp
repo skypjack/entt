@@ -190,7 +190,7 @@ TEST(Process, ThenPeek) {
 
     ASSERT_FALSE(process->peek());
 
-    process->then(std::make_shared<test_process<int>>())->then(std::make_shared<test_process<int>>());
+    process->then(std::make_shared<test_process<int>>()).then(std::make_shared<test_process<int>>());
 
     ASSERT_TRUE(process->peek());
     ASSERT_TRUE(process->peek()->peek());
