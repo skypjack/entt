@@ -135,7 +135,7 @@ TEST(Scheduler, AttachThen) {
 ENTT_DEBUG_TEST(SchedulerDeathTest, Attach) {
     entt::scheduler scheduler{};
 
-    ASSERT_DEATH(scheduler.attach<succeeded_process>(nullptr), "");
+    ASSERT_DEATH(scheduler.attach(nullptr), "");
 }
 
 TEST(Scheduler, Functor) {
