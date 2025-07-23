@@ -34,13 +34,14 @@ namespace entt {
  */
 template<typename Delta, typename Allocator>
 class basic_scheduler {
+    using base_type = basic_process<Delta>;
     using alloc_traits = std::allocator_traits<Allocator>;
-    using container_allocator = typename alloc_traits::template rebind_alloc<std::shared_ptr<basic_process<Delta>>>;
-    using container_type = std::vector<std::shared_ptr<basic_process<Delta>>, container_allocator>;
+    using container_allocator = typename alloc_traits::template rebind_alloc<std::shared_ptr<base_type>>;
+    using container_type = std::vector<std::shared_ptr<base_type>, container_allocator>;
 
 public:
     /*! @brief Process type. */
-    using type = basic_process<Delta>;
+    using type = base_type;
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */

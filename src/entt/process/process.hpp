@@ -273,14 +273,14 @@ struct process_adaptor: public basic_process<Delta> {
     /*! @brief Base type. */
     using base_type = basic_process<Delta>;
     /*! @brief Type used to provide elapsed time. */
-    using delta_type = typename basic_process<Delta>::delta_type;
+    using delta_type = typename base_type::delta_type;
 
     /**
      * @brief Constructs a process adaptor from a lambda or a functor.
      * @param proc Actual process to use under the hood.
      */
     process_adaptor(Func proc)
-        : basic_process<Delta>{},
+        : base_type{},
           func{std::move(proc)} {}
 
     /**
