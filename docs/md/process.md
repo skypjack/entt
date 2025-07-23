@@ -5,6 +5,7 @@
 * [Introduction](#introduction)
 * [The process](#the-process)
   * [Adaptor](#adaptor)
+  * [Continuation](#continuation)
 * [The scheduler](#the-scheduler)
 
 # Introduction
@@ -17,19 +18,17 @@ to define and execute cooperative processes.
 
 # The process
 
-A typical task inherits from the `process` class template that stays true to the
-CRTP idiom. Moreover, derived classes specify what the intended type for elapsed
-times is.
+A typical task inherits from the `process` class template. Derived classes also
+specify what the intended type for elapsed times is.
 
-A process should expose publicly the following member functions whether needed
-(note that it is not required to define a function unless the derived class
-wants to _override_ the default behavior):
+A process should implement the following member functions whether needed (note
+that it is not required to define a function unless the derived class wants to
+_override_ the default behavior):
 
 * `void update(Delta, void *);`
 
   This is invoked once per tick until a process is explicitly aborted or ends
-  either with or without errors. Technically speaking, this member function is 
-  not strictly required. However, each process should at least define it to work
+  either with or without errors. Each process should at least define it to work
   _properly_. The `void *` parameter is an opaque pointer to user data (if any)
   forwarded directly to the process during an update.
 
@@ -46,19 +45,19 @@ wants to _override_ the default behavior):
 * `void aborted();`
 
   This is invoked only if a process is explicitly aborted. There is no guarantee
-  that it executes in the same tick, it depends solely on whether the process is
+  that it executes in the same tick. It depends solely on whether the process is
   aborted immediately or not.
 
-Derived classes can also change the internal state of a process by invoking
-`succeed` and `fail`, as well as `pause` and `unpause` the process itself.<br/>
-All these are protected member functions made available to manage the life cycle
-of a process from a derived class.
+A class can also change the state of a process by invoking `succeed` and `fail`,
+as well as `pause` and `unpause` the process itself.<br/>
+All these are public member functions made available to manage the life cycle of
+a process easily.
 
 Here is a minimal example for the sake of curiosity:
 
 ```cpp
-struct my_process: entt::process<my_process, std::uint32_t> {
-    using delta_type = std::uint32_t;
+struct my_process: entt::process {
+    using delta_type = typename entt::process::delta_type;
 
     my_process(delta_type delay)
         : remaining{delay}
@@ -86,26 +85,26 @@ not properly defined processes with managed life cycles.<br/>
 This class helps in filling the gap and turning lambdas and functors into
 full-featured processes usable by a scheduler.
 
-The function call operator has a signature similar to the one of the `update`
-function of a process but for the fact that it receives two extra callbacks to
-invoke whenever a process terminates with success or with an error:
+Function call operators have signatures similar to that of the `update` member
+function of a process, except that they receive a reference to the handle to
+manage its lifecycle as needed:
 
 ```cpp
-void(Delta delta, void *data, auto succeed, auto fail);
+void(entt::process &handle, delta_type delta, void *data);
 ```
 
 Parameters have the following meaning:
 
+* `handle` is a reference to the process handle itself.
 * `delta` is the elapsed time.
 * `data` is an opaque pointer to user data if any, `nullptr` otherwise.
-* `succeed` is a function to call when a process terminates with success.
-* `fail` is a function to call when a process terminates with errors.
 
-Both `succeed` and `fail` accept no parameters at all.
+The library also provides the `process_from` function to simplify the creation
+of processes starting from lambdas or the like.
 
-Note that usually users should not worry about creating adaptors at all. A
-scheduler creates them internally, each and every time a lambda or a functor is
-used as a process.
+## Continuation
+
+TBD (TODO)
 
 # The scheduler
 
