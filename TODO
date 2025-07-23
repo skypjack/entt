@@ -39,6 +39,5 @@ TODO:
 * paged vector as a standalone class
 * operator bool to meta custom
 * process: doc
-* scheduler: remove attach and then
-* process_adaptor: add watchdog to avoid circular calls, write more tests for plain funcs and the like
+* process_adaptor: write more tests for plain funcs and the like
 * test shared_process_from
