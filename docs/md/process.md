@@ -104,7 +104,19 @@ of processes starting from lambdas or the like.
 
 ## Continuation
 
-TBD (TODO)
+A process may be followed by other processes upon successful termination.<br/>
+This pairing can be set up at creation time, keeping the processes conceptually
+separate from each other while still combining them at runtime:
+
+```cpp
+my_process process{};
+process.then(std::make_shared<my_other_process>());
+```
+
+This approach allows processes to be developed in isolation and combined to
+define complex actions.<br/>
+For example, a delayed operation where a parent process (such as a timer)
+_schedules_ a child process (the deferred task) once the time is over.
 
 # The scheduler
 
@@ -117,7 +129,7 @@ it is a good candidate to run one more time the next tick.<br/>
 A process can also have a _child_. In this case, the parent process is replaced
 with its child when it terminates and only if it returns with success. In case
 of errors, both the parent process and its child are discarded. This way, it is
-easy to create a chain of processes to run sequentially.
+easy to create a _chain of processes_ to run sequentially.
 
 Using a scheduler is straightforward. To create it, users must provide only the
 type for the elapsed times and no arguments at all:
@@ -130,7 +142,7 @@ Otherwise, the `scheduler` alias is also available for the most common cases. It
 uses `std::uint32_t` as a default type:
 
 ```cpp
-entt::scheduler scheduler;
+entt::scheduler scheduler{};
 ```
 
 The class has member functions to query its internal data structures, like
@@ -147,38 +159,34 @@ entt::scheduler::size_type size = scheduler.size();
 scheduler.clear();
 ```
 
-To attach a process to a scheduler, there are mainly two ways:
+To attach a process to a scheduler, it is enough to invoke the `attach` function
+by providing the process itself as an argument:
 
-* If the process inherits from the `process` class template, it is enough to
-  indicate its type and submit all the parameters required to construct it to
-  the `attach` member function:
+```cpp
+scheduler.attach(std::make_shared<my_process>(_1000u));
+```
 
-  ```cpp
-  scheduler.attach<my_process>(1000u);
-  ```
+In case of a lambda or a functor, `process_from` should get the job done:
 
-* Otherwise, in case of a lambda or a functor, it is enough to provide an
-  instance of the class to the `attach` member function:
+```cpp
+scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *){ /* ... */ }));
+```
 
-  ```cpp
-  scheduler.attach([](auto...){ /* ... */ });
-  ```
-
-In both cases, the scheduler is returned and its `then` member function can be
-used to create chains of processes to run sequentially.<br/>
+In both cases, the newly created process is returned by reference and its `then`
+member function is used to create chains of processes to run sequentially.<br/>
 As a minimal example of use:
 
 ```cpp
 // schedules a task in the form of a lambda function
-scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
+scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *) {
     // ...
-})
+}))
 // appends a child in the form of another lambda function
-.then([](auto delta, void *, auto succeed, auto fail) {
+.then(entt::process_from([](entt::process &, std::uint32_t, void *) {
     // ...
-})
+}))
 // appends a child in the form of a process class
-.then<my_process>(1000u);
+.then(std::make_shared<my_process>(1000u));
 ```
 
 To update a scheduler and therefore all its processes, the `update` member
@@ -202,3 +210,6 @@ scheduler.abort(true);
 // ... or gracefully during the next tick
 scheduler.abort();
 ```
+
+The argument passed to the `abort` function indicates whether execution should
+be stopped immediately or processes should be notified on the next tick.
