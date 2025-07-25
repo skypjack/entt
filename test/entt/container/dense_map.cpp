@@ -66,7 +66,8 @@ TEST(DenseMap, Functionalities) {
 
     map.emplace(0, 0);
 
-    ASSERT_EQ(map.at(0.0), 0);
+    ASSERT_EQ(map.at(0), 0); // regular key lookup
+    ASSERT_EQ(map.at(0.0), 0); // transparent key lookup
 
     ASSERT_EQ(map.count(0), 1u);
     ASSERT_EQ(map.count(6.4), 0u);
