@@ -38,6 +38,5 @@ TODO:
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
 * operator bool to meta custom
-* process: doc
-* process_adaptor: write more tests for plain funcs and the like
-* test shared_process_from
+* process: doc and natvis
+* test process and scheduler with allocators

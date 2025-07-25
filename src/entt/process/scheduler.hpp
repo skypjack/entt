@@ -34,7 +34,7 @@ namespace entt {
  */
 template<typename Delta, typename Allocator>
 class basic_scheduler {
-    using base_type = basic_process<Delta>;
+    using base_type = basic_process<Delta, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = typename alloc_traits::template rebind_alloc<std::shared_ptr<base_type>>;
     using container_type = std::vector<std::shared_ptr<base_type>, container_allocator>;
@@ -145,12 +145,28 @@ public:
 
     /**
      * @brief Schedules a process for the next tick.
-     * @param proc a process to schedule.
-     * @return A reference to the newly assigned process.
+     * @tparam Type Type of process to create.
+     * @tparam Args Types of arguments to use to initialize the process.
+     * @param args Parameters to use to initialize the process.
+     * @return A reference to the newly created process.
      */
-    type &attach(std::shared_ptr<type> proc) {
-        ENTT_ASSERT(proc, "Null process not allowed");
-        return *handlers.first().emplace_back(std::move(proc));
+    template<typename Type, typename... Args>
+    type &attach(Args &&...args) {
+        const auto &allocator = handlers.second();
+        return *handlers.first().emplace_back(std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+    }
+
+    /**
+     * @brief Schedules a process for the next tick.
+     * @tparam Func Type of process to create.
+     * @param func Either a lambda or a functor to use as a process.
+     * @return A reference to the newly created process.
+     */
+    template<typename Func>
+    type &attach(Func func) {
+        const auto &allocator = handlers.second();
+        using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
+        return *handlers.first().emplace_back(std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
     }
 
     /**

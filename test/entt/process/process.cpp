@@ -187,70 +187,15 @@ TEST(Process, AbortImmediately) {
 }
 
 TEST(Process, ThenPeek) {
-    auto process = std::make_shared<test_process<int>>();
+    test_process<int> process{};
 
-    ASSERT_FALSE(process->peek());
+    ASSERT_FALSE(process.peek());
 
-    process->then(std::make_shared<test_process<int>>()).then(std::make_shared<test_process<int>>());
+    process.then<test_process<int>>().then<test_process<int>>();
 
-    ASSERT_TRUE(process->peek());
-    ASSERT_TRUE(process->peek()->peek());
-    ASSERT_FALSE(process->peek()->peek()->peek());
+    ASSERT_TRUE(process.peek());
+    ASSERT_TRUE(process.peek()->peek());
+    ASSERT_FALSE(process.peek()->peek()->peek());
     // peek does not release ownership
-    ASSERT_TRUE(process->peek());
-}
-
-ENTT_DEBUG_TEST(ProcessDeathTest, Then) {
-    auto process = std::make_shared<test_process<int>>();
-
-    ASSERT_DEATH(process->then(nullptr), "");
-}
-
-TEST(ProcessAdaptor, Resolved) {
-    bool updated = false;
-    auto lambda = [&updated](entt::process &proc, std::uint32_t, void *) {
-        ASSERT_FALSE(updated);
-        updated = true;
-        proc.succeed();
-    };
-
-    entt::process_adaptor process{lambda};
-
-    process.tick(0u);
-    process.tick(0u);
-
-    ASSERT_TRUE(process.finished());
-    ASSERT_TRUE(updated);
-}
-
-TEST(ProcessAdaptor, Rejected) {
-    bool updated = false;
-    auto lambda = [&updated](entt::process &proc, std::uint32_t, void *) {
-        ASSERT_FALSE(updated);
-        updated = true;
-        proc.fail();
-    };
-
-    entt::process_adaptor process{lambda};
-
-    process.tick(0u);
-    process.tick(0u);
-
-    ASSERT_TRUE(process.rejected());
-    ASSERT_TRUE(updated);
-}
-
-TEST(ProcessAdaptor, Data) {
-    int value = 0;
-    auto lambda = [](entt::process &proc, std::uint32_t, void *data) {
-        *static_cast<int *>(data) = 2;
-        proc.succeed();
-    };
-
-    entt::process_adaptor process{lambda};
-
-    process.tick(0u, &value);
-
-    ASSERT_TRUE(process.finished());
-    ASSERT_EQ(value, 2);
+    ASSERT_TRUE(process.peek());
 }

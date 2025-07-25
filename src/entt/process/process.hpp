@@ -5,10 +5,20 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {
+
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename, typename, typename>
+struct process_adaptor;
+
+} // namespace internal
+/*! @endcond */
 
 /**
  * @brief Base class for processes.
@@ -56,8 +66,9 @@ namespace entt {
  * @sa scheduler
  *
  * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Delta>
+template<typename Delta, typename Allocator>
 class basic_process {
     enum class state : std::uint8_t {
         idle = 0,
@@ -79,34 +90,51 @@ class basic_process {
     virtual void aborted() {}
 
 public:
+    /*! @brief Allocator type. */
+    using allocator_type = Allocator;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
 
     /*! @brief Default constructor. */
-    constexpr basic_process()
-        : next{},
+    basic_process()
+        : basic_process{allocator_type{}} {}
+
+    /**
+     * @brief Constructs a scheduler with a given allocator.
+     * @param allocator The allocator to use.
+     */
+    explicit basic_process(const allocator_type &allocator)
+        : next{nullptr, allocator},
           current{state::idle} {}
+
+    /*! @brief Default copy constructor, deleted on purpose. */
+    basic_process(const basic_process &) = delete;
+
+    /*! @brief Default move constructor, deleted on purpose. */
+    basic_process(basic_process &&) = delete;
 
     /*! @brief Default destructor. */
     virtual ~basic_process() = default;
 
-    /*! @brief Default copy constructor. */
-    basic_process(const basic_process &) = default;
-
-    /*! @brief Default move constructor. */
-    basic_process(basic_process &&) noexcept = default;
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This process scheduler.
+     */
+    basic_process &operator=(const basic_process &) = delete;
 
     /**
-     * @brief Default copy assignment operator.
-     * @return This process.
+     * @brief Default move assignment operator, deleted on purpose.
+     * @return This process scheduler.
      */
-    basic_process &operator=(const basic_process &) = default;
+    basic_process &operator=(basic_process &&) = delete;
 
     /**
-     * @brief Default move assignment operator.
-     * @return This process.
+     * @brief Returns the associated allocator.
+     * @return The associated allocator.
      */
-    basic_process &operator=(basic_process &&) noexcept = default;
+    [[nodiscard]] constexpr allocator_type get_allocator() const noexcept {
+        return next.second();
+    }
 
     /*! @brief Aborts a process if it's still alive, otherwise does nothing. */
     void abort() {
@@ -183,12 +211,28 @@ public:
 
     /**
      * @brief Assigns a child process to run in case of success.
-     * @param child A child process to run in case of success.
-     * @return A reference to the newly assigned child process.
+     * @tparam Type Type of child process to create.
+     * @tparam Args Types of arguments to use to initialize the child process.
+     * @param args Parameters to use to initialize the child process.
+     * @return A reference to the newly created child process.
      */
-    basic_process &then(std::shared_ptr<basic_process> child) {
-        ENTT_ASSERT(child, "Null process not allowed");
-        return *(next = std::move(child));
+    template<typename Type, typename... Args>
+    basic_process &then(Args &&...args) {
+        const auto &allocator = next.second();
+        return *(next.first() = std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+    }
+
+    /**
+     * @brief Assigns a child process to run in case of success.
+     * @tparam Func Type of child process to create.
+     * @param func Either a lambda or a functor to use as a child process.
+     * @return A reference to the newly created child process.
+     */
+    template<typename Func>
+    basic_process &then(Func func) {
+        const auto &allocator = next.second();
+        using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
+        return *(next.first() = std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
     }
 
     /**
@@ -196,7 +240,7 @@ public:
      * @return The child process attached to the object, if any.
      */
     std::shared_ptr<basic_process> peek() {
-        return next;
+        return next.first();
     }
 
     /**
@@ -237,57 +281,23 @@ public:
     }
 
 private:
-    std::shared_ptr<basic_process> next;
+    compressed_pair<std::shared_ptr<basic_process>, allocator_type> next;
     state current;
 };
 
-/**
- * @brief Adaptor for lambdas and functors to turn them into processes.
- *
- * Lambdas and functors can't be used directly with a scheduler for they are not
- * properly defined processes with managed life cycles.<br/>
- * This class helps in filling the gap and turning lambdas and functors into
- * full featured processes usable by a scheduler.
- *
- * The signature of the function call operator should be equivalent to the
- * following:
- *
- * @code{.cpp}
- * void(basic_process<Delta> &process, Delta delta, void *data);
- * @endcode
- *
- * Where:
- *
- * * `process` is a reference to the handler on the library side.
- * * `delta` is the elapsed time.
- * * `data` is an opaque pointer to user data if any, `nullptr` otherwise.
- *
- * @sa process
- * @sa scheduler
- *
- * @tparam Delta Type to use to provide elapsed time.
- * @tparam Func Actual type of process.
- */
-template<typename Delta, typename Func>
-struct process_adaptor: public basic_process<Delta> {
-    /*! @brief Base type. */
-    using base_type = basic_process<Delta>;
-    /*! @brief Type used to provide elapsed time. */
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename Delta, typename Func, typename Allocator>
+struct process_adaptor: public basic_process<Delta, Allocator> {
+    using allocator_type = Allocator;
+    using base_type = basic_process<Delta, Allocator>;
     using delta_type = typename base_type::delta_type;
 
-    /**
-     * @brief Constructs a process adaptor from a lambda or a functor.
-     * @param proc Actual process to use under the hood.
-     */
-    process_adaptor(Func proc)
-        : base_type{},
+    process_adaptor(const allocator_type &allocator, Func proc)
+        : base_type{allocator},
           func{std::move(proc)} {}
 
-    /**
-     * @brief Updates a process and its internal state if required.
-     * @param delta Elapsed time.
-     * @param data Optional data.
-     */
     void update(const delta_type delta, void *data) override {
         func(*this, delta, data);
     }
@@ -296,38 +306,8 @@ private:
     Func func;
 };
 
-/**
- * @brief Deduction guide.
- * @tparam Func Actual type of process.
- */
-template<typename Func>
-process_adaptor(Func) -> process_adaptor<nth_argument_t<1u, Func>, Func>;
-
-/**
- * @brief Utility function to create shared processes from lambdas or functors.
- * @tparam Func Actual type of process.
- * @param func Actual process to use under the hood.
- * @return A properly initialized shared process.
- */
-template<typename Func>
-auto process_from(Func func) {
-    using type = process_adaptor<nth_argument_t<1u, Func>, Func>;
-    return std::make_shared<type>(std::move(func));
-}
-
-/**
- * @brief Utility function to create shared processes from lambdas or functors.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- * @tparam Func Actual type of process.
- * @param allocator The allocator to use.
- * @param func Actual process to use under the hood.
- * @return A properly initialized shared process.
- */
-template<typename Allocator, typename Func>
-auto process_from(const Allocator &allocator, Func func) {
-    using type = process_adaptor<nth_argument_t<1u, Func>, Func>;
-    return std::allocate_shared<type>(allocator, std::move(func));
-}
+} // namespace internal
+/*! @endcond */
 
 } // namespace entt
 

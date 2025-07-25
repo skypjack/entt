@@ -6,11 +6,8 @@
 
 namespace entt {
 
-template<typename>
+template<typename, typename = std::allocator<void>>
 class basic_process;
-
-template<typename, typename>
-struct process_adaptor;
 
 /*! @brief Alias declaration for the most common use case. */
 using process = basic_process<std::uint32_t>;
