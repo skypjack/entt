@@ -4,7 +4,6 @@
 
 * [Introduction](#introduction)
 * [The process](#the-process)
-  * [Adaptor](#adaptor)
   * [Continuation](#continuation)
 * [The scheduler](#the-scheduler)
 
@@ -57,10 +56,12 @@ Here is a minimal example for the sake of curiosity:
 
 ```cpp
 struct my_process: entt::process {
+    using allocator_type = typename entt::process::allocator_type;
     using delta_type = typename entt::process::delta_type;
 
-    my_process(delta_type delay)
-        : remaining{delay}
+    my_process(const allocator_type &allocator, delta_type delay)
+        : entt::process{allocator},
+          remaining{delay}
     {}
 
     void update(delta_type delta, void *) {
@@ -78,30 +79,6 @@ private:
 };
 ```
 
-## Adaptor
-
-Lambdas and functors cannot be used directly with a scheduler because they are
-not properly defined processes with managed life cycles.<br/>
-This class helps in filling the gap and turning lambdas and functors into
-full-featured processes usable by a scheduler.
-
-Function call operators have signatures similar to that of the `update` member
-function of a process, except that they receive a reference to the handle to
-manage its lifecycle as needed:
-
-```cpp
-void(entt::process &handle, delta_type delta, void *data);
-```
-
-Parameters have the following meaning:
-
-* `handle` is a reference to the process handle itself.
-* `delta` is the elapsed time.
-* `data` is an opaque pointer to user data if any, `nullptr` otherwise.
-
-The library also provides the `process_from` function to simplify the creation
-of processes starting from lambdas or the like.
-
 ## Continuation
 
 A process may be followed by other processes upon successful termination.<br/>
@@ -110,13 +87,26 @@ separate from each other while still combining them at runtime:
 
 ```cpp
 my_process process{};
-process.then(std::make_shared<my_other_process>());
+process.then<my_other_process>();
 ```
 
 This approach allows processes to be developed in isolation and combined to
 define complex actions.<br/>
 For example, a delayed operation where a parent process (such as a timer)
 _schedules_ a child process (the deferred task) once the time is over.
+
+The `then` function also accepts lambdas, which are associated with a dedicated
+process internally:
+
+```cpp
+process.then([](entt::process &proc, std::uint32_t delta, void *data) {
+    // ...
+})
+```
+
+The lambda function is such that it accepts a reference to the process that
+manages it (to be able to terminate it, pause it and so on), plus the usual
+values also passed to the `update` function.
 
 # The scheduler
 
@@ -159,17 +149,20 @@ entt::scheduler::size_type size = scheduler.size();
 scheduler.clear();
 ```
 
-To attach a process to a scheduler, it is enough to invoke the `attach` function
-by providing the process itself as an argument:
+To attach a process to a scheduler, invoke the `attach` function with a process
+type and the arguments to use to construct it:
 
 ```cpp
-scheduler.attach(std::make_shared<my_process>(_1000u));
+scheduler.attach<my_process>(_1000u);
 ```
 
-In case of a lambda or a functor, `process_from` should get the job done:
+The scheduler will also provide the process with its allocator as the first
+argument.<br>
+In case of lambdas or functors, the required signature is the one already seen
+for the `then` function of a process:
 
 ```cpp
-scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *){ /* ... */ }));
+scheduler.attach([](entt::process &, std::uint32_t, void *){ /* ... */ });
 ```
 
 In both cases, the newly created process is returned by reference and its `then`
@@ -178,15 +171,15 @@ As a minimal example of use:
 
 ```cpp
 // schedules a task in the form of a lambda function
-scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *) {
+scheduler.attach([](entt::process &, std::uint32_t, void *) {
     // ...
-}))
+})
 // appends a child in the form of another lambda function
-.then(entt::process_from([](entt::process &, std::uint32_t, void *) {
+.then([](entt::process &, std::uint32_t, void *) {
     // ...
-}))
+})
 // appends a child in the form of a process class
-.then(std::make_shared<my_process>(1000u));
+.then<my_process>(1000u);
 ```
 
 To update a scheduler and therefore all its processes, the `update` member
