@@ -1,24 +1,25 @@
-#ifndef ENTT_DAVEY_DAVEY_HPP
-#define ENTT_DAVEY_DAVEY_HPP
+#ifndef ENTT_TOOLS_DAVEY_HPP
+#define ENTT_TOOLS_DAVEY_HPP
 
 #include <cstdint>
 #include <ios>
 #include <sstream>
 #include <string>
-#include <entt/entity/mixin.hpp>
-#include <entt/entity/registry.hpp>
-#include <entt/entity/sparse_set.hpp>
-#include <entt/entity/storage.hpp>
-#include <entt/locator/locator.hpp>
-#include <entt/meta/container.hpp>
-#include <entt/meta/context.hpp>
-#include <entt/meta/meta.hpp>
-#include <entt/meta/pointer.hpp>
-#include <entt/meta/resolve.hpp>
 #include <imgui.h>
+#include "../entity/mixin.hpp"
+#include "../entity/registry.hpp"
+#include "../entity/sparse_set.hpp"
+#include "../entity/storage.hpp"
+#include "../locator/locator.hpp"
+#include "../meta/container.hpp"
+#include "../meta/context.hpp"
+#include "../meta/meta.hpp"
+#include "../meta/pointer.hpp"
+#include "../meta/resolve.hpp"
 
 namespace entt {
 
+/*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
 #define LABEL_OR(elem) label ? label : std::string{elem.info().name()}.data()
@@ -218,27 +219,63 @@ static void present_view(const meta_ctx &ctx, const entt::basic_view<get_t<Get..
 }
 
 } // namespace internal
+/*! @endcond */
 
-template<typename Entity, typename Type, typename Allocator>
-void davey(const meta_ctx &ctx, const entt::basic_storage<Entity, Type, Allocator> &storage) {
+/**
+ * @brief ImGui-based introspection tool for storage types.
+ * @tparam Type Storage element type.
+ * @tparam Entity Storage entity type.
+ * @tparam Allocator Storage allocator type.
+ * @param ctx The context from which to search for meta types.
+ * @param storage An instance of the storage type.
+ */
+template<typename Type, typename Entity, typename Allocator>
+void davey(const meta_ctx &ctx, const entt::basic_storage<Type, Entity, Allocator> &storage) {
     internal::present_storage(ctx, storage);
 }
 
-template<typename Entity, typename Type, typename Allocator>
-void davey(const entt::basic_storage<Entity, Type, Allocator> &storage) {
+/**
+ * @brief ImGui-based introspection tool for storage types.
+ * @tparam Type Storage element type.
+ * @tparam Entity Storage entity type.
+ * @tparam Allocator Storage allocator type.
+ * @param storage An instance of the storage type.
+ */
+template<typename Type, typename Entity, typename Allocator>
+void davey(const entt::basic_storage<Type, Entity, Allocator> &storage) {
     davey(locator<meta_ctx>::value_or(), storage);
 }
 
+/**
+ * @brief ImGui-based introspection tool for view types.
+ * @tparam Get Types of storage iterated by the view.
+ * @tparam Exclude Types of storage used to filter the view.
+ * @param ctx The context from which to search for meta types.
+ * @param view An instance of the view type.
+ */
 template<typename... Get, typename... Exclude>
 void davey(const meta_ctx &ctx, const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
     internal::present_view(ctx, view, std::index_sequence_for<Get...>{});
 }
 
+/**
+ * @brief ImGui-based introspection tool for view types.
+ * @tparam Get Types of storage iterated by the view.
+ * @tparam Exclude Types of storage used to filter the view.
+ * @param view An instance of the view type.
+ */
 template<typename... Get, typename... Exclude>
 void davey(const entt::basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
     davey(locator<meta_ctx>::value_or(), view);
 }
 
+/**
+ * @brief ImGui-based introspection tool for registry types.
+ * @tparam Entity Registry entity type.
+ * @tparam Allocator Registry allocator type.
+ * @param ctx The context from which to search for meta types.
+ * @param registry An instance of the registry type.
+ */
 template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &registry) {
     ImGui::BeginTabBar("#tabs");
@@ -273,6 +310,12 @@ void davey(const meta_ctx &ctx, const entt::basic_registry<Entity, Allocator> &r
     ImGui::EndTabBar();
 }
 
+/**
+ * @brief ImGui-based introspection tool for registry types.
+ * @tparam Entity Registry entity type.
+ * @tparam Allocator Registry allocator type.
+ * @param registry An instance of the registry type.
+ */
 template<typename Entity, typename Allocator>
 void davey(const entt::basic_registry<Entity, Allocator> &registry) {
     davey(locator<meta_ctx>::value_or(), registry);

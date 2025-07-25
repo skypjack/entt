@@ -1,3 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="entt::basic_process&lt;*&gt;">
+		<DisplayString>{{ state={ current,en } }}</DisplayString>
+		<Expand>
+			<Item Name="[state]">current,en</Item>
+			<Item Name="[child]" Condition="next != nullptr">*next</Item>
+		</Expand>
+	</Type>
+	<Type Name="entt::process_adaptor&lt;*&gt;">
+		<DisplayString>{{ state={ current,en } }}</DisplayString>
+		<Expand>
+			<Item Name="[callback]">func</Item>
+			<ExpandedItem>(base_type*)this,nand</ExpandedItem>
+		</Expand>
+	</Type>
+	<Type Name="entt::basic_scheduler&lt;*&gt;">
+		<Intrinsic Name="size" Expression="handlers.first_base::value.size()"/>
+		<DisplayString>{{ size={ size() } }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]" ExcludeView="simple">handlers.first_base::value.capacity()</Item>
+			<IndexListItems>
+				<Size>size()</Size>
+				<ValueNode>*handlers.first_base::value[$i]</ValueNode>
+			</IndexListItems>
+		</Expand>
+	</Type>
 </AutoVisualizer>

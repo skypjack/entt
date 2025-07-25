@@ -37,7 +37,6 @@ TODO:
 * use any for meta_custom_node
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
-* update process/scheduler natvis and doc after rework
-* move tools under the entt dir
-* refine natvis inclusion to reduce boilerplate
-* ENTT_INCLUDE_HEADERS install inteface (see natvis files)
+* operator bool to meta custom
+* process: doc and natvis
+* test process and scheduler with allocators

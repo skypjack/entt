@@ -4,9 +4,9 @@
 #define ENTT_META_CONTAINER_HPP
 
 #include <array>
+#include <cstddef>
 #include <deque>
 #include <iterator>
-#include <limits>
 #include <list>
 #include <map>
 #include <set>
@@ -18,13 +18,11 @@
 #include "../container/dense_set.hpp"
 #include "../core/type_traits.hpp"
 #include "context.hpp"
+#include "fwd.hpp"
 #include "meta.hpp"
 #include "type_traits.hpp"
 
 namespace entt {
-
-/*! @brief Used to identicate that a sequence container has not a fixed size. */
-inline constexpr std::size_t meta_dynamic_extent = std::numeric_limits<std::size_t>::max();
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {

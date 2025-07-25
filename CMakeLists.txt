@@ -90,7 +90,6 @@ target_include_directories(
     EnTT
     INTERFACE
         $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -112,97 +111,97 @@ endif()
 # Add EnTT goodies
 
 option(ENTT_INCLUDE_HEADERS "Add all EnTT headers to the EnTT target." OFF)
-option(ENTT_INCLUDE_TOOLS "Add EnTT tools files to the EnTT target." OFF)
 option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
 
 if(ENTT_INCLUDE_HEADERS)
-    target_sources(
-        EnTT
-        INTERFACE
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/config.h>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/macro.h>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/config/version.h>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_map.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/dense_set.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/table.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/container/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/algorithm.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/any.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/attribute.h>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/bit.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/compressed_pair.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/enum.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/family.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/hashed_string.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/ident.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/iterator.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/memory.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/monostate.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/ranges.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/tuple.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/type_info.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/type_traits.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/core/utility.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/component.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/entity.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/group.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/handle.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/mixin.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/helper.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/organizer.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/ranges.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/registry.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/runtime_view.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/snapshot.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/sparse_set.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/storage.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entity/view.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/adjacency_matrix.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/dot.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/flow.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/graph/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/locator/locator.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/adl_pointer.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/container.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/context.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/factory.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/meta.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/node.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/pointer.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/policy.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/range.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/resolve.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/template.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/type_traits.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/meta/utility.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/poly/poly.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/process.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/process/scheduler.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/cache.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/loader.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/resource/resource.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/delegate.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/dispatcher.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/emitter.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/fwd.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/signal/sigh.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/entt.hpp>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/fwd.hpp>
+    set(
+        HEADERS_FILES
+        config/config.h
+        config/macro.h
+        config/version.h
+        container/dense_map.hpp
+        container/dense_set.hpp
+        container/table.hpp
+        container/fwd.hpp
+        core/algorithm.hpp
+        core/any.hpp
+        core/attribute.h
+        core/bit.hpp
+        core/compressed_pair.hpp
+        core/enum.hpp
+        core/family.hpp
+        core/fwd.hpp
+        core/hashed_string.hpp
+        core/ident.hpp
+        core/iterator.hpp
+        core/memory.hpp
+        core/monostate.hpp
+        core/ranges.hpp
+        core/tuple.hpp
+        core/type_info.hpp
+        core/type_traits.hpp
+        core/utility.hpp
+        entity/component.hpp
+        entity/entity.hpp
+        entity/fwd.hpp
+        entity/group.hpp
+        entity/handle.hpp
+        entity/mixin.hpp
+        entity/helper.hpp
+        entity/organizer.hpp
+        entity/ranges.hpp
+        entity/registry.hpp
+        entity/runtime_view.hpp
+        entity/snapshot.hpp
+        entity/sparse_set.hpp
+        entity/storage.hpp
+        entity/view.hpp
+        graph/adjacency_matrix.hpp
+        graph/dot.hpp
+        graph/flow.hpp
+        graph/fwd.hpp
+        locator/locator.hpp
+        meta/adl_pointer.hpp
+        meta/container.hpp
+        meta/context.hpp
+        meta/factory.hpp
+        meta/fwd.hpp
+        meta/meta.hpp
+        meta/node.hpp
+        meta/pointer.hpp
+        meta/policy.hpp
+        meta/range.hpp
+        meta/resolve.hpp
+        meta/template.hpp
+        meta/type_traits.hpp
+        meta/utility.hpp
+        poly/fwd.hpp
+        poly/poly.hpp
+        process/fwd.hpp
+        process/process.hpp
+        process/scheduler.hpp
+        resource/cache.hpp
+        resource/fwd.hpp
+        resource/loader.hpp
+        resource/resource.hpp
+        signal/delegate.hpp
+        signal/dispatcher.hpp
+        signal/emitter.hpp
+        signal/fwd.hpp
+        signal/sigh.hpp
+        tools/davey.hpp
+        entt.hpp
+        fwd.hpp
+        tools.hpp
     )
-endif()
 
-if(ENTT_INCLUDE_TOOLS)
-    target_sources(
-        EnTT
-        INTERFACE
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/tools/entt/davey/davey.hpp>
-    )
+    list(TRANSFORM HEADERS_FILES APPEND ">" OUTPUT_VARIABLE HEADERS_BUILD_INTERFACE)
+    list(TRANSFORM HEADERS_BUILD_INTERFACE PREPEND "$<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/")
+
+    list(TRANSFORM HEADERS_FILES APPEND ">" OUTPUT_VARIABLE HEADERS_INSTALL_INTERFACE)
+    list(TRANSFORM HEADERS_INSTALL_INTERFACE PREPEND "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/")
+
+    target_sources(EnTT INTERFACE ${HEADERS_BUILD_INTERFACE} ${HEADERS_INSTALL_INTERFACE})
 endif()
 
 if(ENTT_INCLUDE_NATVIS)
@@ -217,32 +216,28 @@ if(ENTT_INCLUDE_NATVIS)
 endif()
 
 if(ENTT_HAS_NATVIS)
-    target_sources(
-        EnTT
-        INTERFACE
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/config.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/config.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/container.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/container.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/core.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/core.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/entity.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/entity.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/graph.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/graph.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/locator.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/locator.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/meta.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/meta.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/poly.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/poly.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/process.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/process.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/resource.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/resource.natvis>
-            $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/signal.natvis>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/signal.natvis>
+    set(
+        NATVIS_FILES
+        config.natvis
+        container.natvis
+        core.natvis
+        entity.natvis
+        graph.natvis
+        locator.natvis
+        meta.natvis
+        poly.natvis
+        process.natvis
+        resource.natvis
+        signal.natvis
     )
+
+    list(TRANSFORM NATVIS_FILES APPEND ">" OUTPUT_VARIABLE NATVIS_BUILD_INTERFACE)
+    list(TRANSFORM NATVIS_BUILD_INTERFACE PREPEND "$<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src/entt/natvis/")
+
+    list(TRANSFORM NATVIS_FILES APPEND ">" OUTPUT_VARIABLE NATVIS_INSTALL_INTERFACE)
+    list(TRANSFORM NATVIS_INSTALL_INTERFACE PREPEND "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/entt/natvis/")
+
+    target_sources(EnTT INTERFACE ${NATVIS_BUILD_INTERFACE} ${NATVIS_INSTALL_INTERFACE})
 endif()
 
 # Install EnTT and all related files

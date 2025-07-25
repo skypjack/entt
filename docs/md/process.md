@@ -5,6 +5,7 @@
 * [Introduction](#introduction)
 * [The process](#the-process)
   * [Adaptor](#adaptor)
+  * [Continuation](#continuation)
 * [The scheduler](#the-scheduler)
 
 # Introduction
@@ -17,19 +18,17 @@ to define and execute cooperative processes.
 
 # The process
 
-A typical task inherits from the `process` class template that stays true to the
-CRTP idiom. Moreover, derived classes specify what the intended type for elapsed
-times is.
+A typical task inherits from the `process` class template. Derived classes also
+specify what the intended type for elapsed times is.
 
-A process should expose publicly the following member functions whether needed
-(note that it is not required to define a function unless the derived class
-wants to _override_ the default behavior):
+A process should implement the following member functions whether needed (note
+that it is not required to define a function unless the derived class wants to
+_override_ the default behavior):
 
 * `void update(Delta, void *);`
 
   This is invoked once per tick until a process is explicitly aborted or ends
-  either with or without errors. Technically speaking, this member function is 
-  not strictly required. However, each process should at least define it to work
+  either with or without errors. Each process should at least define it to work
   _properly_. The `void *` parameter is an opaque pointer to user data (if any)
   forwarded directly to the process during an update.
 
@@ -46,19 +45,19 @@ wants to _override_ the default behavior):
 * `void aborted();`
 
   This is invoked only if a process is explicitly aborted. There is no guarantee
-  that it executes in the same tick, it depends solely on whether the process is
+  that it executes in the same tick. It depends solely on whether the process is
   aborted immediately or not.
 
-Derived classes can also change the internal state of a process by invoking
-`succeed` and `fail`, as well as `pause` and `unpause` the process itself.<br/>
-All these are protected member functions made available to manage the life cycle
-of a process from a derived class.
+A class can also change the state of a process by invoking `succeed` and `fail`,
+as well as `pause` and `unpause` the process itself.<br/>
+All these are public member functions made available to manage the life cycle of
+a process easily.
 
 Here is a minimal example for the sake of curiosity:
 
 ```cpp
-struct my_process: entt::process<my_process, std::uint32_t> {
-    using delta_type = std::uint32_t;
+struct my_process: entt::process {
+    using delta_type = typename entt::process::delta_type;
 
     my_process(delta_type delay)
         : remaining{delay}
@@ -86,26 +85,38 @@ not properly defined processes with managed life cycles.<br/>
 This class helps in filling the gap and turning lambdas and functors into
 full-featured processes usable by a scheduler.
 
-The function call operator has a signature similar to the one of the `update`
-function of a process but for the fact that it receives two extra callbacks to
-invoke whenever a process terminates with success or with an error:
+Function call operators have signatures similar to that of the `update` member
+function of a process, except that they receive a reference to the handle to
+manage its lifecycle as needed:
 
 ```cpp
-void(Delta delta, void *data, auto succeed, auto fail);
+void(entt::process &handle, delta_type delta, void *data);
 ```
 
 Parameters have the following meaning:
 
+* `handle` is a reference to the process handle itself.
 * `delta` is the elapsed time.
 * `data` is an opaque pointer to user data if any, `nullptr` otherwise.
-* `succeed` is a function to call when a process terminates with success.
-* `fail` is a function to call when a process terminates with errors.
 
-Both `succeed` and `fail` accept no parameters at all.
+The library also provides the `process_from` function to simplify the creation
+of processes starting from lambdas or the like.
 
-Note that usually users should not worry about creating adaptors at all. A
-scheduler creates them internally, each and every time a lambda or a functor is
-used as a process.
+## Continuation
+
+A process may be followed by other processes upon successful termination.<br/>
+This pairing can be set up at creation time, keeping the processes conceptually
+separate from each other while still combining them at runtime:
+
+```cpp
+my_process process{};
+process.then(std::make_shared<my_other_process>());
+```
+
+This approach allows processes to be developed in isolation and combined to
+define complex actions.<br/>
+For example, a delayed operation where a parent process (such as a timer)
+_schedules_ a child process (the deferred task) once the time is over.
 
 # The scheduler
 
@@ -118,7 +129,7 @@ it is a good candidate to run one more time the next tick.<br/>
 A process can also have a _child_. In this case, the parent process is replaced
 with its child when it terminates and only if it returns with success. In case
 of errors, both the parent process and its child are discarded. This way, it is
-easy to create a chain of processes to run sequentially.
+easy to create a _chain of processes_ to run sequentially.
 
 Using a scheduler is straightforward. To create it, users must provide only the
 type for the elapsed times and no arguments at all:
@@ -131,7 +142,7 @@ Otherwise, the `scheduler` alias is also available for the most common cases. It
 uses `std::uint32_t` as a default type:
 
 ```cpp
-entt::scheduler scheduler;
+entt::scheduler scheduler{};
 ```
 
 The class has member functions to query its internal data structures, like
@@ -148,38 +159,34 @@ entt::scheduler::size_type size = scheduler.size();
 scheduler.clear();
 ```
 
-To attach a process to a scheduler, there are mainly two ways:
+To attach a process to a scheduler, it is enough to invoke the `attach` function
+by providing the process itself as an argument:
 
-* If the process inherits from the `process` class template, it is enough to
-  indicate its type and submit all the parameters required to construct it to
-  the `attach` member function:
+```cpp
+scheduler.attach(std::make_shared<my_process>(_1000u));
+```
 
-  ```cpp
-  scheduler.attach<my_process>(1000u);
-  ```
+In case of a lambda or a functor, `process_from` should get the job done:
 
-* Otherwise, in case of a lambda or a functor, it is enough to provide an
-  instance of the class to the `attach` member function:
+```cpp
+scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *){ /* ... */ }));
+```
 
-  ```cpp
-  scheduler.attach([](auto...){ /* ... */ });
-  ```
-
-In both cases, the scheduler is returned and its `then` member function can be
-used to create chains of processes to run sequentially.<br/>
+In both cases, the newly created process is returned by reference and its `then`
+member function is used to create chains of processes to run sequentially.<br/>
 As a minimal example of use:
 
 ```cpp
 // schedules a task in the form of a lambda function
-scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
+scheduler.attach(entt::process_from([](entt::process &, std::uint32_t, void *) {
     // ...
-})
+}))
 // appends a child in the form of another lambda function
-.then([](auto delta, void *, auto succeed, auto fail) {
+.then(entt::process_from([](entt::process &, std::uint32_t, void *) {
     // ...
-})
+}))
 // appends a child in the form of a process class
-.then<my_process>(1000u);
+.then(std::make_shared<my_process>(1000u));
 ```
 
 To update a scheduler and therefore all its processes, the `update` member
@@ -203,3 +210,6 @@ scheduler.abort(true);
 // ... or gracefully during the next tick
 scheduler.abort();
 ```
+
+The argument passed to the `abort` function indicates whether execution should
+be stopped immediately or processes should be notified on the next tick.
