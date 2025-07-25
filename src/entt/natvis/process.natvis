@@ -4,14 +4,7 @@
 		<DisplayString>{{ state={ current,en } }}</DisplayString>
 		<Expand>
 			<Item Name="[state]">current,en</Item>
-			<Item Name="[child]" Condition="next != nullptr">*next</Item>
-		</Expand>
-	</Type>
-	<Type Name="entt::process_adaptor&lt;*&gt;">
-		<DisplayString>{{ state={ current,en } }}</DisplayString>
-		<Expand>
-			<Item Name="[callback]">func</Item>
-			<ExpandedItem>(base_type*)this,nand</ExpandedItem>
+			<Item Name="[child]" Condition="next.first_base::value != nullptr">*next.first_base::value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::basic_scheduler&lt;*&gt;">
