@@ -38,4 +38,3 @@ TODO:
 * avoid copying meta_type/data/func nodes
 * paged vector as a standalone class
 * operator bool to meta custom
-* test process and scheduler with allocators

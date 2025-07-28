@@ -107,6 +107,20 @@ TEST(Scheduler, Swap) {
     ASSERT_EQ(counter, 2);
 }
 
+TEST(Scheduler, SharedFromThis) {
+    entt::scheduler scheduler{};
+    auto &process = scheduler.attach<succeeded_process>();
+    const auto &then = process.then<failed_process>();
+    auto other = process.shared_from_this();
+
+    ASSERT_TRUE(other);
+    ASSERT_NE(&process, &then);
+    ASSERT_EQ(&process, other.get());
+    ASSERT_EQ(process.get_allocator(), scheduler.get_allocator());
+    ASSERT_EQ(process.get_allocator(), other->get_allocator());
+    ASSERT_EQ(then.get_allocator(), scheduler.get_allocator());
+}
+
 TEST(Scheduler, AttachThen) {
     entt::scheduler scheduler{};
     std::pair<int, int> counter{};
