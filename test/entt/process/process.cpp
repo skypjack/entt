@@ -199,3 +199,17 @@ TEST(Process, ThenPeek) {
     // peek does not release ownership
     ASSERT_TRUE(process.peek());
 }
+
+TEST(Process, CustomAllocator) {
+    const std::allocator<void> allocator{};
+    entt::process process{allocator};
+
+    ASSERT_EQ(process.get_allocator(), allocator);
+    ASSERT_FALSE(process.get_allocator() != allocator);
+
+    entt::process &other = process.then([](entt::process &, std::uint32_t, void *) {});
+
+    ASSERT_NE(&process, &other);
+    ASSERT_EQ(other.get_allocator(), allocator);
+    ASSERT_FALSE(other.get_allocator() != allocator);
+}
