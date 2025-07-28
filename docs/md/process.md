@@ -5,6 +5,7 @@
 * [Introduction](#introduction)
 * [The process](#the-process)
   * [Continuation](#continuation)
+  * [Shared process](#shared-process)
 * [The scheduler](#the-scheduler)
 
 # Introduction
@@ -107,6 +108,21 @@ process.then([](entt::process &proc, std::uint32_t delta, void *data) {
 The lambda function is such that it accepts a reference to the process that
 manages it (to be able to terminate it, pause it and so on), plus the usual
 values also passed to the `update` function.
+
+## Shared process
+
+All processes inherit from `std::enable_shared_from_this` to allow sharing with
+the caller.<br/>
+The returned smart pointer was created using the allocator associated with the
+scheduler and therefore all its processes. This same allocator is available by
+invoking `get_allocator` on the process itself.
+
+As far as possible, sharing a process is not intended to allow the caller to
+manage it. This could actually compromise the proper functioning of the
+scheduler and the process itself.<br/>
+Rather, the purpose is to allow the callers to save a valid reference to the
+process, allowing them to intervene in its lifecycle through calls like `pause`
+and the like.
 
 # The scheduler
 
