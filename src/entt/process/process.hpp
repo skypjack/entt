@@ -69,7 +69,7 @@ struct process_adaptor;
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Delta, typename Allocator>
-class basic_process: std::enable_shared_from_this<basic_process<Delta, Allocator>> {
+class basic_process: public std::enable_shared_from_this<basic_process<Delta, Allocator>> {
     enum class state : std::uint8_t {
         idle = 0,
         running,
