@@ -47,7 +47,7 @@
 		<Intrinsic Name="is_valid_entity" Expression="!traits_type::version_mask || (*((traits_type::entity_type *)&amp;entity) &lt; (traits_type::version_mask &lt;&lt; traits_type::length))">
 			<Parameter Name="entity" Type="const traits_type::value_type &amp;"/>
 		</Intrinsic>
-		<DisplayString>{{ size={ packed.size() }, type={ info->alias,na } }}</DisplayString>
+		<DisplayString>{{ size={ packed.size() }, type={ descriptor->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.capacity()</Item>
 			<Item Name="[policy]" ExcludeView="simple">mode,en</Item>
@@ -94,7 +94,7 @@
 		<Intrinsic Name="is_valid_entity" Expression="!base_type::traits_type::version_mask || (*((base_type::traits_type::entity_type *)&amp;entity) &lt; (base_type::traits_type::version_mask &lt;&lt; base_type::traits_type::length))">
 			<Parameter Name="entity" Type="const base_type::traits_type::value_type &amp;"/>
 		</Intrinsic>
-		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::info->alias,na } }}</DisplayString>
+		<DisplayString>{{ size={ base_type::packed.size() }, type={ base_type::descriptor->alias,na } }}</DisplayString>
 		<Expand>
 			<Item Name="[capacity]" Optional="true" ExcludeView="simple">payload.capacity() * traits_type::page_size</Item>
 			<Item Name="[page size]" Optional="true" ExcludeView="simple">traits_type::page_size</Item>
@@ -163,7 +163,7 @@
 						<Loop>
 							<Break Condition="pos == last"/>
 							<If Condition="pool_at(pos)->sparse.size() &gt; page &amp;&amp; pool_at(pos)->sparse[page] != nullptr &amp;&amp; ((*((traits_type::entity_type *)&amp;pool_at(pos)->sparse[page][offset])) &amp; entity_mask) != entity_mask">
-								<Item Name="[{ pool_at(pos)->info->alias,na }:{ ((*((traits_type::entity_type *)&amp;pool_at(pos)->sparse[page][offset])) &amp; entity_mask) != entity_mask }]">pool_at(pos),view(simple)nanr</Item>
+								<Item Name="[{ pool_at(pos)->descriptor->alias,na }:{ ((*((traits_type::entity_type *)&amp;pool_at(pos)->sparse[page][offset])) &amp; entity_mask) != entity_mask }]">pool_at(pos),view(simple)nanr</Item>
 							</If>
 							<Exec>++pos</Exec>
 						</Loop>
