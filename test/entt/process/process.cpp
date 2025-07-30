@@ -207,7 +207,7 @@ TEST(Process, CustomAllocator) {
     ASSERT_EQ(process.get_allocator(), allocator);
     ASSERT_FALSE(process.get_allocator() != allocator);
 
-    entt::process &other = process.then([](entt::process &, std::uint32_t, void *) {});
+    const entt::process &other = process.then([](entt::process &, std::uint32_t, void *) {});
 
     ASSERT_NE(&process, &other);
     ASSERT_EQ(other.get_allocator(), allocator);
