@@ -2,7 +2,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
-#include "../../common/config.h"
 #include "../../common/empty.h"
 
 template<typename Delta>

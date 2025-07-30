@@ -1,6 +1,7 @@
 #include <array>
 #include <cstddef>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/group.hpp>

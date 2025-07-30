@@ -1,10 +1,10 @@
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
-#include "../../common/config.h"
 
 class foo_process: public entt::process {
     void update(const delta_type, void *) override {
