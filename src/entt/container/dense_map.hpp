@@ -725,7 +725,12 @@ public:
         return it->second;
     }
 
-    /*! @copydoc at */
+    /**
+     * @brief Accesses a given element with bounds checking.
+     * @tparam Other Type of the key of an element to find.
+     * @param key A key of an element to find.
+     * @return A reference to the mapped value of the requested element.
+     */
     template<typename Other>
     [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, mapped_type const &>>
     at(const Other &key) const {
