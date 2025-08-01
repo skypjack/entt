@@ -112,13 +112,13 @@ struct my_loader {
     struct from_disk_tag{};
     struct from_network_tag{};
 
-    template<typename Args>
+    template<typename... Args>
     result_type operator()(from_disk_tag, Args&&... args) {
         // ...
         return std::make_shared<my_resource>(std::forward<Args>(args)...);
     }
 
-    template<typename Args>
+    template<typename... Args>
     result_type operator()(from_network_tag, Args&&... args) {
         // ...
         return std::make_shared<my_resource>(std::forward<Args>(args)...);
