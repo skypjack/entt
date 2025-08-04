@@ -38,7 +38,7 @@ static void present_element(const entt::meta_any &obj, OnEntity on_entity) {
             if(const auto entt = elem.template cast<Entity>(); entt == entt::null) {
                 ImGui::Text("%s: %s", LABEL_OR(type), "null");
             } else {
-                on_entity(LABEL_OR(type), elem.template cast<Entity>());
+                on_entity(LABEL_OR(type), entt);
             }
         } else if(type.is_enum()) {
             const char *as_string = nullptr;
