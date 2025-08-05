@@ -94,6 +94,8 @@ public:
     using allocator_type = Allocator;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
+    /*! @brief Handle type. */
+    using handle_type = std::shared_ptr<basic_process>;
 
     /*! @brief Default constructor. */
     basic_process()
@@ -239,7 +241,7 @@ public:
      * @brief Returns the child process without releasing ownership, if any.
      * @return The child process attached to the object, if any.
      */
-    std::shared_ptr<basic_process> peek() {
+    handle_type peek() {
         return next.first();
     }
 
@@ -281,7 +283,7 @@ public:
     }
 
 private:
-    compressed_pair<std::shared_ptr<basic_process>, allocator_type> next;
+    compressed_pair<handle_type, allocator_type> next;
     state current;
 };
 
