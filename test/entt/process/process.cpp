@@ -299,6 +299,14 @@ TEST(Process, ThenPeek) {
     ASSERT_TRUE(process.peek());
 }
 
+TEST(Process, Handle) {
+    auto process = std::make_shared<test_process<int>>();
+    auto handle = process->shared_from_this();
+
+    ASSERT_TRUE(handle);
+    ASSERT_EQ(process.get(), handle.get());
+}
+
 TEST(Process, CustomAllocator) {
     const std::allocator<void> allocator{};
     entt::process process{allocator};
