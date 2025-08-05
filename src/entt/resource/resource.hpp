@@ -175,7 +175,7 @@ public:
      * @brief Returns the underlying resource handle.
      * @return The underlying resource handle.
      */
-    [[nodiscard]] const handle_type &handle() const noexcept {
+    [[nodiscard]] handle_type handle() const noexcept {
         return value;
     }
 
