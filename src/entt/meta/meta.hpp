@@ -1540,7 +1540,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (node.info != nullptr) ? meta_type{*ctx, node} : meta_type{};
+    return meta_type{*ctx, node};
 }
 
 template<typename... Args>
