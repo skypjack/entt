@@ -845,7 +845,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return !!(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -853,7 +853,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return !!(node.traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -976,7 +976,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return !!(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -984,7 +984,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return !!(node.traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -1081,7 +1081,7 @@ class meta_type {
 
         for(auto curr = next(); curr; curr = next()) {
             if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
-                if(constness && !static_cast<bool>(curr->traits & internal::meta_traits::is_const)) {
+                if(constness && !(curr->traits & internal::meta_traits::is_const)) {
                     continue;
                 }
             }
@@ -1110,8 +1110,8 @@ class meta_type {
                         ambiguous = false;
                     } else if(match == same) {
                         if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
-                            if(static_cast<bool>(curr->traits & internal::meta_traits::is_const) != static_cast<bool>(candidate->traits & internal::meta_traits::is_const)) {
-                                candidate = static_cast<bool>(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
+                            if(!!(curr->traits & internal::meta_traits::is_const) != !!(candidate->traits & internal::meta_traits::is_const)) {
+                                candidate = !!(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
                                 ambiguous = false;
                                 continue;
                             }
@@ -1188,7 +1188,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_arithmetic() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_arithmetic);
+        return !!(node.traits & internal::meta_traits::is_arithmetic);
     }
 
     /**
@@ -1196,7 +1196,7 @@ public:
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_integral);
+        return !!(node.traits & internal::meta_traits::is_integral);
     }
 
     /**
@@ -1204,7 +1204,7 @@ public:
      * @return True if the underlying type is a signed type, false otherwise.
      */
     [[nodiscard]] bool is_signed() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_signed);
+        return !!(node.traits & internal::meta_traits::is_signed);
     }
 
     /**
@@ -1212,7 +1212,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_array);
+        return !!(node.traits & internal::meta_traits::is_array);
     }
 
     /**
@@ -1220,7 +1220,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_enum);
+        return !!(node.traits & internal::meta_traits::is_enum);
     }
 
     /**
@@ -1228,7 +1228,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_class);
+        return !!(node.traits & internal::meta_traits::is_class);
     }
 
     /**
@@ -1236,7 +1236,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_pointer);
+        return !!(node.traits & internal::meta_traits::is_pointer);
     }
 
     /**
@@ -1253,7 +1253,7 @@ public:
      * @return True if the underlying type is pointer-like, false otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_pointer_like);
+        return !!(node.traits & internal::meta_traits::is_pointer_like);
     }
 
     /**
@@ -1261,7 +1261,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_sequence_container);
+        return !!(node.traits & internal::meta_traits::is_sequence_container);
     }
 
     /**
@@ -1269,7 +1269,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_associative_container);
+        return !!(node.traits & internal::meta_traits::is_associative_container);
     }
 
     /**
