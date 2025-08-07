@@ -56,8 +56,7 @@ public:
           clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
           resize_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::resize},
-          begin_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::begin},
-          end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::end},
+          begin_end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::iter},
           insert_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::erase},
           const_only{std::is_const_v<Type>} {}
@@ -83,8 +82,7 @@ private:
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
     bool (*resize_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
-    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*begin_end_fn)(const meta_ctx &, void *, const void *, const bool){};
     iterator (*insert_fn)(const meta_ctx &, void *, const void *, const void *, const iterator &){};
     iterator (*erase_fn)(const meta_ctx &, void *, const iterator &){};
     bool const_only{};
@@ -118,8 +116,7 @@ public:
           size_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::size},
           clear_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::reserve},
-          begin_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::begin},
-          end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::end},
+          begin_end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::iter},
           insert_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::erase},
           find_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::find},
@@ -151,8 +148,7 @@ private:
     size_type (*size_fn)(const void *){};
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
-    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*begin_end_fn)(const meta_ctx &, void *, const void *, const bool){};
     bool (*insert_fn)(void *, const void *, const void *){};
     size_type (*erase_fn)(void *, const void *){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, const void *){};
@@ -1807,7 +1803,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return begin_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, false);
 }
 
 /**
@@ -1815,7 +1811,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, true);
 }
 
 /**
@@ -1900,12 +1896,12 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return begin_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, true);
 }
 
 /**
