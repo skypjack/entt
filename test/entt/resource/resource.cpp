@@ -42,7 +42,7 @@ TEST(Resource, Functionalities) {
     ASSERT_EQ(other.operator->(), value.get());
     ASSERT_EQ(&static_cast<derived &>(other), value.get());
     ASSERT_EQ(&*other, value.get());
-    ASSERT_EQ(other.handle().use_count(), 2l);
+    ASSERT_EQ(other.handle().use_count(), 3l);
 
     entt::resource<derived> copy{resource};
     entt::resource<derived> move{std::move(other)};
@@ -132,12 +132,12 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
     ASSERT_TRUE(copy);
     ASSERT_EQ(copy, resource);
     ASSERT_NE(copy, entt::resource<derived>{});
-    ASSERT_EQ(copy.handle().use_count(), 3);
+    ASSERT_EQ(copy.handle().use_count(), 4);
 
     ASSERT_TRUE(move);
     ASSERT_EQ(move, resource);
     ASSERT_NE(move, entt::resource<derived>{});
-    ASSERT_EQ(move.handle().use_count(), 3);
+    ASSERT_EQ(move.handle().use_count(), 4);
 
     copy = resource;
     move = std::move(resource);
@@ -148,7 +148,7 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 
     ASSERT_TRUE(copy);
     ASSERT_TRUE(move);
-    ASSERT_EQ(copy.handle().use_count(), 2);
+    ASSERT_EQ(copy.handle().use_count(), 3);
 }
 
 TEST(Resource, DynamicResourceHandleCast) {
@@ -156,20 +156,20 @@ TEST(Resource, DynamicResourceHandleCast) {
     entt::resource<const base> other = resource;
 
     ASSERT_TRUE(other);
-    ASSERT_EQ(resource.handle().use_count(), 2);
+    ASSERT_EQ(resource.handle().use_count(), 3);
     ASSERT_EQ(resource, other);
 
     entt::resource<const derived> cast = dynamic_resource_cast<const derived>(other);
 
     ASSERT_TRUE(cast);
-    ASSERT_EQ(resource.handle().use_count(), 3);
+    ASSERT_EQ(resource.handle().use_count(), 4);
     ASSERT_EQ(resource, cast);
 
     other = entt::resource<base>{std::make_shared<base>()};
     cast = dynamic_resource_cast<const derived>(other);
 
     ASSERT_FALSE(cast);
-    ASSERT_EQ(resource.handle().use_count(), 1);
+    ASSERT_EQ(resource.handle().use_count(), 2);
 }
 
 TEST(Resource, Comparison) {

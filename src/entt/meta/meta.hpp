@@ -56,8 +56,7 @@ public:
           clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
           resize_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::resize},
-          begin_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::begin},
-          end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::end},
+          begin_end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::iter},
           insert_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::erase},
           const_only{std::is_const_v<Type>} {}
@@ -83,8 +82,7 @@ private:
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
     bool (*resize_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
-    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*begin_end_fn)(const meta_ctx &, void *, const void *, const bool){};
     iterator (*insert_fn)(const meta_ctx &, void *, const void *, const void *, const iterator &){};
     iterator (*erase_fn)(const meta_ctx &, void *, const iterator &){};
     bool const_only{};
@@ -118,8 +116,7 @@ public:
           size_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::size},
           clear_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::reserve},
-          begin_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::begin},
-          end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::end},
+          begin_end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::iter},
           insert_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::insert},
           erase_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::erase},
           find_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::find},
@@ -151,8 +148,7 @@ private:
     size_type (*size_fn)(const void *){};
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
-    iterator (*begin_fn)(const meta_ctx &, void *, const void *){};
-    iterator (*end_fn)(const meta_ctx &, void *, const void *){};
+    iterator (*begin_end_fn)(const meta_ctx &, void *, const void *, const bool){};
     bool (*insert_fn)(void *, const void *, const void *){};
     size_type (*erase_fn)(void *, const void *){};
     iterator (*find_fn)(const meta_ctx &, void *, const void *, const void *){};
@@ -161,42 +157,34 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    using vtable_type = void(const internal::meta_traits op, const meta_ctx &, const void *, void *);
+    using vtable_type = void(const meta_ctx &, void *, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_ctx &area, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
+    static void basic_vtable([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *value, [[maybe_unused]] const void *as_const, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(is_meta_pointer_like_v<Type>) {
-            if(!!(req & internal::meta_traits::is_pointer_like)) {
-                if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                    static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(value));
-                } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
-                    using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
+            if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
+                static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(as_const));
+            } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
+                using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
 
-                    if constexpr(std::is_constructible_v<bool, Type>) {
-                        if(const auto &pointer_like = *static_cast<const Type *>(value); pointer_like) {
-                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
-                        }
-                    } else {
-                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(value)));
+                if constexpr(std::is_constructible_v<bool, Type>) {
+                    if(const auto &pointer_like = *static_cast<const Type *>(as_const); pointer_like) {
+                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                     }
+                } else {
+                    static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(as_const)));
                 }
             }
         }
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-            if(!!(req & internal::meta_traits::is_sequence_container)) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *static_cast<meta_sequence_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{area, *static_cast<const Type *>(value)} : meta_sequence_container{area, *static_cast<Type *>(const_cast<void *>(value))};
-            }
+            *static_cast<meta_sequence_container *>(other) = (value == nullptr) ? meta_sequence_container{area, *static_cast<const Type *>(as_const)} : meta_sequence_container{area, *static_cast<Type *>(value)};
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-            if(!!(req & internal::meta_traits::is_associative_container)) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *static_cast<meta_associative_container *>(other) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{area, *static_cast<const Type *>(value)} : meta_associative_container{area, *static_cast<Type *>(const_cast<void *>(value))};
-            }
+            *static_cast<meta_associative_container *>(other) = (value == nullptr) ? meta_associative_container{area, *static_cast<const Type *>(as_const)} : meta_associative_container{area, *static_cast<Type *>(value)};
         }
     }
 
@@ -549,15 +537,15 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        meta_sequence_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_sequence_container() : meta_sequence_container{};
-        if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container, *ctx, storage.data(), &proxy); }
+        meta_sequence_container proxy{};
+        if(!!(node.traits & internal::meta_traits::is_sequence_container)) { vtable(*ctx, storage.data(), std::as_const(storage).data(), &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container | internal::meta_traits::is_const, *ctx, storage.data(), &proxy); }
+        if(!!(node.traits & internal::meta_traits::is_sequence_container)) { vtable(*ctx, nullptr, storage.data(), &proxy); }
         return proxy;
     }
 
@@ -566,15 +554,15 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        meta_associative_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_associative_container() : meta_associative_container{};
-        if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_associative_container, *ctx, storage.data(), &proxy); }
+        meta_associative_container proxy{};
+        if(!!(node.traits & internal::meta_traits::is_associative_container)) { vtable(*ctx, storage.data(), std::as_const(storage).data(), &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_associative_container | internal::meta_traits::is_const, *ctx, storage.data(), &proxy); }
+        if(!!(node.traits & internal::meta_traits::is_associative_container)) { vtable(*ctx, nullptr, storage.data(), &proxy); }
         return proxy;
     }
 
@@ -585,7 +573,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_pointer_like, *ctx, storage.data(), &ret); }
+        if(!!(node.traits & internal::meta_traits::is_pointer_like)) { vtable(*ctx, nullptr, storage.data(), &ret); }
         return ret;
     }
 
@@ -853,7 +841,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return !!(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -861,7 +849,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return !!(node.traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -984,7 +972,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_const);
+        return !!(node.traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -992,7 +980,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_static);
+        return !!(node.traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -1089,7 +1077,7 @@ class meta_type {
 
         for(auto curr = next(); curr; curr = next()) {
             if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
-                if(constness && !static_cast<bool>(curr->traits & internal::meta_traits::is_const)) {
+                if(constness && !(curr->traits & internal::meta_traits::is_const)) {
                     continue;
                 }
             }
@@ -1118,8 +1106,8 @@ class meta_type {
                         ambiguous = false;
                     } else if(match == same) {
                         if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
-                            if(static_cast<bool>(curr->traits & internal::meta_traits::is_const) != static_cast<bool>(candidate->traits & internal::meta_traits::is_const)) {
-                                candidate = static_cast<bool>(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
+                            if(!!(curr->traits & internal::meta_traits::is_const) != !!(candidate->traits & internal::meta_traits::is_const)) {
+                                candidate = !!(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
                                 ambiguous = false;
                                 continue;
                             }
@@ -1196,7 +1184,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool is_arithmetic() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_arithmetic);
+        return !!(node.traits & internal::meta_traits::is_arithmetic);
     }
 
     /**
@@ -1204,7 +1192,7 @@ public:
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_integral);
+        return !!(node.traits & internal::meta_traits::is_integral);
     }
 
     /**
@@ -1212,7 +1200,7 @@ public:
      * @return True if the underlying type is a signed type, false otherwise.
      */
     [[nodiscard]] bool is_signed() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_signed);
+        return !!(node.traits & internal::meta_traits::is_signed);
     }
 
     /**
@@ -1220,7 +1208,7 @@ public:
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_array);
+        return !!(node.traits & internal::meta_traits::is_array);
     }
 
     /**
@@ -1228,7 +1216,7 @@ public:
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_enum);
+        return !!(node.traits & internal::meta_traits::is_enum);
     }
 
     /**
@@ -1236,7 +1224,7 @@ public:
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_class);
+        return !!(node.traits & internal::meta_traits::is_class);
     }
 
     /**
@@ -1244,7 +1232,7 @@ public:
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_pointer);
+        return !!(node.traits & internal::meta_traits::is_pointer);
     }
 
     /**
@@ -1261,7 +1249,7 @@ public:
      * @return True if the underlying type is pointer-like, false otherwise.
      */
     [[nodiscard]] bool is_pointer_like() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_pointer_like);
+        return !!(node.traits & internal::meta_traits::is_pointer_like);
     }
 
     /**
@@ -1269,7 +1257,7 @@ public:
      * @return True if the type is a sequence container, false otherwise.
      */
     [[nodiscard]] bool is_sequence_container() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_sequence_container);
+        return !!(node.traits & internal::meta_traits::is_sequence_container);
     }
 
     /**
@@ -1277,7 +1265,7 @@ public:
      * @return True if the type is an associative container, false otherwise.
      */
     [[nodiscard]] bool is_associative_container() const noexcept {
-        return static_cast<bool>(node.traits & internal::meta_traits::is_associative_container);
+        return !!(node.traits & internal::meta_traits::is_associative_container);
     }
 
     /**
@@ -1540,7 +1528,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (node.info != nullptr) ? meta_type{*ctx, node} : meta_type{};
+    return meta_type{*ctx, node};
 }
 
 template<typename... Args>
@@ -1815,7 +1803,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator to the first element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::begin() {
-    return begin_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, false);
 }
 
 /**
@@ -1823,7 +1811,7 @@ inline bool meta_sequence_container::reserve(const size_type sz) {
  * @return An iterator that is past the last element of the container.
  */
 [[nodiscard]] inline meta_sequence_container::iterator meta_sequence_container::end() {
-    return end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, true);
 }
 
 /**
@@ -1908,12 +1896,12 @@ inline bool meta_associative_container::reserve(const size_type sz) {
 
 /*! @copydoc meta_sequence_container::begin */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::begin() {
-    return begin_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, false);
 }
 
 /*! @copydoc meta_sequence_container::end */
 [[nodiscard]] inline meta_associative_container::iterator meta_associative_container::end() {
-    return end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data);
+    return begin_end_fn(*ctx, const_only ? nullptr : const_cast<void *>(data), data, true);
 }
 
 /**

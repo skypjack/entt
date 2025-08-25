@@ -726,6 +726,29 @@ public:
     }
 
     /**
+     * @brief Accesses a given element with bounds checking.
+     * @tparam Other Type of the key of an element to find.
+     * @param key A key of an element to find.
+     * @return A reference to the mapped value of the requested element.
+     */
+    template<typename Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, mapped_type const &>>
+    at(const Other &key) const {
+        auto it = find(key);
+        ENTT_ASSERT(it != cend(), "Invalid key");
+        return it->second;
+    }
+
+    /*! @copydoc at */
+    template<typename Other>
+    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, mapped_type &>>
+    at(const Other &key) {
+        auto it = find(key);
+        ENTT_ASSERT(it != end(), "Invalid key");
+        return it->second;
+    }
+
+    /**
      * @brief Accesses or inserts a given element.
      * @param key A key of an element to find or insert.
      * @return A reference to the mapped value of the requested element.

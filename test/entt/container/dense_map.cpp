@@ -960,7 +960,7 @@ TEST(DenseMap, EqualRange) {
 }
 
 TEST(DenseMap, Indexing) {
-    entt::dense_map<int, int> map;
+    entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
     const auto key = 1;
 
@@ -970,16 +970,23 @@ TEST(DenseMap, Indexing) {
 
     ASSERT_TRUE(map.contains(key));
     ASSERT_EQ(map[int{key}], 3);
-    ASSERT_EQ(cmap.at(key), 3);
+
     ASSERT_EQ(map.at(key), 3);
+    ASSERT_EQ(cmap.at(key), 3);
+
+    ASSERT_EQ(map.at(static_cast<double>(key)), 3);
+    ASSERT_EQ(cmap.at(static_cast<double>(key)), 3);
 }
 
 ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
-    entt::dense_map<int, int> map;
+    entt::dense_map<int, int, entt::identity, test::transparent_equal_to> map;
     const auto &cmap = map;
 
-    ASSERT_DEATH([[maybe_unused]] auto value = cmap.at(0), "");
     ASSERT_DEATH([[maybe_unused]] auto value = map.at(3), "");
+    ASSERT_DEATH([[maybe_unused]] auto value = cmap.at(0), "");
+
+    ASSERT_DEATH([[maybe_unused]] auto value = map.at(3.), "");
+    ASSERT_DEATH([[maybe_unused]] auto value = cmap.at(0.), "");
 }
 
 TEST(DenseMap, LocalIterator) {
