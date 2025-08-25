@@ -1107,6 +1107,16 @@ public:
     }
 
     /**
+     * @brief Exchanges the contents with those of a given storage.
+     * @param other Storage to exchange the content with.
+     */
+    void swap(basic_storage &other) noexcept {
+        using std::swap;
+        swap(placeholder, other.placeholder);
+        base_type::swap(other);
+    }
+
+    /**
      * @brief Returns the object assigned to an entity, that is `void`.
      *
      * @warning

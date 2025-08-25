@@ -80,6 +80,8 @@ TEST(StorageEntity, Move) {
 }
 
 TEST(StorageEntity, Swap) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::storage<entt::entity> pool;
     entt::storage<entt::entity> other;
 
@@ -95,6 +97,9 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 2u);
 
+    pool.start_from(entt::entity{99});
+    other.start_from(entt::entity{999});
+
     pool.swap(other);
 
     ASSERT_EQ(pool.info(), entt::type_id<void>());
@@ -102,6 +107,10 @@ TEST(StorageEntity, Swap) {
 
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(other.size(), 1u);
+
+    ASSERT_EQ(pool.generate(), traits_type::construct(2, 1));
+    ASSERT_EQ(pool.generate(), entt::entity{999});
+    ASSERT_EQ(other.generate(), entt::entity{99});
 
     ASSERT_EQ(pool.index(entt::entity{1}), 0u);
     ASSERT_EQ(other.index(entt::entity{4}), 0u);
