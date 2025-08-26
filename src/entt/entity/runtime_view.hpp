@@ -38,8 +38,7 @@ public:
           it{},
           tombstone_check{} {}
 
-    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-    runtime_view_iterator(const std::vector<Set *> &cpools, const std::vector<Set *> &ignore, iterator_type curr) noexcept
+    runtime_view_iterator(const std::vector<Set *> &cpools, iterator_type curr, const std::vector<Set *> &ignore) noexcept
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -263,7 +262,7 @@ public:
      * @return An iterator to the first entity that has the given elements.
      */
     [[nodiscard]] iterator begin() const {
-        return pools.empty() ? iterator{} : iterator{pools, filter, pools.front()->end() - static_cast<difference_type>(offset())};
+        return pools.empty() ? iterator{} : iterator{pools, pools.front()->end() - static_cast<difference_type>(offset()), filter};
     }
 
     /**
@@ -273,7 +272,7 @@ public:
      * given elements.
      */
     [[nodiscard]] iterator end() const {
-        return pools.empty() ? iterator{} : iterator{pools, filter, pools.front()->end()};
+        return pools.empty() ? iterator{} : iterator{pools, pools.front()->end(), filter};
     }
 
     /**
