@@ -909,12 +909,9 @@ public:
      * Attempting to use an entity that already belongs to the storage results
      * in undefined behavior.
      *
-     * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid identifier.
      */
-    template<typename... Args>
-    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-    void emplace(const entity_type entt, Args &&...) {
+    void emplace(const entity_type entt) {
         base_type::try_emplace(entt, false);
     }
 
