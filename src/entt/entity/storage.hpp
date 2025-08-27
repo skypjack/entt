@@ -930,13 +930,11 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It, typename... Args>
-    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-    void insert(It first, It last, Args &&...) {
+    template<typename It>
+    void insert(It first, It last) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
         }
