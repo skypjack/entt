@@ -290,7 +290,7 @@ public:
     meta_any(const meta_ctx &area, const meta_any &other)
         : storage{other.storage},
           ctx{&area},
-          node{(other.node.resolve != nullptr) ? other.node.resolve(internal::meta_context::from(*ctx)) : other.node},
+          node{((ctx != other.ctx) && (other.node.resolve != nullptr)) ? other.node.resolve(internal::meta_context::from(*ctx)) : other.node},
           vtable{other.vtable} {}
 
     /**
@@ -301,7 +301,7 @@ public:
     meta_any(const meta_ctx &area, meta_any &&other)
         : storage{std::move(other.storage)},
           ctx{&area},
-          node{(other.node.resolve != nullptr) ? std::exchange(other.node, internal::meta_type_node{}).resolve(internal::meta_context::from(*ctx)) : std::exchange(other.node, internal::meta_type_node{})},
+          node{((ctx != other.ctx) && (other.node.resolve != nullptr)) ? std::exchange(other.node, internal::meta_type_node{}).resolve(internal::meta_context::from(*ctx)) : std::exchange(other.node, internal::meta_type_node{})},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
     /**
