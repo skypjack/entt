@@ -131,22 +131,6 @@ struct MetaData: ::testing::Test {
 
 using MetaDataDeathTest = MetaData;
 
-TEST_F(MetaData, SafeWhenEmpty) {
-    const entt::meta_data data{};
-
-    ASSERT_FALSE(data);
-    ASSERT_EQ(data, entt::meta_data{});
-    ASSERT_EQ(data.arity(), 0u);
-    ASSERT_FALSE(data.is_const());
-    ASSERT_FALSE(data.is_static());
-    ASSERT_EQ(data.type(), entt::meta_type{});
-    ASSERT_FALSE(data.set({}, 0));
-    ASSERT_FALSE(data.get({}));
-    ASSERT_EQ(data.arg(0u), entt::meta_type{});
-    ASSERT_EQ(data.traits<test::meta_traits>(), test::meta_traits::none);
-    ASSERT_EQ(static_cast<const char *>(data.custom()), nullptr);
-}
-
 TEST_F(MetaData, UserTraits) {
     using namespace entt::literals;
 
@@ -193,12 +177,10 @@ TEST_F(MetaData, Name) {
     ASSERT_EQ(type.data("i"_hs).name(), nullptr);
     ASSERT_STREQ(type.data("j"_hs).name(), "j");
     ASSERT_STREQ(type.data("h"_hs).name(), "hhh");
-    ASSERT_EQ(type.data("none"_hs).name(), nullptr);
 
     ASSERT_EQ(other.data("z"_hs).name(), nullptr);
     ASSERT_STREQ(other.data("w"_hs).name(), "w");
     ASSERT_STREQ(other.data("z_ro"_hs).name(), "readonly");
-    ASSERT_EQ(other.data("none"_hs).name(), nullptr);
 }
 
 TEST_F(MetaData, Comparison) {

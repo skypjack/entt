@@ -35,6 +35,6 @@ TODO:
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * review build process for testbed (i.e. tests first due to SDL)
 * use any for meta_custom_node
-* avoid copying meta_type/data/func nodes, and use unique_ptr for meta_custom
+* avoid copying meta_type nodes, and use unique_ptr for meta_custom
 * paged vector as a standalone class
 * resource: shared_from_this?
