@@ -865,7 +865,7 @@ struct meta_data {
     template<typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(meta_handle instance, Type &&value) const {
-        return (node->set != nullptr) && node->set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+        return node->set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
@@ -874,7 +874,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return (node->get != nullptr) ? node->get(meta_handle{*ctx, std::move(instance)}) : meta_any{meta_ctx_arg, *ctx};
+        return node->get(meta_handle{*ctx, std::move(instance)});
     }
 
     /**
@@ -1004,7 +1004,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return ((node->invoke != nullptr) && (sz == arity())) ? node->invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return (sz == arity()) ? node->invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
