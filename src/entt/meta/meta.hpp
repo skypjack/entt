@@ -587,7 +587,7 @@ public:
 
     /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
-        return (ctx == other.ctx) && (((node.info == nullptr) && (other.node.info == nullptr)) || ((node.info != nullptr) && (other.node.info != nullptr) && *node.info == *other.node.info && storage == other.storage));
+        return (ctx == other.ctx) && (node.info == other.node.info) && (storage == other.storage);
     }
 
     /*! @copydoc any::operator!= */
