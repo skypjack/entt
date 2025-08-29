@@ -804,7 +804,13 @@ private:
 };
 
 /*! @brief Opaque wrapper for data members. */
-struct meta_data {
+class meta_data {
+    [[nodiscard]] auto &node_or_assert() const noexcept {
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
+        return *node;
+    }
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_data_node::size_type;
 
@@ -825,7 +831,7 @@ struct meta_data {
      * @return The name assigned to the data member, if any.
      */
     [[nodiscard]] const char *name() const noexcept {
-        return node->name;
+        return node_or_assert().name;
     }
 
     /**
@@ -833,7 +839,7 @@ struct meta_data {
      * @return The number of setters available.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node->arity;
+        return node_or_assert().arity;
     }
 
     /**
@@ -841,7 +847,7 @@ struct meta_data {
      * @return True if the data member is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_const);
+        return !!(node_or_assert().traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -849,7 +855,7 @@ struct meta_data {
      * @return True if the data member is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_static);
+        return !!(node_or_assert().traits & internal::meta_traits::is_static);
     }
 
     /*! @copydoc meta_any::type */
@@ -865,7 +871,7 @@ struct meta_data {
     template<typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(meta_handle instance, Type &&value) const {
-        return node->set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+        return node_or_assert().set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
@@ -874,7 +880,7 @@ struct meta_data {
      * @return A wrapper containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(meta_handle{*ctx, std::move(instance)});
+        return node_or_assert().get(meta_handle{*ctx, std::move(instance)});
     }
 
     /**
@@ -891,7 +897,7 @@ struct meta_data {
      */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
-        return internal::meta_to_user_traits<Type>(node->traits);
+        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
     }
 
     /**
@@ -899,7 +905,7 @@ struct meta_data {
      * @return User defined arbitrary data.
      */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return {node->custom};
+        return {node_or_assert().custom};
     }
 
     /**
@@ -935,7 +941,13 @@ private:
 }
 
 /*! @brief Opaque wrapper for member functions. */
-struct meta_func {
+class meta_func {
+    [[nodiscard]] auto &node_or_assert() const noexcept {
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
+        return *node;
+    }
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_func_node::size_type;
 
@@ -956,7 +968,7 @@ struct meta_func {
      * @return The name assigned to the member function, if any.
      */
     [[nodiscard]] const char *name() const noexcept {
-        return node->name;
+        return node_or_assert().name;
     }
 
     /**
@@ -964,7 +976,7 @@ struct meta_func {
      * @return The number of arguments accepted by the member function.
      */
     [[nodiscard]] size_type arity() const noexcept {
-        return node->arity;
+        return node_or_assert().arity;
     }
 
     /**
@@ -972,7 +984,7 @@ struct meta_func {
      * @return True if the member function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_const);
+        return !!(node_or_assert().traits & internal::meta_traits::is_const);
     }
 
     /**
@@ -980,7 +992,7 @@ struct meta_func {
      * @return True if the member function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const noexcept {
-        return !!(node->traits & internal::meta_traits::is_static);
+        return !!(node_or_assert().traits & internal::meta_traits::is_static);
     }
 
     /**
@@ -1004,7 +1016,7 @@ struct meta_func {
      * @return A wrapper containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return (sz == arity()) ? node->invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1023,12 +1035,12 @@ struct meta_func {
     /*! @copydoc meta_data::traits */
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
-        return internal::meta_to_user_traits<Type>(node->traits);
+        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
     }
 
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return {node->custom};
+        return {node_or_assert().custom};
     }
 
     /**
@@ -1036,7 +1048,7 @@ struct meta_func {
      * @return The next overload of the given function, if any.
      */
     [[nodiscard]] meta_func next() const {
-        return (node->next != nullptr) ? meta_func{*ctx, *node->next} : meta_func{};
+        return (node_or_assert().next != nullptr) ? meta_func{*ctx, *node_or_assert().next} : meta_func{};
     }
 
     /**
@@ -1588,19 +1600,19 @@ inline bool meta_any::assign(meta_any &&other) {
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
-    return (node->type != nullptr) ? meta_type{*ctx, node->type(internal::meta_context::from(*ctx))} : meta_type{};
+    return meta_type{*ctx, node_or_assert().type(internal::meta_context::from(*ctx))};
 }
 
 [[nodiscard]] inline meta_type meta_data::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(*ctx, index) : meta_type{};
+    return index < arity() ? node_or_assert().arg(*ctx, index) : meta_type{};
 }
 
 [[nodiscard]] inline meta_type meta_func::ret() const noexcept {
-    return (node->ret != nullptr) ? meta_type{*ctx, node->ret(internal::meta_context::from(*ctx))} : meta_type{};
+    return meta_type{*ctx, node_or_assert().ret(internal::meta_context::from(*ctx))};
 }
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
-    return index < arity() ? node->arg(*ctx, index) : meta_type{};
+    return index < arity() ? node_or_assert().arg(*ctx, index) : meta_type{};
 }
 
 /*! @cond TURN_OFF_DOXYGEN */

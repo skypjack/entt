@@ -18,9 +18,9 @@ struct meta_handle;
 
 struct meta_custom;
 
-struct meta_data;
+class meta_data;
 
-struct meta_func;
+class meta_func;
 
 class meta_type;
 
