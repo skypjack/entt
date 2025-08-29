@@ -490,7 +490,7 @@ public:
             return meta_any{meta_ctx_arg, *ctx};
         } else {
             // also support early return for performance reasons
-            return ((node.info != nullptr) && (*node.info == entt::type_id<Type>())) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return (storage.info() == entt::type_id<Type>()) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -505,7 +505,7 @@ public:
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
         } else {
             // also support early return for performance reasons
-            return ((node.info != nullptr) && (*node.info == entt::type_id<Type>())) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return (storage.info() == entt::type_id<Type>()) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
