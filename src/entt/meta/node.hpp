@@ -143,7 +143,6 @@ struct meta_type_node {
     const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
-    meta_type_node (*resolve)(const meta_context &) noexcept {};
     meta_type_node (*remove_pointer)(const meta_context &) noexcept {};
     meta_any (*default_constructor)(const meta_ctx &){};
     double (*conversion_helper)(void *, const void *){};
@@ -276,7 +275,6 @@ template<typename Type>
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve<Type>,
         &resolve<std::remove_cv_t<std::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {

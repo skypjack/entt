@@ -198,6 +198,7 @@ class meta_any {
         : storage{std::move(ref)},
           ctx{other.ctx} {
         if(storage || !other.storage) {
+            resolve = other.resolve;
             node = other.node;
             vtable = other.vtable;
         }
@@ -235,7 +236,8 @@ public:
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           ctx{&area},
-          node{internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))},
+          resolve{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>},
+          node{resolve(internal::meta_context::from(*ctx))},
           vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
 
     /**
@@ -258,7 +260,8 @@ public:
         : storage{std::in_place, value},
           ctx{&area} {
         if(storage) {
-            node = internal::resolve<Type>(internal::meta_context::from(*ctx));
+            resolve = &internal::resolve<Type>;
+            node = resolve(internal::meta_context::from(*ctx));
             vtable = &basic_vtable<Type>;
         }
     }
@@ -290,7 +293,8 @@ public:
     meta_any(const meta_ctx &area, const meta_any &other)
         : storage{other.storage},
           ctx{&area},
-          node{((ctx != other.ctx) && (other.node.resolve != nullptr)) ? other.node.resolve(internal::meta_context::from(*ctx)) : other.node},
+          resolve{other.resolve},
+          node{((ctx != other.ctx) && (resolve != nullptr)) ? resolve(internal::meta_context::from(*ctx)) : other.node},
           vtable{other.vtable} {}
 
     /**
@@ -301,7 +305,8 @@ public:
     meta_any(const meta_ctx &area, meta_any &&other)
         : storage{std::move(other.storage)},
           ctx{&area},
-          node{((ctx != other.ctx) && (other.node.resolve != nullptr)) ? std::exchange(other.node, internal::meta_type_node{}).resolve(internal::meta_context::from(*ctx)) : std::exchange(other.node, internal::meta_type_node{})},
+          resolve{std::exchange(other.resolve, nullptr)},
+          node{((ctx != other.ctx) && (resolve != nullptr)) ? resolve(internal::meta_context::from(*ctx)) : std::exchange(other.node, internal::meta_type_node{})},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
     /**
@@ -317,6 +322,7 @@ public:
     meta_any(meta_any &&other) noexcept
         : storage{std::move(other.storage)},
           ctx{other.ctx},
+          resolve{std::exchange(other.resolve, nullptr)},
           node{std::exchange(other.node, internal::meta_type_node{})},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
@@ -335,6 +341,7 @@ public:
             release();
             storage = other.storage;
             ctx = other.ctx;
+            resolve = other.resolve;
             node = other.node;
             vtable = other.vtable;
         }
@@ -355,6 +362,7 @@ public:
         reset();
         storage = std::move(other.storage);
         ctx = other.ctx;
+        resolve = std::exchange(other.resolve, nullptr);
         node = std::exchange(other.node, internal::meta_type_node{});
         vtable = std::exchange(other.vtable, nullptr);
         return *this;
@@ -514,7 +522,8 @@ public:
     void emplace(Args &&...args) {
         release();
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx));
+        resolve = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>;
+        node = resolve(internal::meta_context::from(*ctx));
         vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
     }
 
@@ -528,6 +537,7 @@ public:
     void reset() {
         release();
         storage.reset();
+        resolve = nullptr;
         node = {};
         vtable = nullptr;
     }
@@ -624,6 +634,7 @@ public:
 private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    internal::meta_type_node (*resolve)(const internal::meta_context &) noexcept {};
     internal::meta_type_node node{};
     vtable_type *vtable{};
 };
