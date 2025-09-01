@@ -1603,7 +1603,7 @@ inline bool meta_any::assign(const meta_any &other) {
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    if(*node.info == *other.node.info) {
+    if(storage.info() == other.storage.info()) {
         return storage.assign(std::move(other.storage));
     }
 
