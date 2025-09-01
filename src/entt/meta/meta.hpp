@@ -592,12 +592,12 @@ public:
      * @return False if the wrapper is invalid, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(node.info == nullptr);
+        return !(vtable == nullptr);
     }
 
     /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
-        return (ctx == other.ctx) && (node.info == other.node.info) && (storage == other.storage);
+        return (ctx == other.ctx) && (resolve == other.resolve) && (storage == other.storage);
     }
 
     /*! @copydoc any::operator!= */
