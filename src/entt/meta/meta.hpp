@@ -424,7 +424,8 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
-        return static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<std::remove_cv_t<Type>>(), storage.data()));
+        const auto *elem = any_cast<const Type>(&storage);
+        return (elem != nullptr) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<std::remove_cv_t<Type>>(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -433,8 +434,9 @@ public:
         if constexpr(std::is_const_v<Type>) {
             return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
         } else {
+            auto *elem = any_cast<Type>(&storage);
             // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<Type>(), storage.data())));
+            return (elem != nullptr) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<Type>(), storage.data())));
         }
     }
 
