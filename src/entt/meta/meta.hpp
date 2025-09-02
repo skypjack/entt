@@ -1596,7 +1596,11 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 inline bool meta_any::assign(const meta_any &other) {
-    auto value = other.allow_cast({*ctx, node});
+    if(storage.info() == other.storage.info()) {
+        return storage.assign(other.storage);
+    }
+
+    auto value = other.allow_cast(type());
     return value && storage.assign(value.storage);
 }
 
