@@ -495,7 +495,6 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return meta_any{meta_ctx_arg, *ctx};
         } else {
-            // also support early return for performance reasons
             return (storage.info() == entt::type_id<Type>()) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
@@ -510,7 +509,6 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
         } else {
-            // also support early return for performance reasons
             return (storage.info() == entt::type_id<Type>()) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
@@ -1605,11 +1603,7 @@ inline bool meta_any::assign(const meta_any &other) {
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    if(storage.info() == other.storage.info()) {
-        return storage.assign(std::move(other.storage));
-    }
-
-    return assign(std::as_const(other));
+    return (storage.info() == other.storage.info()) ? storage.assign(std::move(other.storage)) : assign(std::as_const(other));
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
