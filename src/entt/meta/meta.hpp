@@ -157,34 +157,40 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    using vtable_type = void(const meta_ctx &, void *, const void *, void *);
+    using vtable_type = void(const internal::meta_traits, const meta_ctx &, void *, const void *, void *);
 
     template<typename Type>
-    static void basic_vtable([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *value, [[maybe_unused]] const void *as_const, [[maybe_unused]] void *other) {
+    static void basic_vtable([[mayb_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *value, [[maybe_unused]] const void *as_const, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(is_meta_pointer_like_v<Type>) {
-            if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(as_const));
-            } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
-                using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
+            if(req == internal::meta_traits::is_pointer_like) {
+                if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
+                    static_cast<meta_any *>(other)->emplace<Type>(*static_cast<const Type *>(as_const));
+                } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
+                    using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
 
-                if constexpr(std::is_constructible_v<bool, Type>) {
-                    if(const auto &pointer_like = *static_cast<const Type *>(as_const); pointer_like) {
-                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
+                    if constexpr(std::is_constructible_v<bool, Type>) {
+                        if(const auto &pointer_like = *static_cast<const Type *>(as_const); pointer_like) {
+                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
+                        }
+                    } else {
+                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(as_const)));
                     }
-                } else {
-                    static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(as_const)));
                 }
             }
         }
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-            *static_cast<meta_sequence_container *>(other) = (value == nullptr) ? meta_sequence_container{area, *static_cast<const Type *>(as_const)} : meta_sequence_container{area, *static_cast<Type *>(value)};
+            if(req == internal::meta_traits::is_sequence_container) {
+                *static_cast<meta_sequence_container *>(other) = (value == nullptr) ? meta_sequence_container{area, *static_cast<const Type *>(as_const)} : meta_sequence_container{area, *static_cast<Type *>(value)};
+            }
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-            *static_cast<meta_associative_container *>(other) = (value == nullptr) ? meta_associative_container{area, *static_cast<const Type *>(as_const)} : meta_associative_container{area, *static_cast<Type *>(value)};
+            if(req == internal::meta_traits::is_associative_container) {
+                *static_cast<meta_associative_container *>(other) = (value == nullptr) ? meta_associative_container{area, *static_cast<const Type *>(as_const)} : meta_associative_container{area, *static_cast<Type *>(value)};
+            }
         }
     }
 
@@ -546,14 +552,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy{};
-        if(!!(node.traits & internal::meta_traits::is_sequence_container)) { vtable(*ctx, storage.data(), std::as_const(storage).data(), &proxy); }
+        if(vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container, *ctx, storage.data(), std::as_const(storage).data(), &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{};
-        if(!!(node.traits & internal::meta_traits::is_sequence_container)) { vtable(*ctx, nullptr, storage.data(), &proxy); }
+        if(vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container, *ctx, nullptr, storage.data(), &proxy); }
         return proxy;
     }
 
@@ -563,14 +569,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy{};
-        if(!!(node.traits & internal::meta_traits::is_associative_container)) { vtable(*ctx, storage.data(), std::as_const(storage).data(), &proxy); }
+        if(vtable != nullptr) { vtable(internal::meta_traits::is_associative_container, *ctx, storage.data(), std::as_const(storage).data(), &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{};
-        if(!!(node.traits & internal::meta_traits::is_associative_container)) { vtable(*ctx, nullptr, storage.data(), &proxy); }
+        if(vtable != nullptr) { vtable(internal::meta_traits::is_associative_container, *ctx, nullptr, storage.data(), &proxy); }
         return proxy;
     }
 
@@ -581,7 +587,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        if(!!(node.traits & internal::meta_traits::is_pointer_like)) { vtable(*ctx, nullptr, storage.data(), &ret); }
+        if(vtable != nullptr) { vtable(internal::meta_traits::is_pointer_like, *ctx, nullptr, storage.data(), &ret); }
         return ret;
     }
 
