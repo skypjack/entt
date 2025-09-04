@@ -33,3 +33,4 @@ TODO:
 * paged vector as a standalone class
 * resource: shared_from_this?
 * meta perf: the node in the meta_any is pretty much irrelevant, but it affects perf a lot
+* change meta_any::base name, it's confusing due to meta_base_node and base types in meta
