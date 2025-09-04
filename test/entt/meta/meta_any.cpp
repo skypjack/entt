@@ -39,15 +39,10 @@ struct empty {
     empty &operator=(const empty &) = default;
 
     virtual ~empty() {
-        ++destructor_counter;
+        ++counter;
     }
 
-    static void destroy(empty &) {
-        ++destroy_counter;
-    }
-
-    inline static int destroy_counter = 0;    // NOLINT
-    inline static int destructor_counter = 0; // NOLINT
+    inline static int counter = 0; // NOLINT
 };
 
 struct fat: empty {
@@ -94,13 +89,11 @@ struct MetaAny: ::testing::Test {
         using namespace entt::literals;
 
         entt::meta_factory<empty>{}
-            .type("empty"_hs)
-            .dtor<empty::destroy>();
+            .type("empty"_hs);
 
         entt::meta_factory<fat>{}
             .type("fat"_hs)
-            .base<empty>()
-            .dtor<fat::destroy>();
+            .base<empty>();
 
         entt::meta_factory<clazz>{}
             .type("clazz"_hs)
@@ -109,8 +102,7 @@ struct MetaAny: ::testing::Test {
             .func<clazz::func>("func"_hs)
             .conv<int>();
 
-        empty::destroy_counter = 0;
-        empty::destructor_counter = 0;
+        empty::counter = 0;
     }
 
     void TearDown() override {
@@ -1024,8 +1016,7 @@ TEST_F(MetaAny, SBODestruction) {
         any = std::move(other);
     }
 
-    ASSERT_EQ(empty::destroy_counter, 3);
-    ASSERT_EQ(empty::destructor_counter, 6);
+    ASSERT_EQ(empty::counter, 6);
 }
 
 TEST_F(MetaAny, NoSBODestruction) {
@@ -1037,8 +1028,7 @@ TEST_F(MetaAny, NoSBODestruction) {
         any = std::move(other);
     }
 
-    ASSERT_EQ(fat::destroy_counter, 3);
-    ASSERT_EQ(empty::destructor_counter, 4);
+    ASSERT_EQ(empty::counter, 4);
 }
 
 TEST_F(MetaAny, VoidDestruction) {

@@ -194,12 +194,6 @@ class meta_any {
         }
     }
 
-    void release() {
-        if(storage.owner() && (node.dtor.dtor != nullptr)) {
-            node.dtor.dtor(storage.data());
-        }
-    }
-
     meta_any(const meta_any &other, any ref) noexcept
         : storage{std::move(ref)},
           ctx{other.ctx} {
@@ -333,9 +327,7 @@ public:
           vtable{std::exchange(other.vtable, nullptr)} {}
 
     /*! @brief Frees the internal storage, whatever it means. */
-    ~meta_any() {
-        release();
-    }
+    ~meta_any() = default;
 
     /**
      * @brief Copy assignment operator.
@@ -344,7 +336,6 @@ public:
      */
     meta_any &operator=(const meta_any &other) {
         if(this != &other) {
-            release();
             storage = other.storage;
             ctx = other.ctx;
             resolve = other.resolve;
@@ -524,7 +515,6 @@ public:
     /*! @copydoc any::emplace */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
-        release();
         storage.emplace<Type>(std::forward<Args>(args)...);
         resolve = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>;
         node = resolve(internal::meta_context::from(*ctx));
@@ -539,7 +529,6 @@ public:
 
     /*! @copydoc any::reset */
     void reset() {
-        release();
         storage.reset();
         resolve = nullptr;
         node = {};

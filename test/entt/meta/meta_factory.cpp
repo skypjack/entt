@@ -49,18 +49,6 @@ private:
     int value{};
 };
 
-struct dtor_callback {
-    dtor_callback(bool &ref)
-        : cb{&ref} {}
-
-    static void on_destroy(dtor_callback &instance) {
-        *instance.cb = !*instance.cb;
-    }
-
-private:
-    bool *cb;
-};
-
 struct MetaFactory: ::testing::Test {
     void TearDown() override {
         entt::meta_reset();
@@ -173,22 +161,6 @@ TEST_F(MetaFactory, Ctor) {
     ASSERT_TRUE(other.allow_cast<clazz>());
     ASSERT_EQ(instance.cast<const clazz &>().get_int(), values[0u]);
     ASSERT_EQ(other.cast<const clazz &>().get_int(), values[1u]);
-}
-
-TEST_F(MetaFactory, Dtor) {
-    bool check = false;
-    entt::meta_factory<dtor_callback> factory{};
-    entt::meta_any any{std::in_place_type<dtor_callback>, check};
-
-    any.reset();
-
-    ASSERT_FALSE(check);
-
-    factory.dtor<&dtor_callback::on_destroy>();
-    any.emplace<dtor_callback>(check);
-    any.reset();
-
-    ASSERT_TRUE(check);
 }
 
 TEST_F(MetaFactory, DataMemberObject) {

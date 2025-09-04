@@ -87,10 +87,6 @@ struct meta_ctor_node {
     meta_any (*invoke)(const meta_ctx &, meta_any *const){};
 };
 
-struct meta_dtor_node {
-    void (*dtor)(void *){};
-};
-
 struct meta_data_node {
     using size_type = std::size_t;
 
@@ -148,7 +144,6 @@ struct meta_type_node {
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(const meta_ctx &, void *, const void *){};
     meta_template_node templ{};
-    meta_dtor_node dtor{};
     meta_custom_node custom{};
     std::shared_ptr<meta_type_descriptor> details;
 };

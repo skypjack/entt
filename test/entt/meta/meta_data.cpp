@@ -17,12 +17,6 @@
 
 struct base {
     virtual ~base() = default;
-
-    static void destroy(base &) {
-        ++counter;
-    }
-
-    inline static int counter = 0; // NOLINT
     int value{3};
 };
 
@@ -81,13 +75,11 @@ struct MetaData: ::testing::Test {
 
         entt::meta_factory<base>{}
             .type("base"_hs)
-            .dtor<base::destroy>()
             .data<&base::value>("value"_hs);
 
         entt::meta_factory<derived>{}
             .type("derived"_hs)
             .base<base>()
-            .dtor<derived::destroy>()
             .data<&base::value>("value_from_base"_hs);
 
         entt::meta_factory<clazz>{}
@@ -120,8 +112,6 @@ struct MetaData: ::testing::Test {
             .type("array"_hs)
             .data<&array::global>("global"_hs)
             .data<&array::local>("local"_hs);
-
-        base::counter = 0;
     }
 
     void TearDown() override {
@@ -318,10 +308,13 @@ TEST_F(MetaData, SetCast) {
     using namespace entt::literals;
 
     clazz instance{};
+    derived other{};
 
-    ASSERT_EQ(base::counter, 0);
-    ASSERT_TRUE(entt::resolve<clazz>().data("base"_hs).set(instance, derived{}));
-    ASSERT_EQ(base::counter, 1);
+    other.value = 1;
+
+    ASSERT_EQ(instance.instance.value, 3);
+    ASSERT_TRUE(entt::resolve<clazz>().data("base"_hs).set(instance, other));
+    ASSERT_EQ(instance.instance.value, 1);
 }
 
 TEST_F(MetaData, SetConvert) {

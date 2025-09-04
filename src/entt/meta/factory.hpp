@@ -75,11 +75,6 @@ protected:
         }
     }
 
-    void dtor(meta_dtor_node node) {
-        reset_bucket(parent);
-        meta_context::from(*ctx).value[parent].dtor = node;
-    }
-
     void data(meta_data_node node) {
         reset_bucket(node.id);
 
@@ -281,32 +276,6 @@ public:
             base_type::insert_or_assign(internal::meta_ctor_node{type_id<typename descriptor::args_type>().hash(), descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Args...>});
         }
 
-        return *this;
-    }
-
-    /**
-     * @brief Assigns a meta destructor to a meta type.
-     *
-     * Both free functions and member functions can be assigned to meta types in
-     * the role of destructors.<br/>
-     * The signature of a free function should be identical to the following:
-     *
-     * @code{.cpp}
-     * void(Type &);
-     * @endcode
-     *
-     * Member functions should not take arguments instead.<br/>
-     * The purpose is to give users the ability to free up resources that
-     * require special treatment before an object is actually destroyed.
-     *
-     * @tparam Func The actual function to use as a destructor.
-     * @return A meta factory for the parent type.
-     */
-    template<auto Func>
-    meta_factory dtor() noexcept {
-        static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
-        auto *const op = +[](void *instance) { std::invoke(Func, *static_cast<Type *>(instance)); };
-        base_type::dtor(internal::meta_dtor_node{op});
         return *this;
     }
 
