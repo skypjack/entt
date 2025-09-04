@@ -46,10 +46,6 @@
 			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
-	<Type Name="entt::internal::meta_dtor_node">
-		<DisplayString>{{}}</DisplayString>
-		<Expand/>
-	</Type>	
 	<Type Name="entt::internal::meta_func_node"	>
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
