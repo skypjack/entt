@@ -20,9 +20,7 @@ struct base {
     int value{3};
 };
 
-struct derived: base {
-    derived() = default;
-};
+struct derived: base {};
 
 struct clazz {
     operator int() const {
