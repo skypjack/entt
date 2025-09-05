@@ -214,14 +214,14 @@ template<typename... Args>
 }
 
 template<typename Func>
-[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const type_info &to, const bool arithmetic_or_enum, const void *instance, Func func) {
-    if(from.info && *from.info == to) {
+[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const id_type to, const bool arithmetic_or_enum, const void *instance, Func func) {
+    if(from.info && from.info->hash() == to) {
         return func(instance, from);
     }
 
     if(from.details) {
         for(auto &&elem: from.details->conv) {
-            if(elem.type == to.hash()) {
+            if(elem.type == to) {
                 return func(instance, elem);
             }
         }
