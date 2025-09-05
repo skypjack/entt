@@ -422,7 +422,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return (elem != nullptr) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<std::remove_cv_t<Type>>(), storage.data()));
+        return (elem != nullptr) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -433,7 +433,7 @@ public:
         } else {
             auto *elem = any_cast<Type>(&storage);
             // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return (elem != nullptr) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<Type>(), storage.data())));
+            return (elem != nullptr) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), node, type_id<Type>().hash(), storage.data())));
         }
     }
 
@@ -1326,7 +1326,7 @@ public:
      */
     [[nodiscard]] bool can_cast(const meta_type &other) const noexcept {
         // casting this is UB in all cases but we aren't going to use the resulting pointer, so...
-        return other && (internal::try_cast(internal::meta_context::from(*ctx), node, *other.node.info, this) != nullptr);
+        return other && ((*this == other) || (internal::try_cast(internal::meta_context::from(*ctx), node, other.node.info->hash(), this) != nullptr));
     }
 
     /**
@@ -1524,8 +1524,7 @@ public:
 
     /*! @copydoc meta_data::operator== */
     [[nodiscard]] bool operator==(const meta_type &other) const noexcept {
-        // NOLINTNEXTLINE(clang-analyzer-core.NonNullParamChecker)
-        return (ctx == other.ctx) && ((node.info == nullptr) == (other.node.info == nullptr)) && (node.info == nullptr || (*node.info == *other.node.info));
+        return (ctx == other.ctx) && (node.id == other.node.id);
     }
 
 private:

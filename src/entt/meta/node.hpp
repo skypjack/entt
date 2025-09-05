@@ -199,14 +199,12 @@ template<typename... Args>
     return value(context);
 }
 
-[[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const type_info &to, const void *instance) noexcept {
-    if((from.info != nullptr) && *from.info == to) {
-        return instance;
-    }
-
+[[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const id_type to, const void *instance) noexcept {
     if(from.details) {
         for(auto &&curr: from.details->base) {
-            if(const void *elem = try_cast(context, curr.resolve(context), to, curr.cast(instance)); elem) {
+            if(const void *other = curr.cast(instance); curr.type == to) {
+                return other;
+            } else if(const void *elem = try_cast(context, curr.resolve(context), to, other); elem) {
                 return elem;
             }
         }
