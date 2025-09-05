@@ -1330,7 +1330,7 @@ public:
     }
 
     /**
-     * @brief Checks if a type supports conversion it to another type.
+     * @brief Checks whether a type supports conversion to another type.
      * @param other The meta type to test for.
      * @return True if the conversion is allowed, false otherwise.
      */
