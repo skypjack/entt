@@ -320,11 +320,7 @@ public:
      * @param other The instance to move from.
      */
     meta_any(meta_any &&other) noexcept
-        : storage{std::move(other.storage)},
-          ctx{other.ctx},
-          resolve{std::exchange(other.resolve, nullptr)},
-          node{std::exchange(other.node, internal::meta_type_node{})},
-          vtable{std::exchange(other.vtable, nullptr)} {}
+        : meta_any{*other.ctx, std::move(other)} {}
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() = default;
