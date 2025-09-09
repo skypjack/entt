@@ -110,10 +110,10 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_any">
-		<DisplayString Condition="node.info != nullptr">{{ type={ node.info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
+		<DisplayString>{ storage }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="lazy_node.info != nullptr">lazy_node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
