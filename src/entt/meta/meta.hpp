@@ -328,9 +328,6 @@ public:
     meta_any(meta_any &&other) noexcept
         : meta_any{*other.ctx, std::move(other)} {}
 
-    /*! @brief Frees the internal storage, whatever it means. */
-    ~meta_any() = default;
-
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
