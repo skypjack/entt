@@ -129,6 +129,7 @@ struct meta_type_descriptor {
     std::vector<meta_conv_node> conv;
     std::vector<meta_data_node> data;
     std::vector<meta_func_node> func;
+    meta_custom_node custom{};
 };
 
 struct meta_type_node {
@@ -144,7 +145,6 @@ struct meta_type_node {
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(const meta_ctx &, void *, const void *){};
     meta_template_node templ{};
-    meta_custom_node custom{};
     std::shared_ptr<meta_type_descriptor> details;
 };
 

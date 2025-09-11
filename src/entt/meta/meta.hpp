@@ -1513,7 +1513,7 @@ public:
 
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return {node.custom};
+        return node.details ? meta_custom{node.details->custom} : meta_custom{};
     }
 
     /**
