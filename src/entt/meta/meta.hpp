@@ -783,8 +783,8 @@ struct meta_custom {
      * @brief Basic constructor for meta objects.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_custom(internal::meta_custom_node curr) noexcept
-        : node{std::move(curr)} {}
+    meta_custom(const internal::meta_custom_node &curr) noexcept
+        : node{&curr} {}
 
     /**
      * @brief Generic conversion operator.
@@ -792,7 +792,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type *() const noexcept {
-        return (type_id<Type>().hash() == node.type) ? static_cast<Type *>(node.value.get()) : nullptr;
+        return ((node != nullptr) && (type_id<Type>().hash() == node->type)) ? static_cast<Type *>(node->value.get()) : nullptr;
     }
 
     /**
@@ -801,12 +801,12 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type &() const noexcept {
-        ENTT_ASSERT(type_id<Type>().hash() == node.type, "Invalid type");
-        return *static_cast<Type *>(node.value.get());
+        ENTT_ASSERT((node != nullptr) && (type_id<Type>().hash() == node->type), "Invalid type");
+        return *static_cast<Type *>(node->value.get());
     }
 
 private:
-    internal::meta_custom_node node{};
+    const internal::meta_custom_node *node{};
 };
 
 /*! @brief Opaque wrapper for data members. */
