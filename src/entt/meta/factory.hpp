@@ -92,7 +92,7 @@ protected:
             details->func.emplace_back(std::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
             while(member->next != nullptr) { member = member->next.get(); }
-            member->next = std::make_shared<meta_func_node>(std::move(node));
+            member->next = std::make_unique<meta_func_node>(std::move(node));
         }
     }
 
