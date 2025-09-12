@@ -204,7 +204,7 @@ class meta_any {
         }
     }
 
-    const auto &fetch_node() const {
+    [[nodiscard]] const auto &fetch_node() const {
         if((lazy_node.info == nullptr) && (resolve != nullptr)) {
             lazy_node = resolve(internal::meta_context::from(*ctx));
         }
