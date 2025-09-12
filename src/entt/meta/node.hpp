@@ -240,19 +240,8 @@ template<typename Func>
     return func(instance);
 }
 
-[[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
-    const auto it = context.value.find(info.hash());
-    return it != context.value.end() ? &it->second : nullptr;
-}
-
 template<typename Type>
-[[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
-
-    if(auto *elem = try_resolve(context, type_id<Type>()); elem) {
-        return *elem;
-    }
-
+auto setup_node_for() noexcept {
     meta_type_node node{
         &type_id<Type>(),
         type_id<Type>().hash(),
@@ -309,6 +298,18 @@ template<typename Type>
     }
 
     return node;
+}
+
+[[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
+    const auto it = context.value.find(info.hash());
+    return it != context.value.end() ? &it->second : nullptr;
+}
+
+template<typename Type>
+[[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
+    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
+    const auto *elem = try_resolve(context, type_id<Type>());
+    return (elem == nullptr) ? setup_node_for<Type>() : *elem;
 }
 
 } // namespace internal
