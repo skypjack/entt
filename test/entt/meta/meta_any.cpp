@@ -366,7 +366,7 @@ TEST_F(MetaAny, SBOMoveAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-TEST_F(MetaAnyDeathTest, SBOSelfMoveAssignment) {
+TEST_F(MetaAny, SBOSelfMoveAssignment) {
     entt::meta_any any{3};
 
     // avoid warnings due to self-assignment
@@ -700,7 +700,7 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
     ASSERT_NE(other, fat{});
 }
 
-TEST_F(MetaAnyDeathTest, NoSBOSelfMoveAssignment) {
+TEST_F(MetaAny, NoSBOSelfMoveAssignment) {
     const fat instance{.1, .2, .3, .4};
     entt::meta_any any{instance};
 
@@ -956,7 +956,7 @@ TEST_F(MetaAny, VoidMoveAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(MetaAnyDeathTest, VoidSelfMoveAssignment) {
+TEST_F(MetaAny, VoidSelfMoveAssignment) {
     entt::meta_any any{std::in_place_type<void>};
 
     // avoid warnings due to self-assignment
