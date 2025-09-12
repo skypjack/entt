@@ -108,7 +108,7 @@ protected:
 
     void custom(meta_custom_node node) {
         if(bucket == parent) {
-            meta_context::from(*ctx).value[bucket].details->custom = std::move(node);
+            details->custom = std::move(node);
         } else if(invoke == nullptr) {
             find_member_or_assert()->custom = std::move(node);
         } else {
