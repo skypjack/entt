@@ -516,7 +516,7 @@ public:
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
 
-        if(auto *overload = internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>; overload != resolve) {
+        if(auto *overload = &internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>; overload != resolve) {
             resolve = overload;
             lazy_node = internal::meta_type_node{};
             vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
