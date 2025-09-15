@@ -69,7 +69,7 @@ struct meta_custom_node {
 
 struct meta_base_node {
     id_type type{};
-    meta_type_node (*resolve)(const meta_context &) noexcept {};
+    const meta_type_node &(*resolve)(const meta_context &) noexcept {};
     const void *(*cast)(const void *) noexcept {};
 };
 
@@ -94,7 +94,7 @@ struct meta_data_node {
     const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node (*type)(const meta_context &) noexcept {};
+    const meta_type_node &(*type)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     bool (*set)(meta_handle, meta_any){};
     meta_any (*get)(meta_handle){};
@@ -108,7 +108,7 @@ struct meta_func_node {
     const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type arity{0u};
-    meta_type_node (*ret)(const meta_context &) noexcept {};
+    const meta_type_node &(*ret)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
     std::unique_ptr<meta_func_node> next;
@@ -119,8 +119,8 @@ struct meta_template_node {
     using size_type = std::size_t;
 
     size_type arity{0u};
-    meta_type_node (*resolve)(const meta_context &) noexcept {};
-    meta_type_node (*arg)(const meta_context &, const size_type) noexcept {};
+    const meta_type_node &(*resolve)(const meta_context &) noexcept {};
+    const meta_type_node &(*arg)(const meta_context &, const size_type) noexcept {};
 };
 
 struct meta_type_descriptor {
@@ -140,7 +140,7 @@ struct meta_type_node {
     const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
-    meta_type_node (*remove_pointer)(const meta_context &) noexcept {};
+    const meta_type_node &(*remove_pointer)(const meta_context &) noexcept {};
     meta_any (*default_constructor)(const meta_ctx &){};
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(const meta_ctx &, void *, const void *){};
@@ -184,11 +184,11 @@ template<auto Member>
 }
 
 template<typename Type>
-meta_type_node resolve(const meta_context &) noexcept;
+const meta_type_node &resolve(const meta_context &) noexcept;
 
 template<typename... Args>
-[[nodiscard]] auto meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    meta_type_node (*value)(const meta_context &) noexcept = nullptr;
+[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
+    const meta_type_node &(*value)(const meta_context &) noexcept = nullptr;
 
     if constexpr(sizeof...(Args) != 0u) {
         std::size_t pos{};
@@ -294,7 +294,7 @@ auto setup_node_for() noexcept {
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const meta_context &area, const std::size_t index) noexcept { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const meta_context &area, const std::size_t index) noexcept -> decltype(auto) { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
     }
 
     return node;
@@ -306,10 +306,11 @@ auto setup_node_for() noexcept {
 }
 
 template<typename Type>
-[[nodiscard]] meta_type_node resolve(const meta_context &context) noexcept {
+[[nodiscard]] const meta_type_node &resolve(const meta_context &context) noexcept {
     static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
-    const auto *elem = try_resolve(context, type_id<Type>());
-    return (elem == nullptr) ? setup_node_for<Type>() : *elem;
+    static const meta_type_node node = setup_node_for<Type>();
+    const auto *elem = try_resolve(context, *node.info);
+    return (elem == nullptr) ? node : *elem;
 }
 
 } // namespace internal

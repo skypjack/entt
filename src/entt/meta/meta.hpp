@@ -76,8 +76,8 @@ public:
 private:
     const meta_ctx *ctx{};
     const void *data{};
-    internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
-    internal::meta_type_node (*const_reference_node)(const internal::meta_context &){};
+    const internal::meta_type_node &(*value_type_node)(const internal::meta_context &){};
+    const internal::meta_type_node &(*const_reference_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *){};
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
@@ -142,9 +142,9 @@ public:
 private:
     const meta_ctx *ctx{};
     const void *data{};
-    internal::meta_type_node (*key_type_node)(const internal::meta_context &){};
-    internal::meta_type_node (*mapped_type_node)(const internal::meta_context &){};
-    internal::meta_type_node (*value_type_node)(const internal::meta_context &){};
+    const internal::meta_type_node &(*key_type_node)(const internal::meta_context &){};
+    const internal::meta_type_node &(*mapped_type_node)(const internal::meta_context &){};
+    const internal::meta_type_node &(*value_type_node)(const internal::meta_context &){};
     size_type (*size_fn)(const void *){};
     bool (*clear_fn)(void *){};
     bool (*reserve_fn)(void *, const size_type){};
@@ -629,7 +629,7 @@ public:
 private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
-    internal::meta_type_node (*resolve)(const internal::meta_context &) noexcept {};
+    const internal::meta_type_node &(*resolve)(const internal::meta_context &) noexcept {};
     mutable internal::meta_type_node lazy_node{};
     vtable_type *vtable{};
 };
