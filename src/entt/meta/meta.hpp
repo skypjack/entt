@@ -204,9 +204,9 @@ class meta_any {
         }
     }
 
-    [[nodiscard]] const auto &fetch_node() const {
-        if((lazy_node.info == nullptr) && (resolve != nullptr)) {
-            lazy_node = resolve(internal::meta_context::from(*ctx));
+    [[nodiscard]] const auto *fetch_node() const {
+        if((lazy_node == nullptr) && (resolve != nullptr)) {
+            lazy_node = &resolve(internal::meta_context::from(*ctx));
         }
 
         return lazy_node;
@@ -300,7 +300,7 @@ public:
         : storage{other.storage},
           ctx{&area},
           resolve{other.resolve},
-          lazy_node{(ctx == other.ctx) ? other.lazy_node : internal::meta_type_node{}},
+          lazy_node{(ctx == other.ctx) ? other.lazy_node : nullptr},
           vtable{other.vtable} {}
 
     /**
@@ -312,7 +312,7 @@ public:
         : storage{std::move(other.storage)},
           ctx{&area},
           resolve{std::exchange(other.resolve, nullptr)},
-          lazy_node{(ctx == other.ctx) ? std::exchange(other.lazy_node, internal::meta_type_node{}) : internal::meta_type_node{}},
+          lazy_node{(ctx == other.ctx) ? std::exchange(other.lazy_node, nullptr) : nullptr},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
     /**
@@ -359,7 +359,7 @@ public:
         storage = std::move(other.storage);
         ctx = other.ctx;
         resolve = std::exchange(other.resolve, nullptr);
-        lazy_node = std::exchange(other.lazy_node, internal::meta_type_node{});
+        lazy_node = std::exchange(other.lazy_node, nullptr);
         vtable = std::exchange(other.vtable, nullptr);
         return *this;
     }
@@ -421,7 +421,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return (elem != nullptr) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
+        return ((elem != nullptr) || (fetch_node() == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), *fetch_node(), type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -432,7 +432,7 @@ public:
         } else {
             auto *elem = any_cast<Type>(&storage);
             // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return (elem != nullptr) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<Type>().hash(), storage.data())));
+            return ((elem != nullptr) || (fetch_node() == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), *fetch_node(), type_id<Type>().hash(), storage.data())));
         }
     }
 
@@ -518,7 +518,7 @@ public:
 
         if(auto *overload = &internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>; overload != resolve) {
             resolve = overload;
-            lazy_node = internal::meta_type_node{};
+            lazy_node = nullptr;
             vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
         }
     }
@@ -630,7 +630,7 @@ private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     const internal::meta_type_node &(*resolve)(const internal::meta_context &) noexcept {};
-    mutable internal::meta_type_node lazy_node{};
+    mutable const internal::meta_type_node *lazy_node{};
     vtable_type *vtable{};
 };
 
@@ -1152,8 +1152,8 @@ public:
      * @param area The context from which to search for meta types.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_type(const meta_ctx &area, internal::meta_type_node curr) noexcept
-        : node{std::move(curr)},
+    meta_type(const meta_ctx &area, const internal::meta_type_node &curr) noexcept
+        : node{curr},
           ctx{&area} {}
 
     /**
@@ -1545,7 +1545,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return meta_type{*ctx, fetch_node()};
+    return (fetch_node() == nullptr) ? meta_type{} : meta_type{*ctx, *fetch_node()};
 }
 
 template<typename... Args>
@@ -1573,22 +1573,28 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    return (storage.info() == type.info()) ? as_ref() : internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
-        if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
-            return (args.from_void(*ctx, nullptr, instance), ...);
-        } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
-            return (args.conv(*ctx, instance), ...);
-        } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, decltype(internal::meta_type_node::conversion_helper)> || ...)) {
-            // exploits the fact that arithmetic types and enums are also default constructible
-            auto other = type.construct();
-            const auto value = (args(nullptr, instance), ...);
-            other.fetch_node().conversion_helper(other.storage.data(), &value);
-            return other;
-        } else {
-            // forwards to force a compile-time error in case of available arguments
-            return meta_any{meta_ctx_arg, *ctx, std::forward<decltype(args)>(args)...};
-        }
-    });
+    if(storage.info() == type.info()) {
+        return as_ref();
+    } else if(fetch_node() != nullptr) {
+        return internal::try_convert(internal::meta_context::from(*ctx), *fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
+            if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
+                return (args.from_void(*ctx, nullptr, instance), ...);
+            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
+                return (args.conv(*ctx, instance), ...);
+            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, decltype(internal::meta_type_node::conversion_helper)> || ...)) {
+                // exploits the fact that arithmetic types and enums are also default constructible
+                auto other = type.construct();
+                const auto value = (args(nullptr, instance), ...);
+                other.fetch_node()->conversion_helper(other.storage.data(), &value);
+                return other;
+            } else {
+                // forwards to force a compile-time error in case of available arguments
+                return meta_any{meta_ctx_arg, *ctx, std::forward<decltype(args)>(args)...};
+            }
+        });
+    }
+
+    return meta_any{};
 }
 
 inline bool meta_any::assign(const meta_any &other) {
