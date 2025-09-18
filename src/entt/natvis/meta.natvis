@@ -106,14 +106,14 @@
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
 			<Item Name="[template_info]">templ</Item>
-			<Item Name="[details]" Condition="!(details == nullptr)">*details</Item>
+			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_any">
 		<DisplayString>{ storage }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="lazy_node.info != nullptr">lazy_node</ExpandedItem>
+			<ExpandedItem Condition="lazy_node != nullptr">lazy_node,na</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
