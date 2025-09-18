@@ -205,62 +205,6 @@ TEST_F(MetaType, Resolve) {
     ASSERT_TRUE(found);
 }
 
-TEST_F(MetaType, SafeWhenEmpty) {
-    using namespace entt::literals;
-
-    entt::meta_type type{};
-    entt::meta_any *args = nullptr;
-
-    ASSERT_FALSE(type);
-    ASSERT_EQ(type, entt::meta_type{});
-    ASSERT_EQ(type.info(), entt::type_id<void>());
-    ASSERT_EQ(type.id(), entt::id_type{});
-    ASSERT_EQ(type.size_of(), 0u);
-    ASSERT_FALSE(type.is_arithmetic());
-    ASSERT_FALSE(type.is_integral());
-    ASSERT_FALSE(type.is_signed());
-    ASSERT_FALSE(type.is_array());
-    ASSERT_FALSE(type.is_enum());
-    ASSERT_FALSE(type.is_class());
-    ASSERT_FALSE(type.is_pointer());
-    ASSERT_EQ(type.remove_pointer(), type);
-    ASSERT_FALSE(type.is_pointer_like());
-    ASSERT_FALSE(type.is_sequence_container());
-    ASSERT_FALSE(type.is_associative_container());
-    ASSERT_FALSE(type.is_template_specialization());
-    ASSERT_EQ(type.template_arity(), 0u);
-    ASSERT_EQ(type.template_type(), type);
-    ASSERT_EQ(type.template_arg(0u), type);
-    ASSERT_EQ(type.template_arg(1u), type);
-    ASSERT_FALSE(type.can_cast(type));
-    ASSERT_FALSE(type.can_cast(entt::resolve<void>()));
-    ASSERT_FALSE(type.can_convert(type));
-    ASSERT_FALSE(type.can_convert(entt::resolve<void>()));
-    ASSERT_EQ(type.base().begin(), type.base().end());
-    ASSERT_EQ(type.data().begin(), type.data().end());
-    ASSERT_EQ(type.data("data"_hs), entt::meta_data{});
-    ASSERT_EQ(type.func().begin(), type.func().end());
-    ASSERT_EQ(type.func("func"_hs), entt::meta_func{});
-    ASSERT_FALSE(type.construct(args, 0u));
-    ASSERT_FALSE(type.construct(args, 1u));
-    ASSERT_FALSE(type.construct());
-    ASSERT_FALSE(type.construct(0.0));
-    ASSERT_FALSE(type.from_void(static_cast<void *>(nullptr)));
-    ASSERT_FALSE(type.from_void(static_cast<void *>(nullptr), true));
-    ASSERT_FALSE(type.from_void(static_cast<void *>(&type)));
-    ASSERT_FALSE(type.from_void(static_cast<void *>(&type), true));
-    ASSERT_FALSE(type.from_void(static_cast<const void *>(nullptr)));
-    ASSERT_FALSE(type.from_void(static_cast<const void *>(&type)));
-    ASSERT_FALSE(type.invoke("func"_hs, {}, args, 0u));
-    ASSERT_FALSE(type.invoke("func"_hs, {}, args, 1u));
-    ASSERT_FALSE(type.invoke("func"_hs, {}));
-    ASSERT_FALSE(type.invoke("func"_hs, {}, 'c'));
-    ASSERT_FALSE(type.set("data"_hs, {}, 0));
-    ASSERT_FALSE(type.get("data"_hs, {}));
-    ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::none);
-    ASSERT_EQ(static_cast<const char *>(type.custom()), nullptr);
-}
-
 TEST_F(MetaType, UserTraits) {
     ASSERT_EQ(entt::resolve<bool>().traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(entt::resolve<clazz>().traits<test::meta_traits>(), test::meta_traits::none);
