@@ -113,7 +113,7 @@
 		<DisplayString>{ storage }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="lazy_node != nullptr">lazy_node,na</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node,na</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
