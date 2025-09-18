@@ -204,12 +204,9 @@ class meta_any {
         }
     }
 
-    [[nodiscard]] const auto *fetch_node() const {
-        if((node == nullptr) && (resolve != nullptr)) {
-            node = &resolve(internal::meta_context::from(*ctx));
-        }
-
-        return node;
+    [[nodiscard]] const auto &fetch_node() const {
+        ENTT_ASSERT(resolve != nullptr, "Invalid resolve function");
+        return (node == nullptr) ? *(node = &resolve(internal::meta_context::from(*ctx))) : *node;
     }
 
 public:
@@ -421,7 +418,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return ((elem != nullptr) || (fetch_node() == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), *fetch_node(), type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
+        return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -432,7 +429,7 @@ public:
         } else {
             auto *elem = any_cast<Type>(&storage);
             // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return ((elem != nullptr) || (fetch_node() == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), *fetch_node(), type_id<Type>().hash(), storage.data())));
+            return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<Type>().hash(), storage.data())));
         }
     }
 
@@ -1550,7 +1547,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (fetch_node() == nullptr) ? meta_type{} : meta_type{*ctx, *fetch_node()};
+    return (resolve == nullptr) ? meta_type{} : meta_type{*ctx, fetch_node()};
 }
 
 template<typename... Args>
@@ -1580,8 +1577,8 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
     if(storage.info() == type.info()) {
         return as_ref();
-    } else if(fetch_node() != nullptr) {
-        return internal::try_convert(internal::meta_context::from(*ctx), *fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
+    } else if(resolve != nullptr) {
+        return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
             if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
                 return (args.from_void(*ctx, nullptr, instance), ...);
             } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
@@ -1590,7 +1587,7 @@ bool meta_any::set(const id_type id, Type &&value) {
                 // exploits the fact that arithmetic types and enums are also default constructible
                 auto other = type.construct();
                 const auto value = (args(nullptr, instance), ...);
-                other.fetch_node()->conversion_helper(other.storage.data(), &value);
+                other.fetch_node().conversion_helper(other.storage.data(), &value);
                 return other;
             } else {
                 // forwards to force a compile-time error in case of available arguments
