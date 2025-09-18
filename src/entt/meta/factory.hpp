@@ -32,17 +32,17 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
-    auto &fetch_node() noexcept {
+    [[nodiscard]] auto &fetch_node() noexcept {
         return meta_context::from(*ctx).value[parent];
     }
 
-    auto *find_member_or_assert() {
+    [[nodiscard]] auto *find_member_or_assert() {
         auto *member = find_member<&meta_data_node::id>(fetch_node().details->data, bucket);
         ENTT_ASSERT(member != nullptr, "Cannot find member");
         return member;
     }
 
-    auto *find_overload_or_assert() {
+    [[nodiscard]] auto *find_overload_or_assert() {
         auto *overload = find_overload(find_member<&meta_func_node::id>(fetch_node().details->func, bucket), invoke);
         ENTT_ASSERT(overload != nullptr, "Cannot find overload");
         return overload;
