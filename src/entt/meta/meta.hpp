@@ -199,17 +199,17 @@ class meta_any {
           ctx{other.ctx} {
         if(storage || !other.storage) {
             resolve = other.resolve;
-            lazy_node = other.lazy_node;
+            node = other.node;
             vtable = other.vtable;
         }
     }
 
     [[nodiscard]] const auto *fetch_node() const {
-        if((lazy_node == nullptr) && (resolve != nullptr)) {
-            lazy_node = &resolve(internal::meta_context::from(*ctx));
+        if((node == nullptr) && (resolve != nullptr)) {
+            node = &resolve(internal::meta_context::from(*ctx));
         }
 
-        return lazy_node;
+        return node;
     }
 
 public:
@@ -300,7 +300,7 @@ public:
         : storage{other.storage},
           ctx{&area},
           resolve{other.resolve},
-          lazy_node{(ctx == other.ctx) ? other.lazy_node : nullptr},
+          node{(ctx == other.ctx) ? other.node : nullptr},
           vtable{other.vtable} {}
 
     /**
@@ -312,7 +312,7 @@ public:
         : storage{std::move(other.storage)},
           ctx{&area},
           resolve{std::exchange(other.resolve, nullptr)},
-          lazy_node{(ctx == other.ctx) ? std::exchange(other.lazy_node, nullptr) : nullptr},
+          node{(ctx == other.ctx) ? std::exchange(other.node, nullptr) : nullptr},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
     /**
@@ -338,7 +338,7 @@ public:
             storage = other.storage;
             ctx = other.ctx;
             resolve = other.resolve;
-            lazy_node = other.lazy_node;
+            node = other.node;
             vtable = other.vtable;
         }
 
@@ -359,7 +359,7 @@ public:
         storage = std::move(other.storage);
         ctx = other.ctx;
         resolve = std::exchange(other.resolve, nullptr);
-        lazy_node = std::exchange(other.lazy_node, nullptr);
+        node = std::exchange(other.node, nullptr);
         vtable = std::exchange(other.vtable, nullptr);
         return *this;
     }
@@ -518,7 +518,7 @@ public:
 
         if(auto *overload = &internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>; overload != resolve) {
             resolve = overload;
-            lazy_node = nullptr;
+            node = nullptr;
             vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
         }
     }
@@ -533,7 +533,7 @@ public:
     void reset() {
         storage.reset();
         resolve = nullptr;
-        lazy_node = {};
+        node = {};
         vtable = nullptr;
     }
 
@@ -630,7 +630,7 @@ private:
     any storage;
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     const internal::meta_type_node &(*resolve)(const internal::meta_context &) noexcept {};
-    mutable const internal::meta_type_node *lazy_node{};
+    mutable const internal::meta_type_node *node{};
     vtable_type *vtable{};
 };
 
