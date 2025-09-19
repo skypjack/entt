@@ -1521,7 +1521,7 @@ public:
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const noexcept {
+    [[deprecated("empty meta types are never invalid, and they match void instead")]] [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
 
