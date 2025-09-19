@@ -1085,7 +1085,7 @@ private:
 /*! @brief Opaque wrapper for types. */
 class meta_type {
     [[nodiscard]] const auto &fetch_node() const {
-        return (node == nullptr) ? *(node = &internal::resolve<void>(internal::meta_context::from(*ctx))) : *node;
+        return (node == nullptr) ? internal::resolve<void>(internal::meta_context::from(*ctx)) : *node;
     }
 
     template<typename Func>
@@ -1521,7 +1521,7 @@ public:
      * @brief Returns true if an object is valid, false otherwise.
      * @return True if the object is valid, false otherwise.
      */
-    [[deprecated("empty meta types are never invalid, and they match void instead")]] [[nodiscard]] explicit operator bool() const noexcept {
+    [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
 

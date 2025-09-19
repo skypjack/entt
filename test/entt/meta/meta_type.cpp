@@ -232,7 +232,7 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_EQ(type.template_type(), type);
     ASSERT_EQ(type.template_arg(0u), type);
     ASSERT_EQ(type.template_arg(1u), type);
-    ASSERT_TRUE(type.can_cast(type));
+    ASSERT_FALSE(type.can_cast(type));
     ASSERT_TRUE(type.can_cast(entt::resolve<void>()));
     ASSERT_TRUE(type.can_convert(type));
     ASSERT_TRUE(type.can_convert(entt::resolve<void>()));
