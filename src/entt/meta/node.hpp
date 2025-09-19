@@ -145,7 +145,7 @@ struct meta_type_node {
     double (*conversion_helper)(void *, const void *){};
     meta_any (*from_void)(const meta_ctx &, void *, const void *){};
     meta_template_node templ{};
-    std::shared_ptr<meta_type_descriptor> details;
+    std::unique_ptr<meta_type_descriptor> details;
 };
 
 template<auto Member, typename Type, typename Value>
@@ -302,7 +302,7 @@ auto setup_node_for() noexcept {
 
 [[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
     const auto it = context.value.find(info.hash());
-    return it != context.value.end() ? &it->second : nullptr;
+    return it != context.value.end() ? it->second.get() : nullptr;
 }
 
 template<typename Type>

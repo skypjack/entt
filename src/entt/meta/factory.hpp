@@ -33,7 +33,7 @@ class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
     [[nodiscard]] auto &fetch_node() noexcept {
-        return meta_context::from(*ctx).value[parent];
+        return *meta_context::from(*ctx).value[parent];
     }
 
     [[nodiscard]] auto *find_member_or_assert() {
@@ -131,8 +131,8 @@ public:
         : ctx{&area},
           parent{node.info->hash()},
           bucket{parent} {
-        if(auto &curr = meta_context::from(*ctx).value.try_emplace(parent, std::move(node)).first->second; curr.details == nullptr) {
-            curr.details = std::make_shared<meta_type_descriptor>();
+        if(auto *curr = meta_context::from(*ctx).value.try_emplace(parent, std::make_unique<meta_type_node>(std::move(node))).first->second.get(); curr->details == nullptr) {
+            curr->details = std::make_unique<meta_type_descriptor>();
         }
     }
 
@@ -513,7 +513,7 @@ inline void meta_reset(meta_ctx &ctx, const id_type id) noexcept {
     auto &&context = internal::meta_context::from(ctx);
 
     for(auto it = context.value.begin(); it != context.value.end();) {
-        if(it->second.id == id) {
+        if(it->second->id == id) {
             it = context.value.erase(it);
         } else {
             ++it;
