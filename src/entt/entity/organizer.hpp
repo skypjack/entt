@@ -399,7 +399,7 @@ public:
      * @brief Generates a task graph for the current content.
      * @return The adjacency list of the task graph.
      */
-    [[nodiscard]] std::vector<vertex> graph() {
+    [[nodiscard]] std::vector<vertex> graph() const {
         std::vector<vertex> adjacency_list{};
         adjacency_list.reserve(vertices.size());
         auto adjacency_matrix = builder.graph();

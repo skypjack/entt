@@ -909,12 +909,9 @@ public:
      * Attempting to use an entity that already belongs to the storage results
      * in undefined behavior.
      *
-     * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid identifier.
      */
-    template<typename... Args>
-    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-    void emplace(const entity_type entt, Args &&...) {
+    void emplace(const entity_type entt) {
         base_type::try_emplace(entt, false);
     }
 
@@ -933,13 +930,11 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It, typename... Args>
-    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-    void insert(It first, It last, Args &&...) {
+    template<typename It>
+    void insert(It first, It last) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
         }
@@ -1104,6 +1099,16 @@ public:
         placeholder = other.placeholder;
         base_type::operator=(std::move(other));
         return *this;
+    }
+
+    /**
+     * @brief Exchanges the contents with those of a given storage.
+     * @param other Storage to exchange the content with.
+     */
+    void swap(basic_storage &other) noexcept {
+        using std::swap;
+        swap(placeholder, other.placeholder);
+        base_type::swap(other);
     }
 
     /**

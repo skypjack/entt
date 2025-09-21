@@ -46,10 +46,6 @@
 			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
-	<Type Name="entt::internal::meta_dtor_node">
-		<DisplayString>{{}}</DisplayString>
-		<Expand/>
-	</Type>	
 	<Type Name="entt::internal::meta_func_node"	>
 		<Intrinsic Name="has_trait" Expression="!!(traits &amp; property)">
 			<Parameter Name="property" Type="int"/>
@@ -82,6 +78,7 @@
 			<Item Name="[conv]">conv,view(simple)</Item>
 			<Item Name="[data]">data,view(simple)</Item>
 			<Item Name="[func]">func,view(simple)</Item>
+			<Item Name="[custom]">custom</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_type_node">
@@ -109,15 +106,14 @@
 			<Item Name="[conversion_helper]">conversion_helper != nullptr</Item>
 			<Item Name="[from_void]">from_void != nullptr</Item>
 			<Item Name="[template_info]">templ</Item>
-			<Item Name="[custom]">custom</Item>
-			<Item Name="[details]" Condition="!(details == nullptr)">*details</Item>
+			<Item Name="[details]" Condition="details != nullptr">*details</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_any">
-		<DisplayString Condition="node.info != nullptr">{{ type={ node.info->alias,na }, policy={ storage.mode,en } }}</DisplayString>
+		<DisplayString>{ storage }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node,na</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
@@ -152,18 +148,18 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
-		<DisplayString Condition="node.get != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node.get != nullptr">node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
-		<DisplayString Condition="node.invoke != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem Condition="node.invoke != nullptr">node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
 		</Expand>
 	</Type>

@@ -17,18 +17,10 @@
 
 struct base {
     virtual ~base() = default;
-
-    static void destroy(base &) {
-        ++counter;
-    }
-
-    inline static int counter = 0; // NOLINT
     int value{3};
 };
 
-struct derived: base {
-    derived() = default;
-};
+struct derived: base {};
 
 struct clazz {
     operator int() const {
@@ -81,13 +73,11 @@ struct MetaData: ::testing::Test {
 
         entt::meta_factory<base>{}
             .type("base"_hs)
-            .dtor<base::destroy>()
             .data<&base::value>("value"_hs);
 
         entt::meta_factory<derived>{}
             .type("derived"_hs)
             .base<base>()
-            .dtor<derived::destroy>()
             .data<&base::value>("value_from_base"_hs);
 
         entt::meta_factory<clazz>{}
@@ -120,8 +110,6 @@ struct MetaData: ::testing::Test {
             .type("array"_hs)
             .data<&array::global>("global"_hs)
             .data<&array::local>("local"_hs);
-
-        base::counter = 0;
     }
 
     void TearDown() override {
@@ -130,22 +118,6 @@ struct MetaData: ::testing::Test {
 };
 
 using MetaDataDeathTest = MetaData;
-
-TEST_F(MetaData, SafeWhenEmpty) {
-    const entt::meta_data data{};
-
-    ASSERT_FALSE(data);
-    ASSERT_EQ(data, entt::meta_data{});
-    ASSERT_EQ(data.arity(), 0u);
-    ASSERT_FALSE(data.is_const());
-    ASSERT_FALSE(data.is_static());
-    ASSERT_EQ(data.type(), entt::meta_type{});
-    ASSERT_FALSE(data.set({}, 0));
-    ASSERT_FALSE(data.get({}));
-    ASSERT_EQ(data.arg(0u), entt::meta_type{});
-    ASSERT_EQ(data.traits<test::meta_traits>(), test::meta_traits::none);
-    ASSERT_EQ(static_cast<const char *>(data.custom()), nullptr);
-}
 
 TEST_F(MetaData, UserTraits) {
     using namespace entt::literals;
@@ -193,12 +165,10 @@ TEST_F(MetaData, Name) {
     ASSERT_EQ(type.data("i"_hs).name(), nullptr);
     ASSERT_STREQ(type.data("j"_hs).name(), "j");
     ASSERT_STREQ(type.data("h"_hs).name(), "hhh");
-    ASSERT_EQ(type.data("none"_hs).name(), nullptr);
 
     ASSERT_EQ(other.data("z"_hs).name(), nullptr);
     ASSERT_STREQ(other.data("w"_hs).name(), "w");
     ASSERT_STREQ(other.data("z_ro"_hs).name(), "readonly");
-    ASSERT_EQ(other.data("none"_hs).name(), nullptr);
 }
 
 TEST_F(MetaData, Comparison) {
@@ -336,10 +306,13 @@ TEST_F(MetaData, SetCast) {
     using namespace entt::literals;
 
     clazz instance{};
+    derived other{};
 
-    ASSERT_EQ(base::counter, 0);
-    ASSERT_TRUE(entt::resolve<clazz>().data("base"_hs).set(instance, derived{}));
-    ASSERT_EQ(base::counter, 1);
+    other.value = 1;
+
+    ASSERT_EQ(instance.instance.value, 3);
+    ASSERT_TRUE(entt::resolve<clazz>().data("base"_hs).set(instance, other));
+    ASSERT_EQ(instance.instance.value, 1);
 }
 
 TEST_F(MetaData, SetConvert) {

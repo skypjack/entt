@@ -309,13 +309,15 @@ TEST(Registry, Swap) {
     other.erase<int>(entity);
 
     registry = {};
-    registry.emplace<int>(registry.create(entity));
+    const auto reboot = registry.create();
+    registry.emplace<int>(reboot);
 
+    ASSERT_EQ(entity, reboot);
     ASSERT_EQ(test.parent, &other);
 
     registry.swap(other);
-    registry.emplace<int>(entity);
-    registry.emplace<int>(registry.create(entity));
+    registry.emplace<int>(reboot);
+    registry.emplace<int>(registry.create(reboot));
 
     ASSERT_EQ(test.parent, &registry);
 }
@@ -973,7 +975,7 @@ TEST(Registry, EmplaceEmpty) {
 
     ASSERT_FALSE(registry.all_of<test::empty>(entity));
 
-    registry.emplace<test::empty>(entity, 4);
+    registry.emplace<test::empty>(entity);
 
     ASSERT_TRUE(registry.all_of<test::empty>(entity));
 }

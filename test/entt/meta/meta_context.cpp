@@ -117,7 +117,6 @@ class MetaContext: public ::testing::Test {
             .custom<char>('c')
             .base<base>()
             .ctor<char, int>()
-            .dtor<&clazz::move_to_bucket>()
             .data<nullptr, &clazz::value>("value"_hs)
             .data<&clazz::value>("rw"_hs)
             .func<&clazz::cfunc>("func"_hs);
@@ -334,21 +333,6 @@ TEST_F(MetaContext, MetaConv) {
 
     ASSERT_EQ(global.cast<int>(), value.get());
     ASSERT_EQ(local.cast<int>(), value.get_mul());
-}
-
-TEST_F(MetaContext, MetaDtor) {
-    auto global = entt::resolve<clazz>().construct();
-    auto local = entt::resolve<clazz>(ctx()).construct();
-
-    ASSERT_EQ(clazz::bucket, bucket_value);
-
-    global.reset();
-
-    ASSERT_EQ(clazz::bucket, bucket_value);
-
-    local.reset();
-
-    ASSERT_NE(clazz::bucket, bucket_value);
 }
 
 TEST_F(MetaContext, MetaCustom) {

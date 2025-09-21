@@ -104,17 +104,6 @@ generally used to create the following:
 
   Meta default constructors are implicitly generated, if possible.
 
-* _Destructors_. Both free functions and member functions are valid destructors:
-
-  ```cpp
-  entt::meta_factory<my_type>{}.dtor<&destroy>();
-  ```
-
-  The purpose is to offer the possibility to free up resources that require
-  _special treatment_ before an object is actually destroyed.<br/>
-  A function should neither delete nor explicitly invoke the destructor of a
-  given instance.
-
 * _Data members_. Meta data members are actual data members of the underlying
   type but also static and global variables or constants of any kind. From the
   point of view of the client, all the variables associated with the reflected
@@ -293,15 +282,9 @@ type.<br/>
 In particular, the `construct` member function accepts a variable number of
 arguments and searches for a match. It then returns a `meta_any` object that may
 or may not be initialized, depending on whether a suitable constructor was found
-or not.
-
-There is no object that wraps the destructor of a meta type nor a `destroy`
-member function in its API. Destructors are invoked implicitly by `meta_any`
-behind the scenes and users have not to deal with them explicitly. Furthermore,
-they have no name, cannot be searched and would not have member functions to
-expose anyway.<br/>
-Similarly, conversion functions are not directly accessible. They are used
-internally by `meta_any` and the meta objects when needed.
+or not.<br/>
+Conversion functions are not accessible instead. They are used internally by
+`meta_any` and the meta objects when needed.
 
 Meta types and meta objects in general contain much more than what was said.
 Refer to the inline documentation for further details.

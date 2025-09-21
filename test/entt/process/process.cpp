@@ -2,7 +2,6 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
-#include "../../common/config.h"
 #include "../../common/empty.h"
 
 template<typename Delta>
@@ -34,6 +33,20 @@ public:
     bool succeeded_invoked{};
     bool failed_invoked{};
     bool aborted_invoked{};
+};
+
+class test_no_update_process: public entt::process {
+    void aborted() override {
+        aborted_invoked = true;
+    }
+
+public:
+    bool aborted_invoked{};
+};
+
+class test_plain_process: public entt::process {
+    using delta_type = typename entt::process::delta_type;
+    void update(const delta_type, void *) override {}
 };
 
 TEST(Process, Basics) {
@@ -91,7 +104,31 @@ TEST(Process, Basics) {
     ASSERT_TRUE(process.rejected());
 }
 
-TEST(Process, Succeeded) {
+TEST(Process, SucceedNoOverride) {
+    test_plain_process process{};
+
+    ASSERT_FALSE(process.alive());
+
+    process.tick(0u);
+
+    ASSERT_TRUE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_FALSE(process.rejected());
+
+    process.succeed();
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_FALSE(process.rejected());
+
+    process.tick(0u);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_TRUE(process.finished());
+    ASSERT_FALSE(process.rejected());
+}
+
+TEST(Process, Succeed) {
     test_process<test::empty> process{};
 
     process.tick({});
@@ -108,6 +145,30 @@ TEST(Process, Succeeded) {
     ASSERT_TRUE(process.succeeded_invoked);
     ASSERT_FALSE(process.failed_invoked);
     ASSERT_FALSE(process.aborted_invoked);
+}
+
+TEST(Process, FailNoOverride) {
+    test_plain_process process{};
+
+    ASSERT_FALSE(process.alive());
+
+    process.tick(0u);
+
+    ASSERT_TRUE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_FALSE(process.rejected());
+
+    process.fail();
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_FALSE(process.rejected());
+
+    process.tick(0u);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_TRUE(process.rejected());
 }
 
 TEST(Process, Fail) {
@@ -129,25 +190,42 @@ TEST(Process, Fail) {
     ASSERT_FALSE(process.aborted_invoked);
 }
 
-TEST(Process, Data) {
-    test_process<test::empty> process{};
-    int value = 0;
-
-    process.tick({});
-    process.tick({}, &value);
-    process.succeed();
-    process.tick({}, &value);
+TEST(Process, AbortNoOverride) {
+    test_plain_process process{};
 
     ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.finished());
-    ASSERT_FALSE(process.paused());
+
+    process.tick(0u);
+
+    ASSERT_TRUE(process.alive());
+    ASSERT_FALSE(process.finished());
     ASSERT_FALSE(process.rejected());
 
-    ASSERT_EQ(value, 1);
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_TRUE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
+    process.abort();
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_FALSE(process.rejected());
+
+    process.tick(0u);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.finished());
+    ASSERT_TRUE(process.rejected());
+}
+
+TEST(Process, NoUpdateAbort) {
+    test_no_update_process process{};
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_FALSE(process.rejected());
     ASSERT_FALSE(process.aborted_invoked);
+
+    process.tick(0u);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_TRUE(process.rejected());
+    ASSERT_TRUE(process.aborted_invoked);
 }
 
 TEST(Process, AbortNextTick) {
@@ -186,6 +264,27 @@ TEST(Process, AbortImmediately) {
     ASSERT_TRUE(process.aborted_invoked);
 }
 
+TEST(Process, Data) {
+    test_process<test::empty> process{};
+    int value = 0;
+
+    process.tick({});
+    process.tick({}, &value);
+    process.succeed();
+    process.tick({}, &value);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_TRUE(process.finished());
+    ASSERT_FALSE(process.paused());
+    ASSERT_FALSE(process.rejected());
+
+    ASSERT_EQ(value, 1);
+    ASSERT_TRUE(process.update_invoked);
+    ASSERT_TRUE(process.succeeded_invoked);
+    ASSERT_FALSE(process.failed_invoked);
+    ASSERT_FALSE(process.aborted_invoked);
+}
+
 TEST(Process, ThenPeek) {
     test_process<int> process{};
 
@@ -200,6 +299,14 @@ TEST(Process, ThenPeek) {
     ASSERT_TRUE(process.peek());
 }
 
+TEST(Process, Handle) {
+    auto process = std::make_shared<test_process<int>>();
+    auto handle = process->shared_from_this();
+
+    ASSERT_TRUE(handle);
+    ASSERT_EQ(process.get(), handle.get());
+}
+
 TEST(Process, CustomAllocator) {
     const std::allocator<void> allocator{};
     entt::process process{allocator};
@@ -207,7 +314,7 @@ TEST(Process, CustomAllocator) {
     ASSERT_EQ(process.get_allocator(), allocator);
     ASSERT_FALSE(process.get_allocator() != allocator);
 
-    entt::process &other = process.then([](entt::process &, std::uint32_t, void *) {});
+    const entt::process &other = process.then([](entt::process &, std::uint32_t, void *) {});
 
     ASSERT_NE(&process, &other);
     ASSERT_EQ(other.get_allocator(), allocator);

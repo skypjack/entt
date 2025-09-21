@@ -214,7 +214,7 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_FALSE(type);
     ASSERT_EQ(type, entt::meta_type{});
     ASSERT_EQ(type.info(), entt::type_id<void>());
-    ASSERT_EQ(type.id(), entt::id_type{});
+    ASSERT_EQ(type.id(), entt::type_id<void>().hash());
     ASSERT_EQ(type.size_of(), 0u);
     ASSERT_FALSE(type.is_arithmetic());
     ASSERT_FALSE(type.is_integral());
@@ -233,9 +233,9 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_EQ(type.template_arg(0u), type);
     ASSERT_EQ(type.template_arg(1u), type);
     ASSERT_FALSE(type.can_cast(type));
-    ASSERT_FALSE(type.can_cast(entt::resolve<void>()));
-    ASSERT_FALSE(type.can_convert(type));
-    ASSERT_FALSE(type.can_convert(entt::resolve<void>()));
+    ASSERT_TRUE(type.can_cast(entt::resolve<void>()));
+    ASSERT_TRUE(type.can_convert(type));
+    ASSERT_TRUE(type.can_convert(entt::resolve<void>()));
     ASSERT_EQ(type.base().begin(), type.base().end());
     ASSERT_EQ(type.data().begin(), type.data().end());
     ASSERT_EQ(type.data("data"_hs), entt::meta_data{});

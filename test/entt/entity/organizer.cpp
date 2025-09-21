@@ -1,6 +1,7 @@
 #include <array>
 #include <cstddef>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/group.hpp>
@@ -386,6 +387,7 @@ TEST(Organizer, SyncPoint) {
 
 TEST(Organizer, ConstRegistry) {
     entt::organizer organizer;
+    entt::registry registry;
 
     organizer.emplace<&clazz::const_registry_first>("first");
     organizer.emplace<&clazz::const_registry_second>("second");
@@ -405,6 +407,11 @@ TEST(Organizer, ConstRegistry) {
 
     ASSERT_EQ(graph[0u].out_edges().size(), 0u);
     ASSERT_EQ(graph[1u].out_edges().size(), 0u);
+
+    for(auto &&vertex: graph) {
+        typename entt::organizer::function_type *cb = vertex.callback();
+        ASSERT_NO_THROW(cb(vertex.data(), registry));
+    }
 }
 
 TEST(Organizer, Override) {
