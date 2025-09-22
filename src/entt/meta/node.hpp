@@ -215,10 +215,6 @@ template<typename... Args>
 
 template<typename Func>
 [[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const id_type to, const bool arithmetic_or_enum, const void *instance, Func func) {
-    if(from.info && from.info->hash() == to) {
-        return func(instance, from);
-    }
-
     if(from.details) {
         for(auto &&elem: from.details->conv) {
             if(elem.type == to) {
@@ -227,8 +223,10 @@ template<typename Func>
         }
 
         for(auto &&curr: from.details->base) {
-            if(auto other = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); other) {
-                return other;
+            if(const void *other = curr.cast(instance); curr.type == to) {
+                return func(other, curr.resolve(context));
+            } else if(auto elem = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); elem) {
+                return elem;
             }
         }
     }

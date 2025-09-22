@@ -467,17 +467,7 @@ public:
      * @param type Meta type to which the cast is requested.
      * @return True if there exists a viable conversion, false otherwise.
      */
-    [[nodiscard]] bool allow_cast(const meta_type &type) {
-        if(auto other = std::as_const(*this).allow_cast(type); other) {
-            if(other.storage.owner()) {
-                std::swap(*this, other);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
+    [[nodiscard]] bool allow_cast(const meta_type &type);
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
@@ -1338,7 +1328,7 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return (internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), other.info().hash(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u);
+        return ((info() == other.info()) || (internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), other.info().hash(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u));
     }
 
     /**
@@ -1596,6 +1586,20 @@ bool meta_any::set(const id_type id, Type &&value) {
     }
 
     return meta_any{};
+}
+
+[[nodiscard]] inline bool meta_any::allow_cast(const meta_type &type) {
+    if(storage.info() == type.info()) {
+        return true;
+    } else if(auto other = std::as_const(*this).allow_cast(type); other) {
+        if(other.storage.owner()) {
+            std::swap(*this, other);
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 inline bool meta_any::assign(const meta_any &other) {
