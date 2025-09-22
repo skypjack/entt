@@ -143,6 +143,8 @@ I hope the following lists can grow much more in the future.
     mage determined to halt the relentless hordes of undead.
   * [You Are Circle](https://store.steampowered.com/app/3578190/You_Are_Circle/):
     a roguelite top-down shooter with a high-contrast vector line aesthetic.
+  * [EnTT Dino](https://github.com/omgitsaheadcrab/entt_dino): a Dinosaur Game
+    clone in C++ using only `SDL2` and `EnTT`.
 
 ## Engines and the like:
 
