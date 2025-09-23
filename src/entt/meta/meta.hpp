@@ -1586,7 +1586,7 @@ bool meta_any::set(const id_type id, Type &&value) {
         });
     }
 
-    return meta_any{};
+    return meta_any{meta_ctx_arg, *ctx};
 }
 
 [[nodiscard]] inline bool meta_any::allow_cast(const meta_type &type) {
