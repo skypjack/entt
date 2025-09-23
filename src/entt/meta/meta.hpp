@@ -694,6 +694,7 @@ struct meta_handle {
      * @param area The context from which to search for meta types.
      * @param other The instance to copy from.
      */
+    [[deprecated("copying meta handles is not allowed")]]
     meta_handle(const meta_ctx &area, const meta_handle &other)
         : any{area, other.any} {}
 
@@ -735,12 +736,12 @@ struct meta_handle {
     }
 
     /*! @copydoc meta_any::operator== */
-    [[nodiscard]] bool operator==(const meta_handle &other) const noexcept {
+    [[deprecated("compare underlying objects instead")]] [[nodiscard]] bool operator==(const meta_handle &other) const noexcept {
         return (any == other.any);
     }
 
     /*! @copydoc meta_any::operator!= */
-    [[nodiscard]] bool operator!=(const meta_handle &other) const noexcept {
+    [[deprecated("compare underlying objects instead")]] [[nodiscard]] bool operator!=(const meta_handle &other) const noexcept {
         return !(*this == other);
     }
 
