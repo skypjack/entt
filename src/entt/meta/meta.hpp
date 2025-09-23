@@ -323,7 +323,11 @@ public:
      * @param other The instance to move from.
      */
     meta_any(meta_any &&other) noexcept
-        : meta_any{*other.ctx, std::move(other)} {}
+        : storage{std::move(other.storage)},
+          ctx{other.ctx},
+          resolve{std::exchange(other.resolve, nullptr)},
+          node{std::exchange(other.node, nullptr)},
+          vtable{std::exchange(other.vtable, nullptr)} {}
 
     /**
      * @brief Copy assignment operator.
