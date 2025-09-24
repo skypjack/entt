@@ -1447,18 +1447,18 @@ public:
     template<typename Instance = entt::meta_any>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, meta_any *const args, const size_type sz) const {
-        meta_handle handle{*ctx, std::forward<Instance>(instance)};
+        meta_handle wrapped{*ctx, std::forward<Instance>(instance)};
 
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(ref.details->func, id); elem != nullptr) {
-                if(const auto *candidate = lookup(args, sz, (handle->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(std::move(handle), args);
+                if(const auto *candidate = lookup(args, sz, (wrapped->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                    return candidate->invoke(std::move(wrapped), args);
                 }
             }
         }
 
         for(auto &&curr: base()) {
-            if(auto elem = curr.second.invoke(id, handle->as_ref(), args, sz); elem) {
+            if(auto elem = curr.second.invoke(id, *wrapped.operator->(), args, sz); elem) {
                 return elem;
             }
         }
