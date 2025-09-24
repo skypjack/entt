@@ -722,16 +722,6 @@ public:
         return static_cast<bool>(any);
     }
 
-    /*! @copydoc meta_any::operator== */
-    [[deprecated("compare underlying objects instead")]] [[nodiscard]] bool operator==(const meta_handle &other) const noexcept {
-        return (any == other.any);
-    }
-
-    /*! @copydoc meta_any::operator!= */
-    [[deprecated("compare underlying objects instead")]] [[nodiscard]] bool operator!=(const meta_handle &other) const noexcept {
-        return !(*this == other);
-    }
-
     /**
      * @brief Access operator for accessing the contained opaque object.
      * @return A wrapper that shares a reference to an unmanaged object.
