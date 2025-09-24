@@ -195,8 +195,8 @@ TEST_F(MetaFactory, DataPointer) {
     type = entt::resolve<int>();
 
     ASSERT_TRUE(type.data("value"_hs));
-    ASSERT_EQ(type.get("value"_hs, {}), value);
-    ASSERT_TRUE(type.set("value"_hs, {}, value));
+    ASSERT_EQ(type.get("value"_hs, nullptr), value);
+    ASSERT_TRUE(type.set("value"_hs, nullptr, value));
 }
 
 TEST_F(MetaFactory, DataValue) {
@@ -212,8 +212,8 @@ TEST_F(MetaFactory, DataValue) {
     type = entt::resolve<int>();
 
     ASSERT_TRUE(type.data("value"_hs));
-    ASSERT_EQ(type.get("value"_hs, {}), value);
-    ASSERT_FALSE(type.set("value"_hs, {}, value));
+    ASSERT_EQ(type.get("value"_hs, nullptr), value);
+    ASSERT_FALSE(type.set("value"_hs, nullptr, value));
 }
 
 TEST_F(MetaFactory, DataGetterOnly) {
@@ -290,7 +290,7 @@ TEST_F(MetaFactory, Func) {
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.invoke("func"_hs, instance));
     ASSERT_EQ(type.invoke("func"_hs, instance).cast<int>(), instance.get_int());
-    ASSERT_FALSE(type.invoke("func"_hs, {}));
+    ASSERT_FALSE(type.invoke("func"_hs, nullptr));
 }
 
 TEST_F(MetaFactory, FuncOverload) {

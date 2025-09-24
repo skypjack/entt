@@ -229,9 +229,9 @@ TEST_F(MetaData, Static) {
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
-    ASSERT_EQ(data.get({}).cast<int>(), 2);
-    ASSERT_TRUE(data.set({}, 1));
-    ASSERT_EQ(data.get({}).cast<int>(), 1);
+    ASSERT_EQ(data.get(nullptr).cast<int>(), 2);
+    ASSERT_TRUE(data.set(nullptr, 1));
+    ASSERT_EQ(data.get(nullptr).cast<int>(), 1);
 }
 
 TEST_F(MetaData, ConstStatic) {
@@ -245,9 +245,9 @@ TEST_F(MetaData, ConstStatic) {
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_TRUE(data.is_const());
     ASSERT_TRUE(data.is_static());
-    ASSERT_EQ(data.get({}).cast<int>(), 3);
-    ASSERT_FALSE(data.set({}, 1));
-    ASSERT_EQ(data.get({}).cast<int>(), 3);
+    ASSERT_EQ(data.get(nullptr).cast<int>(), 3);
+    ASSERT_FALSE(data.set(nullptr, 1));
+    ASSERT_EQ(data.get(nullptr).cast<int>(), 3);
 }
 
 TEST_F(MetaData, Literal) {
@@ -261,9 +261,9 @@ TEST_F(MetaData, Literal) {
     ASSERT_EQ(data.arg(0u), entt::resolve<char>());
     ASSERT_TRUE(data.is_const());
     ASSERT_TRUE(data.is_static());
-    ASSERT_EQ(data.get({}).cast<char>(), 'c');
-    ASSERT_FALSE(data.set({}, 'a'));
-    ASSERT_EQ(data.get({}).cast<char>(), 'c');
+    ASSERT_EQ(data.get(nullptr).cast<char>(), 'c');
+    ASSERT_FALSE(data.set(nullptr, 'a'));
+    ASSERT_EQ(data.get(nullptr).cast<char>(), 'c');
 }
 
 TEST_F(MetaData, GetMetaAnyArg) {
@@ -299,7 +299,7 @@ TEST_F(MetaData, SetMetaAnyArg) {
 TEST_F(MetaData, SetInvalidArg) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).set({}, 'c'));
+    ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).set(nullptr, 'c'));
 }
 
 TEST_F(MetaData, SetCast) {
@@ -505,7 +505,7 @@ TEST_F(MetaData, ArrayStatic) {
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
-    ASSERT_FALSE(data.get({}));
+    ASSERT_FALSE(data.get(nullptr));
 }
 
 TEST_F(MetaData, Array) {

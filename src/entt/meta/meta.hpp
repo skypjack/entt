@@ -663,6 +663,9 @@ public:
     [[deprecated("not necessary, use direct contructors instead")]]
     meta_handle() = default;
 
+    /*! @brief Empty constructor. */
+    meta_handle(std::nullptr_t) {} 
+
     /**
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
@@ -760,7 +763,7 @@ public:
     }
 
 private:
-    meta_any any;
+    meta_any any{};
 };
 
 /*! @brief Opaque wrapper for user defined data of any type. */
@@ -864,7 +867,7 @@ public:
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
-    template<typename Instance = entt::meta_any, typename Type>
+    template<typename Instance, typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(Instance &&instance, Type &&value) const {
         return node_or_assert().set(meta_handle{*ctx, std::forward<Instance>(instance)}, meta_any{*ctx, std::forward<Type>(value)});
@@ -876,7 +879,7 @@ public:
      * @param instance An instance that fits the underlying type.
      * @return A wrapper containing the value of the underlying variable.
      */
-    template<typename Instance = entt::meta_any>
+    template<typename Instance>
     [[nodiscard]] meta_any get(Instance &&instance) const {
         return node_or_assert().get(meta_handle{*ctx, std::forward<Instance>(instance)});
     }
@@ -1014,7 +1017,7 @@ public:
      * @param sz Number of parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename Instance = entt::meta_any>
+    template<typename Instance>
     meta_any invoke(Instance &&instance, meta_any *const args, const size_type sz) const {
         return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
@@ -1027,7 +1030,7 @@ public:
      * @param args Parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename Instance = entt::meta_any, typename... Args>
+    template<typename Instance, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(Instance &&instance, Args &&...args) const {
         return (sizeof...(Args) == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data()) : meta_any{meta_ctx_arg, *ctx};
@@ -1444,7 +1447,7 @@ public:
      * @param sz Number of parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename Instance = entt::meta_any>
+    template<typename Instance>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, meta_any *const args, const size_type sz) const {
         meta_handle wrapped{*ctx, std::forward<Instance>(instance)};
@@ -1475,7 +1478,7 @@ public:
      * @param args Parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename Instance = entt::meta_any, typename... Args>
+    template<typename Instance, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, Args &&...args) const {
         return invoke(id, std::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
@@ -1490,7 +1493,7 @@ public:
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
-    template<typename Instance = entt::meta_any, typename Type>
+    template<typename Instance, typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(const id_type id, Instance &&instance, Type &&value) const {
         const auto candidate = data(id);
@@ -1504,7 +1507,7 @@ public:
      * @param instance An instance that fits the underlying type.
      * @return A wrapper containing the value of the underlying variable.
      */
-    template<typename Instance = entt::meta_any>
+    template<typename Instance>
     [[nodiscard]] meta_any get(const id_type id, Instance &&instance) const {
         const auto candidate = data(id);
         return candidate ? candidate.get(std::forward<Instance>(instance)) : meta_any{meta_ctx_arg, *ctx};

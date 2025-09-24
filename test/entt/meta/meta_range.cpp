@@ -93,6 +93,6 @@ TEST_F(MetaRange, DirectValue) {
 
     for(auto &&[id, data]: range) {
         ASSERT_EQ(id, "answer"_hs);
-        ASSERT_EQ(data.get({}).cast<int>(), 2);
+        ASSERT_EQ(data.get(nullptr).cast<int>(), 2);
     }
 }
