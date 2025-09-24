@@ -7,6 +7,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/policy.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
@@ -88,19 +89,6 @@ double double_member(const double &value) {
     return value * value;
 }
 
-// waiting for C++20 and lambdas inlined as template arguments
-namespace {
-
-void elem_v_as_void(const function &elem, int &iv) {
-    static_cast<void>(elem.v(iv));
-}
-
-const int &elem_a_as_const(function &elem) {
-    return elem.a();
-}
-
-} // namespace
-
 struct MetaFunc: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
@@ -124,7 +112,7 @@ struct MetaFunc: ::testing::Test {
 
         entt::meta_factory<function>{}
             .type("func"_hs)
-            .func<&entt::registry::emplace_or_replace<function>>("emplace"_hs)
+            .func<&entt::registry::emplace_or_replace<function>, entt::as_ref_t>("emplace"_hs)
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
             .func<entt::overload<int(const base &, int, int)>(&function::f)>("f3"_hs)
             .traits(test::meta_traits::three)
@@ -137,9 +125,9 @@ struct MetaFunc: ::testing::Test {
             .custom<char>('c')
             .func<function::h>("h"_hs)
             .func<function::k>("k"_hs)
-            .func<&elem_v_as_void>("v"_hs)
-            .func<&function::a>("a"_hs)
-            .func<&elem_a_as_const>("ca"_hs)
+            .func<&function::v, entt::as_void_t>("v"_hs)
+            .func<&function::a, entt::as_ref_t>("a"_hs)
+            .func<&function::a, entt::as_cref_t>("ca"_hs)
             .conv<int>();
     }
 

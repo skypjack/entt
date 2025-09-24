@@ -169,6 +169,7 @@ if(ENTT_INCLUDE_HEADERS)
         meta/meta.hpp
         meta/node.hpp
         meta/pointer.hpp
+        meta/policy.hpp
         meta/range.hpp
         meta/resolve.hpp
         meta/template.hpp
