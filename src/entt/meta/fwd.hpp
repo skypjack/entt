@@ -14,7 +14,7 @@ class meta_associative_container;
 
 class meta_any;
 
-struct meta_handle;
+class meta_handle;
 
 struct meta_custom;
 

@@ -21,7 +21,7 @@ namespace entt {
 
 class meta_any;
 class meta_type;
-struct meta_handle;
+class meta_handle;
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
