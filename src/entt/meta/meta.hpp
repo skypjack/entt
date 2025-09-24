@@ -667,14 +667,6 @@ public:
     meta_handle(std::nullptr_t) {} 
 
     /**
-     * @brief Context aware constructor.
-     * @param area The context from which to search for meta types.
-     */
-    [[deprecated("not necessary, use direct contructors instead")]]
-    meta_handle(meta_ctx_arg_t, const meta_ctx &area)
-        : any{meta_ctx_arg, area} {}
-
-    /**
      * @brief Creates a handle that points to an unmanaged object.
      * @tparam Type Type of object to use to initialize the handle.
      * @param ctx The context from which to search for meta types.
@@ -692,15 +684,6 @@ public:
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value)
         : meta_handle{0, locator<meta_ctx>::value_or(), value} {}
-
-    /**
-     * @brief Context aware copy constructor.
-     * @param area The context from which to search for meta types.
-     * @param other The instance to copy from.
-     */
-    [[deprecated("copying meta handles is not allowed")]]
-    meta_handle(const meta_ctx &area, const meta_handle &other)
-        : any{area, other.any} {}
 
     /**
      * @brief Context aware move constructor.
