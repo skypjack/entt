@@ -649,7 +649,16 @@ template<typename Type>
 }
 
 /*! @brief Opaque pointers to instances of any type. */
-struct meta_handle {
+class meta_handle {
+    template<typename Type, typename = std::enable_if_t<std::is_same_v<std::decay_t<Type>, meta_any>>>
+    meta_handle(int, const meta_ctx &ctx, Type &value)
+        : any{ctx, value.as_ref()} {}
+
+    template<typename Type>
+    meta_handle(char, const meta_ctx &ctx, Type &value)
+        : any{ctx, std::in_place_type<Type &>, value} {}
+
+public:
     /*! Default constructor. */
     [[deprecated("not necessary, use direct contructors instead")]]
     meta_handle() = default;
@@ -664,27 +673,13 @@ struct meta_handle {
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
-     * @param value An instance of an object to use to initialize the handle.
-     */
-    meta_handle(meta_any &value)
-        : any{value.as_ref()} {}
-
-    /**
-     * @brief Creates a handle that points to an unmanaged object.
-     * @param value An instance of an object to use to initialize the handle.
-     */
-    meta_handle(const meta_any &value)
-        : any{value.as_ref()} {}
-
-    /**
-     * @brief Creates a handle that points to an unmanaged object.
      * @tparam Type Type of object to use to initialize the handle.
      * @param ctx The context from which to search for meta types.
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(const meta_ctx &ctx, Type &value)
-        : any{ctx, std::in_place_type<Type &>, value} {}
+        : meta_handle{0, ctx, value} {}
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
@@ -693,7 +688,7 @@ struct meta_handle {
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value)
-        : any{std::in_place_type<Type &>, value} {}
+        : meta_handle{0, locator<meta_ctx>::value_or(), value} {}
 
     /**
      * @brief Context aware copy constructor.
