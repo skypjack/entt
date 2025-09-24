@@ -1452,7 +1452,7 @@ public:
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(ref.details->func, id); elem != nullptr) {
                 if(const auto *candidate = lookup(args, sz, (handle->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(meta_handle{*ctx, std::move(handle)}, args);
+                    return candidate->invoke(std::move(handle), args);
                 }
             }
         }
