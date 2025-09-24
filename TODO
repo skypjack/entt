@@ -33,4 +33,4 @@ TODO:
 * paged vector as a standalone class
 * resource: shared_from_this?
 * change meta_any::base name, it's confusing due to meta_base_node and base types in meta
-* delay meta_handle/meta_any creation as long as possible when setting/getting/invoking
+* parent link in data and func meta objects

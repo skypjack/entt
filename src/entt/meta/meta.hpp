@@ -858,24 +858,27 @@ public:
 
     /**
      * @brief Sets the value of a given variable.
+     * @tparam Instance Type of instance to operate on.
      * @tparam Type Type of value to assign.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
-    template<typename Type>
+    template<typename Instance = entt::meta_any, typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
-    bool set(meta_handle instance, Type &&value) const {
-        return node_or_assert().set(meta_handle{*ctx, std::move(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+    bool set(Instance &&instance, Type &&value) const {
+        return node_or_assert().set(meta_handle{*ctx, std::forward<Instance>(instance)}, meta_any{*ctx, std::forward<Type>(value)});
     }
 
     /**
      * @brief Gets the value of a given variable.
-     * @param instance An opaque instance of the underlying type.
+     * @tparam Instance Type of instance to operate on.
+     * @param instance An instance that fits the underlying type.
      * @return A wrapper containing the value of the underlying variable.
      */
-    [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node_or_assert().get(meta_handle{*ctx, std::move(instance)});
+    template<typename Instance = entt::meta_any>
+    [[nodiscard]] meta_any get(Instance &&instance) const {
+        return node_or_assert().get(meta_handle{*ctx, std::forward<Instance>(instance)});
     }
 
     /**
@@ -1005,26 +1008,29 @@ public:
 
     /**
      * @brief Invokes the underlying function, if possible.
-     * @param instance An opaque instance of the underlying type.
+     * @tparam Instance Type of instance to operate on.
+     * @param instance An instance that fits the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    meta_any invoke(meta_handle instance, meta_any *const args, const size_type sz) const {
-        return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::move(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+    template<typename Instance = entt::meta_any>
+    meta_any invoke(Instance &&instance, meta_any *const args, const size_type sz) const {
+        return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
      * @copybrief invoke
+     * @tparam Instance Type of instance to operate on.
      * @tparam Args Types of arguments to use to invoke the function.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @param args Parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename... Args>
+    template<typename Instance = entt::meta_any, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
-    meta_any invoke(meta_handle instance, Args &&...args) const {
-        return (sizeof...(Args) == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::move(instance)}, std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data()) : meta_any{meta_ctx_arg, *ctx};
+    meta_any invoke(Instance &&instance, Args &&...args) const {
+        return (sizeof...(Args) == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data()) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc meta_data::traits */
@@ -1431,24 +1437,28 @@ public:
 
     /**
      * @brief Invokes a function given an identifier, if possible.
+     * @tparam Instance Type of instance to operate on.
      * @param id Unique identifier.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
+    template<typename Instance = entt::meta_any>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
-    meta_any invoke(const id_type id, meta_handle instance, meta_any *const args, const size_type sz) const {
+    meta_any invoke(const id_type id, Instance &&instance, meta_any *const args, const size_type sz) const {
+        meta_handle handle{*ctx, std::forward<Instance>(instance)};
+
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member<&internal::meta_func_node::id>(ref.details->func, id); elem != nullptr) {
-                if(const auto *candidate = lookup(args, sz, (instance->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(meta_handle{*ctx, std::move(instance)}, args);
+                if(const auto *candidate = lookup(args, sz, (handle->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                    return candidate->invoke(meta_handle{*ctx, std::move(handle)}, args);
                 }
             }
         }
 
         for(auto &&curr: base()) {
-            if(auto elem = curr.second.invoke(id, *instance.operator->(), args, sz); elem) {
+            if(auto elem = curr.second.invoke(id, handle->as_ref(), args, sz); elem) {
                 return elem;
             }
         }
@@ -1459,41 +1469,45 @@ public:
     /**
      * @copybrief invoke
      * @param id Unique identifier.
+     * @tparam Instance Type of instance to operate on.
      * @tparam Args Types of arguments to use to invoke the function.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @param args Parameters to use to invoke the function.
      * @return A wrapper containing the returned value, if any.
      */
-    template<typename... Args>
+    template<typename Instance = entt::meta_any, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
-    meta_any invoke(const id_type id, meta_handle instance, Args &&...args) const {
-        return invoke(id, std::move(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
+    meta_any invoke(const id_type id, Instance &&instance, Args &&...args) const {
+        return invoke(id, std::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /**
      * @brief Sets the value of a given variable.
+     * @tparam Instance Type of instance to operate on.
      * @tparam Type Type of value to assign.
      * @param id Unique identifier.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
-    template<typename Type>
+    template<typename Instance = entt::meta_any, typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
-    bool set(const id_type id, meta_handle instance, Type &&value) const {
+    bool set(const id_type id, Instance &&instance, Type &&value) const {
         const auto candidate = data(id);
-        return candidate && candidate.set(std::move(instance), std::forward<Type>(value));
+        return candidate && candidate.set(std::forward<Instance>(instance), std::forward<Type>(value));
     }
 
     /**
      * @brief Gets the value of a given variable.
+     * @tparam Instance Type of instance to operate on.
      * @param id Unique identifier.
-     * @param instance An opaque instance of the underlying type.
+     * @param instance An instance that fits the underlying type.
      * @return A wrapper containing the value of the underlying variable.
      */
-    [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
+    template<typename Instance = entt::meta_any>
+    [[nodiscard]] meta_any get(const id_type id, Instance &&instance) const {
         const auto candidate = data(id);
-        return candidate ? candidate.get(std::move(instance)) : meta_any{meta_ctx_arg, *ctx};
+        return candidate ? candidate.get(std::forward<Instance>(instance)) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc meta_data::traits */
