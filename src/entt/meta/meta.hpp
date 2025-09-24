@@ -657,6 +657,7 @@ struct meta_handle {
      * @brief Context aware constructor.
      * @param area The context from which to search for meta types.
      */
+    [[deprecated("not necessary, use the default constructor instead")]]
     meta_handle(meta_ctx_arg_t, const meta_ctx &area)
         : any{meta_ctx_arg, area} {}
 
