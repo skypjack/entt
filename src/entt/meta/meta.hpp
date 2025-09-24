@@ -1284,10 +1284,8 @@ public:
     }
 
     /**
-     * @brief Checks whether a type refers to a recognized class template
-     * specialization or not.
-     * @return True if the type is a recognized class template specialization,
-     * false otherwise.
+     * @brief Checks whether a type refers to a template specialization or not.
+     * @return True if the type is a template specialization, false otherwise.
      */
     [[nodiscard]] bool is_template_specialization() const noexcept {
         return (fetch_node().templ.arity != 0u);
