@@ -251,12 +251,12 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_FALSE(type.from_void(static_cast<void *>(&type), true));
     ASSERT_FALSE(type.from_void(static_cast<const void *>(nullptr)));
     ASSERT_FALSE(type.from_void(static_cast<const void *>(&type)));
-    ASSERT_FALSE(type.invoke("func"_hs, nullptr, args, 0u));
-    ASSERT_FALSE(type.invoke("func"_hs, nullptr, args, 1u));
-    ASSERT_FALSE(type.invoke("func"_hs, nullptr));
-    ASSERT_FALSE(type.invoke("func"_hs, nullptr, 'c'));
-    ASSERT_FALSE(type.set("data"_hs, nullptr, 0));
-    ASSERT_FALSE(type.get("data"_hs, nullptr));
+    ASSERT_FALSE(type.invoke("func"_hs, entt::meta_any{}, args, 0u));
+    ASSERT_FALSE(type.invoke("func"_hs, entt::meta_any{}, args, 1u));
+    ASSERT_FALSE(type.invoke("func"_hs, entt::meta_any{}));
+    ASSERT_FALSE(type.invoke("func"_hs, entt::meta_any{}, 'c'));
+    ASSERT_FALSE(type.set("data"_hs, entt::meta_any{}, 0));
+    ASSERT_FALSE(type.get("data"_hs, entt::meta_any{}));
     ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::none);
     ASSERT_EQ(static_cast<const char *>(type.custom()), nullptr);
 }
@@ -466,7 +466,7 @@ TEST_F(MetaType, Func) {
     ASSERT_TRUE(type.func("member"_hs));
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.func("member"_hs).invoke(instance));
-    ASSERT_TRUE(type.func("func"_hs).invoke(nullptr));
+    ASSERT_TRUE(type.func("func"_hs).invoke(entt::meta_any{}));
 
     type = entt::resolve<void>();
 
@@ -483,8 +483,8 @@ TEST_F(MetaType, Invoke) {
     ASSERT_TRUE(type.invoke("member"_hs, instance));
     ASSERT_FALSE(type.invoke("rebmem"_hs, instance));
 
-    ASSERT_TRUE(type.invoke("func"_hs, nullptr));
-    ASSERT_FALSE(type.invoke("cnuf"_hs, nullptr));
+    ASSERT_TRUE(type.invoke("func"_hs, entt::meta_any{}));
+    ASSERT_FALSE(type.invoke("cnuf"_hs, entt::meta_any{}));
 }
 
 TEST_F(MetaType, InvokeFromBase) {
@@ -494,7 +494,7 @@ TEST_F(MetaType, InvokeFromBase) {
     concrete instance{};
 
     ASSERT_TRUE(type.invoke("base_only"_hs, instance, 3));
-    ASSERT_FALSE(type.invoke("ylno_esab"_hs, nullptr, 'c'));
+    ASSERT_FALSE(type.invoke("ylno_esab"_hs, entt::meta_any{}, 'c'));
 }
 
 TEST_F(MetaType, OverloadedFunc) {
@@ -766,14 +766,14 @@ TEST_F(MetaType, EnumAndNamedConstants) {
     ASSERT_EQ(type.data("value"_hs).type(), type);
     ASSERT_EQ(type.data("other"_hs).type(), type);
 
-    ASSERT_EQ(type.data("value"_hs).get(nullptr).cast<property_type>(), property_type::value);
-    ASSERT_EQ(type.data("other"_hs).get(nullptr).cast<property_type>(), property_type::other);
+    ASSERT_EQ(type.data("value"_hs).get(entt::meta_any{}).cast<property_type>(), property_type::value);
+    ASSERT_EQ(type.data("other"_hs).get(entt::meta_any{}).cast<property_type>(), property_type::other);
 
-    ASSERT_FALSE(type.data("value"_hs).set(nullptr, property_type::other));
-    ASSERT_FALSE(type.data("other"_hs).set(nullptr, property_type::value));
+    ASSERT_FALSE(type.data("value"_hs).set(entt::meta_any{}, property_type::other));
+    ASSERT_FALSE(type.data("other"_hs).set(entt::meta_any{}, property_type::value));
 
-    ASSERT_EQ(type.data("value"_hs).get(nullptr).cast<property_type>(), property_type::value);
-    ASSERT_EQ(type.data("other"_hs).get(nullptr).cast<property_type>(), property_type::other);
+    ASSERT_EQ(type.data("value"_hs).get(entt::meta_any{}).cast<property_type>(), property_type::value);
+    ASSERT_EQ(type.data("other"_hs).get(entt::meta_any{}).cast<property_type>(), property_type::other);
 }
 
 TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
@@ -787,11 +787,11 @@ TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
     ASSERT_EQ(type.data("min"_hs).type(), type);
     ASSERT_EQ(type.data("max"_hs).type(), type);
 
-    ASSERT_FALSE(type.data("min"_hs).set(nullptr, 128u));
-    ASSERT_FALSE(type.data("max"_hs).set(nullptr, 0u));
+    ASSERT_FALSE(type.data("min"_hs).set(entt::meta_any{}, 128u));
+    ASSERT_FALSE(type.data("max"_hs).set(entt::meta_any{}, 0u));
 
-    ASSERT_EQ(type.data("min"_hs).get(nullptr).cast<unsigned int>(), 0u);
-    ASSERT_EQ(type.data("max"_hs).get(nullptr).cast<unsigned int>(), 128u);
+    ASSERT_EQ(type.data("min"_hs).get(entt::meta_any{}).cast<unsigned int>(), 0u);
+    ASSERT_EQ(type.data("max"_hs).get(entt::meta_any{}).cast<unsigned int>(), 128u);
 }
 
 TEST_F(MetaType, Variables) {

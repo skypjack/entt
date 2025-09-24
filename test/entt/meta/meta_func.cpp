@@ -301,8 +301,8 @@ TEST_F(MetaFunc, Static) {
     ASSERT_EQ(func.arg(1u), entt::resolve<function>());
     ASSERT_FALSE(func.arg(2u));
 
-    auto any = func.invoke(nullptr, 3, entt::forward_as_meta(instance));
-    auto empty = func.invoke(nullptr, derived{}, entt::forward_as_meta(instance));
+    auto any = func.invoke(entt::meta_any{}, 3, entt::forward_as_meta(instance));
+    auto empty = func.invoke(entt::meta_any{}, derived{}, entt::forward_as_meta(instance));
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
@@ -325,7 +325,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_EQ(func.arg(1u), entt::resolve<function>());
     ASSERT_FALSE(func.arg(2u));
 
-    auto any = func.invoke(nullptr, 3, entt::forward_as_meta(instance));
+    auto any = func.invoke(entt::meta_any{}, 3, entt::forward_as_meta(instance));
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
@@ -347,7 +347,7 @@ TEST_F(MetaFunc, StaticAsMember) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
-    ASSERT_FALSE(func.invoke(nullptr, 3));
+    ASSERT_FALSE(func.invoke(entt::meta_any{}, 3));
     ASSERT_FALSE(func.invoke(std::as_const(instance), 3));
 
     ASSERT_TRUE(any);
@@ -369,7 +369,7 @@ TEST_F(MetaFunc, StaticAsConstMember) {
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_FALSE(func.arg(0u));
 
-    ASSERT_FALSE(func.invoke(nullptr));
+    ASSERT_FALSE(func.invoke(entt::meta_any{}));
     ASSERT_TRUE(func.invoke(instance));
 
     ASSERT_TRUE(any);
@@ -391,7 +391,7 @@ TEST_F(MetaFunc, NonClassTypeMember) {
     ASSERT_EQ(func.ret(), entt::resolve<double>());
     ASSERT_FALSE(func.arg(0u));
 
-    ASSERT_FALSE(func.invoke(nullptr));
+    ASSERT_FALSE(func.invoke(entt::meta_any{}));
     ASSERT_TRUE(func.invoke(instance));
 
     ASSERT_TRUE(any);
@@ -451,8 +451,8 @@ TEST_F(MetaFunc, ArgsByRef) {
     entt::meta_any any{3};
     int value = 4;
 
-    ASSERT_EQ(func.invoke(nullptr, entt::forward_as_meta(value), entt::forward_as_meta(instance)).cast<int>(), 8);
-    ASSERT_EQ(func.invoke(nullptr, any.as_ref(), entt::forward_as_meta(instance)).cast<int>(), 6);
+    ASSERT_EQ(func.invoke(entt::meta_any{}, entt::forward_as_meta(value), entt::forward_as_meta(instance)).cast<int>(), 8);
+    ASSERT_EQ(func.invoke(entt::meta_any{}, any.as_ref(), entt::forward_as_meta(instance)).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
@@ -589,7 +589,7 @@ TEST_F(MetaFunc, ExternalMemberFunction) {
 
     ASSERT_FALSE(registry.all_of<function>(entity));
 
-    func.invoke(nullptr, entt::forward_as_meta(registry), entity);
+    func.invoke(entt::meta_any{}, entt::forward_as_meta(registry), entity);
 
     ASSERT_TRUE(registry.all_of<function>(entity));
 }

@@ -660,11 +660,7 @@ class meta_handle {
 
 public:
     /*! Default constructor. */
-    [[deprecated("not necessary, use direct contructors instead")]]
     meta_handle() = default;
-
-    /*! @brief Empty constructor. */
-    meta_handle(std::nullptr_t) {} 
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
