@@ -42,7 +42,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             const char *as_string = nullptr;
 
             for(auto [id, curr]: type.data()) {
-                if(curr.get({}) == elem) {
+                if(curr.get(nullptr) == elem) {
                     as_string = curr.name();
                     break;
                 }
