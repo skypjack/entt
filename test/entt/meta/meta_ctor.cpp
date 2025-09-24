@@ -7,7 +7,6 @@
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
 struct base {
@@ -60,7 +59,7 @@ struct MetaCtor: ::testing::Test {
 
         entt::meta_factory<clazz>{}
             .type("clazz"_hs)
-            .ctor<&entt::registry::emplace_or_replace<clazz, const int &, const char &>, entt::as_ref_t>()
+            .ctor<&entt::registry::emplace_or_replace<clazz, const int &, const char &>>()
             .ctor<const base &, int &>()
             .ctor<const int &, char>()
             .ctor<entt::overload<clazz(int)>(clazz::factory)>()

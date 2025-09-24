@@ -50,7 +50,6 @@ namespace entt {}
 #include "meta/meta.hpp"
 #include "meta/node.hpp"
 #include "meta/pointer.hpp"
-#include "meta/policy.hpp"
 #include "meta/range.hpp"
 #include "meta/resolve.hpp"
 #include "meta/template.hpp"

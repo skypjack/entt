@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <entt/core/type_traits.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
 #include "../../common/config.h"
@@ -59,22 +58,20 @@ using MetaUtilityDeathTest = MetaUtility;
 TEST_F(MetaUtility, MetaDispatch) {
     int value = 2;
 
-    auto as_void = entt::meta_dispatch<entt::as_void_t>(value);
-    auto as_ref = entt::meta_dispatch<entt::as_ref_t>(value);
-    auto as_cref = entt::meta_dispatch<entt::as_cref_t>(value);
-    auto as_is = entt::meta_dispatch(value);
+    auto as_ref = entt::meta_dispatch(value);
+    auto as_cref = entt::meta_dispatch(std::as_const(value));
+    auto as_copy = entt::meta_dispatch(static_cast<int &&>(value));
 
-    ASSERT_EQ(as_void.type(), entt::resolve<void>());
     ASSERT_EQ(as_ref.type(), entt::resolve<int>());
     ASSERT_EQ(as_cref.type(), entt::resolve<int>());
-    ASSERT_EQ(as_is.type(), entt::resolve<int>());
+    ASSERT_EQ(as_copy.type(), entt::resolve<int>());
 
-    ASSERT_NE(as_is.try_cast<int>(), nullptr);
+    ASSERT_NE(as_copy.try_cast<int>(), nullptr);
     ASSERT_NE(as_ref.try_cast<int>(), nullptr);
     ASSERT_EQ(as_cref.try_cast<int>(), nullptr);
     ASSERT_NE(as_cref.try_cast<const int>(), nullptr);
 
-    ASSERT_EQ(as_is.cast<int>(), 2);
+    ASSERT_EQ(as_copy.cast<int>(), 2);
     ASSERT_EQ(as_ref.cast<int>(), 2);
     ASSERT_EQ(as_cref.cast<int>(), 2);
 }

@@ -5,7 +5,6 @@
 #include <entt/entity/storage.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
 enum class my_entity : entt::id_type {};
@@ -31,9 +30,9 @@ meta_mixin<Type>::meta_mixin(const allocator_type &allocator)
 
     entt::meta_factory<element_type>{}
         // cross registry, same type
-        .template func<entt::overload<entt::storage_for_t<element_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<element_type>), entt::as_ref_t>("storage"_hs)
+        .template func<entt::overload<entt::storage_for_t<element_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<element_type>)>("storage"_hs)
         // cross registry, different types
-        .template func<entt::overload<entt::storage_for_t<element_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<element_type>), entt::as_ref_t>("storage"_hs);
+        .template func<entt::overload<entt::storage_for_t<element_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<element_type>)>("storage"_hs);
 }
 
 template<typename Type>

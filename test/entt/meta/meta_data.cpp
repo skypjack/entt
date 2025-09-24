@@ -9,7 +9,6 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
-#include <entt/meta/policy.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
@@ -67,6 +66,17 @@ struct array {
     int local[4];                // NOLINT
 };
 
+// waiting for C++20 and lambdas inlined as template arguments
+namespace {
+
+const int &clazz_i_as_const_reference(const clazz &elem) {
+    return elem.i;
+}
+
+void clazz_i_as_void(const clazz &) {}
+
+} // namespace
+
 struct MetaData: ::testing::Test {
     void SetUp() override {
         using namespace entt::literals;
@@ -82,10 +92,10 @@ struct MetaData: ::testing::Test {
 
         entt::meta_factory<clazz>{}
             .type("clazz"_hs)
-            .data<&clazz::i, entt::as_ref_t>("i"_hs)
+            .data<&clazz::i>("i"_hs)
             .custom<char>('c')
             .traits(test::meta_traits::one | test::meta_traits::two | test::meta_traits::three)
-            .data<&clazz::i, entt::as_cref_t>("ci"_hs)
+            .data<&clazz::i, &clazz_i_as_const_reference>("ci"_hs)
             .data<&clazz::j>("j")
             .traits(test::meta_traits::one)
             .data<&clazz::h>("h"_hs, "hhh")
@@ -94,7 +104,7 @@ struct MetaData: ::testing::Test {
             .traits(test::meta_traits::three)
             .data<'c'>("l"_hs)
             .data<&clazz::instance>("base"_hs)
-            .data<&clazz::i, entt::as_void_t>("void"_hs)
+            .data<&clazz::i, clazz_i_as_void>("void"_hs)
             .conv<int>();
 
         entt::meta_factory<setter_getter>{}
@@ -534,7 +544,7 @@ TEST_F(MetaData, AsVoid) {
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.arity(), 1u);
-    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.type(), entt::resolve<void>());
     ASSERT_EQ(data.arg(0u), entt::resolve<int>());
     ASSERT_TRUE(data.set(instance, 1));
     ASSERT_EQ(instance.i, 1);
