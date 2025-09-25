@@ -36,4 +36,3 @@ TODO:
 * parent link in data and func meta objects
 * remove operator-> from meta_handle, only allow try_cast
 * update natvis and doc for meta (meta_handle and the like changed quite a lot)
-* introduce a placeholder for entt::meta_handle{} (static calls)

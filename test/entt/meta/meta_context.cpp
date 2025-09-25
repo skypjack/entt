@@ -236,11 +236,11 @@ TEST_F(MetaContext, MetaData) {
     ASSERT_FALSE(global.data("value"_hs).is_const());
     ASSERT_TRUE(local.data("value"_hs).is_const());
 
-    ASSERT_EQ(global.data("value"_hs).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.data("value"_hs).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.data("rw"_hs).arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.data("rw"_hs).arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.data("rw"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{'c', 8};
     const argument value{2};
@@ -271,11 +271,11 @@ TEST_F(MetaContext, MetaFunc) {
     ASSERT_FALSE(global.func("func"_hs).is_const());
     ASSERT_TRUE(local.func("func"_hs).is_const());
 
-    ASSERT_EQ(global.func("func"_hs).arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.func("func"_hs).arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.func("func"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.func("func"_hs).arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.func("func"_hs).ret().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.func("func"_hs).ret().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.func("func"_hs).ret().data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{'c', 8};
     const argument value{2};
@@ -364,8 +364,8 @@ TEST_F(MetaContext, MetaTemplate) {
     ASSERT_EQ(local.template_arg(0u), entt::resolve<int>(ctx()));
     ASSERT_EQ(local.template_arg(1u), entt::resolve<char>(ctx()));
 
-    ASSERT_EQ(global.template_arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.template_arg(0u).data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.template_arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.template_arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaPointer) {
@@ -382,8 +382,8 @@ TEST_F(MetaContext, MetaPointer) {
     ASSERT_TRUE(global.type().is_pointer_like());
     ASSERT_TRUE(local.type().is_pointer_like());
 
-    ASSERT_EQ((*global).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ((*local).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ((*global).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaAssociativeContainer) {
@@ -400,17 +400,17 @@ TEST_F(MetaContext, MetaAssociativeContainer) {
     ASSERT_EQ(global.size(), 1u);
     ASSERT_EQ(local.size(), 1u);
 
-    ASSERT_EQ(global.key_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.key_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.key_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.key_type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.mapped_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.mapped_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.mapped_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.mapped_type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ((*global.begin()).first.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ((*local.begin()).first.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ((*global.begin()).first.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).first.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ((*global.begin()).second.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ((*local.begin()).second.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ((*global.begin()).second.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).second.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaSequenceContainer) {
@@ -427,11 +427,11 @@ TEST_F(MetaContext, MetaSequenceContainer) {
     ASSERT_EQ(global.size(), 1u);
     ASSERT_EQ(local.size(), 1u);
 
-    ASSERT_EQ(global.value_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.value_type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.value_type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.value_type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ((*global.begin()).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ((*local.begin()).type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ((*global.begin()).type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ((*local.begin()).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaAny) {
@@ -451,10 +451,10 @@ TEST_F(MetaContext, MetaAny) {
 
     ASSERT_TRUE(two_step_local);
 
-    ASSERT_EQ(global.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(ctx_value.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
-    ASSERT_EQ(in_place.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
-    ASSERT_EQ(two_step_local.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(ctx_value.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(in_place.type().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(two_step_local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, MetaHandle) {
@@ -468,8 +468,8 @@ TEST_F(MetaContext, MetaHandle) {
     ASSERT_TRUE(global);
     ASSERT_TRUE(ctx_value);
 
-    ASSERT_EQ(global->type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(ctx_value->type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global->type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(ctx_value->type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
 
 TEST_F(MetaContext, ForwardAsMeta) {
@@ -481,6 +481,6 @@ TEST_F(MetaContext, ForwardAsMeta) {
     ASSERT_TRUE(global);
     ASSERT_TRUE(local);
 
-    ASSERT_EQ(global.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), global_marker);
-    ASSERT_EQ(local.type().data("marker"_hs).get(entt::meta_handle{}).cast<int>(), local_marker);
+    ASSERT_EQ(global.type().data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.type().data("marker"_hs).get({}).cast<int>(), local_marker);
 }
