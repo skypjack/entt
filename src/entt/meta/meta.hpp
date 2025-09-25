@@ -650,13 +650,13 @@ template<typename Type>
 
 /*! @brief Opaque pointers to instances of any type. */
 class meta_handle {
-    template<typename Type, typename = std::enable_if_t<std::is_same_v<std::decay_t<Type>, meta_any>>>
-    meta_handle(int, const meta_ctx &ctx, Type &value)
-        : any{ctx, value.as_ref()} {}
+    template<typename Type, typename... Args, typename = std::enable_if_t<std::is_same_v<std::decay_t<Type>, meta_any>>>
+    meta_handle(int, Type &value, Args &&...args)
+        : any{std::forward<Args>(args)..., value.as_ref()} {}
 
-    template<typename Type>
-    meta_handle(char, const meta_ctx &ctx, Type &value)
-        : any{ctx, std::in_place_type<Type &>, value} {}
+    template<typename Type, typename... Args>
+    meta_handle(char, Type &value, Args &&...args)
+        : any{std::forward<Args>(args)..., std::in_place_type<Type &>, value} {}
 
 public:
     /*! Default constructor. */
@@ -670,7 +670,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(const meta_ctx &ctx, Type &value)
-        : meta_handle{0, ctx, value} {}
+        : meta_handle{0, value, ctx} {}
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
@@ -679,7 +679,7 @@ public:
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
     meta_handle(Type &value)
-        : meta_handle{0, locator<meta_ctx>::value_or(), value} {}
+        : meta_handle{0, value} {}
 
     /**
      * @brief Context aware move constructor.

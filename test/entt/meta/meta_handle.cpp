@@ -1,6 +1,8 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/locator/locator.hpp>
+#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 
@@ -60,4 +62,47 @@ TEST_F(MetaHandle, Handle) {
     ASSERT_FALSE(chandle->invoke("decr"_hs));
     ASSERT_FALSE(std::as_const(handle)->invoke("decr"_hs));
     ASSERT_EQ(instance.value, 0);
+}
+
+TEST_F(MetaHandle, Value) {
+    int value{2};
+    entt::meta_handle handle{value};
+    entt::meta_handle chandle{std::as_const(value)};
+
+    ASSERT_NE(handle->try_cast<int>(), nullptr);
+    ASSERT_NE(handle->try_cast<const int>(), nullptr);
+    ASSERT_EQ(chandle->try_cast<int>(), nullptr);
+    ASSERT_NE(chandle->try_cast<const int>(), nullptr);
+
+    ASSERT_EQ(&handle->context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&chandle->context(), &entt::locator<entt::meta_ctx>::value_or());
+}
+
+TEST_F(MetaHandle, MetaAny) {
+    entt::meta_any value{2};
+    entt::meta_handle handle{value};
+    entt::meta_handle chandle{std::as_const(value)};
+
+    ASSERT_NE(handle->try_cast<int>(), nullptr);
+    ASSERT_NE(handle->try_cast<const int>(), nullptr);
+    ASSERT_EQ(chandle->try_cast<int>(), nullptr);
+    ASSERT_NE(chandle->try_cast<const int>(), nullptr);
+
+    ASSERT_EQ(&handle->context(), &entt::locator<entt::meta_ctx>::value_or());
+    ASSERT_EQ(&chandle->context(), &entt::locator<entt::meta_ctx>::value_or());
+}
+
+TEST_F(MetaHandle, ScopedMetaAny) {
+    entt::meta_ctx ctx{};
+    entt::meta_any value{ctx, 2};
+    entt::meta_handle handle{value};
+    entt::meta_handle chandle{std::as_const(value)};
+
+    ASSERT_NE(handle->try_cast<int>(), nullptr);
+    ASSERT_NE(handle->try_cast<const int>(), nullptr);
+    ASSERT_EQ(chandle->try_cast<int>(), nullptr);
+    ASSERT_NE(chandle->try_cast<const int>(), nullptr);
+
+    ASSERT_EQ(&handle->context(), &ctx);
+    ASSERT_EQ(&chandle->context(), &ctx);
 }
