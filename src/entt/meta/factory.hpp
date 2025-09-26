@@ -175,7 +175,7 @@ public:
      * @return A meta factory for the given type.
      */
     meta_factory type(const char *name) noexcept {
-        return type(entt::hashed_string::value(name), name);
+        return type(hashed_string::value(name), name);
     }
 
     /**
@@ -294,7 +294,7 @@ public:
      */
     template<auto Data, typename Policy = as_is_t>
     meta_factory data(const char *name) noexcept {
-        return data<Data, Policy>(entt::hashed_string::value(name), name);
+        return data<Data, Policy>(hashed_string::value(name), name);
     }
 
     /**
@@ -363,7 +363,7 @@ public:
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     meta_factory data(const char *name) noexcept {
-        return data<Setter, Getter, Policy>(entt::hashed_string::value(name), name);
+        return data<Setter, Getter, Policy>(hashed_string::value(name), name);
     }
 
     /**
@@ -432,7 +432,7 @@ public:
      */
     template<auto Candidate, typename Policy = as_is_t>
     meta_factory func(const char *name) noexcept {
-        return func<Candidate, Policy>(entt::hashed_string::value(name), name);
+        return func<Candidate, Policy>(hashed_string::value(name), name);
     }
 
     /**
