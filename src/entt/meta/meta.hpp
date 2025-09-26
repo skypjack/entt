@@ -422,7 +422,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<std::remove_cv_t<Type>>().hash(), storage.data()));
+        return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -433,7 +433,7 @@ public:
         } else {
             auto *elem = any_cast<Type>(&storage);
             // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_id<Type>().hash(), storage.data())));
+            return ((elem != nullptr) || (resolve == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<Type>::value(), storage.data())));
         }
     }
 
@@ -753,7 +753,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type *() const noexcept {
-        return ((node != nullptr) && (type_id<Type>().hash() == node->type)) ? static_cast<Type *>(node->value.get()) : nullptr;
+        return ((node != nullptr) && (type_hash<std::remove_const_t<Type>>::value() == node->type)) ? static_cast<Type *>(node->value.get()) : nullptr;
     }
 
     /**
@@ -762,7 +762,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type &() const noexcept {
-        ENTT_ASSERT((node != nullptr) && (type_id<Type>().hash() == node->type), "Invalid type");
+        ENTT_ASSERT((node != nullptr) && (type_hash<std::remove_const_t<Type>>::value() == node->type), "Invalid type");
         return *static_cast<Type *>(node->value.get());
     }
 
