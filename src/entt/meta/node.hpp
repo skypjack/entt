@@ -1,6 +1,7 @@
 #ifndef ENTT_META_NODE_HPP
 #define ENTT_META_NODE_HPP
 
+#include <array>
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -187,16 +188,11 @@ template<typename Type>
 const meta_type_node &resolve(const meta_context &) noexcept;
 
 template<typename... Args>
-[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, [[maybe_unused]] const std::size_t index) noexcept {
-    const meta_type_node &(*value)(const meta_context &) noexcept = nullptr;
-
-    if constexpr(sizeof...(Args) != 0u) {
-        std::size_t pos{};
-        ((value = (pos++ == index ? &resolve<std::remove_cv_t<std::remove_reference_t<Args>>> : value)), ...);
-    }
-
-    ENTT_ASSERT(value != nullptr, "Out of bounds");
-    return value(context);
+[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const std::size_t index) noexcept {
+    using resolve_type = const meta_type_node &(*)(const meta_context &) noexcept;
+    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<std::remove_cv_t<std::remove_reference_t<Args>>>...};
+    ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
+    return list[index](context);
 }
 
 [[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const id_type to, const void *instance) noexcept {
