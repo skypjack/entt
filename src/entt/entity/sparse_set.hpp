@@ -375,7 +375,7 @@ protected:
             break;
         }
 
-    	return iterator(packed, static_cast<difference_type>(pos) + 1);
+        return iterator{packed, static_cast<difference_type>(++pos)};
     }
 
     /*! @brief Forwards variables to derived classes, if any. */
