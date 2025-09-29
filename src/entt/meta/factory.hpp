@@ -510,7 +510,7 @@ public:
  * @param ctx The context from which to reset meta types.
  */
 inline void meta_reset(meta_ctx &ctx, const id_type id) noexcept {
-    auto &&context = internal::meta_context::from(ctx);
+    auto &context = internal::meta_context::from(ctx);
 
     for(auto it = context.value.begin(); it != context.value.end();) {
         if(it->second->id == id) {

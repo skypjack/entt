@@ -249,7 +249,7 @@ template<typename Type, typename... Args, std::size_t... Index>
  */
 template<typename Type>
 [[nodiscard]] meta_type meta_arg(const meta_ctx &ctx, const std::size_t index) noexcept {
-    auto &&context = internal::meta_context::from(ctx);
+    const auto &context = internal::meta_context::from(ctx);
     return {ctx, internal::meta_arg_node(context, Type{}, index)};
 }
 
