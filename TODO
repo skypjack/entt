@@ -32,7 +32,4 @@ TODO:
 * avoid copying meta_type nodes, and use unique_ptr for meta_custom
 * paged vector as a standalone class
 * resource: shared_from_this?
-* change meta_any::base name, it's confusing due to meta_base_node and base types in meta
-* parent link in data and func meta objects
-* remove operator-> from meta_handle, only allow try_cast
 * update natvis and doc for meta (meta_handle and the like changed quite a lot)
