@@ -325,7 +325,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data() noexcept {
-        return mode == any_policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data());
+        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(std::as_const(*this).data());
     }
 
     /**
@@ -334,7 +334,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data(const type_info &req) noexcept {
-        return mode == any_policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
+        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
     }
 
     /**
@@ -355,7 +355,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && mode != any_policy::cref && *descriptor == other.info()) {
+        if(vtable && (mode != any_policy::cref) && (*descriptor == other.info())) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -365,7 +365,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
-        if(vtable && mode != any_policy::cref && *descriptor == other.info()) {
+        if(vtable && (mode != any_policy::cref) && (*descriptor == other.info())) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
