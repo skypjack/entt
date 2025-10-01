@@ -211,16 +211,16 @@ public:
     template<typename Type, typename... Args>
     explicit basic_poly(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_cv_t<std::remove_reference_t<Type>>>()} {}
+          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>()} {}
 
     /**
      * @brief Constructs a poly from a given value.
      * @tparam Type Type of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, basic_poly>>>
     basic_poly(Type &&value) noexcept
-        : basic_poly{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)} {}
+        : basic_poly{std::in_place_type<std::remove_const_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Returns the object type info if any, `type_id<void>()` otherwise.
@@ -257,7 +257,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.template emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_const_t<std::remove_reference_t<Type>>>();
     }
 
     /*! @brief Destroys contained object */

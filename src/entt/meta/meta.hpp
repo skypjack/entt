@@ -161,7 +161,7 @@ class meta_any {
 
     template<typename Type>
     static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *value, [[maybe_unused]] const void *as_const, [[maybe_unused]] void *other) {
-        static_assert(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer_like) {
@@ -241,8 +241,8 @@ public:
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           ctx{&area},
-          resolve{&internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>},
-          vtable{&basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>} {}
+          resolve{&internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>},
+          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>} {}
 
     /**
      * @brief Constructs a wrapper taking ownership of the passed object.
@@ -484,7 +484,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return meta_any{meta_ctx_arg, *ctx};
         } else {
-            return (storage.info() == type_id<Type>()) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return (storage.info() == type_id<Type>()) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -498,7 +498,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
         } else {
-            return (storage.info() == type_id<Type>()) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return (storage.info() == type_id<Type>()) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -507,10 +507,10 @@ public:
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
 
-        if(auto *overload = &internal::resolve<std::remove_cv_t<std::remove_reference_t<Type>>>; overload != resolve) {
+        if(auto *overload = &internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>; overload != resolve) {
             resolve = overload;
             node = nullptr;
-            vtable = &basic_vtable<std::remove_cv_t<std::remove_reference_t<Type>>>;
+            vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
         }
     }
 

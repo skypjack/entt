@@ -147,9 +147,9 @@ struct type_info final {
     template<typename Type>
     // NOLINTBEGIN(modernize-use-transparent-functors)
     constexpr type_info(std::in_place_type_t<Type>) noexcept
-        : seq{type_index<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
-          identifier{type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value()},
-          alias{type_name<std::remove_cv_t<std::remove_reference_t<Type>>>::value()} {}
+        : seq{type_index<std::remove_const_t<std::remove_reference_t<Type>>>::value()},
+          identifier{type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()},
+          alias{type_name<std::remove_const_t<std::remove_reference_t<Type>>>::value()} {}
     // NOLINTEND(modernize-use-transparent-functors)
 
     /**
@@ -258,11 +258,11 @@ private:
  */
 template<typename Type>
 [[nodiscard]] const type_info &type_id() noexcept {
-    if constexpr(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>) {
+    if constexpr(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>) {
         static const type_info instance{std::in_place_type<Type>};
         return instance;
     } else {
-        return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+        return type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
     }
 }
 
@@ -270,7 +270,7 @@ template<typename Type>
 template<typename Type>
 // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
 [[nodiscard]] const type_info &type_id(Type &&) noexcept {
-    return type_id<std::remove_cv_t<std::remove_reference_t<Type>>>();
+    return type_id<std::remove_const_t<std::remove_reference_t<Type>>>();
 }
 
 } // namespace entt

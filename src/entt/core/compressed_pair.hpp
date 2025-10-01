@@ -22,7 +22,7 @@ struct compressed_pair_element {
     // NOLINTNEXTLINE(modernize-use-equals-default)
     constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>) {}
 
-    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
+    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
         : value{std::forward<Arg>(arg)} {}
 
@@ -52,7 +52,7 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
     constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>)
         : base_type{} {}
 
-    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
+    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_const_t<std::remove_reference_t<Arg>>, compressed_pair_element>>>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
         : base_type{std::forward<Arg>(arg)} {}
 

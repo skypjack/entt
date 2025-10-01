@@ -50,7 +50,7 @@ class basic_any {
 
     template<typename Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
-        static_assert(!std::is_void_v<Type> && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(!std::is_void_v<Type> && std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
         const Type *elem = nullptr;
 
         if constexpr(in_situ<Type>) {
@@ -115,7 +115,7 @@ class basic_any {
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
         if constexpr(!std::is_void_v<Type>) {
-            using plain_type = std::remove_cv_t<std::remove_reference_t<Type>>;
+            using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
             vtable = basic_vtable<plain_type>;
             descriptor = &type_id<plain_type>();
@@ -485,7 +485,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
-    if constexpr(std::is_copy_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>) {
+    if constexpr(std::is_copy_constructible_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
         }
@@ -501,7 +501,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
-    const auto &info = type_id<std::remove_cv_t<Type>>();
+    const auto &info = type_id<std::remove_const_t<Type>>();
     return static_cast<const Type *>(data->data(info));
 }
 
@@ -512,7 +512,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
         // last attempt to make wrappers for const references return their values
         return any_cast<Type>(&std::as_const(*data));
     } else {
-        const auto &info = type_id<std::remove_cv_t<Type>>();
+        const auto &info = type_id<Type>();
         return static_cast<Type *>(data->data(info));
     }
 }

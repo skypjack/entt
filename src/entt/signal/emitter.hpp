@@ -147,7 +147,7 @@ public:
      */
     template<typename Type>
     void erase() {
-        handlers.first().erase(type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value());
+        handlers.first().erase(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
     }
 
     /*! @brief Disconnects all the listeners. */
@@ -162,7 +162,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool contains() const {
-        return handlers.first().contains(type_hash<std::remove_cv_t<std::remove_reference_t<Type>>>::value());
+        return handlers.first().contains(type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value());
     }
 
     /**
