@@ -1490,7 +1490,7 @@ public:
 
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return meta_custom{fetch_node().custom};
+        return fetch_node().custom;
     }
 
     /**
