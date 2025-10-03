@@ -1002,7 +1002,7 @@ public:
     template<typename Instance = meta_handle, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(Instance &&instance, Args &&...args) const {
-        return (sizeof...(Args) == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data()) : meta_any{meta_ctx_arg, *ctx};
+        return invoke(std::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::traits */
