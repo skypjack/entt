@@ -1443,6 +1443,53 @@ TEST(Any, CompareVoid) {
     ASSERT_FALSE(entt::any{} != any);
 }
 
+TEST(Any, Data) {
+    entt::any any{2};
+    const auto &cany = any;
+    entt::any empty{};
+
+    ASSERT_EQ(empty.data(), nullptr);
+    ASSERT_NE(any.data(), nullptr);
+    ASSERT_NE(cany.data(), nullptr);
+    ASSERT_NE(any.as_ref().data(), nullptr);
+    ASSERT_EQ(cany.as_ref().data(), nullptr);
+
+    ASSERT_EQ(empty.data<char>(), nullptr);
+    ASSERT_EQ(any.data<char>(), nullptr);
+    ASSERT_EQ(cany.data<char>(), nullptr);
+    ASSERT_EQ(any.data<const char>(), nullptr);
+    ASSERT_EQ(cany.data<const char>(), nullptr);
+    ASSERT_EQ(any.as_ref().data<char>(), nullptr);
+    ASSERT_EQ(cany.as_ref().data<char>(), nullptr);
+    ASSERT_EQ(any.as_ref().data<const char>(), nullptr);
+    ASSERT_EQ(cany.as_ref().data<const char>(), nullptr);
+
+    ASSERT_EQ(empty.data<int>(), nullptr);
+    ASSERT_NE(any.data<int>(), nullptr);
+    ASSERT_NE(cany.data<int>(), nullptr);
+    ASSERT_NE(any.data<const int>(), nullptr);
+    ASSERT_NE(cany.data<const int>(), nullptr);
+    ASSERT_NE(any.as_ref().data<int>(), nullptr);
+    ASSERT_EQ(cany.as_ref().data<int>(), nullptr);
+    ASSERT_NE(any.as_ref().data<const int>(), nullptr);
+    ASSERT_NE(cany.as_ref().data<const int>(), nullptr);
+
+    const auto &char_info = entt::type_id<char>();
+    const auto &int_info = entt::type_id<int>();
+
+    ASSERT_EQ(empty.data(char_info), nullptr);
+    ASSERT_EQ(any.data(char_info), nullptr);
+    ASSERT_EQ(cany.data(char_info), nullptr);
+    ASSERT_EQ(any.as_ref().data(char_info), nullptr);
+    ASSERT_EQ(cany.as_ref().data(char_info), nullptr);
+
+    ASSERT_EQ(empty.data(int_info), nullptr);
+    ASSERT_NE(any.data(int_info), nullptr);
+    ASSERT_NE(cany.data(int_info), nullptr);
+    ASSERT_NE(any.as_ref().data(int_info), nullptr);
+    ASSERT_EQ(cany.as_ref().data(int_info), nullptr);
+}
+
 TEST(Any, AnyCast) {
     entt::any any{2};
     const auto &cany = any;
@@ -1653,10 +1700,10 @@ TEST(Any, Array) {
     ASSERT_EQ(entt::any_cast<int *>(&any), nullptr);
 
     // NOLINTNEXTLINE(*-avoid-c-arrays)
-    entt::any_cast<int(&)[1]>(any)[0] = 2;
+    entt::any_cast<int (&)[1]>(any)[0] = 2;
 
     // NOLINTNEXTLINE(*-avoid-c-arrays)
-    ASSERT_EQ(entt::any_cast<const int(&)[1]>(std::as_const(any))[0], 2);
+    ASSERT_EQ(entt::any_cast<const int (&)[1]>(std::as_const(any))[0], 2);
 }
 
 TEST(Any, CopyMoveReference) {
