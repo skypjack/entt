@@ -33,3 +33,4 @@ TODO:
 * paged vector as a standalone class
 * resource: shared_from_this?
 * update natvis and doc for meta (meta_handle and the like changed quite a lot)
+* defer type_info calls if not needed
