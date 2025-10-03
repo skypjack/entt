@@ -357,9 +357,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type *data() noexcept {
         if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).data<std::remove_const_t<Type>>();
+            return std::as_const(*this).template data<std::remove_const_t<Type>>();
         } else {
-            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(std::as_const(*this).data<std::remove_const_t<Type>>());
+            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(std::as_const(*this).template data<std::remove_const_t<Type>>());
         }
     }
 
@@ -527,7 +527,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
-    return data->data<std::remove_const_t<Type>>();
+    return data->template data<std::remove_const_t<Type>>();
 }
 
 /*! @copydoc any_cast */
@@ -537,7 +537,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
         // last attempt to make wrappers for const references return their values
         return any_cast<Type>(&std::as_const(*data));
     } else {
-        return data->data<Type>();
+        return data->template data<Type>();
     }
 }
 
