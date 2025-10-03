@@ -1321,15 +1321,20 @@ TEST_F(MetaAny, Cast) {
 }
 
 TEST_F(MetaAny, AllowCast) {
+    entt::meta_any any{};
     entt::meta_any instance{clazz{}};
     entt::meta_any other{fat{}};
     entt::meta_any arithmetic{3};
     auto as_cref = entt::forward_as_meta(arithmetic.cast<const int &>());
 
+    ASSERT_FALSE(any);
     ASSERT_TRUE(instance);
     ASSERT_TRUE(other);
     ASSERT_TRUE(arithmetic);
     ASSERT_TRUE(as_cref);
+
+    ASSERT_FALSE(any.allow_cast<clazz>());
+    ASSERT_FALSE(std::as_const(any).allow_cast<clazz>());
 
     ASSERT_TRUE(instance.allow_cast<clazz>());
     ASSERT_TRUE(instance.allow_cast<clazz &>());
@@ -1379,15 +1384,19 @@ TEST_F(MetaAny, AllowCast) {
 }
 
 TEST_F(MetaAny, OpaqueAllowCast) {
+    entt::meta_any any{};
     entt::meta_any instance{clazz{}};
     entt::meta_any other{fat{}};
     entt::meta_any arithmetic{3};
     auto as_cref = entt::forward_as_meta(arithmetic.cast<const int &>());
 
+    ASSERT_FALSE(any);
     ASSERT_TRUE(instance);
     ASSERT_TRUE(other);
     ASSERT_TRUE(arithmetic);
     ASSERT_TRUE(as_cref);
+
+    ASSERT_FALSE(any.allow_cast(entt::resolve<clazz>()));
 
     ASSERT_TRUE(instance.allow_cast(entt::resolve<clazz>()));
     ASSERT_EQ(instance.type(), entt::resolve<clazz>());
