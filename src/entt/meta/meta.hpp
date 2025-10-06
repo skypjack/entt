@@ -1589,16 +1589,16 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 inline bool meta_any::assign(const meta_any &other) {
-    if(storage.info() == other.storage.info()) {
-        return storage.assign(other.storage);
+    if(!storage.assign(other.storage)) {
+        auto value = other.allow_cast(type());
+        return storage.assign(value.storage);
     }
 
-    auto value = other.allow_cast(type());
-    return value && storage.assign(value.storage);
+    return true;
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    return (storage.info() == other.storage.info()) ? storage.assign(std::move(other.storage)) : assign(std::as_const(other));
+    return storage.assign(std::move(other.storage)) || storage.assign(std::as_const(other).allow_cast(type()).storage);
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {
