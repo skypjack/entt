@@ -57,6 +57,24 @@ TEST(Any, Empty) {
     ASSERT_EQ(any.data(), nullptr);
 }
 
+TEST(Any, HasValue) {
+    entt::any any{};
+
+    ASSERT_FALSE(any.has_value());
+    ASSERT_FALSE(any.has_value(entt::type_id<char>()));
+    ASSERT_FALSE(any.has_value(entt::type_id<int>()));
+    ASSERT_FALSE(any.has_value<char>());
+    ASSERT_FALSE(any.has_value<int>());
+
+    any = 2;
+
+    ASSERT_TRUE(any.has_value());
+    ASSERT_FALSE(any.has_value(entt::type_id<char>()));
+    ASSERT_TRUE(any.has_value(entt::type_id<int>()));
+    ASSERT_FALSE(any.has_value<char>());
+    ASSERT_TRUE(any.has_value<int>());
+}
+
 TEST(Any, SBO) {
     entt::any any{'c'};
 

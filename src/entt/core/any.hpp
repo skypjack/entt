@@ -291,6 +291,40 @@ public:
     }
 
     /**
+     * @brief Returns false if a wrapper is empty, true otherwise.
+     * @return False if the wrapper is empty, true otherwise.
+     */
+    bool has_value() const noexcept {
+        return (vtable != nullptr);
+    }
+
+    /**
+     * @brief Returns false if the wrapper does not contain the expected type,
+     * true otherwise.
+     * @param req Expected type.
+     * @return False if the wrapper does not contain the expected type, true
+     * otherwise.
+     */
+    bool has_value(const type_info &req) const noexcept {
+        return (descriptor() == req);
+    }
+
+    /**
+     * @brief Returns false if the wrapper does not contain the expected type,
+     * true otherwise.
+     * @tparam Type Expected type.
+     * @return False if the wrapper does not contain the expected type, true
+     * otherwise.
+     */
+    template<typename Type>
+    bool has_value() const noexcept {
+        static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
+        constexpr const type_info &(*other)() noexcept = &type_id<Type>;
+        // it could be a call across boundaries, but still for the same type
+        return (descriptor == other) || has_value(other());
+    }
+
+    /**
      * @brief Returns the object type info if any, `type_id<void>()` otherwise.
      * @return The object type info if any, `type_id<void>()` otherwise.
      */
@@ -327,9 +361,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *data() const noexcept {
-        constexpr const type_info &(*other)() noexcept = &type_id<std::remove_const_t<Type>>;
-        // it could be a call across boundaries, but still for the same type
-        return static_cast<const Type *>((descriptor == other) ? data() : data(type_id<std::remove_const_t<Type>>()));
+        return has_value<std::remove_const_t<Type>>() ? static_cast<const Type *>(data()) : nullptr;
     }
 
     /**
@@ -381,7 +413,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || (info() == other.info()))) {
+        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || has_value(other.info()))) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -391,7 +423,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
-        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || (info() == other.info()))) {
+        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || has_value(other.info()))) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
@@ -419,7 +451,7 @@ public:
      * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return vtable != nullptr;
+        return has_value();
     }
 
     /**
