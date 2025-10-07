@@ -1555,9 +1555,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
     if(storage.has_value(type.info())) {
         return as_ref();
-    }
-
-    if(resolve != nullptr) {
+    } else if(resolve != nullptr) {
         return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
             if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
                 return (args.from_void(*ctx, nullptr, instance), ...);
@@ -1582,9 +1580,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline bool meta_any::allow_cast(const meta_type &type) {
     if(storage.has_value(type.info())) {
         return true;
-    }
-
-    if(auto other = std::as_const(*this).allow_cast(type); other) {
+    } else if(auto other = std::as_const(*this).allow_cast(type); other) {
         if(other.storage.owner()) {
             std::swap(*this, other);
         }
