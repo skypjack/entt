@@ -93,7 +93,7 @@ TEST_F(MetaHandle, MetaAny) {
 }
 
 TEST_F(MetaHandle, ScopedMetaAny) {
-    entt::meta_ctx ctx{};
+    const entt::meta_ctx ctx{};
     entt::meta_any value{ctx, 2};
     entt::meta_handle handle{value};
     entt::meta_handle chandle{std::as_const(value)};
