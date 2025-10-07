@@ -21,7 +21,7 @@ Checks: >
     -readability-else-after-return,
     -readability-function-cognitive-complexity,
     -readability-named-parameter,
-    -readability-redundant-member-init
+    -readability-redundant-member-init,
     -readability-uppercase-literal-suffix,
 CheckOptions:
     - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
