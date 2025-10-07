@@ -735,7 +735,7 @@ public:
     }
 
 private:
-    meta_any any;
+    meta_any any{};
 };
 
 /*! @brief Opaque wrapper for user defined data of any type. */
