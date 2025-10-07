@@ -294,7 +294,7 @@ public:
      * @brief Returns false if a wrapper is empty, true otherwise.
      * @return False if the wrapper is empty, true otherwise.
      */
-    bool has_value() const noexcept {
+    [[nodiscard]] bool has_value() const noexcept {
         return (vtable != nullptr);
     }
 
@@ -305,7 +305,7 @@ public:
      * @return False if the wrapper does not contain the expected type, true
      * otherwise.
      */
-    bool has_value(const type_info &req) const noexcept {
+    [[nodiscard]] bool has_value(const type_info &req) const noexcept {
         return (descriptor() == req);
     }
 
@@ -317,7 +317,7 @@ public:
      * otherwise.
      */
     template<typename Type>
-    bool has_value() const noexcept {
+    [[nodiscard]] bool has_value() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
         constexpr const type_info &(*other)() noexcept = &type_id<Type>;
         // it could be a call across boundaries, but still for the same type
