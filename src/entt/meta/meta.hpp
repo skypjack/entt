@@ -621,7 +621,7 @@ public:
     }
 
 private:
-    any storage;
+    any storage{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     const internal::meta_type_node &(*resolve)(const internal::meta_context &) noexcept {};
     mutable const internal::meta_type_node *node{};
