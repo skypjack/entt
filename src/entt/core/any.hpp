@@ -155,6 +155,12 @@ class basic_any {
           descriptor{other.descriptor},
           mode{pol} {}
 
+    void destroy_if_owner() {
+        if(owner()) {
+            vtable(request::destroy, *this, nullptr);
+        }
+    }
+
 public:
     /*! @brief Size of the internal storage. */
     static constexpr auto length = Len;
@@ -231,10 +237,8 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        if(owner()) {
-            vtable(request::destroy, *this, nullptr);
+        destroy_if_owner();
         }
-    }
 
     /**
      * @brief Copy assignment operator.
@@ -436,9 +440,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-        if(owner()) {
-            vtable(request::destroy, *this, nullptr);
-        }
+        destroy_if_owner();
 
         instance = nullptr;
         vtable = nullptr;
