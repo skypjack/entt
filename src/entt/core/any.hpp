@@ -238,7 +238,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
         destroy_if_owner();
-        }
+    }
 
     /**
      * @brief Copy assignment operator.
@@ -259,25 +259,23 @@ public:
 
     /**
      * @brief Move assignment operator.
-     *
-     * @warning
-     * Self-moving puts objects in a safe but unspecified state.
-     *
      * @param other The instance to move from.
      * @return This any object.
      */
     basic_any &operator=(basic_any &&other) noexcept {
-        reset();
+        if(this != &other) {
+            destroy_if_owner();
 
-        if(other.mode == any_policy::embedded) {
-            other.vtable(request::move, other, this);
-        } else if(other.mode != any_policy::empty) {
-            instance = std::exchange(other.instance, nullptr);
+            if(other.mode == any_policy::embedded) {
+                other.vtable(request::move, other, this);
+            } else if(other.mode != any_policy::empty) {
+                instance = std::exchange(other.instance, nullptr);
+            }
+
+            vtable = other.vtable;
+            descriptor = other.descriptor;
+            mode = other.mode;
         }
-
-        vtable = other.vtable;
-        descriptor = other.descriptor;
-        mode = other.mode;
 
         return *this;
     }

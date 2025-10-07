@@ -307,11 +307,11 @@ TEST(Any, SBOSelfMoveAssignment) {
     // avoid warnings due to self-assignment
     any = std::move(*&any);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.owner());
-    ASSERT_EQ(any.policy(), entt::any_policy::empty);
-    ASSERT_EQ(any.info(), entt::type_id<void>());
-    ASSERT_EQ(any.data(), nullptr);
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::embedded);
+    ASSERT_EQ(any.info(), entt::type_id<int>());
+    ASSERT_EQ(entt::any_cast<int>(any), 2);
 }
 
 TEST(Any, SBODirectAssignment) {
@@ -633,11 +633,11 @@ TEST(Any, NoSBOSelfMoveAssignment) {
     // avoid warnings due to self-assignment
     any = std::move(*&any);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.owner());
-    ASSERT_EQ(any.policy(), entt::any_policy::empty);
-    ASSERT_EQ(any.info(), entt::type_id<void>());
-    ASSERT_EQ(any.data(), nullptr);
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::dynamic);
+    ASSERT_EQ(any.info(), entt::type_id<fat>());
+    ASSERT_EQ(entt::any_cast<fat>(any), instance);
 }
 
 TEST(Any, NoSBODirectAssignment) {
