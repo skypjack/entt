@@ -484,7 +484,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return meta_any{meta_ctx_arg, *ctx};
         } else {
-            return (storage.info() == type_id<Type>()) ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -498,7 +498,7 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
         } else {
-            return (storage.info() == type_id<Type>()) || allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() || allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
         }
     }
 
@@ -1550,7 +1550,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
-    if(storage.info() == type.info()) {
+    if(storage.has_value(type.info())) {
         return as_ref();
     } else if(resolve != nullptr) {
         return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
@@ -1575,7 +1575,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 }
 
 [[nodiscard]] inline bool meta_any::allow_cast(const meta_type &type) {
-    if(storage.info() == type.info()) {
+    if(storage.has_value(type.info())) {
         return true;
     } else if(auto other = std::as_const(*this).allow_cast(type); other) {
         if(other.storage.owner()) {
