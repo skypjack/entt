@@ -372,9 +372,11 @@ TEST_F(MetaAny, SBOSelfMoveAssignment) {
     // avoid warnings due to self-assignment
     any = std::move(*&any);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.type());
-    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<int>(), 3);
+    ASSERT_EQ(any, entt::meta_any{3});
+    ASSERT_NE(any, entt::meta_any{0});
 }
 
 TEST_F(MetaAny, SBODirectAssignment) {
@@ -707,9 +709,11 @@ TEST_F(MetaAny, NoSBOSelfMoveAssignment) {
     // avoid warnings due to self-assignment
     any = std::move(*&any);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.type());
-    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.cast<fat>(), instance);
+    ASSERT_EQ(any, entt::meta_any{instance});
+    ASSERT_NE(any, fat{});
 }
 
 TEST_F(MetaAny, NoSBODirectAssignment) {
@@ -962,9 +966,10 @@ TEST_F(MetaAny, VoidSelfMoveAssignment) {
     // avoid warnings due to self-assignment
     any = std::move(*&any);
 
-    ASSERT_FALSE(any);
-    ASSERT_FALSE(any.type());
-    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.try_cast<std::size_t>());
+    ASSERT_EQ(any.type(), entt::resolve<void>());
+    ASSERT_EQ(any, entt::meta_any{std::in_place_type<void>});
 }
 
 TEST_F(MetaAny, SBOMoveInvalidate) {

@@ -351,15 +351,10 @@ public:
 
     /**
      * @brief Move assignment operator.
-     *
-     * @warning
-     * Self-moving puts objects in a safe but unspecified state.
-     *
      * @param other The instance to move from.
      * @return This meta any object.
      */
     meta_any &operator=(meta_any &&other) noexcept {
-        reset();
         storage = std::move(other.storage);
         ctx = other.ctx;
         resolve = std::exchange(other.resolve, nullptr);
