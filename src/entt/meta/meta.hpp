@@ -527,7 +527,7 @@ public:
     void reset() {
         storage.reset();
         resolve = nullptr;
-        node = {};
+        node = nullptr;
         vtable = nullptr;
     }
 
