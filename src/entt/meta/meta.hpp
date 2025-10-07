@@ -329,6 +329,9 @@ public:
           node{std::exchange(other.node, nullptr)},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
+    /*! @brief Default destructor. */
+    ~meta_any() = default;
+
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
