@@ -88,17 +88,17 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.info(), entt::type_id<void>());
     ASSERT_EQ(other.info(), entt::type_id<void>());
 
-    pool.generate(entt::entity{4});
+    pool.generate(entt::entity{2});
 
-    other.generate(entt::entity{2});
     other.generate(entt::entity{1});
-    other.erase(entt::entity{2});
+    other.generate(entt::entity{0});
+    other.erase(entt::entity{1});
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 2u);
 
-    pool.start_from(entt::entity{99});
-    other.start_from(entt::entity{999});
+    pool.start_from(entt::entity{3});
+    other.start_from(entt::entity{2});
 
     pool.swap(other);
 
@@ -108,12 +108,12 @@ TEST(StorageEntity, Swap) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(other.size(), 1u);
 
-    ASSERT_EQ(pool.generate(), traits_type::construct(2, 1));
-    ASSERT_EQ(pool.generate(), entt::entity{999});
-    ASSERT_EQ(other.generate(), entt::entity{99});
+    ASSERT_EQ(pool.generate(), traits_type::construct(1, 1));
+    ASSERT_EQ(pool.generate(), entt::entity{2});
+    ASSERT_EQ(other.generate(), entt::entity{3});
 
-    ASSERT_EQ(pool.index(entt::entity{1}), 0u);
-    ASSERT_EQ(other.index(entt::entity{4}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{0}), 0u);
+    ASSERT_EQ(other.index(entt::entity{2}), 0u);
 }
 
 TEST(StorageEntity, Getters) {
