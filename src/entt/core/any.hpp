@@ -26,6 +26,15 @@ enum class any_request : std::uint8_t {
     get
 };
 
+template<std::size_t Len, std::size_t Align>
+struct storage_type {
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+    alignas(Align) std::byte data[Len];
+};
+
+template<std::size_t Align>
+struct storage_type<0u, Align> {};
+
 } // namespace internal
 /*! @endcond */
 
@@ -38,11 +47,7 @@ template<std::size_t Len, std::size_t Align>
 class basic_any {
     using request = internal::any_request;
     using vtable_type = const void *(const request, const basic_any &, const void *);
-
-    struct storage_type {
-        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-        alignas(Align) std::byte data[Len + static_cast<std::size_t>(Len == 0u)];
-    };
+    using storage_type = internal::storage_type<Len, Align>;
 
     template<typename Type>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
