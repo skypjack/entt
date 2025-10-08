@@ -6,10 +6,10 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
-#include "../core/utility.hpp"
 #include "fwd.hpp"
 #include "type_info.hpp"
 #include "type_traits.hpp"
+#include "utility.hpp"
 
 namespace entt {
 
