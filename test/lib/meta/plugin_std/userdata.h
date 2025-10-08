@@ -22,7 +22,6 @@ struct userdata {
     entt::meta_any any{};
 };
 
-ASSIGN_TYPE_ID(void);
 ASSIGN_TYPE_ID(std::size_t);
 ASSIGN_TYPE_ID(test::boxed_int);
 ASSIGN_TYPE_ID(test::empty);
