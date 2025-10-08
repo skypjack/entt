@@ -465,7 +465,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
-        if(vtable && info() == other.info()) {
+        if(vtable && ((descriptor == other.descriptor) || has_value(other.info()))) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
