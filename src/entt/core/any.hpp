@@ -28,26 +28,42 @@ enum class any_request : std::uint8_t {
 
 template<std::size_t Len, std::size_t Align>
 struct basic_any_storage {
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-    alignas(Align) std::byte data[Len];
+    basic_any_storage()
+        : instance{} {}
+
+    basic_any_storage(const void *elem)
+        : instance{elem} {}
+
+    union {
+        const void *instance;
+        alignas(Align) std::byte buffer[Len];
+    };
 };
 
 template<std::size_t Align>
-struct basic_any_storage<0u, Align> {};
+struct basic_any_storage<0u, Align> {
+    basic_any_storage()
+        : instance{} {}
+
+    basic_any_storage(const void *elem)
+        : instance{elem} {}
+
+    const void *instance{};
+};
 
 } // namespace internal
 /*! @endcond */
 
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Len Size of the buffer reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  */
 template<std::size_t Len, std::size_t Align>
-class basic_any {
+class basic_any: private internal::basic_any_storage<Len, Align> {
     using request = internal::any_request;
     using vtable_type = const void *(const request, const basic_any &, const void *);
-    using storage_type = internal::basic_any_storage<Len, Align>;
+    using base_type = internal::basic_any_storage<Len, Align>;
 
     template<typename Type>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
@@ -59,7 +75,7 @@ class basic_any {
         const Type *elem = nullptr;
 
         if constexpr(in_situ<Type>) {
-            elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
+            elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.buffer) : static_cast<const Type *>(value.instance);
         } else {
             elem = static_cast<const Type *>(value.instance);
         }
@@ -103,7 +119,7 @@ class basic_any {
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(elem))};
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
             }
             [[fallthrough]];
         case request::get:
@@ -129,33 +145,33 @@ class basic_any {
                 static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
                 // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
-                instance = (std::addressof(args), ...);
+                this->instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<plain_type>) {
                 mode = any_policy::embedded;
 
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                    ::new(&storage) plain_type{std::forward<Args>(args)...};
+                    ::new(&this->buffer) plain_type{std::forward<Args>(args)...};
                 } else {
                     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-                    ::new(&storage) plain_type(std::forward<Args>(args)...);
+                    ::new(&this->buffer) plain_type(std::forward<Args>(args)...);
                 }
             } else {
                 mode = any_policy::dynamic;
 
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                    instance = new plain_type{std::forward<Args>(args)...};
+                    this->instance = new plain_type{std::forward<Args>(args)...};
                 } else if constexpr(std::is_array_v<plain_type>) {
                     static_assert(sizeof...(Args) == 0u, "Invalid arguments");
-                    instance = new plain_type[std::extent_v<plain_type>]();
+                    this->instance = new plain_type[std::extent_v<plain_type>]();
                 } else {
-                    instance = new plain_type(std::forward<Args>(args)...);
+                    this->instance = new plain_type(std::forward<Args>(args)...);
                 }
             }
         }
     }
 
     basic_any(const basic_any &other, const any_policy pol) noexcept
-        : instance{other.data()},
+        : base_type{other.data()},
           vtable{other.vtable},
           descriptor{other.descriptor},
           mode{pol} {}
@@ -167,7 +183,7 @@ class basic_any {
     }
 
 public:
-    /*! @brief Size of the internal storage. */
+    /*! @brief Size of the internal buffer. */
     static constexpr auto length = Len;
     /*! @brief Alignment requirement. */
     static constexpr auto alignment = Align;
@@ -184,7 +200,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
-        : instance{} {
+        : base_type{} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -195,7 +211,7 @@ public:
      */
     template<typename Type>
     explicit basic_any(std::in_place_t, Type *value)
-        : instance{} {
+        : base_type{} {
         static_assert(!std::is_const_v<Type> && !std::is_void_v<Type>, "Non-const non-void pointer required");
 
         if(value != nullptr) {
@@ -229,18 +245,18 @@ public:
      * @param other The instance to move from.
      */
     basic_any(basic_any &&other) noexcept
-        : instance{},
+        : base_type{},
           vtable{other.vtable},
           descriptor{other.descriptor},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
         } else if(other.mode != any_policy::empty) {
-            instance = std::exchange(other.instance, nullptr);
+            this->instance = std::exchange(other.instance, nullptr);
         }
     }
 
-    /*! @brief Frees the internal storage, whatever it means. */
+    /*! @brief Frees the internal buffer, whatever it means. */
     ~basic_any() {
         destroy_if_owner();
     }
@@ -274,7 +290,7 @@ public:
             if(other.mode == any_policy::embedded) {
                 other.vtable(request::move, other, this);
             } else if(other.mode != any_policy::empty) {
-                instance = std::exchange(other.instance, nullptr);
+                this->instance = std::exchange(other.instance, nullptr);
             }
 
             vtable = other.vtable;
@@ -349,7 +365,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data() const noexcept {
-        return (mode == any_policy::embedded) ? vtable(request::get, *this, nullptr) : instance;
+        return (mode == any_policy::embedded) ? vtable(request::get, *this, nullptr) : this->instance;
     }
 
     /**
@@ -445,7 +461,7 @@ public:
     void reset() {
         destroy_if_owner();
 
-        instance = nullptr;
+        this->instance = nullptr;
         vtable = nullptr;
         descriptor = &type_id<void>;
         mode = any_policy::empty;
@@ -511,10 +527,6 @@ public:
     }
 
 private:
-    union {
-        const void *instance;
-        storage_type storage;
-    };
     vtable_type *vtable{};
     const type_info &(*descriptor)() noexcept {&type_id<void>};
     any_policy mode{any_policy::empty};
@@ -523,7 +535,7 @@ private:
 /**
  * @brief Performs type-safe access to the contained object.
  * @tparam Type Type to which conversion is required.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Len Size of the buffer reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
  * @return The element converted to the requested type.
@@ -581,7 +593,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
  * @tparam Type Type of object to use to initialize the wrapper.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Len Size of the buffer reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
  * @param args Parameters to use to construct the instance.
@@ -594,7 +606,7 @@ template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align
 
 /**
  * @brief Forwards its argument and avoids copies for lvalue references.
- * @tparam Len Size of the storage reserved for the small buffer optimization.
+ * @tparam Len Size of the buffer reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Type Type of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
