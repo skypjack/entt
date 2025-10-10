@@ -439,6 +439,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
+        // it could be a call across boundaries, but still for the same type
         if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
@@ -449,6 +450,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
+        // it could be a call across boundaries, but still for the same type
         if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
