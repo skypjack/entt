@@ -34,3 +34,4 @@ TODO:
 * resource: shared_from_this?
 * finish the imgui viewer/editor!
 * trivially destructible optimization for basic_any
+* basic_any descriptor can go into the vtable, vtable can be used the same as descriptor (for fast return)
