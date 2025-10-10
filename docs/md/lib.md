@@ -28,8 +28,8 @@ The section dedicated to `type_info` contains all the details to get around the
 issue in a concise and elegant way. Please refer to the specific documentation.
 
 When working with linked libraries, compile definitions `ENTT_API_EXPORT` and
-`ENTT_API_IMPORT` are to import or export symbols, so as to make everything work
-nicely across boundaries.<br/>
+`ENTT_API_IMPORT` are there to import or export symbols, so as to make
+everything work nicely across boundaries.<br/>
 On the other hand, everything should run smoothly when working with plugins or
 shared libraries that do not export any symbols.
 
