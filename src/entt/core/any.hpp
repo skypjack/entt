@@ -329,7 +329,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool has_value(const type_info &req) const noexcept {
-        return (descriptor() == req);
+        return (info() == req);
     }
 
     /**
