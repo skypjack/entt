@@ -439,7 +439,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || has_value(other.info()))) {
+        if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -449,7 +449,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
-        if(vtable && (mode != any_policy::cref) && ((descriptor == other.descriptor) || has_value(other.info()))) {
+        if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
@@ -484,7 +484,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
-        if(vtable && ((descriptor == other.descriptor) || has_value(other.info()))) {
+        if(vtable && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
