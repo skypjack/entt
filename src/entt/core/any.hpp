@@ -71,62 +71,65 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
-        static_assert(!std::is_void_v<Type> && std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
-        const Type *elem = nullptr;
+        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
-        if constexpr(in_situ<Type>) {
-            elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.buffer) : static_cast<const Type *>(value.instance);
-        } else {
-            elem = static_cast<const Type *>(value.instance);
-        }
+        if constexpr(!std::is_void_v<Type>) {
+            const Type *elem = nullptr;
 
-        switch(req) {
-        case request::transfer:
-            if constexpr(std::is_move_assignable_v<Type>) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
-                return other;
-            }
-            [[fallthrough]];
-        case request::assign:
-            if constexpr(std::is_copy_assignable_v<Type>) {
-                *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
-                return other;
-            }
-            break;
-        case request::destroy:
             if constexpr(in_situ<Type>) {
-                (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
-            } else if constexpr(std::is_array_v<Type>) {
-                delete[] elem;
+                elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.buffer) : static_cast<const Type *>(value.instance);
             } else {
-                delete elem;
+                elem = static_cast<const Type *>(value.instance);
             }
-            break;
-        case request::compare:
-            if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
-            } else {
-                return (elem == other) ? other : nullptr;
-            }
-        case request::copy:
-            if constexpr(std::is_copy_constructible_v<Type>) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
-            }
-            break;
-        case request::move:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
-            if constexpr(in_situ<Type>) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
-            }
-            [[fallthrough]];
-        case request::get:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
-            if constexpr(in_situ<Type>) {
-                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
-                return elem;
+
+            switch(req) {
+            case request::transfer:
+                if constexpr(std::is_move_assignable_v<Type>) {
+                    // NOLINTNEXTLINE(bugprone-casting-through-void)
+                    *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
+                    return other;
+                }
+                [[fallthrough]];
+            case request::assign:
+                if constexpr(std::is_copy_assignable_v<Type>) {
+                    *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
+                    return other;
+                }
+                break;
+            case request::destroy:
+                if constexpr(in_situ<Type>) {
+                    (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
+                } else if constexpr(std::is_array_v<Type>) {
+                    delete[] elem;
+                } else {
+                    delete elem;
+                }
+                break;
+            case request::compare:
+                if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
+                    return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
+                } else {
+                    return (elem == other) ? other : nullptr;
+                }
+            case request::copy:
+                if constexpr(std::is_copy_constructible_v<Type>) {
+                    // NOLINTNEXTLINE(bugprone-casting-through-void)
+                    static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
+                }
+                break;
+            case request::move:
+                ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
+                if constexpr(in_situ<Type>) {
+                    // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
+                    return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
+                }
+                [[fallthrough]];
+            case request::get:
+                ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
+                if constexpr(in_situ<Type>) {
+                    // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
+                    return elem;
+                }
             }
         }
 
@@ -342,9 +345,9 @@ public:
     template<typename Type>
     [[nodiscard]] bool has_value() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
-        constexpr const type_info &(*other)() noexcept = &type_id<Type>;
+        static constexpr auto *other = &basic_vtable<Type>;
         // it could be a call across boundaries, but still for the same type
-        return (descriptor == other) || has_value(other());
+        return (vtable == other) || has_value(type_id<Type>());
     }
 
     /**
