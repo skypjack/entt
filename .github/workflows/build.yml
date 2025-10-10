@@ -40,10 +40,12 @@ jobs:
   windows:
     strategy:
       matrix:
-        toolset: [default, v142, clang-cl]
+        toolset: [default, v142, v143, clang-cl]
         include:
           - toolset: v142
             toolset_option: -T"v142"
+          - toolset: v143
+            toolset_option: -T"v143"
           - toolset: clang-cl
             toolset_option: -T"ClangCl"
 
