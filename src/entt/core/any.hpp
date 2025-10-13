@@ -28,26 +28,14 @@ enum class any_request : std::uint8_t {
 
 template<std::size_t Len, std::size_t Align>
 struct basic_any_storage {
-    basic_any_storage()
-        : instance{} {}
-
-    basic_any_storage(const void *elem)
-        : instance{elem} {}
-
     union {
-        const void *instance;
+        const void *instance{};
         alignas(Align) std::byte buffer[Len];
     };
 };
 
 template<std::size_t Align>
 struct basic_any_storage<0u, Align> {
-    basic_any_storage()
-        : instance{} {}
-
-    basic_any_storage(const void *elem)
-        : instance{elem} {}
-
     const void *instance{};
 };
 
@@ -174,10 +162,12 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     }
 
     basic_any(const basic_any &other, const any_policy pol) noexcept
-        : base_type{other.data()},
+        : base_type{},
           vtable{other.vtable},
           descriptor{other.descriptor},
-          mode{pol} {}
+          mode{pol} {
+        this->instance = other.data();
+    }
 
     void destroy_if_owner() {
         if(owner()) {
