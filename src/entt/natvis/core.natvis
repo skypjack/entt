@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
     <Type Name="entt::basic_any&lt;*&gt;">
-		<DisplayString Condition="vtable != nullptr">{{ type={ descriptor->alias,na }, policy={ mode,en } }}</DisplayString>
 		<DisplayString>{{ policy={ mode,en } }}</DisplayString>
     </Type>
 	<Type Name="entt::compressed_pair&lt;*&gt;">
