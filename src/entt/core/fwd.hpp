@@ -9,15 +9,15 @@ namespace entt {
 
 /*! @brief Possible modes of an any object. */
 enum class any_policy : std::uint8_t {
-    /*! @brief Default mode, the object does not own any elements. */
+    /*! @brief Default mode, no element available. */
     empty,
-    /*! @brief Owning mode, the object owns a dynamically allocated element. */
+    /*! @brief Owning mode, dynamically allocated element. */
     dynamic,
-    /*! @brief Owning mode, the object owns an embedded element. */
+    /*! @brief Owning mode, embedded element. */
     embedded,
-    /*! @brief Aliasing mode, the object _points_ to a non-const element. */
+    /*! @brief Aliasing mode, non-const reference. */
     ref,
-    /*! @brief Const aliasing mode, the object _points_ to a const element. */
+    /*! @brief Const aliasing mode, const reference. */
     cref
 };
 
