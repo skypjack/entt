@@ -39,6 +39,12 @@ struct basic_any_storage<0u, Align> {
     const void *instance{};
 };
 
+template<typename Type, std::size_t Len, std::size_t Align>
+struct in_situ: std::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>> {};
+
+template<std::size_t Len, std::size_t Align>
+struct in_situ<void, Len, Align>: std::false_type {};
+
 } // namespace internal
 /*! @endcond */
 
@@ -55,16 +61,17 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
-    static constexpr bool in_situ = (Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>;
+    static constexpr bool in_situ_v = internal::in_situ<Type, Len, Align>::value;
 
     template<typename Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
         static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static constexpr auto in_situ = internal::in_situ<Type, Len, Align>::value;
 
         if constexpr(!std::is_void_v<Type>) {
             const Type *elem = nullptr;
 
-            if constexpr(in_situ<Type>) {
+            if constexpr(in_situ_v<Type>) {
                 elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.buffer) : static_cast<const Type *>(value.instance);
             } else {
                 elem = static_cast<const Type *>(value.instance);
@@ -85,7 +92,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 }
                 break;
             case request::destroy:
-                if constexpr(in_situ<Type>) {
+                if constexpr(in_situ_v<Type>) {
                     (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
                 } else if constexpr(std::is_array_v<Type>) {
                     delete[] elem;
@@ -107,14 +114,14 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 break;
             case request::move:
                 ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
-                if constexpr(in_situ<Type>) {
+                if constexpr(in_situ_v<Type>) {
                     // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
                     return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
                 }
                 [[fallthrough]];
             case request::get:
                 ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
-                if constexpr(in_situ<Type>) {
+                if constexpr(in_situ_v<Type>) {
                     // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                     return elem;
                 }
@@ -137,7 +144,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
                 // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
                 this->instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ<plain_type>) {
+            } else if constexpr(in_situ_v<plain_type>) {
                 mode = any_policy::embedded;
 
                 if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
