@@ -372,7 +372,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data(const type_info &req) const noexcept {
-        return (info() == req) ? data() : nullptr;
+        return has_value(req) ? data() : nullptr;
     }
 
     /**
