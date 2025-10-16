@@ -316,7 +316,7 @@ public:
      * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] bool has_value() const noexcept {
-        return (vtable != nullptr);
+        return (mode != any_policy::empty);
     }
 
     /**
