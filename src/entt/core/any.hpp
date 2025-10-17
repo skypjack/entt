@@ -94,7 +94,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
             } else if constexpr(std::is_array_v<Type>) {
                 delete[] elem;
-            } else {
+            } else if constexpr(!std::is_void_v<Type>) {
                 delete elem;
             }
             break;
