@@ -35,4 +35,5 @@ TODO:
 * finish the imgui viewer/editor!
 * trivially destructible optimization for basic_any
 * basic_any descriptor can go into the vtable, vtable can be used the same as descriptor (for fast return)
+* get rid of resolve function pointer in meta_any, use vtable for the one time lookup
 * introduce compile-time flag to skip dll-only checks in basic_any
