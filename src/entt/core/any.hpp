@@ -476,6 +476,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
+        // it could be a call across boundaries, but still for the same type
         if(vtable && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
