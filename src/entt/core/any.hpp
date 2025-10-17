@@ -66,7 +66,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     template<typename Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
         static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
-        static constexpr auto in_situ = internal::in_situ<Type, Len, Align>::value;
 
         const Type *elem = nullptr;
 
