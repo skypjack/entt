@@ -1,11 +1,15 @@
 #ifndef ENTT_CORE_TUPLE_HPP
 #define ENTT_CORE_TUPLE_HPP
 
-#include <tuple>
-#include <type_traits>
-#include <utility>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Provides the member constant `value` to true if a given type is a

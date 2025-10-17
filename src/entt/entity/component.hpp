@@ -1,10 +1,14 @@
 #ifndef ENTT_ENTITY_COMPONENT_HPP
 #define ENTT_ENTITY_COMPONENT_HPP
 
-#include <cstddef>
-#include <type_traits>
-#include "../config/config.h"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <cstddef>
+#    include <type_traits>
+#    include "../config/config.h"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -34,6 +38,8 @@ struct page_size<Type, std::void_t<decltype(Type::page_size)>>
 } // namespace internal
 /*! @endcond */
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /**
  * @brief Common way to access various properties of components.
  * @tparam Type Element type.
@@ -53,6 +59,8 @@ struct component_traits {
     /*! @brief Page size, default is `ENTT_PACKED_PAGE` for non-empty types. */
     static constexpr std::size_t page_size = internal::page_size<Type>::value;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

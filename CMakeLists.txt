@@ -22,7 +22,7 @@ project(
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
-    
+
 message(VERBOSE "*")
 message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2025 Michele Caini <michele.caini@gmail.com>")
@@ -37,6 +37,13 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 option(ENTT_USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if available." OFF)
 option(ENTT_USE_SANITIZER "Enable sanitizers by adding -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined flags if available." OFF)
 option(ENTT_USE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
+option(ENTT_MODULE "Build EnTT module instead of a regular header-only library." OFF)
+
+set(ENTT_USER_CONFIG "" CACHE FILEPATH "Path to a file containing user EnTT configuration.")
+
+if (NOT ENTT_MODULE AND ENTT_USER_CONFIG)
+    message(FATAL_ERROR "The option ENTT_USER_CONFIG can be used only when ENTT_MODULE is ON")
+endif()
 
 if(ENTT_USE_LIBCPP)
     if(NOT WIN32)
@@ -83,25 +90,54 @@ endif()
 
 include(GNUInstallDirs)
 
-add_library(EnTT INTERFACE)
+if (ENTT_MODULE)
+    if (CMAKE_VERSION VERSION_LESS 3.28)
+        message(FATAL_ERROR "CMake >= 3.28 is required to build EnTT as a module")
+    endif()
+
+    set(ENTT_LIBRARY_TYPE STATIC)
+    set(ENTT_SCOPE PUBLIC)
+    set(ENTT_CXX_STD cxx_std_20)
+else()
+    set(ENTT_LIBRARY_TYPE INTERFACE)
+    set(ENTT_SCOPE INTERFACE)
+    set(ENTT_CXX_STD cxx_std_17)
+endif()
+
+add_library(EnTT ${ENTT_LIBRARY_TYPE})
 add_library(EnTT::EnTT ALIAS EnTT)
 
 target_include_directories(
     EnTT
-    INTERFACE
+    ${ENTT_SCOPE}
         $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_features(EnTT INTERFACE cxx_std_17)
+target_compile_features(EnTT ${ENTT_SCOPE} ${ENTT_CXX_STD})
 
 if(ENTT_HAS_LIBCPP)
-    target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
+    target_compile_options(EnTT BEFORE ${ENTT_SCOPE} -stdlib=libc++)
+    if(ENTT_MODULE)
+        target_link_options(EnTT ${ENTT_SCOPE} -stdlib=libc++)
+    endif()
 endif()
 
 if(ENTT_HAS_SANITIZER)
-    target_compile_options(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
-    target_link_libraries(EnTT INTERFACE $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+    target_compile_options(EnTT ${ENTT_SCOPE} $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+    target_link_options(EnTT ${ENTT_SCOPE} $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined>)
+endif()
+
+if (ENTT_USER_CONFIG)
+    target_compile_definitions(EnTT ${ENTT_SCOPE} ENTT_USER_CONFIG=\"${ENTT_USER_CONFIG}\")
+endif()
+
+if (ENTT_MODULE)
+    target_sources(EnTT
+        PUBLIC
+            FILE_SET cxx_modules TYPE CXX_MODULES FILES
+                ${EnTT_SOURCE_DIR}/src/entt/entt.ixx
+    )
 endif()
 
 if(ENTT_CLANG_TIDY_EXECUTABLE)
@@ -272,6 +308,8 @@ if(ENTT_INSTALL)
         TARGETS EnTT
         EXPORT EnTTTargets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        $<$<BOOL:${ENTT_MODULE}>:FILE_SET cxx_modules DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/entt>
     )
 
     write_basic_package_version_file(
@@ -330,12 +368,12 @@ if(ENTT_BUILD_TESTING OR ENTT_BUILD_TESTBED)
     # Tests and tesetbed do not work together because SDL gets confused with EnTT tests
     if(ENTT_BUILD_TESTING)
         option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
-    
+
         option(ENTT_BUILD_BENCHMARK "Build benchmark." OFF)
         option(ENTT_BUILD_EXAMPLE "Build examples." OFF)
         option(ENTT_BUILD_LIB "Build lib tests." OFF)
         option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
-    
+
         include(CTest)
         enable_testing()
         add_subdirectory(test)

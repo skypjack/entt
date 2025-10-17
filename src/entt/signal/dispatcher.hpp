@@ -1,19 +1,23 @@
 #ifndef ENTT_SIGNAL_DISPATCHER_HPP
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
-#include <cstddef>
-#include <functional>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../container/dense_map.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
-#include "../core/type_info.hpp"
-#include "../core/utility.hpp"
-#include "fwd.hpp"
-#include "sigh.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <functional>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../container/dense_map.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/utility.hpp"
+#   include "fwd.hpp"
+#   include "sigh.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -89,6 +93,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic dispatcher implementation.
@@ -391,6 +397,8 @@ public:
 private:
     compressed_pair<container_type, allocator_type> pools;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

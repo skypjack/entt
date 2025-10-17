@@ -1,28 +1,32 @@
 #ifndef ENTT_META_FACTORY_HPP
 #define ENTT_META_FACTORY_HPP
 
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/fwd.hpp"
-#include "../core/hashed_string.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../locator/locator.hpp"
-#include "context.hpp"
-#include "fwd.hpp"
-#include "meta.hpp"
-#include "node.hpp"
-#include "policy.hpp"
-#include "range.hpp"
-#include "resolve.hpp"
-#include "utility.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <cstdint>
+#   include <functional>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/hashed_string.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/type_traits.hpp"
+#   include "../locator/locator.hpp"
+#   include "context.hpp"
+#   include "fwd.hpp"
+#   include "meta.hpp"
+#   include "node.hpp"
+#   include "policy.hpp"
+#   include "range.hpp"
+#   include "resolve.hpp"
+#   include "utility.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -145,6 +149,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Meta factory to be used for reflection purposes.
@@ -580,6 +586,8 @@ inline void meta_reset(meta_ctx &ctx) noexcept {
 inline void meta_reset() noexcept {
     meta_reset(locator<meta_ctx>::value_or());
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

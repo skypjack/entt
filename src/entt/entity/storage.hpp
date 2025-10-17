@@ -1,22 +1,26 @@
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_info.hpp"
-#include "component.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "sparse_set.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/memory.hpp"
+#   include "../core/type_info.hpp"
+#   include "component.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#   include "sparse_set.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -209,6 +213,8 @@ template<typename... Lhs, typename... Rhs>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Storage implementation.
@@ -1236,6 +1242,8 @@ public:
 private:
     size_type placeholder{};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

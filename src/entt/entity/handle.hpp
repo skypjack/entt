@@ -1,15 +1,19 @@
 #ifndef ENTT_ENTITY_HANDLE_HPP
 #define ENTT_ENTITY_HANDLE_HPP
 
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../core/type_traits.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "../core/type_traits.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -85,6 +89,8 @@ template<typename ILhs, typename IRhs>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Non-owning handle to an entity.
@@ -425,6 +431,8 @@ template<typename... Args>
 [[nodiscard]] constexpr bool operator!=(const null_t lhs, const basic_handle<Args...> &rhs) noexcept {
     return (rhs != lhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

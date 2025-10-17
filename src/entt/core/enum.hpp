@@ -1,9 +1,13 @@
 #ifndef ENTT_CORE_ENUM_HPP
 #define ENTT_CORE_ENUM_HPP
 
-#include <type_traits>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <type_traits>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Enable bitmask support for enum classes.

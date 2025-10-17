@@ -1,10 +1,14 @@
 #ifndef ENTT_PROCESS_FWD_HPP
 #define ENTT_PROCESS_FWD_HPP
 
-#include <cstdint>
-#include <memory>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstdint>
+#   include <memory>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 template<typename, typename = std::allocator<void>>
 class basic_process;

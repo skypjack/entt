@@ -1,7 +1,11 @@
 #ifndef ENTT_META_POLICY_HPP
 #define ENTT_META_POLICY_HPP
 
-#include <type_traits>
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <type_traits>
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -12,6 +16,8 @@ struct meta_policy {};
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
 struct as_value_t final: private internal::meta_policy {
@@ -68,6 +74,8 @@ struct is_meta_policy
  */
 template<typename Type>
 inline constexpr bool is_meta_policy_v = is_meta_policy<Type>::value;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

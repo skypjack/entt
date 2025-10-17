@@ -3,24 +3,28 @@
 #ifndef ENTT_META_CONTAINER_HPP
 #define ENTT_META_CONTAINER_HPP
 
-#include <array>
-#include <cstddef>
-#include <deque>
-#include <iterator>
-#include <list>
-#include <map>
-#include <set>
-#include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include "../container/dense_map.hpp"
-#include "../container/dense_set.hpp"
-#include "../core/type_traits.hpp"
-#include "context.hpp"
-#include "fwd.hpp"
-#include "meta.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <array>
+#   include <cstddef>
+#   include <deque>
+#   include <iterator>
+#   include <list>
+#   include <map>
+#   include <set>
+#   include <type_traits>
+#   include <unordered_map>
+#   include <unordered_set>
+#   include <vector>
+#   include "../container/dense_map.hpp"
+#   include "../container/dense_set.hpp"
+#   include "../core/type_traits.hpp"
+#   include "context.hpp"
+#   include "fwd.hpp"
+#   include "meta.hpp"
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -56,6 +60,8 @@ inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief General purpose implementation of meta sequence container traits.
@@ -369,6 +375,8 @@ struct meta_associative_container_traits<dense_map<Args...>>
 template<typename... Args>
 struct meta_associative_container_traits<dense_set<Args...>>
     : basic_meta_associative_container_traits<dense_set<Args...>> {};
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

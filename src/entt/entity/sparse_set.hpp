@@ -1,19 +1,23 @@
 #ifndef ENTT_ENTITY_SPARSE_SET_HPP
 #define ENTT_ENTITY_SPARSE_SET_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/algorithm.hpp"
-#include "../core/any.hpp"
-#include "../core/bit.hpp"
-#include "../core/type_info.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/algorithm.hpp"
+#   include "../core/any.hpp"
+#   include "../core/bit.hpp"
+#   include "../core/type_info.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -134,6 +138,8 @@ template<typename Container>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Sparse set implementation.
@@ -1108,6 +1114,8 @@ private:
     deletion_policy mode;
     size_type head;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

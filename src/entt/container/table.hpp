@@ -1,14 +1,18 @@
 #ifndef ENTT_CONTAINER_TABLE_HPP
 #define ENTT_CONTAINER_TABLE_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -135,6 +139,8 @@ template<typename... Lhs, typename... Rhs>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic table implementation.
@@ -447,10 +453,12 @@ private:
     container_type payload;
 };
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
 /*! @cond TURN_OFF_DOXYGEN */
-namespace std {
+ENTT_MODULE_EXPORT namespace std {
 
 template<typename... Container, typename Allocator>
 struct uses_allocator<entt::basic_table<Container...>, Allocator>

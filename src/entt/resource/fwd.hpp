@@ -1,9 +1,13 @@
 #ifndef ENTT_RESOURCE_FWD_HPP
 #define ENTT_RESOURCE_FWD_HPP
 
-#include <memory>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <memory>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 template<typename>
 struct resource_loader;

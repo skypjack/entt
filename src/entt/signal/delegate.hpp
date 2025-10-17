@@ -1,14 +1,18 @@
 #ifndef ENTT_SIGNAL_DELEGATE_HPP
 #define ENTT_SIGNAL_DELEGATE_HPP
 
-#include <cstddef>
-#include <functional>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <functional>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/type_traits.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -40,6 +44,8 @@ template<typename... Class, typename Ret, typename... Args>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic delegate implementation.
@@ -320,6 +326,8 @@ delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<in
  */
 template<typename Ret, typename... Args>
 delegate(Ret (*)(const void *, Args...), const void * = nullptr) -> delegate<Ret(Args...)>;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

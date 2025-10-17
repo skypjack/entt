@@ -1,21 +1,25 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <cmath>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cmath>
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <limits>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/type_traits.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -203,6 +207,8 @@ template<typename Lhs, typename Rhs>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Associative container for unique objects of a given type.
@@ -924,6 +930,8 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold{default_threshold};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

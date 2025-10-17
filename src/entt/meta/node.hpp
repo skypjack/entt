@@ -1,22 +1,26 @@
 #ifndef ENTT_META_NODE_HPP
 #define ENTT_META_NODE_HPP
 
-#include <array>
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/attribute.h"
-#include "../core/bit.hpp"
-#include "../core/enum.hpp"
-#include "../core/fwd.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
-#include "context.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <array>
+#   include <cstddef>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/attribute.h"
+#   include "../core/bit.hpp"
+#   include "../core/enum.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/type_traits.hpp"
+#   include "../core/utility.hpp"
+#   include "context.hpp"
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
