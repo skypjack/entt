@@ -131,48 +131,48 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        if constexpr(!std::is_void_v<Type>) {
-            using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
+        using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
-            vtable = basic_vtable<plain_type>;
-            descriptor = &type_id<plain_type>;
+        vtable = basic_vtable<plain_type>;
+        descriptor = &type_id<plain_type>;
 
-            if constexpr(std::is_lvalue_reference_v<Type>) {
-                static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
-                mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
-                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
-                this->instance = (std::addressof(args), ...);
-            } else if constexpr(in_situ_v<plain_type>) {
-                mode = any_policy::embedded;
+        if constexpr(std::is_void_v<Type>) {
+            vtable = nullptr;
+            mode = any_policy::empty;
+            this->instance = nullptr;
+        } else if constexpr(std::is_lvalue_reference_v<Type>) {
+            static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
+            mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+            // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
+            this->instance = (std::addressof(args), ...);
+        } else if constexpr(in_situ_v<plain_type>) {
+            mode = any_policy::embedded;
 
-                if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                    ::new(&this->buffer) plain_type{std::forward<Args>(args)...};
-                } else {
-                    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-                    ::new(&this->buffer) plain_type(std::forward<Args>(args)...);
-                }
+            if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
+                ::new(&this->buffer) plain_type{std::forward<Args>(args)...};
             } else {
-                mode = any_policy::dynamic;
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+                ::new(&this->buffer) plain_type(std::forward<Args>(args)...);
+            }
+        } else {
+            mode = any_policy::dynamic;
 
-                if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                    this->instance = new plain_type{std::forward<Args>(args)...};
-                } else if constexpr(std::is_array_v<plain_type>) {
-                    static_assert(sizeof...(Args) == 0u, "Invalid arguments");
-                    this->instance = new plain_type[std::extent_v<plain_type>]();
-                } else {
-                    this->instance = new plain_type(std::forward<Args>(args)...);
-                }
+            if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
+                this->instance = new plain_type{std::forward<Args>(args)...};
+            } else if constexpr(std::is_array_v<plain_type>) {
+                static_assert(sizeof...(Args) == 0u, "Invalid arguments");
+                this->instance = new plain_type[std::extent_v<plain_type>]();
+            } else {
+                this->instance = new plain_type(std::forward<Args>(args)...);
             }
         }
     }
 
     basic_any(const basic_any &other, const any_policy pol) noexcept
-        : base_type{},
+        : base_type{other.data()},
           vtable{other.vtable},
           descriptor{other.descriptor},
-          mode{pol} {
-        this->instance = other.data();
-    }
+          mode{pol} {}
 
     void destroy_if_owner() {
         if(owner()) {
@@ -212,7 +212,9 @@ public:
         : base_type{} {
         static_assert(!std::is_const_v<Type> && !std::is_void_v<Type>, "Non-const non-void pointer required");
 
-        if(value != nullptr) {
+        if(value == nullptr) {
+            initialize<void>();
+        } else {
             initialize<Type &>(*value);
             mode = any_policy::dynamic;
         }
@@ -266,11 +268,8 @@ public:
      */
     basic_any &operator=(const basic_any &other) {
         if(this != &other) {
-            reset();
-
-            if(other.vtable) {
-                other.vtable(request::copy, other, this);
-            }
+            destroy_if_owner();
+            other.vtable ? other.vtable(request::copy, other, this) : initialize<void>();
         }
 
         return *this;
@@ -424,7 +423,7 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
-        reset();
+        destroy_if_owner();
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -460,11 +459,7 @@ public:
     /*! @brief Destroys contained object */
     void reset() {
         destroy_if_owner();
-
-        this->instance = nullptr;
-        vtable = nullptr;
-        descriptor = &type_id<void>;
-        mode = any_policy::empty;
+        initialize<void>();
     }
 
     /**
@@ -528,8 +523,8 @@ public:
 
 private:
     vtable_type *vtable{};
-    const type_info &(*descriptor)() noexcept {&type_id<void>};
-    any_policy mode{any_policy::empty};
+    const type_info &(*descriptor)() noexcept {};
+    any_policy mode{};
 };
 
 /**
