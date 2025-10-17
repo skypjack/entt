@@ -268,7 +268,12 @@ public:
     basic_any &operator=(const basic_any &other) {
         if(this != &other) {
             destroy_if_owner();
-            other.vtable ? other.vtable(request::copy, other, this) : initialize<void>();
+
+            if(other) {
+                other.vtable(request::copy, other, this);
+            } else {
+                initialize<void>();
+            }
         }
 
         return *this;
