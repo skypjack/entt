@@ -583,7 +583,7 @@ public:
 
     /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
-        return (ctx == other.ctx) && (resolve == other.resolve) && (storage == other.storage);
+        return (ctx == other.ctx) && (!!*this ^ !other) && (storage == other.storage);
     }
 
     /*! @copydoc any::operator!= */
