@@ -1522,7 +1522,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (resolve == nullptr) ? meta_type{} : meta_type{*ctx, fetch_node()};
+    return (vtable == nullptr) ? meta_type{} : meta_type{*ctx, fetch_node()};
 }
 
 template<typename... Args>
@@ -1552,7 +1552,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
     if(storage.has_value(type.info())) {
         return as_ref();
-    } else if(resolve != nullptr) {
+    } else if(vtable != nullptr) {
         return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
             if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
                 return (args.from_void(*ctx, nullptr, instance), ...);
