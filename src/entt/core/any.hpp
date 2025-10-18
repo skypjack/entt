@@ -136,7 +136,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         descriptor = &type_id<plain_type>;
 
         if constexpr(std::is_void_v<Type>) {
-            vtable = nullptr;
             mode = any_policy::empty;
             this->instance = nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
@@ -234,9 +233,7 @@ public:
      */
     basic_any(const basic_any &other)
         : basic_any{} {
-        if(other.vtable) {
-            other.vtable(request::copy, other, this);
-        }
+        other.vtable(request::copy, other, this);
     }
 
     /**
@@ -438,7 +435,7 @@ public:
      */
     bool assign(const basic_any &other) {
         // it could be a call across boundaries, but still for the same type
-        if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -449,7 +446,7 @@ public:
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
         // it could be a call across boundaries, but still for the same type
-        if(vtable && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
             if(auto *val = other.data(); val) {
                 return (vtable(request::transfer, *this, val) != nullptr);
             }
@@ -481,11 +478,11 @@ public:
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
         // it could be a call across boundaries, but still for the same type
-        if(vtable && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && ((vtable == other.vtable) || has_value(other.info()))) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
-        return (!vtable && !other.vtable);
+        return (!*this && !other);
     }
 
     /**
