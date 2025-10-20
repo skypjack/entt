@@ -163,6 +163,11 @@ class meta_any {
     static void basic_vtable([[maybe_unused]] const internal::meta_traits req, [[maybe_unused]] const meta_ctx &area, [[maybe_unused]] const void *value, [[maybe_unused]] void *other) {
         static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
+        if(req == internal::meta_traits::is_none) {
+            const auto &self = *static_cast<const meta_any *>(value);
+            self.node = &internal::resolve<Type>(internal::meta_context::from(area));
+        }
+
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer_like) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
@@ -200,15 +205,18 @@ class meta_any {
         : storage{std::move(ref)},
           ctx{other.ctx} {
         if(storage || !other.storage) {
-            resolve = other.resolve;
             node = other.node;
             vtable = other.vtable;
         }
     }
 
     [[nodiscard]] const auto &fetch_node() const {
-        ENTT_ASSERT(resolve != nullptr, "Invalid resolve function");
-        return (node == nullptr) ? *(node = &resolve(internal::meta_context::from(*ctx))) : *node;
+        if(node == nullptr) {
+            ENTT_ASSERT(vtable != nullptr, "Invalid vtable function");
+            vtable(internal::meta_traits::is_none, *ctx, this, nullptr);
+        }
+
+        return *node;
     }
 
 public:
@@ -243,7 +251,6 @@ public:
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           ctx{&area},
-          resolve{&internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>},
           vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>} {}
 
     /**
@@ -266,7 +273,6 @@ public:
         : storage{std::in_place, value},
           ctx{&area} {
         if(storage) {
-            resolve = &internal::resolve<Type>;
             vtable = &basic_vtable<Type>;
         }
     }
@@ -298,7 +304,6 @@ public:
     meta_any(const meta_ctx &area, const meta_any &other)
         : storage{other.storage},
           ctx{&area},
-          resolve{other.resolve},
           node{(ctx == other.ctx) ? other.node : nullptr},
           vtable{other.vtable} {}
 
@@ -310,7 +315,6 @@ public:
     meta_any(const meta_ctx &area, meta_any &&other)
         : storage{std::move(other.storage)},
           ctx{&area},
-          resolve{std::exchange(other.resolve, nullptr)},
           node{(ctx == other.ctx) ? std::exchange(other.node, nullptr) : nullptr},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
@@ -327,7 +331,6 @@ public:
     meta_any(meta_any &&other) noexcept
         : storage{std::move(other.storage)},
           ctx{other.ctx},
-          resolve{std::exchange(other.resolve, nullptr)},
           node{std::exchange(other.node, nullptr)},
           vtable{std::exchange(other.vtable, nullptr)} {}
 
@@ -343,7 +346,6 @@ public:
         if(this != &other) {
             storage = other.storage;
             ctx = other.ctx;
-            resolve = other.resolve;
             node = other.node;
             vtable = other.vtable;
         }
@@ -359,7 +361,6 @@ public:
     meta_any &operator=(meta_any &&other) noexcept {
         storage = std::move(other.storage);
         ctx = other.ctx;
-        resolve = std::exchange(other.resolve, nullptr);
         node = std::exchange(other.node, nullptr);
         vtable = std::exchange(other.vtable, nullptr);
         return *this;
@@ -506,12 +507,8 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-
-        if(auto *overload = &internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>; overload != resolve) {
-            resolve = overload;
-            node = nullptr;
-            vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
-        }
+        node = nullptr;
+        vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
     }
 
     /*! @copydoc any::assign */
@@ -523,7 +520,6 @@ public:
     /*! @copydoc any::reset */
     void reset() {
         storage.reset();
-        resolve = nullptr;
         node = nullptr;
         vtable = nullptr;
     }
@@ -620,7 +616,6 @@ public:
 private:
     any storage{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
-    const internal::meta_type_node &(*resolve)(const internal::meta_context &) noexcept {};
     mutable const internal::meta_type_node *node{};
     vtable_type *vtable{};
 };
