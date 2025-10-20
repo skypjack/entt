@@ -211,12 +211,8 @@ class meta_any {
     }
 
     [[nodiscard]] const auto &fetch_node() const {
-        if(node == nullptr) {
-            ENTT_ASSERT(vtable != nullptr, "Invalid vtable function");
-            vtable(internal::meta_traits::is_none, *ctx, this, nullptr);
-        }
-
-        return *node;
+        ENTT_ASSERT(vtable != nullptr, "Invalid vtable function");
+        return node ? *node : (vtable(internal::meta_traits::is_none, *ctx, this, nullptr), *node);
     }
 
 public:
