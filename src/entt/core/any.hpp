@@ -30,6 +30,7 @@ template<std::size_t Len, std::size_t Align>
 struct basic_any_storage {
     union {
         const void *instance{};
+        // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
         alignas(Align) std::byte buffer[Len];
     };
 };
@@ -40,6 +41,7 @@ struct basic_any_storage<0u, Align> {
 };
 
 template<typename Type, std::size_t Len, std::size_t Align>
+// NOLINTNEXTLINE(bugprone-sizeof-expression)
 struct in_situ: std::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>> {};
 
 template<std::size_t Len, std::size_t Align>
