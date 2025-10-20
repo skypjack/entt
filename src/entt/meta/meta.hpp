@@ -187,12 +187,14 @@ class meta_any {
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_sequence_container)) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *static_cast<meta_sequence_container *>(const_cast<void *>(other)) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_sequence_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
             }
         }
 
         if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
             if(!!(req & internal::meta_traits::is_associative_container)) {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *static_cast<meta_associative_container *>(const_cast<void *>(other)) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_associative_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
             }
         }
@@ -209,7 +211,7 @@ class meta_any {
 
     [[nodiscard]] const auto &fetch_node() const {
         ENTT_ASSERT(vtable != nullptr, "Invalid vtable function");
-        return node ? *node : (vtable(internal::meta_traits::is_none, *this, nullptr), *node);
+        return (node == nullptr) ? (vtable(internal::meta_traits::is_none, *this, nullptr), *node) : *node;
     }
 
 public:
@@ -572,7 +574,7 @@ public:
 
     /*! @copydoc any::operator== */
     [[nodiscard]] bool operator==(const meta_any &other) const noexcept {
-        return (ctx == other.ctx) && (!!*this ^ !other) && (storage == other.storage);
+        return (ctx == other.ctx) && (!*this == !other) && (storage == other.storage);
     }
 
     /*! @copydoc any::operator!= */
