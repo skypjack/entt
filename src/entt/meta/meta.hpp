@@ -185,17 +185,21 @@ class meta_any {
             }
         }
 
-        if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
-            if(!!(req & internal::meta_traits::is_sequence_container)) {
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *static_cast<meta_sequence_container *>(const_cast<void *>(other)) = !!(req & internal::meta_traits::is_const) ? meta_sequence_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_sequence_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
-            }
-        }
+        if constexpr(is_complete_v<meta_sequence_container_traits<Type>> || is_complete_v<meta_associative_container_traits<Type>>) {
+            using container_type = std::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
+            static constexpr auto flag = is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_sequence_container : internal::meta_traits::is_associative_container;
 
-        if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
-            if(!!(req & internal::meta_traits::is_associative_container)) {
+            if(!!(req & flag)) {
+                if(!(req & internal::meta_traits::is_const)) {
+                    if(auto *elem = any_cast<Type>(&const_cast<meta_any &>(value).storage); elem != nullptr) {
+                        // NOLINTNEXTLINE(bugprone-casting-through-void)
+                        *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, *elem};
+                        return;
+                    }
+                }
+
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *static_cast<meta_associative_container *>(const_cast<void *>(other)) = !!(req & internal::meta_traits::is_const) ? meta_associative_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_associative_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
+                *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<const Type &>(value.storage)};
             }
         }
     }
@@ -524,7 +528,7 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        meta_sequence_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_sequence_container() : meta_sequence_container{};
+        meta_sequence_container proxy{};
         if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container, *this, &proxy); }
         return proxy;
     }
@@ -541,7 +545,7 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        meta_associative_container proxy = (storage.policy() == any_policy::cref) ? std::as_const(*this).as_associative_container() : meta_associative_container{};
+        meta_associative_container proxy{};
         if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_associative_container, *this, &proxy); }
         return proxy;
     }
