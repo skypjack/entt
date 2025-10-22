@@ -64,7 +64,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     using base_type = internal::basic_any_storage<Len, Align>;
 
     template<typename Type>
-    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static constexpr bool in_situ_v = internal::in_situ<Type, Len, Align>::value;
 
     template<typename Type>
