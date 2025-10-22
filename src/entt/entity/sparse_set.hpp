@@ -101,6 +101,8 @@ private:
     difference_type offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Container>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
     return rhs.index() - lhs.index();
@@ -135,6 +137,8 @@ template<typename Container>
 [[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
     return !(lhs < rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */

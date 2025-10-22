@@ -29,7 +29,7 @@ namespace internal {
 template<typename It>
 class dense_set_iterator final {
     template<typename>
-    friend class dense_set_iterator;
+    friend class internal::dense_set_iterator;
 
 public:
     using value_type = typename It::value_type::second_type;
@@ -109,6 +109,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<Lhs> &lhs, const dense_set_iterator<Rhs> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -144,10 +146,12 @@ template<typename Lhs, typename Rhs>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 template<typename It>
 class dense_set_local_iterator final {
     template<typename>
-    friend class dense_set_local_iterator;
+    friend class internal::dense_set_local_iterator;
 
 public:
     using value_type = typename It::value_type::second_type;
@@ -195,6 +199,8 @@ private:
     std::size_t offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator==(const dense_set_local_iterator<Lhs> &lhs, const dense_set_local_iterator<Rhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
@@ -204,6 +210,8 @@ template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator!=(const dense_set_local_iterator<Lhs> &lhs, const dense_set_local_iterator<Rhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */

@@ -78,6 +78,8 @@ private:
     size_type offset{};
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Container>
 [[nodiscard]] constexpr bool operator==(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
     return lhs.pos == rhs.pos;
@@ -87,6 +89,8 @@ template<typename Container>
 [[nodiscard]] constexpr bool operator!=(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */
