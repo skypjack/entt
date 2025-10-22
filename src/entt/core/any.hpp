@@ -23,12 +23,12 @@ enum class any_request : std::uint8_t {
     destroy,
     compare,
     copy,
-    move,
-    get
+    move
 };
 
 template<std::size_t Len, std::size_t Align>
 struct basic_any_storage {
+    static constexpr bool has_buffer = true;
     union {
         const void *instance{};
         // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -38,6 +38,7 @@ struct basic_any_storage {
 
 template<std::size_t Align>
 struct basic_any_storage<0u, Align> {
+    static constexpr bool has_buffer = false;
     const void *instance{};
 };
 
@@ -120,13 +121,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             if constexpr(in_situ_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
                 return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
-            }
-            [[fallthrough]];
-        case request::get:
-            ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
-            if constexpr(in_situ_v<Type>) {
-                // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
-                return elem;
             }
         }
 
@@ -364,7 +358,11 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void *data() const noexcept {
-        return (mode == any_policy::embedded) ? vtable(request::get, *this, nullptr) : this->instance;
+        if constexpr(base_type::has_buffer) {
+            return (mode == any_policy::embedded) ? &this->buffer : this->instance;
+        } else {
+            return this->instance;
+        }
     }
 
     /**
