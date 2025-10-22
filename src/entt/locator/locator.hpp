@@ -30,7 +30,7 @@ ENTT_MODULE_EXPORT namespace entt {
 template<typename Service>
 class locator final {
     class service_handle {
-        friend class locator<Service>;
+        friend class entt::locator<Service>;
         std::shared_ptr<Service> value{};
     };
 

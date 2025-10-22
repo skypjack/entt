@@ -22,7 +22,7 @@ namespace internal {
 template<typename... It>
 class table_iterator {
     template<typename...>
-    friend class table_iterator;
+    friend class internal::table_iterator;
 
 public:
     using value_type = decltype(std::forward_as_tuple(*std::declval<It>()...));
@@ -102,6 +102,8 @@ private:
     std::tuple<It...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) - std::get<0>(rhs.it);
@@ -136,6 +138,8 @@ template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator>=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
     return !(lhs < rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */

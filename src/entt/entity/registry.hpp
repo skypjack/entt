@@ -41,7 +41,7 @@ namespace internal {
 template<typename It>
 class registry_storage_iterator final {
     template<typename Other>
-    friend class registry_storage_iterator;
+    friend class internal::registry_storage_iterator;
 
     using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
 
@@ -124,6 +124,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -158,6 +160,8 @@ template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator>=(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 template<typename Allocator>
 class registry_context {

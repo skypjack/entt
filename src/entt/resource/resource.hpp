@@ -25,7 +25,7 @@ ENTT_MODULE_EXPORT namespace entt {
 template<typename Type>
 class resource {
     template<typename>
-    friend class resource;
+    friend class entt::resource;
 
     template<typename Other>
     static constexpr bool is_acceptable = !std::is_same_v<Type, Other> && std::is_constructible_v<Type &, Other &>;

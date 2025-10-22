@@ -85,6 +85,8 @@ private:
     std::tuple<Owned *..., Get *...> pools;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
     return lhs.it == rhs.it;
@@ -94,6 +96,8 @@ template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 struct group_descriptor {
     using size_type = std::size_t;

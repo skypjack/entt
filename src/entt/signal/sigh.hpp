@@ -56,7 +56,7 @@ class sigh;
  */
 template<typename Ret, typename... Args, typename Allocator>
 class sigh<Ret(Args...), Allocator> {
-    friend class sink<sigh<Ret(Args...), Allocator>>;
+    friend class entt::sink<sigh<Ret(Args...), Allocator>>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using delegate_type = delegate<Ret(Args...)>;
@@ -232,7 +232,7 @@ private:
  */
 class connection {
     template<typename>
-    friend class sink;
+    friend class entt::sink;
 
     connection(delegate<void(void *)> fn, void *ref)
         : disconnect{fn}, signal{ref} {}

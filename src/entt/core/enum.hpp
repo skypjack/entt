@@ -29,6 +29,8 @@ inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
 
 } // namespace entt
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /**
  * @brief Operator available for enums for which bitmask support is enabled.
  * @tparam Type Enum class type.
@@ -97,5 +99,7 @@ constexpr std::enable_if_t<entt::enum_as_bitmask_v<Type>, Type &>
 operator^=(Type &lhs, const Type rhs) noexcept {
     return (lhs = (lhs ^ rhs));
 }
+
+ENTT_MODULE_EXPORT_END
 
 #endif

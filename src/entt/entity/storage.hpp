@@ -114,6 +114,8 @@ private:
     difference_type offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs, auto Page>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return rhs.index() - lhs.index();
@@ -149,10 +151,12 @@ template<typename Lhs, typename Rhs, auto Page>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 template<typename It, typename... Other>
 class extended_storage_iterator final {
     template<typename Iter, typename... Args>
-    friend class extended_storage_iterator;
+    friend class internal::extended_storage_iterator;
 
 public:
     using iterator_type = It;
@@ -201,6 +205,8 @@ private:
     std::tuple<It, Other...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
@@ -210,6 +216,8 @@ template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */

@@ -23,7 +23,7 @@ namespace internal {
 template<typename It>
 class handle_storage_iterator final {
     template<typename Other>
-    friend class handle_storage_iterator;
+    friend class internal::handle_storage_iterator;
 
     using underlying_type = std::remove_reference_t<typename It::value_type::second_type>;
     using entity_type = typename underlying_type::entity_type;
@@ -77,6 +77,8 @@ private:
     It last;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename ILhs, typename IRhs>
 [[nodiscard]] constexpr bool operator==(const handle_storage_iterator<ILhs> &lhs, const handle_storage_iterator<IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
@@ -86,6 +88,8 @@ template<typename ILhs, typename IRhs>
 [[nodiscard]] constexpr bool operator!=(const handle_storage_iterator<ILhs> &lhs, const handle_storage_iterator<IRhs> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */
