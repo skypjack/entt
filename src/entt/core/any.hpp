@@ -17,6 +17,7 @@ namespace entt {
 namespace internal {
 
 enum class any_request : std::uint8_t {
+    info,
     transfer,
     assign,
     destroy,
@@ -78,6 +79,8 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         }
 
         switch(req) {
+        case request::info:
+            return &type_id<Type>();
         case request::transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
@@ -135,7 +138,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
         vtable = basic_vtable<plain_type>;
-        descriptor = &type_id<plain_type>;
 
         if constexpr(std::is_void_v<Type>) {
             mode = any_policy::empty;
@@ -171,7 +173,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     basic_any(const basic_any &other, const any_policy pol) noexcept
         : base_type{other.data()},
           vtable{other.vtable},
-          descriptor{other.descriptor},
           mode{pol} {}
 
     void destroy_if_owner() {
@@ -245,7 +246,6 @@ public:
     basic_any(basic_any &&other) noexcept
         : base_type{},
           vtable{other.vtable},
-          descriptor{other.descriptor},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
@@ -294,7 +294,6 @@ public:
             }
 
             vtable = other.vtable;
-            descriptor = other.descriptor;
             mode = other.mode;
         }
 
@@ -352,7 +351,7 @@ public:
      * @return The object type info if any, `type_id<void>()` otherwise.
      */
     [[nodiscard]] const type_info &info() const noexcept {
-        return descriptor();
+        return *static_cast<const type_info *>(vtable(request::info, *this, nullptr));
     }
 
     /*! @copydoc info */
@@ -527,7 +526,6 @@ public:
 
 private:
     vtable_type *vtable{};
-    const type_info &(*descriptor)() noexcept {};
     any_policy mode{};
 };
 
