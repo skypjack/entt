@@ -41,6 +41,8 @@ ENTT_MODULE_EXPORT namespace entt {
 
 } // namespace entt
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /**
  * @brief Operator available for enums for which bitmask support is enabled.
  * @tparam Type Enum class type.
@@ -101,5 +103,7 @@ template<entt::enum_bitmask Type>
 constexpr Type &operator^=(Type &lhs, const Type rhs) noexcept {
     return (lhs = (lhs ^ rhs));
 }
+
+ENTT_MODULE_EXPORT_END
 
 #endif

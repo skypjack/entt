@@ -62,7 +62,7 @@ struct dense_map_node final {
 template<typename It>
 class dense_map_iterator final {
     template<typename>
-    friend class dense_map_iterator;
+    friend class internal::dense_map_iterator;
 
     static_assert(stl::is_pointer_v<It>, "Not a pointer type");
     using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
@@ -154,10 +154,49 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return lhs.it - rhs.it;
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator==(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return lhs.it == rhs.it;
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator!=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator<(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return lhs.it < rhs.it;
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator>(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator<=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator>=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+ENTT_MODULE_EXPORT_END
+
 template<typename It>
 class dense_map_local_iterator final {
     template<typename>
-    friend class dense_map_local_iterator;
+    friend class internal::dense_map_local_iterator;
 
     static_assert(stl::is_pointer_v<It>, "Not a pointer type");
     using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
@@ -214,6 +253,20 @@ private:
     It it{};
     stl::size_t offset{dense_map_placeholder_position};
 };
+
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator==(const dense_map_local_iterator<Lhs> &lhs, const dense_map_local_iterator<Rhs> &rhs) noexcept {
+    return lhs.index() == rhs.index();
+}
+
+template<typename Lhs, typename Rhs>
+[[nodiscard]] constexpr bool operator!=(const dense_map_local_iterator<Lhs> &lhs, const dense_map_local_iterator<Rhs> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */

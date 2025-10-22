@@ -4,21 +4,21 @@
 #include "../config/module.h"
 
 #ifndef ENTT_MODULE
-#include <compare>
-#include "../config/config.h"
-#include "../core/algorithm.hpp"
-#include "../core/any.hpp"
-#include "../core/bit.hpp"
-#include "../core/type_info.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#    include <compare>
+#    include "../config/config.h"
+#    include "../core/algorithm.hpp"
+#    include "../core/any.hpp"
+#    include "../core/bit.hpp"
+#    include "../core/type_info.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
 #endif // ENTT_MODULE
 
 namespace entt {
@@ -116,6 +116,45 @@ private:
     const Container *packed;
     difference_type offset;
 };
+
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename Container>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return rhs.index() - lhs.index();
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator==(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return lhs.index() == rhs.index();
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator!=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return lhs.index() > rhs.index();
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator<=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename Container>
+[[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace internal
 /*! @endcond */
