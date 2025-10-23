@@ -135,7 +135,9 @@ endif()
 if (ENTT_MODULE)
     target_sources(EnTT
         PUBLIC
-            FILE_SET cxx_modules TYPE CXX_MODULES FILES
+            FILE_SET cxx_modules TYPE CXX_MODULES
+            BASE_DIRS ${EnTT_SOURCE_DIR}/src/entt
+            FILES
                 ${EnTT_SOURCE_DIR}/src/entt/entt.ixx
     )
 endif()
@@ -304,13 +306,22 @@ if(ENTT_INSTALL)
 
     include(CMakePackageConfigHelpers)
 
-    install(
-        TARGETS EnTT
-        EXPORT EnTTTargets
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        $<$<BOOL:${ENTT_MODULE}>:FILE_SET cxx_modules DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/entt>
-    )
+    if(ENTT_MODULE)
+        install(
+            TARGETS EnTT
+            EXPORT EnTTTargets
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            FILE_SET cxx_modules DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/entt
+        )
+    else()
+        install(
+            TARGETS EnTT
+            EXPORT EnTTTargets
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        )
+    endif()
 
     write_basic_package_version_file(
         EnTTConfigVersion.cmake
@@ -324,18 +335,37 @@ if(ENTT_INSTALL)
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
     )
 
-    export(
-        EXPORT EnTTTargets
-        FILE ${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake
-        NAMESPACE EnTT::
-    )
+    if(ENTT_MODULE)
+        export(
+            TARGETS EnTT
+            FILE "${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake"
+            NAMESPACE EnTT::
+            CXX_MODULES_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cxx-modules"
+        )
+    else()
+        export(
+            TARGETS EnTT
+            FILE "${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake"
+            NAMESPACE EnTT::
+        )
+    endif()
 
-    install(
-        EXPORT EnTTTargets
-        FILE EnTTTargets.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
-        NAMESPACE EnTT::
-    )
+    if(ENTT_MODULE)
+        install(
+            EXPORT EnTTTargets
+            FILE EnTTTargets.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+            NAMESPACE EnTT::
+            CXX_MODULES_DIRECTORY ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake/cxx-modules
+        )
+    else()
+        install(
+            EXPORT EnTTTargets
+            FILE EnTTTargets.cmake
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+            NAMESPACE EnTT::
+        )
+    endif()
 
     install(
         FILES
