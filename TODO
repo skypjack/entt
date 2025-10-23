@@ -32,7 +32,6 @@ TODO:
 * paged vector as a standalone class
 * resource: shared_from_this?
 * finish the imgui viewer/editor!
-* trivially destructible optimization for basic_any
 * introduce compile-time flag to skip dll-only checks in basic_any
 * auto policy for return types in meta (i.e. it picks as_is or as_(c)ref automatically as needed)
 * find a way to test deleter and the absence of it in basic_any
