@@ -186,20 +186,16 @@ class meta_any {
         }
 
         if constexpr(is_complete_v<meta_sequence_container_traits<Type>> || is_complete_v<meta_associative_container_traits<Type>>) {
-            using container_type = std::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
-            static constexpr auto flag = is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_sequence_container : internal::meta_traits::is_associative_container;
+            if(constexpr auto flag = (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_sequence_container : internal::meta_traits::is_associative_container); !!(req & flag)) {
+                using container_type = std::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
 
-            if(!!(req & flag)) {
-                if(!(req & internal::meta_traits::is_const)) {
-                    if(auto *elem = any_cast<Type>(&const_cast<meta_any &>(value).storage); elem != nullptr) {
-                        // NOLINTNEXTLINE(bugprone-casting-through-void)
-                        *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, *elem};
-                        return;
-                    }
+                if(!!(req & internal::meta_traits::is_const) || (value.storage.policy() == any_policy::cref)) {
+                    // NOLINTNEXTLINE(bugprone-casting-through-void)
+                    *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<const Type &>(value.storage)};
+                } else {
+                    // NOLINTNEXTLINE(bugprone-casting-through-void)
+                    *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
                 }
-
-                // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<const Type &>(value.storage)};
             }
         }
     }
