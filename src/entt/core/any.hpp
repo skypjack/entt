@@ -340,9 +340,8 @@ public:
     template<typename Type>
     [[nodiscard]] bool has_value() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
-        static constexpr auto *other = &basic_vtable<Type>;
         // it could be a call across boundaries, but still for the same type
-        return (vtable == other) || has_value(type_id<Type>());
+        return (vtable == &basic_vtable<Type>) || has_value(type_id<Type>());
     }
 
     /**
