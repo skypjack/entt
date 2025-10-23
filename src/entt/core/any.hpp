@@ -20,7 +20,6 @@ enum class any_request : std::uint8_t {
     info,
     transfer,
     assign,
-    destroy,
     compare,
     copy,
     move
@@ -60,8 +59,9 @@ struct in_situ<void, Len, Align>: std::false_type {};
 template<std::size_t Len, std::size_t Align>
 class basic_any: private internal::basic_any_storage<Len, Align> {
     using request = internal::any_request;
-    using vtable_type = const void *(const request, const basic_any &, const void *);
     using base_type = internal::basic_any_storage<Len, Align>;
+    using vtable_type = const void *(const request, const basic_any &, const void *);
+    using deleter_type = void(const basic_any &);
 
     template<typename Type>
     static constexpr bool in_situ_v = internal::in_situ<Type, Len, Align>::value;
@@ -70,15 +70,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
         static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
-        const Type *elem = nullptr;
-
-        if constexpr(in_situ_v<Type>) {
-            elem = (value.mode == any_policy::embedded) ? reinterpret_cast<const Type *>(&value.buffer) : static_cast<const Type *>(value.instance);
-        } else {
-            elem = static_cast<const Type *>(value.instance);
-        }
-
-        switch(req) {
+        switch(const auto *elem = static_cast<const Type *>(value.data()); req) {
         case request::info:
             return &type_id<Type>();
         case request::transfer:
@@ -92,15 +84,6 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             if constexpr(std::is_copy_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
                 return other;
-            }
-            break;
-        case request::destroy:
-            if constexpr(in_situ_v<Type>) {
-                (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
-            } else if constexpr(std::is_array_v<Type>) {
-                delete[] elem;
-            } else if constexpr(!std::is_void_v<Type>) {
-                delete elem;
             }
             break;
         case request::compare:
@@ -126,6 +109,22 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         return nullptr;
     }
 
+    template<typename Type>
+    static void basic_deleter(const basic_any &value) {
+        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        ENTT_ASSERT((value.mode == any_policy::dynamic) || ((value.mode == any_policy::embedded) && !std::is_trivially_destructible_v<Type>), "Unexpected policy");
+
+        const auto *elem = static_cast<const Type *>(value.data());
+
+        if constexpr(in_situ_v<Type>) {
+            (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
+        } else if constexpr(std::is_array_v<Type>) {
+            delete[] elem;
+        } else {
+            delete elem;
+        }
+    }
+
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
         using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
@@ -133,14 +132,22 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         vtable = basic_vtable<plain_type>;
 
         if constexpr(std::is_void_v<Type>) {
+            deleter = nullptr;
             mode = any_policy::empty;
             this->instance = nullptr;
         } else if constexpr(std::is_lvalue_reference_v<Type>) {
+            deleter = nullptr;
             static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
             mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (std::addressof(args), ...);
         } else if constexpr(in_situ_v<plain_type>) {
+            if constexpr(std::is_trivially_destructible_v<plain_type>) {
+                deleter = nullptr;
+            } else {
+                deleter = &basic_deleter<plain_type>;
+            }
+
             mode = any_policy::embedded;
 
             if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
@@ -150,6 +157,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 ::new(&this->buffer) plain_type(std::forward<Args>(args)...);
             }
         } else {
+            deleter = &basic_deleter<plain_type>;
             mode = any_policy::dynamic;
 
             if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
@@ -163,14 +171,9 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         }
     }
 
-    basic_any(const basic_any &other, const any_policy pol) noexcept
-        : base_type{other.data()},
-          vtable{other.vtable},
-          mode{pol} {}
-
-    void destroy_if_owner() {
-        if(owner()) {
-            vtable(request::destroy, *this, nullptr);
+    void invoke_deleter_if_exists() {
+        if(deleter != nullptr) {
+            deleter(*this);
         }
     }
 
@@ -210,6 +213,7 @@ public:
             initialize<void>();
         } else {
             initialize<Type &>(*value);
+            deleter = &basic_deleter<Type>;
             mode = any_policy::dynamic;
         }
     }
@@ -239,6 +243,7 @@ public:
     basic_any(basic_any &&other) noexcept
         : base_type{},
           vtable{other.vtable},
+          deleter{other.deleter},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
@@ -249,7 +254,7 @@ public:
 
     /*! @brief Frees the internal buffer, whatever it means. */
     ~basic_any() {
-        destroy_if_owner();
+        invoke_deleter_if_exists();
     }
 
     /**
@@ -259,7 +264,7 @@ public:
      */
     basic_any &operator=(const basic_any &other) {
         if(this != &other) {
-            destroy_if_owner();
+            invoke_deleter_if_exists();
 
             if(other) {
                 other.vtable(request::copy, other, this);
@@ -278,7 +283,7 @@ public:
      */
     basic_any &operator=(basic_any &&other) noexcept {
         if(this != &other) {
-            destroy_if_owner();
+            invoke_deleter_if_exists();
 
             if(other.mode == any_policy::embedded) {
                 other.vtable(request::move, other, this);
@@ -287,6 +292,7 @@ public:
             }
 
             vtable = other.vtable;
+            deleter = other.deleter;
             mode = other.mode;
         }
 
@@ -422,7 +428,7 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
-        destroy_if_owner();
+        invoke_deleter_if_exists();
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -457,7 +463,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-        destroy_if_owner();
+        invoke_deleter_if_exists();
         initialize<void>();
     }
 
@@ -497,12 +503,18 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] basic_any as_ref() noexcept {
-        return basic_any{*this, (mode == any_policy::cref ? any_policy::cref : any_policy::ref)};
+        basic_any other = std::as_const(*this).as_ref();
+        other.mode = (mode == any_policy::cref ? any_policy::cref : any_policy::ref);
+        return other;
     }
 
     /*! @copydoc as_ref */
     [[nodiscard]] basic_any as_ref() const noexcept {
-        return basic_any{*this, any_policy::cref};
+        basic_any other{};
+        other.instance = data();
+        other.vtable = vtable;
+        other.mode = any_policy::cref;
+        return other;
     }
 
     /**
@@ -523,6 +535,7 @@ public:
 
 private:
     vtable_type *vtable{};
+    deleter_type *deleter{};
     any_policy mode{};
 };
 
