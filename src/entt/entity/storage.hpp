@@ -1060,6 +1060,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     basic_storage(basic_storage &&other) noexcept
         : base_type{static_cast<base_type &&>(other)},
           placeholder{other.placeholder} {}
@@ -1069,6 +1070,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     basic_storage(basic_storage &&other, const allocator_type &allocator)
         : base_type{static_cast<base_type &&>(other), allocator},
           placeholder{other.placeholder} {}
