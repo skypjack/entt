@@ -450,24 +450,20 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    // NOLINTBEGIN(bugprone-use-after-move)
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)},
+        : base_type{static_cast<base_type &&>(other)},
           payload{std::move(other.payload)} {}
-    // NOLINTEND(bugprone-use-after-move)
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    // NOLINTBEGIN(bugprone-use-after-move)
     basic_storage(basic_storage &&other, const allocator_type &allocator)
-        : base_type{std::move(other), allocator},
+        : base_type{static_cast<base_type &&>(other), allocator},
           payload{std::move(other.payload), allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
     }
-    // NOLINTEND(bugprone-use-after-move)
 
     /*! @brief Default destructor. */
     // NOLINTNEXTLINE(bugprone-exception-escape)
@@ -1064,22 +1060,18 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    // NOLINTBEGIN(bugprone-use-after-move)
     basic_storage(basic_storage &&other) noexcept
-        : base_type{std::move(other)},
+        : base_type{static_cast<base_type &&>(other)},
           placeholder{other.placeholder} {}
-    // NOLINTEND(bugprone-use-after-move)
 
     /**
      * @brief Allocator-extended move constructor.
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    // NOLINTBEGIN(bugprone-use-after-move)
     basic_storage(basic_storage &&other, const allocator_type &allocator)
-        : base_type{std::move(other), allocator},
+        : base_type{static_cast<base_type &&>(other), allocator},
           placeholder{other.placeholder} {}
-    // NOLINTEND(bugprone-use-after-move)
 
     /*! @brief Default destructor. */
     ~basic_storage() override = default;
