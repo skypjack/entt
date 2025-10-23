@@ -1,14 +1,18 @@
 #ifndef ENTT_CONTAINER_TABLE_HPP
 #define ENTT_CONTAINER_TABLE_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -18,7 +22,7 @@ namespace internal {
 template<typename... It>
 class table_iterator {
     template<typename...>
-    friend class table_iterator;
+    friend class internal::table_iterator;
 
 public:
     using value_type = decltype(std::forward_as_tuple(*std::declval<It>()...));
@@ -98,6 +102,8 @@ private:
     std::tuple<It...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) - std::get<0>(rhs.it);
@@ -133,8 +139,12 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic table implementation.
@@ -447,10 +457,12 @@ private:
     container_type payload;
 };
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
 /*! @cond TURN_OFF_DOXYGEN */
-namespace std {
+ENTT_MODULE_EXPORT namespace std {
 
 template<typename... Container, typename Allocator>
 struct uses_allocator<entt::basic_table<Container...>, Allocator>

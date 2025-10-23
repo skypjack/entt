@@ -1,12 +1,16 @@
 #ifndef ENTT_CONTAINER_FWD_HPP
 #define ENTT_CONTAINER_FWD_HPP
 
-#include <functional>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <functional>
+#   include <memory>
+#   include <utility>
+#   include <vector>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 template<
     typename Key,

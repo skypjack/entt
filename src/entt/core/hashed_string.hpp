@@ -1,9 +1,13 @@
 #ifndef ENTT_CORE_HASHED_STRING_HPP
 #define ENTT_CORE_HASHED_STRING_HPP
 
-#include <cstddef>
-#include <cstdint>
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <cstdint>
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -38,6 +42,8 @@ struct basic_hashed_string {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Zero overhead unique identifier.
@@ -311,6 +317,8 @@ inline namespace literals {
 }
 
 } // namespace literals
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

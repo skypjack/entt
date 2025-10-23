@@ -1,9 +1,13 @@
 #ifndef ENTT_POLY_FWD_HPP
 #define ENTT_POLY_FWD_HPP
 
-#include <cstddef>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <cstddef>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 template<typename, std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>

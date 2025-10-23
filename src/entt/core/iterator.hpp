@@ -1,12 +1,16 @@
 #ifndef ENTT_CORE_ITERATOR_HPP
 #define ENTT_CORE_ITERATOR_HPP
 
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <iterator>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Helper type to use as pointer with input iterators.

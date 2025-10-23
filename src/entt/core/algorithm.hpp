@@ -1,14 +1,18 @@
 #ifndef ENTT_CORE_ALGORITHM_HPP
 #define ENTT_CORE_ALGORITHM_HPP
 
-#include <algorithm>
-#include <functional>
-#include <iterator>
-#include <utility>
-#include <vector>
-#include "utility.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <algorithm>
+#   include <functional>
+#   include <iterator>
+#   include <utility>
+#   include <vector>
+#   include "utility.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Function object to wrap `std::sort` in a class type.

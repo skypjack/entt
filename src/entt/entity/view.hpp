@@ -1,17 +1,21 @@
 #ifndef ENTT_ENTITY_VIEW_HPP
 #define ENTT_ENTITY_VIEW_HPP
 
-#include <array>
-#include <cstddef>
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../core/type_traits.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <array>
+#   include <cstddef>
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "../core/type_traits.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -20,7 +24,7 @@ namespace internal {
 
 template<typename... Type>
 // NOLINTNEXTLINE(misc-redundant-expression)
-static constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
+inline constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
 
 template<typename Type>
 const Type *view_placeholder() {
@@ -58,10 +62,13 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
     return elem;
 }
 
+template<typename, typename...>
+class extended_view_iterator;
+
 template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
-    friend class extended_view_iterator;
+    friend class internal::extended_view_iterator;
 
     using iterator_type = typename Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
@@ -127,6 +134,8 @@ private:
     difference_type index;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 [[nodiscard]] constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
     return lhs.it == rhs.it;
@@ -136,6 +145,8 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 [[nodiscard]] constexpr bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 template<typename It, typename... Get>
 class extended_view_iterator final {
@@ -187,6 +198,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) noexcept {
     return lhs.it == rhs.it;
@@ -197,8 +210,12 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief View implementation.
@@ -1133,6 +1150,8 @@ basic_view(Type &...storage) -> basic_view<get_t<Type...>, exclude_t<>>;
  */
 template<typename... Get, typename... Exclude>
 basic_view(std::tuple<Get &...>, std::tuple<Exclude &...> = {}) -> basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

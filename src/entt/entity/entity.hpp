@@ -1,12 +1,16 @@
 #ifndef ENTT_ENTITY_ENTITY_HPP
 #define ENTT_ENTITY_ENTITY_HPP
 
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <cstdint>
+#   include <type_traits>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -52,6 +56,8 @@ struct entt_traits<std::uint64_t> {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Common basic entity traits implementation.
@@ -382,6 +388,8 @@ inline constexpr null_t null{};
  * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

@@ -1,11 +1,15 @@
 #ifndef ENTT_CORE_FWD_HPP
 #define ENTT_CORE_FWD_HPP
 
-#include <cstddef>
-#include <cstdint>
-#include "../config/config.h"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <cstdint>
+#   include "../config/config.h"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Possible modes of an any object. */
 enum class any_policy : std::uint8_t {

@@ -1,14 +1,18 @@
 #ifndef ENTT_ENTITY_FWD_HPP
 #define ENTT_ENTITY_FWD_HPP
 
-#include <cstdint>
-#include <memory>
-#include <type_traits>
-#include "../config/config.h"
-#include "../core/fwd.hpp"
-#include "../core/type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstdint>
+#   include <memory>
+#   include <type_traits>
+#   include "../config/config.h"
+#   include "../core/fwd.hpp"
+#   include "../core/type_traits.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Default entity identifier. */
 enum class entity : id_type {};

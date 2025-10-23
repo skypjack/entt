@@ -1,10 +1,14 @@
 #ifndef ENTT_CORE_FAMILY_HPP
 #define ENTT_CORE_FAMILY_HPP
 
-#include "../config/config.h"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include "../config/config.h"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Dynamic identifier generator.

@@ -1,9 +1,13 @@
 #ifndef ENTT_META_POLICY_HPP
 #define ENTT_META_POLICY_HPP
 
-#include <type_traits>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <type_traits>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Empty class type used to request the _as ref_ policy. */
 struct as_ref_t final {

@@ -1,15 +1,19 @@
 #ifndef ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 #define ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -74,6 +78,8 @@ private:
     size_type offset{};
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Container>
 [[nodiscard]] constexpr bool operator==(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
     return lhs.pos == rhs.pos;
@@ -84,8 +90,12 @@ template<typename Container>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic implementation of a directed adjacency matrix.
@@ -335,6 +345,8 @@ private:
     container_type matrix;
     size_type vert;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

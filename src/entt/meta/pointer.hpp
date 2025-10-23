@@ -3,11 +3,15 @@
 #ifndef ENTT_META_POINTER_HPP
 #define ENTT_META_POINTER_HPP
 
-#include <memory>
-#include <type_traits>
-#include "type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <memory>
+#   include <type_traits>
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Makes plain pointers pointer-like types for the meta system.

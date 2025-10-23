@@ -1,10 +1,14 @@
 #ifndef ENTT_META_FWD_HPP
 #define ENTT_META_FWD_HPP
 
-#include <cstddef>
-#include <limits>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <limits>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 class meta_ctx;
 

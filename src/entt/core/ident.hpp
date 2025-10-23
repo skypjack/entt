@@ -1,13 +1,17 @@
 #ifndef ENTT_CORE_IDENT_HPP
 #define ENTT_CORE_IDENT_HPP
 
-#include <cstddef>
-#include <type_traits>
-#include <utility>
-#include "fwd.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <type_traits>
+#   include <utility>
+#   include "fwd.hpp"
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Type integral identifiers.

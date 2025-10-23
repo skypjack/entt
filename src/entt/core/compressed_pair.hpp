@@ -1,12 +1,16 @@
 #ifndef ENTT_CORE_COMPRESSED_PAIR_HPP
 #define ENTT_CORE_COMPRESSED_PAIR_HPP
 
-#include <cstddef>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "fwd.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "fwd.hpp"
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -71,6 +75,8 @@ struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Ty
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief A compressed pair.
@@ -244,9 +250,11 @@ constexpr void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, 
     lhs.swap(rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
-namespace std {
+ENTT_MODULE_EXPORT namespace std {
 
 /**
  * @brief `std::tuple_size` specialization for `compressed_pair`s.

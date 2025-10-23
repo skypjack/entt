@@ -1,17 +1,23 @@
 #ifndef ENTT_META_UTILITY_HPP
 #define ENTT_META_UTILITY_HPP
 
-#include <cstddef>
-#include <functional>
-#include <type_traits>
-#include <utility>
-#include "../core/type_traits.hpp"
-#include "../locator/locator.hpp"
-#include "meta.hpp"
-#include "node.hpp"
-#include "policy.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <functional>
+#   include <type_traits>
+#   include <utility>
+#   include "../core/type_traits.hpp"
+#   include "../locator/locator.hpp"
+#   include "meta.hpp"
+#   include "node.hpp"
+#   include "policy.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Meta function descriptor traits.
@@ -190,6 +196,8 @@ template<typename Policy = as_is_t, typename Type>
     return meta_dispatch<Policy, Type>(locator<meta_ctx>::value_or(), std::forward<Type>(value));
 }
 
+ENTT_MODULE_EXPORT_END
+
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
@@ -239,6 +247,8 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Returns the meta type of the i-th element of a list of arguments.
@@ -472,6 +482,8 @@ template<typename Type, auto Candidate, typename Policy = as_is_t>
 [[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_construct(meta_any *const args) {
     return meta_construct<Type, Candidate, Policy>(locator<meta_ctx>::value_or(), args);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

@@ -1,12 +1,16 @@
 #ifndef ENTT_RESOURCE_RESOURCE_HPP
 #define ENTT_RESOURCE_RESOURCE_HPP
 
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Basic resource handle.
@@ -21,7 +25,7 @@ namespace entt {
 template<typename Type>
 class resource {
     template<typename>
-    friend class resource;
+    friend class entt::resource;
 
     template<typename Other>
     static constexpr bool is_acceptable = !std::is_same_v<Type, Other> && std::is_constructible_v<Type &, Other &>;

@@ -1,14 +1,18 @@
 #ifndef ENTT_CORE_MEMORY_HPP
 #define ENTT_CORE_MEMORY_HPP
 
-#include <cstddef>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).

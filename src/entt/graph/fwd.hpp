@@ -1,11 +1,15 @@
 #ifndef ENTT_GRAPH_FWD_HPP
 #define ENTT_GRAPH_FWD_HPP
 
-#include <cstddef>
-#include <memory>
-#include "../core/fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <memory>
+#   include "../core/fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Undirected graph category tag. */
 struct directed_tag {};

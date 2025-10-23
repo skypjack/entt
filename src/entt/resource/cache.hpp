@@ -1,21 +1,25 @@
 #ifndef ENTT_RESOURCE_RESOURCE_CACHE_HPP
 #define ENTT_RESOURCE_RESOURCE_CACHE_HPP
 
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../container/dense_map.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../core/utility.hpp"
-#include "fwd.hpp"
-#include "loader.hpp"
-#include "resource.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../container/dense_map.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/utility.hpp"
+#   include "fwd.hpp"
+#   include "loader.hpp"
+#   include "resource.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -25,7 +29,7 @@ namespace internal {
 template<typename Type, typename It>
 class resource_cache_iterator final {
     template<typename, typename>
-    friend class resource_cache_iterator;
+    friend class internal::resource_cache_iterator;
 
 public:
     using value_type = std::pair<id_type, resource<Type>>;
@@ -105,6 +109,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const resource_cache_iterator<Lhs...> &lhs, const resource_cache_iterator<Rhs...> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -140,8 +146,12 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic cache for resources of any type.
@@ -407,6 +417,8 @@ public:
 private:
     compressed_pair<container_type, loader_type> pool;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

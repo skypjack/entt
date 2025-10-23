@@ -111,6 +111,8 @@ mind.
 
 ```cpp
 #include <entt/entt.hpp>
+// or import entt; 
+// See Integration > CMake for details.
 
 struct position {
     float x;
@@ -245,6 +247,9 @@ Note that all `install` calls are guarded by the `ENTT_INSTALL` option to allow
 using `EnTT` as a submodule without conflicting with user logic.<br/>
 It is therefore necessary to set the option to true to take advantage of the
 installation logic provided by this library.
+
+Note that `EnTT` can be consumed also as a C++ module. To enable module support, 
+the `ENTT_MODULE` option has to be set to `ON` in `CMake`.
 
 ## Natvis support
 

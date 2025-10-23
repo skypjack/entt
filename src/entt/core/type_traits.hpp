@@ -1,15 +1,19 @@
 #ifndef ENTT_CORE_TYPE_TRAITS_HPP
 #define ENTT_CORE_TYPE_TRAITS_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Utility class to disambiguate overloaded functions.
@@ -906,6 +910,8 @@ using nth_argument_t = typename nth_argument<Index, Candidate>::type;
 
 } // namespace entt
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Type>
 struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t, entt::type_list<Type...>::size> {};
 
@@ -917,5 +923,7 @@ struct std::tuple_size<entt::value_list<Value...>>: std::integral_constant<std::
 
 template<std::size_t Index, auto... Value>
 struct std::tuple_element<Index, entt::value_list<Value...>>: entt::value_list_element<Index, entt::value_list<Value...>> {};
+
+ENTT_MODULE_EXPORT_END
 
 #endif

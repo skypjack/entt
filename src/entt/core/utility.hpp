@@ -1,10 +1,14 @@
 #ifndef ENTT_CORE_UTILITY_HPP
 #define ENTT_CORE_UTILITY_HPP
 
-#include <type_traits>
-#include <utility>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <type_traits>
+#   include <utility>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Identity function object (waiting for C++20). */
 struct identity {

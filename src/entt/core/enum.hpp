@@ -1,9 +1,13 @@
 #ifndef ENTT_CORE_ENUM_HPP
 #define ENTT_CORE_ENUM_HPP
 
-#include <type_traits>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <type_traits>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Enable bitmask support for enum classes.
@@ -24,6 +28,8 @@ template<typename Type>
 inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
 
 } // namespace entt
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Operator available for enums for which bitmask support is enabled.
@@ -93,5 +99,7 @@ constexpr std::enable_if_t<entt::enum_as_bitmask_v<Type>, Type &>
 operator^=(Type &lhs, const Type rhs) noexcept {
     return (lhs = (lhs ^ rhs));
 }
+
+ENTT_MODULE_EXPORT_END
 
 #endif

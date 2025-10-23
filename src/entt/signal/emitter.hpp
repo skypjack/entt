@@ -1,17 +1,21 @@
 #ifndef ENTT_SIGNAL_EMITTER_HPP
 #define ENTT_SIGNAL_EMITTER_HPP
 
-#include <functional>
-#include <type_traits>
-#include <utility>
-#include "../container/dense_map.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
-#include "../core/type_info.hpp"
-#include "../core/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <functional>
+#   include <type_traits>
+#   include <utility>
+#   include "../container/dense_map.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/utility.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief General purpose event emitter.

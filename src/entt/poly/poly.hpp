@@ -1,17 +1,21 @@
 #ifndef ENTT_POLY_POLY_HPP
 #define ENTT_POLY_POLY_HPP
 
-#include <cstddef>
-#include <functional>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../core/any.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <functional>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../core/any.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/type_traits.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Inspector class used to infer the type of the virtual table. */
 struct poly_inspector {

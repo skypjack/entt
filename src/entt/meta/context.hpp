@@ -1,11 +1,15 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-#include <memory>
-#include "../container/dense_map.hpp"
-#include "../core/fwd.hpp"
-#include "../core/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <memory>
+#   include "../container/dense_map.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/utility.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -24,6 +28,8 @@ struct meta_context {
 } // namespace internal
 /*! @endcond */
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /*! @brief Disambiguation tag for constructors and the like. */
 class meta_ctx_arg_t final {};
 
@@ -35,6 +41,8 @@ class meta_ctx: private internal::meta_context {
     // attorney idiom like model to access the base class
     friend struct internal::meta_context;
 };
+
+ENTT_MODULE_EXPORT_END
 
 /*! @cond TURN_OFF_DOXYGEN */
 [[nodiscard]] inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {

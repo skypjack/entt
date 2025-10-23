@@ -1,11 +1,15 @@
 #ifndef ENTT_LOCATOR_LOCATOR_HPP
 #define ENTT_LOCATOR_LOCATOR_HPP
 
-#include <memory>
-#include <utility>
-#include "../config/config.h"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <memory>
+#   include <utility>
+#   include "../config/config.h"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Service locator, nothing more.
@@ -26,7 +30,7 @@ namespace entt {
 template<typename Service>
 class locator final {
     class service_handle {
-        friend class locator<Service>;
+        friend class entt::locator<Service>;
         std::shared_ptr<Service> value{};
     };
 

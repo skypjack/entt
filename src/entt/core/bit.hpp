@@ -1,12 +1,16 @@
 #ifndef ENTT_CORE_BIT_HPP
 #define ENTT_CORE_BIT_HPP
 
-#include <cstddef>
-#include <limits>
-#include <type_traits>
-#include "../config/config.h"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <limits>
+#   include <type_traits>
+#   include "../config/config.h"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Returns the number of set bits in a value (waiting for C++20 and
