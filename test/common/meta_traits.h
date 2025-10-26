@@ -5,11 +5,11 @@
 
 namespace test {
 
-enum class meta_traits {
-    none = 0x0000,
-    one = 0x0001,
-    two = 0x0002,
-    three = 0x0100,
+enum class meta_traits : std::uint8_t {
+    none = 0x00,
+    one = 0x01,
+    two = 0x02,
+    three = 0x04,
     _entt_enum_as_bitmask
 };
 
