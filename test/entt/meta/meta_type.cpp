@@ -575,10 +575,15 @@ TEST_F(MetaType, OverloadedFuncConstFirst) {
     ASSERT_TRUE(res);
     ASSERT_EQ(res.cast<int>(), 2);
 
-    res = type.invoke("cf"_hs, overloaded_func{3}, 1);
+    res = type.invoke("cf"_hs, entt::meta_handle{instance}, entt::meta_any{1});
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(res.cast<int>(), 6);
+    ASSERT_EQ(res.cast<int>(), 4);
+
+    res = type.invoke("cf"_hs, entt::meta_handle{std::as_const(instance)}, entt::meta_any{1});
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 2);
 }
 
 TEST_F(MetaType, OverloadedFuncNonConstFirst) {
@@ -600,10 +605,15 @@ TEST_F(MetaType, OverloadedFuncNonConstFirst) {
     ASSERT_TRUE(res);
     ASSERT_EQ(res.cast<int>(), 2);
 
-    res = type.invoke("ncf"_hs, overloaded_func{3}, 1);
+    res = type.invoke("ncf"_hs, entt::meta_handle{instance}, entt::meta_any{1});
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(res.cast<int>(), 6);
+    ASSERT_EQ(res.cast<int>(), 4);
+
+    res = type.invoke("ncf"_hs, entt::meta_handle{std::as_const(instance)}, entt::meta_any{1});
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 2);
 }
 
 TEST_F(MetaType, OverloadedFuncOrder) {
