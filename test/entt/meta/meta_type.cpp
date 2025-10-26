@@ -157,7 +157,11 @@ struct MetaType: ::testing::Test {
             .func<entt::overload<int(int, int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int)>(&overloaded_func::f)>("f"_hs)
             .func<entt::overload<int(int) const>(&overloaded_func::f)>("f"_hs)
-            .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs);
+            .func<entt::overload<float(int, float)>(&overloaded_func::f)>("f"_hs)
+            .func<entt::overload<int(int) const>(&overloaded_func::f)>("cf"_hs)
+            .func<entt::overload<int(int)>(&overloaded_func::f)>("cf"_hs)
+            .func<entt::overload<int(int)>(&overloaded_func::f)>("ncf"_hs)
+            .func<entt::overload<int(int) const>(&overloaded_func::f)>("ncf"_hs);
 
         entt::meta_factory<property_type>{}
             .type("property"_hs)
@@ -550,6 +554,56 @@ TEST_F(MetaType, OverloadedFunc) {
 
     // it fails as an ambiguous call
     ASSERT_FALSE(type.invoke("f"_hs, instance, 4, 8.));
+}
+
+TEST_F(MetaType, OverloadedFuncConstFirst) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<overloaded_func>();
+    overloaded_func instance{2};
+    entt::meta_any res{};
+
+    ASSERT_TRUE(type.func("cf"_hs));
+
+    res = type.invoke("cf"_hs, instance, 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 4);
+
+    res = type.invoke("cf"_hs, std::as_const(instance), 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 2);
+
+    res = type.invoke("cf"_hs, overloaded_func{3}, 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 6);
+}
+
+TEST_F(MetaType, OverloadedFuncNonConstFirst) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<overloaded_func>();
+    overloaded_func instance{2};
+    entt::meta_any res{};
+
+    ASSERT_TRUE(type.func("ncf"_hs));
+
+    res = type.invoke("ncf"_hs, instance, 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 4);
+
+    res = type.invoke("ncf"_hs, std::as_const(instance), 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 2);
+
+    res = type.invoke("ncf"_hs, overloaded_func{3}, 1);
+
+    ASSERT_TRUE(res);
+    ASSERT_EQ(res.cast<int>(), 6);
 }
 
 TEST_F(MetaType, OverloadedFuncOrder) {
