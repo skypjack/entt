@@ -211,7 +211,7 @@ class meta_any {
 
     [[nodiscard]] const auto &fetch_node() const {
         if(node == nullptr) {
-            ENTT_ASSERT(vtable != nullptr, "Invalid vtable function");
+            ENTT_ASSERT(*this, "Invalid vtable function");
             vtable(internal::meta_traits::is_none, *this, nullptr);
         }
 
@@ -529,14 +529,14 @@ public:
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
         meta_sequence_container proxy{};
-        if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container, *this, &proxy); }
+        if(*this) { vtable(internal::meta_traits::is_sequence_container, *this, &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
         meta_sequence_container proxy{};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_sequence_container | internal::meta_traits::is_const, *this, &proxy); }
+        if(*this) { vtable(internal::meta_traits::is_sequence_container | internal::meta_traits::is_const, *this, &proxy); }
         return proxy;
     }
 
@@ -546,14 +546,14 @@ public:
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
         meta_associative_container proxy{};
-        if(!proxy && vtable != nullptr) { vtable(internal::meta_traits::is_associative_container, *this, &proxy); }
+        if(*this) { vtable(internal::meta_traits::is_associative_container, *this, &proxy); }
         return proxy;
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
         meta_associative_container proxy{};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_associative_container | internal::meta_traits::is_const, *this, &proxy); }
+        if(*this) { vtable(internal::meta_traits::is_associative_container | internal::meta_traits::is_const, *this, &proxy); }
         return proxy;
     }
 
@@ -564,7 +564,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        if(vtable != nullptr) { vtable(internal::meta_traits::is_pointer_like, ret, storage.data()); }
+        if(*this) { vtable(internal::meta_traits::is_pointer_like, ret, storage.data()); }
         return ret;
     }
 
@@ -1546,7 +1546,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline meta_any meta_any::allow_cast(const meta_type &type) const {
     if(storage.has_value(type.info())) {
         return as_ref();
-    } else if(vtable != nullptr) {
+    } else if(*this) {
         return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
             if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
                 return (args.from_void(*ctx, nullptr, instance), ...);
