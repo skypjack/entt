@@ -58,6 +58,10 @@ struct function {
         return value * iv;
     }
 
+    [[nodiscard]] int f(int iv) {
+        return iv * iv;
+    }
+
     void g(int iv) {
         value = iv * iv;
     }
@@ -121,6 +125,10 @@ struct MetaFunc: ::testing::Test {
             .custom<int>(2)
             .func<entt::overload<int(int) const>(&function::f)>("f1"_hs)
             .traits(test::meta_traits::one)
+            .func<entt::overload<int(int) const>(&function::f)>("cf"_hs)
+            .func<entt::overload<int(int)>(&function::f)>("cf"_hs)
+            .func<entt::overload<int(int)>(&function::f)>("ncf"_hs)
+            .func<entt::overload<int(int) const>(&function::f)>("ncf"_hs)
             .func<&function::g>("g"_hs)
             .custom<char>('c')
             .func<function::h>("h"_hs)
@@ -620,6 +628,58 @@ TEST_F(MetaFunc, Overloaded) {
 
     ASSERT_EQ(static_cast<const int &>(type.func("f2"_hs).custom()), 2);
     ASSERT_EQ(static_cast<const int &>(type.func("f2"_hs).next().custom()), 3);
+}
+
+TEST_F(MetaFunc, OverloadedConstFirst) {
+    using namespace entt::literals;
+
+    auto func = entt::resolve<function>().func("cf"_hs);
+    auto next = func.next();
+    function instance{2};
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_TRUE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_EQ(func.arg(0u), entt::resolve<int>());
+
+    ASSERT_TRUE(next);
+    ASSERT_EQ(next.arity(), 1u);
+    ASSERT_FALSE(next.is_const());
+    ASSERT_EQ(next.ret(), entt::resolve<int>());
+    ASSERT_EQ(next.arg(0u), entt::resolve<int>());
+
+    ASSERT_EQ(func.invoke(instance, 1).cast<int>(), 2);
+    ASSERT_EQ(next.invoke(instance, 1).cast<int>(), 1);
+
+    ASSERT_EQ(func.invoke(std::as_const(instance), 1).cast<int>(), 2);
+    ASSERT_FALSE(next.invoke(std::as_const(instance), 1));
+}
+
+TEST_F(MetaFunc, OverloadedNonConstFirst) {
+    using namespace entt::literals;
+
+    auto func = entt::resolve<function>().func("ncf"_hs);
+    auto next = func.next();
+    function instance{2};
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.arity(), 1u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_EQ(func.arg(0u), entt::resolve<int>());
+
+    ASSERT_TRUE(next);
+    ASSERT_EQ(next.arity(), 1u);
+    ASSERT_TRUE(next.is_const());
+    ASSERT_EQ(next.ret(), entt::resolve<int>());
+    ASSERT_EQ(next.arg(0u), entt::resolve<int>());
+
+    ASSERT_EQ(func.invoke(instance, 1).cast<int>(), 1);
+    ASSERT_EQ(next.invoke(instance, 1).cast<int>(), 2);
+
+    ASSERT_FALSE(func.invoke(std::as_const(instance), 1));
+    ASSERT_EQ(next.invoke(std::as_const(instance), 1).cast<int>(), 2);
 }
 
 TEST_F(MetaFunc, OverloadedOrder) {
