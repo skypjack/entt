@@ -59,24 +59,44 @@ using MetaUtilityDeathTest = MetaUtility;
 TEST_F(MetaUtility, MetaDispatch) {
     int value = 2;
 
-    auto as_void = entt::meta_dispatch<entt::as_void_t>(value);
-    auto as_ref = entt::meta_dispatch<entt::as_ref_t>(value);
     auto as_cref = entt::meta_dispatch<entt::as_cref_t>(value);
+    auto as_ref = entt::meta_dispatch<entt::as_ref_t>(value);
+    auto as_void = entt::meta_dispatch<entt::as_void_t>(value);
+    auto as_auto_copy = entt::meta_dispatch<entt::as_auto_t>(static_cast<int &&>(value));
+    auto as_auto_cref = entt::meta_dispatch<entt::as_auto_t>(std::as_const(value));
+    auto as_auto_ref = entt::meta_dispatch<entt::as_auto_t>(value);
     auto as_is = entt::meta_dispatch(value);
 
-    ASSERT_EQ(as_void.type(), entt::resolve<void>());
-    ASSERT_EQ(as_ref.type(), entt::resolve<int>());
     ASSERT_EQ(as_cref.type(), entt::resolve<int>());
+    ASSERT_EQ(as_ref.type(), entt::resolve<int>());
+    ASSERT_EQ(as_void.type(), entt::resolve<void>());
+    ASSERT_EQ(as_auto_copy.type(), entt::resolve<int>());
+    ASSERT_EQ(as_auto_cref.type(), entt::resolve<int>());
+    ASSERT_EQ(as_auto_ref.type(), entt::resolve<int>());
     ASSERT_EQ(as_is.type(), entt::resolve<int>());
 
-    ASSERT_NE(as_is.try_cast<int>(), nullptr);
-    ASSERT_NE(as_ref.try_cast<int>(), nullptr);
+    ASSERT_EQ(as_cref.base().policy(), entt::any_policy::cref);
+    ASSERT_EQ(as_ref.base().policy(), entt::any_policy::ref);
+    ASSERT_EQ(as_void.base().policy(), entt::any_policy::empty);
+    ASSERT_EQ(as_auto_copy.base().policy(), entt::any_policy::embedded);
+    ASSERT_EQ(as_auto_cref.base().policy(), entt::any_policy::cref);
+    ASSERT_EQ(as_auto_ref.base().policy(), entt::any_policy::ref);
+    ASSERT_EQ(as_is.base().policy(), entt::any_policy::embedded);
+
     ASSERT_EQ(as_cref.try_cast<int>(), nullptr);
     ASSERT_NE(as_cref.try_cast<const int>(), nullptr);
+    ASSERT_NE(as_ref.try_cast<int>(), nullptr);
+    ASSERT_NE(as_auto_copy.try_cast<int>(), nullptr);
+    ASSERT_EQ(as_auto_cref.try_cast<int>(), nullptr);
+    ASSERT_NE(as_auto_ref.try_cast<int>(), nullptr);
+    ASSERT_NE(as_is.try_cast<int>(), nullptr);
 
-    ASSERT_EQ(as_is.cast<int>(), 2);
-    ASSERT_EQ(as_ref.cast<int>(), 2);
     ASSERT_EQ(as_cref.cast<int>(), 2);
+    ASSERT_EQ(as_ref.cast<int>(), 2);
+    ASSERT_EQ(as_auto_copy.cast<int>(), 2);
+    ASSERT_EQ(as_auto_cref.cast<int>(), 2);
+    ASSERT_EQ(as_auto_ref.cast<int>(), 2);
+    ASSERT_EQ(as_is.cast<int>(), 2);
 }
 
 TEST_F(MetaUtility, MetaDispatchMetaAny) {

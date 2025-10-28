@@ -825,6 +825,18 @@ There are a few alternatives available at the moment:
   `as_ref_t` _adapts_ to the constness of the passed object and to that of the
   return type if any.
 
+* The _as-auto_ policy, associated with the type `entt::as_auto_t`.<br/>
+  Useful for decoupling meta type creation code from calling code while still
+  preserving the behavior of data members and member functions as defined:
+
+  ```cpp
+  entt::meta_factory<my_type>{}.func<&my_type::any_member, entt::as_auto_t>("member"_hs);
+  ```
+
+  For data members or member functions that return a reference type, the value
+  is returned by reference with the same constness. In all other cases, the
+  value is returned by copy.
+
 Some uses are rather trivial, but it is useful to note that there are some less
 obvious corner cases that can in turn be solved with the use of policies.
 

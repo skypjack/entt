@@ -5,24 +5,16 @@
 
 namespace entt {
 
-/*! @brief Empty class type used to request the _as ref_ policy. */
-struct as_ref_t final {
-    /*! @cond TURN_OFF_DOXYGEN */
-    template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>;
-    /*! @endcond */
-};
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
 
-/*! @brief Empty class type used to request the _as cref_ policy. */
-struct as_cref_t final {
-    /*! @cond TURN_OFF_DOXYGEN */
-    template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type>;
-    /*! @endcond */
-};
+struct meta_policy {};
+
+} // namespace internal
+/*! @endcond */
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
-struct as_is_t final {
+struct as_is_t final: private internal::meta_policy {
     /*! @cond TURN_OFF_DOXYGEN */
     template<typename>
     static constexpr bool value = true;
@@ -30,7 +22,31 @@ struct as_is_t final {
 };
 
 /*! @brief Empty class type used to request the _as void_ policy. */
-struct as_void_t final {
+struct as_void_t final: private internal::meta_policy {
+    /*! @cond TURN_OFF_DOXYGEN */
+    template<typename>
+    static constexpr bool value = true;
+    /*! @endcond */
+};
+
+/*! @brief Empty class type used to request the _as ref_ policy. */
+struct as_ref_t final: private internal::meta_policy {
+    /*! @cond TURN_OFF_DOXYGEN */
+    template<typename Type>
+    static constexpr bool value = std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>;
+    /*! @endcond */
+};
+
+/*! @brief Empty class type used to request the _as cref_ policy. */
+struct as_cref_t final: private internal::meta_policy {
+    /*! @cond TURN_OFF_DOXYGEN */
+    template<typename Type>
+    static constexpr bool value = std::is_reference_v<Type>;
+    /*! @endcond */
+};
+
+/*! @brief Empty class type used to request the _as auto_ policy. */
+struct as_auto_t final: private internal::meta_policy {
     /*! @cond TURN_OFF_DOXYGEN */
     template<typename>
     static constexpr bool value = true;
@@ -44,7 +60,7 @@ struct as_void_t final {
  */
 template<typename Type>
 struct is_meta_policy
-    : std::bool_constant<std::is_same_v<Type, as_ref_t> || std::is_same_v<Type, as_cref_t> || std::is_same_v<Type, as_is_t> || std::is_same_v<Type, as_void_t>> {};
+    : std::bool_constant<std::is_base_of_v<internal::meta_policy, Type>> {};
 
 /**
  * @brief Helper variable template.

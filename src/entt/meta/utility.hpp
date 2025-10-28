@@ -166,13 +166,13 @@ using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::t
  */
 template<typename Policy = as_is_t, typename Type>
 [[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_dispatch(const meta_ctx &ctx, [[maybe_unused]] Type &&value) {
-    if constexpr(std::is_same_v<Policy, as_void_t>) {
-        return meta_any{ctx, std::in_place_type<void>};
-    } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
-        return meta_any{ctx, std::in_place_type<Type>, value};
-    } else if constexpr(std::is_same_v<Policy, as_cref_t>) {
+    if constexpr(std::is_same_v<Policy, as_cref_t>) {
         static_assert(std::is_lvalue_reference_v<Type>, "Invalid type");
         return meta_any{ctx, std::in_place_type<const std::remove_reference_t<Type> &>, std::as_const(value)};
+    } else if constexpr(std::is_same_v<Policy, as_ref_t> || (std::is_same_v<Policy, as_auto_t> && std::is_lvalue_reference_v<Type>)) {
+        return meta_any{ctx, std::in_place_type<Type>, value};
+    } else if constexpr(std::is_same_v<Policy, as_void_t>) {
+        return meta_any{ctx, std::in_place_type<void>};
     } else {
         return meta_any{ctx, std::forward<Type>(value)};
     }
