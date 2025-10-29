@@ -98,11 +98,11 @@ struct MetaData: ::testing::Test {
             .conv<int>();
 
         entt::meta_factory<clazz>{}
-            .data<&clazz::i, entt::as_auto_t>("ai"_hs)
-            .data<&clazz::j, entt::as_auto_t>("aj"_hs)
-            .data<&clazz::h, entt::as_auto_t>("ah"_hs)
-            .data<&clazz::k, entt::as_auto_t>("ak"_hs)
-            .data<nullptr, &clazz::operator int, entt::as_auto_t>("ao"_hs);
+            .data<&clazz::i, entt::as_is_t>("ir"_hs)
+            .data<&clazz::j, entt::as_is_t>("jc"_hs)
+            .data<&clazz::h, entt::as_is_t>("hr"_hs)
+            .data<&clazz::k, entt::as_is_t>("kc"_hs)
+            .data<nullptr, &clazz::operator int, entt::as_is_t>("ov"_hs);
 
         entt::meta_factory<setter_getter>{}
             .type("setter_getter"_hs)
@@ -548,38 +548,38 @@ TEST_F(MetaData, AsVoid) {
     ASSERT_EQ(data.get(instance), entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(MetaData, AsAuto) {
+TEST_F(MetaData, AsIs) {
     using namespace entt::literals;
 
     auto type = entt::resolve<clazz>();
     entt::meta_data data{};
     clazz instance{};
 
-    data = type.data("ai"_hs);
+    data = type.data("ir"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).base().policy(), entt::any_policy::ref);
 
-    data = type.data("aj"_hs);
+    data = type.data("jc"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).base().policy(), entt::any_policy::cref);
 
-    data = type.data("ah"_hs);
+    data = type.data("hr"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).base().policy(), entt::any_policy::ref);
 
-    data = type.data("ak"_hs);
+    data = type.data("kc"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.get(instance).base().policy(), entt::any_policy::cref);
 
-    data = type.data("ao"_hs);
+    data = type.data("ov"_hs);
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.type(), entt::resolve<int>());

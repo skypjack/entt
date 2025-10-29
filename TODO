@@ -35,4 +35,5 @@ TODO:
 * introduce compile-time flag to skip dll-only checks in basic_any
 * find a way to test deleter and the absence of it in basic_any
 * archetype-like a-là EnTT support (see my own notes)
-* rename meta policy as_is in as_copy
+* meta_factory: add a replace flag to traits to get around the |-only mechanism
+* support searching meta data and func only on top level types, no bases

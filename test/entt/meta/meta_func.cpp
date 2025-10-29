@@ -139,10 +139,10 @@ struct MetaFunc: ::testing::Test {
             .conv<int>();
 
         entt::meta_factory<function>{}
-            .func<&function::a, entt::as_auto_t>("aa"_hs)
-            .func<&function::v, entt::as_auto_t>("av"_hs)
-            .func<&function::operator int, entt::as_auto_t>("ao"_hs)
-            .func<&function::g, entt::as_auto_t>("ag"_hs);
+            .func<&function::a, entt::as_is_t>("ar"_hs)
+            .func<&function::v, entt::as_is_t>("vc"_hs)
+            .func<&function::operator int, entt::as_is_t>("ov"_hs)
+            .func<&function::g, entt::as_is_t>("ge"_hs);
     }
 
     void TearDown() override {
@@ -509,32 +509,32 @@ TEST_F(MetaFunc, AsVoid) {
     ASSERT_EQ(value, instance.value);
 }
 
-TEST_F(MetaFunc, AsAuto) {
+TEST_F(MetaFunc, AsIs) {
     using namespace entt::literals;
 
     auto type = entt::resolve<function>();
     entt::meta_func func{};
     function instance{3};
 
-    func = type.func("aa"_hs);
+    func = type.func("ar"_hs);
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(func.invoke(instance).base().policy(), entt::any_policy::ref);
 
-    func = type.func("av"_hs);
+    func = type.func("vc"_hs);
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(func.invoke(instance, 3).base().policy(), entt::any_policy::cref);
 
-    func = type.func("ao"_hs);
+    func = type.func("ov"_hs);
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(func.invoke(instance).base().policy(), entt::any_policy::embedded);
 
-    func = type.func("ag"_hs);
+    func = type.func("ge"_hs);
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.ret(), entt::resolve<void>());

@@ -14,7 +14,7 @@ struct meta_policy {};
 /*! @endcond */
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
-struct as_is_t final: private internal::meta_policy {
+struct as_value_t final: private internal::meta_policy {
     /*! @cond TURN_OFF_DOXYGEN */
     template<typename>
     static constexpr bool value = true;
@@ -46,7 +46,7 @@ struct as_cref_t final: private internal::meta_policy {
 };
 
 /*! @brief Empty class type used to request the _as auto_ policy. */
-struct as_auto_t final: private internal::meta_policy {
+struct as_is_t final: private internal::meta_policy {
     /*! @cond TURN_OFF_DOXYGEN */
     template<typename>
     static constexpr bool value = true;

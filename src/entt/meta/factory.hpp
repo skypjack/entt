@@ -255,7 +255,7 @@ public:
      * @tparam Policy Optional policy (no policy set by default).
      * @return A meta factory for the parent type.
      */
-    template<auto Candidate, typename Policy = as_is_t>
+    template<auto Candidate, typename Policy = as_value_t>
     meta_factory ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
@@ -292,7 +292,7 @@ public:
      * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
-    template<auto Data, typename Policy = as_is_t>
+    template<auto Data, typename Policy = as_value_t>
     meta_factory data(const char *name) noexcept {
         return data<Data, Policy>(hashed_string::value(name), name);
     }
@@ -311,7 +311,7 @@ public:
      * @param name An optional name for the meta data as a **string literal**.
      * @return A meta factory for the parent type.
      */
-    template<auto Data, typename Policy = as_is_t>
+    template<auto Data, typename Policy = as_value_t>
     meta_factory data(const id_type id, const char *name = nullptr) noexcept {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::invoke_result_t<decltype(Data), Type &>;
@@ -361,7 +361,7 @@ public:
      * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
-    template<auto Setter, auto Getter, typename Policy = as_is_t>
+    template<auto Setter, auto Getter, typename Policy = as_value_t>
     meta_factory data(const char *name) noexcept {
         return data<Setter, Getter, Policy>(hashed_string::value(name), name);
     }
@@ -387,7 +387,7 @@ public:
      * @param name An optional name for the meta data as a **string literal**.
      * @return A meta factory for the parent type.
      */
-    template<auto Setter, auto Getter, typename Policy = as_is_t>
+    template<auto Setter, auto Getter, typename Policy = as_value_t>
     meta_factory data(const id_type id, const char *name = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Getter)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
@@ -430,7 +430,7 @@ public:
      * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
-    template<auto Candidate, typename Policy = as_is_t>
+    template<auto Candidate, typename Policy = as_value_t>
     meta_factory func(const char *name) noexcept {
         return func<Candidate, Policy>(hashed_string::value(name), name);
     }
@@ -449,7 +449,7 @@ public:
      * @param name An optional name for the function as a **string literal**.
      * @return A meta factory for the parent type.
      */
-    template<auto Candidate, typename Policy = as_is_t>
+    template<auto Candidate, typename Policy = as_value_t>
     meta_factory func(const id_type id, const char *name = nullptr) noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");

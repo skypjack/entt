@@ -787,7 +787,7 @@ other problems.
 
 There are a few alternatives available at the moment:
 
-* The _as-is_ policy, associated with the type `entt::as_is_t`.<br/>
+* The _as-value_ policy, associated with the type `entt::as_value_t`.<br/>
   This is the default policy. In general, it should never be used explicitly,
   since it is implicitly selected if no other policy is specified.<br/>
   In this case, the return values of the functions as well as the properties
@@ -825,12 +825,12 @@ There are a few alternatives available at the moment:
   `as_ref_t` _adapts_ to the constness of the passed object and to that of the
   return type if any.
 
-* The _as-auto_ policy, associated with the type `entt::as_auto_t`.<br/>
+* The _as-is_ policy, associated with the type `entt::as_is_t`.<br/>
   Useful for decoupling meta type creation code from calling code while still
   preserving the behavior of data members and member functions as defined:
 
   ```cpp
-  entt::meta_factory<my_type>{}.func<&my_type::any_member, entt::as_auto_t>("member"_hs);
+  entt::meta_factory<my_type>{}.func<&my_type::any_member, entt::as_is_t>("member"_hs);
   ```
 
   For data members or member functions that return a reference type, the value
