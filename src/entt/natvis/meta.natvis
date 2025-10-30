@@ -114,7 +114,7 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node,na</ExpandedItem>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_handle">
@@ -127,7 +127,7 @@
 		<DisplayString Condition="data != nullptr">{{ const={ const_only } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 			<Item Name="[const]">const_only</Item>
 			<Item Name="[data]">data</Item>
 		</Expand>
@@ -136,15 +136,16 @@
 		<DisplayString Condition="data != nullptr">{{ const={ const_only } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 			<Item Name="[const]">const_only</Item>
 			<Item Name="[data]">data</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_custom">
-		<DisplayString>{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
@@ -152,7 +153,7 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
@@ -160,14 +161,15 @@
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
-		<DisplayString>{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<ExpandedItem>node</ExpandedItem>
-			<Item Name="[context]" Condition="ctx != nullptr">ctx->value</Item>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_ctx">
