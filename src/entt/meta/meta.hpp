@@ -506,7 +506,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-        const auto *prev = std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>);
+        auto *prev = std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>);
         node = (prev == vtable) ? node : nullptr;
     }
 
