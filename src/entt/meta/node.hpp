@@ -223,7 +223,7 @@ template<typename Func>
         for(auto &&curr: from.details->base) {
             if(const void *other = curr.cast(instance); curr.type == to) {
                 return func(other, curr.resolve(context));
-            } else if(auto elem = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); elem) {
+            } else if(auto elem = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, other, func); elem) {
                 return elem;
             }
         }
