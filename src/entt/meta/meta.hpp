@@ -1324,10 +1324,11 @@ public:
     /**
      * @brief Lookup utility for meta data (bases are also visited).
      * @param id Unique identifier.
+     * @param recursive True for a search in the base classes, false otherwise.
      * @return The registered meta data for the given identifier, if any.
      */
-    [[nodiscard]] meta_data data(const id_type id) const {
-        const auto *elem = internal::look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), fetch_node(), id);
+    [[nodiscard]] meta_data data(const id_type id, const bool recursive = true) const {
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::data>(internal::meta_context::from(*ctx), fetch_node(), id, recursive);
         return (elem != nullptr) ? meta_data{*ctx, *elem} : meta_data{};
     }
 
@@ -1343,10 +1344,11 @@ public:
     /**
      * @brief Lookup utility for meta functions (bases are also visited).
      * @param id Unique identifier.
+     * @param recursive True for a search in the base classes, false otherwise.
      * @return The registered meta function for the given identifier, if any.
      */
-    [[nodiscard]] meta_func func(const id_type id) const {
-        const auto *elem = internal::look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), fetch_node(), id);
+    [[nodiscard]] meta_func func(const id_type id, const bool recursive = true) const {
+        const auto *elem = internal::look_for<&internal::meta_type_descriptor::func>(internal::meta_context::from(*ctx), fetch_node(), id, recursive);
         return (elem != nullptr) ? meta_func{*ctx, *elem} : meta_func{};
     }
 

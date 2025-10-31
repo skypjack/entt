@@ -166,7 +166,7 @@ template<auto Member, typename Type, typename Value>
 }
 
 template<auto Member>
-[[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id) {
+[[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id, bool recursive) {
     using value_type = typename std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
@@ -174,9 +174,11 @@ template<auto Member>
             return member;
         }
 
-        for(auto &&curr: node.details->base) {
-            if(auto *elem = look_for<Member>(context, curr.resolve(context), id); elem) {
-                return elem;
+        if(recursive) {
+            for(auto &&curr: node.details->base) {
+                if(auto *elem = look_for<Member>(context, curr.resolve(context), id, recursive); elem) {
+                    return elem;
+                }
             }
         }
     }

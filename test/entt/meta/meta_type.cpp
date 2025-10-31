@@ -32,6 +32,10 @@ Type get(Type &elem) {
 
 struct base {
     char value{'c'};
+
+    static int f() {
+        return 0;
+    }
 };
 
 struct derived: base {
@@ -134,7 +138,8 @@ struct MetaType: ::testing::Test {
 
         entt::meta_factory<base>{}
             .type("base"_hs)
-            .data<&base::value>("value"_hs);
+            .data<&base::value>("value"_hs)
+            .func<&base::f>("func"_hs);
 
         entt::meta_factory<derived>{}
             .type("derived")
@@ -455,6 +460,17 @@ TEST_F(MetaType, Data) {
     ASSERT_EQ(type.data().cbegin(), type.data().cend());
 }
 
+TEST_F(MetaType, DataRecursive) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<derived>();
+    const derived instance{};
+
+    ASSERT_TRUE(type.data("value"_hs));
+    ASSERT_EQ('c', type.data("value"_hs).get(instance).cast<char>());
+    ASSERT_FALSE(type.data("value"_hs, false));
+}
+
 TEST_F(MetaType, Func) {
     using namespace entt::literals;
 
@@ -476,6 +492,17 @@ TEST_F(MetaType, Func) {
 
     ASSERT_TRUE(type);
     ASSERT_EQ(type.func().cbegin(), type.func().cend());
+}
+
+TEST_F(MetaType, FuncRecursive) {
+    using namespace entt::literals;
+
+    auto type = entt::resolve<derived>();
+    const derived instance{};
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_EQ(0, type.func("func"_hs).invoke(instance).cast<int>());
+    ASSERT_FALSE(type.func("func"_hs, false));
 }
 
 TEST_F(MetaType, Invoke) {
