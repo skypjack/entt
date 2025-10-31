@@ -59,7 +59,7 @@ struct function {
     }
 
     [[nodiscard]] int f(int iv) {
-        return iv * iv;
+        return value + iv;
     }
 
     void g(int iv) {
@@ -688,13 +688,13 @@ TEST_F(MetaFunc, OverloadedConstFirst) {
     ASSERT_EQ(next.arg(0u), entt::resolve<int>());
 
     ASSERT_EQ(func.invoke(instance, 1).cast<int>(), 2);
-    ASSERT_EQ(next.invoke(instance, 1).cast<int>(), 1);
+    ASSERT_EQ(next.invoke(instance, 1).cast<int>(), 3);
 
     ASSERT_EQ(func.invoke(std::as_const(instance), 1).cast<int>(), 2);
     ASSERT_FALSE(next.invoke(std::as_const(instance), 1));
 
     ASSERT_EQ(func.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 2);
-    ASSERT_EQ(next.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 1);
+    ASSERT_EQ(next.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 3);
 
     ASSERT_EQ(func.invoke(entt::meta_handle{std::as_const(instance)}, entt::meta_any{1}).cast<int>(), 2);
     ASSERT_FALSE(next.invoke(entt::meta_handle{std::as_const(instance)}, entt::meta_any{1}));
@@ -719,13 +719,13 @@ TEST_F(MetaFunc, OverloadedNonConstFirst) {
     ASSERT_EQ(next.ret(), entt::resolve<int>());
     ASSERT_EQ(next.arg(0u), entt::resolve<int>());
 
-    ASSERT_EQ(func.invoke(instance, 1).cast<int>(), 1);
+    ASSERT_EQ(func.invoke(instance, 1).cast<int>(), 3);
     ASSERT_EQ(next.invoke(instance, 1).cast<int>(), 2);
 
     ASSERT_FALSE(func.invoke(std::as_const(instance), 1));
     ASSERT_EQ(next.invoke(std::as_const(instance), 1).cast<int>(), 2);
 
-    ASSERT_EQ(func.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 1);
+    ASSERT_EQ(func.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 3);
     ASSERT_EQ(next.invoke(entt::meta_handle{instance}, entt::meta_any{1}).cast<int>(), 2);
 
     ASSERT_FALSE(func.invoke(entt::meta_handle{std::as_const(instance)}, entt::meta_any{1}));
