@@ -260,6 +260,7 @@ template<typename Key, typename Type, typename Hash, typename KeyEqual, typename
 class dense_map {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
+    static constexpr std::size_t placeholder_position = (std::numeric_limits<std::size_t>::max)();
 
     using node_type = internal::dense_map_node<Key, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
@@ -695,7 +696,7 @@ public:
      * @return Number of elements removed (either 0 or 1).
      */
     size_type erase(const key_type &key) {
-        for(size_type *curr = &sparse.first()[key_to_bucket(key)]; *curr != (std::numeric_limits<size_type>::max)(); curr = &packed.first()[*curr].next) {
+        for(size_type *curr = &sparse.first()[key_to_bucket(key)]; *curr != placeholder_position; curr = &packed.first()[*curr].next) {
             if(packed.second()(packed.first()[*curr].element.first, key)) {
                 const auto index = *curr;
                 *curr = packed.first()[*curr].next;
@@ -918,7 +919,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {packed.first().begin(), (std::numeric_limits<size_type>::max)()};
+        return {packed.first().begin(), placeholder_position};
     }
 
     /**
@@ -936,7 +937,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {packed.first().begin(), (std::numeric_limits<size_type>::max)()};
+        return {packed.first().begin(), placeholder_position};
     }
 
     /**
@@ -1013,7 +1014,7 @@ public:
             sparse.first().resize(sz);
 
             for(auto &&elem: sparse.first()) {
-                elem = (std::numeric_limits<size_type>::max)();
+                elem = placeholder_position;
             }
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
