@@ -258,6 +258,9 @@ Meta data members and functions are accessed by means of their identifiers:
   addition, a meta function object is used to invoke the underlying function and
   then get the return value in the form of a `meta_any` object.
 
+Both functions search for the elements throughout the meta type hierarchy.
+However, they offer the option of passing a second boolean argument to stop the
+search at the top-level meta type.<br/>
 All the meta objects thus obtained as well as the meta types explicitly convert
 to a boolean value to check for validity:
 
