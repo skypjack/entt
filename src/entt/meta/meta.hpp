@@ -481,11 +481,33 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return meta_any{meta_ctx_arg, *ctx};
-        } else {
-            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+        if constexpr(!std::is_reference_v<Type> || !std::is_const_v<std::remove_reference_t<Type>>) {
+            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+                return as_ref();
+            } else if(*this) {
+                if constexpr(std::is_arithmetic_v<std::remove_const_t<std::remove_reference_t<Type>>> || std::is_enum_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                    if(const auto &from = fetch_node(); from.conversion_helper) {
+                        return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
+                    }
+                }
+
+                if(const auto &from = fetch_node(); from.details != nullptr) {
+                    for(auto &&elem: from.details->conv) {
+                        if(elem.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
+                            return elem.conv(*ctx, storage.data());
+                        }
+                    }
+
+                    for(auto &&curr: from.details->base) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).allow_cast<Type>())) {
+                            return other;
+                        }
+                    }
+                }
+            }
         }
+
+        return meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1300,7 +1322,25 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return ((info() == other.info()) || (internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), other.info().hash(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u));
+        if(info() == other.info()) {
+            return true;
+        } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
+            return true;
+        } else if(from.details) {
+            for(auto &&elem: from.details->conv) {
+                if(elem.type == other.info().hash()) {
+                    return true;
+                }
+            }
+
+            for(auto &&curr: from.details->base) {
+                if(curr.type == other.info().hash() || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1549,22 +1589,27 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
-            if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
-                return (args.from_void(*ctx, nullptr, instance), ...);
-            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
-                return (args.conv(*ctx, instance), ...);
-            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, decltype(internal::meta_type_node::conversion_helper)> || ...)) {
-                // exploits the fact that arithmetic types and enums are also default constructible
-                auto other = type.construct();
-                const auto value = (args(nullptr, instance), ...);
-                other.fetch_node().conversion_helper(other.storage.data(), &value);
-                return other;
-            } else {
-                // forwards to force a compile-time error in case of available arguments
-                return meta_any{meta_ctx_arg, *ctx, std::forward<decltype(args)>(args)...};
+        if(const auto &from = fetch_node(); from.conversion_helper && type.is_arithmetic() || type.is_enum()) {
+            // exploits the fact that arithmetic types and enums are also default constructible
+            auto other = type.construct();
+            const auto value = from.conversion_helper(nullptr, storage.data());
+            other.fetch_node().conversion_helper(other.storage.data(), &value);
+            return other;
+        }
+
+        if(const auto &from = fetch_node(); from.details) {
+            for(auto &&elem: from.details->conv) {
+                if(elem.type == type.info().hash()) {
+                    return elem.conv(*ctx, storage.data());
+                }
             }
-        });
+
+            for(auto &&curr: from.details->base) {
+                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == type.info().hash()) || (other = std::as_const(other).allow_cast(type))) {
+                    return other;
+                }
+            }
+        }
     }
 
     return meta_any{meta_ctx_arg, *ctx};
