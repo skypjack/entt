@@ -200,15 +200,6 @@ class meta_any {
         }
     }
 
-    meta_any(const meta_any &other, any ref) noexcept
-        : storage{std::move(ref)},
-          ctx{other.ctx} {
-        if(storage || !other.storage) {
-            node = other.node;
-            vtable = other.vtable;
-        }
-    }
-
     [[nodiscard]] const auto &fetch_node() const {
         if(node == nullptr) {
             ENTT_ASSERT(*this, "Invalid vtable function");
@@ -614,12 +605,20 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{meta_ctx_arg, *ctx};
+        other.storage = storage.as_ref();
+        other.node = node;
+        other.vtable = vtable;
+        return other;
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{meta_ctx_arg, *ctx};
+        other.storage = storage.as_ref();
+        other.node = node;
+        other.vtable = vtable;
+        return other;
     }
 
     /**
