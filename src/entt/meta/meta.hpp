@@ -518,7 +518,7 @@ public:
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
+            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
             if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
                 return true;
@@ -1600,7 +1600,6 @@ bool meta_any::set(const id_type id, Type &&value) {
         return as_ref();
     } else if(*this) {
         if(const auto &from = fetch_node(); from.conversion_helper && type.is_arithmetic() || type.is_enum()) {
-            // exploits the fact that arithmetic types and enums are also default constructible
             auto other = type.construct();
             const auto value = from.conversion_helper(nullptr, storage.data());
             other.fetch_node().conversion_helper(other.storage.data(), &value);
