@@ -1582,7 +1582,7 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        if(const auto &from = fetch_node(); from.conversion_helper && type.is_arithmetic() || type.is_enum()) {
+        if(const auto &from = fetch_node(); from.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
             auto other = type.construct();
             const auto value = from.conversion_helper(nullptr, storage.data());
             other.fetch_node().conversion_helper(other.storage.data(), &value);
