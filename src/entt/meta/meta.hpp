@@ -1061,12 +1061,7 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
+/*! @copydoc operator!=(const meta_data &, const meta_data &) */
 [[nodiscard]] inline bool operator!=(const meta_func &lhs, const meta_func &rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -1550,12 +1545,7 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
+/*! @copydoc operator!=(const meta_data &, const meta_data &) */
 [[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) noexcept {
     return !(lhs == rhs);
 }
