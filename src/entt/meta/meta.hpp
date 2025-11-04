@@ -428,13 +428,9 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
-        } else {
-            auto *elem = any_cast<Type>(&storage);
-            // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<Type>::value(), storage.data())));
-        }
+        auto *elem = any_cast<Type>(&storage);
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
+        return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
 
     /**
