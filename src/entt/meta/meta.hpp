@@ -484,7 +484,7 @@ public:
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).allow_cast<Type>())) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).template allow_cast<Type>())) {
                             return other;
                         }
                     }
