@@ -461,23 +461,21 @@ public:
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @param type Meta type to which the cast is requested.
-     * @return A valid meta any object if there exists a viable conversion, an
-     * invalid one otherwise.
+     * @return A valid meta object if convertible, an invalid one otherwise.
      */
     [[nodiscard]] meta_any allow_cast(const meta_type &type) const;
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @param type Meta type to which the cast is requested.
-     * @return True if there exists a viable conversion, false otherwise.
+     * @return True if convertible, false otherwise.
      */
     [[nodiscard]] bool allow_cast(const meta_type &type);
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a viable conversion, an
-     * invalid one otherwise.
+     * @return A valid meta object if convertible, an invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
@@ -513,7 +511,7 @@ public:
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a viable conversion, false otherwise.
+     * @return True if convertible, false otherwise.
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
@@ -1744,7 +1742,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle;
+    any handle{};
 };
 
 class meta_associative_container::meta_iterator final {
@@ -1816,7 +1814,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle;
+    any handle{};
 };
 /*! @endcond */
 
