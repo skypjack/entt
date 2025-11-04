@@ -746,7 +746,7 @@ public:
     }
 
     /*! @copydoc operator-> */
-    [[nodiscard]] const meta_any *operator->() const {
+    [[deprecated("do not use const handles")]] [[nodiscard]] const meta_any *operator->() const {
         return &any;
     }
 
