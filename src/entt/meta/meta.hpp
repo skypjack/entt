@@ -520,7 +520,17 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
         } else {
-            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() || allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+                return true;
+            } else if(auto other = std::as_const(*this).allow_cast<std::remove_const_t<std::remove_reference_t<Type>>>(); other) {
+                if(other.storage.owner()) {
+                    std::swap(*this, other);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 
