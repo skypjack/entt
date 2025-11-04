@@ -475,7 +475,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(!std::is_reference_v<Type> || !std::is_const_v<std::remove_reference_t<Type>>) {
+        if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
             if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
                 return as_ref();
             } else if(*this) {
