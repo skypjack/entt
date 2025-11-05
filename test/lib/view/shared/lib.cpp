@@ -1,4 +1,4 @@
-#include <entt/core/attribute.h>
+#include <entt/config/attribute.h>
 #include "../types.h"
 
 ENTT_API const void *filter(const view_type &view) {

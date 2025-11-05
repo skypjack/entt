@@ -1,5 +1,5 @@
-#ifndef ENTT_CORE_ATTRIBUTE_H
-#define ENTT_CORE_ATTRIBUTE_H
+#ifndef ENTT_CONFIG_ATTRIBUTE_H
+#define ENTT_CONFIG_ATTRIBUTE_H
 
 #ifndef ENTT_EXPORT
 #    if defined _WIN32 || defined __CYGWIN__ || defined _MSC_VER

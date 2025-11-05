@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <entt/core/attribute.h>
+#include <entt/config/attribute.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>

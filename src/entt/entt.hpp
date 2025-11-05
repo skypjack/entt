@@ -2,6 +2,7 @@
 namespace entt {}
 
 // IWYU pragma: begin_exports
+#include "config/attribute.h"
 #include "config/config.h"
 #include "config/macro.h"
 #include "config/version.h"
@@ -10,7 +11,6 @@ namespace entt {}
 #include "container/table.hpp"
 #include "core/algorithm.hpp"
 #include "core/any.hpp"
-#include "core/attribute.h"
 #include "core/bit.hpp"
 #include "core/compressed_pair.hpp"
 #include "core/enum.hpp"

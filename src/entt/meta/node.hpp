@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
-#include "../core/attribute.h"
 #include "../core/bit.hpp"
 #include "../core/enum.hpp"
 #include "../core/fwd.hpp"

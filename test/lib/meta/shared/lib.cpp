@@ -1,4 +1,4 @@
-#include <entt/core/attribute.h>
+#include <entt/config/attribute.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
