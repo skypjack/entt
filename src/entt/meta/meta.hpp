@@ -209,6 +209,12 @@ class meta_any {
         return *node;
     }
 
+    meta_any(const meta_any &other, any elem)
+        : storage{std::move(elem)},
+          ctx{other.ctx},
+          node{other.node},
+          vtable{other.vtable} {}
+
 public:
     /*! Default constructor. */
     meta_any() = default;
@@ -261,10 +267,8 @@ public:
     template<typename Type>
     explicit meta_any(const meta_ctx &area, std::in_place_t, Type *value)
         : storage{std::in_place, value},
-          ctx{&area} {
-        if(storage) {
-            vtable = &basic_vtable<Type>;
-        }
+          ctx{&area},
+          vtable{storage ? &basic_vtable<Type> : nullptr} {
     }
 
     /**
@@ -605,20 +609,12 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        meta_any other{meta_ctx_arg, *ctx};
-        other.storage = storage.as_ref();
-        other.node = node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref()};
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        meta_any other{meta_ctx_arg, *ctx};
-        other.storage = storage.as_ref();
-        other.node = node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref()};
     }
 
     /**
@@ -781,7 +777,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type &() const noexcept {
-        ENTT_ASSERT((node != nullptr) && (type_hash<std::remove_const_t<Type>>::value() == node->type), "Invalid type");
+        ENTT_ASSERT(static_cast<Type *>(*this) != nullptr, "Invalid type");
         return *static_cast<Type *>(node->value.get());
     }
 
