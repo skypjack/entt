@@ -1716,10 +1716,6 @@ public:
         return handle == other.handle;
     }
 
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
-        return !(*this == other);
-    }
-
     [[nodiscard]] const any &base() const noexcept {
         return handle;
     }
@@ -1729,6 +1725,10 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
+
+[[nodiscard]] inline bool operator!=(const meta_sequence_container::iterator &lhs, const meta_sequence_container::iterator &rhs) noexcept {
+    return !(lhs == rhs);
+}
 
 class meta_associative_container::meta_iterator final {
     using vtable_type = void(const void *, std::pair<meta_any, meta_any> *);
@@ -1792,15 +1792,15 @@ public:
         return handle == other.handle;
     }
 
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
-        return !(*this == other);
-    }
-
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
     any handle{};
 };
+
+[[nodiscard]] inline bool operator!=(const meta_associative_container::iterator &lhs, const meta_associative_container::iterator &rhs) noexcept {
+    return !(lhs == rhs);
+}
 /*! @endcond */
 
 /**
