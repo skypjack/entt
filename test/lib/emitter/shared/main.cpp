@@ -1,6 +1,6 @@
 #include <functional>
 #include <gtest/gtest.h>
-#include <entt/config/attribute.h>
+#include <entt/config/config.h>
 #include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
 

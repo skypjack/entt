@@ -1,4 +1,4 @@
-#include <entt/config/attribute.h>
+#include <entt/config/config.h>
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <entt/config/attribute.h>
+#include <entt/config/config.h>
 #include <entt/locator/locator.hpp>
 #include "../../../common/boxed_type.h"
 

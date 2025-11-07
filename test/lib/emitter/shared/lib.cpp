@@ -1,4 +1,4 @@
-#include <entt/config/attribute.h>
+#include <entt/config/config.h>
 #include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
 #include "../../../common/empty.h"

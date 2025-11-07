@@ -116,7 +116,6 @@ option(ENTT_INCLUDE_NATVIS "Add EnTT natvis files to the EnTT target." OFF)
 if(ENTT_INCLUDE_HEADERS)
     set(
         HEADERS_FILES
-        config/attribute.h
         config/config.h
         config/macro.h
         config/version.h

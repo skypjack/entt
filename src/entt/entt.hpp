@@ -2,7 +2,6 @@
 namespace entt {}
 
 // IWYU pragma: begin_exports
-#include "config/attribute.h"
 #include "config/config.h"
 #include "config/macro.h"
 #include "config/version.h"
