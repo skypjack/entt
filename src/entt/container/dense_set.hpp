@@ -22,6 +22,8 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
+static constexpr std::size_t dense_set_placeholder_position = (std::numeric_limits<std::size_t>::max)();
+
 template<typename It>
 class dense_set_iterator final {
     template<typename>
@@ -152,9 +154,7 @@ public:
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::forward_iterator_tag;
 
-    constexpr dense_set_local_iterator() noexcept
-        : it{},
-          offset{} {}
+    constexpr dense_set_local_iterator() noexcept = default;
 
     constexpr dense_set_local_iterator(It iter, const std::size_t pos) noexcept
         : it{iter},
@@ -187,8 +187,8 @@ public:
     }
 
 private:
-    It it;
-    std::size_t offset;
+    It it{};
+    std::size_t offset{dense_set_placeholder_position};
 };
 
 template<typename Lhs, typename Rhs>
@@ -220,7 +220,7 @@ template<typename Type, typename Hash, typename KeyEqual, typename Allocator>
 class dense_set {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
-    static constexpr std::size_t placeholder_position = (std::numeric_limits<std::size_t>::max)();
+    static constexpr std::size_t placeholder_position = internal::dense_set_placeholder_position;
 
     using node_type = std::pair<std::size_t, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
@@ -788,7 +788,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] const_local_iterator cend([[maybe_unused]] const size_type index) const {
-        return {packed.first().begin(), placeholder_position};
+        return {};
     }
 
     /**
@@ -806,7 +806,7 @@ public:
      * @return An iterator to the end of the given bucket.
      */
     [[nodiscard]] local_iterator end([[maybe_unused]] const size_type index) {
-        return {packed.first().begin(), placeholder_position};
+        return {};
     }
 
     /**
