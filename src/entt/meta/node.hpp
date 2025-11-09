@@ -272,7 +272,7 @@ auto setup_node_for() noexcept {
 
 [[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
     const auto it = context.value.find(info.hash());
-    return it != context.value.end() ? it->second.get() : nullptr;
+    return (it != context.value.end()) ? it->second.get() : nullptr;
 }
 
 template<typename Type>
