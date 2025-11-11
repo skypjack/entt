@@ -43,6 +43,8 @@ function(SETUP_TARGET TARGET_NAME)
     target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
 
     if(MSVC)
+        set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "/PROFILE")
+
         target_compile_options(
             ${TARGET_NAME}
             PRIVATE

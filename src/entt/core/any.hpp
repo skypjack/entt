@@ -450,11 +450,7 @@ public:
     bool assign(basic_any &&other) {
         // it could be a call across boundaries, but still for the same type
         if(other && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
-            if(auto *val = other.data(); val) {
-                return (vtable(request::transfer, *this, val) != nullptr);
-            }
-
-            return (vtable(request::assign, *this, std::as_const(other).data()) != nullptr);
+            return (other.mode == any_policy::cref) ? (vtable(request::assign, *this, std::as_const(other).data()) != nullptr) : (vtable(request::transfer, *this, other.data()) != nullptr);
         }
 
         return false;

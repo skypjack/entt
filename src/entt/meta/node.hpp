@@ -211,31 +211,6 @@ template<typename... Args>
     return nullptr;
 }
 
-template<typename Func>
-[[nodiscard]] inline auto try_convert(const meta_context &context, const meta_type_node &from, const id_type to, const bool arithmetic_or_enum, const void *instance, Func func) {
-    if(from.details) {
-        for(auto &&elem: from.details->conv) {
-            if(elem.type == to) {
-                return func(instance, elem);
-            }
-        }
-
-        for(auto &&curr: from.details->base) {
-            if(const void *other = curr.cast(instance); curr.type == to) {
-                return func(other, curr.resolve(context));
-            } else if(auto elem = try_convert(context, curr.resolve(context), to, arithmetic_or_enum, curr.cast(instance), func); elem) {
-                return elem;
-            }
-        }
-    }
-
-    if(from.conversion_helper && arithmetic_or_enum) {
-        return func(instance, from.conversion_helper);
-    }
-
-    return func(instance);
-}
-
 template<typename Type>
 auto setup_node_for() noexcept {
     meta_type_node node{

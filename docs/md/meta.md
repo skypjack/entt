@@ -258,6 +258,9 @@ Meta data members and functions are accessed by means of their identifiers:
   addition, a meta function object is used to invoke the underlying function and
   then get the return value in the form of a `meta_any` object.
 
+Both functions search for the elements throughout the meta type hierarchy.
+However, they offer the option of passing a second boolean argument to stop the
+search at the top-level meta type.<br/>
 All the meta objects thus obtained as well as the meta types explicitly convert
 to a boolean value to check for validity:
 
@@ -899,12 +902,9 @@ entt::meta_factory<my_type>{}.traits(my_traits::required | my_traits::hidden);
 
 In the example above, `EnTT` bitmask enum support is used, but any integral
 value is fine, as long as it does not exceed 16 bits.<br/>
-It is not possible to assign traits at different times. Therefore, multiple
-calls to the `traits` function overwrite previous values. However, traits can be
-read from meta objects and used to update existing data with a factory,
-effectively extending them as needed.<br/>
-Likewise, users can also set traits on meta objects later if needed, as long as
-the factory is reset to the meta object of interest:
+Traits can be assigned at different times. Subsequent calls to the `traits`
+function do not reset previously set values. However, users must reset the
+factory to the meta object of interest:
 
 ```cpp
 entt::meta_factory<my_type>{}

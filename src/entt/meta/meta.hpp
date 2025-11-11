@@ -200,15 +200,6 @@ class meta_any {
         }
     }
 
-    meta_any(const meta_any &other, any ref) noexcept
-        : storage{std::move(ref)},
-          ctx{other.ctx} {
-        if(storage || !other.storage) {
-            node = other.node;
-            vtable = other.vtable;
-        }
-    }
-
     [[nodiscard]] const auto &fetch_node() const {
         if(node == nullptr) {
             ENTT_ASSERT(*this, "Invalid vtable function");
@@ -428,13 +419,9 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).try_cast<std::remove_const_t<Type>>();
-        } else {
-            auto *elem = any_cast<Type>(&storage);
-            // NOLINTNEXTLINE(bugprone-casting-through-void)
-            return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<Type *>(const_cast<void *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<Type>::value(), storage.data())));
-        }
+        auto *elem = any_cast<Type>(&storage);
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
+        return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
 
     /**
@@ -461,44 +448,74 @@ public:
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @param type Meta type to which the cast is requested.
-     * @return A valid meta any object if there exists a viable conversion, an
-     * invalid one otherwise.
+     * @return A valid meta object if convertible, an invalid one otherwise.
      */
     [[nodiscard]] meta_any allow_cast(const meta_type &type) const;
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @param type Meta type to which the cast is requested.
-     * @return True if there exists a viable conversion, false otherwise.
+     * @return True if convertible, false otherwise.
      */
     [[nodiscard]] bool allow_cast(const meta_type &type);
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return A valid meta any object if there exists a viable conversion, an
-     * invalid one otherwise.
+     * @return A valid meta object if convertible, an invalid one otherwise.
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return meta_any{meta_ctx_arg, *ctx};
-        } else {
-            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() ? as_ref() : allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+        if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
+            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+                return as_ref();
+            } else if(*this) {
+                if constexpr(std::is_arithmetic_v<std::remove_const_t<std::remove_reference_t<Type>>> || std::is_enum_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                    if(const auto &from = fetch_node(); from.conversion_helper) {
+                        return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
+                    }
+                }
+
+                if(const auto &from = fetch_node(); from.details != nullptr) {
+                    for(auto &&elem: from.details->conv) {
+                        if(elem.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
+                            return elem.conv(*ctx, storage.data());
+                        }
+                    }
+
+                    for(auto &&curr: from.details->base) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).template allow_cast<Type>())) {
+                            return other;
+                        }
+                    }
+                }
+            }
         }
+
+        return meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
      * @tparam Type Type to which the cast is requested.
-     * @return True if there exists a viable conversion, false otherwise.
+     * @return True if convertible, false otherwise.
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.data() != nullptr);
+            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
-            return storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>() || allow_cast(meta_type{*ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(internal::meta_context::from(*ctx))});
+            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+                return true;
+            } else if(auto other = std::as_const(*this).allow_cast<std::remove_const_t<std::remove_reference_t<Type>>>(); other) {
+                if(other.storage.owner()) {
+                    std::swap(*this, other);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -506,8 +523,8 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-        node = nullptr;
-        vtable = &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>;
+        auto *prev = std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>);
+        node = (prev == vtable) ? node : nullptr;
     }
 
     /*! @copydoc any::assign */
@@ -588,12 +605,20 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{meta_ctx_arg, *ctx};
+        other.storage = storage.as_ref();
+        other.node = node;
+        other.vtable = vtable;
+        return other;
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        return meta_any{*this, storage.as_ref()};
+        meta_any other{meta_ctx_arg, *ctx};
+        other.storage = storage.as_ref();
+        other.node = node;
+        other.vtable = vtable;
+        return other;
     }
 
     /**
@@ -721,7 +746,7 @@ public:
     }
 
     /*! @copydoc operator-> */
-    [[nodiscard]] const meta_any *operator->() const {
+    [[deprecated("do not use const handles")]] [[nodiscard]] const meta_any *operator->() const {
         return &any;
     }
 
@@ -1036,12 +1061,7 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
+/*! @copydoc operator!=(const meta_data &, const meta_data &) */
 [[nodiscard]] inline bool operator!=(const meta_func &lhs, const meta_func &rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -1300,7 +1320,25 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        return ((info() == other.info()) || (internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), other.info().hash(), other.is_arithmetic() || other.is_enum(), nullptr, [](const void *, auto &&...args) { return ((static_cast<void>(args), 1) + ... + 0u); }) != 0u));
+        if(info() == other.info()) {
+            return true;
+        } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
+            return true;
+        } else if(from.details) {
+            for(auto &&elem: from.details->conv) {
+                if(elem.type == other.info().hash()) {
+                    return true;
+                }
+            }
+
+            for(auto &&curr: from.details->base) {
+                if(curr.type == other.info().hash() || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1507,12 +1545,7 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
+/*! @copydoc operator!=(const meta_data &, const meta_data &) */
 [[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) noexcept {
     return !(lhs == rhs);
 }
@@ -1549,22 +1582,26 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        return internal::try_convert(internal::meta_context::from(*ctx), fetch_node(), type.info().hash(), type.is_arithmetic() || type.is_enum(), storage.data(), [this, &type]([[maybe_unused]] const void *instance, [[maybe_unused]] auto &&...args) {
-            if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_type_node> || ...)) {
-                return (args.from_void(*ctx, nullptr, instance), ...);
-            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, internal::meta_conv_node> || ...)) {
-                return (args.conv(*ctx, instance), ...);
-            } else if constexpr((std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(args)>>, decltype(internal::meta_type_node::conversion_helper)> || ...)) {
-                // exploits the fact that arithmetic types and enums are also default constructible
-                auto other = type.construct();
-                const auto value = (args(nullptr, instance), ...);
-                other.fetch_node().conversion_helper(other.storage.data(), &value);
-                return other;
-            } else {
-                // forwards to force a compile-time error in case of available arguments
-                return meta_any{meta_ctx_arg, *ctx, std::forward<decltype(args)>(args)...};
+        if(const auto &from = fetch_node(); from.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
+            auto other = type.construct();
+            const auto value = from.conversion_helper(nullptr, storage.data());
+            other.fetch_node().conversion_helper(other.storage.data(), &value);
+            return other;
+        }
+
+        if(const auto &from = fetch_node(); from.details) {
+            for(auto &&elem: from.details->conv) {
+                if(elem.type == type.info().hash()) {
+                    return elem.conv(*ctx, storage.data());
+                }
             }
-        });
+
+            for(auto &&curr: from.details->base) {
+                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == type.info().hash()) || (other = std::as_const(other).allow_cast(type))) {
+                    return other;
+                }
+            }
+        }
     }
 
     return meta_any{meta_ctx_arg, *ctx};
@@ -1690,7 +1727,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle;
+    any handle{};
 };
 
 class meta_associative_container::meta_iterator final {
@@ -1762,7 +1799,7 @@ public:
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
-    any handle;
+    any handle{};
 };
 /*! @endcond */
 
