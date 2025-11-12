@@ -106,13 +106,17 @@ protected:
         }
     }
 
-    void traits(const meta_traits value) {
+    void traits(const meta_traits value, const bool unset) {
+        auto set_or_unset_on = [=](auto &node) {
+            node.traits = (unset ? (node.traits & ~value) : (node.traits | value));
+        };
+
         if(bucket == parent) {
-            fetch_node().traits |= value;
+            set_or_unset_on(fetch_node());
         } else if(invoke == nullptr) {
-            find_member_or_assert()->traits |= value;
+            set_or_unset_on(*find_member_or_assert());
         } else {
-            find_overload_or_assert()->traits |= value;
+            set_or_unset_on(*find_overload_or_assert());
         }
     }
 
@@ -474,12 +478,13 @@ public:
      *
      * @tparam Value Type of the traits value.
      * @param value Traits value.
+     * @param unset True to unset the given traits, false otherwise.
      * @return A meta factory for the parent type.
      */
     template<typename Value>
-    meta_factory traits(const Value value) {
+    meta_factory traits(const Value value, const bool unset = false) {
         static_assert(std::is_enum_v<Value>, "Invalid enum type");
-        base_type::traits(internal::user_to_meta_traits(value));
+        base_type::traits(internal::user_to_meta_traits(value), unset);
         return *this;
     }
 
