@@ -275,10 +275,10 @@ class dense_map {
     }
 
     template<typename Other>
-    [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) {
-        for(auto it = begin(bucket), last = end(bucket); it != last; ++it) {
-            if(packed.second()(it->first, key)) {
-                return begin() + static_cast<difference_type>(it.index());
+    [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) {
+        for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
+            if(packed.second()(packed.first()[offset].element.first, key)) {
+                return begin() + offset;
             }
         }
 
@@ -286,10 +286,10 @@ class dense_map {
     }
 
     template<typename Other>
-    [[nodiscard]] auto constrained_find(const Other &key, std::size_t bucket) const {
-        for(auto it = cbegin(bucket), last = cend(bucket); it != last; ++it) {
-            if(packed.second()(it->first, key)) {
-                return cbegin() + static_cast<difference_type>(it.index());
+    [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) const {
+        for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
+            if(packed.second()(packed.first()[offset].element.first, key)) {
+                return cbegin() + offset;
             }
         }
 
