@@ -417,7 +417,7 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
+        return ((elem != nullptr) || !*this) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
     }
 
     /*! @copydoc try_cast */
@@ -425,7 +425,7 @@ public:
     [[nodiscard]] Type *try_cast() {
         auto *elem = any_cast<Type>(&storage);
         // NOLINTNEXTLINE(bugprone-casting-through-void)
-        return ((elem != nullptr) || (vtable == nullptr) || storage.has_value<std::remove_const_t<Type>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
+        return ((elem != nullptr) || !*this || storage.has_value<std::remove_const_t<Type>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
 
     /**
@@ -1547,7 +1547,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (vtable == nullptr) ? meta_type{} : meta_type{*ctx, fetch_node()};
+    return *this ? meta_type{*ctx, fetch_node()} : meta_type{};
 }
 
 template<typename... Args>
