@@ -425,7 +425,7 @@ public:
     [[nodiscard]] Type *try_cast() {
         auto *elem = any_cast<Type>(&storage);
         // NOLINTNEXTLINE(bugprone-casting-through-void)
-        return ((elem != nullptr) || (vtable == nullptr) || storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
+        return ((elem != nullptr) || (vtable == nullptr) || storage.has_value<std::remove_const_t<Type>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
 
     /**
