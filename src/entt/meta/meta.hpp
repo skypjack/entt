@@ -424,8 +424,6 @@ public:
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
         return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(std::as_const(*this).try_cast<std::remove_const_t<Type>>());
-        // NOLINTNEXTLINE(bugprone-casting-through-void)
-        return ((elem != nullptr) || !*this || storage.has_value<std::remove_const_t<Type>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
 
     /**
@@ -589,10 +587,7 @@ public:
         return ret;
     }
 
-    /**
-     * @brief Returns false if a wrapper is invalid, true otherwise.
-     * @return False if the wrapper is invalid, true otherwise.
-     */
+    /*! @copydoc any::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return !(vtable == nullptr);
     }
@@ -1039,10 +1034,7 @@ public:
         return (node_or_assert().next != nullptr) ? meta_func{*ctx, *node_or_assert().next} : meta_func{};
     }
 
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
+    /*! @copydoc meta_data::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
@@ -1523,10 +1515,7 @@ public:
         return fetch_node().custom;
     }
 
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
+    /*! @copydoc meta_data::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
