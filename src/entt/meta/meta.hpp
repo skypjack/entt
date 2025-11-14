@@ -423,7 +423,7 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        auto *elem = any_cast<Type>(&storage);
+        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(std::as_const(*this).try_cast<std::remove_const_t<Type>>());
         // NOLINTNEXTLINE(bugprone-casting-through-void)
         return ((elem != nullptr) || !*this || storage.has_value<std::remove_const_t<Type>>()) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
     }
@@ -1316,19 +1316,19 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        if(info() == other.info()) {
+        if(const auto &to = other.info().hash(); info().hash() == to) {
             return true;
         } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
             return true;
         } else if(from.details) {
             for(auto &&elem: from.details->conv) {
-                if(elem.type == other.info().hash()) {
+                if(elem.type == to) {
                     return true;
                 }
             }
 
             for(auto &&curr: from.details->base) {
-                if(curr.type == other.info().hash() || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
+                if(curr.type == to || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
                     return true;
                 }
             }
@@ -1673,8 +1673,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(handle.data(), 1, nullptr);
-        return *this;
+        return vtable(handle.data(), 1, nullptr), *this;
     }
 
     meta_iterator operator++(int value) noexcept {
@@ -1684,8 +1683,7 @@ public:
     }
 
     meta_iterator &operator--() noexcept {
-        vtable(handle.data(), -1, nullptr);
-        return *this;
+        return vtable(handle.data(), -1, nullptr), *this;
     }
 
     meta_iterator operator--(int value) noexcept {
@@ -1760,8 +1758,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(handle.data(), nullptr);
-        return *this;
+        return vtable(handle.data(), nullptr), *this;
     }
 
     meta_iterator operator++(int) noexcept {
