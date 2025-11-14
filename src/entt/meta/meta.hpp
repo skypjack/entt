@@ -479,10 +479,8 @@ public:
                 }
 
                 if(const auto &from = fetch_node(); from.details != nullptr) {
-                    for(auto &&elem: from.details->conv) {
-                        if(elem.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
-                            return elem.conv(*ctx, storage.data());
-                        }
+                    if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()); elem != nullptr) {
+                        return elem->conv(*ctx, storage.data());
                     }
 
                     for(auto &&curr: from.details->base) {
@@ -1313,10 +1311,8 @@ public:
         } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
             return true;
         } else if(from.details) {
-            for(auto &&elem: from.details->conv) {
-                if(elem.type == to) {
-                    return true;
-                }
+            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, to); elem != nullptr) {
+                return true;
             }
 
             for(auto &&curr: from.details->base) {
@@ -1575,10 +1571,8 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         if(const auto &from = fetch_node(); from.details) {
-            for(auto &&elem: from.details->conv) {
-                if(elem.type == type.info().hash()) {
-                    return elem.conv(*ctx, storage.data());
-                }
+            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, type.info().hash()); elem != nullptr) {
+                return elem->conv(*ctx, storage.data());
             }
 
             for(auto &&curr: from.details->base) {
