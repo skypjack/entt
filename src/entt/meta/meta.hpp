@@ -484,8 +484,10 @@ public:
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).template allow_cast<Type>())) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
                             return other;
+                        } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
+                            return from_base;
                         }
                     }
                 }
@@ -1576,8 +1578,10 @@ bool meta_any::set(const id_type id, Type &&value) {
             }
 
             for(auto &&curr: from.details->base) {
-                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == type.info().hash()) || (other = std::as_const(other).allow_cast(type))) {
+                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == type.info().hash()) {
                     return other;
+                } else if(auto from_base = std::as_const(other).allow_cast(type); from_base) {
+                    return from_base;
                 }
             }
         }
