@@ -1308,11 +1308,9 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        if(const auto &to = other.info().hash(); info().hash() == to) {
+        if(const auto &to = other.info().hash(); (info().hash() == to) || ((fetch_node().conversion_helper != nullptr) && (other.is_arithmetic() || other.is_enum()))) {
             return true;
-        } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
-            return true;
-        } else if(from.details) {
+        } else if(const auto &from = fetch_node(); from.details) {
             if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, to); elem != nullptr) {
                 return true;
             }
@@ -1565,7 +1563,7 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        if(const auto &from = fetch_node(); from.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
+        if(const auto &from = fetch_node(); (from.conversion_helper != nullptr) && (type.is_arithmetic() || type.is_enum())) {
             auto other = type.construct();
             const auto value = from.conversion_helper(nullptr, storage.data());
             other.fetch_node().conversion_helper(other.storage.data(), &value);
