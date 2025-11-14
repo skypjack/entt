@@ -278,7 +278,7 @@ class dense_map {
     [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
-                return begin() + offset;
+                return begin() + static_cast<typename iterator::difference_type>(offset);
             }
         }
 
@@ -289,7 +289,7 @@ class dense_map {
     [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
-                return cbegin() + offset;
+                return cbegin() + static_cast<typename const_iterator::difference_type>(offset);
             }
         }
 
