@@ -244,8 +244,8 @@ public:
     basic_any(basic_any &&other) noexcept
         : base_type{},
           vtable{other.vtable},
-          underlying_type{other.underlying_type},
           deleter{other.deleter},
+          underlying_type{other.underlying_type},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
@@ -294,8 +294,8 @@ public:
             }
 
             vtable = other.vtable;
-            underlying_type = other.underlying_type;
             deleter = other.deleter;
+            underlying_type = other.underlying_type;
             mode = other.mode;
         }
 
