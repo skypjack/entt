@@ -104,7 +104,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
         if(storage.contains(entity)) {
             auto *other = dst.storage(id);
 
-            if(!other) {
+            if(other == nullptr) {
                 using namespace entt::literals;
                 entt::resolve(storage.info()).invoke("storage"_hs, {}, entt::forward_as_meta(dst), id);
                 other = dst.storage(id);
