@@ -105,8 +105,14 @@ if(ENTT_HAS_SANITIZER)
 endif()
 
 if(ENTT_CLANG_TIDY_EXECUTABLE)
-    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE};--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
-endif()
+    set(ENTT_CLANG_TIDY_OPTIONS ";--config-file=${EnTT_SOURCE_DIR}/.clang-tidy;--header-filter=${EnTT_SOURCE_DIR}/src/entt/.*")
+
+    if(MSVC AND NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+        set(ENTT_CLANG_TIDY_OPTIONS "${ENTT_CLANG_TIDY_OPTIONS};--extra-arg=/EHsc;--extra-arg=/wd4996")
+    endif()
+
+    set(CMAKE_CXX_CLANG_TIDY "${ENTT_CLANG_TIDY_EXECUTABLE}${ENTT_CLANG_TIDY_OPTIONS}")
+ endif()
 
 # Add EnTT goodies
 
