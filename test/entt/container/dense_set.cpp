@@ -676,8 +676,8 @@ TEST(DenseSet, EraseFromBucket) {
 
     for(std::size_t next{}; next < 4u; ++next) {
         ASSERT_TRUE(set.emplace(2u * minimum_bucket_count * next).second);
-        ASSERT_TRUE(set.emplace(2u * minimum_bucket_count * next + 2u).second);
-        ASSERT_TRUE(set.emplace(2u * minimum_bucket_count * next + 3u).second);
+        ASSERT_TRUE(set.emplace((2u * minimum_bucket_count * next) + 2u).second);
+        ASSERT_TRUE(set.emplace((2u * minimum_bucket_count * next) + 3u).second);
     }
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
@@ -700,16 +700,16 @@ TEST(DenseSet, EraseFromBucket) {
         ASSERT_TRUE(set.contains(2u * minimum_bucket_count * next));
         ASSERT_EQ(set.bucket(2u * minimum_bucket_count * next), 0u);
 
-        ASSERT_TRUE(set.contains(2u * minimum_bucket_count * next + 2u));
-        ASSERT_EQ(set.bucket(2u * minimum_bucket_count * next + 2u), 2u);
+        ASSERT_TRUE(set.contains((2u * minimum_bucket_count * next) + 2u));
+        ASSERT_EQ(set.bucket((2u * minimum_bucket_count * next) + 2u), 2u);
 
-        ASSERT_TRUE(set.contains(2u * minimum_bucket_count * next + 3u));
-        ASSERT_EQ(set.bucket(2u * minimum_bucket_count * next + 3u), 3u);
+        ASSERT_TRUE(set.contains((2u * minimum_bucket_count * next) + 3u));
+        ASSERT_EQ(set.bucket((2u * minimum_bucket_count * next) + 3u), 3u);
     }
 
     ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 3u));
-    ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 3u + 2u));
-    ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 3u + 3u));
+    ASSERT_FALSE(set.contains((2u * minimum_bucket_count * 3u) + 2u));
+    ASSERT_FALSE(set.contains((2u * minimum_bucket_count * 3u) + 3u));
 
     set.erase(*++set.begin(0u));
     set.erase(*++set.begin(2u));
@@ -723,8 +723,8 @@ TEST(DenseSet, EraseFromBucket) {
     ASSERT_EQ(set.bucket_size(3u), 2u);
 
     ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 1u));
-    ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 1u + 2u));
-    ASSERT_FALSE(set.contains(2u * minimum_bucket_count * 1u + 3u));
+    ASSERT_FALSE(set.contains((2u * minimum_bucket_count * 1u) + 2u));
+    ASSERT_FALSE(set.contains((2u * minimum_bucket_count * 1u) + 3u));
 
     while(set.begin(3) != set.end(3u)) {
         set.erase(*set.begin(3));
@@ -738,11 +738,11 @@ TEST(DenseSet, EraseFromBucket) {
     ASSERT_EQ(set.bucket_size(3u), 0u);
 
     ASSERT_TRUE(set.contains(0u * minimum_bucket_count));
-    ASSERT_TRUE(set.contains(0u * minimum_bucket_count + 2u));
+    ASSERT_TRUE(set.contains((0u * minimum_bucket_count) + 2u));
     ASSERT_TRUE(set.contains(4u * minimum_bucket_count));
-    ASSERT_TRUE(set.contains(4u * minimum_bucket_count + 2u));
+    ASSERT_TRUE(set.contains((4u * minimum_bucket_count) + 2u));
 
-    set.erase(4u * minimum_bucket_count + 2u);
+    set.erase((4u * minimum_bucket_count) + 2u);
     set.erase(0u * minimum_bucket_count);
 
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
@@ -753,9 +753,9 @@ TEST(DenseSet, EraseFromBucket) {
     ASSERT_EQ(set.bucket_size(3u), 0u);
 
     ASSERT_FALSE(set.contains(0u * minimum_bucket_count));
-    ASSERT_TRUE(set.contains(0u * minimum_bucket_count + 2u));
+    ASSERT_TRUE(set.contains((0u * minimum_bucket_count) + 2u));
     ASSERT_TRUE(set.contains(4u * minimum_bucket_count));
-    ASSERT_FALSE(set.contains(4u * minimum_bucket_count + 2u));
+    ASSERT_FALSE(set.contains((4u * minimum_bucket_count) + 2u));
 }
 
 TEST(DenseSet, Swap) {
@@ -902,7 +902,7 @@ TEST(DenseSet, Rehash) {
     ASSERT_TRUE(set.contains(32u));
     ASSERT_EQ(set.bucket(32u), 0u);
 
-    set.rehash(4u * minimum_bucket_count + 1u);
+    set.rehash((4u * minimum_bucket_count) + 1u);
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
@@ -926,7 +926,7 @@ TEST(DenseSet, Rehash) {
     ASSERT_EQ(set.bucket_count(), 2u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
 
-    set.rehash(4u * minimum_bucket_count + 4u);
+    set.rehash((4u * minimum_bucket_count) + 4u);
 
     ASSERT_EQ(set.bucket_count(), 8u * minimum_bucket_count);
     ASSERT_TRUE(set.contains(32u));
