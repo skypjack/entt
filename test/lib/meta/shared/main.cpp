@@ -7,11 +7,7 @@
 #include <entt/meta/resolve.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/empty.h"
-
-ENTT_API void share(const entt::locator<entt::meta_ctx>::node_type &);
-ENTT_API void set_up();
-ENTT_API void tear_down();
-ENTT_API entt::meta_any wrap_int(int);
+#include "lib.h"
 
 TEST(Lib, Meta) {
     using namespace entt::literals;

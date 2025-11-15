@@ -5,8 +5,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/listener.h"
-
-ENTT_API void trigger(entt::dispatcher &);
+#include "lib.h"
 
 TEST(Lib, Dispatcher) {
     entt::dispatcher dispatcher;

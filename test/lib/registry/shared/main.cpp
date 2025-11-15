@@ -6,9 +6,7 @@
 #include <entt/entity/view.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/empty.h"
-
-ENTT_API void update(entt::registry &, int);
-ENTT_API void insert(entt::registry &);
+#include "lib.h"
 
 TEST(Lib, Registry) {
     constexpr auto count = 3;

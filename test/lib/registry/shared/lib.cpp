@@ -4,6 +4,7 @@
 #include <entt/entity/view.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/empty.h"
+#include "lib.h"
 
 template class entt::basic_registry<entt::entity>;
 

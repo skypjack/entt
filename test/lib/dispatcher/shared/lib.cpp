@@ -2,6 +2,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include "../../../common/boxed_type.h"
 #include "../../../common/empty.h"
+#include "lib.h"
 
 ENTT_API void trigger(entt::dispatcher &dispatcher) {
     dispatcher.trigger<test::empty>();
