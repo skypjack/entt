@@ -206,6 +206,7 @@ class meta_any {
             vtable(internal::meta_traits::is_none, *this, nullptr);
         }
 
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
         return *node;
     }
 
