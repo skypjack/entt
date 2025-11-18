@@ -1,28 +1,32 @@
 #ifndef ENTT_META_META_HPP
 #define ENTT_META_META_HPP
 
-#include <array>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/any.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
-#include "../locator/locator.hpp"
-#include "adl_pointer.hpp"
-#include "context.hpp"
-#include "fwd.hpp"
-#include "node.hpp"
-#include "range.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <array>
+#   include <cstddef>
+#   include <iterator>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/any.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/type_traits.hpp"
+#   include "../core/utility.hpp"
+#   include "../locator/locator.hpp"
+#   include "adl_pointer.hpp"
+#   include "context.hpp"
+#   include "fwd.hpp"
+#   include "node.hpp"
+#   include "range.hpp"
+#   include "type_traits.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 class meta_any;
 class meta_type;

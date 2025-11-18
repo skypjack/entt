@@ -1,7 +1,9 @@
 #ifndef ENTT_META_ADL_POINTER_HPP
 #define ENTT_META_ADL_POINTER_HPP
 
-namespace entt {
+#include "../config/module.h"
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief ADL based lookup function for dereferencing meta pointer-like types.

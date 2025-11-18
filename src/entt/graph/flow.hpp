@@ -1,25 +1,29 @@
 #ifndef ENTT_GRAPH_FLOW_HPP
 #define ENTT_GRAPH_FLOW_HPP
 
-#include <algorithm>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../container/dense_map.hpp"
-#include "../container/dense_set.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../core/utility.hpp"
-#include "adjacency_matrix.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <algorithm>
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../container/dense_map.hpp"
+#   include "../container/dense_set.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/utility.hpp"
+#   include "adjacency_matrix.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Utility class for creating task graphs.

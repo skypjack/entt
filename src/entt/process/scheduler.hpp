@@ -1,17 +1,21 @@
 #ifndef ENTT_PROCESS_SCHEDULER_HPP
 #define ENTT_PROCESS_SCHEDULER_HPP
 
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/compressed_pair.hpp"
-#include "fwd.hpp"
-#include "process.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/compressed_pair.hpp"
+#   include "fwd.hpp"
+#   include "process.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Cooperative scheduler for processes.

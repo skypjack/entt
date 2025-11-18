@@ -1,22 +1,26 @@
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
 
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_info.hpp"
-#include "component.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "sparse_set.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <iterator>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/memory.hpp"
+#   include "../core/type_info.hpp"
+#   include "component.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#   include "sparse_set.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -110,6 +114,8 @@ private:
     difference_type offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs, auto Page>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return rhs.index() - lhs.index();
@@ -145,10 +151,12 @@ template<typename Lhs, typename Rhs, auto Page>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 template<typename It, typename... Other>
 class extended_storage_iterator final {
     template<typename Iter, typename... Args>
-    friend class extended_storage_iterator;
+    friend class internal::extended_storage_iterator;
 
 public:
     using iterator_type = It;
@@ -197,6 +205,8 @@ private:
     std::tuple<It, Other...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
@@ -207,8 +217,12 @@ template<typename... Lhs, typename... Rhs>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Storage implementation.
@@ -1236,6 +1250,8 @@ public:
 private:
     size_type placeholder{};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

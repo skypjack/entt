@@ -3,9 +3,13 @@
 #ifndef ENTT_META_TEMPLATE_HPP
 #define ENTT_META_TEMPLATE_HPP
 
-#include "../core/type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../core/type_traits.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @brief Utility class to disambiguate class templates. */
 template<template<typename...> class>

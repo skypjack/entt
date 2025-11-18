@@ -1,33 +1,37 @@
 #ifndef ENTT_ENTITY_REGISTRY_HPP
 #define ENTT_ENTITY_REGISTRY_HPP
 
-#include <algorithm>
-#include <array>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../container/dense_map.hpp"
-#include "../core/algorithm.hpp"
-#include "../core/any.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "group.hpp"
-#include "mixin.hpp"
-#include "sparse_set.hpp"
-#include "storage.hpp"
-#include "view.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <algorithm>
+#   include <array>
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../container/dense_map.hpp"
+#   include "../core/algorithm.hpp"
+#   include "../core/any.hpp"
+#   include "../core/fwd.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/memory.hpp"
+#   include "../core/type_info.hpp"
+#   include "../core/type_traits.hpp"
+#   include "../core/utility.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#   include "group.hpp"
+#   include "mixin.hpp"
+#   include "sparse_set.hpp"
+#   include "storage.hpp"
+#   include "view.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -37,7 +41,7 @@ namespace internal {
 template<typename It>
 class registry_storage_iterator final {
     template<typename Other>
-    friend class registry_storage_iterator;
+    friend class internal::registry_storage_iterator;
 
     using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
 
@@ -120,6 +124,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -154,6 +160,8 @@ template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator>=(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
     return !(lhs < rhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 template<typename Allocator>
 class registry_context {
@@ -228,6 +236,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Fast and reliable entity-component system.
@@ -1233,6 +1243,8 @@ private:
     group_container_type groups;
     storage_for_type<entity_type> entities;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

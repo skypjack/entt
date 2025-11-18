@@ -1,18 +1,22 @@
 #ifndef ENTT_ENTITY_HELPER_HPP
 #define ENTT_ENTITY_HELPER_HPP
 
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include "../core/fwd.hpp"
-#include "../core/type_traits.hpp"
-#include "component.hpp"
-#include "fwd.hpp"
-#include "group.hpp"
-#include "storage.hpp"
-#include "view.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include "../core/fwd.hpp"
+#   include "../core/type_traits.hpp"
+#   include "component.hpp"
+#   include "fwd.hpp"
+#   include "group.hpp"
+#   include "storage.hpp"
+#   include "view.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Converts a registry to a view.

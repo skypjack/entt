@@ -1,15 +1,19 @@
 #ifndef ENTT_SIGNAL_SIGH_HPP
 #define ENTT_SIGNAL_SIGH_HPP
 
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "delegate.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <cstddef>
+#   include <memory>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "delegate.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Sink class.
@@ -52,7 +56,7 @@ class sigh;
  */
 template<typename Ret, typename... Args, typename Allocator>
 class sigh<Ret(Args...), Allocator> {
-    friend class sink<sigh<Ret(Args...), Allocator>>;
+    friend class entt::sink<sigh<Ret(Args...), Allocator>>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using delegate_type = delegate<Ret(Args...)>;
@@ -228,7 +232,7 @@ private:
  */
 class connection {
     template<typename>
-    friend class sink;
+    friend class entt::sink;
 
     connection(delegate<void(void *)> fn, void *ref)
         : disconnect{fn}, signal{ref} {}

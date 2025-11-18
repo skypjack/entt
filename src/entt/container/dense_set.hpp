@@ -1,21 +1,25 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <cmath>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cmath>
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <limits>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/type_traits.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -25,7 +29,7 @@ namespace internal {
 template<typename It>
 class dense_set_iterator final {
     template<typename>
-    friend class dense_set_iterator;
+    friend class internal::dense_set_iterator;
 
 public:
     using value_type = typename It::value_type::second_type;
@@ -105,6 +109,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<Lhs> &lhs, const dense_set_iterator<Rhs> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -140,10 +146,12 @@ template<typename Lhs, typename Rhs>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 template<typename It>
 class dense_set_local_iterator final {
     template<typename>
-    friend class dense_set_local_iterator;
+    friend class internal::dense_set_local_iterator;
 
 public:
     using value_type = typename It::value_type::second_type;
@@ -191,6 +199,8 @@ private:
     std::size_t offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator==(const dense_set_local_iterator<Lhs> &lhs, const dense_set_local_iterator<Rhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
@@ -201,8 +211,12 @@ template<typename Lhs, typename Rhs>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Associative container for unique objects of a given type.
@@ -924,6 +938,8 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold{default_threshold};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

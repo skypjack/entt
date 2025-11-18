@@ -114,3 +114,35 @@ This definition prevents the library from using non-standard techniques, that
 is, functionalities that are not fully compliant with the standard C++.<br/>
 While there are no known portability issues at the time of this writing, this
 should make the library fully portable anyway if needed.
+
+## When consumed as a module
+
+When `EnTT` is consumed as a C++20 module, all the above definitions can be
+put into a custom configuration file that can be referred to through the
+`ENTT_USER_CONFIG` compile definition using its path. <br/>
+
+In case the module is built through CMake, the variable
+`ENTT_USER_CONFIG` can be set directly from the `CMakeLists.txt` file before
+including the library through `add_subdirectory`.<br/>
+
+Example of a custom configuration file and CMake setup:
+```c++
+// user_config.h
+
+#define ENTT_ID_TYPE std::uint64_t
+#define ENTT_USE_ATOMIC
+```
+```c++
+// CMakeLists.txt
+
+set(ENTT_MODULE ON)
+set(ENTT_USER_CONFIG "path/to/user_config.h")
+
+...
+
+add_subdirectory(path/to/entt)
+
+...
+
+target_link_libraries(your_target PUBLIC EnTT::EnTT)
+```

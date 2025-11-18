@@ -1,10 +1,14 @@
 #ifndef ENTT_META_TYPE_TRAITS_HPP
 #define ENTT_META_TYPE_TRAITS_HPP
 
-#include <type_traits>
-#include <utility>
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <type_traits>
+#   include <utility>
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Traits class template to be specialized to enable support for meta

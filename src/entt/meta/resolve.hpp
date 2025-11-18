@@ -1,15 +1,19 @@
 #ifndef ENTT_META_RESOLVE_HPP
 #define ENTT_META_RESOLVE_HPP
 
-#include <type_traits>
-#include "../core/type_info.hpp"
-#include "../locator/locator.hpp"
-#include "context.hpp"
-#include "meta.hpp"
-#include "node.hpp"
-#include "range.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#   include <type_traits>
+#   include "../core/type_info.hpp"
+#   include "../locator/locator.hpp"
+#   include "context.hpp"
+#   include "meta.hpp"
+#   include "node.hpp"
+#   include "range.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Returns the meta type associated with a given type.

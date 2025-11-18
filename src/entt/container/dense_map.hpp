@@ -1,23 +1,27 @@
 #ifndef ENTT_CONTAINER_DENSE_MAP_HPP
 #define ENTT_CONTAINER_DENSE_MAP_HPP
 
-#include <cmath>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <cmath>
+#   include <cstddef>
+#   include <functional>
+#   include <iterator>
+#   include <limits>
+#   include <memory>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include <vector>
+#   include "../config/config.h"
+#   include "../core/bit.hpp"
+#   include "../core/compressed_pair.hpp"
+#   include "../core/iterator.hpp"
+#   include "../core/memory.hpp"
+#   include "../core/type_traits.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -55,7 +59,7 @@ struct dense_map_node final {
 template<typename It>
 class dense_map_iterator final {
     template<typename>
-    friend class dense_map_iterator;
+    friend class internal::dense_map_iterator;
 
     using first_type = decltype(std::as_const(std::declval<It>()->element.first));
     using second_type = decltype((std::declval<It>()->element.second));
@@ -139,6 +143,8 @@ private:
     It it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
     return lhs.it - rhs.it;
@@ -174,10 +180,12 @@ template<typename Lhs, typename Rhs>
     return !(lhs < rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 template<typename It>
 class dense_map_local_iterator final {
     template<typename>
-    friend class dense_map_local_iterator;
+    friend class internal::dense_map_local_iterator;
 
     using first_type = decltype(std::as_const(std::declval<It>()->element.first));
     using second_type = decltype((std::declval<It>()->element.second));
@@ -230,6 +238,8 @@ private:
     std::size_t offset;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename Lhs, typename Rhs>
 [[nodiscard]] constexpr bool operator==(const dense_map_local_iterator<Lhs> &lhs, const dense_map_local_iterator<Rhs> &rhs) noexcept {
     return lhs.index() == rhs.index();
@@ -240,8 +250,12 @@ template<typename Lhs, typename Rhs>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Associative container for key-value pairs with unique keys.
@@ -1055,6 +1069,8 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold{default_threshold};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

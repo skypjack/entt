@@ -1,15 +1,19 @@
 #ifndef ENTT_ENTITY_HANDLE_HPP
 #define ENTT_ENTITY_HANDLE_HPP
 
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../core/type_traits.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#   include <iterator>
+#   include <tuple>
+#   include <type_traits>
+#   include <utility>
+#   include "../config/config.h"
+#   include "../core/iterator.hpp"
+#   include "../core/type_traits.hpp"
+#   include "entity.hpp"
+#   include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -19,7 +23,7 @@ namespace internal {
 template<typename It>
 class handle_storage_iterator final {
     template<typename Other>
-    friend class handle_storage_iterator;
+    friend class internal::handle_storage_iterator;
 
     using underlying_type = std::remove_reference_t<typename It::value_type::second_type>;
     using entity_type = typename underlying_type::entity_type;
@@ -73,6 +77,8 @@ private:
     It last;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
 template<typename ILhs, typename IRhs>
 [[nodiscard]] constexpr bool operator==(const handle_storage_iterator<ILhs> &lhs, const handle_storage_iterator<IRhs> &rhs) noexcept {
     return lhs.it == rhs.it;
@@ -83,8 +89,12 @@ template<typename ILhs, typename IRhs>
     return !(lhs == rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Non-owning handle to an entity.
@@ -425,6 +435,8 @@ template<typename... Args>
 [[nodiscard]] constexpr bool operator!=(const null_t lhs, const basic_handle<Args...> &rhs) noexcept {
     return (rhs != lhs);
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 
