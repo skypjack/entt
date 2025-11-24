@@ -52,7 +52,7 @@ TEST(Any, Empty) {
     ASSERT_FALSE(any);
     ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::any_policy::empty);
-    ASSERT_EQ(any.type(), entt::type_id<void>());
+    ASSERT_EQ(any.info(), entt::type_id<void>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(any.data(), nullptr);
 }
@@ -81,7 +81,7 @@ TEST(Any, SBO) {
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.policy(), entt::any_policy::embedded);
-    ASSERT_EQ(any.type(), entt::type_id<char>());
+    ASSERT_EQ(any.info(), entt::type_id<char>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<char>(any), 'c');
 }
@@ -93,7 +93,7 @@ TEST(Any, NoSBO) {
     ASSERT_TRUE(any);
     ASSERT_TRUE(any.owner());
     ASSERT_EQ(any.policy(), entt::any_policy::dynamic);
-    ASSERT_EQ(any.type(), entt::type_id<fat>());
+    ASSERT_EQ(any.info(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 }

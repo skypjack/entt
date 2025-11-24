@@ -354,11 +354,6 @@ public:
         return *static_cast<const type_info *>(vtable(request::info, *this, nullptr));
     }
 
-    /*! @copydoc info */
-    [[deprecated("use ::info instead")]] [[nodiscard]] const type_info &type() const noexcept {
-        return info();
-    }
-
     /**
      * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
