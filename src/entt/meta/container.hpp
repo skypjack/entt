@@ -72,8 +72,6 @@ struct basic_meta_sequence_container_traits {
 
     /*! @brief Number of elements, or `meta_dynamic_extent` if dynamic. */
     static constexpr std::size_t extent = internal::sequence_container_extent_v<Type>;
-    /*! @brief True in case of fixed size containers, false otherwise. */
-    [[deprecated("use ::extent instead")]] static constexpr bool fixed_size = (extent != meta_dynamic_extent);
 
     /**
      * @brief Returns the number of elements in a container.
