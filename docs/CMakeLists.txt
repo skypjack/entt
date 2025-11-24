@@ -47,7 +47,6 @@ if(DOXYGEN_FOUND)
             md/reference.md
             md/resource.md
             md/signal.md
-            md/unreal.md
             doxy.in
     )
 
