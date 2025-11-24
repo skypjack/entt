@@ -1086,11 +1086,6 @@ public:
         return *descriptor;
     }
 
-    /*! @copydoc info */
-    [[deprecated("use ::info instead")]] [[nodiscard]] const type_info &type() const noexcept {
-        return info();
-    }
-
     /**
      * @brief Forwards variables to derived classes, if any.
      * @tparam Type Type of the element to forward.

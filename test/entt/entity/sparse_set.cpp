@@ -64,7 +64,7 @@ TYPED_TEST(SparseSet, Constructors) {
 
         ASSERT_EQ(set.policy(), entt::deletion_policy::swap_and_pop);
         ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
-        ASSERT_EQ(set.type(), entt::type_id<void>());
+        ASSERT_EQ(set.info(), entt::type_id<void>());
 
         set = sparse_set_type{policy, allocator_type{}};
 
@@ -76,7 +76,7 @@ TYPED_TEST(SparseSet, Constructors) {
 
         ASSERT_EQ(set.policy(), policy);
         ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
-        ASSERT_EQ(set.type(), entt::type_id<int>());
+        ASSERT_EQ(set.info(), entt::type_id<int>());
     }
 }
 
