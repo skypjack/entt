@@ -237,9 +237,9 @@ TYPED_TEST(Poly, Functionalities) {
     ASSERT_TRUE(value);
 
     ASSERT_EQ(empty.info(), entt::type_id<void>());
-    ASSERT_EQ(in_place.type(), entt::type_id<impl>());
+    ASSERT_EQ(in_place.info(), entt::type_id<impl>());
     ASSERT_EQ(alias.info(), entt::type_id<impl>());
-    ASSERT_EQ(value.type(), entt::type_id<impl>());
+    ASSERT_EQ(value.info(), entt::type_id<impl>());
 
     ASSERT_EQ(alias.data(), &instance);
     ASSERT_EQ(std::as_const(alias).data(), &instance);
