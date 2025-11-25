@@ -93,7 +93,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_features(EnTT INTERFACE cxx_std_17)
+target_compile_features(EnTT INTERFACE cxx_std_20)
 
 if(ENTT_HAS_LIBCPP)
     target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)

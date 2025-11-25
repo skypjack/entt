@@ -21,16 +21,16 @@ else()
 
     add_library(GTest::Main ALIAS gtest_main)
 
-    target_compile_features(gtest PUBLIC cxx_std_17)
+    target_compile_features(gtest PUBLIC cxx_std_20)
     set_target_properties(gtest PROPERTIES CXX_CLANG_TIDY "")
 
-    target_compile_features(gtest_main PUBLIC cxx_std_17)
+    target_compile_features(gtest_main PUBLIC cxx_std_20)
     set_target_properties(gtest_main PROPERTIES CXX_CLANG_TIDY "")
 
-    target_compile_features(gmock PUBLIC cxx_std_17)
+    target_compile_features(gmock PUBLIC cxx_std_20)
     set_target_properties(gmock PROPERTIES CXX_CLANG_TIDY "")
 
-    target_compile_features(gmock_main PUBLIC cxx_std_17)
+    target_compile_features(gmock_main PUBLIC cxx_std_20)
     set_target_properties(gmock_main PROPERTIES CXX_CLANG_TIDY "")
 endif()
 

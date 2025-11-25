@@ -217,7 +217,7 @@ the include paths.
 ## Requirements
 
 To be able to use `EnTT`, users must provide a full-featured compiler that
-supports at least C++17.<br/>
+supports at least C++20.<br/>
 The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
