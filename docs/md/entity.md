@@ -1877,7 +1877,7 @@ specific _queries_.<br/>
 The type returned when combining multiple elements together is itself a view,
 more in general a multi component one.
 
-Combining different elements tries to mimic C++20 ranges:
+Combining different elements tries to mimic ranges:
 
 ```cpp
 auto view = registry.view<position>();
