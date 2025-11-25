@@ -18,7 +18,7 @@
 #include "../../common/transparent_equal_to.h"
 
 TEST(DenseSet, Functionalities) {
-    entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
+    entt::dense_set<int, std::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = set.get_allocator());
@@ -112,12 +112,12 @@ TEST(DenseSet, Constructors) {
 }
 
 TEST(DenseSet, Copy) {
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
     const auto max_load_factor = set.max_load_factor() - .05f;
     set.max_load_factor(max_load_factor);
     set.emplace(3u);
 
-    entt::dense_set<std::size_t, entt::identity> other{set};
+    entt::dense_set<std::size_t, std::identity> other{set};
 
     ASSERT_TRUE(set.contains(3u));
     ASSERT_TRUE(other.contains(3u));
@@ -141,12 +141,12 @@ TEST(DenseSet, Copy) {
 }
 
 TEST(DenseSet, Move) {
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
     const auto max_load_factor = set.max_load_factor() - .05f;
     set.max_load_factor(max_load_factor);
     set.emplace(3u);
 
-    entt::dense_set<std::size_t, entt::identity> other{std::move(set)};
+    entt::dense_set<std::size_t, std::identity> other{std::move(set)};
 
     test::is_initialized(set);
 
@@ -462,7 +462,7 @@ TEST(DenseSet, Insert) {
 
 TEST(DenseSet, InsertRehash) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
@@ -493,7 +493,7 @@ TEST(DenseSet, InsertRehash) {
 
 TEST(DenseSet, InsertSameBucket) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     for(std::size_t next{}; next < minimum_bucket_count; ++next) {
         ASSERT_EQ(set.cbegin(next), set.cend(next));
@@ -556,7 +556,7 @@ TEST(DenseSet, Emplace) {
 
 TEST(DenseSet, EmplaceRehash) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
@@ -588,7 +588,7 @@ TEST(DenseSet, EmplaceRehash) {
 
 TEST(DenseSet, EmplaceSameBucket) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     for(std::size_t next{}; next < minimum_bucket_count; ++next) {
         ASSERT_EQ(set.cbegin(next), set.cend(next));
@@ -608,7 +608,7 @@ TEST(DenseSet, EmplaceSameBucket) {
 
 TEST(DenseSet, Erase) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     for(std::size_t next{}, last = minimum_bucket_count + 1u; next < last; ++next) {
         set.emplace(next);
@@ -669,7 +669,7 @@ TEST(DenseSet, EraseWithMovableKeyValue) {
 
 TEST(DenseSet, EraseFromBucket) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
     ASSERT_EQ(set.size(), 0u);
@@ -778,7 +778,7 @@ TEST(DenseSet, Swap) {
 }
 
 TEST(DenseSet, EqualRange) {
-    entt::dense_set<int, entt::identity, test::transparent_equal_to> set;
+    entt::dense_set<int, std::identity, test::transparent_equal_to> set;
     const auto &cset = set;
 
     set.emplace(1);
@@ -813,14 +813,14 @@ TEST(DenseSet, EqualRange) {
 }
 
 TEST(DenseSet, LocalIterator) {
-    using iterator = typename entt::dense_set<std::size_t, entt::identity>::local_iterator;
+    using iterator = typename entt::dense_set<std::size_t, std::identity>::local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
     testing::StaticAssertTypeEq<iterator::pointer, const std::size_t *>();
     testing::StaticAssertTypeEq<iterator::reference, const std::size_t &>();
 
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
     set.emplace(3u);
     set.emplace(3u + minimum_bucket_count);
 
@@ -841,14 +841,14 @@ TEST(DenseSet, LocalIterator) {
 }
 
 TEST(DenseSet, ConstLocalIterator) {
-    using iterator = typename entt::dense_set<std::size_t, entt::identity>::const_local_iterator;
+    using iterator = typename entt::dense_set<std::size_t, std::identity>::const_local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
     testing::StaticAssertTypeEq<iterator::pointer, const std::size_t *>();
     testing::StaticAssertTypeEq<iterator::reference, const std::size_t &>();
 
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
     set.emplace(3u);
     set.emplace(3u + minimum_bucket_count);
 
@@ -889,7 +889,7 @@ TEST(DenseSet, LocalIteratorConversion) {
 
 TEST(DenseSet, Rehash) {
     constexpr std::size_t minimum_bucket_count = 8u;
-    entt::dense_set<std::size_t, entt::identity> set;
+    entt::dense_set<std::size_t, std::identity> set;
     set.emplace(32u);
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
