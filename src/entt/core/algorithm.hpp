@@ -94,7 +94,7 @@ struct radix_sort {
      * @param last An iterator past the last element of the range to sort.
      * @param getter A valid _getter_ function object.
      */
-    template<typename It, typename Getter = identity>
+    template<typename It, typename Getter = std::identity>
     void operator()(It first, It last, Getter getter = Getter{}) const {
         if(first < last) {
             constexpr auto passes = N / Bit;
