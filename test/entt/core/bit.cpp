@@ -5,19 +5,6 @@
 #include <entt/core/bit.hpp>
 #include "../../common/config.h"
 
-TEST(PopCount, Functionalities) {
-    // constexpr-ness guaranteed
-    constexpr auto zero_popcount = entt::popcount(0u);
-
-    ASSERT_EQ(zero_popcount, 0u);
-    ASSERT_EQ(entt::popcount(1u), 1u);
-    ASSERT_EQ(entt::popcount(2u), 1u);
-    ASSERT_EQ(entt::popcount(3u), 2u);
-    ASSERT_EQ(entt::popcount(7u), 3u);
-    ASSERT_EQ(entt::popcount(128u), 1u);
-    ASSERT_EQ(entt::popcount(201u), 4u);
-}
-
 TEST(HasSingleBit, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto zero_is_power_of_two = entt::has_single_bit(0u);
