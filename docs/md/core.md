@@ -201,19 +201,15 @@ in order to meet them.
 
 # Bit
 
-Finding out the population count of an unsigned integral value (`popcount`),
-whether a number is a power of two or not (`has_single_bit`) as well as the next
-power of two given a random value (`next_power_of_two`) can be useful.<br/>
-For example, it helps to allocate memory in pages having a size suitable for the
-fast modulus:
+Some general purpose utilities, such as the fast module function:
 
 ```cpp
 const std::size_t result = entt::fast_mod(value, modulus);
 ```
 
-Where `modulus` is necessarily a power of two. Perhaps not everyone knows that
-this type of operation is far superior in terms of performance to the basic
-modulus and for this reason preferred in many areas.
+Where `modulus` is necessarily a power of two. This type of operation is far
+superior in terms of performance to the basic modulus and for this reason
+preferred in many areas.
 
 # Compressed pair
 
