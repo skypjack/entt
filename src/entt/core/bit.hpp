@@ -1,24 +1,13 @@
 #ifndef ENTT_CORE_BIT_HPP
 #define ENTT_CORE_BIT_HPP
 
+#include <bit>
 #include <cstddef>
 #include <limits>
 #include <type_traits>
 #include "../config/config.h"
 
 namespace entt {
-
-/**
- * @brief Checks whether a value is a power of two or not (waiting for C++20 and
- * `std::has_single_bit`).
- * @tparam Type Unsigned integer type.
- * @param value A value of unsigned integer type.
- * @return True if the value is a power of two, false otherwise.
- */
-template<typename Type>
-[[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, bool> has_single_bit(const Type value) noexcept {
-    return value && ((value & (value - 1)) == 0);
-}
 
 /**
  * @brief Computes the smallest power of two greater than or equal to a value
@@ -49,7 +38,7 @@ template<typename Type>
  */
 template<typename Type>
 [[nodiscard]] constexpr std::enable_if_t<std::is_unsigned_v<Type>, Type> fast_mod(const Type value, const std::size_t mod) noexcept {
-    ENTT_ASSERT_CONSTEXPR(has_single_bit(mod), "Value must be a power of two");
+    ENTT_ASSERT_CONSTEXPR(std::has_single_bit(mod), "Value must be a power of two");
     return static_cast<Type>(value & (mod - 1u));
 }
 

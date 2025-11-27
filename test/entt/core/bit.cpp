@@ -5,19 +5,6 @@
 #include <entt/core/bit.hpp>
 #include "../../common/config.h"
 
-TEST(HasSingleBit, Functionalities) {
-    // constexpr-ness guaranteed
-    constexpr auto zero_is_power_of_two = entt::has_single_bit(0u);
-
-    ASSERT_FALSE(zero_is_power_of_two);
-    ASSERT_TRUE(entt::has_single_bit(1u));
-    ASSERT_TRUE(entt::has_single_bit(2u));
-    ASSERT_TRUE(entt::has_single_bit(4u));
-    ASSERT_FALSE(entt::has_single_bit(7u));
-    ASSERT_TRUE(entt::has_single_bit(128u));
-    ASSERT_FALSE(entt::has_single_bit(200u));
-}
-
 TEST(NextPowerOfTwo, Functionalities) {
     // constexpr-ness guaranteed
     constexpr auto next_power_of_two_of_zero = entt::next_power_of_two(0u);
