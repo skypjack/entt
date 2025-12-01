@@ -154,7 +154,7 @@ class resource_cache {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const id_type, typename Loader::result_type>>;
-    using container_type = dense_map<id_type, typename Loader::result_type, std::identity, std::equal_to<>, container_allocator>;
+    using container_type = dense_map<id_type, typename Loader::result_type, identity, std::equal_to<>, container_allocator>;
 
 public:
     /*! @brief Allocator type. */

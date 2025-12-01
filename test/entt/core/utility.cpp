@@ -11,6 +11,15 @@ struct functions {
     void bar() {}
 };
 
+TEST(Identity, Functionalities) {
+    const entt::identity identity;
+    int value = 2;
+
+    ASSERT_TRUE(entt::is_transparent_v<entt::identity>);
+    ASSERT_EQ(identity(value), value);
+    ASSERT_EQ(&identity(value), &value);
+}
+
 TEST(Overload, Functionalities) {
     ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void (*)(int)>(&functions::foo));
     ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void (*)()>(&functions::foo));
