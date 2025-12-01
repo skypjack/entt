@@ -1,4 +1,5 @@
 #include <array>
+#include <bit>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -11,7 +12,6 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/container/dense_map.hpp>
-#include <entt/core/bit.hpp>
 #include <entt/core/iterator.hpp>
 #include <entt/core/utility.hpp>
 #include "../../common/config.h"
@@ -1160,7 +1160,7 @@ TEST(DenseMap, Reserve) {
     map.reserve(minimum_bucket_count);
 
     ASSERT_EQ(map.bucket_count(), 2 * minimum_bucket_count);
-    ASSERT_EQ(map.bucket_count(), entt::next_power_of_two(static_cast<std::size_t>(std::ceil(minimum_bucket_count / map.max_load_factor()))));
+    ASSERT_EQ(map.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil(minimum_bucket_count / map.max_load_factor()))));
 }
 
 TEST(DenseMap, ThrowingAllocator) {

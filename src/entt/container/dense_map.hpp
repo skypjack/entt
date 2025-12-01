@@ -1,6 +1,7 @@
 #ifndef ENTT_CONTAINER_DENSE_MAP_HPP
 #define ENTT_CONTAINER_DENSE_MAP_HPP
 
+#include <bit>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -1010,7 +1011,7 @@ public:
         const auto cap = static_cast<size_type>(static_cast<float>(size()) / max_load_factor());
         value = value > cap ? value : cap;
 
-        if(const auto sz = next_power_of_two(value); sz != bucket_count()) {
+        if(const auto sz = std::bit_ceil(value); sz != bucket_count()) {
             sparse.first().resize(sz);
 
             for(auto &&elem: sparse.first()) {
