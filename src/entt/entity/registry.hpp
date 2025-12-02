@@ -259,9 +259,7 @@ class basic_registry {
                 return static_cast<storage_type &>(*it->second);
             }
 
-            using alloc_type = typename storage_type::allocator_type;
             typename pool_container_type::mapped_type cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
-
             pools.emplace(id, cpool);
             cpool->bind(*this);
 
