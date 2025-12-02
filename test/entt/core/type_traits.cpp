@@ -119,7 +119,7 @@ TEST(TypeList, Functionalities) {
     testing::StaticAssertTypeEq<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char, double>>, entt::type_list<int>>();
     testing::StaticAssertTypeEq<entt::type_list_diff_t<entt::type_list<int, char, double>, entt::type_list<char>>, entt::type_list<int, double>>();
 
-    testing::StaticAssertTypeEq<entt::type_list_transform_t<entt::type_list<int, char>, entt::type_identity>, entt::type_list<int, char>>();
+    testing::StaticAssertTypeEq<entt::type_list_transform_t<entt::type_list<int, char>, std::type_identity>, entt::type_list<int, char>>();
     testing::StaticAssertTypeEq<entt::type_list_transform_t<entt::type_list<int, char>, std::add_const>, entt::type_list<const int, const char>>();
     testing::StaticAssertTypeEq<entt::type_list_transform_t<entt::type_list<int, char>, multi_argument_operation>, entt::type_list<void, void>>();
 
