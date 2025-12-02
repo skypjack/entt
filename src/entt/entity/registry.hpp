@@ -260,14 +260,7 @@ class basic_registry {
             }
 
             using alloc_type = typename storage_type::allocator_type;
-            typename pool_container_type::mapped_type cpool{};
-
-            if constexpr(std::is_void_v<Type> && !std::is_constructible_v<alloc_type, allocator_type>) {
-                // std::allocator<void> has no cross constructors (waiting for C++20)
-                cpool = std::allocate_shared<storage_type>(get_allocator(), alloc_type{});
-            } else {
-                cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
-            }
+            typename pool_container_type::mapped_type cpool = std::allocate_shared<storage_type>(get_allocator(), get_allocator());
 
             pools.emplace(id, cpool);
             cpool->bind(*this);
