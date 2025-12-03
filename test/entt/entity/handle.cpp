@@ -442,7 +442,6 @@ ENTT_DEBUG_TYPED_TEST(BasicHandleDeathTest, Orphan) {
     ASSERT_DEATH([[maybe_unused]] const auto result = handle.orphan(), "");
 }
 
-/*
 TEST(BasicHandle, Component) {
     entt::registry registry;
     const auto entity = registry.create();
@@ -486,7 +485,6 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ(nullptr, handle.try_get<char>());
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
 }
-*/
 
 TEST(BasicHandle, ImplicitConversion) {
     entt::registry registry;
