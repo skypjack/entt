@@ -219,7 +219,7 @@ TEST(AdjacencyMatrix, Clear) {
 }
 
 TEST(AdjacencyMatrix, VertexIterator) {
-    using iterator = typename entt::adjacency_matrix<entt::directed_tag>::vertex_iterator;
+    using iterator = entt::adjacency_matrix<entt::directed_tag>::vertex_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
     testing::StaticAssertTypeEq<iterator::pointer, void>();
@@ -245,7 +245,7 @@ TEST(AdjacencyMatrix, VertexIterator) {
 }
 
 TEST(AdjacencyMatrix, EdgeIterator) {
-    using iterator = typename entt::adjacency_matrix<entt::directed_tag>::edge_iterator;
+    using iterator = entt::adjacency_matrix<entt::directed_tag>::edge_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<std::size_t, std::size_t>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<std::size_t, std::size_t>>>();
