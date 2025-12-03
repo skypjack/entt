@@ -146,7 +146,7 @@ struct DeducedDerived
     };
 
     template<typename Type>
-    using impl = entt::value_list_cat_t<typename Deduced::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
+    using impl = entt::value_list_cat_t<Deduced::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
 };
 
 struct DefinedDerived
@@ -163,7 +163,7 @@ struct DefinedDerived
     };
 
     template<typename Type>
-    using impl = entt::value_list_cat_t<typename Defined::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
+    using impl = entt::value_list_cat_t<Defined::impl<Type>, entt::value_list<&three_is_a_magic_number>>;
 };
 
 struct impl {
@@ -222,7 +222,7 @@ using PolyDerivedTypes = ::testing::Types<DeducedDerived, DefinedDerived>;
 TYPED_TEST_SUITE(PolyDerived, PolyDerivedTypes, );
 
 TYPED_TEST(Poly, Functionalities) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     impl instance{};
 
@@ -292,7 +292,7 @@ TYPED_TEST(Poly, Functionalities) {
 }
 
 TYPED_TEST(Poly, Owned) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     poly_type poly{impl{}};
     auto *ptr = static_cast<impl *>(poly.data());
@@ -318,7 +318,7 @@ TYPED_TEST(Poly, Owned) {
 }
 
 TYPED_TEST(Poly, Reference) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     impl instance{};
     poly_type poly{std::in_place_type<impl &>, instance};
@@ -344,7 +344,7 @@ TYPED_TEST(Poly, Reference) {
 }
 
 TYPED_TEST(Poly, ConstReference) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     impl instance{};
     poly_type poly{std::in_place_type<const impl &>, instance};
@@ -365,7 +365,7 @@ TYPED_TEST(Poly, ConstReference) {
 }
 
 ENTT_DEBUG_TYPED_TEST(PolyDeathTest, ConstReference) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     impl instance{};
     poly_type poly{std::in_place_type<const impl &>, instance};
@@ -375,7 +375,7 @@ ENTT_DEBUG_TYPED_TEST(PolyDeathTest, ConstReference) {
 }
 
 TYPED_TEST(Poly, AsRef) {
-    using poly_type = typename TestFixture::template type<>;
+    using poly_type = TestFixture::template type<>;
 
     poly_type poly{impl{}};
     auto ref = poly.as_ref();
@@ -408,8 +408,8 @@ TYPED_TEST(Poly, AsRef) {
 }
 
 TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
-    using poly_type = typename TestFixture::template type<>;
-    using zeroed_type = typename TestFixture::template type<0u>;
+    using poly_type = TestFixture::template type<>;
+    using zeroed_type = TestFixture::template type<0u>;
 
     poly_type poly{impl{}};
     const auto broken = poly.data();
@@ -431,7 +431,7 @@ TYPED_TEST(Poly, SBOVsZeroedSBOSize) {
 
 TYPED_TEST(Poly, SboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    using poly_type = typename TestFixture::template type<alignment, alignment>;
+    using poly_type = TestFixture::template type<alignment, alignment>;
 
     std::array<poly_type, 2u> sbo = {over_aligned{}, over_aligned{}};
     const auto *data = sbo[0].data();
@@ -449,7 +449,7 @@ TYPED_TEST(Poly, SboAlignment) {
 
 TYPED_TEST(Poly, NoSboAlignment) {
     constexpr auto alignment = alignof(over_aligned);
-    using poly_type = typename TestFixture::template type<alignment>;
+    using poly_type = TestFixture::template type<alignment>;
 
     std::array<poly_type, 2u> nosbo = {over_aligned{}, over_aligned{}};
     const auto *data = nosbo[0].data();
@@ -466,7 +466,7 @@ TYPED_TEST(Poly, NoSboAlignment) {
 }
 
 TYPED_TEST(PolyEmbedded, EmbeddedVtable) {
-    using poly_type = typename TestFixture::type;
+    using poly_type = TestFixture::type;
 
     poly_type poly{impl{}};
     auto *ptr = static_cast<impl *>(poly.data());
@@ -482,7 +482,7 @@ TYPED_TEST(PolyEmbedded, EmbeddedVtable) {
 }
 
 TYPED_TEST(PolyDerived, InheritanceSupport) {
-    using poly_type = typename TestFixture::type;
+    using poly_type = TestFixture::type;
 
     poly_type poly{impl{}};
 
