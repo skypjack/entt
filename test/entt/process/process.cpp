@@ -45,7 +45,7 @@ public:
 };
 
 class test_plain_process: public entt::process {
-    using delta_type = typename entt::process::delta_type;
+    using delta_type = entt::process::delta_type;
     void update(const delta_type, void *) override {}
 };
 

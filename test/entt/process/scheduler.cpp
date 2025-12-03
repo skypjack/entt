@@ -16,7 +16,7 @@ class foo_process: public entt::process {
     }
 
 public:
-    using allocator_type = typename entt::process::allocator_type;
+    using allocator_type = entt::process::allocator_type;
 
     foo_process(const allocator_type &allocator, std::function<void()> upd, std::function<void()> abort)
         : entt::process{allocator},
