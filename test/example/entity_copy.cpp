@@ -13,8 +13,8 @@ enum class my_entity : entt::id_type {};
 template<typename Type>
 // NOLINTNEXTLINE(*-exception-escape)
 struct meta_mixin: Type {
-    using allocator_type = typename Type::allocator_type;
-    using element_type = typename Type::element_type;
+    using allocator_type = Type::allocator_type;
+    using element_type = Type::element_type;
 
     explicit meta_mixin(const allocator_type &allocator);
 };
@@ -95,7 +95,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     src.emplace<char>(entity, 'c');
 
     ASSERT_EQ(src.storage<entt::entity>().size(), 1u);
-    ASSERT_EQ(dst.template storage<typename TestFixture::type::entity_type>().size(), 1u);
+    ASSERT_EQ(dst.template storage<TestFixture::type::entity_type>().size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
     ASSERT_FALSE((dst.template all_of<int, char>(copy)));
@@ -115,7 +115,7 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     }
 
     ASSERT_EQ(src.storage<entt::entity>().size(), 1u);
-    ASSERT_EQ(dst.template storage<typename TestFixture::type::entity_type>().size(), 1u);
+    ASSERT_EQ(dst.template storage<TestFixture::type::entity_type>().size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
     ASSERT_TRUE((dst.template all_of<int, char>(copy)));
