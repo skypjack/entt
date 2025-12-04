@@ -161,11 +161,11 @@ TEST(Table, ShrinkToFit) {
 }
 
 TEST(Table, Iterator) {
-    using iterator = typename entt::table<int, char>::iterator;
+    using iterator = entt::table<int, char>::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<int &, char &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
+    testing::StaticAssertTypeEq<iterator::reference, std::tuple<int &, char &>>();
 
     entt::table<int, char> table;
     table.emplace(3, 'c');
@@ -214,11 +214,11 @@ TEST(Table, Iterator) {
 }
 
 TEST(Table, ConstIterator) {
-    using iterator = typename entt::table<int, char>::const_iterator;
+    using iterator = entt::table<int, char>::const_iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<const int &, const char &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
+    testing::StaticAssertTypeEq<iterator::reference, std::tuple<const int &, const char &>>();
 
     entt::table<int, char> table;
     table.emplace(3, 'c');
@@ -269,11 +269,11 @@ TEST(Table, ConstIterator) {
 }
 
 TEST(Table, ReverseIterator) {
-    using reverse_iterator = typename entt::table<int, char>::reverse_iterator;
+    using reverse_iterator = entt::table<int, char>::reverse_iterator;
 
-    testing::StaticAssertTypeEq<typename reverse_iterator::value_type, std::tuple<int &, char &>>();
-    testing::StaticAssertTypeEq<typename reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
-    testing::StaticAssertTypeEq<typename reverse_iterator::reference, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<reverse_iterator::value_type, std::tuple<int &, char &>>();
+    testing::StaticAssertTypeEq<reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<int &, char &>>>();
+    testing::StaticAssertTypeEq<reverse_iterator::reference, std::tuple<int &, char &>>();
 
     entt::table<int, char> table;
     table.emplace(3, 'c');
@@ -322,11 +322,11 @@ TEST(Table, ReverseIterator) {
 }
 
 TEST(Table, ConstReverseIterator) {
-    using const_reverse_iterator = typename entt::table<int, char>::const_reverse_iterator;
+    using const_reverse_iterator = entt::table<int, char>::const_reverse_iterator;
 
-    testing::StaticAssertTypeEq<typename const_reverse_iterator::value_type, std::tuple<const int &, const char &>>();
-    testing::StaticAssertTypeEq<typename const_reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
-    testing::StaticAssertTypeEq<typename const_reverse_iterator::reference, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<const_reverse_iterator::value_type, std::tuple<const int &, const char &>>();
+    testing::StaticAssertTypeEq<const_reverse_iterator::pointer, entt::input_iterator_pointer<std::tuple<const int &, const char &>>>();
+    testing::StaticAssertTypeEq<const_reverse_iterator::reference, std::tuple<const int &, const char &>>();
 
     entt::table<int, char> table;
     table.emplace(3, 'c');
@@ -381,8 +381,8 @@ TEST(Table, IteratorConversion) {
 
     table.emplace(3, 'c');
 
-    const typename entt::table<int, char>::iterator it = table.begin();
-    typename entt::table<int, char>::const_iterator cit = it;
+    const entt::table<int, char>::iterator it = table.begin();
+    entt::table<int, char>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<int &, char &>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::tuple<const int &, const char &>>();

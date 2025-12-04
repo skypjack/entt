@@ -184,7 +184,7 @@ TEST(DenseMap, Move) {
 }
 
 TEST(DenseMap, Iterator) {
-    using iterator = typename entt::dense_map<int, int>::iterator;
+    using iterator = entt::dense_map<int, int>::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<const int &, int &>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<const int &, int &>>>();
@@ -237,7 +237,7 @@ TEST(DenseMap, Iterator) {
 }
 
 TEST(DenseMap, ConstIterator) {
-    using iterator = typename entt::dense_map<int, int>::const_iterator;
+    using iterator = entt::dense_map<int, int>::const_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<const int &, const int &>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<const int &, const int &>>>();
@@ -293,8 +293,8 @@ TEST(DenseMap, IteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(1, 3);
 
-    const typename entt::dense_map<int, int>::iterator it = map.begin();
-    typename entt::dense_map<int, int>::const_iterator cit = it;
+    const entt::dense_map<int, int>::iterator it = map.begin();
+    entt::dense_map<int, int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<const int &, int &>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<const int &, const int &>>();
@@ -316,7 +316,7 @@ TEST(DenseMap, IteratorConversion) {
 
 TEST(DenseMap, Insert) {
     entt::dense_map<int, int> map;
-    typename entt::dense_map<int, int>::iterator it;
+    entt::dense_map<int, int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(map.empty());
@@ -450,7 +450,7 @@ TEST(DenseMap, InsertSameBucket) {
 
 TEST(DenseMap, InsertOrAssign) {
     entt::dense_map<int, int> map;
-    typename entt::dense_map<int, int>::iterator it;
+    entt::dense_map<int, int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(map.empty());
@@ -513,7 +513,7 @@ TEST(DenseMap, InsertOrAssign) {
 
 TEST(DenseMap, Emplace) {
     entt::dense_map<int, int> map;
-    typename entt::dense_map<int, int>::iterator it;
+    entt::dense_map<int, int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(map.empty());
@@ -654,7 +654,7 @@ TEST(DenseMap, EmplaceSameBucket) {
 
 TEST(DenseMap, TryEmplace) {
     entt::dense_map<int, int> map;
-    typename entt::dense_map<int, int>::iterator it;
+    entt::dense_map<int, int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(map.empty());
@@ -990,7 +990,7 @@ ENTT_DEBUG_TEST(DenseMapDeathTest, Indexing) {
 }
 
 TEST(DenseMap, LocalIterator) {
-    using iterator = typename entt::dense_map<std::size_t, std::size_t, entt::identity>::local_iterator;
+    using iterator = entt::dense_map<std::size_t, std::size_t, entt::identity>::local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<const std::size_t &, std::size_t &>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<const std::size_t &, std::size_t &>>>();
@@ -1018,7 +1018,7 @@ TEST(DenseMap, LocalIterator) {
 }
 
 TEST(DenseMap, ConstLocalIterator) {
-    using iterator = typename entt::dense_map<std::size_t, std::size_t, entt::identity>::const_local_iterator;
+    using iterator = entt::dense_map<std::size_t, std::size_t, entt::identity>::const_local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<const std::size_t &, const std::size_t &>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<const std::size_t &, const std::size_t &>>>();
@@ -1049,8 +1049,8 @@ TEST(DenseMap, LocalIteratorConversion) {
     entt::dense_map<int, int> map;
     map.emplace(3, 2);
 
-    const typename entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
-    typename entt::dense_map<int, int>::const_local_iterator cit = it;
+    const entt::dense_map<int, int>::local_iterator it = map.begin(map.bucket(3));
+    entt::dense_map<int, int>::const_local_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<const int &, int &>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<const int &, const int &>>();
@@ -1209,7 +1209,7 @@ TEST(DenseMap, NoUsesAllocatorConstruction) {
 }
 
 TEST(DenseMap, KeyUsesAllocatorConstruction) {
-    using string_type = typename test::tracked_memory_resource::string_type;
+    using string_type = test::tracked_memory_resource::string_type;
     using allocator = std::pmr::polymorphic_allocator<std::pair<const string_type, int>>;
 
     test::tracked_memory_resource memory_resource{};
@@ -1232,7 +1232,7 @@ TEST(DenseMap, KeyUsesAllocatorConstruction) {
 }
 
 TEST(DenseMap, ValueUsesAllocatorConstruction) {
-    using string_type = typename test::tracked_memory_resource::string_type;
+    using string_type = test::tracked_memory_resource::string_type;
     using allocator = std::pmr::polymorphic_allocator<std::pair<const int, string_type>>;
 
     test::tracked_memory_resource memory_resource{};

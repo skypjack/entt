@@ -173,7 +173,7 @@ TEST(DenseSet, Move) {
 }
 
 TEST(DenseSet, Iterator) {
-    using iterator = typename entt::dense_set<int>::iterator;
+    using iterator = entt::dense_set<int>::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
     testing::StaticAssertTypeEq<iterator::pointer, const int *>();
@@ -226,7 +226,7 @@ TEST(DenseSet, Iterator) {
 }
 
 TEST(DenseSet, ConstIterator) {
-    using iterator = typename entt::dense_set<int>::const_iterator;
+    using iterator = entt::dense_set<int>::const_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
     testing::StaticAssertTypeEq<iterator::pointer, const int *>();
@@ -279,7 +279,7 @@ TEST(DenseSet, ConstIterator) {
 }
 
 TEST(DenseSet, ReverseIterator) {
-    using iterator = typename entt::dense_set<int>::reverse_iterator;
+    using iterator = entt::dense_set<int>::reverse_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
     testing::StaticAssertTypeEq<iterator::pointer, const int *>();
@@ -332,7 +332,7 @@ TEST(DenseSet, ReverseIterator) {
 }
 
 TEST(DenseSet, ConstReverseIterator) {
-    using iterator = typename entt::dense_set<int>::const_reverse_iterator;
+    using iterator = entt::dense_set<int>::const_reverse_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, int>();
     testing::StaticAssertTypeEq<iterator::pointer, const int *>();
@@ -388,8 +388,8 @@ TEST(DenseSet, IteratorConversion) {
     entt::dense_set<int> set;
     set.emplace(3);
 
-    const typename entt::dense_set<int, int>::iterator it = set.begin();
-    typename entt::dense_set<int, int>::const_iterator cit = it;
+    const entt::dense_set<int, int>::iterator it = set.begin();
+    entt::dense_set<int, int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), const int &>();
     testing::StaticAssertTypeEq<decltype(*cit), const int &>();
@@ -411,7 +411,7 @@ TEST(DenseSet, IteratorConversion) {
 
 TEST(DenseSet, Insert) {
     entt::dense_set<int> set;
-    typename entt::dense_set<int>::iterator it;
+    entt::dense_set<int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(set.empty());
@@ -513,7 +513,7 @@ TEST(DenseSet, InsertSameBucket) {
 
 TEST(DenseSet, Emplace) {
     entt::dense_set<int> set;
-    typename entt::dense_set<int>::iterator it;
+    entt::dense_set<int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(set.empty());
@@ -813,7 +813,7 @@ TEST(DenseSet, EqualRange) {
 }
 
 TEST(DenseSet, LocalIterator) {
-    using iterator = typename entt::dense_set<std::size_t, entt::identity>::local_iterator;
+    using iterator = entt::dense_set<std::size_t, entt::identity>::local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
     testing::StaticAssertTypeEq<iterator::pointer, const std::size_t *>();
@@ -841,7 +841,7 @@ TEST(DenseSet, LocalIterator) {
 }
 
 TEST(DenseSet, ConstLocalIterator) {
-    using iterator = typename entt::dense_set<std::size_t, entt::identity>::const_local_iterator;
+    using iterator = entt::dense_set<std::size_t, entt::identity>::const_local_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::size_t>();
     testing::StaticAssertTypeEq<iterator::pointer, const std::size_t *>();
@@ -872,8 +872,8 @@ TEST(DenseSet, LocalIteratorConversion) {
     entt::dense_set<int> set;
     set.emplace(3);
 
-    const typename entt::dense_set<int>::local_iterator it = set.begin(set.bucket(3));
-    typename entt::dense_set<int>::const_local_iterator cit = it;
+    const entt::dense_set<int>::local_iterator it = set.begin(set.bucket(3));
+    entt::dense_set<int>::const_local_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), const int &>();
     testing::StaticAssertTypeEq<decltype(*cit), const int &>();
@@ -1024,7 +1024,7 @@ TEST(DenseSet, NoUsesAllocatorConstruction) {
 }
 
 TEST(DenseSet, UsesAllocatorConstruction) {
-    using string_type = typename test::tracked_memory_resource::string_type;
+    using string_type = test::tracked_memory_resource::string_type;
     using allocator = std::pmr::polymorphic_allocator<string_type>;
 
     test::tracked_memory_resource memory_resource{};
