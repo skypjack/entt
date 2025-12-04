@@ -119,8 +119,8 @@ TEST(SequenceContainer, StdVector) {
 }
 
 TEST(SequenceContainer, StdVectorBool) {
-    using proxy_type = typename std::vector<bool>::reference;
-    using const_proxy_type = typename std::vector<bool>::const_reference;
+    using proxy_type = std::vector<bool>::reference;
+    using const_proxy_type = std::vector<bool>::const_reference;
 
     std::vector<bool> vec{};
     auto any = entt::forward_as_meta(vec);

@@ -31,7 +31,7 @@ TEST_F(MetaRange, EmptyRange) {
 TEST_F(MetaRange, Iterator) {
     using namespace entt::literals;
 
-    using iterator = typename decltype(entt::resolve())::iterator;
+    using iterator = decltype(entt::resolve())::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<entt::id_type, entt::meta_type>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::meta_type>>>();
