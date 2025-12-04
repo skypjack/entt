@@ -149,7 +149,7 @@ TEST(ResourceCache, Move) {
 TEST(ResourceCache, Iterator) {
     using namespace entt::literals;
 
-    using iterator = typename entt::resource_cache<int>::iterator;
+    using iterator = entt::resource_cache<int>::iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<entt::id_type, entt::resource<int>>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<int>>>>();
@@ -204,7 +204,7 @@ TEST(ResourceCache, Iterator) {
 TEST(ResourceCache, ConstIterator) {
     using namespace entt::literals;
 
-    using iterator = typename entt::resource_cache<int>::const_iterator;
+    using iterator = entt::resource_cache<int>::const_iterator;
 
     testing::StaticAssertTypeEq<iterator::value_type, std::pair<entt::id_type, entt::resource<const int>>>();
     testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::pair<entt::id_type, entt::resource<const int>>>>();
@@ -262,8 +262,8 @@ TEST(ResourceCache, IteratorConversion) {
     entt::resource_cache<int> cache;
     cache.load("resource"_hs, 2);
 
-    const typename entt::resource_cache<int>::iterator it = cache.begin();
-    typename entt::resource_cache<int>::const_iterator cit = it;
+    const entt::resource_cache<int>::iterator it = cache.begin();
+    entt::resource_cache<int>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::resource<int>>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, entt::resource<const int>>>();
@@ -287,7 +287,7 @@ TEST(ResourceCache, Load) {
     using namespace entt::literals;
 
     entt::resource_cache<int> cache;
-    typename entt::resource_cache<int>::iterator it;
+    entt::resource_cache<int>::iterator it;
     bool result{};
 
     ASSERT_TRUE(cache.empty());
