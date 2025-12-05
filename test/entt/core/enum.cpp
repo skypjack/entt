@@ -12,7 +12,7 @@ using EnumTypes = ::testing::Types<test::enum_is_bitmask, test::enum_as_bitmask>
 TYPED_TEST_SUITE(Enum, EnumTypes, );
 
 TYPED_TEST(Enum, Functionalities) {
-    using enum_type = typename TestFixture::type;
+    using enum_type = TestFixture::type;
 
     ASSERT_TRUE(!!((enum_type::foo | enum_type::bar) & enum_type::foo));
     ASSERT_TRUE(!!((enum_type::foo | enum_type::bar) & enum_type::bar));

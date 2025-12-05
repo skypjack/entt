@@ -75,7 +75,7 @@ TEST(AllocateUnique, NoUsesAllocatorConstruction) {
 }
 
 TEST(AllocateUnique, UsesAllocatorConstruction) {
-    using string_type = typename test::tracked_memory_resource::string_type;
+    using string_type = test::tracked_memory_resource::string_type;
 
     test::tracked_memory_resource memory_resource{};
     std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};
@@ -186,7 +186,7 @@ TEST(UninitializedConstructUsingAllocator, NoUsesAllocatorConstruction) {
 #    include <memory_resource>
 
 TEST(UninitializedConstructUsingAllocator, UsesAllocatorConstruction) {
-    using string_type = typename test::tracked_memory_resource::string_type;
+    using string_type = test::tracked_memory_resource::string_type;
 
     test::tracked_memory_resource memory_resource{};
     const std::pmr::polymorphic_allocator<string_type> allocator{&memory_resource};

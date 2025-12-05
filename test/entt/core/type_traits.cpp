@@ -79,7 +79,7 @@ TEST_F(UnpackAsValue, Functionalities) {
 TEST(IntegralConstant, Functionalities) {
     const entt::integral_constant<3> constant{};
 
-    testing::StaticAssertTypeEq<typename entt::integral_constant<3>::value_type, int>();
+    testing::StaticAssertTypeEq<entt::integral_constant<3>::value_type, int>();
     ASSERT_EQ(constant.value, 3);
 }
 
@@ -275,5 +275,5 @@ TEST(NthArgument, Functionalities) {
 TEST(Tag, Functionalities) {
     using namespace entt::literals;
     ASSERT_EQ(entt::tag<"foobar"_hs>::value, entt::hashed_string::value("foobar"));
-    testing::StaticAssertTypeEq<typename entt::tag<"foobar"_hs>::value_type, entt::id_type>();
+    testing::StaticAssertTypeEq<entt::tag<"foobar"_hs>::value_type, entt::id_type>();
 }
