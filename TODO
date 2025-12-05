@@ -35,3 +35,4 @@ TODO:
 * archetype-like a-là EnTT support (see my own notes)
 * meta: conversion_helper machinery has lot of room for improvements
 * organizer: view/storage only based model, no registry
+* update graph.md (ie children -> out_edges)
