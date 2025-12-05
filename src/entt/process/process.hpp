@@ -294,7 +294,7 @@ template<typename Delta, typename Func, typename Allocator>
 struct process_adaptor: public basic_process<Delta, Allocator> {
     using allocator_type = Allocator;
     using base_type = basic_process<Delta, Allocator>;
-    using delta_type = typename base_type::delta_type;
+    using delta_type = base_type::delta_type;
 
     process_adaptor(const allocator_type &allocator, Func proc)
         : base_type{allocator},
