@@ -45,7 +45,7 @@ struct poly_inspector {
  */
 template<typename Concept, std::size_t Len, std::size_t Align>
 class poly_vtable {
-    using inspector = typename Concept::template type<poly_inspector>;
+    using inspector = Concept::template type<poly_inspector>;
 
     template<typename Ret, typename Clazz, typename... Args>
     static auto vtable_entry(Ret (*)(Clazz &, Args...))
@@ -195,9 +195,9 @@ class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, L
 
 public:
     /*! @brief Concept type. */
-    using concept_type = typename Concept::template type<poly_base<basic_poly>>;
+    using concept_type = Concept::template type<poly_base<basic_poly>>;
     /*! @brief Virtual table type. */
-    using vtable_type = typename poly_vtable<Concept, Len, Align>::type;
+    using vtable_type = poly_vtable<Concept, Len, Align>::type;
 
     /*! @brief Default constructor. */
     basic_poly() noexcept = default;
