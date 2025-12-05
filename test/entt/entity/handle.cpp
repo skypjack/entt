@@ -84,7 +84,7 @@ TYPED_TEST(BasicHandle, Storage) {
     const auto entity = registry.create();
     const handle_type handle{registry, entity};
 
-    testing::StaticAssertTypeEq<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::constness_as_t<entt::sparse_set, handle_type::registry_type> &>>();
+    testing::StaticAssertTypeEq<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::constness_as_t<entt::sparse_set, typename handle_type::registry_type> &>>();
 
     ASSERT_EQ(handle.storage().begin(), handle.storage().end());
 
@@ -569,7 +569,7 @@ TYPED_TEST(BasicHandle, Null) {
     ASSERT_TRUE(handle != entt::null);
     ASSERT_TRUE(entt::null != handle);
 
-    if constexpr(!std::is_const_v<handle_type::registry_type>) {
+    if constexpr(!std::is_const_v<typename handle_type::registry_type>) {
         handle.destroy();
 
         ASSERT_TRUE(handle == entt::null);
