@@ -57,8 +57,8 @@ Here is a minimal example for the sake of curiosity:
 
 ```cpp
 struct my_process: entt::process {
-    using allocator_type = typename entt::process::allocator_type;
-    using delta_type = typename entt::process::delta_type;
+    using allocator_type = entt::process::allocator_type;
+    using delta_type = entt::process::delta_type;
 
     my_process(const allocator_type &allocator, delta_type delay)
         : entt::process{allocator},

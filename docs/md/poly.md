@@ -230,14 +230,14 @@ For a deduced concept, inheritance is achieved in a few steps:
 ```cpp
 struct DrawableAndErasable: entt::type_list<> {
     template<typename Base>
-    struct type: typename Drawable::type<Base> {
+    struct type: Drawable::type<Base> {
         static constexpr auto base = Drawable::impl<Drawable::type<entt::poly_inspector>>::size;
         void erase() { entt::poly_call<base + 0>(*this); }
     };
 
     template<typename Type>
     using impl = entt::value_list_cat_t<
-        typename Drawable::impl<Type>,
+        Drawable::impl<Type>,
         entt::value_list<&Type::erase>
     >;
 };
