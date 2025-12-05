@@ -21,7 +21,7 @@ using RuntimeViewTypes = ::testing::Types<entt::runtime_view, entt::const_runtim
 TYPED_TEST_SUITE(RuntimeView, RuntimeViewTypes, );
 
 TYPED_TEST(RuntimeView, Functionalities) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -75,7 +75,7 @@ TYPED_TEST(RuntimeView, Functionalities) {
 }
 
 TYPED_TEST(RuntimeView, InvalidView) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     runtime_view_type view{};
 
@@ -98,7 +98,7 @@ TYPED_TEST(RuntimeView, InvalidView) {
 }
 
 TYPED_TEST(RuntimeView, Constructors) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     entt::storage<int> storage{};
     const entt::entity entity{0};
@@ -127,7 +127,7 @@ TYPED_TEST(RuntimeView, Constructors) {
 }
 
 TYPED_TEST(RuntimeView, Copy) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const entt::entity entity{0};
@@ -163,7 +163,7 @@ TYPED_TEST(RuntimeView, Copy) {
 }
 
 TYPED_TEST(RuntimeView, Move) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const entt::entity entity{0};
@@ -204,7 +204,7 @@ TYPED_TEST(RuntimeView, Move) {
 }
 
 TYPED_TEST(RuntimeView, Swap) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     entt::storage<int> storage{};
     const entt::entity entity{0};
@@ -241,8 +241,8 @@ TYPED_TEST(RuntimeView, Swap) {
 }
 
 TYPED_TEST(RuntimeView, Iterator) {
-    using runtime_view_type = typename TestFixture::type;
-    using iterator = typename runtime_view_type::iterator;
+    using runtime_view_type = TestFixture::type;
+    using iterator = runtime_view_type::iterator;
 
     entt::storage<int> storage{};
     const entt::entity entity{0};
@@ -271,7 +271,7 @@ TYPED_TEST(RuntimeView, Iterator) {
 }
 
 TYPED_TEST(RuntimeView, Contains) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     entt::storage<int> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -289,7 +289,7 @@ TYPED_TEST(RuntimeView, Contains) {
 }
 
 TYPED_TEST(RuntimeView, Empty) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     entt::storage<int> storage{};
     const entt::entity entity{0};
@@ -309,7 +309,7 @@ TYPED_TEST(RuntimeView, Empty) {
 }
 
 TYPED_TEST(RuntimeView, Each) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -327,7 +327,7 @@ TYPED_TEST(RuntimeView, Each) {
 }
 
 TYPED_TEST(RuntimeView, EachWithHoles) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{3}};
@@ -347,7 +347,7 @@ TYPED_TEST(RuntimeView, EachWithHoles) {
 }
 
 TYPED_TEST(RuntimeView, Exclude) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<char>> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -369,7 +369,7 @@ TYPED_TEST(RuntimeView, Exclude) {
 }
 
 TYPED_TEST(RuntimeView, StableType) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<test::pointer_stable>> storage{};
     const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{3}};
@@ -408,7 +408,7 @@ TYPED_TEST(RuntimeView, StableType) {
 }
 
 TYPED_TEST(RuntimeView, StableTypeWithExclude) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     constexpr entt::entity tombstone = entt::tombstone;
     std::tuple<entt::storage<int>, entt::storage<test::pointer_stable>> storage{};
@@ -444,7 +444,7 @@ TYPED_TEST(RuntimeView, StableTypeWithExclude) {
 }
 
 TYPED_TEST(RuntimeView, SameStorageTypes) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<int>, entt::storage<int>> storage{};
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -470,7 +470,7 @@ TYPED_TEST(RuntimeView, SameStorageTypes) {
 }
 
 TYPED_TEST(RuntimeView, StorageEntity) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<entt::entity>, entt::storage<char>> storage{};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate()};
@@ -504,7 +504,7 @@ TYPED_TEST(RuntimeView, StorageEntity) {
 }
 
 TYPED_TEST(RuntimeView, StorageEntityWithExclude) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<entt::entity>, entt::storage<int>, entt::storage<char>> storage{};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};
@@ -542,7 +542,7 @@ TYPED_TEST(RuntimeView, StorageEntityWithExclude) {
 }
 
 TYPED_TEST(RuntimeView, StorageEntityExcludeOnly) {
-    using runtime_view_type = typename TestFixture::type;
+    using runtime_view_type = TestFixture::type;
 
     std::tuple<entt::storage<entt::entity>, entt::storage<int>> storage{};
     const std::array entity{std::get<0>(storage).generate(), std::get<0>(storage).generate(), std::get<0>(storage).generate()};

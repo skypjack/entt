@@ -461,8 +461,8 @@ TEST(Registry, RegistryStorageIteratorConversion) {
     auto proxy = registry.storage();
     [[maybe_unused]] auto cproxy = std::as_const(registry).storage();
 
-    const typename decltype(proxy)::iterator it = proxy.begin();
-    typename decltype(cproxy)::iterator cit = it;
+    const decltype(proxy)::iterator it = proxy.begin();
+    decltype(cproxy)::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::pair<entt::id_type, entt::sparse_set &>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::pair<entt::id_type, const entt::sparse_set &>>();
@@ -592,7 +592,7 @@ TEST(Registry, Identifiers) {
 
     const auto invalid = traits_type::combine(traits_type::to_entity(post) + 1u, {});
 
-    ASSERT_EQ(traits_type::to_version(invalid), typename traits_type::version_type{});
+    ASSERT_EQ(traits_type::to_version(invalid), traits_type::version_type{});
     ASSERT_EQ(registry.current(invalid), traits_type::to_version(entt::tombstone));
 }
 
@@ -626,13 +626,13 @@ TEST(Registry, VersionOverflow) {
     registry.destroy(entity);
 
     ASSERT_NE(registry.current(entity), traits_type::to_version(entity));
-    ASSERT_NE(registry.current(entity), typename traits_type::version_type{});
+    ASSERT_NE(registry.current(entity), traits_type::version_type{});
 
     registry.destroy(registry.create(), traits_type::to_version(entt::tombstone) - 1u);
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), traits_type::to_version(entity));
-    ASSERT_EQ(registry.current(entity), typename traits_type::version_type{});
+    ASSERT_EQ(registry.current(entity), traits_type::version_type{});
 }
 
 TEST(Registry, NullEntity) {
@@ -2447,7 +2447,7 @@ TEST(Registry, ContextPoolMemberDestructionOrder) {
     const auto entity = registry->create();
     bool ctx_check = false;
 
-    registry->ctx().emplace<typename destruction_order::ctx_check_type>();
+    registry->ctx().emplace<destruction_order::ctx_check_type>();
     registry->emplace<destruction_order>(entity, *registry, ctx_check);
     registry.reset();
 

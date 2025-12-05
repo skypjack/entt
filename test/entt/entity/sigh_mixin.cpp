@@ -63,7 +63,7 @@ TYPED_TEST_SUITE(SighMixin, SighMixinTypes, );
 TYPED_TEST_SUITE(SighMixinDeathTest, SighMixinTypes, );
 
 TYPED_TEST(SighMixin, Functionalities) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
 
     entt::registry registry;
@@ -139,7 +139,7 @@ TYPED_TEST(SighMixin, Functionalities) {
 }
 
 TYPED_TEST(SighMixin, InsertWeakRange) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::registry registry;
     auto &pool = registry.storage<value_type>();
@@ -319,7 +319,7 @@ TEST(SighMixin, StorageEntity) {
 }
 
 TYPED_TEST(SighMixin, Move) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::sigh_mixin<entt::storage<value_type>> pool;
     entt::registry registry;
@@ -379,7 +379,7 @@ TYPED_TEST(SighMixin, Move) {
 }
 
 TYPED_TEST(SighMixin, Swap) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
 
     entt::sigh_mixin<entt::storage<value_type>> pool;
@@ -461,7 +461,7 @@ TEST(SighMixin, AutoSignal) {
 }
 
 TYPED_TEST(SighMixin, Registry) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::registry registry;
     entt::sigh_mixin<entt::storage<value_type>> pool;
@@ -476,14 +476,14 @@ TYPED_TEST(SighMixin, Registry) {
 }
 
 ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, Registry) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     entt::sigh_mixin<entt::storage<value_type>> pool;
     ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
     ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
 
 TYPED_TEST(SighMixin, CustomRegistry) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using registry_type = test::custom_registry<test::entity>;
 
     registry_type registry;
@@ -515,7 +515,7 @@ TYPED_TEST(SighMixin, CustomRegistry) {
 }
 
 ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, CustomRegistry) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using registry_type = test::custom_registry<test::entity>;
     entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
     ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
@@ -523,9 +523,9 @@ ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, CustomRegistry) {
 }
 
 TYPED_TEST(SighMixin, CustomAllocator) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using storage_type = entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
-    using registry_type = typename storage_type::registry_type;
+    using registry_type = storage_type::registry_type;
 
     const test::throwing_allocator<entt::entity> allocator{};
     storage_type pool{allocator};
@@ -582,9 +582,9 @@ TYPED_TEST(SighMixin, CustomAllocator) {
 }
 
 TYPED_TEST(SighMixin, ThrowingAllocator) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using storage_type = entt::sigh_mixin<entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>>>;
-    using registry_type = typename storage_type::registry_type;
+    using registry_type = storage_type::registry_type;
 
     storage_type pool{};
     typename storage_type::base_type &base = pool;
@@ -656,7 +656,7 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
 
 TEST(SighMixin, ThrowingComponent) {
     using storage_type = entt::sigh_mixin<entt::storage<test::throwing_type>>;
-    using registry_type = typename storage_type::registry_type;
+    using registry_type = storage_type::registry_type;
 
     storage_type pool;
     registry_type registry;

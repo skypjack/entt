@@ -66,7 +66,7 @@ TEST(Invoke, Functionalities) {
 }
 
 TYPED_TEST(ToEntity, Functionalities) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
     using traits_type = entt::component_traits<value_type>;
 
     entt::registry registry;

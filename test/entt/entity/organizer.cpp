@@ -92,7 +92,7 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 
@@ -158,7 +158,7 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 
@@ -231,7 +231,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_EQ(graph[3u].out_edges()[0u], 4u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 
@@ -313,7 +313,7 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_EQ(graph[2u].out_edges()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 
@@ -380,7 +380,7 @@ TEST(Organizer, SyncPoint) {
     ASSERT_EQ(graph[4u].out_edges()[0u], 5u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 }
@@ -409,7 +409,7 @@ TEST(Organizer, ConstRegistry) {
     ASSERT_EQ(graph[1u].out_edges().size(), 0u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
+        entt::organizer::function_type *cb = vertex.callback();
         ASSERT_NO_THROW(cb(vertex.data(), registry));
     }
 }

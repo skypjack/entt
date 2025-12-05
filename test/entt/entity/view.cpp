@@ -765,7 +765,7 @@ TEST(MultiStorageView, Iterator) {
     std::get<0>(storage).insert(entity.begin(), entity.end());
     std::get<1>(storage).insert(entity.begin(), entity.end());
 
-    using iterator = typename decltype(view)::iterator;
+    using iterator = decltype(view)::iterator;
 
     iterator end{view.begin()};
     iterator begin{};

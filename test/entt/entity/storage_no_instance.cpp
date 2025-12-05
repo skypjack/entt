@@ -49,7 +49,7 @@ TYPED_TEST_SUITE(StorageNoInstance, StorageNoInstanceTypes, );
 TYPED_TEST_SUITE(StorageNoInstanceDeathTest, StorageNoInstanceTypes, );
 
 TYPED_TEST(StorageNoInstance, Constructors) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
 
@@ -65,7 +65,7 @@ TYPED_TEST(StorageNoInstance, Constructors) {
 }
 
 TYPED_TEST(StorageNoInstance, Move) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{3}, entt::entity{2}};
@@ -118,7 +118,7 @@ TYPED_TEST(StorageNoInstance, Move) {
 }
 
 TYPED_TEST(StorageNoInstance, Swap) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     entt::storage<value_type> other;
@@ -148,7 +148,7 @@ TYPED_TEST(StorageNoInstance, Swap) {
 }
 
 TYPED_TEST(StorageNoInstance, Getters) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{4};
@@ -169,7 +169,7 @@ TYPED_TEST(StorageNoInstance, Getters) {
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Getters) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{4};
@@ -182,7 +182,7 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Getters) {
 }
 
 TYPED_TEST(StorageNoInstance, Value) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{4};
@@ -193,7 +193,7 @@ TYPED_TEST(StorageNoInstance, Value) {
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Value) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
 
@@ -201,7 +201,7 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Value) {
 }
 
 TYPED_TEST(StorageNoInstance, Emplace) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -213,7 +213,7 @@ TYPED_TEST(StorageNoInstance, Emplace) {
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{4};
@@ -227,7 +227,7 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Emplace) {
 }
 
 TYPED_TEST(StorageNoInstance, TryEmplace) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     entt::sparse_set &base = pool;
@@ -256,7 +256,7 @@ TYPED_TEST(StorageNoInstance, TryEmplace) {
 }
 
 TYPED_TEST(StorageNoInstance, Patch) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{4};
@@ -276,7 +276,7 @@ TYPED_TEST(StorageNoInstance, Patch) {
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Patch) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
 
@@ -284,7 +284,7 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Patch) {
 }
 
 TYPED_TEST(StorageNoInstance, Insert) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -304,7 +304,7 @@ TYPED_TEST(StorageNoInstance, Insert) {
 }
 
 ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Insert) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{1}, entt::entity{3}};
@@ -316,8 +316,8 @@ ENTT_DEBUG_TYPED_TEST(StorageNoInstanceDeathTest, Insert) {
 }
 
 TYPED_TEST(StorageNoInstance, Iterable) {
-    using value_type = typename TestFixture::type;
-    using iterator = typename entt::storage<value_type>::iterable::iterator;
+    using value_type = TestFixture::type;
+    using iterator = entt::storage<value_type>::iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
@@ -359,8 +359,8 @@ TYPED_TEST(StorageNoInstance, Iterable) {
 }
 
 TYPED_TEST(StorageNoInstance, ConstIterable) {
-    using value_type = typename TestFixture::type;
-    using iterator = typename entt::storage<value_type>::const_iterable::iterator;
+    using value_type = TestFixture::type;
+    using iterator = entt::storage<value_type>::const_iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
@@ -402,7 +402,7 @@ TYPED_TEST(StorageNoInstance, ConstIterable) {
 }
 
 TYPED_TEST(StorageNoInstance, IterableIteratorConversion) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
 
@@ -419,7 +419,7 @@ TYPED_TEST(StorageNoInstance, IterableIteratorConversion) {
 }
 
 TYPED_TEST(StorageNoInstance, IterableAlgorithmCompatibility) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{3};
@@ -433,8 +433,8 @@ TYPED_TEST(StorageNoInstance, IterableAlgorithmCompatibility) {
 }
 
 TYPED_TEST(StorageNoInstance, ReverseIterable) {
-    using value_type = typename TestFixture::type;
-    using iterator = typename entt::storage<value_type>::reverse_iterable::iterator;
+    using value_type = TestFixture::type;
+    using iterator = entt::storage<value_type>::reverse_iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
@@ -476,8 +476,8 @@ TYPED_TEST(StorageNoInstance, ReverseIterable) {
 }
 
 TYPED_TEST(StorageNoInstance, ConstReverseIterable) {
-    using value_type = typename TestFixture::type;
-    using iterator = typename entt::storage<value_type>::const_reverse_iterable::iterator;
+    using value_type = TestFixture::type;
+    using iterator = entt::storage<value_type>::const_reverse_iterable::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
@@ -519,7 +519,7 @@ TYPED_TEST(StorageNoInstance, ConstReverseIterable) {
 }
 
 TYPED_TEST(StorageNoInstance, ReverseIterableIteratorConversion) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
 
@@ -536,7 +536,7 @@ TYPED_TEST(StorageNoInstance, ReverseIterableIteratorConversion) {
 }
 
 TYPED_TEST(StorageNoInstance, ReverseIterableAlgorithmCompatibility) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const entt::entity entity{3};
@@ -550,7 +550,7 @@ TYPED_TEST(StorageNoInstance, ReverseIterableAlgorithmCompatibility) {
 }
 
 TYPED_TEST(StorageNoInstance, SortOrdered) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}};
@@ -562,7 +562,7 @@ TYPED_TEST(StorageNoInstance, SortOrdered) {
 }
 
 TYPED_TEST(StorageNoInstance, SortReverse) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
@@ -574,7 +574,7 @@ TYPED_TEST(StorageNoInstance, SortReverse) {
 }
 
 TYPED_TEST(StorageNoInstance, SortUnordered) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
@@ -590,7 +590,7 @@ TYPED_TEST(StorageNoInstance, SortUnordered) {
 }
 
 TYPED_TEST(StorageNoInstance, SortN) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> pool;
     const std::array entity{entt::entity{2}, entt::entity{4}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
@@ -617,7 +617,7 @@ TYPED_TEST(StorageNoInstance, SortN) {
 }
 
 TYPED_TEST(StorageNoInstance, SortAsDisjoint) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> lhs;
     const entt::storage<value_type> rhs;
@@ -633,7 +633,7 @@ TYPED_TEST(StorageNoInstance, SortAsDisjoint) {
 }
 
 TYPED_TEST(StorageNoInstance, SortAsOverlap) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -654,7 +654,7 @@ TYPED_TEST(StorageNoInstance, SortAsOverlap) {
 }
 
 TYPED_TEST(StorageNoInstance, SortAsOrdered) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -673,7 +673,7 @@ TYPED_TEST(StorageNoInstance, SortAsOrdered) {
 }
 
 TYPED_TEST(StorageNoInstance, SortAsReverse) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;
@@ -697,7 +697,7 @@ TYPED_TEST(StorageNoInstance, SortAsReverse) {
 }
 
 TYPED_TEST(StorageNoInstance, SortAsUnordered) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     entt::storage<value_type> lhs;
     entt::storage<value_type> rhs;

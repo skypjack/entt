@@ -41,7 +41,7 @@ using EntityTypes = ::testing::Types<entt::entity, test::entity, test::other_ent
 TYPED_TEST_SUITE(Entity, EntityTypes, );
 
 TYPED_TEST(Entity, Traits) {
-    using entity_type = typename TestFixture::type;
+    using entity_type = TestFixture::type;
     using traits_type = entt::entt_traits<entity_type>;
 
     constexpr entity_type tombstone{entt::tombstone};
@@ -117,7 +117,7 @@ TYPED_TEST(Entity, Traits) {
 }
 
 TYPED_TEST(Entity, Null) {
-    using entity_type = typename TestFixture::type;
+    using entity_type = TestFixture::type;
     using traits_type = entt::entt_traits<entity_type>;
 
     constexpr entity_type null{entt::null};
@@ -140,7 +140,7 @@ TYPED_TEST(Entity, Null) {
 }
 
 TYPED_TEST(Entity, Tombstone) {
-    using entity_type = typename TestFixture::type;
+    using entity_type = TestFixture::type;
     using traits_type = entt::entt_traits<entity_type>;
 
     constexpr entity_type tombstone{entt::tombstone};

@@ -52,11 +52,11 @@ TEST(BasicSnapshot, GetEntityType) {
 
     ASSERT_EQ(data.size(), 2u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), storage.size());
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.free_list());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[1u]), storage.free_list());
 
     constexpr auto number_of_entities = 3u;
     std::array<entt::entity, number_of_entities> entity{};
@@ -69,11 +69,11 @@ TEST(BasicSnapshot, GetEntityType) {
 
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), storage.size());
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(&data[1u]), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[1u]), storage.free_list());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(&data[1u]), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[1u]), storage.free_list());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[2u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), storage.data()[0u]);
@@ -108,16 +108,16 @@ TEST(BasicSnapshot, GetType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
     snapshot.get<int>(archive);
 
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
@@ -155,16 +155,16 @@ TEST(BasicSnapshot, GetPointerStableType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
     snapshot.get<test::pointer_stable>(archive);
 
     ASSERT_EQ(data.size(), 6u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
@@ -204,16 +204,16 @@ TEST(BasicSnapshot, GetEmptyType) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
     snapshot.get<test::empty>(archive);
 
     ASSERT_EQ(data.size(), 3u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), storage.size());
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), storage.size());
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
@@ -244,16 +244,16 @@ TEST(BasicSnapshot, GetTypeSparse) {
 
     ASSERT_EQ(data.size(), 1u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), 0u);
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), 0u);
 
     data.clear();
     snapshot.get<int>(archive, entity.begin(), entity.end());
 
     ASSERT_EQ(data.size(), 6u);
 
-    ASSERT_NE(entt::any_cast<typename traits_type::entity_type>(data.data()), nullptr);
-    ASSERT_EQ(entt::any_cast<typename traits_type::entity_type>(data[0u]), static_cast<typename traits_type::entity_type>(std::distance(entity.begin(), entity.end())));
+    ASSERT_NE(entt::any_cast<traits_type::entity_type>(data.data()), nullptr);
+    ASSERT_EQ(entt::any_cast<traits_type::entity_type>(data[0u]), static_cast<traits_type::entity_type>(std::distance(entity.begin(), entity.end())));
 
     ASSERT_NE(entt::any_cast<entt::entity>(&data[1u]), nullptr);
     ASSERT_EQ(entt::any_cast<entt::entity>(data[1u]), entity[0u]);
@@ -313,8 +313,8 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     ASSERT_FALSE(registry.valid(entity[1u]));
     ASSERT_FALSE(registry.valid(entity[2u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
+    data.emplace_back(static_cast<traits_type::entity_type>(0u));
+    data.emplace_back(static_cast<traits_type::entity_type>(0u));
 
     loader.get<entt::entity>(archive);
 
@@ -325,8 +325,8 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(storage.free_list(), 0u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
@@ -364,7 +364,7 @@ TEST(BasicSnapshotLoader, GetType) {
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
 
@@ -376,7 +376,7 @@ TEST(BasicSnapshotLoader, GetType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -411,7 +411,7 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
 
     loader.get<test::empty>(archive, "other"_hs);
@@ -422,7 +422,7 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<test::empty>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
@@ -453,7 +453,7 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
     data.emplace_back(static_cast<entt::entity>(entt::null));
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -466,7 +466,7 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -505,7 +505,7 @@ TEST(BasicSnapshotLoader, GetTypeWithListener) {
 
     registry.on_construct<shadow>().connect<&shadow::listener>(check);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity);
     data.emplace_back(value);
 
@@ -530,13 +530,13 @@ TEST(BasicSnapshotLoader, Orphans) {
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
     data.emplace_back(value);
 
@@ -582,8 +582,8 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_FALSE(registry.valid(entity[1u]));
     ASSERT_FALSE(registry.valid(entity[2u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(0u));
+    data.emplace_back(static_cast<traits_type::entity_type>(0u));
+    data.emplace_back(static_cast<traits_type::entity_type>(0u));
 
     loader.get<entt::entity>(archive);
 
@@ -602,8 +602,8 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(storage.free_list(), 0u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
@@ -630,8 +630,8 @@ TEST(BasicContinuousLoader, GetEntityType) {
 
     ASSERT_EQ(registry.create(), entity[2u]);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
@@ -664,8 +664,8 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_NE(loader.map(entity[1u]), static_cast<entt::entity>(entt::null));
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
 
     data.emplace_back(entity[1u]);
 
@@ -676,8 +676,8 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_TRUE(registry.valid(loader.map(entity[1u])));
     ASSERT_EQ(storage[3u], loader.map(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
 
     data.emplace_back(entity[1u]);
     data.emplace_back(entity[2u]);
@@ -720,7 +720,7 @@ TEST(BasicContinuousLoader, GetType) {
     ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
 
@@ -735,7 +735,7 @@ TEST(BasicContinuousLoader, GetType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -784,13 +784,13 @@ TEST(BasicContinuousLoader, GetTypeExtended) {
     ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[1u]);
     data.emplace_back(value);
 
@@ -829,7 +829,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
 
     loader.get<test::empty>(archive, "other"_hs);
@@ -843,7 +843,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<test::empty>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
@@ -880,7 +880,7 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
     ASSERT_FALSE(registry.valid(loader.map(entity[0u])));
     ASSERT_FALSE(registry.valid(loader.map(entity[1u])));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
     data.emplace_back(static_cast<entt::entity>(entt::null));
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -896,7 +896,7 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
     ASSERT_EQ(storage.size(), 0u);
     ASSERT_EQ(registry.storage<int>("other"_hs).size(), 1u);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(3u));
+    data.emplace_back(static_cast<traits_type::entity_type>(3u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(value[0u]);
@@ -938,7 +938,7 @@ TEST(BasicContinuousLoader, GetTypeWithListener) {
 
     registry.on_construct<shadow>().connect<&shadow::listener>(check);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity);
     data.emplace_back(value);
 
@@ -963,13 +963,13 @@ TEST(BasicContinuousLoader, Orphans) {
     ASSERT_FALSE(registry.valid(entity[0u]));
     ASSERT_FALSE(registry.valid(entity[1u]));
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
-    data.emplace_back(static_cast<typename traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
+    data.emplace_back(static_cast<traits_type::entity_type>(2u));
 
     data.emplace_back(entity[0u]);
     data.emplace_back(entity[1u]);
 
-    data.emplace_back(static_cast<typename traits_type::entity_type>(1u));
+    data.emplace_back(static_cast<traits_type::entity_type>(1u));
     data.emplace_back(entity[0u]);
     data.emplace_back(value);
 

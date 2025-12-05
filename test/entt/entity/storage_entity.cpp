@@ -379,11 +379,11 @@ ENTT_DEBUG_TEST(StorageEntityDeathTest, FreeList) {
 }
 
 TEST(StorageEntity, Iterable) {
-    using iterator = typename entt::storage<entt::entity>::iterable::iterator;
+    using iterator = entt::storage<entt::entity>::iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<iterator::reference, iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -405,7 +405,7 @@ TEST(StorageEntity, Iterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - static_cast<typename iterator::difference_type>(pool.free_list()));
+    ASSERT_EQ(begin.base(), pool.end() - static_cast<iterator::difference_type>(pool.free_list()));
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
@@ -423,11 +423,11 @@ TEST(StorageEntity, Iterable) {
 }
 
 TEST(StorageEntity, ConstIterable) {
-    using iterator = typename entt::storage<entt::entity>::const_iterable::iterator;
+    using iterator = entt::storage<entt::entity>::const_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<iterator::reference, iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -449,7 +449,7 @@ TEST(StorageEntity, ConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_NE(begin.base(), pool.begin());
-    ASSERT_EQ(begin.base(), pool.end() - static_cast<typename iterator::difference_type>(pool.free_list()));
+    ASSERT_EQ(begin.base(), pool.end() - static_cast<iterator::difference_type>(pool.free_list()));
     ASSERT_EQ(end.base(), pool.end());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{4});
@@ -470,8 +470,8 @@ TEST(StorageEntity, IterableIteratorConversion) {
     entt::storage<entt::entity> pool;
     pool.generate(entt::entity{3});
 
-    const typename entt::storage<entt::entity>::iterable::iterator it = pool.each().begin();
-    typename entt::storage<entt::entity>::const_iterable::iterator cit = it;
+    const entt::storage<entt::entity>::iterable::iterator it = pool.each().begin();
+    entt::storage<entt::entity>::const_iterable::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();
@@ -491,11 +491,11 @@ TEST(StorageEntity, IterableAlgorithmCompatibility) {
 }
 
 TEST(StorageEntity, ReverseIterable) {
-    using iterator = typename entt::storage<entt::entity>::reverse_iterable::iterator;
+    using iterator = entt::storage<entt::entity>::reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<iterator::reference, iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -517,7 +517,7 @@ TEST(StorageEntity, ReverseIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<typename iterator::difference_type>(pool.free_list()));
+    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<iterator::difference_type>(pool.free_list()));
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
@@ -535,11 +535,11 @@ TEST(StorageEntity, ReverseIterable) {
 }
 
 TEST(StorageEntity, ReverseConstIterable) {
-    using iterator = typename entt::storage<entt::entity>::const_reverse_iterable::iterator;
+    using iterator = entt::storage<entt::entity>::const_reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
-    testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
+    testing::StaticAssertTypeEq<iterator::value_type, std::tuple<entt::entity>>();
+    testing::StaticAssertTypeEq<iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity>>>();
+    testing::StaticAssertTypeEq<iterator::reference, iterator::value_type>();
 
     entt::storage<entt::entity> pool;
 
@@ -561,7 +561,7 @@ TEST(StorageEntity, ReverseConstIterable) {
     ASSERT_NE(begin, end);
 
     ASSERT_EQ(begin.base(), pool.rbegin());
-    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<typename iterator::difference_type>(pool.free_list()));
+    ASSERT_EQ(end.base(), pool.rbegin() + static_cast<iterator::difference_type>(pool.free_list()));
     ASSERT_NE(end.base(), pool.rend());
 
     ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
@@ -582,8 +582,8 @@ TEST(StorageEntity, ReverseIterableIteratorConversion) {
     entt::storage<entt::entity> pool;
     pool.generate(entt::entity{3});
 
-    const typename entt::storage<entt::entity>::reverse_iterable::iterator it = pool.reach().begin();
-    typename entt::storage<entt::entity>::const_reverse_iterable::iterator cit = it;
+    const entt::storage<entt::entity>::reverse_iterable::iterator it = pool.reach().begin();
+    entt::storage<entt::entity>::const_reverse_iterable::iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity>>();
     testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity>>();

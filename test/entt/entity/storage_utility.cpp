@@ -11,7 +11,7 @@ using StorageUtilityTypes = ::testing::Types<int, char, double, void>;
 TYPED_TEST_SUITE(StorageUtility, StorageUtilityTypes, );
 
 TYPED_TEST(StorageUtility, StorageType) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     // just a bunch of static asserts to avoid regressions
 #ifdef ENTT_NO_MIXIN
@@ -24,7 +24,7 @@ TYPED_TEST(StorageUtility, StorageType) {
 }
 
 TYPED_TEST(StorageUtility, StorageFor) {
-    using value_type = typename TestFixture::type;
+    using value_type = TestFixture::type;
 
     // just a bunch of static asserts to avoid regressions
 #ifdef ENTT_NO_MIXIN
