@@ -322,7 +322,7 @@ public:
     }
 
     /**
-     * @brief Force loads a resource, if its identifier does not exist.
+     * @brief Force loads a resource, even if its identifier already exists.
      * @copydetails load
      */
     template<typename... Args>
