@@ -21,7 +21,7 @@ class edge_iterator {
     using size_type = std::size_t;
 
     void find_next() noexcept {
-        for(; pos != last && !it[static_cast<typename It::difference_type>(pos)]; pos += offset) {}
+        for(; pos != last && !it[static_cast<It::difference_type>(pos)]; pos += offset) {}
     }
 
 public:

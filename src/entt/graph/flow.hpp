@@ -206,7 +206,7 @@ public:
      * @return The requested identifier.
      */
     [[nodiscard]] id_type operator[](const size_type pos) const {
-        return vertices.cbegin()[static_cast<typename task_container_type::difference_type>(pos)];
+        return vertices.cbegin()[static_cast<task_container_type::difference_type>(pos)];
     }
 
     /*! @brief Clears the flow builder. */
