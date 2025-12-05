@@ -31,7 +31,7 @@ class dense_set_iterator final {
     friend class dense_set_iterator;
 
 public:
-    using value_type = typename It::value_type::second_type;
+    using value_type = It::value_type::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
@@ -149,7 +149,7 @@ class dense_set_local_iterator final {
     friend class dense_set_local_iterator;
 
 public:
-    using value_type = typename It::value_type::second_type;
+    using value_type = It::value_type::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
@@ -167,7 +167,7 @@ public:
           offset{other.offset} {}
 
     constexpr dense_set_local_iterator &operator++() noexcept {
-        return offset = it[static_cast<typename It::difference_type>(offset)].first, *this;
+        return offset = it[static_cast<It::difference_type>(offset)].first, *this;
     }
 
     constexpr dense_set_local_iterator operator++(int) noexcept {
@@ -176,7 +176,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::addressof(it[static_cast<typename It::difference_type>(offset)].second);
+        return std::addressof(it[static_cast<It::difference_type>(offset)].second);
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -238,7 +238,7 @@ class dense_set {
     [[nodiscard]] auto constrained_find(const Other &value, const std::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
-                return begin() + static_cast<typename iterator::difference_type>(offset);
+                return begin() + static_cast<iterator::difference_type>(offset);
             }
         }
 
@@ -249,7 +249,7 @@ class dense_set {
     [[nodiscard]] auto constrained_find(const Other &value, const std::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
-                return cbegin() + static_cast<typename const_iterator::difference_type>(offset);
+                return cbegin() + static_cast<const_iterator::difference_type>(offset);
             }
         }
 

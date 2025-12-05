@@ -205,7 +205,7 @@ public:
           offset{other.offset} {}
 
     constexpr dense_map_local_iterator &operator++() noexcept {
-        return (offset = it[static_cast<typename It::difference_type>(offset)].next), *this;
+        return (offset = it[static_cast<It::difference_type>(offset)].next), *this;
     }
 
     constexpr dense_map_local_iterator operator++(int) noexcept {
@@ -218,7 +218,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
-        const auto idx = static_cast<typename It::difference_type>(offset);
+        const auto idx = static_cast<It::difference_type>(offset);
         return {it[idx].element.first, it[idx].element.second};
     }
 
@@ -279,7 +279,7 @@ class dense_map {
     [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
-                return begin() + static_cast<typename iterator::difference_type>(offset);
+                return begin() + static_cast<iterator::difference_type>(offset);
             }
         }
 
@@ -290,7 +290,7 @@ class dense_map {
     [[nodiscard]] auto constrained_find(const Other &key, const std::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
-                return cbegin() + static_cast<typename const_iterator::difference_type>(offset);
+                return cbegin() + static_cast<const_iterator::difference_type>(offset);
             }
         }
 
