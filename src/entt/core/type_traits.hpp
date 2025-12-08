@@ -125,7 +125,7 @@ struct type_list_element<0u, type_list<First, Other...>> {
  * @tparam List Type list to search into.
  */
 template<std::size_t Index, typename List>
-using type_list_element_t = typename type_list_element<Index, List>::type;
+using type_list_element_t = type_list_element<Index, List>::type;
 
 /*! @brief Primary template isn't defined on purpose. */
 template<typename, typename>
@@ -210,7 +210,7 @@ struct type_list_cat<> {
 template<typename... Type, typename... Other, typename... List>
 struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
     /*! @brief A type list composed by the types of all the type lists. */
-    using type = typename type_list_cat<type_list<Type..., Other...>, List...>::type;
+    using type = type_list_cat<type_list<Type..., Other...>, List...>::type;
 };
 
 /**
@@ -228,7 +228,7 @@ struct type_list_cat<type_list<Type...>> {
  * @tparam List Type lists to concatenate.
  */
 template<typename... List>
-using type_list_cat_t = typename type_list_cat<List...>::type;
+using type_list_cat_t = type_list_cat<List...>::type;
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
@@ -255,7 +255,7 @@ struct type_list_unique<type_list<>, Type...> {
 template<typename List>
 struct type_list_unique {
     /*! @brief A type list without duplicate types. */
-    using type = typename internal::type_list_unique<List>::type;
+    using type = internal::type_list_unique<List>::type;
 };
 
 /**
@@ -263,7 +263,7 @@ struct type_list_unique {
  * @tparam List Type list.
  */
 template<typename List>
-using type_list_unique_t = typename type_list_unique<List>::type;
+using type_list_unique_t = type_list_unique<List>::type;
 
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
@@ -311,7 +311,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
  * @tparam List Type lists between which to compute the difference.
  */
 template<typename... List>
-using type_list_diff_t = typename type_list_diff<List...>::type;
+using type_list_diff_t = type_list_diff<List...>::type;
 
 /*! @brief Primary template isn't defined on purpose. */
 template<typename, template<typename...> class>
@@ -335,7 +335,7 @@ struct type_list_transform<type_list<Type...>, Op> {
  * @tparam Op Unary operation as template class with a type member named `type`.
  */
 template<typename List, template<typename...> class Op>
-using type_list_transform_t = typename type_list_transform<List, Op>::type;
+using type_list_transform_t = type_list_transform<List, Op>::type;
 
 /**
  * @brief A class to use to push around lists of constant values, nothing more.
@@ -382,7 +382,7 @@ struct value_list_element<0u, value_list<Value, Other...>> {
  * @tparam List Value list to search into.
  */
 template<std::size_t Index, typename List>
-using value_list_element_t = typename value_list_element<Index, List>::type;
+using value_list_element_t = value_list_element<Index, List>::type;
 
 /**
  * @brief Helper type.
@@ -475,7 +475,7 @@ struct value_list_cat<> {
 template<auto... Value, auto... Other, typename... List>
 struct value_list_cat<value_list<Value...>, value_list<Other...>, List...> {
     /*! @brief A value list composed by the values of all the value lists. */
-    using type = typename value_list_cat<value_list<Value..., Other...>, List...>::type;
+    using type = value_list_cat<value_list<Value..., Other...>, List...>::type;
 };
 
 /**
@@ -493,7 +493,7 @@ struct value_list_cat<value_list<Value...>> {
  * @tparam List Value lists to concatenate.
  */
 template<typename... List>
-using value_list_cat_t = typename value_list_cat<List...>::type;
+using value_list_cat_t = value_list_cat<List...>::type;
 
 /*! @brief Primary template isn't defined on purpose. */
 template<typename>
@@ -525,7 +525,7 @@ struct value_list_unique<value_list<>> {
  * @tparam Type A value list.
  */
 template<typename Type>
-using value_list_unique_t = typename value_list_unique<Type>::type;
+using value_list_unique_t = value_list_unique<Type>::type;
 
 /**
  * @brief Provides the member constant `value` to true if a value list contains
@@ -573,7 +573,7 @@ struct value_list_diff<value_list<Value...>, value_list<Other...>> {
  * @tparam List Value lists between which to compute the difference.
  */
 template<typename... List>
-using value_list_diff_t = typename value_list_diff<List...>::type;
+using value_list_diff_t = value_list_diff<List...>::type;
 
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
@@ -817,7 +817,7 @@ struct constness_as<To, const From> {
  * @tparam From The type from which to transcribe the constness.
  */
 template<typename To, typename From>
-using constness_as_t = typename constness_as<To, From>::type;
+using constness_as_t = constness_as<To, From>::type;
 
 /**
  * @brief Extracts the class of a non-static member object or function.
@@ -846,7 +846,7 @@ public:
  * @tparam Member A pointer to a non-static member object or function.
  */
 template<typename Member>
-using member_class_t = typename member_class<Member>::type;
+using member_class_t = member_class<Member>::type;
 
 /**
  * @brief Extracts the n-th argument of a _callable_ type.
@@ -881,7 +881,7 @@ public:
  * @tparam Candidate A valid function, member function or data member type.
  */
 template<std::size_t Index, typename Candidate>
-using nth_argument_t = typename nth_argument<Index, Candidate>::type;
+using nth_argument_t = nth_argument<Index, Candidate>::type;
 
 } // namespace entt
 

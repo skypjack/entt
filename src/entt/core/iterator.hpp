@@ -140,7 +140,7 @@ template<typename Type>
 template<typename It, typename Sentinel = It>
 struct iterable_adaptor final {
     /*! @brief Value type. */
-    using value_type = typename std::iterator_traits<It>::value_type;
+    using value_type = std::iterator_traits<It>::value_type;
     /*! @brief Iterator type. */
     using iterator = It;
     /*! @brief Sentinel type. */

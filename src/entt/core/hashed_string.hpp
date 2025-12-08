@@ -61,19 +61,19 @@ class basic_hashed_string: internal::basic_hashed_string<Char> {
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const typename base_type::value_type *str) noexcept
+        constexpr const_wrapper(const base_type::value_type *str) noexcept
             : repr{str} {}
 
-        const typename base_type::value_type *repr;
+        const base_type::value_type *repr;
     };
 
 public:
     /*! @brief Character type. */
-    using value_type = typename base_type::value_type;
+    using value_type = base_type::value_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename base_type::size_type;
+    using size_type = base_type::size_type;
     /*! @brief Unsigned integer type. */
-    using hash_type = typename base_type::hash_type;
+    using hash_type = base_type::hash_type;
 
     /**
      * @brief Returns directly the numeric representation of a string view.
