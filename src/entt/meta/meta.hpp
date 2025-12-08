@@ -785,7 +785,7 @@ class meta_data {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_data_node::size_type;
+    using size_type = internal::meta_data_node::size_type;
 
     /*! @brief Default constructor. */
     meta_data() noexcept = default;
@@ -925,7 +925,7 @@ class meta_func {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_func_node::size_type;
+    using size_type = internal::meta_func_node::size_type;
 
     /*! @brief Default constructor. */
     meta_func() noexcept = default;
@@ -1057,7 +1057,7 @@ class meta_type {
     }
 
     template<typename Func>
-    [[nodiscard]] auto lookup(meta_any *const args, const typename internal::meta_type_node::size_type sz, [[maybe_unused]] bool constness, Func next) const {
+    [[nodiscard]] auto lookup(meta_any *const args, const internal::meta_type_node::size_type sz, [[maybe_unused]] bool constness, Func next) const {
         decltype(next()) candidate = nullptr;
         size_type same{};
         bool ambiguous{};
@@ -1111,7 +1111,7 @@ class meta_type {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_type_node::size_type;
+    using size_type = internal::meta_type_node::size_type;
 
     /*! @brief Default constructor. */
     meta_type() noexcept = default;
@@ -1325,8 +1325,8 @@ public:
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
-        using range_type = meta_range<meta_type, typename decltype(internal::meta_type_descriptor::base)::const_iterator>;
+    [[nodiscard]] meta_range<meta_type, decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
+        using range_type = meta_range<meta_type, decltype(internal::meta_type_descriptor::base)::const_iterator>;
         return fetch_node().details ? range_type{{*ctx, fetch_node().details->base.cbegin()}, {*ctx, fetch_node().details->base.cend()}} : range_type{};
     }
 
@@ -1334,8 +1334,8 @@ public:
      * @brief Returns a range to visit registered top-level meta data.
      * @return An iterable range to visit registered top-level meta data.
      */
-    [[nodiscard]] meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator> data() const noexcept {
-        using range_type = meta_range<meta_data, typename decltype(internal::meta_type_descriptor::data)::const_iterator>;
+    [[nodiscard]] meta_range<meta_data, decltype(internal::meta_type_descriptor::data)::const_iterator> data() const noexcept {
+        using range_type = meta_range<meta_data, decltype(internal::meta_type_descriptor::data)::const_iterator>;
         return fetch_node().details ? range_type{{*ctx, fetch_node().details->data.cbegin()}, {*ctx, fetch_node().details->data.cend()}} : range_type{};
     }
 
@@ -1354,8 +1354,8 @@ public:
      * @brief Returns a range to visit registered top-level functions.
      * @return An iterable range to visit registered top-level functions.
      */
-    [[nodiscard]] meta_range<meta_func, typename decltype(internal::meta_type_descriptor::func)::const_iterator> func() const noexcept {
-        using return_type = meta_range<meta_func, typename decltype(internal::meta_type_descriptor::func)::const_iterator>;
+    [[nodiscard]] meta_range<meta_func, decltype(internal::meta_type_descriptor::func)::const_iterator> func() const noexcept {
+        using return_type = meta_range<meta_func, decltype(internal::meta_type_descriptor::func)::const_iterator>;
         return fetch_node().details ? return_type{{*ctx, fetch_node().details->func.cbegin()}, {*ctx, fetch_node().details->func.cend()}} : return_type{};
     }
 

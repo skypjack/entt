@@ -38,7 +38,7 @@ template<typename Type>
  * @param ctx The context from which to search for meta types.
  * @return An iterable range to use to visit all meta types.
  */
-[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve(const meta_ctx &ctx) noexcept {
+[[nodiscard]] inline meta_range<meta_type, decltype(internal::meta_context::value)::const_iterator> resolve(const meta_ctx &ctx) noexcept {
     const auto &context = internal::meta_context::from(ctx);
     return {{ctx, context.value.cbegin()}, {ctx, context.value.cend()}};
 }
@@ -47,7 +47,7 @@ template<typename Type>
  * @brief Returns a range to use to visit all meta types.
  * @return An iterable range to use to visit all meta types.
  */
-[[nodiscard]] inline meta_range<meta_type, typename decltype(internal::meta_context::value)::const_iterator> resolve() noexcept {
+[[nodiscard]] inline meta_range<meta_type, decltype(internal::meta_context::value)::const_iterator> resolve() noexcept {
     return resolve(locator<meta_ctx>::value_or());
 }
 

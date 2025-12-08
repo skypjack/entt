@@ -149,7 +149,7 @@ public:
  * @tparam Candidate The actual function to associate with the reflected type.
  */
 template<typename Type, typename Candidate>
-using meta_function_helper_t = typename meta_function_helper<Type, Candidate>::type;
+using meta_function_helper_t = meta_function_helper<Type, Candidate>::type;
 
 /**
  * @brief Wraps a value depending on the given policy.

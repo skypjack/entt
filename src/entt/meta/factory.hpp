@@ -409,7 +409,7 @@ public:
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
         } else {
-            using args_type = typename meta_function_helper_t<Type, decltype(Setter)>::args_type;
+            using args_type = meta_function_helper_t<Type, decltype(Setter)>::args_type;
 
             base_type::data(
                 internal::meta_data_node{

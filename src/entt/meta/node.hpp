@@ -157,7 +157,7 @@ template<auto Member, typename Type, typename Value>
         }
     }
 
-    return static_cast<typename Type::value_type *>(nullptr);
+    return static_cast<Type::value_type *>(nullptr);
 }
 
 [[nodiscard]] inline auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
@@ -167,7 +167,7 @@ template<auto Member, typename Type, typename Value>
 
 template<auto Member>
 [[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id, bool recursive) {
-    using value_type = typename std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
+    using value_type = std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
         if(auto *member = find_member<&value_type::id>((node.details.get()->*Member), id); member != nullptr) {
