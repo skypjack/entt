@@ -50,7 +50,7 @@ public:
             signal.publish(events[pos]);
         }
 
-        events.erase(events.cbegin(), events.cbegin() + static_cast<typename container_type::difference_type>(length));
+        events.erase(events.cbegin(), events.cbegin() + static_cast<container_type::difference_type>(length));
     }
 
     void disconnect(void *instance) override {
@@ -114,7 +114,7 @@ class basic_dispatcher {
     using mapped_type = std::shared_ptr<internal::basic_dispatcher_handler>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
-    using container_allocator = typename alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
+    using container_allocator = alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
     using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<>, container_allocator>;
 
     template<typename Type>
