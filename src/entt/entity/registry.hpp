@@ -158,7 +158,7 @@ template<typename Lhs, typename Rhs>
 template<typename Allocator>
 class registry_context {
     using alloc_traits = std::allocator_traits<Allocator>;
-    using allocator_type = typename alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
+    using allocator_type = alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
 
 public:
     explicit registry_context(const allocator_type &allocator)
@@ -296,9 +296,9 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename traits_type::value_type;
+    using entity_type = traits_type::value_type;
     /*! @brief Underlying version type. */
-    using version_type = typename traits_type::version_type;
+    using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Common type among all storage types. */
@@ -315,7 +315,7 @@ public:
      * @tparam Type Storage value type, eventually const.
      */
     template<typename Type>
-    using storage_for_type = typename storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
+    using storage_for_type = storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
 
     /*! @brief Default constructor. */
     basic_registry()
@@ -534,7 +534,7 @@ public:
      */
     version_type destroy(const entity_type entt) {
         for(size_type pos = pools.size(); pos != 0u; --pos) {
-            pools.begin()[static_cast<typename pool_container_type::difference_type>(pos - 1u)].second->remove(entt);
+            pools.begin()[static_cast<pool_container_type::difference_type>(pos - 1u)].second->remove(entt);
         }
 
         entities.erase(entt);
@@ -571,7 +571,7 @@ public:
     template<typename It>
     void destroy(It first, It last) {
         const auto to = entities.sort_as(first, last);
-        const auto from = entities.cend() - static_cast<typename common_type::difference_type>(entities.free_list());
+        const auto from = entities.cend() - static_cast<common_type::difference_type>(entities.free_list());
 
         for(auto &&curr: pools) {
             curr.second->remove(from, to);
@@ -971,7 +971,7 @@ public:
     void clear() {
         if constexpr(sizeof...(Type) == 0u) {
             for(size_type pos = pools.size(); pos; --pos) {
-                pools.begin()[static_cast<typename pool_container_type::difference_type>(pos - 1u)].second->clear();
+                pools.begin()[static_cast<pool_container_type::difference_type>(pos - 1u)].second->clear();
             }
 
             const auto elem = entities.each();
@@ -1095,7 +1095,7 @@ public:
     basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>
     group(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) {
         using group_type = basic_group<owned_t<storage_for_type<Owned>...>, get_t<storage_for_type<Get>...>, exclude_t<storage_for_type<Exclude>...>>;
-        using handler_type = typename group_type::handler;
+        using handler_type = group_type::handler;
 
         if(auto it = groups.find(group_type::group_id()); it != groups.cend()) {
             return {*std::static_pointer_cast<handler_type>(it->second)};
@@ -1119,7 +1119,7 @@ public:
     [[nodiscard]] basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>
     group_if_exists(get_t<Get...> = get_t{}, exclude_t<Exclude...> = exclude_t{}) const {
         using group_type = basic_group<owned_t<storage_for_type<const Owned>...>, get_t<storage_for_type<const Get>...>, exclude_t<storage_for_type<const Exclude>...>>;
-        using handler_type = typename group_type::handler;
+        using handler_type = group_type::handler;
 
         if(auto it = groups.find(group_type::group_id()); it != groups.cend()) {
             return {*std::static_pointer_cast<handler_type>(it->second)};

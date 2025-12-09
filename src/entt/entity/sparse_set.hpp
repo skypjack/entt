@@ -22,10 +22,10 @@ namespace internal {
 
 template<typename Container>
 struct sparse_set_iterator final {
-    using value_type = typename Container::value_type;
-    using pointer = typename Container::const_pointer;
-    using reference = typename Container::const_reference;
-    using difference_type = typename Container::difference_type;
+    using value_type = Container::value_type;
+    using pointer = Container::const_pointer;
+    using reference = Container::const_reference;
+    using difference_type = Container::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     constexpr sparse_set_iterator() noexcept
@@ -73,7 +73,7 @@ struct sparse_set_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return (*packed)[static_cast<typename Container::size_type>(index() - value)];
+        return (*packed)[static_cast<Container::size_type>(index() - value)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -227,8 +227,8 @@ class basic_sparse_set {
         auto &from = packed[lhs];
         auto &to = packed[rhs];
 
-        sparse_ref(from) = traits_type::combine(static_cast<typename traits_type::entity_type>(rhs), traits_type::to_integral(from));
-        sparse_ref(to) = traits_type::combine(static_cast<typename traits_type::entity_type>(lhs), traits_type::to_integral(to));
+        sparse_ref(from) = traits_type::combine(static_cast<traits_type::entity_type>(rhs), traits_type::to_integral(from));
+        sparse_ref(to) = traits_type::combine(static_cast<traits_type::entity_type>(lhs), traits_type::to_integral(to));
 
         std::swap(from, to);
     }
@@ -282,7 +282,7 @@ protected:
     void in_place_pop(const basic_iterator it) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
         const auto pos = entity_to_pos(std::exchange(sparse_ref(*it), null));
-        packed[pos] = traits_type::combine(static_cast<typename traits_type::entity_type>(std::exchange(head, pos)), tombstone);
+        packed[pos] = traits_type::combine(static_cast<traits_type::entity_type>(std::exchange(head, pos)), tombstone);
     }
 
     /**
@@ -351,7 +351,7 @@ protected:
             if(head != max_size && !force_back) {
                 pos = head;
                 ENTT_ASSERT(elem == null, "Slot not available");
-                elem = traits_type::combine(static_cast<typename traits_type::entity_type>(head), traits_type::to_integral(entt));
+                elem = traits_type::combine(static_cast<traits_type::entity_type>(head), traits_type::to_integral(entt));
                 head = entity_to_pos(std::exchange(packed[pos], entt));
                 break;
             }
@@ -359,12 +359,12 @@ protected:
         case deletion_policy::swap_and_pop:
             packed.push_back(entt);
             ENTT_ASSERT(elem == null, "Slot not available");
-            elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
+            elem = traits_type::combine(static_cast<traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             break;
         case deletion_policy::swap_only:
             if(elem == null) {
                 packed.push_back(entt);
-                elem = traits_type::combine(static_cast<typename traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
+                elem = traits_type::combine(static_cast<traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             } else {
                 ENTT_ASSERT(!(entity_to_pos(elem) < head), "Slot not available");
                 bump(entt);
@@ -386,15 +386,15 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename traits_type::value_type;
+    using entity_type = traits_type::value_type;
     /*! @brief Underlying version type. */
-    using version_type = typename traits_type::version_type;
+    using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained entities. */
-    using pointer = typename packed_container_type::const_pointer;
+    using pointer = packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */
     using iterator = basic_iterator;
     /*! @brief Constant random access iterator type. */
@@ -932,7 +932,7 @@ public:
                     swap_or_move(from, to);
 
                     packed[to] = packed[from];
-                    const auto elem = static_cast<typename traits_type::entity_type>(to);
+                    const auto elem = static_cast<traits_type::entity_type>(to);
                     sparse_ref(packed[to]) = traits_type::combine(elem, traits_type::to_integral(packed[to]));
 
                     for(; from && packed[from - 1u] == tombstone; --from) {}
@@ -1011,7 +1011,7 @@ public:
                 const auto entt = packed[curr];
 
                 swap_or_move(next, idx);
-                const auto elem = static_cast<typename traits_type::entity_type>(curr);
+                const auto elem = static_cast<traits_type::entity_type>(curr);
                 sparse_ref(entt) = traits_type::combine(elem, traits_type::to_integral(packed[curr]));
                 curr = std::exchange(next, idx);
             }

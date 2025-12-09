@@ -67,11 +67,11 @@ class basic_entt_traits {
 
 public:
     /*! @brief Value type. */
-    using value_type = typename Traits::value_type;
+    using value_type = Traits::value_type;
     /*! @brief Underlying entity type. */
-    using entity_type = typename Traits::entity_type;
+    using entity_type = Traits::entity_type;
     /*! @brief Underlying version type. */
-    using version_type = typename Traits::version_type;
+    using version_type = Traits::version_type;
 
     /*! @brief Entity mask size. */
     static constexpr entity_type entity_mask = Traits::entity_mask;
@@ -175,7 +175,7 @@ struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
  * @return The integral representation of the given value.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
+[[nodiscard]] constexpr entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
     return entt_traits<Entity>::to_integral(value);
 }
 
@@ -186,7 +186,7 @@ template<typename Entity>
  * @return The integral representation of the entity part.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
+[[nodiscard]] constexpr entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
     return entt_traits<Entity>::to_entity(value);
 }
 
@@ -197,7 +197,7 @@ template<typename Entity>
  * @return The integral representation of the version part.
  */
 template<typename Entity>
-[[nodiscard]] constexpr typename entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
+[[nodiscard]] constexpr entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
     return entt_traits<Entity>::to_version(value);
 }
 

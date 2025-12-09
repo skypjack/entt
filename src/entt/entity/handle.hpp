@@ -22,10 +22,10 @@ class handle_storage_iterator final {
     friend class handle_storage_iterator;
 
     using underlying_type = std::remove_reference_t<typename It::value_type::second_type>;
-    using entity_type = typename underlying_type::entity_type;
+    using entity_type = underlying_type::entity_type;
 
 public:
-    using value_type = typename std::iterator_traits<It>::value_type;
+    using value_type = std::iterator_traits<It>::value_type;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -107,9 +107,9 @@ public:
     /*! @brief Type of registry accepted by the handle. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename traits_type::value_type;
+    using entity_type = traits_type::value_type;
     /*! @brief Underlying version type. */
-    using version_type = typename traits_type::version_type;
+    using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Iterable handle type. */

@@ -60,7 +60,7 @@ class basic_sigh_mixin final: public Type {
 
     using basic_registry_type = basic_registry<typename owner_type::entity_type, typename owner_type::allocator_type>;
     using sigh_type = sigh<void(owner_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
-    using underlying_iterator = typename underlying_type::base_type::basic_iterator;
+    using underlying_iterator = underlying_type::base_type::basic_iterator;
 
     static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
 
@@ -90,7 +90,7 @@ private:
                     destruction.publish(reg, underlying_type::base_type::operator[](pos));
                 }
             } else {
-                for(auto entt: static_cast<typename underlying_type::base_type &>(*this)) {
+                for(auto entt: static_cast<underlying_type::base_type &>(*this)) {
                     if constexpr(underlying_type::storage_policy == deletion_policy::in_place) {
                         if(entt != tombstone) {
                             destruction.publish(reg, entt);
@@ -105,7 +105,7 @@ private:
         underlying_type::pop_all();
     }
 
-    underlying_iterator try_emplace(const typename underlying_type::entity_type entt, const bool force_back, const void *value) final {
+    underlying_iterator try_emplace(const underlying_type::entity_type entt, const bool force_back, const void *value) final {
         const auto it = underlying_type::try_emplace(entt, force_back, value);
 
         if(auto &reg = owner_or_assert(); it != underlying_type::base_type::end()) {
@@ -129,9 +129,9 @@ private:
 
 public:
     /*! @brief Allocator type. */
-    using allocator_type = typename underlying_type::allocator_type;
+    using allocator_type = underlying_type::allocator_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename underlying_type::entity_type;
+    using entity_type = underlying_type::entity_type;
     /*! @brief Expected registry type. */
     using registry_type = owner_type;
 
@@ -402,7 +402,7 @@ class basic_reactive_mixin final: public Type {
         return static_cast<owner_type &>(*owner);
     }
 
-    void emplace_element(const Registry &, typename underlying_type::entity_type entity) {
+    void emplace_element(const Registry &, underlying_type::entity_type entity) {
         if(!underlying_type::contains(entity)) {
             underlying_type::emplace(entity);
         }
@@ -423,9 +423,9 @@ private:
 
 public:
     /*! @brief Allocator type. */
-    using allocator_type = typename underlying_type::allocator_type;
+    using allocator_type = underlying_type::allocator_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename underlying_type::entity_type;
+    using entity_type = underlying_type::entity_type;
     /*! @brief Expected registry type. */
     using registry_type = owner_type;
 

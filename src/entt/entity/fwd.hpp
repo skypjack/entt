@@ -247,7 +247,7 @@ struct storage_type<reactive, Entity, Allocator> {
  * @tparam Args Arguments to forward.
  */
 template<typename... Args>
-using storage_type_t = typename storage_type<Args...>::type;
+using storage_type_t = storage_type<Args...>::type;
 
 /**
  * Type-to-storage conversion utility that preserves constness.
@@ -266,7 +266,7 @@ struct storage_for {
  * @tparam Args Arguments to forward.
  */
 template<typename... Args>
-using storage_for_t = typename storage_for<Args...>::type;
+using storage_for_t = storage_for<Args...>::type;
 
 /**
  * @brief Alias declaration for the most common use case.

@@ -16,7 +16,7 @@ namespace internal {
 
 template<typename Set>
 class runtime_view_iterator final {
-    using iterator_type = typename Set::iterator;
+    using iterator_type = Set::iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid() const {
@@ -26,10 +26,10 @@ class runtime_view_iterator final {
     }
 
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
+    using value_type = iterator_traits::value_type;
+    using pointer = iterator_traits::pointer;
+    using reference = iterator_traits::reference;
+    using difference_type = iterator_traits::difference_type;
     using iterator_category = std::bidirectional_iterator_tag;
 
     constexpr runtime_view_iterator() noexcept
@@ -135,7 +135,7 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename Type::entity_type;
+    using entity_type = Type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Signed integer type. */

@@ -29,7 +29,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename registry_type::entity_type;
+    using entity_type = registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -72,7 +72,7 @@ public:
     /*! @brief Type of registry to convert. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename registry_type::entity_type;
+    using entity_type = registry_type::entity_type;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -123,7 +123,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  * @return The entity associated with the given element.
  */
 template<typename... Args>
-typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
+basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &storage, const typename basic_storage<Args...>::value_type &instance) {
     using traits_type = component_traits<typename basic_storage<Args...>::value_type, typename basic_storage<Args...>::entity_type>;
     static_assert(traits_type::page_size != 0u, "Unexpected page size");
     const auto *page = storage.raw();
@@ -131,7 +131,7 @@ typename basic_storage<Args...>::entity_type to_entity(const basic_storage<Args.
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     for(std::size_t pos{}, count = storage.size(); pos < count; pos += traits_type::page_size, ++page) {
         if(const auto dist = (std::addressof(instance) - *page); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
-            return *(static_cast<const typename basic_storage<Args...>::base_type &>(storage).rbegin() + static_cast<decltype(dist)>(pos) + dist);
+            return *(static_cast<const basic_storage<Args...>::base_type &>(storage).rbegin() + static_cast<decltype(dist)>(pos) + dist);
         }
     }
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)

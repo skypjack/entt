@@ -36,10 +36,10 @@ class storage_iterator final {
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
 
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
+    using value_type = iterator_traits::value_type;
+    using pointer = iterator_traits::pointer;
+    using reference = iterator_traits::reference;
+    using difference_type = iterator_traits::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     constexpr storage_iterator() noexcept = default;
@@ -89,7 +89,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        const auto pos = static_cast<typename Container::size_type>(index() - value);
+        const auto pos = static_cast<Container::size_type>(index() - value);
         return (*payload)[pos / Page][fast_mod(static_cast<std::size_t>(pos), Page)];
     }
 
@@ -231,7 +231,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
-    using underlying_iterator = typename underlying_type::basic_iterator;
+    using underlying_iterator = underlying_type::basic_iterator;
     using traits_type = component_traits<Type, Entity>;
 
     [[nodiscard]] auto &element_at(const std::size_t pos) const {
@@ -409,9 +409,9 @@ public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained elements. */
-    using pointer = typename container_type::pointer;
+    using pointer = container_type::pointer;
     /*! @brief Constant pointer type to contained elements. */
-    using const_pointer = typename alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
+    using const_pointer = alloc_traits::template rebind_traits<typename alloc_traits::const_pointer>::const_pointer;
     /*! @brief Random access iterator type. */
     using iterator = internal::storage_iterator<container_type, traits_type::page_size>;
     /*! @brief Constant random access iterator type. */
@@ -974,11 +974,11 @@ class basic_storage<Entity, Entity, Allocator>
     : public basic_sparse_set<Entity, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-    using underlying_iterator = typename basic_sparse_set<Entity, Allocator>::basic_iterator;
+    using underlying_iterator = basic_sparse_set<Entity, Allocator>::basic_iterator;
     using traits_type = entt_traits<Entity>;
 
     auto from_placeholder() noexcept {
-        const auto entt = traits_type::combine(static_cast<typename traits_type::entity_type>(placeholder), {});
+        const auto entt = traits_type::combine(static_cast<traits_type::entity_type>(placeholder), {});
         ENTT_ASSERT(entt != null, "No more entities available");
         placeholder += static_cast<size_type>(entt != null);
         return entt;

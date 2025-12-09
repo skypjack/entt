@@ -63,10 +63,10 @@ class view_iterator final {
     template<typename, typename...>
     friend class extended_view_iterator;
 
-    using iterator_type = typename Type::const_iterator;
+    using iterator_type = Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 
-    [[nodiscard]] bool valid(const typename iterator_traits::value_type entt) const noexcept {
+    [[nodiscard]] bool valid(const iterator_traits::value_type entt) const noexcept {
         return (!Checked || (entt != tombstone))
                && ((Get == 1u) || (internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)))
                && ((Exclude == 0u) || internal::none_of(filter.begin(), filter.end(), entt));
@@ -77,10 +77,10 @@ class view_iterator final {
     }
 
 public:
-    using value_type = typename iterator_traits::value_type;
-    using pointer = typename iterator_traits::pointer;
-    using reference = typename iterator_traits::reference;
-    using difference_type = typename iterator_traits::difference_type;
+    using value_type = iterator_traits::value_type;
+    using pointer = iterator_traits::pointer;
+    using reference = iterator_traits::reference;
+    using difference_type = iterator_traits::difference_type;
     using iterator_category = std::forward_iterator_tag;
 
     constexpr view_iterator() noexcept
@@ -287,7 +287,7 @@ protected:
         filter[pos] = elem;
     }
 
-    [[nodiscard]] bool none_of(const typename Type::entity_type entt) const noexcept {
+    [[nodiscard]] bool none_of(const Type::entity_type entt) const noexcept {
         return internal::none_of(filter.begin(), filter.end(), entt);
     }
 
@@ -300,7 +300,7 @@ public:
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename Type::entity_type;
+    using entity_type = Type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Signed integer type. */
@@ -440,7 +440,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index>
-    [[nodiscard]] auto get(const typename base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto get(const base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
         return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
     }
 
@@ -475,15 +475,15 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
 
 public:
     /*! @brief Common type among all storage types. */
-    using common_type = typename base_type::common_type;
+    using common_type = base_type::common_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename base_type::entity_type;
+    using entity_type = base_type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename base_type::size_type;
+    using size_type = base_type::size_type;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Forward iterator type. */
-    using iterator = typename base_type::iterator;
+    using iterator = base_type::iterator;
     /*! @brief Iterable view type. */
     using iterable = iterable_adaptor<internal::extended_view_iterator<iterator, Get...>>;
 
@@ -697,7 +697,7 @@ public:
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename common_type::entity_type;
+    using entity_type = common_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Signed integer type. */
@@ -915,17 +915,17 @@ class basic_view<get_t<Get>, exclude_t<>>
 
 public:
     /*! @brief Common type among all storage types. */
-    using common_type = typename base_type::common_type;
+    using common_type = base_type::common_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename base_type::entity_type;
+    using entity_type = base_type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename base_type::size_type;
+    using size_type = base_type::size_type;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename base_type::iterator;
+    using iterator = base_type::iterator;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = typename base_type::reverse_iterator;
+    using reverse_iterator = base_type::reverse_iterator;
     /*! @brief Iterable view type. */
     using iterable = std::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(std::declval<Get>().each())>;
 
@@ -953,7 +953,7 @@ public:
      * @tparam Type Type of element of which to return the storage.
      * @return The storage for the given element type.
      */
-    template<typename Type = typename Get::element_type>
+    template<typename Type = Get::element_type>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
         return storage<0>();
@@ -1042,7 +1042,7 @@ public:
      *
      * @code{.cpp}
      * void(const entity_type, Type &);
-     * void(typename Type &);
+     * void(Type &);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
