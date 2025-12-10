@@ -247,8 +247,9 @@ I hope the following lists can grow much more in the future.
     (or those yet to be).
   * [Physecs](https://github.com/thfProjects/Physecs): real-time 3D rigid body
     physics simulation built on `EnTT`.
-  * [KODZA](https://gitlab.com/arqitek/kodza/): A work in progress game engine
-    by Arqitek.
+  * [KODZA](https://gitlab.com/arqitek/kodza/): A work in progress game engine.
+  * [Omnix](https://github.com/Ace-codes-swift/Omnix): An under-development,
+    multi-purpose 3D engine for `macOS`, using `EnTT` for the ECS.
 
 ## Articles, videos and blog posts:
 
