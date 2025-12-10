@@ -6,6 +6,7 @@ module;
 #define ENTT_MODULE_EXPORT_END }
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <deque>
 #include <functional>
@@ -13,13 +14,14 @@ module;
 #include <list>
 #include <map>
 #include <memory>
+#include <ostream>
 #include <set>
 #include <string_view>
 #include <unordered_set>
 #include <utility>
 
 #ifdef ENTT_USER_CONFIG
-#   include ENTT_USER_CONFIG
+#    include ENTT_USER_CONFIG
 #endif // ENTT_USER_CONFIG
 
 #include "config/config.h"
@@ -29,43 +31,43 @@ module;
 
 export module entt;
 
-#include "core/fwd.hpp"
-#include "core/utility.hpp"
 #include "core/algorithm.hpp"
-#include "core/hashed_string.hpp"
-#include "core/type_info.hpp"
-#include "core/type_traits.hpp"
 #include "core/any.hpp"
 #include "core/bit.hpp"
 #include "core/compressed_pair.hpp"
 #include "core/enum.hpp"
 #include "core/family.hpp"
+#include "core/fwd.hpp"
+#include "core/hashed_string.hpp"
 #include "core/ident.hpp"
 #include "core/iterator.hpp"
 #include "core/memory.hpp"
 #include "core/monostate.hpp"
 #include "core/ranges.hpp"
 #include "core/tuple.hpp"
+#include "core/type_info.hpp"
+#include "core/type_traits.hpp"
+#include "core/utility.hpp"
 
-#include "container/fwd.hpp"
 #include "container/dense_map.hpp"
 #include "container/dense_set.hpp"
+#include "container/fwd.hpp"
 #include "container/table.hpp"
 
-#include "signal/fwd.hpp"
 #include "signal/delegate.hpp"
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"
+#include "signal/fwd.hpp"
 #include "signal/sigh.hpp"
 
-#include "graph/fwd.hpp"
 #include "graph/adjacency_matrix.hpp"
 #include "graph/dot.hpp"
 #include "graph/flow.hpp"
+#include "graph/fwd.hpp"
 
-#include "entity/fwd.hpp"
 #include "entity/component.hpp"
 #include "entity/entity.hpp"
+#include "entity/fwd.hpp"
 #include "entity/group.hpp"
 #include "entity/handle.hpp"
 #include "entity/helper.hpp"
@@ -81,20 +83,20 @@ export module entt;
 
 #include "locator/locator.hpp"
 
-#include "meta/fwd.hpp"
 #include "meta/adl_pointer.hpp"
-#include "meta/context.hpp"
-#include "meta/type_traits.hpp"
-#include "meta/node.hpp"
-#include "meta/range.hpp"
-#include "meta/meta.hpp"
 #include "meta/container.hpp"
-#include "meta/resolve.hpp"
-#include "meta/policy.hpp"
-#include "meta/utility.hpp"
+#include "meta/context.hpp"
 #include "meta/factory.hpp"
+#include "meta/fwd.hpp"
+#include "meta/meta.hpp"
+#include "meta/node.hpp"
 #include "meta/pointer.hpp"
+#include "meta/policy.hpp"
+#include "meta/range.hpp"
+#include "meta/resolve.hpp"
 #include "meta/template.hpp"
+#include "meta/type_traits.hpp"
+#include "meta/utility.hpp"
 
 #include "poly/fwd.hpp"
 #include "poly/poly.hpp"
@@ -103,7 +105,7 @@ export module entt;
 #include "process/process.hpp"
 #include "process/scheduler.hpp"
 
-#include "resource/fwd.hpp"
 #include "resource/cache.hpp"
+#include "resource/fwd.hpp"
 #include "resource/loader.hpp"
 #include "resource/resource.hpp"
