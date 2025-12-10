@@ -140,7 +140,7 @@ static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, 
 
             if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
                 if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                    present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const Entity entt) {
+                    present_element<std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const Entity entt) {
                         ImGui::Text("%s: %d [%d/%d]", name, to_integral(entt), to_entity(entt), to_version(entt));
                     });
                 }
@@ -187,7 +187,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
 template<typename... Get, typename... Exclude, std::size_t... Index>
 static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view, std::index_sequence<Index...>) {
     using view_type = basic_view<get_t<Get...>, exclude_t<Exclude...>>;
-    const std::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
+    const std::array<const view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
 
     for(auto tup: view.each()) {
         const auto entt = std::get<0>(tup);
@@ -200,7 +200,7 @@ static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, ex
 
                     if(ImGui::TreeNode(&storage->info(), "%s", label)) {
                         if(const auto obj = type.from_void(storage->value(entt)); obj) {
-                            present_element<typename view_type::entity_type>(obj, [](const char *name, const typename view_type::entity_type entt) {
+                            present_element<typename view_type::entity_type>(obj, [](const char *name, const view_type::entity_type entt) {
                                 ImGui::Text("%s: %d [%d/%d]", name, to_integral(entt), to_entity(entt), to_version(entt));
                             });
                         }
