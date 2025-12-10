@@ -151,7 +151,6 @@ I hope the following lists can grow much more in the future.
   * [Hazel Engine](https://github.com/TheCherno/Hazel): a work in progress
     engine created by [The Cherno](https://github.com/TheCherno/Hazel) during
     one of his most famous video series.
-  * [KODZA](https://gitlab.com/arqitek/kodza/): A work in progress game engine by Arqitek.
   * [Aether Engine](https://hadean.com/spatial-simulation/)
     [v1.1+](https://docs.hadean.com/v1.1/Licenses/) by
     [Hadean](https://hadean.com/): a library designed for spatially partitioning
@@ -248,6 +247,8 @@ I hope the following lists can grow much more in the future.
     (or those yet to be).
   * [Physecs](https://github.com/thfProjects/Physecs): real-time 3D rigid body
     physics simulation built on `EnTT`.
+  * [KODZA](https://gitlab.com/arqitek/kodza/): A work in progress game engine
+    by Arqitek.
 
 ## Articles, videos and blog posts:
 
