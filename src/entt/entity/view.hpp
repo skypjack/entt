@@ -61,7 +61,7 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
 template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
-    friend class extended_view_iterator;
+    friend struct extended_view_iterator;
 
     using iterator_type = Type::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
@@ -138,13 +138,7 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
 }
 
 template<typename It, typename... Get>
-class extended_view_iterator final {
-    template<std::size_t... Index>
-    [[nodiscard]] auto dereference(std::index_sequence<Index...>) const noexcept {
-        return std::tuple_cat(std::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
-    }
-
-public:
+struct extended_view_iterator final {
     using iterator_type = It;
     using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
@@ -169,7 +163,9 @@ public:
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return dereference(std::index_sequence_for<Get...>{});
+        return [this]<auto... Index>(std::index_sequence<Index...>) {
+            return std::tuple_cat(std::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
+        }(std::index_sequence_for<Get...>{});
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
@@ -439,11 +435,6 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
     template<typename Type>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t... Index>
-    [[nodiscard]] auto get(const base_type::entity_type entt, std::index_sequence<Index...>) const noexcept {
-        return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
-    }
-
     template<std::size_t Curr, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const std::tuple<typename base_type::entity_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
@@ -454,7 +445,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
     }
 
     template<std::size_t Curr, typename Func, std::size_t... Index>
-    void each(Func &func, std::index_sequence<Index...>) const {
+    void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = std::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
@@ -463,13 +454,6 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
                     std::apply(func, std::tuple_cat(dispatch_get<Curr, Index>(curr)...));
                 }
             }
-        }
-    }
-
-    template<typename Func, std::size_t... Index>
-    void pick_and_each(Func &func, std::index_sequence<Index...> seq) const {
-        if(const auto *view = base_type::handle(); view != nullptr) {
-            ((view == base_type::pool_at(Index) ? each<Index>(func, seq) : void()), ...);
         }
     }
 
@@ -607,7 +591,9 @@ public:
     template<std::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
-            return get(entt, std::index_sequence_for<Get...>{});
+            return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
+                return std::tuple_cat(storage<Idx>()->get_as_tuple(entt)...);
+            }(std::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
         } else {
@@ -632,7 +618,11 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        pick_and_each(func, std::index_sequence_for<Get...>{});
+        [this, &func]<auto... Index>(std::index_sequence<Index...> seq) {
+            if(const auto *view = base_type::handle(); view != nullptr) {
+                ((view == base_type::pool_at(Index) ? each<Index>(std::move(func), seq) : void()), ...);
+            }
+        }(std::index_sequence_for<Get...>{});
     }
 
     /**
