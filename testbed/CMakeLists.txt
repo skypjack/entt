@@ -25,12 +25,7 @@ FetchContent_Declare(
     GIT_SHALLOW 1
 )
 
-FetchContent_GetProperties(imgui)
-
-if(NOT imgui_POPULATED)
-    FetchContent_Populate(imgui)
-    set(imgui_INCLUDE_DIR ${imgui_SOURCE_DIR})
-endif()
+FetchContent_MakeAvailable(imgui)
 
 # Testbed executable
 
