@@ -17,6 +17,7 @@ else()
     )
 
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
     FetchContent_MakeAvailable(googletest)
 
     add_library(GTest::Main ALIAS gtest_main)
@@ -186,19 +187,19 @@ if(ENTT_BUILD_SNAPSHOT)
         GIT_TAG v1.3.2
         GIT_SHALLOW 1
     )
+       
+    set(BUILD_DOC OFF CACHE BOOL "" FORCE)
+    set(BUILD_SANDBOX OFF CACHE BOOL "" FORCE)
+    set(SKIP_PORTABILITY_TEST ON CACHE BOOL "" FORCE)
+    set(SKIP_PERFORMANCE_COMPARISON ON CACHE BOOL "" FORCE)
 
-    FetchContent_GetProperties(cereal)
+    FetchContent_MakeAvailable(cereal)
 
-    if(NOT cereal_POPULATED)
-        FetchContent_Populate(cereal)
-        set(cereal_INCLUDE_DIR ${cereal_SOURCE_DIR}/include)
-    endif()
+    SETUP_BASIC_TEST(cereal_snapshot snapshot/snapshot.cpp)
 
-    SETUP_BASIC_TEST(cereal snapshot/snapshot.cpp)
-
-    set_target_properties(cereal PROPERTIES CXX_CLANG_TIDY "")
-    target_include_directories(cereal PRIVATE ${cereal_INCLUDE_DIR})
-    target_compile_options(cereal PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
+    target_link_libraries(cereal_snapshot PRIVATE cereal)
+    target_compile_options(cereal_snapshot PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
+    set_target_properties(cereal_snapshot PROPERTIES CXX_CLANG_TIDY "")
 endif()
 
 # Test config
