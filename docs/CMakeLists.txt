@@ -1,6 +1,6 @@
 # Doxygen configuration (documentation)
 
-find_package(Doxygen 1.13)
+find_package(Doxygen 1.14)
 
 if(DOXYGEN_FOUND)
     include(FetchContent)
