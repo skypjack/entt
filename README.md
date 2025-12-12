@@ -221,8 +221,8 @@ supports at least C++20.<br/>
 The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
-* `CMake` version 3.15.7 or later.
-* `Doxygen` version 1.14.0 or later.
+* `CMake` version 3.28 or later.
+* `Doxygen` version 1.14 or later.
 
 Alternatively, [Bazel](https://bazel.build) is also supported as a build system
 (credits to [zaucy](https://github.com/zaucy) who offered to maintain it).<br/>
