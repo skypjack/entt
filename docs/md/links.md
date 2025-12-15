@@ -145,6 +145,8 @@ I hope the following lists can grow much more in the future.
     a roguelite top-down shooter with a high-contrast vector line aesthetic.
   * [EnTT Dino](https://github.com/omgitsaheadcrab/entt_dino): a Dinosaur Game
     clone in C++ using only `SDL2` and `EnTT`.
+  * [Bim!](https://github.com/j-jorge/bim): a last-man-standing arcade online
+    game for Android.
 
 ## Engines and the like:
 
