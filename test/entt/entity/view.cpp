@@ -64,6 +64,30 @@ TEST(SingleStorageView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleStorageView, Conversion) {
+    entt::basic_view<entt::get_t<entt::storage<char>>, entt::exclude_t<>> view{};
+    entt::basic_view<entt::get_t<const entt::storage<char>>, entt::exclude_t<>> cview{view};
+
+    ASSERT_FALSE(view);
+    ASSERT_FALSE(cview);
+
+    entt::storage<char> storage{};
+    view.storage(storage);
+    cview = view;
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+
+    ASSERT_TRUE(view.empty());
+    ASSERT_TRUE(cview.empty());
+
+    const entt::entity entity{1};
+    storage.emplace(entity, 'c');
+
+    ASSERT_FALSE(view.empty());
+    ASSERT_FALSE(cview.empty());
+}
+
 TEST(SingleStorageView, InvalidView) {
     entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<>> view{};
     auto iterable = view.each();

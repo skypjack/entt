@@ -939,6 +939,16 @@ public:
         : basic_view{std::get<0>(value)} {}
 
     /**
+     * @brief Constructs a view from a convertible counterpart.
+     * @tparam OGet Type of storage of the convertible counterpart.
+     * @param other A storage view to convert from.
+     */
+    template<typename OGet, typename = std::enable_if_t<!std::is_same_v<Get, OGet> && std::is_constructible_v<Get, OGet>>>
+    basic_view(const basic_view<get_t<OGet>, exclude_t<>> &other) noexcept
+        : base_type{other} {
+    }
+
+    /**
      * @brief Returns the storage for a given element type, if any.
      * @tparam Type Type of element of which to return the storage.
      * @return The storage for the given element type.
