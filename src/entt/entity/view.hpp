@@ -457,6 +457,13 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof.
         }
     }
 
+    template<typename Type>
+    void storage_if(Type *elem) noexcept {
+        if(elem != nullptr) {
+            storage<index_of<typename Type::element_type>>(*elem);
+        }
+    }
+
 public:
     /*! @brief Common type among all storage types. */
     using common_type = base_type::common_type;
@@ -491,6 +498,18 @@ public:
      */
     basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> excl = {}) noexcept
         : basic_view{std::make_from_tuple<basic_view>(std::tuple_cat(value, excl))} {}
+
+    /**
+     * @brief Constructs a view from a convertible counterpart.
+     * @tparam Args Storage types managed by the other view.
+     * @param other A view to convert from.
+     */
+    template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
+    basic_view(const basic_view<Args...> &other) noexcept
+        : basic_view{} {
+        (storage_if(other.storage<typename Get::element_type>()), ...);
+        (storage_if(other.storage<typename Exclude::element_type>()), ...);
+    }
 
     /**
      * @brief Forces a view to use a given element to drive iterations

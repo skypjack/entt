@@ -682,6 +682,54 @@ TEST(MultiStorageView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(MultiStorageView, Conversion) {
+    entt::basic_view<entt::get_t<entt::storage<int>, const entt::storage<char>>, entt::exclude_t<entt::storage<double>, const entt::storage<float>>> view1{};
+    entt::basic_view<entt::get_t<const entt::storage<int>, const entt::storage<char>>, entt::exclude_t<const entt::storage<double>, const entt::storage<float>>> view2{view1};
+    entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<const entt::storage<double>>> view3{view1};
+    entt::basic_view<entt::get_t<const entt::storage<char>>, entt::exclude_t<>> view4{view1};
+
+    ASSERT_FALSE(view1);
+    ASSERT_FALSE(view2);
+    ASSERT_FALSE(view3);
+    ASSERT_FALSE(view4);
+
+    entt::storage<int> istorage{};
+    entt::storage<char> cstorage{};
+    entt::storage<double> dstorage{};
+    entt::storage<float> fstorage{};
+
+    view1.storage(istorage);
+    view1.storage(cstorage);
+    view1.storage(dstorage);
+    view1.storage(fstorage);
+
+    view2 = view1;
+    view3 = view1;
+    view4 = view1;
+
+    ASSERT_TRUE(view1);
+    ASSERT_TRUE(view2);
+    ASSERT_TRUE(view3);
+    ASSERT_TRUE(view4);
+
+    ASSERT_EQ(0u, view1.size_hint());
+    ASSERT_EQ(0u, view2.size_hint());
+    ASSERT_EQ(0u, view3.size_hint());
+    ASSERT_EQ(0u, view4.size());
+
+    const entt::entity entity{1};
+
+    istorage.emplace(entity);
+    cstorage.emplace(entity);
+    dstorage.emplace(entity);
+    fstorage.emplace(entity);
+
+    ASSERT_EQ(1u, view1.size_hint());
+    ASSERT_EQ(1u, view2.size_hint());
+    ASSERT_EQ(1u, view3.size_hint());
+    ASSERT_EQ(1u, view4.size());
+}
+
 TEST(MultiStorageView, InvalidView) {
     entt::basic_view<entt::get_t<entt::storage<int>>, entt::exclude_t<entt::storage<char>>> view{};
     auto iterable = view.each();
