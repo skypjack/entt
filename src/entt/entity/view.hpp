@@ -903,8 +903,10 @@ class basic_view<get_t<Get>, exclude_t<>>
     : public basic_storage_view<typename Get::base_type, Get::storage_policy> {
     using base_type = basic_storage_view<typename Get::base_type, Get::storage_policy>;
 
-    basic_view(Get *value) noexcept
-        : base_type{value} {
+    void storage_if(Get *value) noexcept {
+        if(value != nullptr) {
+            storage(*value);
+        }
     }
 
 public:
@@ -949,7 +951,8 @@ public:
      */
     template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
     basic_view(const basic_view<Args...> &other) noexcept
-        : basic_view{other.storage<typename Get::element_type>()} {
+        : base_type{} {
+        storage_if(other.storage<typename Get::element_type>());
     }
 
     /**
