@@ -903,6 +903,10 @@ class basic_view<get_t<Get>, exclude_t<>>
     : public basic_storage_view<typename Get::base_type, Get::storage_policy> {
     using base_type = basic_storage_view<typename Get::base_type, Get::storage_policy>;
 
+    basic_view(Get *value) noexcept
+        : base_type{value} {
+    }
+
 public:
     /*! @brief Common type among all storage types. */
     using common_type = base_type::common_type;
@@ -940,12 +944,12 @@ public:
 
     /**
      * @brief Constructs a view from a convertible counterpart.
-     * @tparam OGet Type of storage of the convertible counterpart.
-     * @param other A storage view to convert from.
+     * @tparam Args Storage types managed by the other view.
+     * @param other A view to convert from.
      */
-    template<typename OGet, typename = std::enable_if_t<!std::is_same_v<Get, OGet> && std::is_constructible_v<Get, OGet>>>
-    basic_view(const basic_view<get_t<OGet>, exclude_t<>> &other) noexcept
-        : base_type{other} {
+    template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
+    basic_view(const basic_view<Args...> &other) noexcept
+        : basic_view{other.storage<typename Get::element_type>()} {
     }
 
     /**
