@@ -507,8 +507,8 @@ public:
     template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
     basic_view(const basic_view<Args...> &other) noexcept
         : basic_view{} {
-        (storage_if(other.storage<typename Get::element_type>()), ...);
-        (storage_if(other.storage<typename Exclude::element_type>()), ...);
+        (storage_if(other.template storage<typename Get::element_type>()), ...);
+        (storage_if(other.template storage<typename Exclude::element_type>()), ...);
     }
 
     /**
@@ -971,7 +971,7 @@ public:
     template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
     basic_view(const basic_view<Args...> &other) noexcept
         : base_type{} {
-        storage_if(other.storage<typename Get::element_type>());
+        storage_if(other.template storage<typename Get::element_type>());
     }
 
     /**
