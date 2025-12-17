@@ -192,7 +192,7 @@ const meta_type_node &resolve(const meta_context &) noexcept;
 template<typename... Args>
 [[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const std::size_t index) noexcept {
     using resolve_type = const meta_type_node &(*)(const meta_context &) noexcept;
-    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<std::remove_const_t<std::remove_reference_t<Args>>>...};
+    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<std::remove_cvref_t<Args>>...};
     ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
     return list[index](context);
 }
@@ -278,7 +278,7 @@ auto setup_node_for() noexcept {
 
 template<typename Type>
 [[nodiscard]] const meta_type_node &resolve(const meta_context &context) noexcept {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Invalid type");
+    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Invalid type");
     static const meta_type_node node = setup_node_for<Type>();
     const auto *elem = try_resolve(context, *node.info);
     return (elem == nullptr) ? node : *elem;

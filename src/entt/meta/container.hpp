@@ -63,7 +63,7 @@ inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>:
  */
 template<typename Type>
 struct basic_meta_sequence_container_traits {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Unexpected type");
+    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Unexpected type");
 
     /*! @brief Unsigned integer type. */
     using size_type = meta_sequence_container::size_type;
@@ -187,7 +187,7 @@ struct basic_meta_sequence_container_traits {
  */
 template<typename Type>
 struct basic_meta_associative_container_traits {
-    static_assert(std::is_same_v<Type, std::remove_const_t<std::remove_reference_t<Type>>>, "Unexpected type");
+    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Unexpected type");
 
     /*! @brief Unsigned integer type. */
     using size_type = meta_associative_container::size_type;

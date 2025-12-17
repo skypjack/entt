@@ -51,7 +51,7 @@ public:
         : ctx{&area},
           data{&instance},
           value_type_node{&internal::resolve<typename Type::value_type>},
-          const_reference_node{&internal::resolve<std::remove_const_t<std::remove_reference_t<typename Type::const_reference>>>},
+          const_reference_node{&internal::resolve<std::remove_cvref_t<typename Type::const_reference>>},
           size_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::size},
           clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
@@ -161,7 +161,7 @@ class meta_any {
 
     template<typename Type>
     static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] const void *other) {
-        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
 
         if(req == internal::meta_traits::is_none) {
             value.node = &internal::resolve<Type>(internal::meta_context::from(*value.ctx));
@@ -248,7 +248,7 @@ public:
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           ctx{&area},
-          vtable{&basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>} {}
+          vtable{&basic_vtable<std::remove_cvref_t<Type>>} {}
 
     /**
      * @brief Constructs a wrapper taking ownership of the passed object.
@@ -470,22 +470,22 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
-            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+            if(storage.has_value<std::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
-                if constexpr(std::is_arithmetic_v<std::remove_const_t<std::remove_reference_t<Type>>> || std::is_enum_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+                if constexpr(std::is_arithmetic_v<std::remove_cvref_t<Type>> || std::is_enum_v<std::remove_cvref_t<Type>>) {
                     if(const auto &from = fetch_node(); from.conversion_helper) {
                         return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
                     }
                 }
 
                 if(const auto &from = fetch_node(); from.details != nullptr) {
-                    if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()); elem != nullptr) {
+                    if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, entt::type_hash<std::remove_cvref_t<Type>>::value()); elem != nullptr) {
                         return elem->conv(*ctx, storage.data());
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == entt::type_hash<std::remove_cvref_t<Type>>::value()) {
                             return other;
                         } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
                             return from_base;
@@ -508,9 +508,9 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
-            if(storage.has_value<std::remove_const_t<std::remove_reference_t<Type>>>()) {
+            if(storage.has_value<std::remove_cvref_t<Type>>()) {
                 return true;
-            } else if(auto other = std::as_const(*this).allow_cast<std::remove_const_t<std::remove_reference_t<Type>>>(); other) {
+            } else if(auto other = std::as_const(*this).allow_cast<std::remove_cvref_t<Type>>(); other) {
                 if(other.storage.owner()) {
                     std::swap(*this, other);
                 }
@@ -526,7 +526,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-        auto *prev = std::exchange(vtable, &basic_vtable<std::remove_const_t<std::remove_reference_t<Type>>>);
+        auto *prev = std::exchange(vtable, &basic_vtable<std::remove_cvref_t<Type>>);
         node = (prev == vtable) ? node : nullptr;
     }
 

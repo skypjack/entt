@@ -93,11 +93,11 @@ struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)>
     : meta_function_descriptor_traits<
           Ret,
           std::conditional_t<
-              std::is_same_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type> || std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>,
+              std::is_same_v<std::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<std::remove_cvref_t<MaybeType>, Type>,
               type_list<Args...>,
               type_list<MaybeType, Args...>>,
-          !(std::is_same_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type> || std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>),
-          std::is_const_v<std::remove_reference_t<MaybeType>> && (std::is_same_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type> || std::is_base_of_v<std::remove_const_t<std::remove_reference_t<MaybeType>>, Type>)> {};
+          !(std::is_same_v<std::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<std::remove_cvref_t<MaybeType>, Type>),
+          std::is_const_v<std::remove_reference_t<MaybeType>> && (std::is_same_v<std::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<std::remove_cvref_t<MaybeType>, Type>)> {};
 
 /**
  * @brief Meta function descriptor.
@@ -316,7 +316,7 @@ template<typename Type, auto Data>
 template<typename Type, auto Data, typename Policy = as_value_t>
 [[nodiscard]] std::enable_if_t<is_meta_policy_v<Policy>, meta_any> meta_getter(meta_handle instance) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>>) {
-        if constexpr(!std::is_array_v<std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>>) {
+        if constexpr(!std::is_array_v<std::remove_cvref_t<std::invoke_result_t<decltype(Data), Type &>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
                 if(auto *clazz = instance->try_cast<Type>(); clazz) {
                     return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *clazz));
@@ -418,7 +418,7 @@ template<typename Type, typename... Args>
  */
 template<typename Type, typename Policy = as_value_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, Candidate &&candidate, meta_any *const args) {
-    if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<std::remove_const_t<std::remove_reference_t<Candidate>>>) {
+    if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<std::remove_cvref_t<Candidate>>) {
         meta_any placeholder{meta_ctx_arg, ctx};
         return internal::meta_invoke<Type, Policy>(placeholder, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {

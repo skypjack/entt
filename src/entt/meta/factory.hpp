@@ -223,7 +223,7 @@ public:
      */
     template<auto Candidate>
     auto conv() noexcept {
-        using conv_type = std::remove_const_t<std::remove_reference_t<std::invoke_result_t<decltype(Candidate), Type &>>>;
+        using conv_type = std::remove_cvref_t<std::invoke_result_t<decltype(Candidate), Type &>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
         base_type::insert_or_assign(internal::meta_conv_node{type_id<conv_type>().hash(), op});
         return *this;
@@ -240,7 +240,7 @@ public:
      */
     template<typename To>
     meta_factory conv() noexcept {
-        using conv_type = std::remove_const_t<std::remove_reference_t<To>>;
+        using conv_type = std::remove_cvref_t<To>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const Type *>(instance))); };
         base_type::insert_or_assign(internal::meta_conv_node{type_id<conv_type>().hash(), op});
         return *this;
@@ -263,7 +263,7 @@ public:
     meta_factory ctor() noexcept {
         using descriptor = meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
-        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>, Type>, "The function doesn't return an object of the required type");
+        static_assert(std::is_same_v<std::remove_cvref_t<typename descriptor::return_type>, Type>, "The function doesn't return an object of the required type");
         base_type::insert_or_assign(internal::meta_ctor_node{type_id<typename descriptor::args_type>().hash(), descriptor::args_type::size, &meta_arg<typename descriptor::args_type>, &meta_construct<Type, Candidate, Policy>});
         return *this;
     }
@@ -328,8 +328,8 @@ public:
                     /* this is never static */
                     std::is_const_v<std::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
-                    &internal::resolve<std::remove_const_t<std::remove_reference_t<data_type>>>,
-                    &meta_arg<type_list<std::remove_const_t<std::remove_reference_t<data_type>>>>,
+                    &internal::resolve<std::remove_cvref_t<data_type>>,
+                    &meta_arg<type_list<std::remove_cvref_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
         } else {
@@ -347,8 +347,8 @@ public:
                     name,
                     ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
-                    &internal::resolve<std::remove_const_t<std::remove_reference_t<data_type>>>,
-                    &meta_arg<type_list<std::remove_const_t<std::remove_reference_t<data_type>>>>,
+                    &internal::resolve<std::remove_cvref_t<data_type>>,
+                    &meta_arg<type_list<std::remove_cvref_t<data_type>>>,
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
         }
@@ -404,7 +404,7 @@ public:
                     /* this is never static */
                     internal::meta_traits::is_const,
                     0u,
-                    &internal::resolve<std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>,
+                    &internal::resolve<std::remove_cvref_t<typename descriptor::return_type>>,
                     &meta_arg<type_list<>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
@@ -418,7 +418,7 @@ public:
                     /* this is never static nor const */
                     internal::meta_traits::is_none,
                     1u,
-                    &internal::resolve<std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>,
+                    &internal::resolve<std::remove_cvref_t<typename descriptor::return_type>>,
                     &meta_arg<type_list<type_list_element_t<static_cast<std::size_t>(args_type::size != 1u), args_type>>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
@@ -464,7 +464,7 @@ public:
                 name,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
-                &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_const_t<std::remove_reference_t<typename descriptor::return_type>>>>,
+                &internal::resolve<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, std::remove_cvref_t<typename descriptor::return_type>>>,
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 

@@ -68,7 +68,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
-        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
 
         switch(const auto *elem = static_cast<const Type *>(value.data()); req) {
             using enum internal::any_request;
@@ -112,7 +112,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type>
     static void basic_deleter(const basic_any &value) {
-        static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
         ENTT_ASSERT((value.mode == any_policy::dynamic) || ((value.mode == any_policy::embedded) && !std::is_trivially_destructible_v<Type>), "Unexpected policy");
 
         const auto *elem = static_cast<const Type *>(value.data());
@@ -128,7 +128,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
+        using plain_type = std::remove_cvref_t<Type>;
 
         vtable = basic_vtable<plain_type>;
         underlying_type = type_hash<plain_type>::value();
@@ -559,7 +559,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
-    if constexpr(std::is_copy_constructible_v<std::remove_const_t<std::remove_reference_t<Type>>>) {
+    if constexpr(std::is_copy_constructible_v<std::remove_cvref_t<Type>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
         }

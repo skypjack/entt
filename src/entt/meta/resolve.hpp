@@ -20,7 +20,7 @@ namespace entt {
 template<typename Type>
 [[nodiscard]] meta_type resolve(const meta_ctx &ctx) noexcept {
     const auto &context = internal::meta_context::from(ctx);
-    return {ctx, internal::resolve<std::remove_const_t<std::remove_reference_t<Type>>>(context)};
+    return {ctx, internal::resolve<std::remove_cvref_t<Type>>(context)};
 }
 
 /**
