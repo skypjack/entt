@@ -71,34 +71,35 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         static_assert(std::is_same_v<std::remove_const_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
 
         switch(const auto *elem = static_cast<const Type *>(value.data()); req) {
-        case request::info:
+            using enum internal::any_request;
+        case info:
             return &type_id<Type>();
-        case request::transfer:
+        case transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
             }
             [[fallthrough]];
-        case request::assign:
+        case assign:
             if constexpr(std::is_copy_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
                 return other;
             }
             break;
-        case request::compare:
+        case compare:
             if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
                 return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
             } else {
                 return (elem == other) ? other : nullptr;
             }
-        case request::copy:
+        case copy:
             if constexpr(std::is_copy_constructible_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
                 static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
             }
             break;
-        case request::move:
+        case move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
