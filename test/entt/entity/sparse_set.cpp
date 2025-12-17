@@ -181,7 +181,8 @@ TYPED_TEST(SparseSet, FreeList) {
         const entity_type other{2};
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
 
@@ -197,7 +198,7 @@ TYPED_TEST(SparseSet, FreeList) {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
 
@@ -213,7 +214,7 @@ TYPED_TEST(SparseSet, FreeList) {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::to_entity(entt::tombstone));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), 0u);
 
@@ -253,11 +254,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, FreeList) {
         set.push(entity_type{3});
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
-        case entt::deletion_policy::in_place: {
+            using enum entt::deletion_policy;
+        case swap_and_pop:
+        case in_place: {
             ASSERT_DEATH(set.free_list(0u), "");
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_NO_THROW(set.free_list(0u));
             ASSERT_NO_THROW(set.free_list(1u));
             ASSERT_DEATH(set.free_list(2u), "");
@@ -297,7 +299,8 @@ TYPED_TEST(SparseSet, ShrinkToFit) {
         ASSERT_EQ(set.extent(), 0u);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             set.push(entity_type{traits_type::page_size - 1u});
             set.push(entity_type{traits_type::page_size});
 
@@ -338,7 +341,7 @@ TYPED_TEST(SparseSet, ShrinkToFit) {
             ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
             ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             set.push(entity_type{traits_type::page_size - 1u});
             set.push(entity_type{traits_type::page_size});
 
@@ -379,7 +382,7 @@ TYPED_TEST(SparseSet, ShrinkToFit) {
             ASSERT_FALSE(set.contains(entity_type{traits_type::page_size - 1u}));
             ASSERT_FALSE(set.contains(entity_type{traits_type::page_size}));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             set.push(entity_type{traits_type::page_size - 1u});
             set.push(entity_type{traits_type::page_size});
 
@@ -462,11 +465,12 @@ TYPED_TEST(SparseSet, Pagination) {
         set.shrink_to_fit();
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
-        case entt::deletion_policy::in_place: {
+            using enum entt::deletion_policy;
+        case swap_and_pop:
+        case in_place: {
             ASSERT_EQ(set.extent(), 0u);
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.extent(), 2 * traits_type::page_size);
         } break;
         }
@@ -493,15 +497,16 @@ TYPED_TEST(SparseSet, Contiguous) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_only:
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_only:
+        case swap_and_pop: {
             ASSERT_TRUE(set.contiguous());
 
             set.clear();
 
             ASSERT_TRUE(set.contiguous());
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_FALSE(set.contiguous());
 
             set.compact();
@@ -541,7 +546,8 @@ TYPED_TEST(SparseSet, Data) {
         ASSERT_FALSE(set.contains(entity));
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
 
             ASSERT_EQ(set.size(), 1u);
@@ -550,7 +556,7 @@ TYPED_TEST(SparseSet, Data) {
 
             ASSERT_EQ(set.data()[0u], other);
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
 
             ASSERT_EQ(set.size(), 2u);
@@ -560,7 +566,7 @@ TYPED_TEST(SparseSet, Data) {
             ASSERT_EQ(set.data()[0u], static_cast<entity_type>(entt::tombstone));
             ASSERT_EQ(set.data()[1u], other);
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_TRUE(set.contains(traits_type::next(entity)));
 
             ASSERT_EQ(set.size(), 2u);
@@ -771,12 +777,13 @@ TYPED_TEST(SparseSet, FindErased) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
-        case entt::deletion_policy::in_place: {
+            using enum entt::deletion_policy;
+        case swap_and_pop:
+        case in_place: {
             ASSERT_EQ(set.find(entity), set.cend());
             ASSERT_EQ(set.find(traits_type::next(entity)), set.cend());
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.find(entity), set.cend());
             ASSERT_NE(set.find(traits_type::next(entity)), set.cend());
         } break;
@@ -860,17 +867,18 @@ TYPED_TEST(SparseSet, ContainsErased) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_FALSE(set.contains(entity));
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_FALSE(set.contains(entity));
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_FALSE(set.contains(entity));
             ASSERT_TRUE(set.contains(traits_type::next(entity)));
@@ -921,15 +929,16 @@ TYPED_TEST(SparseSet, CurrentErased) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.current(entity), traits_type::to_version(entt::tombstone));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.current(entity), traits_type::to_version(traits_type::next(entity)));
         } break;
@@ -957,17 +966,18 @@ TYPED_TEST(SparseSet, Index) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
             ASSERT_EQ(set.index(other), 0u);
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_FALSE(set.contains(traits_type::next(entity)));
             ASSERT_EQ(set.index(other), 1u);
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_TRUE(set.contains(traits_type::next(entity)));
             ASSERT_EQ(set.index(traits_type::next(entity)), 1u);
@@ -986,11 +996,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Index) {
 
         // index works the same in all cases, test only once
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
+            using enum entt::deletion_policy;
+        case swap_and_pop:
             ASSERT_DEATH([[maybe_unused]] const auto pos = set.index(entity_type{1}), "");
             break;
-        case entt::deletion_policy::in_place:
-        case entt::deletion_policy::swap_only:
+        case in_place:
+        case swap_only:
             SUCCEED();
             break;
         }
@@ -1022,11 +1033,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Indexing) {
 
         // operator[] works the same in all cases, test only once
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
+            using enum entt::deletion_policy;
+        case swap_and_pop:
             ASSERT_DEATH([[maybe_unused]] auto value = set[0u], "");
             break;
-        case entt::deletion_policy::in_place:
-        case entt::deletion_policy::swap_only:
+        case in_place:
+        case swap_only:
             SUCCEED();
             break;
         }
@@ -1058,11 +1070,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Value) {
 
         // value works the same in all cases, test only once
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
+            using enum entt::deletion_policy;
+        case swap_and_pop:
             ASSERT_DEATH([[maybe_unused]] auto *value = set.value(entity_type{3}), "");
             break;
-        case entt::deletion_policy::in_place:
-        case entt::deletion_policy::swap_only:
+        case in_place:
+        case swap_only:
             SUCCEED();
             break;
         }
@@ -1079,7 +1092,8 @@ TYPED_TEST(SparseSet, Push) {
         const std::array entity{entity_type{1}, entity_type{3}};
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(*set.push(entity[0u]), entity[0u]);
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
@@ -1117,7 +1131,7 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.push(entity.begin(), entity.begin()), set.end());
             ASSERT_EQ(set.size(), 0u);
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(*set.push(entity[0u]), entity[0u]);
             ASSERT_EQ(*set.push(entity[1u]), entity[1u]);
@@ -1156,7 +1170,7 @@ TYPED_TEST(SparseSet, Push) {
             ASSERT_EQ(set.push(entity.begin(), entity.begin()), set.end());
             ASSERT_EQ(set.size(), 0u);
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), 0u);
             ASSERT_EQ(*set.push(entity[0u]), entity[0u]);
@@ -1279,13 +1293,14 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Bump) {
 
         // bump works the same in all cases, test only once
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
+            using enum entt::deletion_policy;
+        case swap_and_pop:
             ASSERT_DEATH(set.bump(entt::null), "");
             ASSERT_DEATH(set.bump(entt::tombstone), "");
             ASSERT_DEATH(set.bump(entity_type{3}), "");
             break;
-        case entt::deletion_policy::in_place:
-        case entt::deletion_policy::swap_only:
+        case in_place:
+        case swap_only:
             SUCCEED();
             break;
         }
@@ -1303,7 +1318,8 @@ TYPED_TEST(SparseSet, Erase) {
         const std::array entity{entity_type{1}, entity_type{3}, traits_type::construct(2, 4)};
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
 
@@ -1326,7 +1342,7 @@ TYPED_TEST(SparseSet, Erase) {
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
             ASSERT_FALSE(set.contains(entity[2u]));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
 
@@ -1357,7 +1373,7 @@ TYPED_TEST(SparseSet, Erase) {
             ASSERT_EQ(set.free_list(), 4u);
             ASSERT_FALSE(set.contains(entity[2u]));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), 0u);
 
@@ -1439,7 +1455,8 @@ TYPED_TEST(SparseSet, Remove) {
         const std::array entity{entity_type{1}, entity_type{3}, traits_type::construct(2, 4)};
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
 
@@ -1471,7 +1488,7 @@ TYPED_TEST(SparseSet, Remove) {
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
             ASSERT_FALSE(set.contains(entity[2u]));
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), traits_type::entity_mask);
 
@@ -1511,7 +1528,7 @@ TYPED_TEST(SparseSet, Remove) {
             ASSERT_EQ(set.free_list(), 4u);
             ASSERT_FALSE(set.contains(entity[2u]));
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 0u);
             ASSERT_EQ(set.free_list(), 0u);
 
@@ -1595,7 +1612,8 @@ TYPED_TEST(SparseSet, Compact) {
         set.push(other);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_EQ(set.index(entity), 0u);
             ASSERT_EQ(set.index(other), 1u);
@@ -1616,7 +1634,7 @@ TYPED_TEST(SparseSet, Compact) {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.index(other), 0u);
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_EQ(set.index(entity), 0u);
             ASSERT_EQ(set.index(other), 1u);
@@ -1653,7 +1671,7 @@ TYPED_TEST(SparseSet, Compact) {
             ASSERT_EQ(set.size(), 1u);
             ASSERT_EQ(set.index(other), 0u);
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_EQ(set.index(entity), 0u);
             ASSERT_EQ(set.index(other), 1u);
@@ -1717,11 +1735,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SwapElements) {
 
         // swap_elements works the same in all cases, test only once
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
-        case entt::deletion_policy::in_place:
+            using enum entt::deletion_policy;
+        case swap_and_pop:
+        case in_place:
             SUCCEED();
             break;
-        case entt::deletion_policy::swap_only:
+        case swap_only:
             ASSERT_DEATH(set.swap_elements(entity, other), "");
 
             set.push(entity);
@@ -1822,11 +1841,12 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, Sort) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop:
-        case entt::deletion_policy::swap_only: {
+            using enum entt::deletion_policy;
+        case swap_and_pop:
+        case swap_only: {
             SUCCEED();
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_DEATH(set.sort(std::less{}), "");
         } break;
         }
@@ -1885,14 +1905,15 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortN) {
         set.erase(entity);
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             SUCCEED();
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_DEATH(set.sort_n(1u, std::less{}), "");
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             ASSERT_EQ(set.size(), 2u);
             ASSERT_NO_THROW(set.sort_n(1u, std::less{}));
             ASSERT_DEATH(set.sort_n(2u, std::less{}), "");
@@ -2089,10 +2110,11 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
         sparse_set_type rhs{policy};
 
         switch(policy) {
-        case entt::deletion_policy::swap_and_pop: {
+            using enum entt::deletion_policy;
+        case swap_and_pop: {
             SUCCEED();
         } break;
-        case entt::deletion_policy::in_place: {
+        case in_place: {
             const entity_type entity{4};
 
             lhs.push(entity);
@@ -2100,7 +2122,7 @@ ENTT_DEBUG_TYPED_TEST(SparseSetDeathTest, SortAs) {
 
             ASSERT_DEATH(lhs.sort_as(rhs.begin(), rhs.end()), "");
         } break;
-        case entt::deletion_policy::swap_only: {
+        case swap_only: {
             const std::array entity{entity_type{1}, entity_type{4}, entity_type{2}};
 
             lhs.push(entity.begin(), entity.end());
