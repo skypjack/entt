@@ -194,11 +194,11 @@ a solution in this case:
 ```cpp
 template<>
 struct entt::type_hash<Type> final {
-    [[nodiscard]] static constexpr id_type value() noexcept {
+    [[nodiscard]] static consteval id_type value() noexcept {
         return hashed_string::value("Type");
     }
 
-    [[nodiscard]] constexpr operator id_type() const noexcept {
+    [[nodiscard]] consteval operator id_type() const noexcept {
         return value();
     }
 };
