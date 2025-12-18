@@ -211,8 +211,7 @@ struct null_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
-        return value;
+        return traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
     }
 
     /**
@@ -220,7 +219,7 @@ struct null_t {
      * @param other A null object.
      * @return True in all cases.
      */
-    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const null_t other) const noexcept {
+    [[nodiscard]] consteval bool operator==([[maybe_unused]] const null_t other) const noexcept {
         return true;
     }
 
@@ -229,7 +228,7 @@ struct null_t {
      * @param other A null object.
      * @return False in all cases.
      */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const null_t other) const noexcept {
+    [[nodiscard]] consteval bool operator!=([[maybe_unused]] const null_t other) const noexcept {
         return false;
     }
 
@@ -291,8 +290,7 @@ struct tombstone_t {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
-        constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
-        return value;
+        return traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
     }
 
     /**
@@ -300,7 +298,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return True in all cases.
      */
-    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
+    [[nodiscard]] consteval bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
         return true;
     }
 
@@ -309,7 +307,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return False in all cases.
      */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
+    [[nodiscard]] consteval bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
         return false;
     }
 
