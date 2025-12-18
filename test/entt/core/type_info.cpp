@@ -7,7 +7,7 @@
 
 template<>
 struct entt::type_name<float> final {
-    [[nodiscard]] static consteval std::string_view value() noexcept {
+    [[nodiscard]] static ENTT_CONSTEVAL std::string_view value() noexcept {
         return std::string_view{""};
     }
 };

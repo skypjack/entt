@@ -42,7 +42,7 @@ template<typename Type>
 }
 
 template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
-[[nodiscard]] consteval std::string_view type_name(int) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL std::string_view type_name(int) noexcept {
     constexpr auto value = stripped_type_name<Type>();
     return value;
 }
@@ -54,7 +54,7 @@ template<typename Type>
 }
 
 template<typename Type, auto = stripped_type_name<Type>().find_first_of('.')>
-[[nodiscard]] consteval id_type type_hash(int) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL id_type type_hash(int) noexcept {
     constexpr auto stripped = stripped_type_name<Type>();
     constexpr auto value = hashed_string::value(stripped.data(), stripped.size());
     return value;

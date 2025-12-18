@@ -124,19 +124,19 @@ struct meta_function_descriptor<Type, Ret (*)()>
 template<typename Type, typename Candidate>
 class meta_function_helper {
     template<typename Ret, typename... Args, typename Class>
-    static consteval meta_function_descriptor<Type, Ret (Class::*)(Args...) const> get_rid_of_noexcept(Ret (Class::*)(Args...) const);
+    static meta_function_descriptor<Type, Ret (Class::*)(Args...) const> get_rid_of_noexcept(Ret (Class::*)(Args...) const);
 
     template<typename Ret, typename... Args, typename Class>
-    static consteval meta_function_descriptor<Type, Ret (Class::*)(Args...)> get_rid_of_noexcept(Ret (Class::*)(Args...));
+    static meta_function_descriptor<Type, Ret (Class::*)(Args...)> get_rid_of_noexcept(Ret (Class::*)(Args...));
 
     template<typename Ret, typename Class, typename = std::enable_if_t<std::is_member_object_pointer_v<Ret Class::*>>>
-    static consteval meta_function_descriptor<Type, Ret Class::*> get_rid_of_noexcept(Ret Class::*);
+    static meta_function_descriptor<Type, Ret Class::*> get_rid_of_noexcept(Ret Class::*);
 
     template<typename Ret, typename... Args>
-    static consteval meta_function_descriptor<Type, Ret (*)(Args...)> get_rid_of_noexcept(Ret (*)(Args...));
+    static meta_function_descriptor<Type, Ret (*)(Args...)> get_rid_of_noexcept(Ret (*)(Args...));
 
     template<typename Class>
-    static consteval meta_function_descriptor<Class, decltype(&Class::operator())> get_rid_of_noexcept(Class);
+    static meta_function_descriptor<Class, decltype(&Class::operator())> get_rid_of_noexcept(Class);
 
 public:
     /*! @brief The meta function descriptor of the given function. */
