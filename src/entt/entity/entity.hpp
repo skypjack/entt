@@ -219,7 +219,7 @@ struct null_t {
      * @param other A null object.
      * @return True in all cases.
      */
-    [[nodiscard]] consteval bool operator==([[maybe_unused]] const null_t other) const noexcept {
+    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const null_t other) const noexcept {
         return true;
     }
 
@@ -228,7 +228,7 @@ struct null_t {
      * @param other A null object.
      * @return False in all cases.
      */
-    [[nodiscard]] consteval bool operator!=([[maybe_unused]] const null_t other) const noexcept {
+    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const null_t other) const noexcept {
         return false;
     }
 
@@ -298,7 +298,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return True in all cases.
      */
-    [[nodiscard]] consteval bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
+    [[nodiscard]] constexpr bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
         return true;
     }
 
@@ -307,7 +307,7 @@ struct tombstone_t {
      * @param other A tombstone object.
      * @return False in all cases.
      */
-    [[nodiscard]] consteval bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
+    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
         return false;
     }
 
