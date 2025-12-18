@@ -12,7 +12,7 @@
 #define ASSIGN_TYPE_ID(clazz) \
     template<> \
     struct entt::type_hash<clazz> { \
-        static constexpr entt::id_type value() noexcept { \
+        static consteval entt::id_type value() noexcept { \
             return entt::basic_hashed_string<std::remove_const_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}; \
         } \
     }
