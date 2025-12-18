@@ -611,7 +611,7 @@ public:
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
             return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
-                return std::tuple_cat(storage<Idx>()->get_as_tuple(entt)...);
+                return std::tuple_cat(this->storage<Idx>()->get_as_tuple(entt)...);
             }(std::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
