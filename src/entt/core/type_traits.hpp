@@ -186,7 +186,7 @@ inline constexpr std::size_t type_list_index_v = type_list_index<Type, List>::va
  * @return A type list composed by the types of both the type lists.
  */
 template<typename... Type, typename... Other>
-constexpr type_list<Type..., Other...> operator+(type_list<Type...>, type_list<Other...>) {
+consteval type_list<Type..., Other...> operator+(type_list<Type...>, type_list<Other...>) {
     return {};
 }
 
@@ -451,7 +451,7 @@ inline constexpr std::size_t value_list_index_v = value_list_index<Value, List>:
  * @return A value list composed by the values of both the value lists.
  */
 template<auto... Value, auto... Other>
-constexpr value_list<Value..., Other...> operator+(value_list<Value...>, value_list<Other...>) {
+consteval value_list<Value..., Other...> operator+(value_list<Value...>, value_list<Other...>) {
     return {};
 }
 
@@ -731,25 +731,25 @@ template<typename Type>
 struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
 
 template<typename>
-[[nodiscard]] constexpr bool dispatch_is_equality_comparable();
+[[nodiscard]] consteval bool dispatch_is_equality_comparable();
 
 template<typename Type, std::size_t... Index>
-[[nodiscard]] constexpr bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
+[[nodiscard]] consteval bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
     return (dispatch_is_equality_comparable<std::tuple_element_t<Index, Type>>() && ...);
 }
 
 template<typename>
-[[nodiscard]] constexpr bool maybe_equality_comparable(char) {
+[[nodiscard]] consteval bool maybe_equality_comparable(char) {
     return false;
 }
 
 template<typename Type>
-[[nodiscard]] constexpr auto maybe_equality_comparable(int) -> decltype(std::declval<Type>() == std::declval<Type>()) {
+[[nodiscard]] consteval auto maybe_equality_comparable(int) -> decltype(std::declval<Type>() == std::declval<Type>()) {
     return true;
 }
 
 template<typename Type>
-[[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
+[[nodiscard]] consteval bool dispatch_is_equality_comparable() {
     // NOLINTBEGIN(modernize-use-transparent-functors)
     if constexpr(std::is_array_v<Type>) {
         return false;
@@ -856,19 +856,19 @@ using member_class_t = member_class<Member>::type;
 template<std::size_t Index, typename Candidate>
 class nth_argument {
     template<typename Ret, typename... Args>
-    static constexpr type_list<Args...> pick_up(Ret (*)(Args...));
+    static consteval type_list<Args...> pick_up(Ret (*)(Args...));
 
     template<typename Ret, typename Class, typename... Args>
-    static constexpr type_list<Args...> pick_up(Ret (Class ::*)(Args...));
+    static consteval type_list<Args...> pick_up(Ret (Class ::*)(Args...));
 
     template<typename Ret, typename Class, typename... Args>
-    static constexpr type_list<Args...> pick_up(Ret (Class ::*)(Args...) const);
+    static consteval type_list<Args...> pick_up(Ret (Class ::*)(Args...) const);
 
     template<typename Type, typename Class>
-    static constexpr type_list<Type> pick_up(Type Class ::*);
+    static consteval type_list<Type> pick_up(Type Class ::*);
 
     template<typename Type>
-    static constexpr decltype(pick_up(&Type::operator())) pick_up(Type &&);
+    static consteval decltype(pick_up(&Type::operator())) pick_up(Type &&);
 
 public:
     /*! @brief N-th argument of the _callable_ type. */
