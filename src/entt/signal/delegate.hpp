@@ -16,25 +16,25 @@ namespace entt {
 namespace internal {
 
 template<typename Ret, typename... Args>
-constexpr auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
+consteval auto function_pointer(Ret (*)(Args...)) -> Ret (*)(Args...);
 
 template<typename Ret, typename Type, typename... Args, typename Other>
-constexpr auto function_pointer(Ret (*)(Type, Args...), Other &&) -> Ret (*)(Args...);
+consteval auto function_pointer(Ret (*)(Type, Args...), Other &&) -> Ret (*)(Args...);
 
 template<typename Class, typename Ret, typename... Args, typename... Other>
-constexpr auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)(Args...);
+consteval auto function_pointer(Ret (Class::*)(Args...), Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Ret, typename... Args, typename... Other>
-constexpr auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
+consteval auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Type, typename... Other, typename = std::enable_if_t<std::is_member_object_pointer_v<Type Class::*>>>
-constexpr auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
+consteval auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
 using function_pointer_t = decltype(function_pointer(std::declval<Type>()...));
 
 template<typename... Class, typename Ret, typename... Args>
-[[nodiscard]] constexpr auto index_sequence_for(Ret (*)(Args...)) {
+[[nodiscard]] consteval auto index_sequence_for(Ret (*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
 
