@@ -68,7 +68,7 @@ class poly_vtable {
         -> decltype(std::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
-    [[nodiscard]] static constexpr auto make_vtable(type_list<Func...>) noexcept {
+    [[nodiscard]] static consteval auto make_vtable(type_list<Func...>) noexcept {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
         } else if constexpr((std::is_function_v<Func> && ...)) {
