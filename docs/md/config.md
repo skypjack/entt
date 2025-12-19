@@ -4,7 +4,7 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
-  * [ENTT_NOEXCEPTION](#entt_noexception)
+  * [ENTT_NO_EXCEPTION](#entt_no_exception)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_SPARSE_PAGE](#entt_sparse_page)
@@ -33,7 +33,7 @@ Each parameter can result in internal library definitions. It is not recommended
 to try to also modify these definitions, since there is no guarantee that they
 will remain stable over time unlike the options below.
 
-## ENTT_NOEXCEPTION
+## ENTT_NO_EXCEPTION
 
 Define this variable without assigning any value to it to turn off exception
 handling in `EnTT`.<br/>

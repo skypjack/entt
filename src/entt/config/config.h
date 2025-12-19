@@ -5,7 +5,7 @@
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
-#if defined(__cpp_exceptions) && !defined(ENTT_NOEXCEPTION)
+#if defined(__cpp_exceptions) && !defined(ENTT_NO_EXCEPTION)
 #    define ENTT_THROW throw
 #    define ENTT_TRY try
 #    define ENTT_CATCH catch(...)
