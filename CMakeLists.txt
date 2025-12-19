@@ -194,6 +194,7 @@ if(ENTT_INCLUDE_HEADERS)
         signal/emitter.hpp
         signal/fwd.hpp
         signal/sigh.hpp
+        stl/memory.hpp
         tools/davey.hpp
         entt.hpp
         fwd.hpp

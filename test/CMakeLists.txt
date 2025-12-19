@@ -301,3 +301,7 @@ SETUP_BASIC_TEST(delegate entt/signal/delegate.cpp)
 SETUP_BASIC_TEST(dispatcher entt/signal/dispatcher.cpp)
 SETUP_BASIC_TEST(emitter entt/signal/emitter.cpp)
 SETUP_BASIC_TEST(sigh entt/signal/sigh.cpp)
+
+# Test stl
+
+SETUP_BASIC_TEST(stl_memory entt/stl/memory.cpp)

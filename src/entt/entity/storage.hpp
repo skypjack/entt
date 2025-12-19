@@ -13,6 +13,7 @@
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
+#include "../stl/memory.hpp"
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -265,7 +266,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         const auto it = base_type::try_emplace(entt, force_back);
 
         ENTT_TRY {
-            auto *elem = to_address(assure_at_least(static_cast<size_type>(it.index())));
+            auto *elem = stl::to_address(assure_at_least(static_cast<size_type>(it.index())));
             entt::uninitialized_construct_using_allocator(elem, get_allocator(), std::forward<Args>(args)...);
         }
         ENTT_CATCH {
@@ -306,7 +307,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     void move_to(const std::size_t lhs, const std::size_t rhs) {
         auto &elem = element_at(lhs);
         allocator_type allocator{get_allocator()};
-        entt::uninitialized_construct_using_allocator(to_address(assure_at_least(rhs)), allocator, std::move(elem));
+        entt::uninitialized_construct_using_allocator(stl::to_address(assure_at_least(rhs)), allocator, std::move(elem));
         alloc_traits::destroy(allocator, std::addressof(elem));
     }
 
