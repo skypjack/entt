@@ -20,7 +20,7 @@ using std::to_address;
 #ifndef ENTT_HAS_TO_ADDRESS
 #    include <type_traits>
 #    include <utility>
-#
+
 template<typename Type>
 [[nodiscard]] constexpr auto to_address(Type &&ptr) noexcept {
     if constexpr(std::is_pointer_v<std::decay_t<Type>>) {
