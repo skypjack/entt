@@ -35,3 +35,4 @@ TODO:
 * refine tests: add prefixes (i.e. signal_delegate) or scope into their dirs
 * introduce a way to inject stl from outside too
 * doc: internal stl stuff
+* doc: config.md is outdated
