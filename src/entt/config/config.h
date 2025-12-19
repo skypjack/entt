@@ -5,6 +5,10 @@
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
+#ifdef ENTT_USE_STL
+#    define ENTT_FORCE_STL
+#endif
+
 #if defined(__cpp_exceptions) && !defined(ENTT_NO_EXCEPTION)
 #    define ENTT_THROW throw
 #    define ENTT_TRY try
