@@ -4,6 +4,7 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
+  * [ENTT_USE_STL](#entt_use_stl) 
   * [ENTT_NO_EXCEPTION](#entt_no_exception)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
@@ -13,6 +14,7 @@
     * [ENTT_ASSERT_CONSTEXPR](#entt_assert_constexpr)
     * [ENTT_DISABLE_ASSERT](#entt_disable_assert)
   * [ENTT_NO_ETO](#entt_no_eto)
+  * [ENTT_NO_MIXIN](#entt_no_mixin)
   * [ENTT_STANDARD_CPP](#entt_standard_cpp)
 
 # Introduction
@@ -32,6 +34,13 @@ within the compilation units, if preferred).<br/>
 Each parameter can result in internal library definitions. It is not recommended
 to try to also modify these definitions, since there is no guarantee that they
 will remain stable over time unlike the options below.
+
+## ENTT_USE_STL
+
+Intended for testing purposes, it forces the use of built-in replacements of
+some parts of the standard library that aren't always available otherwise.<br/>
+`EnTT` _detects_ these cases on its own, and users should never define this
+variable explicitly. However, it's still possible if desired.
 
 ## ENTT_NO_EXCEPTION
 
@@ -105,6 +114,13 @@ In order to reduce memory consumption and increase performance, empty types are
 never instantiated nor stored by the ECS module of `EnTT`.<br/>
 Use this variable to treat these types like all others and therefore to create a
 dedicated storage for them.
+
+## ENTT_NO_MIXIN
+
+`EnTT` automatically assigns mixins to all storage types to support signaling
+when creating, destroying, and modifying elements.<br/>
+Mixins can have a (most likely negligible) cost in terms of performance and
+compilation time. If unwanted, this macro suppresses automatic generation.
 
 ## ENTT_STANDARD_CPP
 
