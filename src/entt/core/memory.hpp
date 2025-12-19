@@ -11,6 +11,21 @@
 namespace entt {
 
 /**
+ * @brief Unwraps fancy pointers, does nothing otherwise (waiting for C++20).
+ * @tparam Type Pointer type.
+ * @param ptr Fancy or raw pointer.
+ * @return A raw pointer that represents the address of the original pointer.
+ */
+template<typename Type>
+[[nodiscard]] constexpr auto to_address(Type &&ptr) noexcept {
+    if constexpr(std::is_pointer_v<std::decay_t<Type>>) {
+        return ptr;
+    } else {
+        return to_address(std::forward<Type>(ptr).operator->());
+    }
+}
+
+/**
  * @brief Utility function to design allocation-aware containers.
  * @tparam Allocator Type of allocator.
  * @param lhs A valid allocator.
@@ -76,7 +91,7 @@ struct allocation_deleter: private Allocator {
      */
     constexpr void operator()(pointer ptr) noexcept(std::is_nothrow_destructible_v<typename allocator_type::value_type>) {
         using alloc_traits = std::allocator_traits<Allocator>;
-        alloc_traits::destroy(*this, std::to_address(ptr));
+        alloc_traits::destroy(*this, to_address(ptr));
         alloc_traits::deallocate(*this, ptr, 1u);
     }
 };
@@ -101,7 +116,7 @@ constexpr auto allocate_unique(Allocator &allocator, Args &&...args) {
     auto ptr = alloc_traits::allocate(alloc, 1u);
 
     ENTT_TRY {
-        alloc_traits::construct(alloc, std::to_address(ptr), std::forward<Args>(args)...);
+        alloc_traits::construct(alloc, to_address(ptr), std::forward<Args>(args)...);
     }
     ENTT_CATCH {
         alloc_traits::deallocate(alloc, ptr, 1u);

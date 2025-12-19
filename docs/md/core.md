@@ -445,9 +445,9 @@ Some are geared towards simplifying the implementation of (internal or external)
 allocator aware containers. Others are designed to help the developer with
 everyday problems.
 
-The former are very specific and for niche problems. For example, there are
-tools designed to help forget the meaning of acronyms like _POCCA_, _POCMA_ or
-_POCS_.<br/>
+The former are very specific and for niche problems. These are tools designed to
+unwrap fancy or plain pointers (`to_address`) or to help forget the meaning of
+acronyms like _POCCA_, _POCMA_ or _POCS_.<br/>
 I will not describe them here in detail. Instead, I recommend reading the inline
 documentation to those interested in the subject.
 
