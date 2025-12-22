@@ -5,7 +5,7 @@
 #include <entt/core/iterator.hpp>
 #include "../../common/boxed_type.h"
 
-TEST(InputIteratorPointer, Functionalities) {
+TEST(Iterator, InputIteratorPointer) {
     entt::input_iterator_pointer ptr{test::boxed_int{0}};
 
     ASSERT_EQ(ptr->value, 0);
@@ -17,7 +17,7 @@ TEST(InputIteratorPointer, Functionalities) {
     ASSERT_EQ(ptr.operator->(), &ptr.operator*());
 }
 
-TEST(IotaIterator, Functionalities) {
+TEST(Iterator, IotaIterator) {
     entt::iota_iterator<std::size_t> first{};
     const entt::iota_iterator<std::size_t> last{2u};
 
@@ -31,7 +31,7 @@ TEST(IotaIterator, Functionalities) {
     ASSERT_EQ(*first, 2u);
 }
 
-TEST(IterableAdaptor, Functionalities) {
+TEST(Iterator, IterableAdaptor) {
     std::vector<int> vec{1, 2};
     entt::iterable_adaptor iterable{vec.begin(), vec.end()};
     decltype(iterable) other{};

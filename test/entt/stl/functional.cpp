@@ -3,7 +3,7 @@
 #include <entt/core/type_traits.hpp>
 #include <entt/stl/functional.hpp>
 
-TEST(Identity, Functionalities) {
+TEST(Functional, Identity) {
     const entt::stl::identity identity;
     int value = 2;
 

@@ -27,7 +27,7 @@ TEST(Ident, Uniqueness) {
     }
 }
 
-TEST(Identifier, SingleType) {
+TEST(Ident, SingleType) {
     using id = entt::ident<test::empty>;
     [[maybe_unused]] const std::integral_constant<id::value_type, id::value<test::empty>> ic;
 }

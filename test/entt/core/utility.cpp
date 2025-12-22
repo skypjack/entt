@@ -10,7 +10,7 @@ struct functions {
     void bar() {}
 };
 
-TEST(Overload, Functionalities) {
+TEST(Utility, Overload) {
     ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void (*)(int)>(&functions::foo));
     ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void (*)()>(&functions::foo));
 
@@ -27,7 +27,7 @@ TEST(Overload, Functionalities) {
     ASSERT_NO_THROW((instance.*entt::overload<void()>(&functions::bar))());
 }
 
-TEST(Overloaded, Functionalities) {
+TEST(Utility, Overloaded) {
     int iv = 0;
     char cv = '\0';
 
@@ -42,7 +42,7 @@ TEST(Overloaded, Functionalities) {
     ASSERT_EQ(cv, 'c');
 }
 
-TEST(YCombinator, Functionalities) {
+TEST(Utility, YCombinator) {
     entt::y_combinator gauss([](const auto &self, auto value) -> unsigned int {
         return value ? (value + self(value - 1u)) : 0;
     });

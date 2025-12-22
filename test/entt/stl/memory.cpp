@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/stl/memory.hpp>
 
-TEST(ToAddress, Functionalities) {
+TEST(Memory, ToAddress) {
     const std::shared_ptr<int> shared = std::make_shared<int>();
     auto *plain = &*shared;
 

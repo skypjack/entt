@@ -14,7 +14,7 @@ struct BasicHashedString: ::testing::Test {
 using HashedString = BasicHashedString;
 using HashedWString = BasicHashedString;
 
-TEST_F(BasicHashedString, DeductionGuide) {
+TEST_F(HashedString, DeductionGuide) {
     testing::StaticAssertTypeEq<decltype(entt::basic_hashed_string{"foo"}), entt::hashed_string>();
     testing::StaticAssertTypeEq<decltype(entt::basic_hashed_string{L"foo"}), entt::hashed_wstring>();
 }
@@ -121,6 +121,11 @@ TEST_F(HashedString, Constexprness) {
 
     ASSERT_GT(entt::hashed_string{"foo"}, "bar"_hs);
     ASSERT_GE(entt::hashed_string{"foo"}, "foo"_hs);
+}
+
+TEST_F(HashedWString, DeductionGuide) {
+    testing::StaticAssertTypeEq<decltype(entt::basic_hashed_string{"foo"}), entt::hashed_string>();
+    testing::StaticAssertTypeEq<decltype(entt::basic_hashed_string{L"foo"}), entt::hashed_wstring>();
 }
 
 TEST_F(HashedWString, Functionalities) {

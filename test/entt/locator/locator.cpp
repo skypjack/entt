@@ -20,22 +20,22 @@ private:
     int value;
 };
 
-struct ServiceLocator: ::testing::Test {
+struct Locator: ::testing::Test {
     void SetUp() override {
         entt::locator<base_service>::reset();
     }
 };
 
-using ServiceLocatorDeathTest = ServiceLocator;
+using LocatorDeathTest = Locator;
 
-TEST_F(ServiceLocator, ValueAndTheLike) {
+TEST_F(Locator, ValueAndTheLike) {
     ASSERT_FALSE(entt::locator<base_service>::has_value());
     ASSERT_EQ(entt::locator<base_service>::value_or<derived_service>(1).invoke(3), 4);
     ASSERT_TRUE(entt::locator<base_service>::has_value());
     ASSERT_EQ(entt::locator<base_service>::value().invoke(9), 10);
 }
 
-TEST_F(ServiceLocator, Emplace) {
+TEST_F(Locator, Emplace) {
     ASSERT_FALSE(entt::locator<base_service>::has_value());
     ASSERT_EQ(entt::locator<base_service>::emplace<derived_service>(5).invoke(1), 6);
     ASSERT_TRUE(entt::locator<base_service>::has_value());
@@ -49,7 +49,7 @@ TEST_F(ServiceLocator, Emplace) {
     ASSERT_EQ(entt::locator<base_service>::value().invoke(3), 8);
 }
 
-TEST_F(ServiceLocator, ResetHandle) {
+TEST_F(Locator, ResetHandle) {
     entt::locator<base_service>::emplace<derived_service>(1);
     auto handle = entt::locator<base_service>::handle();
 
@@ -66,7 +66,7 @@ TEST_F(ServiceLocator, ResetHandle) {
     ASSERT_EQ(entt::locator<base_service>::value().invoke(3), 4);
 }
 
-TEST_F(ServiceLocator, ElementWithDeleter) {
+TEST_F(Locator, ElementWithDeleter) {
     derived_service service{1};
     entt::locator<base_service>::reset(&service, [&service](base_service *serv) {
         ASSERT_EQ(serv, &service);
@@ -81,7 +81,7 @@ TEST_F(ServiceLocator, ElementWithDeleter) {
     ASSERT_EQ(service.invoke(1), 3);
 }
 
-ENTT_DEBUG_TEST_F(ServiceLocatorDeathTest, UninitializedValue) {
+ENTT_DEBUG_TEST_F(LocatorDeathTest, UninitializedValue) {
     ASSERT_EQ(entt::locator<base_service>::value_or<derived_service>(1).invoke(1), 2);
 
     entt::locator<base_service>::reset();
