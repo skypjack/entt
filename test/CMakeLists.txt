@@ -304,4 +304,5 @@ SETUP_BASIC_TEST(sigh entt/signal/sigh.cpp)
 
 # Test stl
 
+SETUP_BASIC_TEST(stl_functional entt/stl/functional.cpp ENTT_USE_STL)
 SETUP_BASIC_TEST(stl_memory entt/stl/memory.cpp ENTT_USE_STL)
