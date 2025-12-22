@@ -6,7 +6,7 @@
 #include "../../../common/boxed_type.h"
 #include "userdata.h"
 
-TEST(Lib, Locator) {
+TEST(Locator, Plugin) {
     entt::locator<test::boxed_int>::emplace().value = 4;
 
     ASSERT_EQ(entt::locator<test::boxed_int>::value().value, 4);

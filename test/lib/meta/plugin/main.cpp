@@ -9,7 +9,7 @@
 #include <entt/meta/resolve.hpp>
 #include "userdata.h"
 
-TEST(Lib, Meta) {
+TEST(Meta, Plugin) {
     using namespace entt::literals;
 
     ASSERT_FALSE(entt::resolve("boxed_int"_hs));

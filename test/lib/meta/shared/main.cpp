@@ -9,7 +9,7 @@
 #include "../../../common/empty.h"
 #include "lib.h"
 
-TEST(Lib, Meta) {
+TEST(Meta, Shared) {
     using namespace entt::literals;
 
     ASSERT_FALSE(entt::resolve("boxed_int"_hs));

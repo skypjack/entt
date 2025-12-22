@@ -3,7 +3,7 @@
 #include "../types.h"
 #include "lib.h"
 
-TEST(Lib, View) {
+TEST(View, Shared) {
     view_type view{};
     const void *storage = filter(view);
 

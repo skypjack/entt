@@ -8,7 +8,7 @@
 #include "../../../common/empty.h"
 #include "lib.h"
 
-TEST(Lib, Registry) {
+TEST(Registry, Shared) {
     constexpr auto count = 3;
     entt::registry registry;
 

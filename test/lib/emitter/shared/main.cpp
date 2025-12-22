@@ -5,7 +5,7 @@
 #include "../../../common/emitter.h"
 #include "lib.h"
 
-TEST(Lib, Emitter) {
+TEST(Emitter, Shared) {
     test::emitter emitter;
     int value{};
 

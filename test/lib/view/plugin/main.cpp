@@ -4,7 +4,7 @@
 #include <cr.h>
 #include "../types.h"
 
-TEST(Lib, View) {
+TEST(View, Plugin) {
     view_type view{};
 
     cr_plugin ctx;

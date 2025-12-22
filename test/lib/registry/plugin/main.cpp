@@ -9,7 +9,7 @@
 #include "../../../common/boxed_type.h"
 #include "../../../common/empty.h"
 
-TEST(Lib, Registry) {
+TEST(Registry, Plugin) {
     constexpr auto count = 3;
     entt::registry registry;
 

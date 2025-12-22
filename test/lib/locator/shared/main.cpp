@@ -4,7 +4,7 @@
 #include "../../../common/boxed_type.h"
 #include "lib.h"
 
-TEST(Lib, Locator) {
+TEST(Locator, Shared) {
     entt::locator<test::boxed_int>::emplace().value = 4;
 
     ASSERT_EQ(entt::locator<test::boxed_int>::value().value, 4);

@@ -6,7 +6,7 @@
 #include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
 
-TEST(Lib, Emitter) {
+TEST(Emitter, Plugin) {
     test::emitter emitter;
     int value{};
 

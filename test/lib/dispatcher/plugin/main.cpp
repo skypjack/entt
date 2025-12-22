@@ -7,7 +7,7 @@
 #include "../../../common/boxed_type.h"
 #include "../../../common/listener.h"
 
-TEST(Lib, Dispatcher) {
+TEST(Dispatcher, Plugin) {
     entt::dispatcher dispatcher;
     test::listener<test::boxed_int> listener;
 

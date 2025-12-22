@@ -7,7 +7,7 @@
 #include "../../../common/listener.h"
 #include "lib.h"
 
-TEST(Lib, Dispatcher) {
+TEST(Dispatcher, Shared) {
     entt::dispatcher dispatcher;
     test::listener<test::boxed_int> listener;
 
