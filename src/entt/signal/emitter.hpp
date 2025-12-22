@@ -8,7 +8,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
-#include "../core/utility.hpp"
+#include "../stl/functional.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -39,7 +39,7 @@ class emitter {
 
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
-    using container_type = dense_map<key_type, mapped_type, identity, std::equal_to<>, container_allocator>;
+    using container_type = dense_map<key_type, mapped_type, stl::identity, std::equal_to<>, container_allocator>;
 
 public:
     /*! @brief Allocator type. */
