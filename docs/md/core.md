@@ -915,10 +915,6 @@ It is not possible to escape the temptation to add utilities of some kind to a
 library. In fact, `EnTT` also provides a handful of tools to simplify the
 life of developers:
 
-* `entt::identity`: the identity function object that will be available with
-  C++20. It returns its argument unchanged and nothing more. It is useful as a
-  sort of _do nothing_ function in template programming.
-
 * `entt::overload`: a tool to disambiguate different overloads from their
   function type. It works with both free and member functions.<br/>
   Consider the following definition:
