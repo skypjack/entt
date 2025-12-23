@@ -140,7 +140,11 @@ endfunction()
 # Test benchmark
 
 if(ENTT_BUILD_BENCHMARK)
-    SETUP_BASIC_TEST_DEPRECATED(benchmark benchmark/benchmark.cpp)
+    SETUP_BASIC_TEST(
+        NAME benchmark
+        SOURCES benchmark/benchmark.cpp
+    )
+
     set_target_properties(benchmark PROPERTIES CXX_CLANG_TIDY "")
 endif()
 
