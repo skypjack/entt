@@ -272,7 +272,10 @@ SETUP_BASIC_TEST_DEPRECATED(flow entt/graph/flow.cpp)
 
 # Test locator
 
-SETUP_BASIC_TEST_DEPRECATED(locator entt/locator/locator.cpp)
+SETUP_BASIC_TEST(
+    NAME locator
+    SOURCES entt/locator/locator.cpp
+)
 
 # Test meta
 
