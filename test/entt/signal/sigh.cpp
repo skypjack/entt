@@ -27,7 +27,7 @@ struct sigh_listener {
     bool val{false};
 };
 
-struct const_nonconst_noexcept {
+struct sigh_const_nonconst_noexcept {
     void f() {
         ++cnt;
     }
@@ -430,22 +430,22 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
 TEST(SigH, ConstNonConstNoExcept) {
     entt::sigh<void()> sigh;
     entt::sink sink{sigh};
-    const_nonconst_noexcept functor;
-    const const_nonconst_noexcept cfunctor;
+    sigh_const_nonconst_noexcept functor;
+    const sigh_const_nonconst_noexcept cfunctor;
 
-    sink.connect<&const_nonconst_noexcept::f>(functor);
-    sink.connect<&const_nonconst_noexcept::g>(&functor);
-    sink.connect<&const_nonconst_noexcept::h>(cfunctor);
-    sink.connect<&const_nonconst_noexcept::i>(&cfunctor);
+    sink.connect<&sigh_const_nonconst_noexcept::f>(functor);
+    sink.connect<&sigh_const_nonconst_noexcept::g>(&functor);
+    sink.connect<&sigh_const_nonconst_noexcept::h>(cfunctor);
+    sink.connect<&sigh_const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);
     ASSERT_EQ(cfunctor.cnt, 2);
 
-    sink.disconnect<&const_nonconst_noexcept::f>(functor);
-    sink.disconnect<&const_nonconst_noexcept::g>(&functor);
-    sink.disconnect<&const_nonconst_noexcept::h>(cfunctor);
-    sink.disconnect<&const_nonconst_noexcept::i>(&cfunctor);
+    sink.disconnect<&sigh_const_nonconst_noexcept::f>(functor);
+    sink.disconnect<&sigh_const_nonconst_noexcept::g>(&functor);
+    sink.disconnect<&sigh_const_nonconst_noexcept::h>(cfunctor);
+    sink.disconnect<&sigh_const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);

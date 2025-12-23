@@ -38,7 +38,7 @@ struct delegate_functor {
     const int data_member = 4;
 };
 
-struct const_nonconst_noexcept {
+struct delegate_const_nonconst_noexcept {
     void f() {
         ++cnt;
     }
@@ -239,25 +239,25 @@ TEST(Delegate, Comparison) {
 
 TEST(Delegate, ConstNonConstNoExcept) {
     entt::delegate<void()> delegate;
-    const_nonconst_noexcept functor;
+    delegate_const_nonconst_noexcept functor;
 
-    delegate.connect<&const_nonconst_noexcept::f>(functor);
+    delegate.connect<&delegate_const_nonconst_noexcept::f>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::g>(functor);
+    delegate.connect<&delegate_const_nonconst_noexcept::g>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::h>(functor);
+    delegate.connect<&delegate_const_nonconst_noexcept::h>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::i>(functor);
+    delegate.connect<&delegate_const_nonconst_noexcept::i>(functor);
     delegate();
 
     ASSERT_EQ(functor.cnt, 4);
 }
 
 TEST(Delegate, DeductionGuide) {
-    const_nonconst_noexcept functor;
+    delegate_const_nonconst_noexcept functor;
     int value = 0;
 
     const entt::delegate plain_func{entt::connect_arg<&power_of_two>};
@@ -265,15 +265,15 @@ TEST(Delegate, DeductionGuide) {
     const entt::delegate sum_func_with_const_ref{entt::connect_arg<&sum_with_ref>, std::as_const(value)};
     const entt::delegate sum_func_with_ptr{entt::connect_arg<&sum_with_ptr>, &value};
     const entt::delegate sum_func_with_const_ptr{entt::connect_arg<&sum_with_ptr>, &std::as_const(value)};
-    const entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, functor};
-    const entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, functor};
-    const entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
-    const entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, &std::as_const(functor)};
-    const entt::delegate member_func_i{entt::connect_arg<&const_nonconst_noexcept::i>, functor};
-    const entt::delegate member_func_i_const{entt::connect_arg<&const_nonconst_noexcept::i>, std::as_const(functor)};
-    const entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, functor};
-    const entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, &functor};
-    const entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
+    const entt::delegate member_func_f{entt::connect_arg<&delegate_const_nonconst_noexcept::f>, functor};
+    const entt::delegate member_func_g{entt::connect_arg<&delegate_const_nonconst_noexcept::g>, functor};
+    const entt::delegate member_func_h{entt::connect_arg<&delegate_const_nonconst_noexcept::h>, &functor};
+    const entt::delegate member_func_h_const{entt::connect_arg<&delegate_const_nonconst_noexcept::h>, &std::as_const(functor)};
+    const entt::delegate member_func_i{entt::connect_arg<&delegate_const_nonconst_noexcept::i>, functor};
+    const entt::delegate member_func_i_const{entt::connect_arg<&delegate_const_nonconst_noexcept::i>, std::as_const(functor)};
+    const entt::delegate data_member_u{entt::connect_arg<&delegate_const_nonconst_noexcept::u>, functor};
+    const entt::delegate data_member_v{entt::connect_arg<&delegate_const_nonconst_noexcept::v>, &functor};
+    const entt::delegate data_member_v_const{entt::connect_arg<&delegate_const_nonconst_noexcept::v>, &std::as_const(functor)};
     const entt::delegate lambda{+[](const void *, int) { return 0; }};
 
     testing::StaticAssertTypeEq<decltype(plain_func)::type, int(const int &)>();

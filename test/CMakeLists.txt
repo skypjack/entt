@@ -339,10 +339,14 @@ SETUP_BASIC_TEST(
 
 # Test signal
 
-SETUP_BASIC_TEST_DEPRECATED(delegate entt/signal/delegate.cpp)
-SETUP_BASIC_TEST_DEPRECATED(dispatcher entt/signal/dispatcher.cpp)
-SETUP_BASIC_TEST_DEPRECATED(emitter entt/signal/emitter.cpp)
-SETUP_BASIC_TEST_DEPRECATED(sigh entt/signal/sigh.cpp)
+SETUP_BASIC_TEST(
+    NAME signal
+    SOURCES
+        entt/signal/delegate.cpp
+        entt/signal/dispatcher.cpp
+        entt/signal/emitter.cpp
+        entt/signal/sigh.cpp
+)
 
 # Test stl
 
