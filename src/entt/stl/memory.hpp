@@ -1,6 +1,7 @@
 #ifndef ENTT_STL_MEMORY_HPP
 #define ENTT_STL_MEMORY_HPP
 
+/*! @cond TURN_OFF_DOXYGEN */
 #include "../config/config.h"
 
 namespace entt::stl {
@@ -30,6 +31,7 @@ template<typename Type>
     }
 }
 #endif
+/*! @endcond */
 
 } // namespace entt::stl
 

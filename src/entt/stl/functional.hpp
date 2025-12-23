@@ -3,6 +3,7 @@
 
 #include "../config/config.h"
 
+/*! @cond TURN_OFF_DOXYGEN */
 namespace entt::stl {
 
 #ifndef ENTT_FORCE_STL
@@ -31,5 +32,6 @@ struct identity {
 #endif
 
 } // namespace entt::stl
+/*! @endcond */
 
 #endif
