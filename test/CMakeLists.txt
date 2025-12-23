@@ -266,9 +266,13 @@ SETUP_BASIC_TEST_DEPRECATED(view entt/entity/view.cpp)
 
 # Test graph
 
-SETUP_BASIC_TEST_DEPRECATED(adjacency_matrix entt/graph/adjacency_matrix.cpp)
-SETUP_BASIC_TEST_DEPRECATED(dot entt/graph/dot.cpp)
-SETUP_BASIC_TEST_DEPRECATED(flow entt/graph/flow.cpp)
+SETUP_BASIC_TEST(
+    NAME graph
+    SOURCES
+        entt/graph/adjacency_matrix.cpp
+        entt/graph/dot.cpp
+        entt/graph/flow.cpp
+)
 
 # Test locator
 
