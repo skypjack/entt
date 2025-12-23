@@ -217,7 +217,10 @@ endif()
 
 # Test config
 
-SETUP_BASIC_TEST_DEPRECATED(version entt/config/version.cpp)
+SETUP_BASIC_TEST(
+    NAME config
+    SOURCES entt/config/version.cpp
+)
 
 # Test container
 
