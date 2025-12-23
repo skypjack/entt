@@ -224,9 +224,13 @@ SETUP_BASIC_TEST(
 
 # Test container
 
-SETUP_BASIC_TEST_DEPRECATED(dense_map entt/container/dense_map.cpp)
-SETUP_BASIC_TEST_DEPRECATED(dense_set entt/container/dense_set.cpp)
-SETUP_BASIC_TEST_DEPRECATED(table entt/container/table.cpp)
+SETUP_BASIC_TEST(
+    NAME container
+    SOURCES
+        entt/container/dense_map.cpp
+        entt/container/dense_set.cpp
+        entt/container/table.cpp
+)
 
 # Test core
 
