@@ -298,7 +298,10 @@ SETUP_BASIC_TEST_DEPRECATED(meta_utility entt/meta/meta_utility.cpp)
 
 # Test poly
 
-SETUP_BASIC_TEST_DEPRECATED(poly entt/poly/poly.cpp)
+SETUP_BASIC_TEST(
+    NAME poly
+    SOURCES entt/poly/poly.cpp
+)
 
 # Test process
 
