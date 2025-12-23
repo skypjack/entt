@@ -331,5 +331,10 @@ SETUP_BASIC_TEST_DEPRECATED(sigh entt/signal/sigh.cpp)
 
 # Test stl
 
-SETUP_BASIC_TEST_DEPRECATED(stl_functional entt/stl/functional.cpp ENTT_USE_STL)
-SETUP_BASIC_TEST_DEPRECATED(stl_memory entt/stl/memory.cpp ENTT_USE_STL)
+SETUP_BASIC_TEST(
+    NAME stl
+    SOURCES
+        entt/stl/functional.cpp
+        entt/stl/memory.cpp
+    DEFS ENTT_USE_STL
+)
