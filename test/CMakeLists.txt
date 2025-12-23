@@ -305,8 +305,12 @@ SETUP_BASIC_TEST(
 
 # Test process
 
-SETUP_BASIC_TEST_DEPRECATED(process entt/process/process.cpp)
-SETUP_BASIC_TEST_DEPRECATED(scheduler entt/process/scheduler.cpp)
+SETUP_BASIC_TEST(
+    NAME process
+    SOURCES
+        entt/process/process.cpp
+        entt/process/scheduler.cpp
+)
 
 # Test resource
 
