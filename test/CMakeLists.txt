@@ -234,21 +234,25 @@ SETUP_BASIC_TEST(
 
 # Test core
 
-SETUP_BASIC_TEST_DEPRECATED(algorithm entt/core/algorithm.cpp)
-SETUP_BASIC_TEST_DEPRECATED(any entt/core/any.cpp)
-SETUP_BASIC_TEST_DEPRECATED(bit entt/core/bit.cpp)
-SETUP_BASIC_TEST_DEPRECATED(compressed_pair entt/core/compressed_pair.cpp)
-SETUP_BASIC_TEST_DEPRECATED(enum entt/core/enum.cpp)
-SETUP_BASIC_TEST_DEPRECATED(family entt/core/family.cpp)
-SETUP_BASIC_TEST_DEPRECATED(hashed_string entt/core/hashed_string.cpp)
-SETUP_BASIC_TEST_DEPRECATED(ident entt/core/ident.cpp)
-SETUP_BASIC_TEST_DEPRECATED(iterator entt/core/iterator.cpp)
-SETUP_BASIC_TEST_DEPRECATED(memory entt/core/memory.cpp)
-SETUP_BASIC_TEST_DEPRECATED(monostate entt/core/monostate.cpp)
-SETUP_BASIC_TEST_DEPRECATED(tuple entt/core/tuple.cpp)
-SETUP_BASIC_TEST_DEPRECATED(type_info entt/core/type_info.cpp)
-SETUP_BASIC_TEST_DEPRECATED(type_traits entt/core/type_traits.cpp)
-SETUP_BASIC_TEST_DEPRECATED(utility entt/core/utility.cpp)
+SETUP_BASIC_TEST(
+    NAME core
+    SOURCES
+        entt/core/algorithm.cpp
+        entt/core/any.cpp
+        entt/core/bit.cpp
+        entt/core/compressed_pair.cpp
+        entt/core/enum.cpp
+        entt/core/family.cpp
+        entt/core/hashed_string.cpp
+        entt/core/ident.cpp
+        entt/core/iterator.cpp
+        entt/core/memory.cpp
+        entt/core/monostate.cpp
+        entt/core/tuple.cpp
+        entt/core/type_info.cpp
+        entt/core/type_traits.cpp
+        entt/core/utility.cpp
+)
 
 # Test entity
 
