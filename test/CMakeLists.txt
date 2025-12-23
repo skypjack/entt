@@ -314,9 +314,13 @@ SETUP_BASIC_TEST(
 
 # Test resource
 
-SETUP_BASIC_TEST_DEPRECATED(resource entt/resource/resource.cpp)
-SETUP_BASIC_TEST_DEPRECATED(resource_cache entt/resource/resource_cache.cpp)
-SETUP_BASIC_TEST_DEPRECATED(resource_loader entt/resource/resource_loader.cpp)
+SETUP_BASIC_TEST(
+    NAME resource
+    SOURCES
+        entt/resource/resource.cpp
+        entt/resource/resource_cache.cpp
+        entt/resource/resource_loader.cpp
+)
 
 # Test signal
 
