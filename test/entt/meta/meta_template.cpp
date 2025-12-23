@@ -5,19 +5,21 @@
 #include <entt/meta/template.hpp>
 #include <entt/meta/type_traits.hpp>
 
-template<typename>
-struct function_type;
+struct MetaTemplate: ::testing::Test {
+    template<typename>
+    struct function_type;
+
+    template<typename Ret, typename... Args>
+    struct function_type<Ret(Args...)> {};
+};
 
 template<typename Ret, typename... Args>
-struct function_type<Ret(Args...)> {};
-
-template<typename Ret, typename... Args>
-struct entt::meta_template_traits<function_type<Ret(Args...)>> {
-    using class_type = meta_class_template_tag<function_type>;
+struct entt::meta_template_traits<MetaTemplate::function_type<Ret(Args...)>> {
+    using class_type = meta_class_template_tag<MetaTemplate::function_type>;
     using args_type = type_list<Ret, Args...>;
 };
 
-TEST(MetaTemplate, Invalid) {
+TEST_F(MetaTemplate, Invalid) {
     const auto type = entt::resolve<int>();
 
     ASSERT_FALSE(type.is_template_specialization());
@@ -26,7 +28,7 @@ TEST(MetaTemplate, Invalid) {
     ASSERT_EQ(type.template_arg(0u), entt::meta_type{});
 }
 
-TEST(MetaTemplate, Valid) {
+TEST_F(MetaTemplate, Valid) {
     const auto type = entt::resolve<entt::type_list<int, char>>();
 
     ASSERT_TRUE(type.is_template_specialization());
@@ -37,7 +39,7 @@ TEST(MetaTemplate, Valid) {
     ASSERT_EQ(type.template_arg(2u), entt::meta_type{});
 }
 
-TEST(MetaTemplate, CustomTraits) {
+TEST_F(MetaTemplate, CustomTraits) {
     const auto type = entt::resolve<function_type<void(int, const char &)>>();
 
     ASSERT_TRUE(type.is_template_specialization());

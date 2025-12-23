@@ -294,22 +294,26 @@ SETUP_BASIC_TEST(
 
 # Test meta
 
-SETUP_BASIC_TEST_DEPRECATED(meta_any entt/meta/meta_any.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_base entt/meta/meta_base.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_container entt/meta/meta_container.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_context entt/meta/meta_context.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_conv entt/meta/meta_conv.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_ctor entt/meta/meta_ctor.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_custom entt/meta/meta_custom.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_data entt/meta/meta_data.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_factory entt/meta/meta_factory.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_func entt/meta/meta_func.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_handle entt/meta/meta_handle.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_pointer entt/meta/meta_pointer.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_range entt/meta/meta_range.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_template entt/meta/meta_template.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_type entt/meta/meta_type.cpp)
-SETUP_BASIC_TEST_DEPRECATED(meta_utility entt/meta/meta_utility.cpp)
+SETUP_BASIC_TEST(
+    NAME meta
+    SOURCES
+        entt/meta/meta_any.cpp
+        entt/meta/meta_base.cpp
+        entt/meta/meta_container.cpp
+        entt/meta/meta_context.cpp
+        entt/meta/meta_conv.cpp
+        entt/meta/meta_ctor.cpp
+        entt/meta/meta_custom.cpp
+        entt/meta/meta_data.cpp
+        entt/meta/meta_factory.cpp
+        entt/meta/meta_func.cpp
+        entt/meta/meta_handle.cpp
+        entt/meta/meta_pointer.cpp
+        entt/meta/meta_range.cpp
+        entt/meta/meta_template.cpp
+        entt/meta/meta_type.cpp
+        entt/meta/meta_utility.cpp
+)
 
 # Test poly
 

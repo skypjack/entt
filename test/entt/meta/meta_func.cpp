@@ -13,87 +13,87 @@
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
 
-struct base {
-    base() = default;
-    virtual ~base() = default;
-
-    void setter(int iv) {
-        value = iv;
-    }
-
-    [[nodiscard]] int getter() const {
-        return value;
-    }
-
-    static void static_setter(base &ref, int iv) {
-        ref.value = iv;
-    }
-
-    int value{3};
-};
-
-void fake_member(base &instance, int value) {
-    instance.value = value;
-}
-
-[[nodiscard]] int fake_const_member(const base &instance) {
-    return instance.value;
-}
-
-struct derived: base {
-    derived() = default;
-};
-
-struct function {
-    [[nodiscard]] int f(const base &, int val, int other) {
-        return f(val, other);
-    }
-
-    [[nodiscard]] int f(int val, const int other) {
-        value = val;
-        return other * other;
-    }
-
-    [[nodiscard]] int f(int iv) const {
-        return value * iv;
-    }
-
-    [[nodiscard]] int f(int iv) {
-        return (value += iv);
-    }
-
-    void g(int iv) {
-        value = iv * iv;
-    }
-
-    [[nodiscard]] static int h(int &iv, const function &instance) {
-        return (iv *= instance.value);
-    }
-
-    static void k(int iv, function &instance) {
-        instance.value = iv;
-    }
-
-    [[nodiscard]] const int &v(int &iv) const {
-        return (iv = value);
-    }
-
-    [[nodiscard]] int &a() {
-        return value;
-    }
-
-    [[nodiscard]] operator int() const {
-        return value;
-    }
-
-    int value{};
-};
-
-double double_member(const double &value) {
-    return value * value;
-}
-
 struct MetaFunc: ::testing::Test {
+    struct base {
+        base() = default;
+        virtual ~base() = default;
+
+        void setter(int iv) {
+            value = iv;
+        }
+
+        [[nodiscard]] int getter() const {
+            return value;
+        }
+
+        static void static_setter(base &ref, int iv) {
+            ref.value = iv;
+        }
+
+        int value{3};
+    };
+
+    static void fake_member(base &instance, int value) {
+        instance.value = value;
+    }
+
+    [[nodiscard]] static int fake_const_member(const base &instance) {
+        return instance.value;
+    }
+
+    struct derived: base {
+        derived() = default;
+    };
+
+    struct function {
+        [[nodiscard]] int f(const base &, int val, int other) {
+            return f(val, other);
+        }
+
+        [[nodiscard]] int f(int val, const int other) {
+            value = val;
+            return other * other;
+        }
+
+        [[nodiscard]] int f(int iv) const {
+            return value * iv;
+        }
+
+        [[nodiscard]] int f(int iv) {
+            return (value += iv);
+        }
+
+        void g(int iv) {
+            value = iv * iv;
+        }
+
+        [[nodiscard]] static int h(int &iv, const function &instance) {
+            return (iv *= instance.value);
+        }
+
+        static void k(int iv, function &instance) {
+            instance.value = iv;
+        }
+
+        [[nodiscard]] const int &v(int &iv) const {
+            return (iv = value);
+        }
+
+        [[nodiscard]] int &a() {
+            return value;
+        }
+
+        [[nodiscard]] operator int() const {
+            return value;
+        }
+
+        int value{};
+    };
+
+    static double double_member(const double &value) {
+        return value * value;
+    }
+
     void SetUp() override {
         using namespace entt::literals;
 

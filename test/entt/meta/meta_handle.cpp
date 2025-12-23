@@ -6,19 +6,19 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 
-struct clazz {
-    void incr() {
-        ++value;
-    }
-
-    void decr() {
-        --value;
-    }
-
-    int value{};
-};
-
 struct MetaHandle: ::testing::Test {
+    struct clazz {
+        void incr() {
+            ++value;
+        }
+
+        void decr() {
+            --value;
+        }
+
+        int value{};
+    };
+
     void SetUp() override {
         using namespace entt::literals;
 

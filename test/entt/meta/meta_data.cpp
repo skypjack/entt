@@ -15,59 +15,59 @@
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
 
-struct base {
-    virtual ~base() = default;
-    int value{3};
-};
-
-struct derived: base {};
-
-struct clazz {
-    operator int() const {
-        return h;
-    }
-
-    int i{0};
-    const int j{1}; // NOLINT
-    base instance{};
-    inline static int h{2};       // NOLINT
-    inline static const int k{3}; // NOLINT
-};
-
-struct setter_getter {
-    int setter(double val) {
-        return value = static_cast<int>(val);
-    }
-
-    [[nodiscard]] int getter() const {
-        return value;
-    }
-
-    int setter_with_ref(const int &val) {
-        return value = val;
-    }
-
-    [[nodiscard]] const int &getter_with_ref() const {
-        return value;
-    }
-
-    static int static_setter(setter_getter &type, int value) {
-        return type.value = value;
-    }
-
-    static int static_getter(const setter_getter &type) {
-        return type.value;
-    }
-
-    int value{0};
-};
-
-struct array {
-    inline static int global[2]; // NOLINT
-    int local[4];                // NOLINT
-};
-
 struct MetaData: ::testing::Test {
+    struct base {
+        virtual ~base() = default;
+        int value{3};
+    };
+
+    struct derived: base {};
+
+    struct clazz {
+        operator int() const {
+            return h;
+        }
+
+        int i{0};
+        const int j{1}; // NOLINT
+        base instance{};
+        inline static int h{2};       // NOLINT
+        inline static const int k{3}; // NOLINT
+    };
+
+    struct setter_getter {
+        int setter(double val) {
+            return value = static_cast<int>(val);
+        }
+
+        [[nodiscard]] int getter() const {
+            return value;
+        }
+
+        int setter_with_ref(const int &val) {
+            return value = val;
+        }
+
+        [[nodiscard]] const int &getter_with_ref() const {
+            return value;
+        }
+
+        static int static_setter(setter_getter &type, int value) {
+            return type.value = value;
+        }
+
+        static int static_getter(const setter_getter &type) {
+            return type.value;
+        }
+
+        int value{0};
+    };
+
+    struct array {
+        inline static int global[2]; // NOLINT
+        int local[4];                // NOLINT
+    };
+
     void SetUp() override {
         using namespace entt::literals;
 

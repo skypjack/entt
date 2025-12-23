@@ -20,108 +20,108 @@
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
 
-template<typename Type>
-void set(Type &elem, Type value) {
-    elem = value;
-}
-
-template<typename Type>
-Type get(Type &elem) {
-    return elem;
-}
-
-struct base {
-    char value{'c'};
-
-    static int f() {
-        return 0;
-    }
-};
-
-struct derived: base {
-    derived()
-        : base{} {}
-};
-
-struct abstract {
-    virtual ~abstract() = default;
-
-    virtual void func(int) {}
-    void base_only(int) {}
-};
-
-struct concrete: base, abstract {
-    void func(int val) override {
-        abstract::func(val);
-        value = val;
-    }
-
-    int value{3};
-};
-
-struct clazz {
-    clazz() = default;
-
-    clazz(const base &, int val)
-        : value{val} {}
-
-    void member() {}
-    static void func() {}
-
-    [[nodiscard]] operator int() const {
-        return value;
-    }
-
-    int value{};
-};
-
-struct overloaded_func {
-    [[nodiscard]] int f(const base &, int first, int second) {
-        return f(first, second);
-    }
-
-    [[nodiscard]] int f(int first, const int second) {
-        value = first;
-        return second * second;
-    }
-
-    [[nodiscard]] int f(int val) {
-        return 2 * std::as_const(*this).f(val);
-    }
-
-    [[nodiscard]] int f(int val) const {
-        return val * value;
-    }
-
-    [[nodiscard]] float f(int first, const float second) {
-        value = first;
-        return second + second;
-    }
-
-    int value{};
-};
-
-struct from_void_callback {
-    from_void_callback(bool &ref)
-        : cb{&ref} {}
-
-    from_void_callback(const from_void_callback &) = delete;
-    from_void_callback &operator=(const from_void_callback &) = delete;
-
-    ~from_void_callback() {
-        *cb = !*cb;
-    }
-
-private:
-    bool *cb;
-};
-
-enum class property_type : std::uint8_t {
-    value,
-    other
-};
-
 struct MetaType: ::testing::Test {
+    template<typename Type>
+    static void set(Type &elem, Type value) {
+        elem = value;
+    }
+
+    template<typename Type>
+    static Type get(Type &elem) {
+        return elem;
+    }
+
+    struct base {
+        char value{'c'};
+
+        static int f() {
+            return 0;
+        }
+    };
+
+    struct derived: base {
+        derived()
+            : base{} {}
+    };
+
+    struct abstract {
+        virtual ~abstract() = default;
+
+        virtual void func(int) {}
+        void base_only(int) {}
+    };
+
+    struct concrete: base, abstract {
+        void func(int val) override {
+            abstract::func(val);
+            value = val;
+        }
+
+        int value{3};
+    };
+
+    struct clazz {
+        clazz() = default;
+
+        clazz(const base &, int val)
+            : value{val} {}
+
+        void member() {}
+        static void func() {}
+
+        [[nodiscard]] operator int() const {
+            return value;
+        }
+
+        int value{};
+    };
+
+    struct overloaded_func {
+        [[nodiscard]] int f(const base &, int first, int second) {
+            return f(first, second);
+        }
+
+        [[nodiscard]] int f(int first, const int second) {
+            value = first;
+            return second * second;
+        }
+
+        [[nodiscard]] int f(int val) {
+            return 2 * std::as_const(*this).f(val);
+        }
+
+        [[nodiscard]] int f(int val) const {
+            return val * value;
+        }
+
+        [[nodiscard]] float f(int first, const float second) {
+            value = first;
+            return second + second;
+        }
+
+        int value{};
+    };
+
+    struct from_void_callback {
+        from_void_callback(bool &ref)
+            : cb{&ref} {}
+
+        from_void_callback(const from_void_callback &) = delete;
+        from_void_callback &operator=(const from_void_callback &) = delete;
+
+        ~from_void_callback() {
+            *cb = !*cb;
+        }
+
+    private:
+        bool *cb;
+    };
+
+    enum class property_type : std::uint8_t {
+        value,
+        other
+    };
+
     void SetUp() override {
         using namespace entt::literals;
 

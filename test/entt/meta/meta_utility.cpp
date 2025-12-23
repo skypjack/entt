@@ -10,45 +10,45 @@
 #include "../../common/config.h"
 #include "../../common/empty.h"
 
-struct clazz {
-    void setter(int iv) {
-        member = iv;
-    }
-
-    [[nodiscard]] int getter() const {
-        return member;
-    }
-
-    static void static_setter(clazz &instance, int iv) {
-        instance.member = iv;
-    }
-
-    [[nodiscard]] static int static_getter(const clazz &instance) {
-        return instance.member;
-    }
-
-    static void reset_value() {
-        value = 0;
-    }
-
-    [[nodiscard]] static int get_value() {
-        return value;
-    }
-
-    [[nodiscard]] static clazz factory(int iv) {
-        clazz instance{};
-        instance.member = iv;
-        return instance;
-    }
-
-    int member{};
-    const int cmember{};              // NOLINT
-    inline static int value{};        // NOLINT
-    inline static const int cvalue{}; // NOLINT
-    inline static int arr[3u]{};      // NOLINT
-};
-
 struct MetaUtility: ::testing::Test {
+    struct clazz {
+        void setter(int iv) {
+            member = iv;
+        }
+
+        [[nodiscard]] int getter() const {
+            return member;
+        }
+
+        static void static_setter(clazz &instance, int iv) {
+            instance.member = iv;
+        }
+
+        [[nodiscard]] static int static_getter(const clazz &instance) {
+            return instance.member;
+        }
+
+        static void reset_value() {
+            value = 0;
+        }
+
+        [[nodiscard]] static int get_value() {
+            return value;
+        }
+
+        [[nodiscard]] static clazz factory(int iv) {
+            clazz instance{};
+            instance.member = iv;
+            return instance;
+        }
+
+        int member{};
+        const int cmember{};              // NOLINT
+        inline static int value{};        // NOLINT
+        inline static const int cvalue{}; // NOLINT
+        inline static int arr[3u]{};      // NOLINT
+    };
+
     void SetUp() override {
         clazz::value = 0;
     }

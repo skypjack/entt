@@ -16,75 +16,75 @@
 #include "../../common/linter.hpp"
 #include "../../common/non_comparable.h"
 
-struct clazz {
-    void member(int iv) {
-        value = iv;
-    }
-
-    static char func() {
-        return 'c';
-    }
-
-    operator int() const {
-        return value;
-    }
-
-    int value{0};
-};
-
-struct empty {
-    empty() = default;
-
-    empty(const empty &) = default;
-    empty &operator=(const empty &) = default;
-
-    virtual ~empty() {
-        ++counter;
-    }
-
-    inline static int counter = 0; // NOLINT
-};
-
-struct fat: empty {
-    fat()
-        : value{.0, .0, .0, .0} {}
-
-    fat(double v1, double v2, double v3, double v4)
-        : value{v1, v2, v3, v4} {}
-
-    ~fat() override = default;
-
-    fat(const fat &) = default;
-    fat &operator=(const fat &) = default;
-
-    bool operator==(const fat &other) const {
-        return (value == other.value);
-    }
-
-    std::array<double, 4u> value{};
-};
-
-enum class enum_class : std::uint8_t {
-    foo = 0u,
-    bar = 1u
-};
-
-struct unmanageable {
-    unmanageable()
-        : value{std::make_unique<int>(3)} {}
-
-    ~unmanageable() = default;
-
-    unmanageable(const unmanageable &) = delete;
-    unmanageable(unmanageable &&) = delete;
-
-    unmanageable &operator=(const unmanageable &) = delete;
-    unmanageable &operator=(unmanageable &&) = delete;
-
-    std::unique_ptr<int> value;
-};
-
 struct MetaAny: ::testing::Test {
+    struct clazz {
+        void member(int iv) {
+            value = iv;
+        }
+
+        static char func() {
+            return 'c';
+        }
+
+        operator int() const {
+            return value;
+        }
+
+        int value{0};
+    };
+
+    struct empty {
+        empty() = default;
+
+        empty(const empty &) = default;
+        empty &operator=(const empty &) = default;
+
+        virtual ~empty() {
+            ++counter;
+        }
+
+        inline static int counter = 0; // NOLINT
+    };
+
+    struct fat: empty {
+        fat()
+            : value{.0, .0, .0, .0} {}
+
+        fat(double v1, double v2, double v3, double v4)
+            : value{v1, v2, v3, v4} {}
+
+        ~fat() override = default;
+
+        fat(const fat &) = default;
+        fat &operator=(const fat &) = default;
+
+        bool operator==(const fat &other) const {
+            return (value == other.value);
+        }
+
+        std::array<double, 4u> value{};
+    };
+
+    enum class enum_class : std::uint8_t {
+        foo = 0u,
+        bar = 1u
+    };
+
+    struct unmanageable {
+        unmanageable()
+            : value{std::make_unique<int>(3)} {}
+
+        ~unmanageable() = default;
+
+        unmanageable(const unmanageable &) = delete;
+        unmanageable(unmanageable &&) = delete;
+
+        unmanageable &operator=(const unmanageable &) = delete;
+        unmanageable &operator=(unmanageable &&) = delete;
+
+        std::unique_ptr<int> value;
+    };
+
     void SetUp() override {
         using namespace entt::literals;
 

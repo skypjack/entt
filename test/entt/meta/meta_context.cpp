@@ -14,66 +14,6 @@
 #include <entt/meta/template.hpp>
 #include "../../common/empty.h"
 
-struct base {
-    base() = default;
-
-    base(char cv)
-        : value{cv} {}
-
-    [[nodiscard]] char get() const {
-        return value;
-    }
-
-    char value;
-};
-
-struct clazz: base {
-    clazz()
-        : base{} {}
-
-    clazz(int iv)
-        : base{},
-          value{iv} {}
-
-    clazz(char cv, int iv) // NOLINT
-        : base{cv},
-          value{iv} {}
-
-    [[nodiscard]] int func(int iv) {
-        return (value = iv);
-    }
-
-    [[nodiscard]] int cfunc(int) const {
-        return value;
-    }
-
-    static void move_to_bucket(const clazz &instance) {
-        bucket = instance.value;
-    }
-
-    int value{};
-    inline static int bucket{}; // NOLINT
-};
-
-struct argument {
-    argument(int val)
-        : value{val} {}
-
-    [[nodiscard]] int get() const {
-        return value;
-    }
-
-    [[nodiscard]] int get_mul() const {
-        return value * 2;
-    }
-
-private:
-    int value{};
-};
-
-template<typename...>
-struct template_clazz {};
-
 class MetaContext: public ::testing::Test {
     static void init_global_context() {
         using namespace entt::literals;
@@ -126,6 +66,66 @@ class MetaContext: public ::testing::Test {
     }
 
 public:
+    struct base {
+        base() = default;
+
+        base(char cv)
+            : value{cv} {}
+
+        [[nodiscard]] char get() const {
+            return value;
+        }
+
+        char value;
+    };
+
+    struct clazz: base {
+        clazz()
+            : base{} {}
+
+        clazz(int iv)
+            : base{},
+              value{iv} {}
+
+        clazz(char cv, int iv) // NOLINT
+            : base{cv},
+              value{iv} {}
+
+        [[nodiscard]] int func(int iv) {
+            return (value = iv);
+        }
+
+        [[nodiscard]] int cfunc(int) const {
+            return value;
+        }
+
+        static void move_to_bucket(const clazz &instance) {
+            bucket = instance.value;
+        }
+
+        int value{};
+        inline static int bucket{}; // NOLINT
+    };
+
+    struct argument {
+        argument(int val)
+            : value{val} {}
+
+        [[nodiscard]] int get() const {
+            return value;
+        }
+
+        [[nodiscard]] int get_mul() const {
+            return value * 2;
+        }
+
+    private:
+        int value{};
+    };
+
+    template<typename...>
+    struct template_clazz {};
+
     void SetUp() override {
         init_global_context();
         init_local_context();

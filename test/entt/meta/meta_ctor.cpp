@@ -10,43 +10,43 @@
 #include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct base {
-    char value{'c'};
-};
-
-struct derived: base {
-    derived()
-        : base{} {}
-};
-
-struct clazz {
-    clazz(const base &other, int &iv)
-        : clazz{iv, other.value} {}
-
-    clazz(const int &iv, char cv)
-        : i{iv}, c{cv} {}
-
-    operator int() const {
-        return i;
-    }
-
-    static clazz factory(int value) {
-        return {value, 'c'};
-    }
-
-    static clazz factory(base other, int value, int mul) {
-        return {value * mul, other.value};
-    }
-
-    int i{};
-    char c{};
-};
-
-double double_factory() {
-    return 1.;
-}
-
 struct MetaCtor: ::testing::Test {
+    struct base {
+        char value{'c'};
+    };
+
+    struct derived: base {
+        derived()
+            : base{} {}
+    };
+
+    struct clazz {
+        clazz(const base &other, int &iv)
+            : clazz{iv, other.value} {}
+
+        clazz(const int &iv, char cv)
+            : i{iv}, c{cv} {}
+
+        operator int() const {
+            return i;
+        }
+
+        static clazz factory(int value) {
+            return {value, 'c'};
+        }
+
+        static clazz factory(base other, int value, int mul) {
+            return {value * mul, other.value};
+        }
+
+        int i{};
+        char c{};
+    };
+
+    static double double_factory() {
+        return 1.;
+    }
+
     void SetUp() override {
         using namespace entt::literals;
 

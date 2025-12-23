@@ -5,20 +5,20 @@
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
 
-struct clazz {
-    int i{2};
-    char j{'c'};
-
-    [[nodiscard]] int f(int) const {
-        return i;
-    }
-
-    [[nodiscard]] char g(char) const {
-        return j;
-    }
-};
-
 struct MetaCustom: ::testing::Test {
+    struct clazz {
+        int i{2};
+        char j{'c'};
+
+        [[nodiscard]] int f(int) const {
+            return i;
+        }
+
+        [[nodiscard]] char g(char) const {
+            return j;
+        }
+    };
+
     void SetUp() override {
         using namespace entt::literals;
 

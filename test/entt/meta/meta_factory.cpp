@@ -13,43 +13,43 @@
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
 
-struct base {
-    char member{};
-};
-
-struct clazz: base {
-    clazz(int val)
-        : value{val} {}
-
-    [[nodiscard]] explicit operator int() const noexcept {
-        return get_int();
-    }
-
-    void set_int(int val) noexcept {
-        value = val;
-    }
-
-    void set_boxed_int(test::boxed_int val) noexcept {
-        value = val.value;
-    }
-
-    [[nodiscard]] int get_int() const noexcept {
-        return value;
-    }
-
-    [[nodiscard]] static std::string to_string(const clazz &instance) {
-        return std::to_string(instance.get_int());
-    }
-
-    [[nodiscard]] static clazz from_string(const std::string &value) {
-        return clazz{std::stoi(value)};
-    }
-
-private:
-    int value{};
-};
-
 struct MetaFactory: ::testing::Test {
+    struct base {
+        char member{};
+    };
+
+    struct clazz: base {
+        clazz(int val)
+            : value{val} {}
+
+        [[nodiscard]] explicit operator int() const noexcept {
+            return get_int();
+        }
+
+        void set_int(int val) noexcept {
+            value = val;
+        }
+
+        void set_boxed_int(test::boxed_int val) noexcept {
+            value = val.value;
+        }
+
+        [[nodiscard]] int get_int() const noexcept {
+            return value;
+        }
+
+        [[nodiscard]] static std::string to_string(const clazz &instance) {
+            return std::to_string(instance.get_int());
+        }
+
+        [[nodiscard]] static clazz from_string(const std::string &value) {
+            return clazz{std::stoi(value)};
+        }
+
+    private:
+        int value{};
+    };
+
     void TearDown() override {
         entt::meta_reset();
     }

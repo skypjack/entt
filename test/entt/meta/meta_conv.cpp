@@ -8,25 +8,25 @@
 #include <entt/meta/node.hpp>
 #include <entt/meta/resolve.hpp>
 
-struct clazz {
-    clazz() = default;
-
-    operator int() const {
-        return value;
-    }
-
-    [[nodiscard]] bool to_bool() const {
-        return (value != 0);
-    }
-
-    int value{};
-};
-
-double conv_to_double(const clazz &instance) {
-    return instance.value * 2.;
-}
-
 struct MetaConv: ::testing::Test {
+    struct clazz {
+        clazz() = default;
+
+        operator int() const {
+            return value;
+        }
+
+        [[nodiscard]] bool to_bool() const {
+            return (value != 0);
+        }
+
+        int value{};
+    };
+
+    static double conv_to_double(const clazz &instance) {
+        return instance.value * 2.;
+    }
+
     void SetUp() override {
         using namespace entt::literals;
 
