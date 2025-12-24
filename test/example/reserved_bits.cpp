@@ -10,33 +10,31 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 
-enum class my_entity : entt::id_type {
-    disabled = 0x10000000,
-    _entt_enum_as_bitmask
-};
+struct ReservedBits: testing::Test {
+    enum class my_entity : entt::id_type {
+        disabled = 0x10000000,
+        _entt_enum_as_bitmask
+    };
 
-struct entity_traits {
-    using value_type = my_entity;
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
-    static constexpr entity_type entity_mask = 0xFFFF;  // 16b
-    static constexpr entity_type version_mask = 0x0FFF; // 12b
+    struct entity_traits {
+        using value_type = my_entity;
+        using entity_type = std::uint32_t;
+        using version_type = std::uint16_t;
+        static constexpr entity_type entity_mask = 0xFFFF;  // 16b
+        static constexpr entity_type version_mask = 0x0FFF; // 12b
+    };
+
+    [[nodiscard]] static bool is_disabled(const my_entity entity) {
+        return ((entity & my_entity::disabled) == my_entity::disabled);
+    }
 };
 
 template<>
-struct entt::entt_traits<my_entity>: entt::basic_entt_traits<entity_traits> {
+struct entt::entt_traits<ReservedBits::my_entity>: entt::basic_entt_traits<ReservedBits::entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
-namespace {
-
-[[nodiscard]] bool is_disabled(const my_entity entity) {
-    return ((entity & my_entity::disabled) == my_entity::disabled);
-}
-
-} // namespace
-
-TEST(Example, DisabledEntity) {
+TEST_F(ReservedBits, DisabledEntity) {
     entt::basic_registry<my_entity> registry{};
     auto view = registry.view<my_entity, int>();
 

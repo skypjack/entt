@@ -151,10 +151,14 @@ endif()
 # Test example
 
 if(ENTT_BUILD_EXAMPLE)
-    SETUP_BASIC_TEST_DEPRECATED(custom_identifier example/custom_identifier.cpp)
-    SETUP_BASIC_TEST_DEPRECATED(entity_copy example/entity_copy.cpp)
-    SETUP_BASIC_TEST_DEPRECATED(reserved_bits example/reserved_bits.cpp)
-    SETUP_BASIC_TEST_DEPRECATED(signal_less example/signal_less.cpp)
+    SETUP_BASIC_TEST(
+        NAME example
+        SOURCES
+            example/custom_identifier.cpp
+            example/entity_copy.cpp
+            example/reserved_bits.cpp
+            example/signal_less.cpp
+    )
 endif()
 
 # Test lib

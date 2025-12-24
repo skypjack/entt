@@ -8,47 +8,50 @@
 #include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
-enum class my_entity : entt::id_type {};
+struct EntityCopy: testing::Test {
+    enum class my_entity : entt::id_type {};
+    enum class other_entity : entt::id_type {};
 
-template<typename Type>
-// NOLINTNEXTLINE(*-exception-escape)
-struct meta_mixin: Type {
-    using allocator_type = Type::allocator_type;
-    using element_type = Type::element_type;
+    template<typename Type>
+    // NOLINTNEXTLINE(*-exception-escape)
+    struct meta_mixin: Type {
+        using allocator_type = Type::allocator_type;
+        using element_type = Type::element_type;
 
-    explicit meta_mixin(const allocator_type &allocator);
+        explicit meta_mixin(const allocator_type &allocator);
+    };
+
+    void TearDown() override {
+        entt::meta_reset();
+    }
 };
 
-template<typename Type, typename Entity>
-struct entt::storage_type<Type, Entity> {
-    using type = meta_mixin<basic_storage<Type, Entity>>;
+template<typename Type>
+struct entt::storage_type<Type, EntityCopy::my_entity> {
+    using type = EntityCopy::meta_mixin<basic_storage<Type, EntityCopy::my_entity>>;
 };
 
 template<typename Type>
-meta_mixin<Type>::meta_mixin(const allocator_type &allocator)
+struct entt::storage_type<Type, EntityCopy::other_entity> {
+    using type = EntityCopy::meta_mixin<basic_storage<Type, EntityCopy::other_entity>>;
+};
+
+template<typename Type>
+EntityCopy::meta_mixin<Type>::meta_mixin(const allocator_type &allocator)
     : Type{allocator} {
     using namespace entt::literals;
 
     entt::meta_factory<element_type>{}
         // cross registry, same type
-        .template func<entt::overload<entt::storage_for_t<element_type, entt::entity> &(const entt::id_type)>(&entt::basic_registry<entt::entity>::storage<element_type>), entt::as_ref_t>("storage"_hs)
+        .template func<entt::overload<entt::storage_for_t<element_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<element_type>), entt::as_ref_t>("storage"_hs)
         // cross registry, different types
-        .template func<entt::overload<entt::storage_for_t<element_type, my_entity> &(const entt::id_type)>(&entt::basic_registry<my_entity>::storage<element_type>), entt::as_ref_t>("storage"_hs);
+        .template func<entt::overload<entt::storage_for_t<element_type, other_entity> &(const entt::id_type)>(&entt::basic_registry<other_entity>::storage<element_type>), entt::as_ref_t>("storage"_hs);
 }
 
-template<typename Type>
-struct EntityCopy: testing::Test {
-    using type = Type;
-};
-
-using EntityCopyTypes = ::testing::Types<entt::basic_registry<entt::entity>, entt::basic_registry<my_entity>>;
-
-TYPED_TEST_SUITE(EntityCopy, EntityCopyTypes, );
-
-TEST(EntityCopy, SameRegistry) {
+TEST_F(EntityCopy, SameRegistry) {
     using namespace entt::literals;
 
-    entt::registry registry{};
+    entt::basic_registry<my_entity> registry{};
     auto &&custom = registry.storage<double>("custom"_hs);
 
     const auto src = registry.create();
@@ -58,7 +61,7 @@ TEST(EntityCopy, SameRegistry) {
     registry.emplace<int>(src, 2);
     registry.emplace<char>(src, 'c');
 
-    ASSERT_EQ(registry.storage<entt::entity>().size(), 2u);
+    ASSERT_EQ(registry.storage<my_entity>().size(), 2u);
     ASSERT_TRUE(custom.contains(src));
     ASSERT_FALSE(custom.contains(dst));
     ASSERT_TRUE((registry.all_of<int, char>(src)));
@@ -71,7 +74,7 @@ TEST(EntityCopy, SameRegistry) {
         }
     }
 
-    ASSERT_EQ(registry.storage<entt::entity>().size(), 2u);
+    ASSERT_EQ(registry.storage<my_entity>().size(), 2u);
     ASSERT_TRUE(custom.contains(src));
     ASSERT_FALSE(custom.contains(dst));
     ASSERT_TRUE((registry.all_of<int, char>(src)));
@@ -81,12 +84,11 @@ TEST(EntityCopy, SameRegistry) {
     ASSERT_EQ(registry.get<char>(dst), 'c');
 }
 
-TYPED_TEST(EntityCopy, CrossRegistry) {
+TEST_F(EntityCopy, CrossRegistry) {
     using namespace entt::literals;
 
-    entt::basic_registry<entt::entity> src{};
-    // other registry type, see typed test suite
-    typename TestFixture::type dst{};
+    entt::basic_registry<my_entity> src{};
+    entt::basic_registry<other_entity> dst{};
 
     const auto entity = src.create();
     const auto copy = dst.create();
@@ -94,8 +96,8 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
     src.emplace<int>(entity, 2);
     src.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(src.storage<entt::entity>().size(), 1u);
-    ASSERT_EQ(dst.template storage<typename TestFixture::type::entity_type>().size(), 1u);
+    ASSERT_EQ(src.storage<my_entity>().size(), 1u);
+    ASSERT_EQ(dst.storage<other_entity>().size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
     ASSERT_FALSE((dst.template all_of<int, char>(copy)));
@@ -114,8 +116,8 @@ TYPED_TEST(EntityCopy, CrossRegistry) {
         }
     }
 
-    ASSERT_EQ(src.storage<entt::entity>().size(), 1u);
-    ASSERT_EQ(dst.template storage<typename TestFixture::type::entity_type>().size(), 1u);
+    ASSERT_EQ(src.storage<my_entity>().size(), 1u);
+    ASSERT_EQ(dst.storage<other_entity>().size(), 1u);
 
     ASSERT_TRUE((src.all_of<int, char>(entity)));
     ASSERT_TRUE((dst.template all_of<int, char>(copy)));
