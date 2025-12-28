@@ -15,15 +15,23 @@
 #include "../../common/empty.h"
 #include "../../common/pointer_stable.h"
 
-struct shadow {
-    entt::entity target{entt::null};
+struct SnapshotCommonBase: testing::Test {
+    struct shadow {
+        entt::entity target{entt::null};
 
-    static void listener(entt::entity &elem, entt::registry &registry, const entt::entity entt) {
-        elem = registry.get<shadow>(entt).target;
-    }
+        static void listener(entt::entity &elem, entt::registry &registry, const entt::entity entt) {
+            elem = registry.get<shadow>(entt).target;
+        }
+    };
 };
 
-TEST(BasicSnapshot, Constructors) {
+struct BasicSnapshot: SnapshotCommonBase {};
+struct BasicSnapshotLoader: SnapshotCommonBase {};
+struct BasicContinuousLoader: SnapshotCommonBase {};
+
+using BasicSnapshotLoaderDeathTest = BasicSnapshotLoader;
+
+TEST_F(BasicSnapshot, Constructors) {
     static_assert(!std::is_default_constructible_v<entt::basic_snapshot<entt::registry>>, "Default constructible type not allowed");
     static_assert(!std::is_copy_constructible_v<entt::basic_snapshot<entt::registry>>, "Copy constructible type not allowed");
     static_assert(!std::is_copy_assignable_v<entt::basic_snapshot<entt::registry>>, "Copy assignable type not allowed");
@@ -37,7 +45,7 @@ TEST(BasicSnapshot, Constructors) {
     ASSERT_NO_THROW(snapshot = std::move(other));
 }
 
-TEST(BasicSnapshot, GetEntityType) {
+TEST_F(BasicSnapshot, GetEntityType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -85,7 +93,7 @@ TEST(BasicSnapshot, GetEntityType) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[4u]), storage.data()[2u]);
 }
 
-TEST(BasicSnapshot, GetType) {
+TEST_F(BasicSnapshot, GetType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -132,7 +140,7 @@ TEST(BasicSnapshot, GetType) {
     ASSERT_EQ(entt::any_cast<int>(data[4u]), value[2u]);
 }
 
-TEST(BasicSnapshot, GetPointerStableType) {
+TEST_F(BasicSnapshot, GetPointerStableType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -182,7 +190,7 @@ TEST(BasicSnapshot, GetPointerStableType) {
     ASSERT_EQ(entt::any_cast<test::pointer_stable>(data[5u]), value[2u]);
 }
 
-TEST(BasicSnapshot, GetEmptyType) {
+TEST_F(BasicSnapshot, GetEmptyType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -222,7 +230,7 @@ TEST(BasicSnapshot, GetEmptyType) {
     ASSERT_EQ(entt::any_cast<entt::entity>(data[2u]), entity[2u]);
 }
 
-TEST(BasicSnapshot, GetTypeSparse) {
+TEST_F(BasicSnapshot, GetTypeSparse) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -271,7 +279,7 @@ TEST(BasicSnapshot, GetTypeSparse) {
     ASSERT_EQ(entt::any_cast<int>(data[5u]), value[2u]);
 }
 
-TEST(BasicSnapshotLoader, Constructors) {
+TEST_F(BasicSnapshotLoader, Constructors) {
     static_assert(!std::is_default_constructible_v<entt::basic_snapshot_loader<entt::registry>>, "Default constructible type not allowed");
     static_assert(!std::is_copy_constructible_v<entt::basic_snapshot_loader<entt::registry>>, "Copy constructible type not allowed");
     static_assert(!std::is_copy_assignable_v<entt::basic_snapshot_loader<entt::registry>>, "Copy assignable type not allowed");
@@ -290,14 +298,14 @@ TEST(BasicSnapshotLoader, Constructors) {
     ASSERT_NO_THROW(loader = std::move(other));
 }
 
-ENTT_DEBUG_TEST(BasicSnapshotLoaderDeathTest, Constructors) {
+ENTT_DEBUG_TEST_F(BasicSnapshotLoaderDeathTest, Constructors) {
     entt::registry registry;
     registry.emplace<int>(registry.create());
 
     ASSERT_DEATH([[maybe_unused]] const entt::basic_snapshot_loader loader{registry}, "");
 }
 
-TEST(BasicSnapshotLoader, GetEntityType) {
+TEST_F(BasicSnapshotLoader, GetEntityType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -348,7 +356,7 @@ TEST(BasicSnapshotLoader, GetEntityType) {
     ASSERT_EQ(registry.create(), entity[2u]);
 }
 
-TEST(BasicSnapshotLoader, GetType) {
+TEST_F(BasicSnapshotLoader, GetType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -396,7 +404,7 @@ TEST(BasicSnapshotLoader, GetType) {
     ASSERT_EQ(storage.get(entity[1u]), value[1u]);
 }
 
-TEST(BasicSnapshotLoader, GetEmptyType) {
+TEST_F(BasicSnapshotLoader, GetEmptyType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -437,7 +445,7 @@ TEST(BasicSnapshotLoader, GetEmptyType) {
     ASSERT_TRUE(storage.contains(entity[1u]));
 }
 
-TEST(BasicSnapshotLoader, GetTypeSparse) {
+TEST_F(BasicSnapshotLoader, GetTypeSparse) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -488,7 +496,7 @@ TEST(BasicSnapshotLoader, GetTypeSparse) {
     ASSERT_EQ(storage.get(entity[1u]), value[1u]);
 }
 
-TEST(BasicSnapshotLoader, GetTypeWithListener) {
+TEST_F(BasicSnapshotLoader, GetTypeWithListener) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
@@ -515,7 +523,7 @@ TEST(BasicSnapshotLoader, GetTypeWithListener) {
     ASSERT_EQ(check, entity);
 }
 
-TEST(BasicSnapshotLoader, Orphans) {
+TEST_F(BasicSnapshotLoader, Orphans) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -552,7 +560,7 @@ TEST(BasicSnapshotLoader, Orphans) {
     ASSERT_FALSE(registry.valid(entity[1u]));
 }
 
-TEST(BasicContinuousLoader, Constructors) {
+TEST_F(BasicContinuousLoader, Constructors) {
     static_assert(!std::is_default_constructible_v<entt::basic_continuous_loader<entt::registry>>, "Default constructible type not allowed");
     static_assert(!std::is_copy_constructible_v<entt::basic_continuous_loader<entt::registry>>, "Copy constructible type not allowed");
     static_assert(!std::is_copy_assignable_v<entt::basic_continuous_loader<entt::registry>>, "Copy assignable type not allowed");
@@ -566,7 +574,7 @@ TEST(BasicContinuousLoader, Constructors) {
     ASSERT_NO_THROW(loader = std::move(other));
 }
 
-TEST(BasicContinuousLoader, GetEntityType) {
+TEST_F(BasicContinuousLoader, GetEntityType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -701,7 +709,7 @@ TEST(BasicContinuousLoader, GetEntityType) {
     ASSERT_EQ(storage[1u], loader.map(entity[1u]));
 }
 
-TEST(BasicContinuousLoader, GetType) {
+TEST_F(BasicContinuousLoader, GetType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -758,7 +766,7 @@ TEST(BasicContinuousLoader, GetType) {
     ASSERT_EQ(storage.get(loader.map(entity[1u])), value[1u]);
 }
 
-TEST(BasicContinuousLoader, GetTypeExtended) {
+TEST_F(BasicContinuousLoader, GetTypeExtended) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -811,7 +819,7 @@ TEST(BasicContinuousLoader, GetTypeExtended) {
     ASSERT_EQ(storage.get(loader.map(entity[1u])).target, loader.map(entity[0u]));
 }
 
-TEST(BasicContinuousLoader, GetEmptyType) {
+TEST_F(BasicContinuousLoader, GetEmptyType) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -861,7 +869,7 @@ TEST(BasicContinuousLoader, GetEmptyType) {
     ASSERT_TRUE(storage.contains(loader.map(entity[1u])));
 }
 
-TEST(BasicContinuousLoader, GetTypeSparse) {
+TEST_F(BasicContinuousLoader, GetTypeSparse) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -921,7 +929,7 @@ TEST(BasicContinuousLoader, GetTypeSparse) {
     ASSERT_EQ(storage.get(loader.map(entity[1u])), value[1u]);
 }
 
-TEST(BasicContinuousLoader, GetTypeWithListener) {
+TEST_F(BasicContinuousLoader, GetTypeWithListener) {
     using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
@@ -948,7 +956,7 @@ TEST(BasicContinuousLoader, GetTypeWithListener) {
     ASSERT_EQ(check, entity);
 }
 
-TEST(BasicContinuousLoader, Orphans) {
+TEST_F(BasicContinuousLoader, Orphans) {
     using namespace entt::literals;
     using traits_type = entt::entt_traits<entt::entity>;
 

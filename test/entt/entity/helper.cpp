@@ -11,17 +11,15 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/pointer_stable.h"
 
-struct clazz {
-    void func(entt::registry &, entt::entity curr) {
-        entt = curr;
-    }
+struct Invoke: testing::Test {
+    struct clazz {
+        void func(entt::registry &, entt::entity curr) {
+            entt = curr;
+        }
 
-    entt::entity entt{entt::null};
+        entt::entity entt{entt::null};
+    };
 };
-
-void sigh_callback(int &value) {
-    ++value;
-}
 
 template<typename Type>
 struct ToEntity: testing::Test {
@@ -35,6 +33,12 @@ using ToEntityTypes = ::testing::Types<int, test::pointer_stable>;
 
 TYPED_TEST_SUITE(ToEntity, ToEntityTypes, );
 TYPED_TEST_SUITE(ToEntityDeprecated, ToEntityTypes, );
+
+struct SighHelper: testing::Test {
+    static void sigh_callback(int &value) {
+        ++value;
+    }
+};
 
 TEST(AsView, Functionalities) {
     entt::registry registry;
@@ -55,7 +59,7 @@ TEST(AsGroup, Functionalities) {
     ([](entt::group<entt::owned_t<const double>, entt::get_t<const char>, entt::exclude_t<const int>>) {})(entt::as_group{cregistry});
 }
 
-TEST(Invoke, Functionalities) {
+TEST_F(Invoke, Functionalities) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -121,7 +125,7 @@ TYPED_TEST(ToEntity, Functionalities) {
     ASSERT_EQ(entt::to_entity(storage, storage.get(other)), other);
 }
 
-TEST(SighHelper, Functionalities) {
+TEST_F(SighHelper, Functionalities) {
     using namespace entt::literals;
 
     entt::registry registry{};

@@ -3,40 +3,44 @@
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/entity/entity.hpp>
-#include "../../common/entity.h"
 
-struct entity_traits {
-    using value_type = test::entity;
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
-    static constexpr entity_type entity_mask = 0x3FFFF; // 18b
-    static constexpr entity_type version_mask = 0x0FFF; // 12b
-};
+struct EntityBase: testing::Test {
+    enum my_entity : std::uint32_t {};
+    enum other_entity : std::uint32_t {};
 
-struct other_entity_traits {
-    using value_type = test::other_entity;
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
-    static constexpr entity_type entity_mask = 0xFFFFFFFF; // 32b
-    static constexpr entity_type version_mask = 0x00;      // 0b
+    struct entity_traits {
+        using value_type = my_entity;
+        using entity_type = std::uint32_t;
+        using version_type = std::uint16_t;
+        static constexpr entity_type entity_mask = 0x3FFFF; // 18b
+        static constexpr entity_type version_mask = 0x0FFF; // 12b
+    };
+
+    struct other_entity_traits {
+        using value_type = other_entity;
+        using entity_type = std::uint32_t;
+        using version_type = std::uint16_t;
+        static constexpr entity_type entity_mask = 0xFFFFFFFF; // 32b
+        static constexpr entity_type version_mask = 0x00;      // 0b
+    };
 };
 
 template<>
-struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
+struct entt::entt_traits<EntityBase::my_entity>: entt::basic_entt_traits<EntityBase::entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
 template<>
-struct entt::entt_traits<test::other_entity>: entt::basic_entt_traits<other_entity_traits> {
+struct entt::entt_traits<EntityBase::other_entity>: entt::basic_entt_traits<EntityBase::other_entity_traits> {
     static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
 template<typename Type>
-struct Entity: testing::Test {
+struct Entity: EntityBase {
     using type = Type;
 };
 
-using EntityTypes = ::testing::Types<entt::entity, test::entity, test::other_entity>;
+using EntityTypes = ::testing::Types<entt::entity, EntityBase::my_entity, EntityBase::other_entity>;
 
 TYPED_TEST_SUITE(Entity, EntityTypes, );
 

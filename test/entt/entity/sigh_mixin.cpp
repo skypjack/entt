@@ -12,7 +12,6 @@
 #include <entt/entity/storage.hpp>
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
-#include "../../common/entity.h"
 #include "../../common/linter.hpp"
 #include "../../common/non_default_constructible.h"
 #include "../../common/pointer_stable.h"
@@ -20,37 +19,41 @@
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
 
-struct auto_signal final {
-    auto_signal(bool &cflag, bool &uflag, bool &dflag)
-        : created{&cflag},
-          updated{&uflag},
-          destroyed{&dflag} {}
+struct SighMixinBase: testing::Test {
+    enum class my_entity : std::uint32_t {};
 
-    static void on_construct(entt::registry &registry, const entt::entity entt) {
-        *registry.get<auto_signal>(entt).created = true;
+    struct auto_signal final {
+        auto_signal(bool &cflag, bool &uflag, bool &dflag)
+            : created{&cflag},
+              updated{&uflag},
+              destroyed{&dflag} {}
+
+        static void on_construct(entt::registry &registry, const entt::entity entt) {
+            *registry.get<auto_signal>(entt).created = true;
+        }
+
+        static void on_update(entt::registry &registry, const entt::entity entt) {
+            *registry.get<auto_signal>(entt).updated = true;
+        }
+
+        static void on_destroy(entt::registry &registry, const entt::entity entt) {
+            *registry.get<auto_signal>(entt).destroyed = true;
+        }
+
+    private:
+        bool *created{};
+        bool *updated{};
+        bool *destroyed{};
+    };
+
+    template<typename Registry>
+    static void listener(std::size_t &counter, Registry &, typename Registry::entity_type) {
+        ++counter;
     }
-
-    static void on_update(entt::registry &registry, const entt::entity entt) {
-        *registry.get<auto_signal>(entt).updated = true;
-    }
-
-    static void on_destroy(entt::registry &registry, const entt::entity entt) {
-        *registry.get<auto_signal>(entt).destroyed = true;
-    }
-
-private:
-    bool *created{};
-    bool *updated{};
-    bool *destroyed{};
 };
 
-template<typename Registry>
-void listener(std::size_t &counter, Registry &, typename Registry::entity_type) {
-    ++counter;
-}
-
 template<typename Type>
-struct SighMixin: testing::Test {
+struct SighMixin: SighMixinBase {
     using type = Type;
 };
 
@@ -84,8 +87,8 @@ TYPED_TEST(SighMixin, Functionalities) {
     ASSERT_EQ(on_construct, 0u);
     ASSERT_EQ(on_destroy, 0u);
 
-    pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     ASSERT_NE(pool.push(entity[0u]), pool.entt::sparse_set::end());
 
@@ -149,7 +152,7 @@ TYPED_TEST(SighMixin, InsertWeakRange) {
 
     ASSERT_EQ(on_construct, 0u);
 
-    pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
+    pool.on_construct().template connect<&SighMixinBase::listener<entt::registry>>(on_construct);
     pool.insert(view.begin(), view.end());
 
     ASSERT_EQ(on_construct, 2u);
@@ -174,8 +177,8 @@ TEST(SighMixin, NonDefaultConstructibleType) {
     ASSERT_EQ(on_construct, 0u);
     ASSERT_EQ(on_destroy, 0u);
 
-    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     ASSERT_EQ(pool.push(entity[0u]), pool.entt::sparse_set::end());
 
@@ -226,8 +229,8 @@ TEST(SighMixin, VoidType) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     pool.emplace(entity);
 
@@ -264,8 +267,8 @@ TEST(SighMixin, StorageEntity) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.on_construct().connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     pool.push(entt::entity{1});
 
@@ -328,8 +331,8 @@ TYPED_TEST(SighMixin, Move) {
     std::size_t on_destroy{};
 
     pool.bind(registry);
-    pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     pool.emplace(entt::entity{3}, 3);
 
@@ -390,12 +393,12 @@ TYPED_TEST(SighMixin, Swap) {
     std::size_t on_destroy{};
 
     pool.bind(registry);
-    pool.on_construct().template connect<&listener<entt::registry>>(on_construct);
-    pool.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     other.bind(registry);
-    other.on_construct().template connect<&listener<entt::registry>>(on_construct);
-    other.on_destroy().template connect<&listener<entt::registry>>(on_destroy);
+    other.on_construct().template connect<&SighMixinBase::listener<entt::registry>>(on_construct);
+    other.on_destroy().template connect<&SighMixinBase::listener<entt::registry>>(on_destroy);
 
     pool.emplace(entt::entity{4}, 1);
 
@@ -435,28 +438,28 @@ TEST(SighMixin, AutoSignal) {
     bool updated{};
     bool destroyed{};
 
-    registry.emplace<auto_signal>(entity, created, updated, destroyed);
-    registry.replace<auto_signal>(entity, created, updated, destroyed);
-    registry.erase<auto_signal>(entity);
+    registry.emplace<SighMixinBase::auto_signal>(entity, created, updated, destroyed);
+    registry.replace<SighMixinBase::auto_signal>(entity, created, updated, destroyed);
+    registry.erase<SighMixinBase::auto_signal>(entity);
 
     ASSERT_TRUE(created);
     ASSERT_TRUE(updated);
     ASSERT_TRUE(destroyed);
 
-    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_TRUE(registry.storage<SighMixinBase::auto_signal>().empty());
     ASSERT_TRUE(registry.valid(entity));
 
     created = updated = destroyed = false;
 
-    registry.emplace<auto_signal>(entity, created, updated, destroyed);
-    registry.replace<auto_signal>(entity, created, updated, destroyed);
+    registry.emplace<SighMixinBase::auto_signal>(entity, created, updated, destroyed);
+    registry.replace<SighMixinBase::auto_signal>(entity, created, updated, destroyed);
     registry.destroy(entity);
 
     ASSERT_TRUE(created);
     ASSERT_TRUE(updated);
     ASSERT_TRUE(destroyed);
 
-    ASSERT_TRUE(registry.storage<auto_signal>().empty());
+    ASSERT_TRUE(registry.storage<SighMixinBase::auto_signal>().empty());
     ASSERT_FALSE(registry.valid(entity));
 }
 
@@ -484,10 +487,10 @@ ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, Registry) {
 
 TYPED_TEST(SighMixin, CustomRegistry) {
     using value_type = TestFixture::type;
-    using registry_type = test::custom_registry<test::entity>;
+    using registry_type = test::custom_registry<SighMixinBase::my_entity>;
 
     registry_type registry;
-    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, SighMixinBase::my_entity>, registry_type> pool;
     const std::array entity{registry.create(), registry.create()};
 
     ASSERT_FALSE(pool);
@@ -499,8 +502,8 @@ TYPED_TEST(SighMixin, CustomRegistry) {
     std::size_t on_construct{};
     std::size_t on_destroy{};
 
-    pool.on_construct().template connect<&listener<registry_type>>(on_construct);
-    pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<registry_type>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<registry_type>>(on_destroy);
 
     pool.emplace(entity[0u]);
     pool.emplace(entity[1u]);
@@ -516,8 +519,8 @@ TYPED_TEST(SighMixin, CustomRegistry) {
 
 ENTT_DEBUG_TYPED_TEST(SighMixinDeathTest, CustomRegistry) {
     using value_type = TestFixture::type;
-    using registry_type = test::custom_registry<test::entity>;
-    entt::basic_sigh_mixin<entt::basic_storage<value_type, test::entity>, registry_type> pool;
+    using registry_type = test::custom_registry<SighMixinBase::my_entity>;
+    entt::basic_sigh_mixin<entt::basic_storage<value_type, SighMixinBase::my_entity>, registry_type> pool;
     ASSERT_DEATH([[maybe_unused]] auto &registry = pool.registry(), "");
     ASSERT_DEATH([[maybe_unused]] const auto &registry = std::as_const(pool).registry(), "");
 }
@@ -535,8 +538,8 @@ TYPED_TEST(SighMixin, CustomAllocator) {
     std::size_t on_destroy{};
 
     pool.bind(registry);
-    pool.on_construct().template connect<&listener<registry_type>>(on_construct);
-    pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<registry_type>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<registry_type>>(on_destroy);
 
     pool.reserve(1u);
 
@@ -597,8 +600,8 @@ TYPED_TEST(SighMixin, ThrowingAllocator) {
     std::size_t on_destroy{};
 
     pool.bind(registry);
-    pool.on_construct().template connect<&listener<registry_type>>(on_construct);
-    pool.on_destroy().template connect<&listener<registry_type>>(on_destroy);
+    pool.on_construct().template connect<&SighMixinBase::listener<registry_type>>(on_construct);
+    pool.on_destroy().template connect<&SighMixinBase::listener<registry_type>>(on_destroy);
 
     pool.get_allocator().template throw_counter<value_type>(0u);
 
@@ -665,8 +668,8 @@ TEST(SighMixin, ThrowingComponent) {
     std::size_t on_destroy{};
 
     pool.bind(registry);
-    pool.on_construct().connect<&listener<registry_type>>(on_construct);
-    pool.on_destroy().connect<&listener<registry_type>>(on_destroy);
+    pool.on_construct().connect<&SighMixinBase::listener<registry_type>>(on_construct);
+    pool.on_destroy().connect<&SighMixinBase::listener<registry_type>>(on_destroy);
 
     const std::array entity{entt::entity{3}, entt::entity{1}};
     const std::array<test::throwing_type, 2u> value{true, false};

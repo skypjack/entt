@@ -212,11 +212,14 @@ if(ENTT_BUILD_SNAPSHOT)
 
     FetchContent_MakeAvailable(cereal)
 
-    SETUP_BASIC_TEST_DEPRECATED(cereal_snapshot snapshot/snapshot.cpp)
+    SETUP_BASIC_TEST(
+        NAME snapshot
+        SOURCES snapshot/snapshot.cpp
+    )
 
-    target_link_libraries(cereal_snapshot PRIVATE cereal)
-    target_compile_options(cereal_snapshot PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
-    set_target_properties(cereal_snapshot PROPERTIES CXX_CLANG_TIDY "")
+    target_link_libraries(snapshot PRIVATE cereal)
+    target_compile_options(snapshot PRIVATE $<$<NOT:$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","MSVC">>:-Wno-conversion>)
+    set_target_properties(snapshot PROPERTIES CXX_CLANG_TIDY "")
 endif()
 
 # Test config
@@ -260,24 +263,34 @@ SETUP_BASIC_TEST(
 
 # Test entity
 
-SETUP_BASIC_TEST_DEPRECATED(component entt/entity/component.cpp)
-SETUP_BASIC_TEST_DEPRECATED(entity entt/entity/entity.cpp)
-SETUP_BASIC_TEST_DEPRECATED(group entt/entity/group.cpp)
-SETUP_BASIC_TEST_DEPRECATED(handle entt/entity/handle.cpp)
-SETUP_BASIC_TEST_DEPRECATED(helper entt/entity/helper.cpp)
-SETUP_BASIC_TEST_DEPRECATED(organizer entt/entity/organizer.cpp)
-SETUP_BASIC_TEST_DEPRECATED(reactive_mixin entt/entity/reactive_mixin.cpp)
-SETUP_BASIC_TEST_DEPRECATED(registry entt/entity/registry.cpp)
-SETUP_BASIC_TEST_DEPRECATED(runtime_view entt/entity/runtime_view.cpp)
-SETUP_BASIC_TEST_DEPRECATED(sigh_mixin entt/entity/sigh_mixin.cpp)
-SETUP_BASIC_TEST_DEPRECATED(snapshot entt/entity/snapshot.cpp)
-SETUP_BASIC_TEST_DEPRECATED(sparse_set entt/entity/sparse_set.cpp)
-SETUP_BASIC_TEST_DEPRECATED(storage entt/entity/storage.cpp)
-SETUP_BASIC_TEST_DEPRECATED(storage_entity entt/entity/storage_entity.cpp)
-SETUP_BASIC_TEST_DEPRECATED(storage_no_instance entt/entity/storage_no_instance.cpp)
-SETUP_BASIC_TEST_DEPRECATED(storage_utility entt/entity/storage_utility.cpp)
-SETUP_BASIC_TEST_DEPRECATED(storage_utility_no_mixin entt/entity/storage_utility.cpp ENTT_NO_MIXIN)
-SETUP_BASIC_TEST_DEPRECATED(view entt/entity/view.cpp)
+SETUP_BASIC_TEST(
+    NAME entity
+    SOURCES
+        entt/entity/component.cpp
+        entt/entity/entity.cpp
+        entt/entity/group.cpp
+        entt/entity/handle.cpp
+        entt/entity/helper.cpp
+        entt/entity/organizer.cpp
+        entt/entity/reactive_mixin.cpp
+        entt/entity/registry.cpp
+        entt/entity/runtime_view.cpp
+        entt/entity/sigh_mixin.cpp
+        entt/entity/snapshot.cpp
+        entt/entity/sparse_set.cpp
+        entt/entity/storage.cpp
+        entt/entity/storage_entity.cpp
+        entt/entity/storage_no_instance.cpp
+        entt/entity/storage_utility.cpp
+        entt/entity/view.cpp
+)
+
+SETUP_BASIC_TEST(
+    NAME entity_no_mixin
+    SOURCES
+        entt/entity/storage_utility.cpp
+    DEFS ENTT_NO_MIXIN
+)
 
 # Test graph
 

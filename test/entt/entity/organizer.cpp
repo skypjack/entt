@@ -10,31 +10,33 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 
-void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
-void ro_char_rw_int(entt::group<entt::owned_t<int>, entt::get_t<const char>>) {}
-void ro_char_rw_double(entt::view<entt::get_t<const char>>, double &) {}
-void ro_int_double(entt::view<entt::get_t<const int>>, const double &) {}
-void sync_point(entt::registry &, entt::view<entt::get_t<const int>>) {}
+struct Organizer: testing::Test {
+    static void ro_int_rw_char_double(entt::view<entt::get_t<const int, char>>, double &) {}
+    static void ro_char_rw_int(entt::group<entt::owned_t<int>, entt::get_t<const char>>) {}
+    static void ro_char_rw_double(entt::view<entt::get_t<const char>>, double &) {}
+    static void ro_int_double(entt::view<entt::get_t<const int>>, const double &) {}
+    static void sync_point(entt::registry &, entt::view<entt::get_t<const int>>) {}
 
-struct clazz {
-    void ro_int_char_double(entt::view<entt::get_t<const int, const char>>, const double &) {}
-    void rw_int(entt::view<entt::get_t<int>>) {}
-    void rw_int_char(entt::view<entt::get_t<int, char>>) {}
-    void rw_int_char_double(entt::view<entt::get_t<int, char>>, double &) {}
+    struct clazz {
+        void ro_int_char_double(entt::view<entt::get_t<const int, const char>>, const double &) {}
+        void rw_int(entt::view<entt::get_t<int>>) {}
+        void rw_int_char(entt::view<entt::get_t<int, char>>) {}
+        void rw_int_char_double(entt::view<entt::get_t<int, char>>, double &) {}
 
-    static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
-    static void ro_char_with_payload(const clazz &, entt::group<entt::owned_t<const char>>) {}
-    static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
+        static void ro_int_with_payload(const clazz &, entt::view<entt::get_t<const int>>) {}
+        static void ro_char_with_payload(const clazz &, entt::group<entt::owned_t<const char>>) {}
+        static void ro_int_char_with_payload(clazz &, entt::view<entt::get_t<const int, const char>>) {}
 
-    static void const_registry_first(const entt::registry &, entt::view<entt::get_t<int>>) {}
-    static void const_registry_second(const entt::registry &, entt::view<entt::get_t<double>>) {}
+        static void const_registry_first(const entt::registry &, entt::view<entt::get_t<int>>) {}
+        static void const_registry_second(const entt::registry &, entt::view<entt::get_t<double>>) {}
+    };
+
+    static void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &) {
+        value = view.size();
+    }
 };
 
-void to_args_integrity(entt::view<entt::get_t<int>> view, std::size_t &value, entt::registry &) {
-    value = view.size();
-}
-
-TEST(Organizer, EmplaceFreeFunction) {
+TEST_F(Organizer, EmplaceFreeFunction) {
     entt::organizer organizer;
     entt::registry registry;
 
@@ -101,7 +103,7 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_EQ(organizer.graph().size(), 0u);
 }
 
-TEST(Organizer, EmplaceMemberFunction) {
+TEST_F(Organizer, EmplaceMemberFunction) {
     entt::organizer organizer;
     entt::registry registry;
     clazz instance;
@@ -167,7 +169,7 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_EQ(organizer.graph().size(), 0u);
 }
 
-TEST(Organizer, EmplaceFreeFunctionWithPayload) {
+TEST_F(Organizer, EmplaceFreeFunctionWithPayload) {
     entt::organizer organizer;
     entt::registry registry;
     clazz instance;
@@ -240,7 +242,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_EQ(organizer.graph().size(), 0u);
 }
 
-TEST(Organizer, EmplaceDirectFunction) {
+TEST_F(Organizer, EmplaceDirectFunction) {
     entt::organizer organizer;
     entt::registry registry;
     clazz instance;
@@ -322,7 +324,7 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_EQ(organizer.graph().size(), 0u);
 }
 
-TEST(Organizer, SyncPoint) {
+TEST_F(Organizer, SyncPoint) {
     entt::organizer organizer;
     entt::registry registry;
     clazz instance;
@@ -385,7 +387,7 @@ TEST(Organizer, SyncPoint) {
     }
 }
 
-TEST(Organizer, ConstRegistry) {
+TEST_F(Organizer, ConstRegistry) {
     entt::organizer organizer;
     entt::registry registry;
 
@@ -414,7 +416,7 @@ TEST(Organizer, ConstRegistry) {
     }
 }
 
-TEST(Organizer, Override) {
+TEST_F(Organizer, Override) {
     entt::organizer organizer;
 
     organizer.emplace<&ro_int_rw_char_double, const char, const double>("t1");
@@ -446,7 +448,7 @@ TEST(Organizer, Override) {
     ASSERT_EQ(graph[1u].out_edges()[0u], 2u);
 }
 
-TEST(Organizer, Prepare) {
+TEST_F(Organizer, Prepare) {
     entt::organizer organizer;
     entt::registry registry;
     clazz instance;
@@ -477,7 +479,7 @@ TEST(Organizer, Prepare) {
     ASSERT_EQ(std::as_const(registry).storage<double>(), nullptr);
 }
 
-TEST(Organizer, Dependencies) {
+TEST_F(Organizer, Dependencies) {
     entt::organizer organizer;
     clazz instance;
 
@@ -524,7 +526,7 @@ TEST(Organizer, Dependencies) {
     ASSERT_EQ(*buffer[0u], entt::type_id<char>());
 }
 
-TEST(Organizer, ToArgsIntegrity) {
+TEST_F(Organizer, ToArgsIntegrity) {
     entt::organizer organizer;
     entt::registry registry;
 

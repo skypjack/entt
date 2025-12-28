@@ -21,62 +21,65 @@
 #include "../../common/throwing_type.hpp"
 #include "../../common/tracked_memory_resource.hpp"
 
-struct update_from_destructor {
-    update_from_destructor(entt::storage<update_from_destructor> &ref, entt::entity other)
-        : storage{&ref},
-          target{other} {}
+struct StorageBase: testing::Test {
+    enum class my_entity : std::uint32_t {};
 
-    update_from_destructor(const update_from_destructor &) = delete;
-    update_from_destructor &operator=(const update_from_destructor &) = delete;
+    struct update_from_destructor {
+        update_from_destructor(entt::basic_storage<update_from_destructor, my_entity> &ref, my_entity other)
+            : storage{&ref},
+              target{other} {}
 
-    update_from_destructor(update_from_destructor &&other) noexcept
-        : storage{std::exchange(other.storage, nullptr)},
-          target{std::exchange(other.target, entt::null)} {}
+        update_from_destructor(const update_from_destructor &) = delete;
+        update_from_destructor &operator=(const update_from_destructor &) = delete;
 
-    update_from_destructor &operator=(update_from_destructor &&other) noexcept {
-        storage = std::exchange(other.storage, nullptr);
-        target = std::exchange(other.target, entt::null);
-        return *this;
-    }
+        update_from_destructor(update_from_destructor &&other) noexcept
+            : storage{std::exchange(other.storage, nullptr)},
+              target{std::exchange(other.target, entt::null)} {}
 
-    ~update_from_destructor() {
-        if(target != entt::null && storage->contains(target)) {
-            storage->erase(target);
+        update_from_destructor &operator=(update_from_destructor &&other) noexcept {
+            storage = std::exchange(other.storage, nullptr);
+            target = std::exchange(other.target, entt::null);
+            return *this;
         }
-    }
 
-private:
-    entt::storage<update_from_destructor> *storage{};
-    entt::entity target{entt::null};
-};
-
-struct create_from_constructor {
-    create_from_constructor(entt::storage<create_from_constructor> &ref, entt::entity other)
-        : child{other} {
-        if(child != entt::null) {
-            ref.emplace(child, ref, entt::null);
+        ~update_from_destructor() {
+            if(target != entt::null && storage->contains(target)) {
+                storage->erase(target);
+            }
         }
-    }
 
-    entt::entity child;
+    private:
+        entt::basic_storage<update_from_destructor, my_entity> *storage{};
+        my_entity target{entt::null};
+    };
+
+    struct create_from_constructor {
+        create_from_constructor(entt::basic_storage<create_from_constructor, my_entity> &ref, my_entity other)
+            : child{other} {
+            if(child != entt::null) {
+                ref.emplace(child, ref, entt::null);
+            }
+        }
+
+        my_entity child;
+    };
 };
 
 template<>
-struct entt::component_traits<std::unordered_set<char>> {
+struct entt::component_traits<std::unordered_set<char>, StorageBase::my_entity> {
     static constexpr auto in_place_delete = true;
     static constexpr auto page_size = 4u;
 };
 
 template<>
-struct entt::component_traits<int> {
+struct entt::component_traits<int, StorageBase::my_entity> {
     static constexpr auto in_place_delete = false;
     static constexpr auto page_size = 128u;
 };
 
 template<typename Type>
-struct Storage: testing::Test {
-    static_assert(entt::component_traits<Type>::page_size != 0u, "Empty type not allowed");
-
+struct Storage: StorageBase {
+    static_assert(entt::component_traits<Type, my_entity>::page_size != 0u, "Empty type not allowed");
     using type = Type;
 };
 
@@ -90,15 +93,16 @@ TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
 
 TYPED_TEST(Storage, Constructors) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
     ASSERT_EQ(pool.info(), entt::type_id<value_type>());
 
-    pool = entt::storage<value_type>{std::allocator<value_type>{}};
+    pool = entt::basic_storage<value_type, entity_type>{std::allocator<value_type>{}};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy{traits_type::in_place_delete});
     ASSERT_NO_THROW([[maybe_unused]] auto alloc = pool.get_allocator());
@@ -107,16 +111,17 @@ TYPED_TEST(Storage, Constructors) {
 
 TYPED_TEST(Storage, Move) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{3}, entt::entity{2}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{3}, entity_type{2}};
 
     pool.emplace(entity[0u], 3);
 
     static_assert(std::is_move_constructible_v<decltype(pool)>, "Move constructible type required");
     static_assert(std::is_move_assignable_v<decltype(pool)>, "Move assignable type required");
 
-    entt::storage<value_type> other{std::move(pool)};
+    entt::basic_storage<value_type, entity_type> other{std::move(pool)};
 
     test::is_initialized(pool);
 
@@ -127,7 +132,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(other.index(entity[0u]), 0u);
     ASSERT_EQ(other.get(entity[0u]), value_type{3});
 
-    entt::storage<value_type> extended{std::move(other), std::allocator<value_type>{}};
+    entt::basic_storage<value_type, entity_type> extended{std::move(other), std::allocator<value_type>{}};
 
     test::is_initialized(other);
 
@@ -149,7 +154,7 @@ TYPED_TEST(Storage, Move) {
     ASSERT_EQ(pool.index(entity[0u]), 0u);
     ASSERT_EQ(pool.get(entity[0u]), value_type{3});
 
-    other = entt::storage<value_type>{};
+    other = entt::basic_storage<value_type, entity_type>{};
     other.emplace(entity[1u], 2);
     other = std::move(pool);
     test::is_initialized(pool);
@@ -164,19 +169,20 @@ TYPED_TEST(Storage, Move) {
 
 TYPED_TEST(Storage, Swap) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    entt::storage<value_type> other;
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_storage<value_type, entity_type> other;
 
     ASSERT_EQ(pool.info(), entt::type_id<value_type>());
     ASSERT_EQ(other.info(), entt::type_id<value_type>());
 
-    pool.emplace(entt::entity{4}, 1);
+    pool.emplace(entity_type{4}, 1);
 
-    other.emplace(entt::entity{2}, 2);
-    other.emplace(entt::entity{1}, 3);
-    other.erase(entt::entity{2});
+    other.emplace(entity_type{2}, 2);
+    other.emplace(entity_type{1}, 3);
+    other.erase(entity_type{2});
 
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_EQ(other.size(), 1u + traits_type::in_place_delete);
@@ -189,18 +195,19 @@ TYPED_TEST(Storage, Swap) {
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
     ASSERT_EQ(other.size(), 1u);
 
-    ASSERT_EQ(pool.index(entt::entity{1}), traits_type::in_place_delete);
-    ASSERT_EQ(other.index(entt::entity{4}), 0u);
+    ASSERT_EQ(pool.index(entity_type{1}), traits_type::in_place_delete);
+    ASSERT_EQ(other.index(entity_type{4}), 0u);
 
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{3});
-    ASSERT_EQ(other.get(entt::entity{4}), value_type{1});
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{3});
+    ASSERT_EQ(other.get(entity_type{4}), value_type{1});
 }
 
 TYPED_TEST(Storage, Capacity) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     pool.reserve(64);
 
@@ -215,16 +222,17 @@ TYPED_TEST(Storage, Capacity) {
 
 TYPED_TEST(Storage, ShrinkToFit) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     for(std::size_t next{}; next < traits_type::page_size; ++next) {
-        pool.emplace(entt::entity(next));
+        pool.emplace(entity_type(next));
     }
 
-    pool.emplace(entt::entity{traits_type::page_size});
-    pool.erase(entt::entity{traits_type::page_size});
+    pool.emplace(entity_type{traits_type::page_size});
+    pool.erase(entity_type{traits_type::page_size});
     pool.compact();
 
     ASSERT_EQ(pool.capacity(), 2 * traits_type::page_size);
@@ -248,11 +256,12 @@ TYPED_TEST(Storage, ShrinkToFit) {
 
 TYPED_TEST(Storage, Raw) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{1}, 1);
-    pool.emplace(entt::entity{3}, 3);
+    pool.emplace(entity_type{1}, 1);
+    pool.emplace(entity_type{3}, 3);
 
     ASSERT_EQ(pool.raw()[0u][0u], value_type{1});
     ASSERT_EQ(std::as_const(pool).raw()[0u][1u], value_type{3});
@@ -260,14 +269,15 @@ TYPED_TEST(Storage, Raw) {
 
 TYPED_TEST(Storage, Iterator) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, value_type>();
     testing::StaticAssertTypeEq<typename iterator::pointer, value_type *>();
     testing::StaticAssertTypeEq<typename iterator::reference, value_type &>();
 
-    entt::storage<value_type> pool;
-    pool.emplace(entt::entity{1}, 2);
+    entt::basic_storage<value_type, entity_type> pool;
+    pool.emplace(entity_type{1}, 2);
 
     iterator end{pool.begin()};
     iterator begin{};
@@ -311,7 +321,7 @@ TYPED_TEST(Storage, Iterator) {
     ASSERT_EQ(begin.index(), 0);
     ASSERT_EQ(end.index(), -1);
 
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{3}, 4);
     begin = pool.begin();
 
     ASSERT_EQ(begin.index(), 1);
@@ -323,14 +333,15 @@ TYPED_TEST(Storage, Iterator) {
 
 TYPED_TEST(Storage, ConstIterator) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::const_iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::const_iterator;
 
     testing::StaticAssertTypeEq<typename iterator::value_type, value_type>();
     testing::StaticAssertTypeEq<typename iterator::pointer, const value_type *>();
     testing::StaticAssertTypeEq<typename iterator::reference, const value_type &>();
 
-    entt::storage<value_type> pool;
-    pool.emplace(entt::entity{1}, 2);
+    entt::basic_storage<value_type, entity_type> pool;
+    pool.emplace(entity_type{1}, 2);
 
     iterator cend{pool.cbegin()};
     iterator cbegin{};
@@ -376,7 +387,7 @@ TYPED_TEST(Storage, ConstIterator) {
     ASSERT_EQ(cbegin.index(), 0);
     ASSERT_EQ(cend.index(), -1);
 
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{3}, 4);
     cbegin = pool.cbegin();
 
     ASSERT_EQ(cbegin.index(), 1);
@@ -388,14 +399,15 @@ TYPED_TEST(Storage, ConstIterator) {
 
 TYPED_TEST(Storage, ReverseIterator) {
     using value_type = TestFixture::type;
-    using reverse_iterator = entt::storage<value_type>::reverse_iterator;
+    using entity_type = TestFixture::my_entity;
+    using reverse_iterator = entt::basic_storage<value_type, entity_type>::reverse_iterator;
 
     testing::StaticAssertTypeEq<typename reverse_iterator::value_type, value_type>();
     testing::StaticAssertTypeEq<typename reverse_iterator::pointer, value_type *>();
     testing::StaticAssertTypeEq<typename reverse_iterator::reference, value_type &>();
 
-    entt::storage<value_type> pool;
-    pool.emplace(entt::entity{1}, 2);
+    entt::basic_storage<value_type, entity_type> pool;
+    pool.emplace(entity_type{1}, 2);
 
     reverse_iterator end{pool.rbegin()};
     reverse_iterator begin{};
@@ -439,7 +451,7 @@ TYPED_TEST(Storage, ReverseIterator) {
     ASSERT_EQ(begin.base().index(), -1);
     ASSERT_EQ(end.base().index(), 0);
 
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{3}, 4);
     begin = pool.rbegin();
     end = pool.rend();
 
@@ -452,14 +464,15 @@ TYPED_TEST(Storage, ReverseIterator) {
 
 TYPED_TEST(Storage, ConstReverseIterator) {
     using value_type = TestFixture::type;
-    using const_reverse_iterator = entt::storage<value_type>::const_reverse_iterator;
+    using entity_type = TestFixture::my_entity;
+    using const_reverse_iterator = entt::basic_storage<value_type, entity_type>::const_reverse_iterator;
 
     testing::StaticAssertTypeEq<typename const_reverse_iterator::value_type, value_type>();
     testing::StaticAssertTypeEq<typename const_reverse_iterator::pointer, const value_type *>();
     testing::StaticAssertTypeEq<typename const_reverse_iterator::reference, const value_type &>();
 
-    entt::storage<value_type> pool;
-    pool.emplace(entt::entity{1}, 2);
+    entt::basic_storage<value_type, entity_type> pool;
+    pool.emplace(entity_type{1}, 2);
 
     const_reverse_iterator cend{pool.crbegin()};
     const_reverse_iterator cbegin{};
@@ -505,7 +518,7 @@ TYPED_TEST(Storage, ConstReverseIterator) {
     ASSERT_EQ(cbegin.base().index(), -1);
     ASSERT_EQ(cend.base().index(), 0);
 
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{3}, 4);
     cbegin = pool.crbegin();
     cend = pool.crend();
 
@@ -518,13 +531,14 @@ TYPED_TEST(Storage, ConstReverseIterator) {
 
 TYPED_TEST(Storage, IteratorConversion) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{1}, 2);
+    pool.emplace(entity_type{1}, 2);
 
-    const typename entt::storage<value_type>::iterator it = pool.begin();
-    typename entt::storage<value_type>::const_iterator cit = it;
+    const typename entt::basic_storage<value_type, entity_type>::iterator it = pool.begin();
+    typename entt::basic_storage<value_type, entity_type>::const_iterator cit = it;
 
     testing::StaticAssertTypeEq<decltype(*it), value_type &>();
     testing::StaticAssertTypeEq<decltype(*cit), const value_type &>();
@@ -544,17 +558,18 @@ TYPED_TEST(Storage, IteratorConversion) {
 
 TYPED_TEST(Storage, IteratorPageSizeAwareness) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    static_assert(!std::is_same_v<value_type, int> || (traits_type::page_size != entt::component_traits<value_type *>::page_size), "Different page size required");
+    static_assert(!std::is_same_v<value_type, int> || (traits_type::page_size != entt::component_traits<value_type *, entity_type>::page_size), "Different page size required");
 
     for(unsigned int next{}; next < traits_type::page_size; ++next) {
-        pool.emplace(entt::entity{next});
+        pool.emplace(entity_type{next});
     }
 
-    pool.emplace(entt::entity{traits_type::page_size});
+    pool.emplace(entity_type{traits_type::page_size});
 
     // test the proper use of component traits by the storage iterator
     ASSERT_EQ(&pool.begin()[0], pool.raw()[1u]);
@@ -563,9 +578,10 @@ TYPED_TEST(Storage, IteratorPageSizeAwareness) {
 
 TYPED_TEST(Storage, Getters) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const entt::entity entity{1};
+    entt::basic_storage<value_type, entity_type> pool;
+    const entity_type entity{1};
 
     pool.emplace(entity, 3);
 
@@ -584,9 +600,10 @@ TYPED_TEST(Storage, Getters) {
 
 ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Getters) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const entt::entity entity{4};
+    entt::basic_storage<value_type, entity_type> pool;
+    const entity_type entity{4};
 
     ASSERT_DEATH([[maybe_unused]] const auto &value = pool.get(entity), "");
     ASSERT_DEATH([[maybe_unused]] const auto &value = std::as_const(pool).get(entity), "");
@@ -597,9 +614,10 @@ ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Getters) {
 
 TYPED_TEST(Storage, Value) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const entt::entity entity{2};
+    entt::basic_storage<value_type, entity_type> pool;
+    const entity_type entity{2};
 
     pool.emplace(entity);
 
@@ -608,38 +626,44 @@ TYPED_TEST(Storage, Value) {
 
 ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Value) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    ASSERT_DEATH([[maybe_unused]] const void *value = pool.value(entt::entity{2}), "");
+    ASSERT_DEATH([[maybe_unused]] const void *value = pool.value(entity_type{2}), "");
 }
 
 TYPED_TEST(Storage, Emplace) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), value_type &>();
 
-    ASSERT_EQ(pool.emplace(entt::entity{3}), value_type{});
-    ASSERT_EQ(pool.emplace(entt::entity{1}, 2), value_type{2});
+    ASSERT_EQ(pool.emplace(entity_type{3}), value_type{});
+    ASSERT_EQ(pool.emplace(entity_type{1}, 2), value_type{2});
 }
 
 TEST(Storage, EmplaceAggregate) {
-    entt::storage<test::aggregate> pool;
+    using entity_type = StorageBase::my_entity;
+
+    entt::basic_storage<test::aggregate, entity_type> pool;
 
     testing::StaticAssertTypeEq<decltype(pool.emplace({})), test::aggregate &>();
 
     // aggregate types with no args enter the non-aggregate path
-    ASSERT_EQ(pool.emplace(entt::entity{3}), test::aggregate{});
+    ASSERT_EQ(pool.emplace(entity_type{3}), test::aggregate{});
     // aggregate types with args work despite the lack of support in the standard library
-    ASSERT_EQ(pool.emplace(entt::entity{1}, 2), test::aggregate{2});
+    ASSERT_EQ(pool.emplace(entity_type{1}, 2), test::aggregate{2});
 }
 
 TEST(Storage, EmplaceSelfMoveSupport) {
+    using entity_type = StorageBase::my_entity;
+
     // see #37 - this test shouldn't crash, that's all
-    entt::storage<std::unordered_set<int>> pool;
-    const entt::entity entity{1};
+    entt::basic_storage<std::unordered_set<int>, entity_type> pool;
+    const entity_type entity{1};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::swap_and_pop);
 
@@ -650,9 +674,11 @@ TEST(Storage, EmplaceSelfMoveSupport) {
 }
 
 TEST(Storage, EmplaceSelfMoveSupportInPlaceDelete) {
+    using entity_type = StorageBase::my_entity;
+
     // see #37 - this test shouldn't crash, that's all
-    entt::storage<std::unordered_set<char>> pool;
-    const entt::entity entity{1};
+    entt::basic_storage<std::unordered_set<char>, entity_type> pool;
+    const entity_type entity{1};
 
     ASSERT_EQ(pool.policy(), entt::deletion_policy::in_place);
 
@@ -664,11 +690,12 @@ TEST(Storage, EmplaceSelfMoveSupportInPlaceDelete) {
 
 TYPED_TEST(Storage, TryEmplace) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_sparse_set<entity_type> &base = pool;
+    const std::array entity{entity_type{1}, entity_type{3}};
     value_type instance{4};
 
     ASSERT_NE(base.push(entity[0u], &instance), base.end());
@@ -715,11 +742,12 @@ TYPED_TEST(Storage, TryEmplace) {
 
 TEST(Storage, TryEmplaceNonDefaultConstructible) {
     using value_type = std::pair<int &, int &>;
+    using entity_type = StorageBase::my_entity;
     static_assert(!std::is_default_constructible_v<value_type>, "Default constructible types not allowed");
 
-    entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_sparse_set<entity_type> &base = pool;
+    const std::array entity{entity_type{1}, entity_type{3}};
 
     ASSERT_EQ(pool.info(), entt::type_id<value_type>());
     ASSERT_EQ(pool.info(), base.info());
@@ -758,11 +786,12 @@ TEST(Storage, TryEmplaceNonDefaultConstructible) {
 
 TEST(Storage, TryEmplaceNonCopyConstructible) {
     using value_type = std::unique_ptr<int>;
+    using entity_type = StorageBase::my_entity;
     static_assert(!std::is_copy_constructible_v<value_type>, "Copy constructible types not allowed");
 
-    entt::storage<value_type> pool;
-    entt::sparse_set &base = pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_sparse_set<entity_type> &base = pool;
+    const std::array entity{entity_type{1}, entity_type{3}};
 
     ASSERT_EQ(pool.info(), entt::type_id<value_type>());
     ASSERT_EQ(pool.info(), base.info());
@@ -800,9 +829,10 @@ TEST(Storage, TryEmplaceNonCopyConstructible) {
 
 TYPED_TEST(Storage, Patch) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const entt::entity entity{2};
+    entt::basic_storage<value_type, entity_type> pool;
+    const entity_type entity{2};
 
     auto callback = [](auto &&elem) {
         if constexpr(std::is_class_v<std::remove_reference_t<decltype(elem)>>) {
@@ -825,19 +855,21 @@ TYPED_TEST(Storage, Patch) {
 
 ENTT_DEBUG_TYPED_TEST(StorageDeathTest, Patch) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     ASSERT_DEATH(pool.patch(entt::null), "");
 }
 
 TYPED_TEST(Storage, Insert) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
-    typename entt::storage<value_type>::iterator it{};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{1}, entity_type{3}};
+    typename entt::basic_storage<value_type, entity_type>::iterator it{};
 
     it = pool.insert(entity.begin(), entity.end(), value_type{4});
 
@@ -878,10 +910,11 @@ TYPED_TEST(Storage, Insert) {
 
 TYPED_TEST(Storage, Erase) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{2}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{1}, entity_type{3}, entity_type{2}};
     const std::array value{value_type{1}, value_type{2}, value_type{4}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
@@ -918,10 +951,11 @@ TYPED_TEST(Storage, Erase) {
 
 TYPED_TEST(Storage, CrossErase) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    entt::sparse_set set;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_sparse_set<entity_type> set;
+    const std::array entity{entity_type{1}, entity_type{3}};
 
     pool.emplace(entity[0u], 1);
     pool.emplace(entity[1u], 3);
@@ -935,10 +969,11 @@ TYPED_TEST(Storage, CrossErase) {
 
 TYPED_TEST(Storage, Remove) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{2}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{1}, entity_type{3}, entity_type{2}};
     const std::array value{value_type{1}, value_type{2}, value_type{4}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
@@ -978,10 +1013,11 @@ TYPED_TEST(Storage, Remove) {
 
 TYPED_TEST(Storage, CrossRemove) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    entt::sparse_set set;
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    entt::basic_storage<value_type, entity_type> pool;
+    entt::basic_sparse_set<entity_type> set;
+    const std::array entity{entity_type{1}, entity_type{3}};
 
     pool.emplace(entity[0u], 1);
     pool.emplace(entity[1u], 3);
@@ -995,10 +1031,11 @@ TYPED_TEST(Storage, CrossRemove) {
 
 TYPED_TEST(Storage, Clear) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{1}, entt::entity{3}, entt::entity{2}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{1}, entity_type{3}, entity_type{2}};
 
     pool.insert(entity.begin(), entity.end());
 
@@ -1020,9 +1057,10 @@ TYPED_TEST(Storage, Clear) {
 
 TYPED_TEST(Storage, Compact) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
     ASSERT_TRUE(pool.empty());
 
@@ -1030,35 +1068,35 @@ TYPED_TEST(Storage, Compact) {
 
     ASSERT_TRUE(pool.empty());
 
-    pool.emplace(entt::entity{0}, value_type{0});
+    pool.emplace(entity_type{0}, value_type{0});
     pool.compact();
 
     ASSERT_EQ(pool.size(), 1u);
 
-    pool.emplace(entt::entity{4}, value_type{4});
-    pool.erase(entt::entity{0});
+    pool.emplace(entity_type{4}, value_type{4});
+    pool.erase(entity_type{0});
 
     ASSERT_EQ(pool.size(), 1u + traits_type::in_place_delete);
-    ASSERT_EQ(pool.index(entt::entity{4}), traits_type::in_place_delete);
-    ASSERT_EQ(pool.get(entt::entity{4}), value_type{4});
+    ASSERT_EQ(pool.index(entity_type{4}), traits_type::in_place_delete);
+    ASSERT_EQ(pool.get(entity_type{4}), value_type{4});
 
     pool.compact();
 
     ASSERT_EQ(pool.size(), 1u);
-    ASSERT_EQ(pool.index(entt::entity{4}), 0u);
-    ASSERT_EQ(pool.get(entt::entity{4}), value_type{4});
+    ASSERT_EQ(pool.index(entity_type{4}), 0u);
+    ASSERT_EQ(pool.get(entity_type{4}), value_type{4});
 
-    pool.emplace(entt::entity{0}, value_type{0});
+    pool.emplace(entity_type{0}, value_type{0});
     pool.compact();
 
     ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.index(entt::entity{4}), 0u);
-    ASSERT_EQ(pool.index(entt::entity{0}), 1u);
-    ASSERT_EQ(pool.get(entt::entity{4}), value_type{4});
-    ASSERT_EQ(pool.get(entt::entity{0}), value_type{0});
+    ASSERT_EQ(pool.index(entity_type{4}), 0u);
+    ASSERT_EQ(pool.index(entity_type{0}), 1u);
+    ASSERT_EQ(pool.get(entity_type{4}), value_type{4});
+    ASSERT_EQ(pool.get(entity_type{0}), value_type{0});
 
-    pool.erase(entt::entity{0});
-    pool.erase(entt::entity{4});
+    pool.erase(entity_type{0});
+    pool.erase(entity_type{4});
     pool.compact();
 
     ASSERT_TRUE(pool.empty());
@@ -1066,42 +1104,44 @@ TYPED_TEST(Storage, Compact) {
 
 TYPED_TEST(Storage, SwapElements) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{1}, 1);
-    pool.emplace(entt::entity{2}, 3);
-    pool.emplace(entt::entity{4}, 8);
+    pool.emplace(entity_type{1}, 1);
+    pool.emplace(entity_type{2}, 3);
+    pool.emplace(entity_type{4}, 8);
 
-    pool.erase(entt::entity{2});
+    pool.erase(entity_type{2});
 
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{1});
-    ASSERT_EQ(pool.get(entt::entity{4}), value_type{8});
-    ASSERT_EQ(pool.index(entt::entity{1}), 0u);
-    ASSERT_EQ(pool.index(entt::entity{4}), 1u + traits_type::in_place_delete);
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{1});
+    ASSERT_EQ(pool.get(entity_type{4}), value_type{8});
+    ASSERT_EQ(pool.index(entity_type{1}), 0u);
+    ASSERT_EQ(pool.index(entity_type{4}), 1u + traits_type::in_place_delete);
 
-    pool.swap_elements(entt::entity{1}, entt::entity{4});
+    pool.swap_elements(entity_type{1}, entity_type{4});
 
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{1});
-    ASSERT_EQ(pool.get(entt::entity{4}), value_type{8});
-    ASSERT_EQ(pool.index(entt::entity{1}), 1u + traits_type::in_place_delete);
-    ASSERT_EQ(pool.index(entt::entity{4}), 0u);
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{1});
+    ASSERT_EQ(pool.get(entity_type{4}), value_type{8});
+    ASSERT_EQ(pool.index(entity_type{1}), 1u + traits_type::in_place_delete);
+    ASSERT_EQ(pool.index(entity_type{4}), 0u);
 }
 
 TYPED_TEST(Storage, Iterable) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::iterable::iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity, value_type &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, value_type &>>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entity_type, value_type &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entity_type, value_type &>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
-    entt::storage<value_type> pool;
-    const entt::sparse_set &base = pool;
+    entt::basic_storage<value_type, entity_type> pool;
+    const entt::basic_sparse_set<entity_type> &base = pool;
 
-    pool.emplace(entt::entity{1}, 2);
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{1}, 2);
+    pool.emplace(entity_type{3}, 4);
 
     auto iterable = pool.each();
 
@@ -1118,9 +1158,9 @@ TYPED_TEST(Storage, Iterable) {
     ASSERT_EQ(begin.base(), base.begin());
     ASSERT_EQ(end.base(), base.end());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entity_type{3});
     ASSERT_EQ(std::get<1>(*begin.operator->().operator->()), value_type{4});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*begin), entity_type{3});
     ASSERT_EQ(std::get<1>(*begin), value_type{4});
 
     ASSERT_EQ(begin++, iterable.begin());
@@ -1129,26 +1169,27 @@ TYPED_TEST(Storage, Iterable) {
     ASSERT_EQ(begin.base(), base.end());
 
     for(auto [entity, element]: iterable) {
-        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(entity), entity_type>();
         testing::StaticAssertTypeEq<decltype(element), value_type &>();
-        ASSERT_TRUE(entity != entt::entity{1} || element == value_type{2});
-        ASSERT_TRUE(entity != entt::entity{3} || element == value_type{4});
+        ASSERT_TRUE(entity != entity_type{1} || element == value_type{2});
+        ASSERT_TRUE(entity != entity_type{3} || element == value_type{4});
     }
 }
 
 TYPED_TEST(Storage, ConstIterable) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::const_iterable::iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::const_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity, const value_type &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, const value_type &>>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entity_type, const value_type &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entity_type, const value_type &>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
-    entt::storage<value_type> pool;
-    const entt::sparse_set &base = pool;
+    entt::basic_storage<value_type, entity_type> pool;
+    const entt::basic_sparse_set<entity_type> &base = pool;
 
-    pool.emplace(entt::entity{1}, 2);
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{1}, 2);
+    pool.emplace(entity_type{3}, 4);
 
     auto iterable = std::as_const(pool).each();
 
@@ -1165,9 +1206,9 @@ TYPED_TEST(Storage, ConstIterable) {
     ASSERT_EQ(begin.base(), base.begin());
     ASSERT_EQ(end.base(), base.end());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entity_type{3});
     ASSERT_EQ(std::get<1>(*begin.operator->().operator->()), value_type{4});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*begin), entity_type{3});
     ASSERT_EQ(std::get<1>(*begin), value_type{4});
 
     ASSERT_EQ(begin++, iterable.begin());
@@ -1176,25 +1217,26 @@ TYPED_TEST(Storage, ConstIterable) {
     ASSERT_EQ(begin.base(), base.end());
 
     for(auto [entity, element]: iterable) {
-        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(entity), entity_type>();
         testing::StaticAssertTypeEq<decltype(element), const value_type &>();
-        ASSERT_TRUE(entity != entt::entity{1} || element == value_type{2});
-        ASSERT_TRUE(entity != entt::entity{3} || element == value_type{4});
+        ASSERT_TRUE(entity != entity_type{1} || element == value_type{2});
+        ASSERT_TRUE(entity != entity_type{3} || element == value_type{4});
     }
 }
 
 TYPED_TEST(Storage, IterableIteratorConversion) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{3}, 1);
+    pool.emplace(entity_type{3}, 1);
 
-    const typename entt::storage<value_type>::iterable::iterator it = pool.each().begin();
-    typename entt::storage<value_type>::const_iterable::iterator cit = it;
+    const typename entt::basic_storage<value_type, entity_type>::iterable::iterator it = pool.each().begin();
+    typename entt::basic_storage<value_type, entity_type>::const_iterable::iterator cit = it;
 
-    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity, value_type &>>();
-    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity, const value_type &>>();
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entity_type, value_type &>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entity_type, const value_type &>>();
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
@@ -1202,30 +1244,32 @@ TYPED_TEST(Storage, IterableIteratorConversion) {
 
 TYPED_TEST(Storage, IterableAlgorithmCompatibility) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{3}, 1);
+    pool.emplace(entity_type{3}, 1);
 
     const auto iterable = pool.each();
-    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entity_type{3}; });
 
-    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*it), entity_type{3});
 }
 
 TYPED_TEST(Storage, ReverseIterable) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::reverse_iterable::iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity, value_type &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, value_type &>>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entity_type, value_type &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entity_type, value_type &>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
-    entt::storage<value_type> pool;
-    const entt::sparse_set &base = pool;
+    entt::basic_storage<value_type, entity_type> pool;
+    const entt::basic_sparse_set<entity_type> &base = pool;
 
-    pool.emplace(entt::entity{1}, 2);
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{1}, 2);
+    pool.emplace(entity_type{3}, 4);
 
     auto iterable = pool.reach();
 
@@ -1242,9 +1286,9 @@ TYPED_TEST(Storage, ReverseIterable) {
     ASSERT_EQ(begin.base(), base.rbegin());
     ASSERT_EQ(end.base(), base.rend());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entity_type{1});
     ASSERT_EQ(std::get<1>(*begin.operator->().operator->()), value_type{2});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin), entity_type{1});
     ASSERT_EQ(std::get<1>(*begin), value_type{2});
 
     ASSERT_EQ(begin++, iterable.begin());
@@ -1253,26 +1297,27 @@ TYPED_TEST(Storage, ReverseIterable) {
     ASSERT_EQ(begin.base(), base.rend());
 
     for(auto [entity, element]: iterable) {
-        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(entity), entity_type>();
         testing::StaticAssertTypeEq<decltype(element), value_type &>();
-        ASSERT_TRUE(entity != entt::entity{1} || element == value_type{2});
-        ASSERT_TRUE(entity != entt::entity{3} || element == value_type{4});
+        ASSERT_TRUE(entity != entity_type{1} || element == value_type{2});
+        ASSERT_TRUE(entity != entity_type{3} || element == value_type{4});
     }
 }
 
 TYPED_TEST(Storage, ConstReverseIterable) {
     using value_type = TestFixture::type;
-    using iterator = entt::storage<value_type>::const_reverse_iterable::iterator;
+    using entity_type = TestFixture::my_entity;
+    using iterator = entt::basic_storage<value_type, entity_type>::const_reverse_iterable::iterator;
 
-    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entt::entity, const value_type &>>();
-    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entt::entity, const value_type &>>>();
+    testing::StaticAssertTypeEq<typename iterator::value_type, std::tuple<entity_type, const value_type &>>();
+    testing::StaticAssertTypeEq<typename iterator::pointer, entt::input_iterator_pointer<std::tuple<entity_type, const value_type &>>>();
     testing::StaticAssertTypeEq<typename iterator::reference, typename iterator::value_type>();
 
-    entt::storage<value_type> pool;
-    const entt::sparse_set &base = pool;
+    entt::basic_storage<value_type, entity_type> pool;
+    const entt::basic_sparse_set<entity_type> &base = pool;
 
-    pool.emplace(entt::entity{1}, 2);
-    pool.emplace(entt::entity{3}, 4);
+    pool.emplace(entity_type{1}, 2);
+    pool.emplace(entity_type{3}, 4);
 
     auto iterable = std::as_const(pool).reach();
 
@@ -1289,9 +1334,9 @@ TYPED_TEST(Storage, ConstReverseIterable) {
     ASSERT_EQ(begin.base(), base.rbegin());
     ASSERT_EQ(end.base(), base.rend());
 
-    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin.operator->().operator->()), entity_type{1});
     ASSERT_EQ(std::get<1>(*begin.operator->().operator->()), value_type{2});
-    ASSERT_EQ(std::get<0>(*begin), entt::entity{1});
+    ASSERT_EQ(std::get<0>(*begin), entity_type{1});
     ASSERT_EQ(std::get<1>(*begin), value_type{2});
 
     ASSERT_EQ(begin++, iterable.begin());
@@ -1300,25 +1345,26 @@ TYPED_TEST(Storage, ConstReverseIterable) {
     ASSERT_EQ(begin.base(), base.rend());
 
     for(auto [entity, element]: iterable) {
-        testing::StaticAssertTypeEq<decltype(entity), entt::entity>();
+        testing::StaticAssertTypeEq<decltype(entity), entity_type>();
         testing::StaticAssertTypeEq<decltype(element), const value_type &>();
-        ASSERT_TRUE(entity != entt::entity{1} || element == value_type{2});
-        ASSERT_TRUE(entity != entt::entity{3} || element == value_type{4});
+        ASSERT_TRUE(entity != entity_type{1} || element == value_type{2});
+        ASSERT_TRUE(entity != entity_type{3} || element == value_type{4});
     }
 }
 
 TYPED_TEST(Storage, ReverseIterableIteratorConversion) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{3}, 1);
+    pool.emplace(entity_type{3}, 1);
 
-    const typename entt::storage<value_type>::reverse_iterable::iterator it = pool.reach().begin();
-    typename entt::storage<value_type>::const_reverse_iterable::iterator cit = it;
+    const typename entt::basic_storage<value_type, entity_type>::reverse_iterable::iterator it = pool.reach().begin();
+    typename entt::basic_storage<value_type, entity_type>::const_reverse_iterable::iterator cit = it;
 
-    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entt::entity, value_type &>>();
-    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entt::entity, const value_type &>>();
+    testing::StaticAssertTypeEq<decltype(*it), std::tuple<entity_type, value_type &>>();
+    testing::StaticAssertTypeEq<decltype(*cit), std::tuple<entity_type, const value_type &>>();
 
     ASSERT_EQ(it, cit);
     ASSERT_NE(++cit, it);
@@ -1326,50 +1372,54 @@ TYPED_TEST(Storage, ReverseIterableIteratorConversion) {
 
 TYPED_TEST(Storage, ReverseIterableAlgorithmCompatibility) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{3}, 1);
+    pool.emplace(entity_type{3}, 1);
 
     const auto iterable = pool.reach();
-    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entt::entity{3}; });
+    const auto it = std::find_if(iterable.begin(), iterable.end(), [](auto args) { return std::get<0>(args) == entity_type{3}; });
 
-    ASSERT_EQ(std::get<0>(*it), entt::entity{3});
+    ASSERT_EQ(std::get<0>(*it), entity_type{3});
 }
 
 TYPED_TEST(Storage, SortOrdered) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{8}, entity_type{16}, entity_type{2}, entity_type{1}, entity_type{4}};
     const std::array value{value_type{8}, value_type{4}, value_type{2}, value_type{1}, value_type{0}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 }
 
 TYPED_TEST(Storage, SortReverse) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{8}, entity_type{16}, entity_type{2}, entity_type{1}, entity_type{4}};
     const std::array value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.begin(), value.end(), pool.begin(), pool.end()));
 }
 
 TYPED_TEST(Storage, SortUnordered) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{8}, entity_type{16}, entity_type{2}, entity_type{1}, entity_type{4}};
     const std::array value{value_type{2}, value_type{1}, value_type{0}, value_type{4}, value_type{8}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
@@ -1394,15 +1444,16 @@ TYPED_TEST(Storage, SortUnordered) {
 
 TYPED_TEST(Storage, SortN) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
-    const std::array entity{entt::entity{8}, entt::entity{16}, entt::entity{2}, entt::entity{1}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> pool;
+    const std::array entity{entity_type{8}, entity_type{16}, entity_type{2}, entity_type{1}, entity_type{4}};
     const std::array value{value_type{1}, value_type{2}, value_type{0}, value_type{4}, value_type{8}};
 
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort_n(0u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::sparse_set::begin(), pool.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 
     pool.sort_n(2u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
@@ -1437,45 +1488,47 @@ TYPED_TEST(Storage, SortN) {
 
 TYPED_TEST(Storage, SortAsDisjoint) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> lhs;
-    const entt::storage<value_type> rhs;
-    const std::array entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> lhs;
+    const entt::basic_storage<value_type, entity_type> rhs;
+    const std::array entity{entity_type{1}, entity_type{2}, entity_type{4}};
     const std::array value{value_type{0}, value_type{1}, value_type{2}};
 
     lhs.insert(entity.begin(), entity.end(), value.begin());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 
-    lhs.sort_as(rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end());
+    lhs.sort_as(rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 }
 
 TYPED_TEST(Storage, SortAsOverlap) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> lhs;
-    entt::storage<value_type> rhs;
-    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}};
+    entt::basic_storage<value_type, entity_type> lhs;
+    entt::basic_storage<value_type, entity_type> rhs;
+    const std::array lhs_entity{entity_type{1}, entity_type{2}, entity_type{4}};
     const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}};
 
     lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    const std::array rhs_entity{entt::entity{2}};
+    const std::array rhs_entity{entity_type{2}};
     const std::array rhs_value{value_type{1}};
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    lhs.sort_as(rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end());
+    lhs.sort_as(rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end());
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -1492,53 +1545,55 @@ TYPED_TEST(Storage, SortAsOverlap) {
 
 TYPED_TEST(Storage, SortAsOrdered) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> lhs;
-    entt::storage<value_type> rhs;
-    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    entt::basic_storage<value_type, entity_type> lhs;
+    entt::basic_storage<value_type, entity_type> rhs;
+    const std::array lhs_entity{entity_type{1}, entity_type{2}, entity_type{4}, entity_type{8}, entity_type{16}};
     const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
     lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    const std::array rhs_entity{entt::entity{32}, entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    const std::array rhs_entity{entity_type{32}, entity_type{1}, entity_type{2}, entity_type{4}, entity_type{8}, entity_type{16}};
     const std::array rhs_value{value_type{16}, value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
+    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 }
 
 TYPED_TEST(Storage, SortAsReverse) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> lhs;
-    entt::storage<value_type> rhs;
-    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    entt::basic_storage<value_type, entity_type> lhs;
+    entt::basic_storage<value_type, entity_type> rhs;
+    const std::array lhs_entity{entity_type{1}, entity_type{2}, entity_type{4}, entity_type{8}, entity_type{16}};
     const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
     lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    const std::array rhs_entity{entt::entity{16}, entt::entity{8}, entt::entity{4}, entt::entity{2}, entt::entity{1}, entt::entity{32}};
+    const std::array rhs_entity{entity_type{16}, entity_type{8}, entity_type{4}, entity_type{2}, entity_type{1}, entity_type{32}};
     const std::array rhs_value{value_type{8}, value_type{4}, value_type{2}, value_type{1}, value_type{0}, value_type{16}};
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
+    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1561,26 +1616,27 @@ TYPED_TEST(Storage, SortAsReverse) {
 
 TYPED_TEST(Storage, SortAsUnordered) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> lhs;
-    entt::storage<value_type> rhs;
-    const std::array lhs_entity{entt::entity{1}, entt::entity{2}, entt::entity{4}, entt::entity{8}, entt::entity{16}};
+    entt::basic_storage<value_type, entity_type> lhs;
+    entt::basic_storage<value_type, entity_type> rhs;
+    const std::array lhs_entity{entity_type{1}, entity_type{2}, entity_type{4}, entity_type{8}, entity_type{16}};
     const std::array lhs_value{value_type{0}, value_type{1}, value_type{2}, value_type{4}, value_type{8}};
 
     lhs.insert(lhs_entity.begin(), lhs_entity.end(), lhs_value.begin());
 
-    const std::array rhs_entity{entt::entity{4}, entt::entity{2}, entt::entity{32}, entt::entity{1}, entt::entity{8}, entt::entity{16}};
+    const std::array rhs_entity{entity_type{4}, entity_type{2}, entity_type{32}, entity_type{1}, entity_type{8}, entity_type{16}};
     const std::array rhs_value{value_type{2}, value_type{1}, value_type{16}, value_type{0}, value_type{4}, value_type{8}};
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::sparse_set::begin(), rhs.entt::sparse_set::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::sparse_set::begin(), lhs.entt::sparse_set::end());
+    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1603,24 +1659,28 @@ TYPED_TEST(Storage, SortAsUnordered) {
 
 TEST(Storage, MoveOnlyComponent) {
     using value_type = std::unique_ptr<int>;
+    using entity_type = StorageBase::my_entity;
     static_assert(!std::is_copy_assignable_v<value_type>, "Copy assignable types not allowed");
     static_assert(std::is_move_assignable_v<value_type>, "Move assignable type required");
     // the purpose is to ensure that move only types are always accepted
-    [[maybe_unused]] const entt::storage<value_type> pool;
+    [[maybe_unused]] const entt::basic_storage<value_type, entity_type> pool;
 }
 
 TEST(Storage, NonMovableComponent) {
     using value_type = std::pair<const int, const int>;
+    using entity_type = StorageBase::my_entity;
     static_assert(!std::is_move_assignable_v<value_type>, "Move assignable types not allowed");
     // the purpose is to ensure that non-movable types are always accepted
-    [[maybe_unused]] const entt::storage<value_type> pool;
+    [[maybe_unused]] const entt::basic_storage<value_type, entity_type> pool;
 }
 
 ENTT_DEBUG_TEST(StorageDeathTest, NonMovableComponent) {
-    entt::storage<std::pair<const int, const int>> pool;
-    const entt::entity entity{0};
-    const entt::entity destroy{1};
-    const entt::entity other{2};
+    using entity_type = StorageBase::my_entity;
+
+    entt::basic_storage<std::pair<const int, const int>, entity_type> pool;
+    const entity_type entity{0};
+    const entity_type destroy{1};
+    const entity_type other{2};
 
     pool.emplace(entity);
     pool.emplace(destroy);
@@ -1635,10 +1695,11 @@ ENTT_DEBUG_TEST(StorageDeathTest, NonMovableComponent) {
 
 TYPED_TEST(Storage, CanModifyDuringIteration) {
     using value_type = TestFixture::type;
-    using traits_type = entt::component_traits<value_type>;
+    using entity_type = TestFixture::my_entity;
+    using traits_type = entt::component_traits<value_type, entity_type>;
 
-    entt::storage<value_type> pool;
-    auto *ptr = &pool.emplace(entt::entity{0}, 2);
+    entt::basic_storage<value_type, entity_type> pool;
+    auto *ptr = &pool.emplace(entity_type{0}, 2);
 
     ASSERT_EQ(pool.capacity(), traits_type::page_size);
 
@@ -1646,7 +1707,7 @@ TYPED_TEST(Storage, CanModifyDuringIteration) {
     pool.reserve(traits_type::page_size + 1u);
 
     ASSERT_EQ(pool.capacity(), 2 * traits_type::page_size);
-    ASSERT_EQ(&pool.get(entt::entity{0}), ptr);
+    ASSERT_EQ(&pool.get(entity_type{0}), ptr);
 
     // this should crash with asan enabled if we break the constraint
     [[maybe_unused]] const auto &value = *it;
@@ -1654,14 +1715,15 @@ TYPED_TEST(Storage, CanModifyDuringIteration) {
 
 TYPED_TEST(Storage, ReferencesGuaranteed) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::storage<value_type> pool;
+    entt::basic_storage<value_type, entity_type> pool;
 
-    pool.emplace(entt::entity{0}, 0);
-    pool.emplace(entt::entity{1}, 1);
+    pool.emplace(entity_type{0}, 0);
+    pool.emplace(entity_type{1}, 1);
 
-    ASSERT_EQ(pool.get(entt::entity{0}), value_type{0});
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{1});
+    ASSERT_EQ(pool.get(entity_type{0}), value_type{0});
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{1});
 
     for(auto &&elem: pool) {
         if(!(elem == value_type{})) {
@@ -1669,8 +1731,8 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
         }
     }
 
-    ASSERT_EQ(pool.get(entt::entity{0}), value_type{0});
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{4});
+    ASSERT_EQ(pool.get(entity_type{0}), value_type{0});
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{4});
 
     auto begin = pool.begin();
 
@@ -1678,26 +1740,28 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
         *(begin++) = value_type{3};
     }
 
-    ASSERT_EQ(pool.get(entt::entity{0}), value_type{3});
-    ASSERT_EQ(pool.get(entt::entity{1}), value_type{3});
+    ASSERT_EQ(pool.get(entity_type{0}), value_type{3});
+    ASSERT_EQ(pool.get(entity_type{1}), value_type{3});
 }
 
 TEST(Storage, UpdateFromDestructor) {
+    using entity_type = StorageBase::my_entity;
+
     constexpr auto size = 10u;
-    const std::array entity{entt::entity{4u}, entt::entity{2u}, entt::entity{0u}};
+    const std::array entity{entity_type{4u}, entity_type{2u}, entity_type{0u}};
 
     for(auto target: entity) {
-        entt::storage<update_from_destructor> pool;
+        entt::basic_storage<StorageBase::update_from_destructor, entity_type> pool;
 
         for(std::size_t next{}; next < size; ++next) {
-            const auto other = entt::entity(next);
-            pool.emplace(other, pool, other == entt::entity(size / 2) ? target : other);
+            const auto other = entity_type(next);
+            pool.emplace(other, pool, other == entity_type(size / 2) ? target : other);
         }
 
-        pool.erase(entt::entity(size / 2));
+        pool.erase(entity_type(size / 2));
 
         ASSERT_EQ(pool.size(), size - 1u - (target != entt::null));
-        ASSERT_FALSE(pool.contains(entt::entity(size / 2)));
+        ASSERT_FALSE(pool.contains(entity_type(size / 2)));
         ASSERT_FALSE(pool.contains(target));
 
         pool.clear();
@@ -1705,25 +1769,29 @@ TEST(Storage, UpdateFromDestructor) {
         ASSERT_TRUE(pool.empty());
 
         for(std::size_t next{}; next < size; ++next) {
-            ASSERT_FALSE(pool.contains(entt::entity(next)));
+            ASSERT_FALSE(pool.contains(entity_type(next)));
         }
     }
 }
 
 TEST(Storage, CreateFromConstructor) {
-    entt::storage<create_from_constructor> pool;
-    const entt::entity entity{0u};
-    const entt::entity other{1u};
+    using entity_type = StorageBase::my_entity;
+
+    entt::basic_storage<StorageBase::create_from_constructor, entity_type> pool;
+    const entity_type entity{0u};
+    const entity_type other{1u};
 
     pool.emplace(entity, pool, other);
 
     ASSERT_EQ(pool.get(entity).child, other);
-    ASSERT_EQ(pool.get(other).child, static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(pool.get(other).child, static_cast<entity_type>(entt::null));
 }
 
 TEST(Storage, ClassLevelNewDelete) {
-    entt::storage<test::new_delete> pool;
-    const entt::entity entity{0u};
+    using entity_type = StorageBase::my_entity;
+
+    entt::basic_storage<test::new_delete, entity_type> pool;
+    const entity_type entity{0u};
 
     // yeah, that's for code coverage purposes only :)
     pool.emplace(entity, *std::make_unique<test::new_delete>(test::new_delete{3}));
@@ -1733,16 +1801,17 @@ TEST(Storage, ClassLevelNewDelete) {
 
 TYPED_TEST(Storage, CustomAllocator) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    const test::throwing_allocator<entt::entity> allocator{};
-    entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>> pool{allocator};
+    const test::throwing_allocator<entity_type> allocator{};
+    entt::basic_storage<value_type, entity_type, test::throwing_allocator<value_type>> pool{allocator};
 
     pool.reserve(1u);
 
     ASSERT_NE(pool.capacity(), 0u);
 
-    pool.emplace(entt::entity{0});
-    pool.emplace(entt::entity{1});
+    pool.emplace(entity_type{0});
+    pool.emplace(entity_type{1});
 
     decltype(pool) other{std::move(pool), allocator};
 
@@ -1779,12 +1848,13 @@ TYPED_TEST(Storage, CustomAllocator) {
 
 TYPED_TEST(Storage, ThrowingAllocator) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
-    entt::basic_storage<value_type, entt::entity, test::throwing_allocator<value_type>> pool{};
+    entt::basic_storage<value_type, entity_type, test::throwing_allocator<value_type>> pool{};
     typename std::decay_t<decltype(pool)>::base_type &base = pool;
 
-    constexpr auto packed_page_size = entt::component_traits<value_type>::page_size;
-    constexpr auto sparse_page_size = entt::entt_traits<entt::entity>::page_size;
+    constexpr auto packed_page_size = entt::component_traits<value_type, entity_type>::page_size;
+    constexpr auto sparse_page_size = entt::entt_traits<entity_type>::page_size;
 
     pool.get_allocator().template throw_counter<value_type>(0u);
 
@@ -1800,28 +1870,28 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 
     ASSERT_EQ(pool.capacity(), 0u);
 
-    pool.get_allocator().template throw_counter<entt::entity>(0u);
+    pool.get_allocator().template throw_counter<entity_type>(0u);
 
-    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
-    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_THROW(pool.emplace(entity_type{0}, 0), test::throwing_allocator_exception);
+    ASSERT_FALSE(pool.contains(entity_type{0}));
     ASSERT_TRUE(pool.empty());
 
-    pool.get_allocator().template throw_counter<entt::entity>(0u);
+    pool.get_allocator().template throw_counter<entity_type>(0u);
 
-    ASSERT_THROW(base.push(entt::entity{0}), test::throwing_allocator_exception);
-    ASSERT_FALSE(base.contains(entt::entity{0}));
+    ASSERT_THROW(base.push(entity_type{0}), test::throwing_allocator_exception);
+    ASSERT_FALSE(base.contains(entity_type{0}));
     ASSERT_TRUE(base.empty());
 
     pool.get_allocator().template throw_counter<value_type>(0u);
 
-    ASSERT_THROW(pool.emplace(entt::entity{0}, 0), test::throwing_allocator_exception);
-    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_THROW(pool.emplace(entity_type{0}, 0), test::throwing_allocator_exception);
+    ASSERT_FALSE(pool.contains(entity_type{0}));
     ASSERT_NO_THROW(pool.compact());
     ASSERT_TRUE(pool.empty());
 
-    pool.emplace(entt::entity{0}, 0);
-    const std::array entity{entt::entity{1}, entt::entity{sparse_page_size}};
-    pool.get_allocator().template throw_counter<entt::entity>(1u);
+    pool.emplace(entity_type{0}, 0);
+    const std::array entity{entity_type{1}, entity_type{sparse_page_size}};
+    pool.get_allocator().template throw_counter<entity_type>(1u);
 
     ASSERT_THROW(pool.insert(entity.begin(), entity.end(), value_type{0}), test::throwing_allocator_exception);
     ASSERT_TRUE(pool.contains(entity[0u]));
@@ -1829,7 +1899,7 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 
     pool.erase(entity[0u]);
     const std::array component{value_type{1}, value_type{sparse_page_size}};
-    pool.get_allocator().template throw_counter<entt::entity>(0u);
+    pool.get_allocator().template throw_counter<entity_type>(0u);
     pool.compact();
 
     ASSERT_THROW(pool.insert(entity.begin(), entity.end(), component.begin()), test::throwing_allocator_exception);
@@ -1838,8 +1908,10 @@ TYPED_TEST(Storage, ThrowingAllocator) {
 }
 
 TEST(Storage, ThrowingComponent) {
-    entt::storage<test::throwing_type> pool;
-    const std::array entity{entt::entity{4}, entt::entity{1}};
+    using entity_type = StorageBase::my_entity;
+
+    entt::basic_storage<test::throwing_type, entity_type> pool;
+    const std::array entity{entity_type{4}, entity_type{1}};
     const std::array value{test::throwing_type{true}, test::throwing_type{false}};
 
     // strong exception safety
@@ -1891,10 +1963,11 @@ TEST(Storage, ThrowingComponent) {
 
 TYPED_TEST(Storage, NoUsesAllocatorConstruction) {
     using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
 
     test::tracked_memory_resource memory_resource{};
-    entt::basic_storage<value_type, entt::entity, std::pmr::polymorphic_allocator<value_type>> pool{&memory_resource};
-    const entt::entity entity{2};
+    entt::basic_storage<value_type, entity_type, std::pmr::polymorphic_allocator<value_type>> pool{&memory_resource};
+    const entity_type entity{2};
 
     pool.emplace(entity);
     pool.erase(entity);
@@ -1908,10 +1981,11 @@ TYPED_TEST(Storage, NoUsesAllocatorConstruction) {
 
 TEST(Storage, UsesAllocatorConstruction) {
     using string_type = test::tracked_memory_resource::string_type;
+    using entity_type = StorageBase::my_entity;
 
     test::tracked_memory_resource memory_resource{};
-    entt::basic_storage<string_type, entt::entity, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
-    const entt::entity entity{2};
+    entt::basic_storage<string_type, entity_type, std::pmr::polymorphic_allocator<string_type>> pool{&memory_resource};
+    const entity_type entity{2};
 
     pool.emplace(entity);
     pool.erase(entity);

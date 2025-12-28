@@ -12,26 +12,19 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/sparse_set.hpp>
 #include "../../common/config.h"
-#include "../../common/entity.h"
 #include "../../common/linter.hpp"
 #include "../../common/throwing_allocator.hpp"
 
-struct entity_traits {
-    using value_type = test::entity;
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
-    static constexpr entity_type entity_mask = 0x3FFFF; // 18b
-    static constexpr entity_type version_mask = 0x0FFF; // 12b
-};
+struct SparseSetBase: testing::Test {
+    enum class my_entity : std::uint32_t {};
 
-template<>
-struct entt::entt_traits<test::entity>: entt::basic_entt_traits<entity_traits> {
-    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
-};
-
-template<typename Type>
-struct SparseSet: testing::Test {
-    using type = Type;
+    struct entity_traits {
+        using value_type = my_entity;
+        using entity_type = std::uint32_t;
+        using version_type = std::uint16_t;
+        static constexpr entity_type entity_mask = 0x3FFFF; // 18b
+        static constexpr entity_type version_mask = 0x0FFF; // 12b
+    };
 
     inline static const std::array<entt::deletion_policy, 3u> deletion_policy{
         entt::deletion_policy::swap_and_pop,
@@ -40,10 +33,20 @@ struct SparseSet: testing::Test {
     };
 };
 
+template<>
+struct entt::entt_traits<SparseSetBase::my_entity>: entt::basic_entt_traits<SparseSetBase::entity_traits> {
+    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
+};
+
+template<typename Type>
+struct SparseSet: SparseSetBase {
+    using type = Type;
+};
+
 template<typename Type>
 using SparseSetDeathTest = SparseSet<Type>;
 
-using SparseSetTypes = ::testing::Types<entt::entity, test::entity>;
+using SparseSetTypes = ::testing::Types<entt::entity, SparseSetBase::my_entity>;
 
 TYPED_TEST_SUITE(SparseSet, SparseSetTypes, );
 TYPED_TEST_SUITE(SparseSetDeathTest, SparseSetTypes, );
