@@ -1395,7 +1395,7 @@ TYPED_TEST(Storage, SortOrdered) {
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::template basic_sparse_set<entity_type>::begin(), pool.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 }
 
@@ -1410,7 +1410,7 @@ TYPED_TEST(Storage, SortReverse) {
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort([&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(entity.begin(), entity.end(), pool.entt::template basic_sparse_set<entity_type>::begin(), pool.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.begin(), value.end(), pool.begin(), pool.end()));
 }
 
@@ -1453,7 +1453,7 @@ TYPED_TEST(Storage, SortN) {
     pool.insert(entity.begin(), entity.end(), value.begin());
     pool.sort_n(0u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::basic_sparse_set<entity_type>::begin(), pool.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), pool.entt::template basic_sparse_set<entity_type>::begin(), pool.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), pool.begin(), pool.end()));
 
     pool.sort_n(2u, [&pool](auto lhs, auto rhs) { return pool.get(lhs) < pool.get(rhs); });
@@ -1497,12 +1497,12 @@ TYPED_TEST(Storage, SortAsDisjoint) {
 
     lhs.insert(entity.begin(), entity.end(), value.begin());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 
-    lhs.sort_as(rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end());
+    lhs.sort_as(rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end());
 
-    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(entity.rbegin(), entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(value.rbegin(), value.rend(), lhs.begin(), lhs.end()));
 }
 
@@ -1522,13 +1522,13 @@ TYPED_TEST(Storage, SortAsOverlap) {
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    lhs.sort_as(rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end());
+    lhs.sort_as(rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end());
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -1559,15 +1559,15 @@ TYPED_TEST(Storage, SortAsOrdered) {
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
+    rhs.sort_as(lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end());
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 }
 
@@ -1587,13 +1587,13 @@ TYPED_TEST(Storage, SortAsReverse) {
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
+    rhs.sort_as(lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
@@ -1630,13 +1630,13 @@ TYPED_TEST(Storage, SortAsUnordered) {
 
     rhs.insert(rhs_entity.begin(), rhs_entity.end(), rhs_value.begin());
 
-    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(lhs_entity.rbegin(), lhs_entity.rend(), lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(lhs_value.rbegin(), lhs_value.rend(), lhs.begin(), lhs.end()));
 
-    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::basic_sparse_set<entity_type>::begin(), rhs.entt::basic_sparse_set<entity_type>::end()));
+    ASSERT_TRUE(std::equal(rhs_entity.rbegin(), rhs_entity.rend(), rhs.entt::template basic_sparse_set<entity_type>::begin(), rhs.entt::template basic_sparse_set<entity_type>::end()));
     ASSERT_TRUE(std::equal(rhs_value.rbegin(), rhs_value.rend(), rhs.begin(), rhs.end()));
 
-    rhs.sort_as(lhs.entt::basic_sparse_set<entity_type>::begin(), lhs.entt::basic_sparse_set<entity_type>::end());
+    rhs.sort_as(lhs.entt::template basic_sparse_set<entity_type>::begin(), lhs.entt::template basic_sparse_set<entity_type>::end());
 
     auto begin = rhs.begin();
     auto end = rhs.end();
