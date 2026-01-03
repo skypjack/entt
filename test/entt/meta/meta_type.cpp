@@ -906,7 +906,7 @@ TEST_F(MetaType, Variables) {
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     using namespace entt::literals;
 
-    ASSERT_FALSE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
+    ASSERT_FALSE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).bucket.empty());
 
     entt::meta_reset<double>();
     entt::meta_reset<unsigned int>();
@@ -923,7 +923,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(entt::resolve("derived"_hs));
     ASSERT_FALSE(entt::resolve("class"_hs));
 
-    ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).value.empty());
+    ASSERT_TRUE(entt::internal::meta_context::from(entt::locator<entt::meta_ctx>::value_or()).bucket.empty());
 
     // implicitly generated default constructor is not cleared
     ASSERT_TRUE(entt::resolve<clazz>().construct());

@@ -33,7 +33,7 @@ class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
     [[nodiscard]] auto &fetch_node() noexcept {
-        return *meta_context::from(*ctx).value[parent];
+        return *meta_context::from(*ctx).bucket[parent];
     }
 
     [[nodiscard]] auto *find_member_or_assert() {
@@ -135,7 +135,7 @@ public:
         : ctx{&area},
           parent{node.info->hash()},
           bucket{parent} {
-        if(auto *curr = meta_context::from(*ctx).value.try_emplace(parent, std::make_unique<meta_type_node>(std::move(node))).first->second.get(); curr->details == nullptr) {
+        if(auto *curr = meta_context::from(*ctx).bucket.try_emplace(parent, std::make_unique<meta_type_node>(std::move(node))).first->second.get(); curr->details == nullptr) {
             curr->details = std::make_unique<meta_type_descriptor>();
         }
     }
@@ -546,9 +546,9 @@ public:
 inline void meta_reset(meta_ctx &ctx, const id_type id) noexcept {
     auto &context = internal::meta_context::from(ctx);
 
-    for(auto it = context.value.begin(); it != context.value.end();) {
+    for(auto it = context.bucket.begin(); it != context.bucket.end();) {
         if(it->second->id == id) {
-            it = context.value.erase(it);
+            it = context.bucket.erase(it);
         } else {
             ++it;
         }
@@ -580,7 +580,7 @@ inline void meta_reset(const id_type id) noexcept {
  */
 template<typename Type>
 void meta_reset(meta_ctx &ctx) noexcept {
-    internal::meta_context::from(ctx).value.erase(type_id<Type>().hash());
+    internal::meta_context::from(ctx).bucket.erase(type_id<Type>().hash());
 }
 
 /**
@@ -603,7 +603,7 @@ void meta_reset() noexcept {
  * @param ctx The context from which to reset meta types.
  */
 inline void meta_reset(meta_ctx &ctx) noexcept {
-    internal::meta_context::from(ctx).value.clear();
+    internal::meta_context::from(ctx).bucket.clear();
 }
 
 /**

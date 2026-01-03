@@ -15,7 +15,9 @@ namespace internal {
 struct meta_type_node;
 
 struct meta_context {
-    dense_map<id_type, std::unique_ptr<meta_type_node>, stl::identity> value;
+    using container_type = dense_map<id_type, std::unique_ptr<meta_type_node>, stl::identity>;
+
+    container_type bucket;
 
     [[nodiscard]] inline static meta_context &from(meta_ctx &);
     [[nodiscard]] inline static const meta_context &from(const meta_ctx &);
