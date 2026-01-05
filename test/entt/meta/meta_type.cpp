@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <string_view>
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
@@ -313,10 +314,10 @@ TEST_F(MetaType, IdAndInfo) {
 TEST_F(MetaType, Name) {
     using namespace entt::literals;
 
-    ASSERT_EQ(entt::resolve<base>().name(), nullptr);
-    ASSERT_STREQ(entt::resolve<derived>().name(), "derived");
-    ASSERT_STREQ(entt::resolve<unsigned int>().name(), "uint");
-    ASSERT_EQ(entt::resolve<void>().name(), nullptr);
+    ASSERT_EQ(entt::resolve<base>().name(), std::string_view{});
+    ASSERT_EQ(entt::resolve<derived>().name(), std::string_view{"derived"});
+    ASSERT_EQ(entt::resolve<unsigned int>().name(), std::string_view{"uint"});
+    ASSERT_EQ(entt::resolve<void>().name(), std::string_view{});
 }
 
 TEST_F(MetaType, SizeOf) {

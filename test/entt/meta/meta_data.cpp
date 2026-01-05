@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -169,13 +170,13 @@ TEST_F(MetaData, Name) {
     const entt::meta_type type = entt::resolve<clazz>();
     const entt::meta_type other = entt::resolve<setter_getter>();
 
-    ASSERT_EQ(type.data("i"_hs).name(), nullptr);
-    ASSERT_STREQ(type.data("j"_hs).name(), "j");
-    ASSERT_STREQ(type.data("h"_hs).name(), "hhh");
+    ASSERT_EQ(type.data("i"_hs).name(), std::string_view{});
+    ASSERT_EQ(type.data("j"_hs).name(), std::string_view{"j"});
+    ASSERT_EQ(type.data("h"_hs).name(), std::string_view{"hhh"});
 
-    ASSERT_EQ(other.data("z"_hs).name(), nullptr);
-    ASSERT_STREQ(other.data("w"_hs).name(), "w");
-    ASSERT_STREQ(other.data("z_ro"_hs).name(), "readonly");
+    ASSERT_EQ(other.data("z"_hs).name(), std::string_view{});
+    ASSERT_EQ(other.data("w"_hs).name(), std::string_view{"w"});
+    ASSERT_EQ(other.data("z_ro"_hs).name(), std::string_view{"readonly"});
 }
 
 TEST_F(MetaData, Comparison) {

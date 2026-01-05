@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
@@ -214,9 +215,9 @@ TEST_F(MetaFunc, Name) {
 
     const entt::meta_type type = entt::resolve<derived>();
 
-    ASSERT_EQ(type.func("setter_from_base"_hs).name(), nullptr);
-    ASSERT_STREQ(type.func("getter_from_base"_hs).name(), "getter_from_base");
-    ASSERT_STREQ(type.func("static_setter_from_base"_hs).name(), "static setter");
+    ASSERT_EQ(type.func("setter_from_base"_hs).name(), std::string_view{});
+    ASSERT_EQ(type.func("getter_from_base"_hs).name(), std::string_view{"getter_from_base"});
+    ASSERT_EQ(type.func("static_setter_from_base"_hs).name(), std::string_view{"static setter"});
 }
 
 TEST_F(MetaFunc, Comparison) {

@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -803,8 +804,8 @@ public:
      * @brief Returns the name assigned to a data member, if any.
      * @return The name assigned to the data member, if any.
      */
-    [[nodiscard]] const char *name() const noexcept {
-        return node_or_assert().name;
+    [[nodiscard]] std::string_view name() const noexcept {
+        return (node_or_assert().name == nullptr) ? std::string_view{} : std::string_view{node_or_assert().name};
     }
 
     /**
@@ -943,8 +944,8 @@ public:
      * @brief Returns the name assigned to a member function, if any.
      * @return The name assigned to the member function, if any.
      */
-    [[nodiscard]] const char *name() const noexcept {
-        return node_or_assert().name;
+    [[nodiscard]] std::string_view name() const noexcept {
+        return (node_or_assert().name == nullptr) ? std::string_view{} : std::string_view{node_or_assert().name};
     }
 
     /**
@@ -1153,8 +1154,8 @@ public:
      * @brief Returns the name assigned to a type, if any.
      * @return The name assigned to the type, if any.
      */
-    [[nodiscard]] const char *name() const noexcept {
-        return fetch_node().name;
+    [[nodiscard]] std::string_view name() const noexcept {
+        return (fetch_node().name == nullptr) ? std::string_view{} : std::string_view{fetch_node().name};
     }
 
     /**
