@@ -305,17 +305,17 @@ TEST_F(MetaContext, MetaCtor) {
     ASSERT_EQ(any.cast<const clazz &>().value, 0);
     ASSERT_EQ(other.cast<const clazz &>().value, 0);
 
-    const argument argument{2};
+    const argument value{2};
 
-    any = global.construct(argument);
-    other = local.construct(argument);
+    any = global.construct(value);
+    other = local.construct(value);
 
     ASSERT_TRUE(any);
     ASSERT_FALSE(other);
     ASSERT_EQ(any.cast<const clazz &>().value, 2);
 
-    any = global.construct('c', argument);
-    other = local.construct('c', argument);
+    any = global.construct('c', value);
+    other = local.construct('c', value);
 
     ASSERT_FALSE(any);
     ASSERT_TRUE(other);
