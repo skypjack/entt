@@ -5,28 +5,28 @@
 #include <entt/entity/storage.hpp>
 
 struct SignalLess: testing::Test {
-    enum entity : std::uint32_t {};
+    enum my_entity : std::uint32_t {};
 
     template<typename, typename = void>
     struct has_on_construct: std::false_type {};
 
     template<typename Type>
-    struct has_on_construct<Type, std::void_t<decltype(&entt::storage_type_t<Type, entity>::on_construct)>>: std::true_type {};
+    struct has_on_construct<Type, std::void_t<decltype(&entt::storage_type_t<Type, my_entity>::on_construct)>>: std::true_type {};
 
     template<typename Type>
     static constexpr auto has_on_construct_v = has_on_construct<Type>::value;
 };
 
 template<typename Type>
-struct entt::storage_type<Type, SignalLess::entity> {
+struct entt::storage_type<Type, SignalLess::my_entity> {
     // no signal regardless of element type ...
-    using type = basic_storage<Type, SignalLess::entity>;
+    using type = basic_storage<Type, SignalLess::my_entity>;
 };
 
 template<>
-struct entt::storage_type<char, SignalLess::entity> {
+struct entt::storage_type<char, SignalLess::my_entity> {
     // ... unless it's char, because yes.
-    using type = sigh_mixin<basic_storage<char, SignalLess::entity>>;
+    using type = sigh_mixin<basic_storage<char, SignalLess::my_entity>>;
 };
 
 TEST_F(SignalLess, Example) {
@@ -34,7 +34,7 @@ TEST_F(SignalLess, Example) {
     ASSERT_FALSE((has_on_construct_v<int>));
     ASSERT_TRUE((has_on_construct_v<char>));
 
-    entt::basic_registry<entity> registry;
+    entt::basic_registry<my_entity> registry;
     const std::array entity{registry.create()};
 
     // literally a test for storage_adapter_mixin
