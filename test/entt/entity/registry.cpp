@@ -694,26 +694,26 @@ TEST_F(Registry, CreateManyEntitiesAtOnce) {
 TEST_F(Registry, CreateManyEntitiesAtOnceWithListener) {
     entt::registry registry{};
     std::array<entt::entity, 3u> entity{};
-    listener listener;
+    listener callback;
 
-    registry.on_construct<int>().connect<&listener::incr>(listener);
+    registry.on_construct<int>().connect<&listener::incr>(callback);
     registry.create(entity.begin(), entity.end());
     registry.insert(entity.begin(), entity.end(), 1);
     registry.insert(entity.begin(), entity.end(), 'c');
 
     ASSERT_EQ(registry.get<int>(entity[0]), 1);
     ASSERT_EQ(registry.get<char>(entity[1]), 'c');
-    ASSERT_EQ(listener.counter, 3);
+    ASSERT_EQ(callback.counter, 3);
 
-    registry.on_construct<int>().disconnect<&listener::incr>(listener);
-    registry.on_construct<test::empty>().connect<&listener::incr>(listener);
+    registry.on_construct<int>().disconnect<&listener::incr>(callback);
+    registry.on_construct<test::empty>().connect<&listener::incr>(callback);
     registry.create(entity.begin(), entity.end());
     registry.insert(entity.begin(), entity.end(), 'a');
     registry.insert<test::empty>(entity.begin(), entity.end());
 
     ASSERT_TRUE(registry.all_of<test::empty>(entity[0]));
     ASSERT_EQ(registry.get<char>(entity[2]), 'a');
-    ASSERT_EQ(listener.counter, 6);
+    ASSERT_EQ(callback.counter, 6);
 }
 
 TEST_F(Registry, CreateWithHint) {
@@ -1630,106 +1630,106 @@ TEST_F(Registry, Orphan) {
 TEST_F(Registry, Signals) {
     entt::registry registry{};
     std::array<entt::entity, 2u> entity{};
-    listener listener;
+    listener callback;
 
-    registry.on_construct<test::empty>().connect<&listener::incr>(listener);
-    registry.on_destroy<test::empty>().connect<&listener::decr>(listener);
-    registry.on_construct<int>().connect<&listener::incr>(listener);
-    registry.on_destroy<int>().connect<&listener::decr>(listener);
+    registry.on_construct<test::empty>().connect<&listener::incr>(callback);
+    registry.on_destroy<test::empty>().connect<&listener::decr>(callback);
+    registry.on_construct<int>().connect<&listener::incr>(callback);
+    registry.on_destroy<int>().connect<&listener::decr>(callback);
 
     registry.create(entity.begin(), entity.end());
     registry.insert<test::empty>(entity.begin(), entity.end());
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[1u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[1u]);
 
     registry.insert<int>(entity.rbegin(), entity.rend());
 
-    ASSERT_EQ(listener.counter, 4);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 4);
+    ASSERT_EQ(callback.last, entity[0u]);
 
     registry.erase<test::empty, int>(entity[0u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
 
-    registry.on_destroy<test::empty>().disconnect<&listener::decr>(listener);
-    registry.on_destroy<int>().disconnect<&listener::decr>(listener);
+    registry.on_destroy<test::empty>().disconnect<&listener::decr>(callback);
+    registry.on_destroy<int>().disconnect<&listener::decr>(callback);
 
     registry.erase<test::empty, int>(entity[1u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
 
-    registry.on_construct<test::empty>().disconnect<&listener::incr>(listener);
-    registry.on_construct<int>().disconnect<&listener::incr>(listener);
+    registry.on_construct<test::empty>().disconnect<&listener::incr>(callback);
+    registry.on_construct<int>().disconnect<&listener::incr>(callback);
 
     registry.emplace<test::empty>(entity[1u]);
     registry.emplace<int>(entity[1u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
 
-    registry.on_construct<int>().connect<&listener::incr>(listener);
-    registry.on_destroy<int>().connect<&listener::decr>(listener);
+    registry.on_construct<int>().connect<&listener::incr>(callback);
+    registry.on_destroy<int>().connect<&listener::decr>(callback);
 
     registry.emplace<int>(entity[0u]);
     registry.erase<int>(entity[1u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[1u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[1u]);
 
-    registry.on_construct<test::empty>().connect<&listener::incr>(listener);
-    registry.on_destroy<test::empty>().connect<&listener::decr>(listener);
+    registry.on_construct<test::empty>().connect<&listener::incr>(callback);
+    registry.on_destroy<test::empty>().connect<&listener::decr>(callback);
 
     registry.erase<test::empty>(entity[1u]);
     registry.emplace<test::empty>(entity[0u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
 
     registry.clear<test::empty, int>();
 
-    ASSERT_EQ(listener.counter, 0);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 0);
+    ASSERT_EQ(callback.last, entity[0u]);
 
     registry.insert<test::empty>(entity.begin(), entity.end());
     registry.insert<int>(entity.begin(), entity.end());
     registry.destroy(entity[1u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[1u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[1u]);
 
     registry.erase<int, test::empty>(entity[0u]);
     registry.emplace_or_replace<int>(entity[0u]);
     registry.emplace_or_replace<test::empty>(entity[0u]);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
 
-    registry.on_destroy<test::empty>().disconnect<&listener::decr>(listener);
-    registry.on_destroy<int>().disconnect<&listener::decr>(listener);
-
-    registry.emplace_or_replace<test::empty>(entity[0u]);
-    registry.emplace_or_replace<int>(entity[0u]);
-
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, entity[0u]);
-
-    registry.on_update<test::empty>().connect<&listener::incr>(listener);
-    registry.on_update<int>().connect<&listener::incr>(listener);
+    registry.on_destroy<test::empty>().disconnect<&listener::decr>(callback);
+    registry.on_destroy<int>().disconnect<&listener::decr>(callback);
 
     registry.emplace_or_replace<test::empty>(entity[0u]);
     registry.emplace_or_replace<int>(entity[0u]);
 
-    ASSERT_EQ(listener.counter, 4);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, entity[0u]);
+
+    registry.on_update<test::empty>().connect<&listener::incr>(callback);
+    registry.on_update<int>().connect<&listener::incr>(callback);
+
+    registry.emplace_or_replace<test::empty>(entity[0u]);
+    registry.emplace_or_replace<int>(entity[0u]);
+
+    ASSERT_EQ(callback.counter, 4);
+    ASSERT_EQ(callback.last, entity[0u]);
 
     registry.replace<test::empty>(entity[0u]);
     registry.replace<int>(entity[0u]);
 
-    ASSERT_EQ(listener.counter, 6);
-    ASSERT_EQ(listener.last, entity[0u]);
+    ASSERT_EQ(callback.counter, 6);
+    ASSERT_EQ(callback.last, entity[0u]);
 }
 
 TEST_F(Registry, SignalsOnRuntimePool) {
@@ -1737,77 +1737,77 @@ TEST_F(Registry, SignalsOnRuntimePool) {
 
     entt::registry registry{};
     const auto entity = registry.create();
-    listener listener;
+    listener callback;
 
-    registry.on_construct<int>("custom"_hs).connect<&listener::incr>(listener);
-    registry.on_update<int>("custom"_hs).connect<&listener::incr>(listener);
-    registry.on_destroy<int>("custom"_hs).connect<&listener::incr>(listener);
+    registry.on_construct<int>("custom"_hs).connect<&listener::incr>(callback);
+    registry.on_update<int>("custom"_hs).connect<&listener::incr>(callback);
+    registry.on_destroy<int>("custom"_hs).connect<&listener::incr>(callback);
 
-    ASSERT_EQ(listener.counter, 0);
+    ASSERT_EQ(callback.counter, 0);
 
     registry.emplace<int>(entity);
     registry.patch<int>(entity);
     registry.erase<int>(entity);
 
-    ASSERT_EQ(listener.counter, 0);
+    ASSERT_EQ(callback.counter, 0);
 
     registry.storage<int>("custom"_hs).emplace(entity);
     registry.storage<int>("custom"_hs).patch(entity);
     registry.storage<int>("custom"_hs).erase(entity);
 
-    ASSERT_EQ(listener.counter, 3);
+    ASSERT_EQ(callback.counter, 3);
 }
 
 TEST_F(Registry, SignalsOnEntity) {
     entt::registry registry{};
-    listener listener;
+    listener callback;
 
-    registry.on_construct<entt::entity>().connect<&listener::incr>(listener);
+    registry.on_construct<entt::entity>().connect<&listener::incr>(callback);
 
     entt::entity entity = registry.create();
     entt::entity other = registry.create();
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, other);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, other);
 
     registry.destroy(other);
     registry.destroy(entity);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, other);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_EQ(callback.last, other);
 
-    registry.on_construct<entt::entity>().disconnect(&listener);
+    registry.on_construct<entt::entity>().disconnect(&callback);
 
     other = registry.create();
     entity = registry.create();
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_NE(listener.last, entity);
-    ASSERT_NE(listener.last, other);
+    ASSERT_EQ(callback.counter, 2);
+    ASSERT_NE(callback.last, entity);
+    ASSERT_NE(callback.last, other);
 
-    registry.on_update<entt::entity>().connect<&listener::decr>(listener);
+    registry.on_update<entt::entity>().connect<&listener::decr>(callback);
     registry.patch<entt::entity>(entity);
 
-    ASSERT_EQ(listener.counter, 1);
-    ASSERT_EQ(listener.last, entity);
+    ASSERT_EQ(callback.counter, 1);
+    ASSERT_EQ(callback.last, entity);
 
-    registry.on_update<entt::entity>().disconnect(&listener);
+    registry.on_update<entt::entity>().disconnect(&callback);
     registry.patch<entt::entity>(other);
 
-    ASSERT_EQ(listener.counter, 1);
-    ASSERT_NE(listener.last, other);
+    ASSERT_EQ(callback.counter, 1);
+    ASSERT_NE(callback.last, other);
 
-    registry.on_destroy<entt::entity>().connect<&listener::decr>(listener);
+    registry.on_destroy<entt::entity>().connect<&listener::decr>(callback);
     registry.destroy(entity);
 
-    ASSERT_EQ(listener.counter, 0);
-    ASSERT_EQ(listener.last, entity);
+    ASSERT_EQ(callback.counter, 0);
+    ASSERT_EQ(callback.last, entity);
 
-    registry.on_destroy<entt::entity>().disconnect(&listener);
+    registry.on_destroy<entt::entity>().disconnect(&callback);
     registry.destroy(other);
 
-    ASSERT_EQ(listener.counter, 0);
-    ASSERT_NE(listener.last, other);
+    ASSERT_EQ(callback.counter, 0);
+    ASSERT_NE(callback.last, other);
 }
 
 TEST_F(Registry, SignalWhenDestroying) {
