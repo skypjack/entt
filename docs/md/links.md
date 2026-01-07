@@ -147,6 +147,8 @@ I hope the following lists can grow much more in the future.
     clone in C++ using only `SDL2` and `EnTT`.
   * [Bim!](https://github.com/j-jorge/bim): a last-man-standing arcade online
     game for Android.
+  * [MonsterWar](https://github.com/WispSnow/MonsterWar): a tower defense game
+    developed in C++ with `SDL3`, `EnTT`, and a few other libraries.
 
 ## Engines and the like:
 
