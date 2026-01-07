@@ -1,6 +1,7 @@
-#include <entt/core/attribute.h>
+#include <entt/config/config.h>
 #include <entt/locator/locator.hpp>
 #include "../../../common/boxed_type.h"
+#include "lib.h"
 
 ENTT_API void set_up(const entt::locator<test::boxed_int>::node_type &handle) {
     entt::locator<test::boxed_int>::reset(handle);

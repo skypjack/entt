@@ -32,8 +32,6 @@ TODO:
 * paged vector as a standalone class
 * resource: shared_from_this?
 * finish the imgui viewer/editor!
-* introduce compile-time flag to skip dll-only checks in basic_any
 * archetype-like a-là EnTT support (see my own notes)
-* meta_any refine allow_cast implementations
 * meta: conversion_helper machinery has lot of room for improvements
-* meta_factory: add a replace flag to traits to get around the |-only mechanism
+* organizer: view/storage only based model, no registry

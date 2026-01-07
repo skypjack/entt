@@ -10,7 +10,8 @@ enum class meta_traits : std::uint8_t {
     one = 0x01,
     two = 0x02,
     three = 0x04,
-    _entt_enum_as_bitmask
+    all = 0xFF,
+    _entt_enum_as_bitmask = all
 };
 
 } // namespace test

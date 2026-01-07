@@ -5,7 +5,6 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
-#include "attribute.h"
 #include "fwd.hpp"
 #include "hashed_string.hpp"
 

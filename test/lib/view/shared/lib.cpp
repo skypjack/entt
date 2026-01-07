@@ -1,5 +1,6 @@
-#include <entt/core/attribute.h>
+#include <entt/config/config.h>
 #include "../types.h"
+#include "lib.h"
 
 ENTT_API const void *filter(const view_type &view) {
     // forces the creation of all symbols for the view type

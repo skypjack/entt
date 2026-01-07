@@ -351,6 +351,23 @@ TEST_F(MetaFactory, Traits) {
     ASSERT_EQ(type.data("member"_hs).traits<test::meta_traits>(), test::meta_traits::one);
     ASSERT_EQ(type.func("func"_hs).traits<test::meta_traits>(), test::meta_traits::two);
     ASSERT_EQ(type.func("func"_hs).next().traits<test::meta_traits>(), test::meta_traits::three);
+
+    entt::meta_factory<clazz>{}
+        .traits(test::meta_traits::one, true)
+        .data<&base::member>("member"_hs)
+        .traits(test::meta_traits::one | test::meta_traits::three, true)
+        .func<&clazz::set_int>("func"_hs)
+        .traits(test::meta_traits::one | test::meta_traits::three, true)
+        .func<&clazz::set_boxed_int>("func"_hs)
+        .traits(test::meta_traits::all, true);
+
+    // traits are copied and never refreshed
+    type = entt::resolve<clazz>();
+
+    ASSERT_EQ(type.traits<test::meta_traits>(), test::meta_traits::three);
+    ASSERT_EQ(type.data("member"_hs).traits<test::meta_traits>(), test::meta_traits::none);
+    ASSERT_EQ(type.func("func"_hs).traits<test::meta_traits>(), test::meta_traits::two);
+    ASSERT_EQ(type.func("func"_hs).next().traits<test::meta_traits>(), test::meta_traits::none);
 }
 
 TEST_F(MetaFactory, Custom) {

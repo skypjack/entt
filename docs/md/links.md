@@ -327,6 +327,9 @@ I hope the following lists can grow much more in the future.
     [Collector](https://play.google.com/store/apps/details?id=com.esri.arcgis.collector)
     and
     [Navigator](https://play.google.com/store/apps/details?id=com.esri.navigator).
+  * [OneArc](https://onearc.com/): [licenses](https://onearc.com/third-party-licensors/)
+    do not lie. Their products use EnTT in some way, but it is not known _what_
+    way.
   * [FASTSUITE Edition 2](https://www.fastsuite.com/en_EN/fastsuite/fastsuite-edition-2.html)
     by [Cenit](http://www.cenit.com/en_EN/about-us/overview.html): they use
     `EnTT` to drive their simulation, that is, the communication between robot

@@ -1,10 +1,9 @@
 #include <functional>
 #include <gtest/gtest.h>
-#include <entt/core/attribute.h>
+#include <entt/config/config.h>
 #include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
-
-ENTT_API void emit(test::emitter &);
+#include "lib.h"
 
 TEST(Lib, Emitter) {
     test::emitter emitter;

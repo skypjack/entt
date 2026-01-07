@@ -130,6 +130,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         using plain_type = std::remove_const_t<std::remove_reference_t<Type>>;
 
         vtable = basic_vtable<plain_type>;
+        underlying_type = type_hash<plain_type>::value();
 
         if constexpr(std::is_void_v<Type>) {
             deleter = nullptr;
@@ -244,6 +245,7 @@ public:
         : base_type{},
           vtable{other.vtable},
           deleter{other.deleter},
+          underlying_type{other.underlying_type},
           mode{other.mode} {
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
@@ -293,6 +295,7 @@ public:
 
             vtable = other.vtable;
             deleter = other.deleter;
+            underlying_type = other.underlying_type;
             mode = other.mode;
         }
 
@@ -327,7 +330,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool has_value(const type_info &req) const noexcept {
-        return (info() == req);
+        return (underlying_type == req.hash());
     }
 
     /**
@@ -340,8 +343,7 @@ public:
     template<typename Type>
     [[nodiscard]] bool has_value() const noexcept {
         static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
-        // it could be a call across boundaries, but still for the same type
-        return (vtable == &basic_vtable<Type>) || has_value(type_id<Type>());
+        return (underlying_type == type_hash<Type>::value());
     }
 
     /**
@@ -437,8 +439,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        // it could be a call across boundaries, but still for the same type
-        if(other && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && (mode != any_policy::cref) && (underlying_type == other.underlying_type)) {
             return (vtable(request::assign, *this, other.data()) != nullptr);
         }
 
@@ -448,8 +449,7 @@ public:
     /*! @copydoc assign */
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
-        // it could be a call across boundaries, but still for the same type
-        if(other && (mode != any_policy::cref) && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && (mode != any_policy::cref) && (underlying_type == other.underlying_type)) {
             return (other.mode == any_policy::cref) ? (vtable(request::assign, *this, std::as_const(other).data()) != nullptr) : (vtable(request::transfer, *this, other.data()) != nullptr);
         }
 
@@ -476,8 +476,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const basic_any &other) const noexcept {
-        // it could be a call across boundaries, but still for the same type
-        if(other && ((vtable == other.vtable) || has_value(other.info()))) {
+        if(other && (underlying_type == other.underlying_type)) {
             return (vtable(request::compare, *this, other.data()) != nullptr);
         }
 
@@ -508,6 +507,7 @@ public:
         basic_any other{};
         other.instance = data();
         other.vtable = vtable;
+        other.underlying_type = underlying_type;
         other.mode = any_policy::cref;
         return other;
     }
@@ -531,6 +531,7 @@ public:
 private:
     vtable_type *vtable{};
     deleter_type *deleter{};
+    id_type underlying_type{};
     any_policy mode{};
 };
 

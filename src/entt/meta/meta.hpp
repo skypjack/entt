@@ -206,8 +206,15 @@ class meta_any {
             vtable(internal::meta_traits::is_none, *this, nullptr);
         }
 
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
         return *node;
     }
+
+    meta_any(const meta_any &other, any elem)
+        : storage{std::move(elem)},
+          ctx{other.ctx},
+          node{other.node},
+          vtable{other.vtable} {}
 
 public:
     /*! Default constructor. */
@@ -261,10 +268,8 @@ public:
     template<typename Type>
     explicit meta_any(const meta_ctx &area, std::in_place_t, Type *value)
         : storage{std::in_place, value},
-          ctx{&area} {
-        if(storage) {
-            vtable = &basic_vtable<Type>;
-        }
+          ctx{&area},
+          vtable{storage ? &basic_vtable<Type> : nullptr} {
     }
 
     /**
@@ -413,15 +418,13 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
+        return ((elem != nullptr) || !*this) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
     }
 
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        auto *elem = any_cast<Type>(&storage);
-        // NOLINTNEXTLINE(bugprone-casting-through-void)
-        return ((elem != nullptr) || (vtable == nullptr)) ? elem : static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), static_cast<constness_as_t<any, Type> &>(storage).data())));
+        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(std::as_const(*this).try_cast<std::remove_const_t<Type>>());
     }
 
     /**
@@ -477,15 +480,15 @@ public:
                 }
 
                 if(const auto &from = fetch_node(); from.details != nullptr) {
-                    for(auto &&elem: from.details->conv) {
-                        if(elem.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
-                            return elem.conv(*ctx, storage.data());
-                        }
+                    if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()); elem != nullptr) {
+                        return elem->conv(*ctx, storage.data());
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) || (other = std::as_const(other).template allow_cast<Type>())) {
+                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == entt::type_hash<std::remove_const_t<std::remove_reference_t<Type>>>::value()) {
                             return other;
+                        } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
+                            return from_base;
                         }
                     }
                 }
@@ -585,10 +588,7 @@ public:
         return ret;
     }
 
-    /**
-     * @brief Returns false if a wrapper is invalid, true otherwise.
-     * @return False if the wrapper is invalid, true otherwise.
-     */
+    /*! @copydoc any::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return !(vtable == nullptr);
     }
@@ -605,20 +605,12 @@ public:
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
-        meta_any other{meta_ctx_arg, *ctx};
-        other.storage = storage.as_ref();
-        other.node = node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref()};
     }
 
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() const noexcept {
-        meta_any other{meta_ctx_arg, *ctx};
-        other.storage = storage.as_ref();
-        other.node = node;
-        other.vtable = vtable;
-        return other;
+        return meta_any{*this, storage.as_ref()};
     }
 
     /**
@@ -781,7 +773,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type &() const noexcept {
-        ENTT_ASSERT((node != nullptr) && (type_hash<std::remove_const_t<Type>>::value() == node->type), "Invalid type");
+        ENTT_ASSERT(static_cast<Type *>(*this) != nullptr, "Invalid type");
         return *static_cast<Type *>(node->value.get());
     }
 
@@ -1043,10 +1035,7 @@ public:
         return (node_or_assert().next != nullptr) ? meta_func{*ctx, *node_or_assert().next} : meta_func{};
     }
 
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
+    /*! @copydoc meta_data::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
@@ -1320,19 +1309,15 @@ public:
      * @return True if the conversion is allowed, false otherwise.
      */
     [[nodiscard]] bool can_convert(const meta_type &other) const noexcept {
-        if(info() == other.info()) {
+        if(const auto &to = other.info().hash(); (info().hash() == to) || ((fetch_node().conversion_helper != nullptr) && (other.is_arithmetic() || other.is_enum()))) {
             return true;
-        } else if(const auto &from = fetch_node(); from.conversion_helper && (other.is_arithmetic() || other.is_enum())) {
-            return true;
-        } else if(from.details) {
-            for(auto &&elem: from.details->conv) {
-                if(elem.type == other.info().hash()) {
-                    return true;
-                }
+        } else if(const auto &from = fetch_node(); from.details) {
+            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, to); elem != nullptr) {
+                return true;
             }
 
             for(auto &&curr: from.details->base) {
-                if(curr.type == other.info().hash() || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
+                if(curr.type == to || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
                     return true;
                 }
             }
@@ -1527,10 +1512,7 @@ public:
         return fetch_node().custom;
     }
 
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
+    /*! @copydoc meta_data::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
         return (node != nullptr);
     }
@@ -1551,7 +1533,7 @@ private:
 }
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
-    return (vtable == nullptr) ? meta_type{} : meta_type{*ctx, fetch_node()};
+    return *this ? meta_type{*ctx, fetch_node()} : meta_type{};
 }
 
 template<typename... Args>
@@ -1582,7 +1564,7 @@ bool meta_any::set(const id_type id, Type &&value) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        if(const auto &from = fetch_node(); from.conversion_helper && (type.is_arithmetic() || type.is_enum())) {
+        if(const auto &from = fetch_node(); (from.conversion_helper != nullptr) && (type.is_arithmetic() || type.is_enum())) {
             auto other = type.construct();
             const auto value = from.conversion_helper(nullptr, storage.data());
             other.fetch_node().conversion_helper(other.storage.data(), &value);
@@ -1590,15 +1572,15 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         if(const auto &from = fetch_node(); from.details) {
-            for(auto &&elem: from.details->conv) {
-                if(elem.type == type.info().hash()) {
-                    return elem.conv(*ctx, storage.data());
-                }
+            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, type.info().hash()); elem != nullptr) {
+                return elem->conv(*ctx, storage.data());
             }
 
             for(auto &&curr: from.details->base) {
-                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); (curr.type == type.info().hash()) || (other = std::as_const(other).allow_cast(type))) {
+                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == type.info().hash()) {
                     return other;
+                } else if(auto from_base = std::as_const(other).allow_cast(type); from_base) {
+                    return from_base;
                 }
             }
         }
@@ -1677,8 +1659,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(handle.data(), 1, nullptr);
-        return *this;
+        return vtable(handle.data(), 1, nullptr), *this;
     }
 
     meta_iterator operator++(int value) noexcept {
@@ -1688,8 +1669,7 @@ public:
     }
 
     meta_iterator &operator--() noexcept {
-        vtable(handle.data(), -1, nullptr);
-        return *this;
+        return vtable(handle.data(), -1, nullptr), *this;
     }
 
     meta_iterator operator--(int value) noexcept {
@@ -1716,10 +1696,6 @@ public:
         return handle == other.handle;
     }
 
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
-        return !(*this == other);
-    }
-
     [[nodiscard]] const any &base() const noexcept {
         return handle;
     }
@@ -1729,6 +1705,10 @@ private:
     vtable_type *vtable{};
     any handle{};
 };
+
+[[nodiscard]] inline bool operator!=(const meta_sequence_container::iterator &lhs, const meta_sequence_container::iterator &rhs) noexcept {
+    return !(lhs == rhs);
+}
 
 class meta_associative_container::meta_iterator final {
     using vtable_type = void(const void *, std::pair<meta_any, meta_any> *);
@@ -1764,8 +1744,7 @@ public:
           handle{iter} {}
 
     meta_iterator &operator++() noexcept {
-        vtable(handle.data(), nullptr);
-        return *this;
+        return vtable(handle.data(), nullptr), *this;
     }
 
     meta_iterator operator++(int) noexcept {
@@ -1792,15 +1771,15 @@ public:
         return handle == other.handle;
     }
 
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const noexcept {
-        return !(*this == other);
-    }
-
 private:
     const meta_ctx *ctx{};
     vtable_type *vtable{};
     any handle{};
 };
+
+[[nodiscard]] inline bool operator!=(const meta_associative_container::iterator &lhs, const meta_associative_container::iterator &rhs) noexcept {
+    return !(lhs == rhs);
+}
 /*! @endcond */
 
 /**
