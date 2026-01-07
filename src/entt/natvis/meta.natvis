@@ -173,14 +173,14 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_ctx">
-		<Intrinsic Name="element_at" Expression="value.packed.first_base::value[pos].element">
+		<Intrinsic Name="element_at" Expression="bucket.packed.first_base::value[pos].element">
 			<Parameter Name="pos" Type="int"/>
 		</Intrinsic>
-		<DisplayString>{ value }</DisplayString>
+		<DisplayString>{ bucket }</DisplayString>
 		<Expand>
 			<CustomListItems>
 				<Variable Name="pos" InitialValue="0"/>
-				<Variable Name="last" InitialValue="value.size()"/>
+				<Variable Name="last" InitialValue="bucket.size()"/>
 				<Loop>
 					<Break Condition="pos == last"/>
 					<Item Name="[{ element_at(pos).first }]">element_at(pos).second</Item>
