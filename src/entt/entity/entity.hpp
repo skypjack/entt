@@ -23,7 +23,7 @@ struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
 };
 
 template<typename Type>
-struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
+struct entt_traits<Type, std::void_t<typename Type::entity_type>>
     : entt_traits<typename Type::entity_type> {
     using value_type = Type;
 };
@@ -57,8 +57,12 @@ struct entt_traits<std::uint64_t> {
  * @brief Common basic entity traits implementation.
  * @tparam Traits Actual entity traits to use.
  */
+
+template<typename Traits, typename = void>
+class basic_entt_traits;
+
 template<typename Traits>
-class basic_entt_traits {
+class basic_entt_traits<Traits, std::void_t<decltype(sizeof(Traits))>> {
     static constexpr auto length = popcount(Traits::entity_mask);
 
     static_assert(Traits::entity_mask && ((Traits::entity_mask & (Traits::entity_mask + 1)) == 0), "Invalid entity mask");
@@ -159,8 +163,11 @@ public:
  * @brief Entity traits.
  * @tparam Type Type of identifier.
  */
+template<typename Type, typename = void>
+struct entt_traits;
+
 template<typename Type>
-struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
+struct entt_traits<Type, std::void_t<decltype(sizeof(basic_entt_traits<internal::entt_traits<Type>>))>>: basic_entt_traits<internal::entt_traits<Type>> {
     /*! @brief Base type. */
     using base_type = basic_entt_traits<internal::entt_traits<Type>>;
     /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
@@ -207,7 +214,7 @@ struct null_t {
      * @tparam Entity Type of identifier.
      * @return The null representation for the given type.
      */
-    template<typename Entity>
+    template<typename Entity, decltype(sizeof(entt_traits<Entity>)) * = nullptr>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
         constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
@@ -238,7 +245,7 @@ struct null_t {
      * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
-    template<typename Entity>
+    template<typename Entity, decltype(sizeof(entt_traits<Entity>)) * = nullptr>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
         return traits_type::to_entity(entity) == traits_type::to_entity(*this);
@@ -251,7 +258,8 @@ struct null_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
+    [[nodiscard]] constexpr auto operator!=(const Entity entity) const noexcept
+        -> decltype(this->operator==(entity)) {
         return !(entity == *this);
     }
 };
@@ -264,7 +272,8 @@ struct null_t {
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity lhs, const null_t rhs) noexcept {
+[[nodiscard]] constexpr auto operator==(const Entity lhs, const null_t rhs) noexcept
+    -> decltype(rhs.operator==(lhs)) {
     return rhs.operator==(lhs);
 }
 
@@ -276,7 +285,8 @@ template<typename Entity>
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity lhs, const null_t rhs) noexcept {
+[[nodiscard]] constexpr auto operator!=(const Entity lhs, const null_t rhs) noexcept
+    -> decltype(rhs.operator==(lhs)) {
     return !(rhs == lhs);
 }
 
@@ -287,7 +297,7 @@ struct tombstone_t {
      * @tparam Entity Type of identifier.
      * @return The tombstone representation for the given type.
      */
-    template<typename Entity>
+    template<typename Entity, decltype(sizeof(entt_traits<Entity>)) * = nullptr>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
         constexpr auto value = traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
@@ -318,7 +328,7 @@ struct tombstone_t {
      * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
-    template<typename Entity>
+    template<typename Entity, decltype(sizeof(entt_traits<Entity>)) * = nullptr>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
 
@@ -336,8 +346,9 @@ struct tombstone_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
-        return !(entity == *this);
+    [[nodiscard]] constexpr auto operator!=(const Entity entity) const noexcept
+        -> decltype(this->operator==(entity)) {
+        return !(*this == entity);
     }
 };
 
@@ -349,7 +360,8 @@ struct tombstone_t {
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity lhs, const tombstone_t rhs) noexcept {
+[[nodiscard]] constexpr auto operator==(const Entity lhs, const tombstone_t rhs) noexcept
+    -> decltype(rhs.operator==(lhs)) {
     return rhs.operator==(lhs);
 }
 
@@ -361,7 +373,8 @@ template<typename Entity>
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity lhs, const tombstone_t rhs) noexcept {
+[[nodiscard]] constexpr auto operator!=(const Entity lhs, const tombstone_t rhs) noexcept
+    -> decltype(rhs.operator==(lhs)) {
     return !(rhs == lhs);
 }
 
