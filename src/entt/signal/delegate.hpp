@@ -286,19 +286,6 @@ private:
 };
 
 /**
- * @brief Compares the contents of two delegates.
- * @tparam Ret Return type of a function type.
- * @tparam Args Types of arguments of a function type.
- * @param lhs A valid delegate object.
- * @param rhs A valid delegate object.
- * @return True if the two contents differ, false otherwise.
- */
-template<typename Ret, typename... Args>
-[[nodiscard]] bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-/**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
  */
