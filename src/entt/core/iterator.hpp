@@ -121,18 +121,6 @@ template<typename Type>
 }
 
 /**
- * @brief Comparison operator.
- * @tparam Type Value type of the iota iterator.
- * @param lhs A properly initialized iota iterator.
- * @param rhs A properly initialized iota iterator.
- * @return True if the two iterators differ, false otherwise.
- */
-template<typename Type>
-[[nodiscard]] constexpr bool operator!=(const iota_iterator<Type> &lhs, const iota_iterator<Type> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-/**
  * @brief Utility class to create an iterable object from a pair of iterators.
  * @tparam It Type of iterator.
  * @tparam Sentinel Type of sentinel.
