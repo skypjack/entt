@@ -78,10 +78,6 @@ public:
         return true;
     }
 
-    bool operator!=(const throwing_allocator<Type> &other) const {
-        return !(*this == other);
-    }
-
 private:
     std::allocator<Type> allocator;
     std::shared_ptr<container_type> config;
