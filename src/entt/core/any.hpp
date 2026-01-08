@@ -480,15 +480,6 @@ public:
     }
 
     /**
-     * @brief Checks if two wrappers differ in their content.
-     * @param other Wrapper with which to compare.
-     * @return True if the two objects differ in their content, false otherwise.
-     */
-    [[nodiscard]] bool operator!=(const basic_any &other) const noexcept {
-        return !(*this == other);
-    }
-
-    /**
      * @brief Aliasing constructor.
      * @return A wrapper that shares a reference to an unmanaged object.
      */
