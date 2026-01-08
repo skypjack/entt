@@ -232,18 +232,6 @@ template<typename Char>
  * @tparam Char Character type.
  * @param lhs A valid hashed string.
  * @param rhs A valid hashed string.
- * @return True if the two hashed strings differ, false otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
  * @return True if the first element is less than the second, false otherwise.
  */
 template<typename Char>
