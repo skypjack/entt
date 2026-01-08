@@ -78,11 +78,6 @@ template<typename ILhs, typename IRhs>
     return lhs.it == rhs.it;
 }
 
-template<typename ILhs, typename IRhs>
-[[nodiscard]] constexpr bool operator!=(const handle_storage_iterator<ILhs> &lhs, const handle_storage_iterator<IRhs> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 } // namespace internal
 /*! @endcond */
 
@@ -362,20 +357,6 @@ private:
 template<typename... Args, typename... Other>
 [[nodiscard]] bool operator==(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
     return lhs.registry() == rhs.registry() && lhs.entity() == rhs.entity();
-}
-
-/**
- * @brief Compares two handles.
- * @tparam Args Scope of the first handle.
- * @tparam Other Scope of the second handle.
- * @param lhs A valid handle.
- * @param rhs A valid handle.
- * @return False if both handles refer to the same registry and the same
- * entity, true otherwise.
- */
-template<typename... Args, typename... Other>
-[[nodiscard]] bool operator!=(const basic_handle<Args...> &lhs, const basic_handle<Other...> &rhs) noexcept {
-    return !(lhs == rhs);
 }
 
 /**
