@@ -122,11 +122,6 @@ template<typename Lhs, typename Rhs, auto Page>
 }
 
 template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator!=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename Lhs, typename Rhs, auto Page>
 [[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
@@ -201,11 +196,6 @@ private:
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) == std::get<0>(rhs.it);
-}
-
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
-    return !(lhs == rhs);
 }
 
 } // namespace internal
