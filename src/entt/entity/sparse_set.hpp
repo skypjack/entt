@@ -108,11 +108,6 @@ template<typename Container>
 }
 
 template<typename Container>
-[[nodiscard]] constexpr bool operator!=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename Container>
 [[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
     return lhs.index() > rhs.index();
 }
