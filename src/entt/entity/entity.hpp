@@ -224,15 +224,6 @@ struct null_t {
     }
 
     /**
-     * @brief Compares two null objects.
-     * @param other A null object.
-     * @return False in all cases.
-     */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const null_t other) const noexcept {
-        return false;
-    }
-
-    /**
      * @brief Compares a null object and an identifier of any type.
      * @tparam Entity Type of identifier.
      * @param entity Identifier with which to compare.
@@ -300,15 +291,6 @@ struct tombstone_t {
      */
     [[nodiscard]] constexpr bool operator==([[maybe_unused]] const tombstone_t other) const noexcept {
         return true;
-    }
-
-    /**
-     * @brief Compares two tombstone objects.
-     * @param other A tombstone object.
-     * @return False in all cases.
-     */
-    [[nodiscard]] constexpr bool operator!=([[maybe_unused]] const tombstone_t other) const noexcept {
-        return false;
     }
 
     /**
