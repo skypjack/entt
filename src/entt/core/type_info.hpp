@@ -192,16 +192,6 @@ private:
 }
 
 /**
- * @brief Compares the contents of two type info objects.
- * @param lhs A type info object.
- * @param rhs A type info object.
- * @return True if the two type info objects differ, false otherwise.
- */
-[[nodiscard]] constexpr bool operator!=(const type_info &lhs, const type_info &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-/**
  * @brief Compares two type info objects.
  * @param lhs A valid type info object.
  * @param rhs A valid type info object.
