@@ -132,11 +132,6 @@ template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
     return lhs.it == rhs.it;
 }
 
-template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
-[[nodiscard]] constexpr bool operator!=(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 template<typename It, typename... Get>
 struct extended_view_iterator final {
     using iterator_type = It;
@@ -186,11 +181,6 @@ private:
 template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) noexcept {
     return lhs.it == rhs.it;
-}
-
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) noexcept {
-    return !(lhs == rhs);
 }
 
 } // namespace internal
