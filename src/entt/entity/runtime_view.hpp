@@ -82,10 +82,6 @@ public:
         return it == other.it;
     }
 
-    [[nodiscard]] constexpr bool operator!=(const runtime_view_iterator &other) const noexcept {
-        return !(*this == other);
-    }
-
 private:
     const std::vector<Set *> *pools;
     const std::vector<Set *> *filter;
