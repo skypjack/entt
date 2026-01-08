@@ -111,11 +111,6 @@ template<typename... Args>
 }
 
 template<typename... Args>
-[[nodiscard]] constexpr bool operator!=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename... Args>
 [[nodiscard]] constexpr bool operator<(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
