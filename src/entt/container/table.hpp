@@ -109,11 +109,6 @@ template<typename... Lhs, typename... Rhs>
 }
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator<(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
     return std::get<0>(lhs.it) < std::get<0>(rhs.it);
 }
