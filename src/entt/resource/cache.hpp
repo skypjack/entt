@@ -116,11 +116,6 @@ template<typename... Lhs, typename... Rhs>
 }
 
 template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator!=(const resource_cache_iterator<Lhs...> &lhs, const resource_cache_iterator<Rhs...> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename... Lhs, typename... Rhs>
 [[nodiscard]] constexpr bool operator<(const resource_cache_iterator<Lhs...> &lhs, const resource_cache_iterator<Rhs...> &rhs) noexcept {
     return lhs.it < rhs.it;
 }
