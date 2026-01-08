@@ -599,11 +599,6 @@ public:
         return (ctx == other.ctx) && (!*this == !other) && (storage == other.storage);
     }
 
-    /*! @copydoc any::operator!= */
-    [[nodiscard]] bool operator!=(const meta_any &other) const noexcept {
-        return !(*this == other);
-    }
-
     /*! @copydoc any::as_ref */
     [[nodiscard]] meta_any as_ref() noexcept {
         return meta_any{*this, storage.as_ref()};
@@ -907,16 +902,6 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/**
- * @brief Checks if two objects refer to the same type.
- * @param lhs An object, either valid or not.
- * @param rhs An object, either valid or not.
- * @return False if the objects refer to the same node, true otherwise.
- */
-[[nodiscard]] inline bool operator!=(const meta_data &lhs, const meta_data &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 /*! @brief Opaque wrapper for member functions. */
 class meta_func {
     [[nodiscard]] auto &node_or_assert() const noexcept {
@@ -1045,11 +1030,6 @@ private:
     const internal::meta_func_node *node{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
-
-/*! @copydoc operator!=(const meta_data &, const meta_data &) */
-[[nodiscard]] inline bool operator!=(const meta_func &lhs, const meta_func &rhs) noexcept {
-    return !(lhs == rhs);
-}
 
 /*! @brief Opaque wrapper for types. */
 class meta_type {
@@ -1523,11 +1503,6 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
-/*! @copydoc operator!=(const meta_data &, const meta_data &) */
-[[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
     return *this ? meta_type{*ctx, fetch_node()} : meta_type{};
 }
@@ -1702,10 +1677,6 @@ private:
     any handle{};
 };
 
-[[nodiscard]] inline bool operator!=(const meta_sequence_container::iterator &lhs, const meta_sequence_container::iterator &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
 class meta_associative_container::meta_iterator final {
     using vtable_type = void(const void *, std::pair<meta_any, meta_any> *);
 
@@ -1773,9 +1744,6 @@ private:
     any handle{};
 };
 
-[[nodiscard]] inline bool operator!=(const meta_associative_container::iterator &lhs, const meta_associative_container::iterator &rhs) noexcept {
-    return !(lhs == rhs);
-}
 /*! @endcond */
 
 /**
