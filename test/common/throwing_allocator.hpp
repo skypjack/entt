@@ -74,7 +74,7 @@ public:
         (*config)[entt::type_id<Other>().hash()] = len;
     }
 
-    bool operator==(const throwing_allocator<Type> &) const {
+    [[nodiscard]] bool operator==(const throwing_allocator<Type> &) const noexcept {
         return true;
     }
 

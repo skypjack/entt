@@ -7,15 +7,15 @@ namespace test {
 
 struct aggregate {
     int value{};
+
+    [[nodiscard]] constexpr bool operator==(const aggregate &other) const noexcept {
+        return value == other.value;
+    }
+
+    [[nodiscard]] constexpr auto operator<=>(const aggregate &other) const noexcept {
+        return value <=> other.value;
+    }
 };
-
-[[nodiscard]] inline bool operator==(const aggregate &lhs, const aggregate &rhs) {
-    return lhs.value == rhs.value;
-}
-
-[[nodiscard]] inline bool operator<(const aggregate &lhs, const aggregate &rhs) {
-    return lhs.value < rhs.value;
-}
 
 // ensure aggregate-ness :)
 static_assert(std::is_aggregate_v<test::aggregate>, "Not an aggregate type");

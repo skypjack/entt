@@ -4,7 +4,7 @@
 namespace test {
 
 struct non_comparable {
-    bool operator==(const non_comparable &) const = delete;
+    bool operator==(const non_comparable &) const noexcept = delete;
 };
 
 } // namespace test

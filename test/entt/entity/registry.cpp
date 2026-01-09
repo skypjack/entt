@@ -31,6 +31,10 @@ struct Registry: testing::Test {
 
     struct no_eto_type {
         static constexpr std::size_t page_size = 1024u;
+
+        [[nodiscard]] bool operator==(const no_eto_type &other) const noexcept {
+            return this == &other;
+        }
     };
 
     struct listener {
@@ -84,10 +88,6 @@ struct Registry: testing::Test {
 };
 
 using RegistryDeathTest = Registry;
-
-bool operator==(const Registry::no_eto_type &lhs, const Registry::no_eto_type &rhs) {
-    return &lhs == &rhs;
-}
 
 struct entity_traits {
     using value_type = Registry::my_entity;

@@ -6,15 +6,15 @@ namespace test {
 struct pointer_stable {
     static constexpr auto in_place_delete = true;
     int value{};
+
+    [[nodiscard]] constexpr bool operator==(const pointer_stable &other) const noexcept {
+        return value == other.value;
+    }
+
+    [[nodiscard]] constexpr auto operator<=>(const pointer_stable &other) const noexcept {
+        return value <=> other.value;
+    }
 };
-
-[[nodiscard]] inline bool operator==(const pointer_stable &lhs, const pointer_stable &rhs) {
-    return lhs.value == rhs.value;
-}
-
-[[nodiscard]] inline bool operator<(const pointer_stable &lhs, const pointer_stable &rhs) {
-    return lhs.value < rhs.value;
-}
 
 } // namespace test
 

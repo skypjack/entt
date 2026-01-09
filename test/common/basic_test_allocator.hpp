@@ -27,7 +27,7 @@ struct basic_test_allocator: std::allocator<Type> {
         return *this;
     }
 
-    bool operator==(const basic_test_allocator &other) const {
+    [[nodiscard]] bool operator==(const basic_test_allocator &other) const noexcept {
         return (this == &other);
     }
 };

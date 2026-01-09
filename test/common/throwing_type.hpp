@@ -29,13 +29,13 @@ struct throwing_type {
         return trigger;
     }
 
+    [[nodiscard]] bool operator==(const throwing_type &other) const noexcept {
+        return trigger == other.trigger;
+    }
+
 private:
     bool trigger{};
 };
-
-inline bool operator==(const throwing_type &lhs, const throwing_type &rhs) {
-    return lhs.throw_on_copy() == rhs.throw_on_copy();
-}
 
 } // namespace test
 
