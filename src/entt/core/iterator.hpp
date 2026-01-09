@@ -104,21 +104,18 @@ public:
         return current;
     }
 
+    /**
+     * @brief Comparison operator.
+     * @param other A properly initialized iota iterator.
+     * @return True if the two iterators are identical, false otherwise.
+     */
+    [[nodiscard]] constexpr bool operator==(const iota_iterator &other) const noexcept {
+        return current == other.current;
+    }
+
 private:
     value_type current;
 };
-
-/**
- * @brief Comparison operator.
- * @tparam Type Value type of the iota iterator.
- * @param lhs A properly initialized iota iterator.
- * @param rhs A properly initialized iota iterator.
- * @return True if the two iterators are identical, false otherwise.
- */
-template<typename Type>
-[[nodiscard]] constexpr bool operator==(const iota_iterator<Type> &lhs, const iota_iterator<Type> &rhs) noexcept {
-    return *lhs == *rhs;
-}
 
 /**
  * @brief Utility class to create an iterable object from a pair of iterators.
