@@ -63,8 +63,9 @@ public:
         return std::make_pair<size_type>(pos / vert, pos % vert);
     }
 
-    template<typename Type>
-    friend constexpr bool operator==(const edge_iterator<Type> &, const edge_iterator<Type> &) noexcept;
+    [[nodiscard]] constexpr bool operator==(const edge_iterator &other) const noexcept {
+        return pos == other.pos;
+    }
 
 private:
     It it{};
@@ -73,11 +74,6 @@ private:
     size_type last{};
     size_type offset{};
 };
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator==(const edge_iterator<Container> &lhs, const edge_iterator<Container> &rhs) noexcept {
-    return lhs.pos == rhs.pos;
-}
 
 } // namespace internal
 /*! @endcond */
