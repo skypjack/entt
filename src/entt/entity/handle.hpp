@@ -18,7 +18,7 @@ namespace internal {
 
 template<typename It>
 class handle_storage_iterator final {
-    template<typename Other>
+    template<typename>
     friend class handle_storage_iterator;
 
     using underlying_type = std::remove_reference_t<typename It::value_type::second_type>;
