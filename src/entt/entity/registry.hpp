@@ -36,7 +36,7 @@ namespace internal {
 
 template<typename It>
 class registry_storage_iterator final {
-    template<typename Other>
+    template<typename>
     friend class registry_storage_iterator;
 
     using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
