@@ -73,18 +73,15 @@ public:
         return it;
     }
 
-    template<typename... Lhs, typename... Rhs>
-    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) noexcept;
+    template<typename... Args>
+    [[nodiscard]] constexpr bool operator==(const extended_group_iterator<Args...> &other) const noexcept {
+        return it == other.it;
+    }
 
 private:
     It it;
     std::tuple<Owned *..., Get *...> pools;
 };
-
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
 
 struct group_descriptor {
     using size_type = std::size_t;
