@@ -1,6 +1,7 @@
 #ifndef ENTT_COMMON_AGGREGATE_H
 #define ENTT_COMMON_AGGREGATE_H
 
+#include <compare>
 #include <type_traits>
 
 namespace test {

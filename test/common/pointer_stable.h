@@ -1,6 +1,8 @@
 #ifndef ENTT_COMMON_POINTER_STABLE_H
 #define ENTT_COMMON_POINTER_STABLE_H
 
+#include <compare>
+
 namespace test {
 
 struct pointer_stable {
