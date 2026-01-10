@@ -3,6 +3,7 @@
 
 #include <bit>
 #include <cmath>
+#include <compare>
 #include <cstddef>
 #include <functional>
 #include <iterator>
