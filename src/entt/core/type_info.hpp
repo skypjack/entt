@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_TYPE_INFO_HPP
 #define ENTT_CORE_TYPE_INFO_HPP
 
+#include <compare>
 #include <string_view>
 #include <type_traits>
 #include <utility>
@@ -175,64 +176,29 @@ struct type_info final {
         return alias;
     }
 
+    /**
+     * @brief Compares two type info objects.
+     * @param other A type info object.
+     * @return True if the two type info objects are identical, false otherwise.
+     */
+    [[nodiscard]] constexpr bool operator==(const type_info &other) const noexcept {
+        return identifier == other.identifier;
+    }
+
+    /**
+     * @brief Lexicographically compares two type info objects.
+     * @param other A type info object.
+     * @return The relative order between the two type info objects.
+     */
+    [[nodiscard]] constexpr auto operator<=>(const type_info &other) const noexcept {
+        return seq <=> other.seq;
+    }
+
 private:
     id_type seq;
     id_type identifier;
     std::string_view alias;
 };
-
-/**
- * @brief Compares the contents of two type info objects.
- * @param lhs A type info object.
- * @param rhs A type info object.
- * @return True if the two type info objects are identical, false otherwise.
- */
-[[nodiscard]] constexpr bool operator==(const type_info &lhs, const type_info &rhs) noexcept {
-    return lhs.hash() == rhs.hash();
-}
-
-/**
- * @brief Compares two type info objects.
- * @param lhs A valid type info object.
- * @param rhs A valid type info object.
- * @return True if the first element is less than the second, false otherwise.
- */
-[[nodiscard]] constexpr bool operator<(const type_info &lhs, const type_info &rhs) noexcept {
-    return lhs.index() < rhs.index();
-}
-
-/**
- * @brief Compares two type info objects.
- * @param lhs A valid type info object.
- * @param rhs A valid type info object.
- * @return True if the first element is less than or equal to the second, false
- * otherwise.
- */
-[[nodiscard]] constexpr bool operator<=(const type_info &lhs, const type_info &rhs) noexcept {
-    return !(rhs < lhs);
-}
-
-/**
- * @brief Compares two type info objects.
- * @param lhs A valid type info object.
- * @param rhs A valid type info object.
- * @return True if the first element is greater than the second, false
- * otherwise.
- */
-[[nodiscard]] constexpr bool operator>(const type_info &lhs, const type_info &rhs) noexcept {
-    return rhs < lhs;
-}
-
-/**
- * @brief Compares two type info objects.
- * @param lhs A valid type info object.
- * @param rhs A valid type info object.
- * @return True if the first element is greater than or equal to the second,
- * false otherwise.
- */
-[[nodiscard]] constexpr bool operator>=(const type_info &lhs, const type_info &rhs) noexcept {
-    return !(lhs < rhs);
-}
 
 /**
  * @brief Returns the type info object associated to a given type.
