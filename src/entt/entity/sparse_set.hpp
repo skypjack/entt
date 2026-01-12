@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_SPARSE_SET_HPP
 #define ENTT_ENTITY_SPARSE_SET_HPP
 
+#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -84,6 +85,20 @@ struct sparse_set_iterator final {
         return operator[](0);
     }
 
+    [[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator &other) const noexcept {
+        // intentionally reversed due to backward iteration
+        return other.offset - offset;
+    }
+
+    [[nodiscard]] constexpr bool operator==(const sparse_set_iterator &other) const noexcept {
+        return offset == other.offset;
+    }
+
+    [[nodiscard]] constexpr auto operator<=>(const sparse_set_iterator &other) const noexcept {
+        // intentionally reversed due to backward iteration
+        return other.offset <=> offset;
+    }
+
     [[nodiscard]] constexpr pointer data() const noexcept {
         return packed ? packed->data() : nullptr;
     }
@@ -96,36 +111,6 @@ private:
     const Container *packed;
     difference_type offset;
 };
-
-template<typename Container>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return rhs.index() - lhs.index();
-}
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator==(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return lhs.index() == rhs.index();
-}
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator<(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return lhs.index() > rhs.index();
-}
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator>(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator<=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return !(lhs > rhs);
-}
-
-template<typename Container>
-[[nodiscard]] constexpr bool operator>=(const sparse_set_iterator<Container> &lhs, const sparse_set_iterator<Container> &rhs) noexcept {
-    return !(lhs < rhs);
-}
 
 } // namespace internal
 /*! @endcond */
