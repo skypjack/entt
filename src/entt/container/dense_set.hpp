@@ -31,8 +31,10 @@ class dense_set_iterator final {
     template<typename>
     friend class dense_set_iterator;
 
+    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+
 public:
-    using value_type = It::value_type::second_type;
+    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
@@ -120,8 +122,10 @@ class dense_set_local_iterator final {
     template<typename>
     friend class dense_set_local_iterator;
 
+    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+
 public:
-    using value_type = It::value_type::second_type;
+    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
@@ -139,7 +143,7 @@ public:
           offset{other.offset} {}
 
     constexpr dense_set_local_iterator &operator++() noexcept {
-        return offset = it[static_cast<It::difference_type>(offset)].first, *this;
+        return offset = it[static_cast<difference_type>(offset)].first, *this;
     }
 
     constexpr dense_set_local_iterator operator++(int) noexcept {
@@ -148,7 +152,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::addressof(it[static_cast<It::difference_type>(offset)].second);
+        return std::addressof(it[static_cast<difference_type>(offset)].second);
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -271,17 +275,17 @@ public:
     /*! @brief Type of function to use to compare the elements for equality. */
     using key_equal = KeyEqual;
     /*! @brief Random access iterator type. */
-    using iterator = internal::dense_set_iterator<typename packed_container_type::iterator>;
+    using iterator = internal::dense_set_iterator<typename packed_container_type::pointer>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_iterator>;
+    using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_pointer>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = std::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     /*! @brief Forward iterator type. */
-    using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::iterator>;
+    using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::pointer>;
     /*! @brief Constant forward iterator type. */
-    using const_local_iterator = internal::dense_set_local_iterator<typename packed_container_type::const_iterator>;
+    using const_local_iterator = internal::dense_set_local_iterator<typename packed_container_type::const_pointer>;
 
     /*! @brief Default constructor. */
     dense_set()
@@ -395,7 +399,7 @@ public:
      * @return An iterator to the first instance of the internal array.
      */
     [[nodiscard]] const_iterator cbegin() const noexcept {
-        return packed.first().begin();
+        return packed.first().data();
     }
 
     /*! @copydoc cbegin */
@@ -405,7 +409,7 @@ public:
 
     /*! @copydoc begin */
     [[nodiscard]] iterator begin() noexcept {
-        return packed.first().begin();
+        return packed.first().data();
     }
 
     /**
@@ -414,7 +418,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
-        return packed.first().end();
+        return packed.first().data() + packed.first().size();
     }
 
     /*! @copydoc cend */
@@ -424,7 +428,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
-        return packed.first().end();
+        return packed.first().data() + packed.first().size();
     }
 
     /**
@@ -729,7 +733,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] const_local_iterator cbegin(const size_type index) const {
-        return {packed.first().begin(), sparse.first()[index]};
+        return {packed.first().data(), sparse.first()[index]};
     }
 
     /**
@@ -747,7 +751,7 @@ public:
      * @return An iterator to the beginning of the given bucket.
      */
     [[nodiscard]] local_iterator begin(const size_type index) {
-        return {packed.first().begin(), sparse.first()[index]};
+        return {packed.first().data(), sparse.first()[index]};
     }
 
     /**
