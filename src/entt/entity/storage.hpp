@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
 
+#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -26,7 +27,8 @@ namespace internal {
 
 template<typename Container, auto Page>
 class storage_iterator final {
-    friend storage_iterator<const Container, Page>;
+    template<typename, auto>
+    friend class storage_iterator;
 
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
@@ -102,6 +104,23 @@ public:
         return operator[](0);
     }
 
+    template<typename Other, auto Page>
+    [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Other, Page> &other) const noexcept {
+        // intentionally reversed due to backward iteration
+        return other.offset - offset;
+    }
+
+    template<typename Other, auto Page>
+    [[nodiscard]] constexpr bool operator==(const storage_iterator<Other, Page> &other) const noexcept {
+        return offset == other.offset;
+    }
+
+    template<typename Other, auto Page>
+    [[nodiscard]] constexpr auto operator<=>(const storage_iterator<Other, Page> &other) const noexcept {
+        // intentionally reversed due to backward iteration
+        return other.offset <=> offset;
+    }
+
     [[nodiscard]] constexpr difference_type index() const noexcept {
         return offset - 1;
     }
@@ -111,39 +130,9 @@ private:
     difference_type offset;
 };
 
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return rhs.index() - lhs.index();
-}
-
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator==(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return lhs.index() == rhs.index();
-}
-
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator<(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return lhs.index() > rhs.index();
-}
-
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator>(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator<=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return !(lhs > rhs);
-}
-
-template<typename Lhs, typename Rhs, auto Page>
-[[nodiscard]] constexpr bool operator>=(const storage_iterator<Lhs, Page> &lhs, const storage_iterator<Rhs, Page> &rhs) noexcept {
-    return !(lhs < rhs);
-}
-
 template<typename It, typename... Other>
 class extended_storage_iterator final {
-    template<typename Iter, typename... Args>
+    template<typename, typename...>
     friend class extended_storage_iterator;
 
 public:
@@ -186,17 +175,14 @@ public:
         return std::get<It>(it);
     }
 
-    template<typename... Lhs, typename... Rhs>
-    friend constexpr bool operator==(const extended_storage_iterator<Lhs...> &, const extended_storage_iterator<Rhs...> &) noexcept;
+    template<typename... Args>
+    [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Args...> &other) const noexcept {
+        return std::get<0>(it) == std::get<0>(other.it);
+    }
 
 private:
     std::tuple<It, Other...> it;
 };
-
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
-    return std::get<0>(lhs.it) == std::get<0>(rhs.it);
-}
 
 } // namespace internal
 /*! @endcond */
