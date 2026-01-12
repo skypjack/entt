@@ -1,6 +1,7 @@
 #ifndef ENTT_META_RANGE_HPP
 #define ENTT_META_RANGE_HPP
 
+#include <compare>
 #include <cstddef>
 #include <iterator>
 #include <utility>
@@ -86,49 +87,22 @@ struct meta_range_iterator final {
         return operator[](0);
     }
 
-    template<typename... Args>
-    friend constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+    [[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
+        return it - other.it;
+    }
 
-    template<typename... Args>
-    friend constexpr bool operator==(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+    [[nodiscard]] constexpr bool operator==(const meta_range_iterator &other) const noexcept {
+        return it == other.it;
+    }
 
-    template<typename... Args>
-    friend constexpr bool operator<(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
+    [[nodiscard]] constexpr auto operator<=>(const meta_range_iterator &other) const noexcept {
+        return it <=> other.it;
+    }
 
 private:
     It it;
     const meta_ctx *ctx;
 };
-
-template<typename... Args>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return lhs.it - rhs.it;
-}
-
-template<typename... Args>
-[[nodiscard]] constexpr bool operator==(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
-
-template<typename... Args>
-[[nodiscard]] constexpr bool operator<(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return lhs.it < rhs.it;
-}
-
-template<typename... Args>
-[[nodiscard]] constexpr bool operator>(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-template<typename... Args>
-[[nodiscard]] constexpr bool operator<=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return !(lhs > rhs);
-}
-
-template<typename... Args>
-[[nodiscard]] constexpr bool operator>=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
-    return !(lhs < rhs);
-}
 
 } // namespace internal
 /*! @endcond */
