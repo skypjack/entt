@@ -104,19 +104,19 @@ public:
         return operator[](0);
     }
 
-    template<typename Other, auto Page>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Other, Page> &other) const noexcept {
+    template<typename Other, auto Arg>
+    [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Other, Arg> &other) const noexcept {
         // intentionally reversed due to backward iteration
         return other.offset - offset;
     }
 
-    template<typename Other, auto Page>
-    [[nodiscard]] constexpr bool operator==(const storage_iterator<Other, Page> &other) const noexcept {
+    template<typename Other, auto Arg>
+    [[nodiscard]] constexpr bool operator==(const storage_iterator<Other, Arg> &other) const noexcept {
         return offset == other.offset;
     }
 
-    template<typename Other, auto Page>
-    [[nodiscard]] constexpr auto operator<=>(const storage_iterator<Other, Page> &other) const noexcept {
+    template<typename Other, auto Arg>
+    [[nodiscard]] constexpr auto operator<=>(const storage_iterator<Other, Arg> &other) const noexcept {
         // intentionally reversed due to backward iteration
         return other.offset <=> offset;
     }
