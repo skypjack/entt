@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <compare>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -107,48 +108,24 @@ public:
         return operator*();
     }
 
-    template<typename Lhs, typename Rhs>
-    friend constexpr std::ptrdiff_t operator-(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
+    template<typename Other>
+    [[nodiscard]] constexpr std::ptrdiff_t operator-(const registry_storage_iterator<Other> &other) const noexcept {
+        return it - other.it;
+    }
 
-    template<typename Lhs, typename Rhs>
-    friend constexpr bool operator==(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
+    template<typename Other>
+    [[nodiscard]] constexpr bool operator==(const registry_storage_iterator<Other> &other) const noexcept {
+        return it == other.it;
+    }
 
-    template<typename Lhs, typename Rhs>
-    friend constexpr bool operator<(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
+    template<typename Other>
+    [[nodiscard]] constexpr auto operator<=>(const registry_storage_iterator<Other> &other) const noexcept {
+        return it <=> other.it;
+    }
 
 private:
     It it;
 };
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return lhs.it - rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator==(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return lhs.it < rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<=(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return !(lhs > rhs);
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>=(const registry_storage_iterator<Lhs> &lhs, const registry_storage_iterator<Rhs> &rhs) noexcept {
-    return !(lhs < rhs);
-}
 
 template<typename Allocator>
 class registry_context {
