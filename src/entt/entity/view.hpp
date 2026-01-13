@@ -117,8 +117,10 @@ public:
         return *operator->();
     }
 
-    template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
-    friend constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) noexcept;
+    template<typename Other, auto... Args>
+    [[nodiscard]] constexpr bool operator==(const view_iterator<Other, Args...> &other) const noexcept {
+        return it == other.it;
+    }
 
 private:
     iterator_type it;
@@ -126,11 +128,6 @@ private:
     std::array<const Type *, Exclude> filter;
     difference_type index;
 };
-
-template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
-[[nodiscard]] constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &lhs, const view_iterator<RhsType, RhsArgs...> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
 
 template<typename It, typename... Get>
 struct extended_view_iterator final {
@@ -171,17 +168,14 @@ struct extended_view_iterator final {
         return it;
     }
 
-    template<typename... Lhs, typename... Rhs>
-    friend bool constexpr operator==(const extended_view_iterator<Lhs...> &, const extended_view_iterator<Rhs...> &) noexcept;
+    template<typename... Other>
+    [[nodiscard]] constexpr bool operator==(const extended_view_iterator<Other...> &other) const noexcept {
+        return it == other.it;
+    }
 
 private:
     It it;
 };
-
-template<typename... Lhs, typename... Rhs>
-[[nodiscard]] constexpr bool operator==(const extended_view_iterator<Lhs...> &lhs, const extended_view_iterator<Rhs...> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
 
 } // namespace internal
 /*! @endcond */
