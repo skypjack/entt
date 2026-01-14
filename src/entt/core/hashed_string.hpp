@@ -194,6 +194,24 @@ public:
     [[nodiscard]] constexpr operator hash_type() const noexcept {
         return value();
     }
+
+    /**
+     * @brief Compares two hashed strings.
+     * @param other A valid hashed string.
+     * @return True if the two hashed strings are identical, false otherwise.
+     */
+    [[nodiscard]] constexpr bool operator==(const basic_hashed_string &other) const noexcept {
+        return value() == other.value();
+    }
+
+    /**
+     * @brief Lexicographically compares two hashed strings.
+     * @param other A valid hashed string.
+     * @return The relative order between the two hashed strings.
+     */
+    [[nodiscard]] constexpr auto operator<=>(const basic_hashed_string &other) const noexcept {
+        return value() <=> other.value();
+    }
 };
 
 /**
@@ -214,69 +232,6 @@ basic_hashed_string(const Char *str, std::size_t len) -> basic_hashed_string<Cha
 template<typename Char, std::size_t N>
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the two hashed strings are identical, false otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator==(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return lhs.value() == rhs.value();
-}
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the first element is less than the second, false otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator<(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return lhs.value() < rhs.value();
-}
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the first element is less than or equal to the second, false
- * otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator<=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return !(rhs < lhs);
-}
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the first element is greater than the second, false
- * otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator>(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the first element is greater than or equal to the second,
- * false otherwise.
- */
-template<typename Char>
-[[nodiscard]] constexpr bool operator>=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) noexcept {
-    return !(lhs < rhs);
-}
 
 inline namespace literals {
 
