@@ -102,9 +102,9 @@ public:
     /*! @brief Type of registry accepted by the handle. */
     using registry_type = Registry;
     /*! @brief Underlying entity identifier. */
-    using entity_type = traits_type::value_type;
+    using entity_type = typename Registry::entity_type;
     /*! @brief Underlying version type. */
-    using version_type = traits_type::version_type;
+    using version_type = typename Registry::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Iterable handle type. */
