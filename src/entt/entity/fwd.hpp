@@ -10,6 +10,24 @@
 
 namespace entt {
 
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename>
+struct entt_traits;
+
+} // namespace internal
+/*! @endcond */
+
+/**
+ * @brief Specifies that a type is an entity-like type.
+ * @tparam Type Type to check.
+ */
+template<typename Type>
+concept entity_like = requires {
+    typename internal::entt_traits<Type>;
+};
+
 /*! @brief Default entity identifier. */
 enum class entity : id_type {};
 
