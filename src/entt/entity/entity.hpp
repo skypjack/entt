@@ -14,17 +14,20 @@ namespace entt {
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
 
-template<typename, typename = void>
+template<typename>
 struct entt_traits;
 
 template<typename Type>
-struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
-    : entt_traits<std::underlying_type_t<Type>> {
+    requires std::is_enum_v<Type>
+struct entt_traits<Type>: entt_traits<std::underlying_type_t<Type>> {
     using value_type = Type;
 };
 
 template<typename Type>
-struct entt_traits<Type, std::enable_if_t<std::is_class_v<Type>>>
+    requires requires { typename Type::entity_type; }
+             && std::convertible_to<Type, typename Type::entity_type>
+             && std::constructible_from<Type, typename Type::entity_type>
+struct entt_traits<Type>
     : entt_traits<typename Type::entity_type> {
     using value_type = Type;
 };
