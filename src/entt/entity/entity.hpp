@@ -163,7 +163,7 @@ public:
  * @brief Entity traits.
  * @tparam Type Type of identifier.
  */
-template<typename Type>
+template<entity_like Type>
 struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
     /*! @brief Base type. */
     using base_type = basic_entt_traits<internal::entt_traits<Type>>;
@@ -177,7 +177,7 @@ struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
  * @param value The value to convert.
  * @return The integral representation of the given value.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
     return entt_traits<Entity>::to_integral(value);
 }
@@ -188,7 +188,7 @@ template<typename Entity>
  * @param value The value to convert.
  * @return The integral representation of the entity part.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
     return entt_traits<Entity>::to_entity(value);
 }
@@ -199,7 +199,7 @@ template<typename Entity>
  * @param value The value to convert.
  * @return The integral representation of the version part.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
     return entt_traits<Entity>::to_version(value);
 }
@@ -211,7 +211,7 @@ struct null_t {
      * @tparam Entity Type of identifier.
      * @return The null representation for the given type.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
         return traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
@@ -232,7 +232,7 @@ struct null_t {
      * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
         return traits_type::to_entity(entity) == traits_type::to_entity(*this);
@@ -244,7 +244,7 @@ struct null_t {
      * @param entity Identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
         return !(entity == *this);
     }
@@ -257,7 +257,7 @@ struct null_t {
  * @param rhs A null object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr bool operator==(const Entity lhs, const null_t rhs) noexcept {
     return rhs.operator==(lhs);
 }
@@ -269,7 +269,7 @@ template<typename Entity>
  * @param rhs A null object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr bool operator!=(const Entity lhs, const null_t rhs) noexcept {
     return !(rhs == lhs);
 }
@@ -281,7 +281,7 @@ struct tombstone_t {
      * @tparam Entity Type of identifier.
      * @return The tombstone representation for the given type.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr operator Entity() const noexcept {
         using traits_type = entt_traits<Entity>;
         return traits_type::construct(traits_type::entity_mask, traits_type::version_mask);
@@ -302,7 +302,7 @@ struct tombstone_t {
      * @param entity Identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const noexcept {
         using traits_type = entt_traits<Entity>;
 
@@ -319,7 +319,7 @@ struct tombstone_t {
      * @param entity Identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
-    template<typename Entity>
+    template<entity_like Entity>
     [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
         return !(entity == *this);
     }
@@ -332,7 +332,7 @@ struct tombstone_t {
  * @param rhs A tombstone object yet to be converted.
  * @return False if the two elements differ, true otherwise.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr bool operator==(const Entity lhs, const tombstone_t rhs) noexcept {
     return rhs.operator==(lhs);
 }
@@ -344,7 +344,7 @@ template<typename Entity>
  * @param rhs A tombstone object yet to be converted.
  * @return True if the two elements differ, false otherwise.
  */
-template<typename Entity>
+template<entity_like Entity>
 [[nodiscard]] constexpr bool operator!=(const Entity lhs, const tombstone_t rhs) noexcept {
     return !(rhs == lhs);
 }
