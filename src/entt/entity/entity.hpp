@@ -237,42 +237,7 @@ struct null_t {
         using traits_type = entt_traits<Entity>;
         return traits_type::to_entity(entity) == traits_type::to_entity(*this);
     }
-
-    /**
-     * @brief Compares a null object and an identifier of any type.
-     * @tparam Entity Type of identifier.
-     * @param entity Identifier with which to compare.
-     * @return True if the two elements differ, false otherwise.
-     */
-    template<entity_like Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
-        return !(entity == *this);
-    }
 };
-
-/**
- * @brief Compares a null object and an identifier of any type.
- * @tparam Entity Type of identifier.
- * @param lhs Identifier with which to compare.
- * @param rhs A null object yet to be converted.
- * @return False if the two elements differ, true otherwise.
- */
-template<entity_like Entity>
-[[nodiscard]] constexpr bool operator==(const Entity lhs, const null_t rhs) noexcept {
-    return rhs.operator==(lhs);
-}
-
-/**
- * @brief Compares a null object and an identifier of any type.
- * @tparam Entity Type of identifier.
- * @param lhs Identifier with which to compare.
- * @param rhs A null object yet to be converted.
- * @return True if the two elements differ, false otherwise.
- */
-template<entity_like Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity lhs, const null_t rhs) noexcept {
-    return !(rhs == lhs);
-}
 
 /*! @brief Tombstone object for all identifiers.  */
 struct tombstone_t {
@@ -312,42 +277,7 @@ struct tombstone_t {
             return (traits_type::to_version(entity) == traits_type::to_version(*this));
         }
     }
-
-    /**
-     * @brief Compares a tombstone object and an identifier of any type.
-     * @tparam Entity Type of identifier.
-     * @param entity Identifier with which to compare.
-     * @return True if the two elements differ, false otherwise.
-     */
-    template<entity_like Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const noexcept {
-        return !(entity == *this);
-    }
 };
-
-/**
- * @brief Compares a tombstone object and an identifier of any type.
- * @tparam Entity Type of identifier.
- * @param lhs Identifier with which to compare.
- * @param rhs A tombstone object yet to be converted.
- * @return False if the two elements differ, true otherwise.
- */
-template<entity_like Entity>
-[[nodiscard]] constexpr bool operator==(const Entity lhs, const tombstone_t rhs) noexcept {
-    return rhs.operator==(lhs);
-}
-
-/**
- * @brief Compares a tombstone object and an identifier of any type.
- * @tparam Entity Type of identifier.
- * @param lhs Identifier with which to compare.
- * @param rhs A tombstone object yet to be converted.
- * @return True if the two elements differ, false otherwise.
- */
-template<entity_like Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity lhs, const tombstone_t rhs) noexcept {
-    return !(rhs == lhs);
-}
 
 /**
  * @brief Compile-time constant for null entities.
