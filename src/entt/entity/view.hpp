@@ -29,13 +29,13 @@ const Type *view_placeholder() {
     return &placeholder;
 }
 
-template<typename It, typename Entity>
+template<typename It, entity_like Entity>
 [[nodiscard]] bool all_of(It first, const It last, const Entity entt) noexcept {
     for(; (first != last) && (*first)->contains(entt); ++first) {}
     return first == last;
 }
 
-template<typename It, typename Entity>
+template<typename It, entity_like Entity>
 [[nodiscard]] bool none_of(It first, const It last, const Entity entt) noexcept {
     for(; (first != last) && !(*first)->contains(entt); ++first) {}
     return first == last;

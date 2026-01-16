@@ -202,7 +202,7 @@ private:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Entity, typename Allocator, typename>
+template<typename Type, entity_like Entity, typename Allocator, typename>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
@@ -762,7 +762,7 @@ private:
 };
 
 /*! @copydoc basic_storage */
-template<typename Type, typename Entity, typename Allocator>
+template<typename Type, entity_like Entity, typename Allocator>
 class basic_storage<Type, Entity, Allocator, std::enable_if_t<component_traits<Type, Entity>::page_size == 0u>>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
@@ -946,7 +946,7 @@ public:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity, typename Allocator>
+template<entity_like Entity, typename Allocator>
 class basic_storage<Entity, Entity, Allocator>
     : public basic_sparse_set<Entity, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;

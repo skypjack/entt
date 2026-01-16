@@ -43,13 +43,13 @@ enum class deletion_policy : std::uint8_t {
     unspecified = swap_and_pop
 };
 
-template<typename Type, typename Entity = entity, typename = void>
+template<typename Type, entity_like Entity = entity, typename = void>
 struct component_traits;
 
-template<typename Entity = entity, typename = std::allocator<Entity>>
+template<entity_like Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
-template<typename Type, typename = entity, typename = std::allocator<Type>, typename = void>
+template<typename Type, entity_like = entity, typename = std::allocator<Type>, typename = void>
 class basic_storage;
 
 template<typename, typename>
@@ -58,7 +58,7 @@ class basic_sigh_mixin;
 template<typename, typename>
 class basic_reactive_mixin;
 
-template<typename Entity = entity, typename = std::allocator<Entity>>
+template<entity_like Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
 
 template<typename, typename, typename = void>
@@ -240,7 +240,7 @@ struct type_list_transform<owned_t<Type...>, Op> {
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
+template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
     using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
@@ -254,7 +254,7 @@ struct reactive final {};
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Entity, typename Allocator>
+template<entity_like Entity, typename Allocator>
 struct storage_type<reactive, Entity, Allocator> {
     /*! @brief Type-to-storage conversion result. */
     using type = ENTT_STORAGE(reactive_mixin, basic_storage<reactive, Entity, Allocator>);
@@ -273,7 +273,7 @@ using storage_type_t = storage_type<Args...>::type;
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
+template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
 struct storage_for {
     /*! @brief Type-to-storage conversion result. */
     using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;

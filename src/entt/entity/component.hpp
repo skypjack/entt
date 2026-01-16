@@ -39,7 +39,7 @@ struct page_size<Type, std::void_t<decltype(Type::page_size)>>
  * @tparam Type Element type.
  * @tparam Entity A valid entity type.
  */
-template<typename Type, typename Entity, typename>
+template<typename Type, entity_like Entity, typename>
 struct component_traits {
     static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
 

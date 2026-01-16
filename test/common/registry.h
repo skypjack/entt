@@ -5,7 +5,7 @@
 
 namespace test {
 
-template<typename Entity>
+template<entt::entity_like Entity>
 struct custom_registry: private entt::basic_registry<Entity> {
     using base_type = entt::basic_registry<Entity>;
 
@@ -21,10 +21,10 @@ public:
 
     using base_type::base_type;
 
-    using base_type::storage;
     using base_type::create;
     using base_type::emplace;
     using base_type::insert;
+    using base_type::storage;
 };
 
 } // namespace test

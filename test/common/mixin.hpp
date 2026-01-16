@@ -28,7 +28,7 @@ public:
 
 } // namespace test
 
-template<typename Entity>
+template<entt::entity_like Entity>
 struct entt::storage_type<test::assure_loop, Entity> {
     using type = test::assure_loop_mixin<entt::basic_storage<test::assure_loop, Entity>>;
 };
