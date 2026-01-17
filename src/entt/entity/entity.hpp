@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_ENTITY_HPP
 
 #include <bit>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
