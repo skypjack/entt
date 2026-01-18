@@ -2,6 +2,7 @@
 #define ENTT_GRAPH_FLOW_HPP
 
 #include <algorithm>
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -288,7 +289,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    template<typename It>
+    template<std::input_iterator It>
     std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
     ro(It first, It last) {
         for(; first != last; ++first) {
@@ -315,7 +316,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    template<typename It>
+    template<std::input_iterator It>
     std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
     rw(It first, It last) {
         for(; first != last; ++first) {
