@@ -4,6 +4,7 @@
 #include <bit>
 #include <cmath>
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -547,7 +548,7 @@ public:
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      */
-    template<typename It>
+    template<std::input_iterator It>
     void insert(It first, It last) {
         for(; first != last; ++first) {
             insert(*first);
