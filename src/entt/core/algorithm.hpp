@@ -2,6 +2,7 @@
 #define ENTT_CORE_ALGORITHM_HPP
 
 #include <algorithm>
+#include <concepts>
 #include <functional>
 #include <iterator>
 #include <utility>
@@ -24,7 +25,6 @@ struct std_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
      * @tparam Compare Type of comparison function object.
      * @tparam Args Types of arguments to forward to the sort function.
      * @param first An iterator to the first element of the range to sort.
@@ -32,8 +32,8 @@ struct std_sort {
      * @param compare A valid comparison function object.
      * @param args Arguments to forward to the sort function, if any.
      */
-    template<typename It, typename Compare = std::less<>, typename... Args>
-    void operator()(It first, It last, Compare compare = Compare{}, Args &&...args) const {
+    template<typename Compare = std::less<>, typename... Args>
+    void operator()(std::random_access_iterator auto first, std::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
         std::sort(std::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
     }
 };
@@ -45,14 +45,13 @@ struct insertion_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
      * @tparam Compare Type of comparison function object.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param compare A valid comparison function object.
      */
-    template<typename It, typename Compare = std::less<>>
-    void operator()(It first, It last, Compare compare = Compare{}) const {
+    template<typename Compare = std::less<>>
+    void operator()(std::random_access_iterator auto first, std::random_access_iterator auto last, Compare compare = Compare{}) const {
         if(first < last) {
             for(auto it = first + 1; it < last; ++it) {
                 auto value = std::move(*it);
@@ -94,7 +93,7 @@ struct radix_sort {
      * @param last An iterator past the last element of the range to sort.
      * @param getter A valid _getter_ function object.
      */
-    template<typename It, typename Getter = stl::identity>
+    template<std::random_access_iterator It, typename Getter = stl::identity>
     void operator()(It first, It last, Getter getter = Getter{}) const {
         if(first < last) {
             constexpr auto passes = N / Bit;
