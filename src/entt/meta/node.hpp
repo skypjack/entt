@@ -61,7 +61,7 @@ template<typename Type>
 struct meta_type_node;
 
 struct meta_custom_node {
-    id_type type{};
+    id_type id{};
     std::shared_ptr<void> value{};
 };
 
