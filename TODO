@@ -35,3 +35,5 @@ TODO:
 * introduce a way to inject stl from outside too
 * use entity_like concept where applicable
 * clang-format config for concepts (and review existing too)
+* review sentinels (std::default_sentinel and the like)
+* review non-const to const iterator conversions
