@@ -26,9 +26,6 @@
 
 namespace entt {
 
-class meta_any;
-class meta_type;
-
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
