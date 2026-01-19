@@ -16,13 +16,10 @@
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "context.hpp"
+#include "fwd.hpp"
 #include "type_traits.hpp"
 
 namespace entt {
-
-class meta_any;
-class meta_type;
-class meta_handle;
 
 /*! @cond TURN_OFF_DOXYGEN */
 namespace internal {
