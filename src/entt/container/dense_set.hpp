@@ -521,12 +521,10 @@ public:
 
     /**
      * @brief Inserts elements into the container, if they do not exist.
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      */
-    template<std::input_iterator It>
-    void insert(It first, It last) {
+    void insert(std::input_iterator auto first, std::input_iterator auto last) {
         for(; first != last; ++first) {
             insert(*first);
         }
