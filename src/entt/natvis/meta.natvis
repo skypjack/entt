@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="entt::internal::meta_base_node">
-		<DisplayString Condition="resolve != nullptr">{{ type={ type } }}</DisplayString>
+		<DisplayString Condition="type != nullptr">{{ id={ id } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[type]">type</Item>
+			<Item Name="[id]">id</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_conv_node">
-		<DisplayString Condition="conv != nullptr">{{ type={ type } }}</DisplayString>
+		<DisplayString Condition="conv != nullptr">{{ id={ id } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[type]">type</Item>
+			<Item Name="[type]">id</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_ctor_node">
@@ -23,10 +23,10 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::internal::meta_custom_node">
-		<DisplayString Condition="value != nullptr">{{ type={ type } }}</DisplayString>
+		<DisplayString Condition="value != nullptr">{{ id={ id } }}</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
-			<Item Name="[type]">type</Item>
+			<Item Name="[id]">id</Item>
 			<Item Name="[value]">value</Item>
 		</Expand>
 	</Type>
