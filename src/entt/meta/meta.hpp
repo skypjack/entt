@@ -482,12 +482,12 @@ public:
                 }
 
                 if(const auto &from = fetch_node(); from.details != nullptr) {
-                    if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, entt::type_hash<std::remove_cvref_t<Type>>::value()); elem != nullptr) {
+                    if(const auto *elem = internal::find_member(from.details->conv, entt::type_hash<std::remove_cvref_t<Type>>::value()); elem != nullptr) {
                         return elem->conv(*ctx, storage.data());
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == entt::type_hash<std::remove_cvref_t<Type>>::value()) {
+                        if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == entt::type_hash<std::remove_cvref_t<Type>>::value()) {
                             return other;
                         } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
                             return from_base;
@@ -1062,7 +1062,7 @@ class meta_type {
 
                     if(const auto &info = other.info(); info == type.info()) {
                         ++match;
-                    } else if(!(type.fetch_node().conversion_helper && other.fetch_node().conversion_helper) && !(type.fetch_node().details && (internal::find_member<&internal::meta_base_node::type>(type.fetch_node().details->base, info.hash()) || internal::find_member<&internal::meta_conv_node::type>(type.fetch_node().details->conv, info.hash())))) {
+                    } else if(!(type.fetch_node().conversion_helper && other.fetch_node().conversion_helper) && !(type.fetch_node().details && (internal::find_member(type.fetch_node().details->base, info.hash()) || internal::find_member(type.fetch_node().details->conv, info.hash())))) {
                         break;
                     }
                 }
@@ -1113,7 +1113,7 @@ public:
      * @param curr The underlying node with which to construct the instance.
      */
     meta_type(const meta_ctx &area, const internal::meta_base_node &curr) noexcept
-        : meta_type{area, curr.resolve(internal::meta_context::from(area))} {}
+        : meta_type{area, curr.type(internal::meta_context::from(area))} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1289,12 +1289,12 @@ public:
         if(const auto &to = other.info().hash(); (info().hash() == to) || ((fetch_node().conversion_helper != nullptr) && (other.is_arithmetic() || other.is_enum()))) {
             return true;
         } else if(const auto &from = fetch_node(); from.details) {
-            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, to); elem != nullptr) {
+            if(const auto *elem = internal::find_member(from.details->conv, to); elem != nullptr) {
                 return true;
             }
 
             for(auto &&curr: from.details->base) {
-                if(curr.type == to || meta_type{*ctx, curr.resolve(internal::meta_context::from(*ctx))}.can_convert(other)) {
+                if(curr.id == to || meta_type{*ctx, curr.type(internal::meta_context::from(*ctx))}.can_convert(other)) {
                     return true;
                 }
             }
@@ -1418,7 +1418,7 @@ public:
         meta_handle wrapped{*ctx, std::forward<Instance>(instance)};
 
         if(const auto &ref = fetch_node(); ref.details) {
-            if(auto *elem = internal::find_member<&internal::meta_func_node::id>(ref.details->func, id); elem != nullptr) {
+            if(auto *elem = internal::find_member(ref.details->func, id); elem != nullptr) {
                 if(const auto *candidate = lookup(args, sz, (wrapped->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
                     return candidate->invoke(std::move(wrapped), args);
                 }
@@ -1544,12 +1544,12 @@ bool meta_any::set(const id_type id, Type &&value) {
         }
 
         if(const auto &from = fetch_node(); from.details) {
-            if(const auto *elem = internal::find_member<&internal::meta_conv_node::type>(from.details->conv, type.info().hash()); elem != nullptr) {
+            if(const auto *elem = internal::find_member(from.details->conv, type.info().hash()); elem != nullptr) {
                 return elem->conv(*ctx, storage.data());
             }
 
             for(auto &&curr: from.details->base) {
-                if(auto other = curr.resolve(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.type == type.info().hash()) {
+                if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == type.info().hash()) {
                     return other;
                 } else if(auto from_base = std::as_const(other).allow_cast(type); from_base) {
                     return from_base;

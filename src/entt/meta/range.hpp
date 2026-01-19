@@ -73,8 +73,6 @@ struct meta_range_iterator final {
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         if constexpr(std::is_same_v<It, typename meta_context::container_type::const_iterator>) {
             return {it[value].first, Type{*ctx, *it[value].second}};
-        } else if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, meta_base_node>) {
-            return {it[value].type, Type{*ctx, it[value]}};
         } else {
             return {it[value].id, Type{*ctx, it[value]}};
         }

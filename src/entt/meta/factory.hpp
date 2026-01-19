@@ -37,13 +37,13 @@ class basic_meta_factory {
     }
 
     [[nodiscard]] auto *find_member_or_assert() {
-        auto *member = find_member<&meta_data_node::id>(fetch_node().details->data, bucket);
+        auto *member = find_member(fetch_node().details->data, bucket);
         ENTT_ASSERT(member != nullptr, "Cannot find member");
         return member;
     }
 
     [[nodiscard]] auto *find_overload_or_assert() {
-        auto *overload = find_overload(find_member<&meta_func_node::id>(fetch_node().details->func, bucket), invoke);
+        auto *overload = find_overload(find_member(fetch_node().details->func, bucket), invoke);
         ENTT_ASSERT(overload != nullptr, "Cannot find overload");
         return overload;
     }
@@ -69,14 +69,14 @@ protected:
         reset_bucket(parent);
 
         if constexpr(std::is_same_v<Type, meta_base_node>) {
-            auto *member = find_member<&meta_base_node::type>(elem.details->base, node.type);
+            auto *member = find_member(elem.details->base, node.id);
             member ? (*member = node) : elem.details->base.emplace_back(node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
-            auto *member = find_member<&meta_conv_node::type>(elem.details->conv, node.type);
+            auto *member = find_member(elem.details->conv, node.id);
             member ? (*member = node) : elem.details->conv.emplace_back(node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
-            auto *member = find_member<&meta_ctor_node::id>(elem.details->ctor, node.id);
+            auto *member = find_member(elem.details->ctor, node.id);
             member ? (*member = node) : elem.details->ctor.emplace_back(node);
         }
     }
@@ -86,7 +86,7 @@ protected:
 
         reset_bucket(node.id);
 
-        if(auto *member = find_member<&meta_data_node::id>(elem.details->data, node.id); member == nullptr) {
+        if(auto *member = find_member(elem.details->data, node.id); member == nullptr) {
             elem.details->data.emplace_back(std::move(node));
         } else if(member->set != node.set || member->get != node.get) {
             *member = std::move(node);
@@ -98,7 +98,7 @@ protected:
 
         reset_bucket(node.id, node.invoke);
 
-        if(auto *member = find_member<&meta_func_node::id>(elem.details->func, node.id); member == nullptr) {
+        if(auto *member = find_member(elem.details->func, node.id); member == nullptr) {
             elem.details->func.emplace_back(std::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
             while(member->next != nullptr) { member = member->next.get(); }

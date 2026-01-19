@@ -66,13 +66,13 @@ struct meta_custom_node {
 };
 
 struct meta_base_node {
-    id_type type{};
-    const meta_type_node &(*resolve)(const meta_context &) noexcept {};
+    id_type id{};
+    const meta_type_node &(*type)(const meta_context &) noexcept {};
     const void *(*cast)(const void *) noexcept {};
 };
 
 struct meta_conv_node {
-    id_type type{};
+    id_type id{};
     meta_any (*conv)(const meta_ctx &, const void *){};
 };
 
@@ -146,10 +146,10 @@ struct meta_type_node {
     std::unique_ptr<meta_type_descriptor> details{};
 };
 
-template<auto Member, typename Type, typename Value>
+template<typename Type, typename Value>
 [[nodiscard]] auto *find_member(Type &from, const Value value) {
     for(auto &&elem: from) {
-        if((elem.*Member) == value) {
+        if(elem.id == value) {
             return &elem;
         }
     }
@@ -167,13 +167,13 @@ template<auto Member>
     using value_type = std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
-        if(auto *member = find_member<&value_type::id>((node.details.get()->*Member), id); member != nullptr) {
+        if(auto *member = find_member((node.details.get()->*Member), id); member != nullptr) {
             return member;
         }
 
         if(recursive) {
             for(auto &&curr: node.details->base) {
-                if(auto *elem = look_for<Member>(context, curr.resolve(context), id, recursive); elem) {
+                if(auto *elem = look_for<Member>(context, curr.type(context), id, recursive); elem) {
                     return elem;
                 }
             }
@@ -197,9 +197,9 @@ template<typename... Args>
 [[nodiscard]] inline const void *try_cast(const meta_context &context, const meta_type_node &from, const id_type to, const void *instance) noexcept {
     if(from.details) {
         for(auto &&curr: from.details->base) {
-            if(const void *other = curr.cast(instance); curr.type == to) {
+            if(const void *other = curr.cast(instance); curr.id == to) {
                 return other;
-            } else if(const void *elem = try_cast(context, curr.resolve(context), to, other); elem) {
+            } else if(const void *elem = try_cast(context, curr.type(context), to, other); elem) {
                 return elem;
             }
         }
