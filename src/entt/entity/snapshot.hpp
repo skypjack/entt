@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_SNAPSHOT_HPP
 #define ENTT_ENTITY_SNAPSHOT_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
@@ -136,7 +137,7 @@ public:
      * @param id Optional name used to map the storage within the registry.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename Type, typename Archive, typename It>
+    template<typename Type, typename Archive, std::input_iterator It>
     const basic_snapshot &get(Archive &archive, It first, It last, const id_type id = type_hash<Type>::value()) const {
         static_assert(!std::is_same_v<Type, entity_type>, "Entity types not supported");
 

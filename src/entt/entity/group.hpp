@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_GROUP_HPP
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
@@ -642,7 +643,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It>
+    template<std::input_iterator It>
     void sort_as(It first, It last) const {
         if(*this) {
             descriptor->handle().sort_as(first, last);

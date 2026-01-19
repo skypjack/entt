@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_MIXIN_HPP
 #define ENTT_ENTITY_MIXIN_HPP
 
+#include <concepts>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -309,11 +310,11 @@ public:
 
     /**
      * @brief Assigns each element in a range an identifier.
-     * @tparam It Type of mutable forward iterator.
+     * @tparam It Type of output iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<typename It>
+    template<std::output_iterator<entity_type> It>
     void generate(It first, It last) {
         underlying_type::generate(first, last);
 
@@ -361,7 +362,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @param args Parameters to use to forward to the underlying storage.
      */
-    template<typename It, typename... Args>
+    template<std::input_iterator It, typename... Args>
     void insert(It first, It last, Args &&...args) {
         auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);

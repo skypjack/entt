@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_STORAGE_HPP
 
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -693,7 +694,7 @@ public:
      * @param value An instance of the object to construct.
      * @return Iterator pointing to the first element inserted, if any.
      */
-    template<typename It>
+    template<std::input_iterator It>
     iterator insert(It first, It last, const value_type &value = {}) {
         for(; first != last; ++first) {
             emplace_element(*first, true, value);
@@ -901,7 +902,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It>
+    template<std::input_iterator It>
     void insert(It first, It last) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
@@ -1131,11 +1132,11 @@ public:
 
     /**
      * @brief Assigns each element in a range an identifier.
-     * @tparam It Type of mutable forward iterator.
+     * @tparam It Type of output iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<typename It>
+    template<std::output_iterator<entity_type> It>
     void generate(It first, It last) {
         for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
             *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
