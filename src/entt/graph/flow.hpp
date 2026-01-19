@@ -284,14 +284,11 @@ public:
 
     /**
      * @brief Assigns a range of read-only resources to the current task.
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    template<std::input_iterator It>
-    std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
-    ro(It first, It last) {
+    basic_flow &ro(std::input_iterator auto first, std::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, false);
         }
@@ -311,14 +308,11 @@ public:
 
     /**
      * @brief Assigns a range of writable resources to the current task.
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    template<std::input_iterator It>
-    std::enable_if_t<std::is_same_v<std::remove_const_t<typename std::iterator_traits<It>::value_type>, id_type>, basic_flow &>
-    rw(It first, It last) {
+    basic_flow &rw(std::input_iterator auto first, std::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, true);
         }
