@@ -38,3 +38,4 @@ TODO:
 * hashed_string consteval-ness on construction to further reduce risks
 * review sentinels (std::default_sentinel and the like)
 * review non-const to const iterator conversions
+* meta_base, then iterator.hpp
