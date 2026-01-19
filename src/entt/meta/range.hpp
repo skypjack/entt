@@ -2,6 +2,7 @@
 #define ENTT_META_RANGE_HPP
 
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <utility>
@@ -112,7 +113,7 @@ private:
  * @tparam Type Type of meta objects returned.
  * @tparam It Type of forward iterator.
  */
-template<typename Type, typename It>
+template<typename Type, std::forward_iterator It>
 using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, It>>;
 
 } // namespace entt
