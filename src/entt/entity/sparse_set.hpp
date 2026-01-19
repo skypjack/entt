@@ -786,14 +786,12 @@ public:
      * Attempting to assign an entity that already belongs to the sparse set
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return Iterator pointing to the first element inserted in case of
      * success, the `end()` iterator otherwise.
      */
-    template<std::input_iterator It>
-    iterator push(It first, It last) {
+    iterator push(std::input_iterator auto first, std::input_iterator auto last) {
         auto curr = end();
 
         for(; first != last; ++first) {

@@ -537,12 +537,10 @@ public:
      *
      * @sa destroy
      *
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<std::input_iterator It>
-    void destroy(It first, It last) {
+    void destroy(std::input_iterator auto first, std::input_iterator auto last) {
         const auto to = entities.sort_as(first, last);
         const auto from = entities.cend() - static_cast<common_type::difference_type>(entities.free_list());
 
@@ -580,12 +578,11 @@ public:
      * @sa emplace
      *
      * @tparam Type Type of element to create.
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename Type, std::input_iterator It>
-    void insert(It first, It last) {
+    template<typename Type>
+    void insert(std::input_iterator auto first, std::input_iterator auto last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(std::move(first), std::move(last));
     }
@@ -596,13 +593,12 @@ public:
      * @sa emplace
      *
      * @tparam Type Type of element to create.
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the element to assign.
      */
-    template<typename Type, std::input_iterator It>
-    void insert(It first, It last, const Type &value) {
+    template<typename Type>
+    void insert(std::input_iterator auto first, std::input_iterator auto last, const Type &value) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(std::move(first), std::move(last), value);
     }

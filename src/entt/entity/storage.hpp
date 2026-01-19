@@ -688,14 +688,12 @@ public:
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the object to construct.
      * @return Iterator pointing to the first element inserted, if any.
      */
-    template<std::input_iterator It>
-    iterator insert(It first, It last, const value_type &value = {}) {
+    iterator insert(std::input_iterator auto first, std::input_iterator auto last, const value_type &value = {}) {
         for(; first != last; ++first) {
             emplace_element(*first, true, value);
         }

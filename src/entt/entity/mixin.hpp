@@ -356,14 +356,13 @@ public:
     /**
      * @brief Assigns one or more entities to a storage and constructs their
      * objects from a given instance.
-     * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to forward to the underlying storage.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param args Parameters to use to forward to the underlying storage.
      */
-    template<std::input_iterator It, typename... Args>
-    void insert(It first, It last, Args &&...args) {
+    template<typename... Args>
+    void insert(std::input_iterator auto first, std::input_iterator auto last, Args &&...args) {
         auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 

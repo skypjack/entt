@@ -130,15 +130,14 @@ public:
      * the entities in a range.
      * @tparam Type Type of elements to serialize.
      * @tparam Archive Type of output archive.
-     * @tparam It Type of input iterator.
      * @param archive A valid reference to an output archive.
      * @param first An iterator to the first element of the range to serialize.
      * @param last An iterator past the last element of the range to serialize.
      * @param id Optional name used to map the storage within the registry.
      * @return An object of this type to continue creating the snapshot.
      */
-    template<typename Type, typename Archive, std::input_iterator It>
-    const basic_snapshot &get(Archive &archive, It first, It last, const id_type id = type_hash<Type>::value()) const {
+    template<typename Type, typename Archive>
+    const basic_snapshot &get(Archive &archive, std::input_iterator auto first, std::input_iterator auto last, const id_type id = type_hash<Type>::value()) const {
         static_assert(!std::is_same_v<Type, entity_type>, "Entity types not supported");
 
         if(const auto *storage = reg->template storage<Type>(id); storage && !storage->empty()) {

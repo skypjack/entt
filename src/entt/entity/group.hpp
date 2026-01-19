@@ -639,12 +639,10 @@ public:
      * The shared pool of entities and thus its order is affected by the changes
      * to each and every pool that it tracks.
      *
-     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<std::input_iterator It>
-    void sort_as(It first, It last) const {
+    void sort_as(std::input_iterator auto first, std::input_iterator auto last) const {
         if(*this) {
             descriptor->handle().sort_as(first, last);
         }
