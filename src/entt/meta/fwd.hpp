@@ -20,7 +20,7 @@ struct meta_custom;
 
 class meta_data;
 
-class meta_func;
+class meta_base;
 
 class meta_type;
 
