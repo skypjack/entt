@@ -164,6 +164,14 @@
 			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
 		</Expand>
 	</Type>
+	<Type Name="entt::meta_base">
+		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
+		<DisplayString>{{}}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
+			<Item Name="[context]" Condition="ctx != nullptr">ctx,na</Item>
+		</Expand>
+	</Type>
 	<Type Name="entt::meta_type">
 		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
