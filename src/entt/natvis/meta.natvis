@@ -142,14 +142,14 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_custom">
-		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_data">
-		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
@@ -157,7 +157,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_func">
-		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
@@ -165,7 +165,7 @@
 		</Expand>
 	</Type>
 	<Type Name="entt::meta_type">
-		<DisplayString Condition="node != nullptr">{ node }</DisplayString>
+		<DisplayString Condition="node != nullptr">{ node,na }</DisplayString>
 		<DisplayString>{{}}</DisplayString>
 		<Expand>
 			<ExpandedItem Condition="node != nullptr">node</ExpandedItem>
