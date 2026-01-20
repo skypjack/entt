@@ -124,7 +124,7 @@ TEST_F(MetaFactory, Base) {
     ASSERT_NE(range.begin(), range.end());
     ASSERT_EQ(std::distance(range.begin(), range.end()), 1);
     ASSERT_EQ(range.begin()->first, entt::type_id<base>().hash());
-    ASSERT_EQ(range.begin()->second.info(), entt::type_id<base>());
+    ASSERT_EQ(range.begin()->second.type().info(), entt::type_id<base>());
 }
 
 TEST_F(MetaFactory, Conv) {

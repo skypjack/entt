@@ -1032,6 +1032,44 @@ private:
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
+/*! @brief Opaque wrapper for base types. */
+class meta_base {
+    [[nodiscard]] auto &node_or_assert() const noexcept {
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
+        return *node;
+    }
+
+public:
+    /*! @brief Default constructor. */
+    meta_base() noexcept = default;
+
+    /**
+     * @brief Context aware constructor for meta objects.
+     * @param area The context from which to search for meta types.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_base(const meta_ctx &area, const internal::meta_base_node &curr) noexcept
+        : node{&curr},
+          ctx{&area} {}
+
+    /*! @copydoc meta_any::type */
+    [[nodiscard]] inline meta_type type() const noexcept;
+
+    /*! @copydoc meta_data::operator bool */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return (node != nullptr);
+    }
+
+    /*! @copydoc meta_data::operator== */
+    [[nodiscard]] bool operator==(const meta_base &other) const noexcept {
+        return (ctx == other.ctx) && (node == other.node);
+    }
+
+private:
+    const internal::meta_base_node *node{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+};
+
 /*! @brief Opaque wrapper for types. */
 class meta_type {
     [[nodiscard]] const auto &fetch_node() const {
@@ -1106,14 +1144,6 @@ public:
     meta_type(const meta_ctx &area, const internal::meta_type_node &curr) noexcept
         : node{&curr},
           ctx{&area} {}
-
-    /**
-     * @brief Context aware constructor for meta objects.
-     * @param area The context from which to search for meta types.
-     * @param curr The underlying node with which to construct the instance.
-     */
-    meta_type(const meta_ctx &area, const internal::meta_base_node &curr) noexcept
-        : meta_type{area, curr.type(internal::meta_context::from(area))} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1307,8 +1337,8 @@ public:
      * @brief Returns a range to visit registered top-level base meta types.
      * @return An iterable range to visit registered top-level base meta types.
      */
-    [[nodiscard]] meta_range<meta_type, decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
-        using range_type = meta_range<meta_type, decltype(internal::meta_type_descriptor::base)::const_iterator>;
+    [[nodiscard]] meta_range<meta_base, decltype(internal::meta_type_descriptor::base)::const_iterator> base() const noexcept {
+        using range_type = meta_range<meta_base, decltype(internal::meta_type_descriptor::base)::const_iterator>;
         return fetch_node().details ? range_type{{*ctx, fetch_node().details->base.cbegin()}, {*ctx, fetch_node().details->base.cend()}} : range_type{};
     }
 
@@ -1426,7 +1456,7 @@ public:
         }
 
         for(auto &&curr: base()) {
-            if(auto elem = curr.second.invoke(id, *wrapped.operator->(), args, sz); elem) {
+            if(auto elem = curr.second.type().invoke(id, *wrapped.operator->(), args, sz); elem) {
                 return elem;
             }
         }
@@ -1602,6 +1632,10 @@ inline bool meta_any::assign(meta_any &&other) {
 
 [[nodiscard]] inline meta_type meta_func::arg(const size_type index) const noexcept {
     return index < arity() ? node_or_assert().arg(*ctx, index) : meta_type{};
+}
+
+[[nodiscard]] inline meta_type meta_base::type() const noexcept {
+    return meta_type{*ctx, node_or_assert().type(internal::meta_context::from(*ctx))};
 }
 
 /*! @cond TURN_OFF_DOXYGEN */

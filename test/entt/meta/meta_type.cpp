@@ -423,7 +423,7 @@ TEST_F(MetaType, Base) {
 
     for(auto curr: type.base()) {
         ASSERT_EQ(curr.first, entt::type_id<base>().hash());
-        ASSERT_EQ(curr.second, entt::resolve<base>());
+        ASSERT_EQ(curr.second.type(), entt::resolve<base>());
     }
 }
 

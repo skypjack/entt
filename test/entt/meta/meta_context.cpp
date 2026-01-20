@@ -218,7 +218,7 @@ TEST_F(MetaContext, MetaBase) {
     ASSERT_EQ((std::distance(global.base().cbegin(), global.base().cend())), 0);
     ASSERT_EQ((std::distance(local.base().cbegin(), local.base().cend())), 1);
 
-    ASSERT_EQ(local.base().cbegin()->second.info(), entt::type_id<base>());
+    ASSERT_EQ(local.base().cbegin()->second.type().info(), entt::type_id<base>());
 
     ASSERT_FALSE(entt::resolve(entt::type_id<base>()));
     ASSERT_TRUE(entt::resolve(ctx(), entt::type_id<base>()));

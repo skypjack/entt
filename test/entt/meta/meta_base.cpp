@@ -60,6 +60,27 @@ struct MetaBase: ::testing::Test {
     }
 };
 
+TEST_F(MetaBase, Comparison) {
+    const auto type = entt::resolve<base_3>();
+    const auto base = type.base().begin()->second;
+
+    ASSERT_TRUE(base);
+
+    ASSERT_EQ(base, base);
+    ASSERT_NE(base, entt::meta_base{});
+    ASSERT_FALSE(base != base);
+    ASSERT_TRUE(base == base);
+}
+
+TEST_F(MetaBase, Type) {
+    const auto type = entt::resolve<base_3>();
+    const auto iterable = type.base();
+
+    ASSERT_EQ(++iterable.begin(), iterable.end());
+    ASSERT_EQ(iterable.begin()->first, entt::type_id<base_2>().hash());
+    ASSERT_EQ(iterable.begin()->second.type(), entt::resolve<base_2>());
+}
+
 TEST_F(MetaBase, Base) {
     auto any = entt::resolve<derived>().construct();
     any.cast<derived &>().value_1 = 2;
