@@ -372,7 +372,10 @@ public:
         return *this;
     }
 
-    /*! @copydoc any::info */
+    /**
+     * @brief Returns the meta type associated with the contained instance.
+     * @return The meta type associated with the contained instance.
+     */
     [[nodiscard]] inline meta_type type() const noexcept;
 
     /**
