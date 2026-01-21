@@ -141,12 +141,13 @@ public:
 
     /**
      * @brief Resets or replaces a service.
+     * @tparam Type Service type.
      * @tparam Deleter Deleter type.
      * @param elem A pointer to a service to manage.
      * @param deleter A deleter to use to destroy the service.
      */
-    template<typename Deleter = std::default_delete<Type>>
-    static void reset(std::derived_from<Service> auto *elem, Deleter deleter = {}) {
+    template<std::derived_from<Service> Type, typename Deleter = std::default_delete<Type>>
+    static void reset(Type *elem, Deleter deleter = {}) {
         service = std::shared_ptr<Service>{elem, std::move(deleter)};
     }
 
