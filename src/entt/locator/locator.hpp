@@ -1,6 +1,7 @@
 #ifndef ENTT_LOCATOR_LOCATOR_HPP
 #define ENTT_LOCATOR_LOCATOR_HPP
 
+#include <concepts>
 #include <memory>
 #include <utility>
 #include "../config/config.h"
@@ -84,7 +85,8 @@ public:
      * @param args Parameters to use to construct the fallback service.
      * @return A reference to a valid service.
      */
-    template<typename Type = Service, typename... Args>
+    template<std::derived_from<Service> Type = Service, typename... Args>
+    requires std::constructible_from<Type, Args...>
     [[nodiscard]] static Service &value_or(Args &&...args) {
         return service ? *service : emplace<Type>(std::forward<Args>(args)...);
     }
@@ -96,7 +98,8 @@ public:
      * @param args Parameters to use to construct the service.
      * @return A reference to a valid service.
      */
-    template<typename Type = Service, typename... Args>
+    template<std::derived_from<Service> Type = Service, typename... Args>
+    requires std::constructible_from<Type, Args...>
     static Service &emplace(Args &&...args) {
         service = std::make_shared<Type>(std::forward<Args>(args)...);
         return *service;
@@ -111,7 +114,8 @@ public:
      * @param args Parameters to use to construct the service.
      * @return A reference to a valid service.
      */
-    template<typename Type = Service, typename Allocator, typename... Args>
+    template<std::derived_from<Service> Type = Service, typename Allocator, typename... Args>
+    requires std::constructible_from<Type, Args...>
     static Service &emplace(std::allocator_arg_t, Allocator alloc, Args &&...args) {
         service = std::allocate_shared<Type>(alloc, std::forward<Args>(args)...);
         return *service;
@@ -137,13 +141,12 @@ public:
 
     /**
      * @brief Resets or replaces a service.
-     * @tparam Type Service type.
      * @tparam Deleter Deleter type.
      * @param elem A pointer to a service to manage.
      * @param deleter A deleter to use to destroy the service.
      */
-    template<typename Type, typename Deleter = std::default_delete<Type>>
-    static void reset(Type *elem, Deleter deleter = {}) {
+    template<typename Deleter = std::default_delete<Type>>
+    static void reset(std::derived_from<Service> auto *elem, Deleter deleter = {}) {
         service = std::shared_ptr<Service>{elem, std::move(deleter)};
     }
 
