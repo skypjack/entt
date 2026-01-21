@@ -26,6 +26,23 @@
 
 namespace entt {
 
+/*! @cond TURN_OFF_DOXYGEN */
+namespace internal {
+
+template<typename Type>
+struct basic_meta_object {
+    [[nodiscard]] auto &node_or_assert() const noexcept {
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
+        return *node;
+    }
+
+    const Type *node{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+};
+
+} // namespace internal
+/*! @endcond */
+
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
@@ -773,28 +790,51 @@ private:
     const internal::meta_custom_node *node{};
 };
 
-/*! @brief Opaque wrapper for data members. */
-class meta_data {
-    [[nodiscard]] auto &node_or_assert() const noexcept {
-        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
-        return *node;
-    }
-
-public:
-    /*! @brief Unsigned integer type. */
-    using size_type = internal::meta_data_node::size_type;
+/**
+ * @brief Common opaque wrapper for meta objects.
+ * @tparam Type Underlying meta node type.
+ */
+template<typename Type>
+struct meta_object: protected internal::basic_meta_object<Type> {
+    /*! @brief Underlying meta node type. */
+    using node_type = Type;
 
     /*! @brief Default constructor. */
-    meta_data() noexcept = default;
+    meta_object() noexcept = default;
 
     /**
      * @brief Context aware constructor for meta objects.
      * @param area The context from which to search for meta types.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_data(const meta_ctx &area, const internal::meta_data_node &curr) noexcept
-        : node{&curr},
-          ctx{&area} {}
+    meta_object(const meta_ctx &area, const node_type &curr) noexcept
+        : internal::basic_meta_object<Type>{&curr, &area} {
+    }
+
+    /**
+     * @brief Returns true if an object is valid, false otherwise.
+     * @return True if the object is valid, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const noexcept {
+        return (this->node != nullptr);
+    }
+
+    /**
+     * @brief Checks if two objects refer to the same type.
+     * @param other The object with which to compare.
+     * @return True if the objects refer to the same type, false otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_object &other) const noexcept {
+        return (this->ctx == other.ctx) && (this->node == other.node);
+    }
+};
+
+/*! @brief Opaque wrapper for data members. */
+struct meta_data: meta_object<internal::meta_data_node> {
+    /*! @brief Unsigned integer type. */
+    using size_type = internal::meta_data_node::size_type;
+
+    using meta_object::meta_object;
 
     /**
      * @brief Returns the name assigned to a data member, if any.
@@ -880,51 +920,14 @@ public:
     [[nodiscard]] meta_custom custom() const noexcept {
         return {node_or_assert().custom};
     }
-
-    /**
-     * @brief Returns true if an object is valid, false otherwise.
-     * @return True if the object is valid, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
-    }
-
-    /**
-     * @brief Checks if two objects refer to the same type.
-     * @param other The object with which to compare.
-     * @return True if the objects refer to the same type, false otherwise.
-     */
-    [[nodiscard]] bool operator==(const meta_data &other) const noexcept {
-        return (ctx == other.ctx) && (node == other.node);
-    }
-
-private:
-    const internal::meta_data_node *node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /*! @brief Opaque wrapper for member functions. */
-class meta_func {
-    [[nodiscard]] auto &node_or_assert() const noexcept {
-        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
-        return *node;
-    }
-
-public:
+struct meta_func: meta_object<internal::meta_func_node> {
     /*! @brief Unsigned integer type. */
     using size_type = internal::meta_func_node::size_type;
 
-    /*! @brief Default constructor. */
-    meta_func() noexcept = default;
-
-    /**
-     * @brief Context aware constructor for meta objects.
-     * @param area The context from which to search for meta types.
-     * @param curr The underlying node with which to construct the instance.
-     */
-    meta_func(const meta_ctx &area, const internal::meta_func_node &curr) noexcept
-        : node{&curr},
-          ctx{&area} {}
+    using meta_object::meta_object;
 
     /**
      * @brief Returns the name assigned to a member function, if any.
@@ -1016,58 +1019,14 @@ public:
     [[nodiscard]] meta_func next() const {
         return (node_or_assert().next != nullptr) ? meta_func{*ctx, *node_or_assert().next} : meta_func{};
     }
-
-    /*! @copydoc meta_data::operator bool */
-    [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
-    }
-
-    /*! @copydoc meta_data::operator== */
-    [[nodiscard]] bool operator==(const meta_func &other) const noexcept {
-        return (ctx == other.ctx) && (node == other.node);
-    }
-
-private:
-    const internal::meta_func_node *node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /*! @brief Opaque wrapper for base types. */
-class meta_base {
-    [[nodiscard]] auto &node_or_assert() const noexcept {
-        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
-        return *node;
-    }
-
-public:
-    /*! @brief Default constructor. */
-    meta_base() noexcept = default;
-
-    /**
-     * @brief Context aware constructor for meta objects.
-     * @param area The context from which to search for meta types.
-     * @param curr The underlying node with which to construct the instance.
-     */
-    meta_base(const meta_ctx &area, const internal::meta_base_node &curr) noexcept
-        : node{&curr},
-          ctx{&area} {}
+struct meta_base: meta_object<internal::meta_base_node> {
+    using meta_object::meta_object;
 
     /*! @copydoc meta_any::type */
     [[nodiscard]] inline meta_type type() const noexcept;
-
-    /*! @copydoc meta_data::operator bool */
-    [[nodiscard]] explicit operator bool() const noexcept {
-        return (node != nullptr);
-    }
-
-    /*! @copydoc meta_data::operator== */
-    [[nodiscard]] bool operator==(const meta_base &other) const noexcept {
-        return (ctx == other.ctx) && (node == other.node);
-    }
-
-private:
-    const internal::meta_base_node *node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /*! @brief Opaque wrapper for types. */

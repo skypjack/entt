@@ -18,9 +18,11 @@ class meta_handle;
 
 struct meta_custom;
 
-class meta_data;
+struct meta_data;
 
-class meta_base;
+struct meta_func;
+
+struct meta_base;
 
 class meta_type;
 
