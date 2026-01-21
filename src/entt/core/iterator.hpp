@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_ITERATOR_HPP
 #define ENTT_CORE_ITERATOR_HPP
 
+#include <concepts>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -122,7 +123,7 @@ private:
  * @tparam It Type of iterator.
  * @tparam Sentinel Type of sentinel.
  */
-template<typename It, typename Sentinel = It>
+template<std::input_or_output_iterator It, std::sentinel_for<It> Sentinel = It>
 struct iterable_adaptor final {
     /*! @brief Value type. */
     using value_type = std::iterator_traits<It>::value_type;
