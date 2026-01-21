@@ -19,15 +19,15 @@ template<typename>
 struct entt_traits;
 
 template<typename Type>
-    requires std::is_enum_v<Type>
+requires std::is_enum_v<Type>
 struct entt_traits<Type>: entt_traits<std::underlying_type_t<Type>> {
     using value_type = Type;
 };
 
 template<typename Type>
-    requires requires { typename Type::entity_type; }
-             && std::convertible_to<Type, typename Type::entity_type>
-             && std::constructible_from<Type, typename Type::entity_type>
+requires requires { typename Type::entity_type; }
+         && std::convertible_to<Type, typename Type::entity_type>
+         && std::constructible_from<Type, typename Type::entity_type>
 struct entt_traits<Type>
     : entt_traits<typename Type::entity_type> {
     using value_type = Type;
