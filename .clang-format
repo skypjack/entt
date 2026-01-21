@@ -3,6 +3,7 @@ BasedOnStyle: llvm
 AccessModifierOffset: -4
 AlignEscapedNewlines: DontAlign
 AllowShortBlocksOnASingleLine: Always
+AllowShortCompoundRequirementOnASingleLine: true
 AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: WithoutElse
@@ -10,6 +11,7 @@ AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeConceptDeclarations: Always
 BreakBeforeTernaryOperators: true
 ColumnLimit: 0
 DerivePointerAlignment: false
@@ -26,10 +28,13 @@ IncludeCategories:
     Priority: 5
 IncludeIsMainRegex: "^$"
 IndentPPDirectives: AfterHash
+IndentRequiresClause: false
 IndentWidth: 4
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 PointerAlignment: Right
+RequiresClausePosition: OwnLine
+RequiresExpressionIndentation: OuterScope
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: false
 SpaceAroundPointerQualifiers: After
