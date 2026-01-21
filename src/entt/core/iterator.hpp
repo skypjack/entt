@@ -53,11 +53,8 @@ private:
  * @brief Plain iota iterator (waiting for C++20).
  * @tparam Type Value type.
  */
-template<typename Type>
-class iota_iterator final {
-    static_assert(std::is_integral_v<Type>, "Not an integral type");
-
-public:
+template<std::integral Type>
+struct iota_iterator final {
     /*! @brief Value type, likely an integral one. */
     using value_type = Type;
     /*! @brief Invalid pointer type. */
