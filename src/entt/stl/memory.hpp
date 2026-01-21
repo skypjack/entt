@@ -19,15 +19,21 @@ using std::to_address;
 #endif
 
 #ifndef ENTT_HAS_TO_ADDRESS
+#    include <memory>
 #    include <type_traits>
-#    include <utility>
 
 template<typename Type>
-[[nodiscard]] constexpr auto to_address(Type &&ptr) noexcept {
-    if constexpr(std::is_pointer_v<std::decay_t<Type>>) {
-        return ptr;
+constexpr Type *to_address(Type *ptr) noexcept {
+    static_assert(!std::is_function_v<Type>, "Invalid type");
+    return ptr;
+}
+
+template<typename Type>
+constexpr auto to_address(const Type &ptr) noexcept {
+    if constexpr(requires { std::pointer_traits<Type>::to_address(ptr); }) {
+        return std::pointer_traits<Type>::to_address(ptr);
     } else {
-        return to_address(std::forward<Type>(ptr).operator->());
+        return std::to_address(ptr.operator->());
     }
 }
 #endif
