@@ -18,7 +18,7 @@ namespace entt {
 template<std::size_t N>
 struct choice_t
     // unfortunately, doxygen cannot parse such a construct
-    : /*! @cond TURN_OFF_DOXYGEN */ choice_t<N - 1> /*! @endcond */
+    : /*! @cond ENTT_INTERNAL */ choice_t<N - 1> /*! @endcond */
 {};
 
 /*! @copybrief choice_t */
@@ -230,7 +230,7 @@ struct type_list_cat<type_list<Type...>> {
 template<typename... List>
 using type_list_cat_t = type_list_cat<List...>::type;
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename...>
@@ -656,7 +656,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename, typename = void>
@@ -715,7 +715,7 @@ struct is_transparent<Type, std::void_t<typename Type::is_transparent>>: std::tr
 template<typename Type>
 inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename, typename = void>

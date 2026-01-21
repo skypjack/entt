@@ -190,7 +190,7 @@ template<typename Policy = as_value_t, typename Type>
     return meta_dispatch<Policy, Type>(locator<meta_ctx>::value_or(), std::forward<Type>(value));
 }
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename Policy, typename Candidate, typename... Args>

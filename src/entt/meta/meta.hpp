@@ -26,7 +26,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename Type>
@@ -1597,7 +1597,7 @@ inline bool meta_any::assign(meta_any &&other) {
     return meta_type{*ctx, node_or_assert().type(internal::meta_context::from(*ctx))};
 }
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 class meta_sequence_container::meta_iterator final {
     using vtable_type = void(const void *, const std::ptrdiff_t, meta_any *);
 

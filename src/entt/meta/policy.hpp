@@ -5,7 +5,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 struct meta_policy {};
@@ -15,7 +15,7 @@ struct meta_policy {};
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
 struct as_value_t final: private internal::meta_policy {
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     template<typename>
     static constexpr bool value = true;
     /*! @endcond */
@@ -23,7 +23,7 @@ struct as_value_t final: private internal::meta_policy {
 
 /*! @brief Empty class type used to request the _as void_ policy. */
 struct as_void_t final: private internal::meta_policy {
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     template<typename>
     static constexpr bool value = true;
     /*! @endcond */
@@ -31,7 +31,7 @@ struct as_void_t final: private internal::meta_policy {
 
 /*! @brief Empty class type used to request the _as ref_ policy. */
 struct as_ref_t final: private internal::meta_policy {
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     template<typename Type>
     static constexpr bool value = std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>;
     /*! @endcond */
@@ -39,7 +39,7 @@ struct as_ref_t final: private internal::meta_policy {
 
 /*! @brief Empty class type used to request the _as cref_ policy. */
 struct as_cref_t final: private internal::meta_policy {
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     template<typename Type>
     static constexpr bool value = std::is_reference_v<Type>;
     /*! @endcond */
@@ -47,7 +47,7 @@ struct as_cref_t final: private internal::meta_policy {
 
 /*! @brief Empty class type used to request the _as auto_ policy. */
 struct as_is_t final: private internal::meta_policy {
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     template<typename>
     static constexpr bool value = true;
     /*! @endcond */

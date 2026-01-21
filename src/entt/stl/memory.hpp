@@ -1,7 +1,7 @@
 #ifndef ENTT_STL_MEMORY_HPP
 #define ENTT_STL_MEMORY_HPP
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 #include "../config/config.h"
 
 namespace entt::stl {

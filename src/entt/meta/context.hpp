@@ -9,7 +9,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 struct meta_type_node;
@@ -38,7 +38,7 @@ class meta_ctx: private internal::meta_context {
     friend struct internal::meta_context;
 };
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 [[nodiscard]] inline internal::meta_context &internal::meta_context::from(meta_ctx &ctx) {
     return ctx;
 }

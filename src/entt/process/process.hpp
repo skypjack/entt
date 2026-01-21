@@ -11,7 +11,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename, typename, typename>
@@ -287,7 +287,7 @@ private:
     state current;
 };
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename Delta, typename Func, typename Allocator>

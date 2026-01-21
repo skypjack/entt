@@ -22,7 +22,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 static constexpr std::size_t dense_set_placeholder_position = (std::numeric_limits<std::size_t>::max)();

@@ -12,7 +12,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename... It>
@@ -420,7 +420,7 @@ private:
 
 } // namespace entt
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace std {
 
 template<typename... Container, typename Allocator>

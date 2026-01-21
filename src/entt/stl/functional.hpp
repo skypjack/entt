@@ -3,7 +3,7 @@
 
 #include "../config/config.h"
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
 #ifndef ENTT_FORCE_STL

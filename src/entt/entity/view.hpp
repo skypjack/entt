@@ -15,7 +15,7 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename... Type>
@@ -234,7 +234,7 @@ class basic_common_view {
     }
 
 protected:
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     basic_common_view() noexcept {
         for(size_type pos{}, last = filter.size(); pos < last; ++pos) {
             filter[pos] = placeholder;
@@ -677,7 +677,7 @@ class basic_storage_view {
     static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Unexpected type");
 
 protected:
-    /*! @cond TURN_OFF_DOXYGEN */
+    /*! @cond ENTT_INTERNAL */
     basic_storage_view() noexcept = default;
 
     basic_storage_view(const Type *value) noexcept

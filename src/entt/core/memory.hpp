@@ -112,7 +112,7 @@ constexpr auto allocate_unique(Allocator &allocator, Args &&...args) {
     return std::unique_ptr<Type, allocation_deleter<allocator_type>>{ptr, alloc};
 }
 
-/*! @cond TURN_OFF_DOXYGEN */
+/*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename Type>
