@@ -21,6 +21,7 @@
 		<DisplayString>{{ size={ events.size() }, event={ "$T1" } }}</DisplayString>
 		<Expand>
 			<Item Name="[signal]">signal</Item>
+			<Item Name="[events]">events,view(simple)</Item>
 		</Expand>
 	</Type>
 	<Type Name="entt::emitter&lt;*&gt;">
