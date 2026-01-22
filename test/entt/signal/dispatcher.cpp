@@ -11,8 +11,14 @@ struct non_aggregate {
 };
 
 struct receiver {
-    static void forward(entt::dispatcher &dispatcher, test::empty &event) {
+    static void forward_empty(entt::dispatcher &dispatcher, test::empty &event) {
         dispatcher.enqueue(event);
+    }
+
+    static void forward_int(entt::dispatcher &owner, int &value) {
+        for(int next{}; next < value; ++next) {
+            owner.enqueue<int>(value);
+        }
     }
 
     void receive(const test::empty &) {
@@ -120,7 +126,7 @@ TEST(Dispatcher, StopAndGo) {
     entt::dispatcher dispatcher{};
     receiver receiver{};
 
-    dispatcher.sink<test::empty>().connect<&receiver::forward>(dispatcher);
+    dispatcher.sink<test::empty>().connect<&receiver::forward_empty>(dispatcher);
     dispatcher.sink<test::empty>().connect<&receiver::receive>(receiver);
 
     dispatcher.enqueue<test::empty>();
@@ -128,7 +134,7 @@ TEST(Dispatcher, StopAndGo) {
 
     ASSERT_EQ(receiver.cnt, 1);
 
-    dispatcher.sink<test::empty>().disconnect<&receiver::forward>(dispatcher);
+    dispatcher.sink<test::empty>().disconnect<&receiver::forward_empty>(dispatcher);
     dispatcher.update();
 
     ASSERT_EQ(receiver.cnt, 2);
@@ -188,9 +194,7 @@ TEST(Dispatcher, AutoQueue) {
     entt::dispatcher dispatcher{};
 
     // enqueueing the same event type does not invalidate references - see #1303
-    dispatcher.sink<int>().connect<+[](entt::dispatcher &owner, int &value) {
-        for(int next{}; next < value; ++next) { owner.enqueue<int>(value); }
-    }>(dispatcher);
+    dispatcher.sink<int>().connect<&receiver::forward_int>(dispatcher);
 
     dispatcher.enqueue<int>(4);
     dispatcher.update<int>();
