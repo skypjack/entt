@@ -44,13 +44,12 @@ public:
           events{allocator} {}
 
     void publish() override {
-        const auto length = events.size();
+        container_type other{};
+        other.swap(events);
 
-        for(std::size_t pos{}; pos < length; ++pos) {
-            signal.publish(events[pos]);
+        for(auto &&elem: other) {
+            signal.publish(elem);
         }
-
-        events.erase(events.cbegin(), events.cbegin() + static_cast<container_type::difference_type>(length));
     }
 
     void disconnect(void *instance) override {

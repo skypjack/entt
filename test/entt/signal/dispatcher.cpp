@@ -184,6 +184,24 @@ TEST(Dispatcher, NamedQueue) {
     ASSERT_EQ(receiver.cnt, 3);
 }
 
+TEST(Dispatcher, AutoQueue) {
+    entt::dispatcher dispatcher{};
+
+    // enqueueing the same event type does not invalidate references - see #1303
+    dispatcher.sink<int>().connect<+[](entt::dispatcher &owner, int &value) {
+        for(int next{}; next < value; ++next) { owner.enqueue<int>(value); }
+    }>(dispatcher);
+
+    dispatcher.enqueue<int>(4);
+    dispatcher.update<int>();
+
+    ASSERT_EQ(dispatcher.size<int>(), 4u);
+
+    dispatcher.update<int>();
+
+    ASSERT_EQ(dispatcher.size<int>(), 16u);
+}
+
 TEST(Dispatcher, CustomAllocator) {
     const std::allocator<void> allocator{};
     entt::dispatcher dispatcher{allocator};
