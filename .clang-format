@@ -41,7 +41,18 @@ SpaceAroundPointerQualifiers: After
 SpaceBeforeCaseColon: false
 SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: false
-SpaceBeforeParens: Never
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: false
+  AfterForeachMacros: false
+  AfterFunctionDeclarationName: false
+  AfterFunctionDefinitionName: false
+  AfterIfMacros: false
+  AfterOverloadedOperator: false
+  AfterPlacementOperator: false
+  AfterRequiresInClause: true
+  AfterRequiresInExpression: false
+  BeforeNonEmptyParentheses: false
 SpaceBeforeRangeBasedForLoopColon: false
 Standard: Latest
 TabWidth: 4
