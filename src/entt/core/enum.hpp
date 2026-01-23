@@ -29,7 +29,7 @@ template<typename Type>
 inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
 
 /**
- * @brief Specify that an enum class supports bitmask operations.
+ * @brief Specifies that an enum class supports bitmask operations.
  * @tparam Type Enum class type.
  */
 template<typename Type>
