@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_ENUM_HPP
 #define ENTT_CORE_ENUM_HPP
 
+#include <concepts>
 #include <type_traits>
 
 namespace entt {
