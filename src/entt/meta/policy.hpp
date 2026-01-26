@@ -69,6 +69,13 @@ struct is_meta_policy
 template<typename Type>
 inline constexpr bool is_meta_policy_v = is_meta_policy<Type>::value;
 
+/**
+ * @brief Specifies whether a type is a meta policy.
+ * @tparam Type Type to check.
+ */
+template<typename Type>
+concept meta_policy = is_meta_policy_v<Type>;
+
 } // namespace entt
 
 #endif
