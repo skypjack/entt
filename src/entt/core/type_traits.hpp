@@ -725,11 +725,12 @@ struct has_tuple_size_value: std::false_type {};
 template<typename Type>
 struct has_tuple_size_value<Type, std::void_t<decltype(std::tuple_size<const Type>::value)>>: std::true_type {};
 
-template<typename, typename = void>
+template<typename>
 struct has_value_type: std::false_type {};
 
 template<typename Type>
-struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
+requires requires { typename Type::value_type; }
+struct has_value_type<Type>: std::true_type {};
 
 template<typename>
 [[nodiscard]] ENTT_CONSTEVAL bool dispatch_is_equality_comparable();
