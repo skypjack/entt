@@ -1,4 +1,5 @@
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -38,7 +39,8 @@ struct ReactiveMixin: ReactiveMixinBase {
 };
 
 template<typename Type>
-struct entt::storage_type<Type, ReactiveMixinBase::my_entity, std::allocator<Type>, std::enable_if_t<!std::is_same_v<Type, ReactiveMixinBase::my_entity>>> {
+requires (!std::same_as<Type, ReactiveMixinBase::my_entity>)
+struct entt::storage_type<Type, ReactiveMixinBase::my_entity, std::allocator<Type>> {
     using type = entt::basic_sigh_mixin<entt::basic_storage<Type, ReactiveMixinBase::my_entity>, test::custom_registry<ReactiveMixinBase::my_entity>>;
 };
 
