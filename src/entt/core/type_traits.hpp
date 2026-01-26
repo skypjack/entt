@@ -701,12 +701,13 @@ inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct is_transparent: std::false_type {};
 
 /*! @copydoc is_transparent */
 template<typename Type>
-struct is_transparent<Type, std::void_t<typename Type::is_transparent>>: std::true_type {};
+requires requires { typename Type::is_transparent; }
+struct is_transparent<Type>: std::true_type {};
 
 /**
  * @brief Helper variable template.
