@@ -13,7 +13,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Type, std::size_t, typename = void>
+template<typename Type, std::size_t>
 struct compressed_pair_element {
     using reference = Type &;
     using const_reference = const Type &;
@@ -43,7 +43,8 @@ private:
 };
 
 template<typename Type, std::size_t Tag>
-struct compressed_pair_element<Type, Tag, std::enable_if_t<is_ebco_eligible_v<Type>>>: Type {
+requires is_ebco_eligible_v<Type>
+struct compressed_pair_element<Type, Tag>: Type {
     using reference = Type &;
     using const_reference = const Type &;
     using base_type = Type;
