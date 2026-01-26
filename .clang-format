@@ -11,6 +11,7 @@ AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Attach
 BreakBeforeConceptDeclarations: Always
 BreakBeforeTernaryOperators: true
 ColumnLimit: 0
@@ -30,10 +31,12 @@ IncludeIsMainRegex: "^$"
 IndentPPDirectives: AfterHash
 IndentRequiresClause: false
 IndentWidth: 4
+InsertBraces: true
+InsertNewlineAtEOF: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
 PointerAlignment: Right
-RequiresClausePosition: OwnLine
+RequiresClausePosition: OwnLineWithBrace
 RequiresExpressionIndentation: OuterScope
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: false
