@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_COMPRESSED_PAIR_HPP
 #define ENTT_CORE_COMPRESSED_PAIR_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <tuple>
 #include <type_traits>
@@ -18,12 +19,13 @@ struct compressed_pair_element {
     using reference = Type &;
     using const_reference = const Type &;
 
-    template<typename Dummy = Type, typename = std::enable_if_t<std::is_default_constructible_v<Dummy>>>
     // NOLINTNEXTLINE(modernize-use-equals-default)
-    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>) {}
+    constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<Type>)
+    requires std::default_initializable<Type> {}
 
-    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cvref_t<Arg>, compressed_pair_element>>>
+    template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
+    requires not std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>
         : value{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
@@ -49,12 +51,13 @@ struct compressed_pair_element<Type, Tag>: Type {
     using const_reference = const Type &;
     using base_type = Type;
 
-    template<typename Dummy = Type, typename = std::enable_if_t<std::is_default_constructible_v<Dummy>>>
     constexpr compressed_pair_element() noexcept(std::is_nothrow_default_constructible_v<base_type>)
+    requires std::default_initializable<Type>
         : base_type{} {}
 
-    template<typename Arg, typename = std::enable_if_t<!std::is_same_v<std::remove_cvref_t<Arg>, compressed_pair_element>>>
+    template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
+    requires not std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>
         : base_type{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
@@ -100,11 +103,9 @@ public:
      *
      * This constructor is only available when the types that the pair stores
      * are both at least default constructible.
-     *
-     * @tparam Dummy Dummy template parameter used for internal purposes.
      */
-    template<bool Dummy = true, typename = std::enable_if_t<Dummy && std::is_default_constructible_v<first_type> && std::is_default_constructible_v<second_type>>>
     constexpr compressed_pair() noexcept(std::is_nothrow_default_constructible_v<first_base> && std::is_nothrow_default_constructible_v<second_base>)
+    requires std::default_initializable<first_type> && std::default_initializable<second_type>
         : first_base{},
           second_base{} {}
 
