@@ -25,7 +25,7 @@ struct compressed_pair_element {
 
     template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
-    requires not std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>
+    requires (!std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>)
         : value{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
@@ -57,7 +57,7 @@ struct compressed_pair_element<Type, Tag>: Type {
 
     template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
-    requires not std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>
+    requires (!std::same_as<std::remove_cvref_t<Arg>, compressed_pair_element>)
         : base_type{std::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
