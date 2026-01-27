@@ -16,26 +16,26 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename, typename, typename = void>
+template<typename, typename>
 struct has_on_construct final: std::false_type {};
 
 template<typename Type, typename Registry>
-struct has_on_construct<Type, Registry, std::void_t<decltype(Type::on_construct(std::declval<Registry &>(), std::declval<Registry>().create()))>>
-    : std::true_type {};
+requires std::invocable<decltype(&Type::on_construct), Registry &, typename Registry::entity_type>
+struct has_on_construct<Type, Registry>: std::true_type {};
 
-template<typename, typename, typename = void>
+template<typename, typename>
 struct has_on_update final: std::false_type {};
 
 template<typename Type, typename Registry>
-struct has_on_update<Type, Registry, std::void_t<decltype(Type::on_update(std::declval<Registry &>(), std::declval<Registry>().create()))>>
-    : std::true_type {};
+requires std::invocable<decltype(&Type::on_update), Registry &, typename Registry::entity_type>
+struct has_on_update<Type, Registry>: std::true_type {};
 
-template<typename, typename, typename = void>
+template<typename, typename>
 struct has_on_destroy final: std::false_type {};
 
 template<typename Type, typename Registry>
-struct has_on_destroy<Type, Registry, std::void_t<decltype(Type::on_destroy(std::declval<Registry &>(), std::declval<Registry>().create()))>>
-    : std::true_type {};
+requires std::invocable<decltype(&Type::on_destroy), Registry &, typename Registry::entity_type>
+struct has_on_destroy<Type, Registry>: std::true_type {};
 
 } // namespace internal
 /*! @endcond */
