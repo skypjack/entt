@@ -129,7 +129,8 @@ class meta_function_helper {
     template<typename Ret, typename... Args, typename Class>
     static meta_function_descriptor<Type, Ret (Class::*)(Args...)> get_rid_of_noexcept(Ret (Class::*)(Args...));
 
-    template<typename Ret, typename Class, typename = std::enable_if_t<std::is_member_object_pointer_v<Ret Class::*>>>
+    template<typename Ret, typename Class>
+    requires std::is_member_object_pointer_v<Ret Class::*>
     static meta_function_descriptor<Type, Ret Class::*> get_rid_of_noexcept(Ret Class::*);
 
     template<typename Ret, typename... Args>
