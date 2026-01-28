@@ -619,13 +619,11 @@ public:
 
     /**
      * @brief Returns the number of elements matching a key (either 1 or 0).
-     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return Number of elements matching the key (either 1 or 0).
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, size_type>>
-    count(const Other &key) const {
+    [[nodiscard]] size_type count(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return find(key) != end();
     }
 
@@ -646,21 +644,18 @@ public:
 
     /**
      * @brief Finds an element that compares _equivalent_ to a given value.
-     * @tparam Other Type of an element to search for.
      * @param value Value of an element to search for.
      * @return An iterator to an element with the given value. If no such
      * element is found, a past-the-end iterator is returned.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, iterator>>
-    find(const Other &value) {
+    [[nodiscard]] iterator find(const auto &value)
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return constrained_find(value, value_to_bucket(value));
     }
 
     /*! @copydoc find */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
-    find(const Other &value) const {
+    [[nodiscard]] const_iterator find(const auto &value) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return constrained_find(value, value_to_bucket(value));
     }
 
@@ -684,22 +679,19 @@ public:
     /**
      * @brief Returns a range containing all elements that compare _equivalent_
      * to a given value.
-     * @tparam Other Type of an element to search for.
      * @param value Value of an element to search for.
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<iterator, iterator>>>
-    equal_range(const Other &value) {
+    [[nodiscard]] std::pair<iterator, iterator> equal_range(const auto &value)
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<const_iterator, const_iterator>>>
-    equal_range(const Other &value) const {
+    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const auto &value) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == cend())};
     }
@@ -716,13 +708,11 @@ public:
     /**
      * @brief Checks if the container contains an element that compares
      * _equivalent_ to a given value.
-     * @tparam Other Type of an element to search for.
      * @param value Value of an element to search for.
      * @return True if there is such an element, false otherwise.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, bool>>
-    contains(const Other &value) const {
+    [[nodiscard]] bool contains(const auto &value) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return (find(value) != cend());
     }
 

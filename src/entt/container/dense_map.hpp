@@ -537,8 +537,8 @@ public:
      * @tparam Arg Type of the key-value pair to insert into the container.
      */
     template<typename Arg>
-    std::enable_if_t<std::is_constructible_v<value_type, Arg &&>, std::pair<iterator, bool>>
-    insert(Arg &&value) {
+    requires std::constructible_from<value_type, Arg &&>
+    std::pair<iterator, bool> insert(Arg &&value) {
         return insert_or_do_nothing(std::forward<Arg>(value).first, std::forward<Arg>(value).second);
     }
 
@@ -697,22 +697,19 @@ public:
 
     /**
      * @brief Accesses a given element with bounds checking.
-     * @tparam Other Type of the key of an element to find.
      * @param key A key of an element to find.
      * @return A reference to the mapped value of the requested element.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, mapped_type const &>>
-    at(const Other &key) const {
+    [[nodiscard]] mapped_type const &at(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         auto it = find(key);
         ENTT_ASSERT(it != cend(), "Invalid key");
         return it->second;
     }
 
     /*! @copydoc at */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, mapped_type &>>
-    at(const Other &key) {
+    [[nodiscard]] mapped_type &at(const auto &key)
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         auto it = find(key);
         ENTT_ASSERT(it != end(), "Invalid key");
         return it->second;
@@ -747,13 +744,12 @@ public:
 
     /**
      * @brief Returns the number of elements matching a key (either 1 or 0).
-     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return Number of elements matching the key (either 1 or 0).
      */
     template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, size_type>>
-    count(const Other &key) const {
+    [[nodiscard]] size_type count(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return find(key) != end();
     }
 
@@ -775,21 +771,18 @@ public:
     /**
      * @brief Finds an element with a key that compares _equivalent_ to a given
      * key.
-     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return An iterator to an element with the given key. If no such element
      * is found, a past-the-end iterator is returned.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, iterator>>
-    find(const Other &key) {
+    [[nodiscard]] iterator find(const auto &key)
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return constrained_find(key, key_to_bucket(key));
     }
 
     /*! @copydoc find */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, const_iterator>>
-    find(const Other &key) const {
+    [[nodiscard]] const_iterator find(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return constrained_find(key, key_to_bucket(key));
     }
 
@@ -813,22 +806,19 @@ public:
     /**
      * @brief Returns a range containing all elements that compare _equivalent_
      * to a given key.
-     * @tparam Other Type of an element to search for.
      * @param key Key value of an element to search for.
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<iterator, iterator>>>
-    equal_range(const Other &key) {
+    [[nodiscard]] std::pair<iterator, iterator> equal_range(const auto &key)
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, std::pair<const_iterator, const_iterator>>>
-    equal_range(const Other &key) const {
+    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
         return {it, it + !(it == cend())};
     }
@@ -845,13 +835,11 @@ public:
     /**
      * @brief Checks if the container contains an element with a key that
      * compares _equivalent_ to a given value.
-     * @tparam Other Type of the key value of an element to search for.
      * @param key Key value of an element to search for.
      * @return True if there is such an element, false otherwise.
      */
-    template<typename Other>
-    [[nodiscard]] std::enable_if_t<is_transparent_v<hasher> && is_transparent_v<key_equal>, std::conditional_t<false, Other, bool>>
-    contains(const Other &key) const {
+    [[nodiscard]] bool contains(const auto &key) const
+    requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return (find(key) != cend());
     }
 
