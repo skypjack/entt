@@ -198,7 +198,7 @@ private:
  * In all other cases, modifying the storage iterated by a view in any way can
  * invalidate all iterators.
  */
-template<typename, typename, typename>
+template<typename, typename>
 class basic_view;
 
 /**
@@ -409,7 +409,8 @@ private:
  * @tparam Exclude Types of storage used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-class basic_view<get_t<Get...>, exclude_t<Exclude...>, std::enable_if_t<(sizeof...(Get) != 0u)>>
+requires (sizeof...(Get) != 0u)
+class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     : public basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
 

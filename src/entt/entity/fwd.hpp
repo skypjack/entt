@@ -61,7 +61,7 @@ class basic_reactive_mixin;
 template<entity_like Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
 
-template<typename, typename, typename = void>
+template<typename, typename>
 class basic_view;
 
 template<typename Type, typename = std::allocator<Type *>>
