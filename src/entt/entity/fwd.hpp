@@ -49,7 +49,7 @@ struct component_traits;
 template<entity_like Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
-template<typename Type, entity_like = entity, typename = std::allocator<Type>, typename = void>
+template<typename Type, entity_like = entity, typename = std::allocator<Type>>
 class basic_storage;
 
 template<typename, typename>
@@ -240,7 +240,7 @@ struct type_list_transform<owned_t<Type...>, Op> {
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<Type>, typename = void>
+template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<Type>>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
     using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
