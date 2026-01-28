@@ -711,11 +711,10 @@ public:
 
     /**
      * @brief Returns the number of entities that have the given element.
-     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return Number of entities that have the given element.
      */
-    template<typename..., deletion_policy Pol = Policy>
-    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, size_type> size() const noexcept {
+    [[nodiscard]] size_type size() const noexcept
+    requires (Policy != deletion_policy::in_place) {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->size() : size_type{};
         } else {
@@ -726,21 +725,19 @@ public:
 
     /**
      * @brief Estimates the number of entities iterated by the view.
-     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return Estimated number of entities iterated by the view.
      */
-    template<typename..., deletion_policy Pol = Policy>
-    [[nodiscard]] std::enable_if_t<Pol == deletion_policy::in_place, size_type> size_hint() const noexcept {
+    [[nodiscard]] size_type size_hint() const noexcept
+    requires (Policy == deletion_policy::in_place) {
         return leading ? leading->size() : size_type{};
     }
 
     /**
      * @brief Checks whether a view is empty.
-     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return True if the view is empty, false otherwise.
      */
-    template<typename..., deletion_policy Pol = Policy>
-    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, bool> empty() const noexcept {
+    [[nodiscard]] bool empty() const noexcept
+    requires (Policy != deletion_policy::in_place) {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return !leading || leading->empty();
         } else {
@@ -785,23 +782,21 @@ public:
      *
      * If the view is empty, the returned iterator will be equal to `rend()`.
      *
-     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return An iterator to the first entity of the reversed view.
      */
-    template<typename..., deletion_policy Pol = Policy>
-    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, reverse_iterator> rbegin() const noexcept {
+    [[nodiscard]] reverse_iterator rbegin() const noexcept
+    requires (Policy != deletion_policy::in_place) {
         return leading ? leading->rbegin() : reverse_iterator{};
     }
 
     /**
      * @brief Returns an iterator that is past the last entity of the reversed
      * view.
-     * @tparam Pol Dummy template parameter used for sfinae purposes only.
      * @return An iterator to the entity following the last entity of the
      * reversed view.
      */
-    template<typename..., deletion_policy Pol = Policy>
-    [[nodiscard]] std::enable_if_t<Pol != deletion_policy::in_place, reverse_iterator> rend() const noexcept {
+    [[nodiscard]] reverse_iterator rend() const noexcept
+    requires (Policy != deletion_policy::in_place) {
         if constexpr(Policy == deletion_policy::swap_and_pop) {
             return leading ? leading->rend() : reverse_iterator{};
         } else {
