@@ -1,9 +1,9 @@
 #ifndef ENTT_STL_MEMORY_HPP
 #define ENTT_STL_MEMORY_HPP
 
-/*! @cond ENTT_INTERNAL */
 #include "../config/config.h"
 
+/*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
 #ifndef ENTT_FORCE_STL
