@@ -6,7 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
-#ifndef ENTT_FORCE_STL
+#ifdef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
 #
@@ -31,20 +31,8 @@ using std::sentinel_for;
 
 namespace internal {
 
-template<typename It>
-requires requires { typename std::iterator_traits<It>::iterator_category; }
-struct iterator_tag {
-    using type = typename std::iterator_traits<It>::iterator_category;
-};
-
-template<typename It>
-requires requires { typename It::iterator_concept; }
-struct iterator_tag<It> {
-    using type = typename It::iterator_concept;
-};
-
 template<typename It, typename Tag>
-concept has_iterator_tag = std::derived_from<typename iterator_tag<It>::type, Tag>;
+concept has_iterator_tag = std::derived_from<typename It::iterator_concept, Tag> || std::derived_from<typename std::iterator_traits<It>::iterator_category, Tag>;
 
 } // namespace internal
 
