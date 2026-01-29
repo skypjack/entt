@@ -748,7 +748,6 @@ public:
      * @param key Key value of an element to search for.
      * @return Number of elements matching the key (either 1 or 0).
      */
-    template<typename Other>
     [[nodiscard]] size_type count(const auto &key) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         return find(key) != end();
