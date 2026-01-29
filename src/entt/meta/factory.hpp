@@ -32,6 +32,12 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
+    enum class mode {
+        type,
+        data,
+        func
+    };
+
     [[nodiscard]] auto *find_member_or_assert() {
         auto *member = find_member(parent->details->data, bucket);
         ENTT_ASSERT(member != nullptr, "Cannot find member");
@@ -39,6 +45,7 @@ class basic_meta_factory {
     }
 
     [[nodiscard]] auto *find_overload_or_assert() {
+        ENTT_ASSERT(invoke != nullptr, "Invoke function not available");
         auto *overload = find_overload(find_member(parent->details->func, bucket), invoke);
         ENTT_ASSERT(overload != nullptr, "Cannot find overload");
         return overload;
@@ -46,7 +53,7 @@ class basic_meta_factory {
 
 protected:
     void type(const id_type id, const char *name) noexcept {
-        no_bucket = true;
+        state = mode::type;
         ENTT_ASSERT(parent->id == id || !resolve(*ctx, id), "Duplicate identifier");
         parent->name = name;
         parent->id = id;
@@ -54,7 +61,7 @@ protected:
 
     template<typename Type>
     void insert_or_assign(Type node) {
-        no_bucket = true;
+        state = mode::type;
 
         if constexpr(std::is_same_v<Type, meta_base_node>) {
             auto *member = find_member(parent->details->base, node.id);
@@ -70,7 +77,7 @@ protected:
     }
 
     void data(meta_data_node node) {
-        no_bucket = false;
+        state = mode::data;
         bucket = node.id;
 
         if(auto *member = find_member(parent->details->data, node.id); member == nullptr) {
@@ -81,7 +88,7 @@ protected:
     }
 
     void func(meta_func_node node) {
-        no_bucket = false;
+        state = mode::func;
         bucket = node.id;
         invoke = node.invoke;
 
@@ -98,22 +105,30 @@ protected:
             node.traits = (unset ? (node.traits & ~value) : (node.traits | value));
         };
 
-        if(no_bucket) {
+        switch(state) {
+        case mode::type:
             set_or_unset_on(*parent);
-        } else if(invoke == nullptr) {
+            break;
+        case mode::data:
             set_or_unset_on(*find_member_or_assert());
-        } else {
+            break;
+        case mode::func:
             set_or_unset_on(*find_overload_or_assert());
+            break;
         }
     }
 
     void custom(meta_custom_node node) {
-        if(no_bucket) {
+        switch(state) {
+        case mode::type:
             parent->custom = std::move(node);
-        } else if(invoke == nullptr) {
+            break;
+        case mode::data:
             find_member_or_assert()->custom = std::move(node);
-        } else {
+            break;
+        case mode::func:
             find_overload_or_assert()->custom = std::move(node);
+            break;
         }
     }
 
@@ -121,7 +136,7 @@ public:
     basic_meta_factory(meta_ctx &area, meta_type_node node)
         : ctx{&area},
           bucket{node.info->hash()},
-          no_bucket{true} {
+          state{mode::type} {
         if(const auto it = meta_context::from(*ctx).bucket.find(bucket); it == meta_context::from(*ctx).bucket.cend()) {
             parent = meta_context::from(*ctx).bucket.emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get();
             parent->details = std::make_unique<meta_type_descriptor>();
@@ -135,7 +150,7 @@ private:
     id_type bucket{};
     invoke_type *invoke{};
     meta_type_node *parent{};
-    bool no_bucket{};
+    mode state{};
 };
 
 } // namespace internal
