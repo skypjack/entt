@@ -11,7 +11,7 @@ jobs:
       matrix:
         compiler: [clang++]
         id_type: ["std::uint32_t", "std::uint64_t"]
-        cxx_std: [cxx_std_20]
+        cxx_std: [cxx_std_20, cxx_std_23]
 
     runs-on: ubuntu-latest
 

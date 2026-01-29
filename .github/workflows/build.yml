@@ -85,7 +85,7 @@ jobs:
       matrix:
         os: [windows-latest, macOS-latest, ubuntu-latest]
         id_type: ["std::uint32_t", "std::uint64_t"]
-        cxx_std: [cxx_std_20]
+        cxx_std: [cxx_std_20, cxx_std_23]
 
     timeout-minutes: 15
     runs-on: ${{ matrix.os }}
