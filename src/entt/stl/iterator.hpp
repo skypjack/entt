@@ -6,7 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
-#ifdef ENTT_FORCE_STL
+#ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
 #
