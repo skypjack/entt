@@ -491,7 +491,7 @@ public:
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<std::output_iterator<entity_type> It>
+    template<stl::output_iterator<entity_type> It>
     void create(It first, It last) {
         entities.generate(std::move(first), std::move(last));
     }

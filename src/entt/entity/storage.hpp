@@ -1136,7 +1136,7 @@ public:
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
-    template<std::output_iterator<entity_type> It>
+    template<stl::output_iterator<entity_type> It>
     void generate(It first, It last) {
         for(const auto sz = base_type::size(); first != last && base_type::free_list() != sz; ++first) {
             *first = *base_type::try_emplace(base_type::data()[base_type::free_list()], true);
