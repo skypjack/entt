@@ -275,6 +275,24 @@ TEST_F(MetaFactory, DataOverwrite) {
     ASSERT_FALSE(type.data("value"_hs).is_const());
 }
 
+TEST_F(MetaFactory, DataTypeNameClash) {
+    using namespace entt::literals;
+
+    const auto value = 2;
+    entt::meta_factory<base> factory{};
+    const auto member = entt::type_id<base>().hash();
+    entt::meta_data data = entt::resolve<base>().data(member);
+
+    ASSERT_FALSE(data);
+
+    factory.data<&base::member>(member).custom<int>(value);
+    data = entt::resolve<base>().data(member);
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(static_cast<const int *>(data.custom()), nullptr);
+    ASSERT_EQ(static_cast<int>(data.custom()), value);
+}
+
 TEST_F(MetaFactory, Func) {
     using namespace entt::literals;
 
@@ -318,6 +336,24 @@ TEST_F(MetaFactory, FuncOverload) {
 
     ASSERT_TRUE(type.invoke("func"_hs, instance, test::boxed_int{3}));
     ASSERT_EQ(instance.get_int(), 3);
+}
+
+TEST_F(MetaFactory, FuncTypeNameClash) {
+    using namespace entt::literals;
+
+    const auto value = 2;
+    entt::meta_factory<clazz> factory{};
+    const auto member = entt::type_id<base>().hash();
+    entt::meta_func func = entt::resolve<base>().func(member);
+
+    ASSERT_FALSE(func);
+
+    factory.func<&clazz::get_int>(member).custom<int>(value);
+    func = entt::resolve<clazz>().func(member);
+
+    ASSERT_TRUE(func);
+    ASSERT_NE(static_cast<const int *>(func.custom()), nullptr);
+    ASSERT_EQ(static_cast<int>(func.custom()), value);
 }
 
 TEST_F(MetaFactory, Traits) {

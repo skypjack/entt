@@ -44,14 +44,9 @@ class basic_meta_factory {
         return overload;
     }
 
-    void reset_bucket(const id_type id, invoke_type *const ref = nullptr) {
-        invoke = ref;
-        bucket = id;
-    }
-
 protected:
     void type(const id_type id, const char *name) noexcept {
-        reset_bucket(parent->info->hash());
+        no_bucket = true;
         ENTT_ASSERT(parent->id == id || !resolve(*ctx, id), "Duplicate identifier");
         parent->name = name;
         parent->id = id;
@@ -59,7 +54,7 @@ protected:
 
     template<typename Type>
     void insert_or_assign(Type node) {
-        reset_bucket(parent->info->hash());
+        no_bucket = true;
 
         if constexpr(std::is_same_v<Type, meta_base_node>) {
             auto *member = find_member(parent->details->base, node.id);
@@ -75,7 +70,8 @@ protected:
     }
 
     void data(meta_data_node node) {
-        reset_bucket(node.id);
+        no_bucket = false;
+        bucket = node.id;
 
         if(auto *member = find_member(parent->details->data, node.id); member == nullptr) {
             parent->details->data.emplace_back(std::move(node));
@@ -85,7 +81,9 @@ protected:
     }
 
     void func(meta_func_node node) {
-        reset_bucket(node.id, node.invoke);
+        no_bucket = false;
+        bucket = node.id;
+        invoke = node.invoke;
 
         if(auto *member = find_member(parent->details->func, node.id); member == nullptr) {
             parent->details->func.emplace_back(std::move(node));
@@ -100,7 +98,7 @@ protected:
             node.traits = (unset ? (node.traits & ~value) : (node.traits | value));
         };
 
-        if(bucket == parent->info->hash()) {
+        if(no_bucket) {
             set_or_unset_on(*parent);
         } else if(invoke == nullptr) {
             set_or_unset_on(*find_member_or_assert());
@@ -110,7 +108,7 @@ protected:
     }
 
     void custom(meta_custom_node node) {
-        if(bucket == parent->info->hash()) {
+        if(no_bucket) {
             parent->custom = std::move(node);
         } else if(invoke == nullptr) {
             find_member_or_assert()->custom = std::move(node);
@@ -122,7 +120,8 @@ protected:
 public:
     basic_meta_factory(meta_ctx &area, meta_type_node node)
         : ctx{&area},
-          bucket{node.info->hash()} {
+          bucket{node.info->hash()},
+          no_bucket{true} {
         if(const auto it = meta_context::from(*ctx).bucket.find(bucket); it == meta_context::from(*ctx).bucket.cend()) {
             parent = meta_context::from(*ctx).bucket.emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get();
             parent->details = std::make_unique<meta_type_descriptor>();
@@ -136,6 +135,7 @@ private:
     id_type bucket{};
     invoke_type *invoke{};
     meta_type_node *parent{};
+    bool no_bucket{};
 };
 
 } // namespace internal
