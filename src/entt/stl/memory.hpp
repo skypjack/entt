@@ -33,7 +33,7 @@ constexpr auto to_address(const Type &ptr) noexcept {
     if constexpr(requires { std::pointer_traits<Type>::to_address(ptr); }) {
         return std::pointer_traits<Type>::to_address(ptr);
     } else {
-        return std::to_address(ptr.operator->());
+        return to_address(ptr.operator->());
     }
 }
 #endif
