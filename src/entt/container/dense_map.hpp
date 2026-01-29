@@ -20,6 +20,7 @@
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/concepts.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -547,7 +548,7 @@ public:
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      */
-    void insert(std::input_iterator auto first, std::input_iterator auto last) {
+    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         for(; first != last; ++first) {
             insert(*first);
         }

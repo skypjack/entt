@@ -17,6 +17,7 @@
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "../locator/locator.hpp"
+#include "../stl/concepts.hpp"
 #include "adl_pointer.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
@@ -1617,7 +1618,7 @@ public:
 
     meta_iterator() = default;
 
-    template<std::bidirectional_iterator It>
+    template<entt::stl::bidirectional_iterator It>
     meta_iterator(const meta_ctx &area, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<It>},
@@ -1698,7 +1699,7 @@ public:
 
     meta_iterator() = default;
 
-    template<bool KeyOnly, std::forward_iterator It>
+    template<bool KeyOnly, entt::stl::forward_iterator It>
     meta_iterator(const meta_ctx &area, std::bool_constant<KeyOnly>, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<KeyOnly, It>},

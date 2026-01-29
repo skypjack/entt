@@ -14,6 +14,7 @@
 #include "../core/any.hpp"
 #include "../core/bit.hpp"
 #include "../core/type_info.hpp"
+#include "../stl/concepts.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -791,7 +792,7 @@ public:
      * @return Iterator pointing to the first element inserted in case of
      * success, the `end()` iterator otherwise.
      */
-    iterator push(std::input_iterator auto first, std::input_iterator auto last) {
+    iterator push(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         auto curr = end();
 
         for(; first != last; ++first) {
@@ -842,7 +843,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<std::input_iterator It>
+    template<entt::stl::input_iterator It>
     void erase(It first, It last) {
         if constexpr(std::is_same_v<It, basic_iterator>) {
             pop(first, last);
@@ -869,7 +870,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @return The number of entities actually removed.
      */
-    template<std::input_iterator It>
+    template<entt::stl::input_iterator It>
     size_type remove(It first, It last) {
         size_type count{};
 
@@ -1028,7 +1029,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @return An iterator past the last of the elements actually shared.
      */
-    template<std::input_iterator It>
+    template<entt::stl::input_iterator It>
     iterator sort_as(It first, It last) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         const size_type len = (mode == deletion_policy::swap_only) ? head : packed.size();

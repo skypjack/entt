@@ -22,6 +22,7 @@
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/concepts.hpp"
 #include "../stl/functional.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -540,7 +541,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    void destroy(std::input_iterator auto first, std::input_iterator auto last) {
+    void destroy(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         const auto to = entities.sort_as(first, last);
         const auto from = entities.cend() - static_cast<common_type::difference_type>(entities.free_list());
 
@@ -582,7 +583,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename Type>
-    void insert(std::input_iterator auto first, std::input_iterator auto last) {
+    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(std::move(first), std::move(last));
     }
@@ -598,7 +599,7 @@ public:
      * @param value An instance of the element to assign.
      */
     template<typename Type>
-    void insert(std::input_iterator auto first, std::input_iterator auto last, const Type &value) {
+    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last, const Type &value) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(std::move(first), std::move(last), value);
     }
@@ -708,7 +709,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @return The number of elements actually removed.
      */
-    template<typename Type, typename... Other, std::input_iterator It>
+    template<typename Type, typename... Other, entt::stl::input_iterator It>
     size_type remove(It first, It last) {
         size_type count{};
 
@@ -761,7 +762,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename Type, typename... Other, std::input_iterator It>
+    template<typename Type, typename... Other, entt::stl::input_iterator It>
     void erase(It first, It last) {
         if constexpr(std::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};

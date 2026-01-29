@@ -8,6 +8,7 @@
 #include "../core/any.hpp"
 #include "../core/type_info.hpp"
 #include "../signal/sigh.hpp"
+#include "../stl/concepts.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -362,7 +363,7 @@ public:
      * @param args Parameters to use to forward to the underlying storage.
      */
     template<typename... Args>
-    void insert(std::input_iterator auto first, std::input_iterator auto last, Args &&...args) {
+    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last, Args &&...args) {
         auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 

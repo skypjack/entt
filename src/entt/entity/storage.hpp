@@ -15,6 +15,7 @@
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
+#include "../stl/concepts.hpp"
 #include "../stl/memory.hpp"
 #include "component.hpp"
 #include "entity.hpp"
@@ -693,7 +694,7 @@ public:
      * @param value An instance of the object to construct.
      * @return Iterator pointing to the first element inserted, if any.
      */
-    iterator insert(std::input_iterator auto first, std::input_iterator auto last, const value_type &value = {}) {
+    iterator insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last, const value_type &value = {}) {
         for(; first != last; ++first) {
             emplace_element(*first, true, value);
         }
@@ -901,7 +902,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<std::input_iterator It>
+    template<entt::stl::input_iterator It>
     void insert(It first, It last) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);

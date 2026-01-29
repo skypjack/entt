@@ -8,6 +8,7 @@
 #include <utility>
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../stl/concepts.hpp"
 #include "context.hpp"
 
 namespace entt {
@@ -111,7 +112,7 @@ private:
  * @tparam Type Type of meta objects returned.
  * @tparam It Type of forward iterator.
  */
-template<typename Type, std::forward_iterator It>
+template<typename Type, entt::stl::forward_iterator It>
 using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, It>>;
 
 } // namespace entt

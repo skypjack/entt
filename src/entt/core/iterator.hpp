@@ -6,6 +6,7 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
+#include "../stl/concepts.hpp"
 
 namespace entt {
 
@@ -120,7 +121,7 @@ private:
  * @tparam It Type of iterator.
  * @tparam Sentinel Type of sentinel.
  */
-template<std::input_or_output_iterator It, std::sentinel_for<It> Sentinel = It>
+template<entt::stl::input_or_output_iterator It, entt::stl::sentinel_for<It> Sentinel = It>
 struct iterable_adaptor final {
     /*! @brief Value type. */
     using value_type = std::iterator_traits<It>::value_type;

@@ -16,6 +16,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../stl/concepts.hpp"
 #include "../stl/functional.hpp"
 #include "adjacency_matrix.hpp"
 #include "fwd.hpp"
@@ -288,7 +289,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &ro(std::input_iterator auto first, std::input_iterator auto last) {
+    basic_flow &ro(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, false);
         }
@@ -312,7 +313,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &rw(std::input_iterator auto first, std::input_iterator auto last) {
+    basic_flow &rw(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, true);
         }

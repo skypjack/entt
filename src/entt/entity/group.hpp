@@ -14,6 +14,7 @@
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/concepts.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -642,7 +643,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    void sort_as(std::input_iterator auto first, std::input_iterator auto last) const {
+    void sort_as(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) const {
         if(*this) {
             descriptor->handle().sort_as(first, last);
         }
