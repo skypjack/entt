@@ -27,6 +27,7 @@ using std::sentinel_for;
 #ifndef ENTT_HAS_ITERATOR_CONCEPTS
 #    include <concepts>
 #    include <iterator>
+#    include <utility>
 
 namespace internal {
 
@@ -42,8 +43,8 @@ struct iterator_tag<It> {
     using type = typename It::iterator_concept;
 };
 
-template<typename It>
-using iterator_tag_t = typename iterator_tag<It>::type;
+template<typename It, typename Tag>
+concept has_iterator_tag = std::derived_from<typename iterator_tag<It>::type, Tag>;
 
 } // namespace internal
 
@@ -58,19 +59,21 @@ concept input_or_output_iterator = requires(It it) {
 };
 
 template<typename It>
-concept input_iterator = std::derived_from<internal::iterator_tag_t<It>, std::input_iterator_tag>;
+concept input_iterator = input_or_output_iterator<It> && internal::has_iterator_tag<It, std::input_iterator_tag>;
 
 template<typename It, typename Type>
-concept output_iterator = std::derived_from<internal::iterator_tag_t<It>, std::output_iterator_tag>;
+concept output_iterator = input_or_output_iterator<It> && requires(It it, Type &&value) {
+    *it++ = std::forward<Type>(value);
+};
 
 template<typename It>
-concept forward_iterator = std::derived_from<internal::iterator_tag_t<It>, std::forward_iterator_tag>;
+concept forward_iterator = input_iterator<It> && internal::has_iterator_tag<It, std::forward_iterator_tag>;
 
 template<typename It>
-concept bidirectional_iterator = std::derived_from<internal::iterator_tag_t<It>, std::bidirectional_iterator_tag>;
+concept bidirectional_iterator = forward_iterator<It> && internal::has_iterator_tag<It, std::bidirectional_iterator_tag>;
 
 template<typename It>
-concept random_access_iterator = std::derived_from<internal::iterator_tag_t<It>, std::random_access_iterator_tag>;
+concept random_access_iterator = bidirectional_iterator<It> && internal::has_iterator_tag<It, std::random_access_iterator_tag>;
 
 template<class Sentinel, typename It>
 concept sentinel_for = input_or_output_iterator<It> && requires(Sentinel sentinel, It it) {
