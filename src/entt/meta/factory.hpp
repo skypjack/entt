@@ -122,10 +122,12 @@ protected:
 public:
     basic_meta_factory(meta_ctx &area, meta_type_node node)
         : ctx{&area},
-          bucket{node.info->hash()},
-          parent{meta_context::from(*ctx).bucket.try_emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get()} {
-        if(parent->details == nullptr) {
+          bucket{node.info->hash()} {
+        if(const auto it = meta_context::from(*ctx).bucket.find(bucket); it == meta_context::from(*ctx).bucket.cend()) {
+            parent = meta_context::from(*ctx).bucket.emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get();
             parent->details = std::make_unique<meta_type_descriptor>();
+        } else {
+            parent = it->second.get();
         }
     }
 
