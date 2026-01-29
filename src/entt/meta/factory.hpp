@@ -32,18 +32,14 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
-    [[nodiscard]] auto &fetch_node() noexcept {
-        return *meta_context::from(*ctx).bucket[parent];
-    }
-
     [[nodiscard]] auto *find_member_or_assert() {
-        auto *member = find_member(fetch_node().details->data, bucket);
+        auto *member = find_member(parent->details->data, bucket);
         ENTT_ASSERT(member != nullptr, "Cannot find member");
         return member;
     }
 
     [[nodiscard]] auto *find_overload_or_assert() {
-        auto *overload = find_overload(find_member(fetch_node().details->func, bucket), invoke);
+        auto *overload = find_overload(find_member(parent->details->func, bucket), invoke);
         ENTT_ASSERT(overload != nullptr, "Cannot find overload");
         return overload;
     }
@@ -55,51 +51,44 @@ class basic_meta_factory {
 
 protected:
     void type(const id_type id, const char *name) noexcept {
-        reset_bucket(parent);
-        auto &elem = fetch_node();
-        ENTT_ASSERT(elem.id == id || !resolve(*ctx, id), "Duplicate identifier");
-        elem.name = name;
-        elem.id = id;
+        reset_bucket(parent->info->hash());
+        ENTT_ASSERT(parent->id == id || !resolve(*ctx, id), "Duplicate identifier");
+        parent->name = name;
+        parent->id = id;
     }
 
     template<typename Type>
     void insert_or_assign(Type node) {
-        auto &elem = fetch_node();
-
-        reset_bucket(parent);
+        reset_bucket(parent->info->hash());
 
         if constexpr(std::is_same_v<Type, meta_base_node>) {
-            auto *member = find_member(elem.details->base, node.id);
-            member ? (*member = node) : elem.details->base.emplace_back(node);
+            auto *member = find_member(parent->details->base, node.id);
+            member ? (*member = node) : parent->details->base.emplace_back(node);
         } else if constexpr(std::is_same_v<Type, meta_conv_node>) {
-            auto *member = find_member(elem.details->conv, node.id);
-            member ? (*member = node) : elem.details->conv.emplace_back(node);
+            auto *member = find_member(parent->details->conv, node.id);
+            member ? (*member = node) : parent->details->conv.emplace_back(node);
         } else {
             static_assert(std::is_same_v<Type, meta_ctor_node>, "Unexpected type");
-            auto *member = find_member(elem.details->ctor, node.id);
-            member ? (*member = node) : elem.details->ctor.emplace_back(node);
+            auto *member = find_member(parent->details->ctor, node.id);
+            member ? (*member = node) : parent->details->ctor.emplace_back(node);
         }
     }
 
     void data(meta_data_node node) {
-        auto &elem = fetch_node();
-
         reset_bucket(node.id);
 
-        if(auto *member = find_member(elem.details->data, node.id); member == nullptr) {
-            elem.details->data.emplace_back(std::move(node));
+        if(auto *member = find_member(parent->details->data, node.id); member == nullptr) {
+            parent->details->data.emplace_back(std::move(node));
         } else if(member->set != node.set || member->get != node.get) {
             *member = std::move(node);
         }
     }
 
     void func(meta_func_node node) {
-        auto &elem = fetch_node();
-
         reset_bucket(node.id, node.invoke);
 
-        if(auto *member = find_member(elem.details->func, node.id); member == nullptr) {
-            elem.details->func.emplace_back(std::move(node));
+        if(auto *member = find_member(parent->details->func, node.id); member == nullptr) {
+            parent->details->func.emplace_back(std::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
             while(member->next != nullptr) { member = member->next.get(); }
             member->next = std::make_unique<meta_func_node>(std::move(node));
@@ -107,12 +96,12 @@ protected:
     }
 
     void traits(const meta_traits value, const bool unset) {
-        auto set_or_unset_on = [=](auto &node) {
+        const auto set_or_unset_on = [=](auto &node) {
             node.traits = (unset ? (node.traits & ~value) : (node.traits | value));
         };
 
-        if(bucket == parent) {
-            set_or_unset_on(fetch_node());
+        if(bucket == parent->info->hash()) {
+            set_or_unset_on(*parent);
         } else if(invoke == nullptr) {
             set_or_unset_on(*find_member_or_assert());
         } else {
@@ -121,8 +110,8 @@ protected:
     }
 
     void custom(meta_custom_node node) {
-        if(bucket == parent) {
-            fetch_node().custom = std::move(node);
+        if(bucket == parent->info->hash()) {
+            parent->custom = std::move(node);
         } else if(invoke == nullptr) {
             find_member_or_assert()->custom = std::move(node);
         } else {
@@ -133,18 +122,18 @@ protected:
 public:
     basic_meta_factory(meta_ctx &area, meta_type_node node)
         : ctx{&area},
-          parent{node.info->hash()},
-          bucket{parent} {
-        if(auto *curr = meta_context::from(*ctx).bucket.try_emplace(parent, std::make_unique<meta_type_node>(std::move(node))).first->second.get(); curr->details == nullptr) {
-            curr->details = std::make_unique<meta_type_descriptor>();
+          bucket{node.info->hash()},
+          parent{meta_context::from(*ctx).bucket.try_emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get()} {
+        if(parent->details == nullptr) {
+            parent->details = std::make_unique<meta_type_descriptor>();
         }
     }
 
 private:
     meta_ctx *ctx{};
-    id_type parent{};
     id_type bucket{};
     invoke_type *invoke{};
+    meta_type_node *parent{};
 };
 
 } // namespace internal
