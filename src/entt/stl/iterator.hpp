@@ -31,8 +31,28 @@ using std::sentinel_for;
 
 namespace internal {
 
+template<typename It>
+concept has_iterator_category = requires {
+    typename std::iterator_traits<It>::iterator_category;
+};
+
+template<typename It>
+concept has_iterator_concept = has_iterator_category<It> && requires {
+    typename It::iterator_concept;
+};
+
+template<has_iterator_category It>
+struct iterator_tag {
+    using type = typename std::iterator_traits<It>::iterator_category;
+};
+
+template<has_iterator_concept It>
+struct iterator_tag<It> {
+    using type = typename It::iterator_concept;
+};
+
 template<typename It, typename Tag>
-concept has_iterator_tag = std::derived_from<typename It::iterator_concept, Tag> || std::derived_from<typename std::iterator_traits<It>::iterator_category, Tag>;
+concept has_iterator_tag = std::derived_from<typename iterator_tag<It>::type, Tag>;
 
 } // namespace internal
 
