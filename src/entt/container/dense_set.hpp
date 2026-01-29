@@ -525,7 +525,7 @@ public:
      * @param first An iterator to the first element of the range of elements.
      * @param last An iterator past the last element of the range of elements.
      */
-    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
+    void insert(stl::input_iterator auto first, stl::input_iterator auto last) {
         for(; first != last; ++first) {
             insert(*first);
         }

@@ -289,7 +289,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &ro(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
+    basic_flow &ro(stl::input_iterator auto first, stl::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, false);
         }
@@ -313,7 +313,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &rw(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) {
+    basic_flow &rw(stl::input_iterator auto first, stl::input_iterator auto last) {
         for(; first != last; ++first) {
             emplace(*first, true);
         }

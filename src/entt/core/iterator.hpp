@@ -121,7 +121,7 @@ private:
  * @tparam It Type of iterator.
  * @tparam Sentinel Type of sentinel.
  */
-template<entt::stl::input_or_output_iterator It, entt::stl::sentinel_for<It> Sentinel = It>
+template<stl::input_or_output_iterator It, stl::sentinel_for<It> Sentinel = It>
 struct iterable_adaptor final {
     /*! @brief Value type. */
     using value_type = std::iterator_traits<It>::value_type;

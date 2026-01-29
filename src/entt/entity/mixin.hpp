@@ -363,7 +363,7 @@ public:
      * @param args Parameters to use to forward to the underlying storage.
      */
     template<typename... Args>
-    void insert(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last, Args &&...args) {
+    void insert(stl::input_iterator auto first, stl::input_iterator auto last, Args &&...args) {
         auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 

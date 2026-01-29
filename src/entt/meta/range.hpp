@@ -112,7 +112,7 @@ private:
  * @tparam Type Type of meta objects returned.
  * @tparam It Type of forward iterator.
  */
-template<typename Type, entt::stl::forward_iterator It>
+template<typename Type, stl::forward_iterator It>
 using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, It>>;
 
 } // namespace entt

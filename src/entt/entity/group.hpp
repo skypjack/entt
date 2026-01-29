@@ -643,7 +643,7 @@ public:
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    void sort_as(entt::stl::input_iterator auto first, entt::stl::input_iterator auto last) const {
+    void sort_as(stl::input_iterator auto first, stl::input_iterator auto last) const {
         if(*this) {
             descriptor->handle().sort_as(first, last);
         }

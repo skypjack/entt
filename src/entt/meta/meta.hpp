@@ -1618,7 +1618,7 @@ public:
 
     meta_iterator() = default;
 
-    template<entt::stl::bidirectional_iterator It>
+    template<stl::bidirectional_iterator It>
     meta_iterator(const meta_ctx &area, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<It>},
@@ -1699,7 +1699,7 @@ public:
 
     meta_iterator() = default;
 
-    template<bool KeyOnly, entt::stl::forward_iterator It>
+    template<bool KeyOnly, stl::forward_iterator It>
     meta_iterator(const meta_ctx &area, std::bool_constant<KeyOnly>, It iter) noexcept
         : ctx{&area},
           vtable{&basic_vtable<KeyOnly, It>},

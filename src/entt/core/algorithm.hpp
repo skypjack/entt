@@ -34,7 +34,7 @@ struct std_sort {
      * @param args Arguments to forward to the sort function, if any.
      */
     template<typename Compare = std::less<>, typename... Args>
-    void operator()(entt::stl::random_access_iterator auto first, entt::stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
+    void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
         std::sort(std::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
     }
 };
@@ -52,7 +52,7 @@ struct insertion_sort {
      * @param compare A valid comparison function object.
      */
     template<typename Compare = std::less<>>
-    void operator()(entt::stl::random_access_iterator auto first, entt::stl::random_access_iterator auto last, Compare compare = Compare{}) const {
+    void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}) const {
         if(first < last) {
             for(auto it = first + 1; it < last; ++it) {
                 auto value = std::move(*it);
@@ -94,7 +94,7 @@ struct radix_sort {
      * @param last An iterator past the last element of the range to sort.
      * @param getter A valid _getter_ function object.
      */
-    template<entt::stl::random_access_iterator It, typename Getter = stl::identity>
+    template<stl::random_access_iterator It, typename Getter = stl::identity>
     void operator()(It first, It last, Getter getter = Getter{}) const {
         if(first < last) {
             constexpr auto passes = N / Bit;
