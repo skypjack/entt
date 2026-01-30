@@ -11,7 +11,7 @@ struct SignalLess: testing::Test {
     struct has_on_construct: std::false_type {};
 
     template<typename Type>
-    requires requires { entt::storage_type_t<Type, my_entity>::on_construct; }
+    requires requires { &entt::storage_type_t<Type, my_entity>::on_construct; }
     struct has_on_construct<Type>: std::true_type {};
 
     template<typename Type>
