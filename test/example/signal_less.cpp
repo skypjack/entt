@@ -7,11 +7,12 @@
 struct SignalLess: testing::Test {
     enum my_entity : std::uint32_t {};
 
-    template<typename, typename = void>
+    template<typename>
     struct has_on_construct: std::false_type {};
 
     template<typename Type>
-    struct has_on_construct<Type, std::void_t<decltype(&entt::storage_type_t<Type, my_entity>::on_construct)>>: std::true_type {};
+    requires requires { entt::storage_type_t<Type, my_entity>::on_construct; }
+    struct has_on_construct<Type>: std::true_type {};
 
     template<typename Type>
     static constexpr auto has_on_construct_v = has_on_construct<Type>::value;
