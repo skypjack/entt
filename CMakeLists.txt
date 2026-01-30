@@ -133,6 +133,7 @@ if(ENTT_INCLUDE_HEADERS)
         core/any.hpp
         core/bit.hpp
         core/compressed_pair.hpp
+        core/concepts.hpp
         core/enum.hpp
         core/family.hpp
         core/fwd.hpp

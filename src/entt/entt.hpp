@@ -12,6 +12,7 @@ namespace entt {}
 #include "core/any.hpp"
 #include "core/bit.hpp"
 #include "core/compressed_pair.hpp"
+#include "core/concepts.hpp"
 #include "core/enum.hpp"
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
