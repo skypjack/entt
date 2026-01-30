@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <utility>
 #include "../core/any.hpp"
+#include "../core/concepts.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
@@ -112,9 +113,8 @@ public:
      * @tparam Type The type for which to generate the virtual table.
      * @return A static virtual table for the given concept and type.
      */
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] static type instance() noexcept {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Type differs from its decayed form");
         static const vtable_type vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
 
         if constexpr(is_mono) {

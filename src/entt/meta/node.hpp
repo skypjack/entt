@@ -10,6 +10,7 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
+#include "../core/concepts.hpp"
 #include "../core/enum.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
@@ -183,7 +184,7 @@ template<auto Member>
     return static_cast<value_type *>(nullptr);
 }
 
-template<typename Type>
+template<cvref_unqualified Type>
 const meta_type_node &resolve(const meta_context &) noexcept;
 
 template<typename... Args>
@@ -273,9 +274,8 @@ auto setup_node_for() noexcept {
     return (it != context.bucket.end()) ? it->second.get() : nullptr;
 }
 
-template<typename Type>
+template<cvref_unqualified Type>
 [[nodiscard]] const meta_type_node &resolve(const meta_context &context) noexcept {
-    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Invalid type");
     static const meta_type_node node = setup_node_for<Type>();
     const auto *elem = try_resolve(context, *node.info);
     return (elem == nullptr) ? node : *elem;

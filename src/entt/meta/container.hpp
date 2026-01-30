@@ -16,6 +16,7 @@
 #include <vector>
 #include "../container/dense_map.hpp"
 #include "../container/dense_set.hpp"
+#include "../core/concepts.hpp"
 #include "../core/type_traits.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
@@ -61,10 +62,8 @@ inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>:
  * @brief General purpose implementation of meta sequence container traits.
  * @tparam Type Type of underlying sequence container.
  */
-template<typename Type>
+template<cvref_unqualified Type>
 struct basic_meta_sequence_container_traits {
-    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Unexpected type");
-
     /*! @brief Unsigned integer type. */
     using size_type = meta_sequence_container::size_type;
     /*! @brief Meta iterator type. */
@@ -185,10 +184,8 @@ struct basic_meta_sequence_container_traits {
  * @brief General purpose implementation of meta associative container traits.
  * @tparam Type Type of underlying associative container.
  */
-template<typename Type>
+template<cvref_unqualified Type>
 struct basic_meta_associative_container_traits {
-    static_assert(std::is_same_v<Type, std::remove_cvref_t<Type>>, "Unexpected type");
-
     /*! @brief Unsigned integer type. */
     using size_type = meta_associative_container::size_type;
     /*! @brief Meta iterator type. */

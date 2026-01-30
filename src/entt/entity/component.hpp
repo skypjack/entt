@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -40,10 +41,8 @@ struct page_size<Type>: std::integral_constant<std::size_t, Type::page_size> {};
  * @tparam Type Element type.
  * @tparam Entity A valid entity type.
  */
-template<typename Type, entity_like Entity, typename>
+template<cvref_unqualified Type, entity_like Entity, typename>
 struct component_traits {
-    static_assert(std::is_same_v<std::decay_t<Type>, Type>, "Unsupported type");
-
     /*! @brief Element type. */
     using element_type = Type;
     /*! @brief Underlying entity identifier. */

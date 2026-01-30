@@ -11,6 +11,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -176,10 +177,8 @@ private:
 class meta_any {
     using vtable_type = void(const internal::meta_traits, const meta_any &, const void *);
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] const void *other) {
-        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
-
         if(req == internal::meta_traits::is_none) {
             value.node = &internal::resolve<Type>(internal::meta_context::from(*value.ctx));
         }

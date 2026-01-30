@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
@@ -23,9 +24,8 @@ template<typename... Type>
 // NOLINTNEXTLINE(misc-redundant-expression)
 static constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
 
-template<typename Type>
+template<cvref_unqualified Type>
 const Type *view_placeholder() {
-    static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Unexpected type");
     static const Type placeholder{};
     return &placeholder;
 }
@@ -210,10 +210,8 @@ class basic_view;
  * @tparam Get Number of storage iterated by the view.
  * @tparam Exclude Number of storage used to filter the view.
  */
-template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
+template<cvref_unqualified Type, bool Checked, std::size_t Get, std::size_t Exclude>
 class basic_common_view {
-    static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Unexpected type");
-
     template<typename Return, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>);
 
@@ -674,10 +672,8 @@ public:
  * @tparam Type Common type among all storage types.
  * @tparam Policy Storage policy.
  */
-template<typename Type, deletion_policy Policy>
+template<cvref_unqualified Type, deletion_policy Policy>
 class basic_storage_view {
-    static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Unexpected type");
-
 protected:
     /*! @cond ENTT_INTERNAL */
     basic_storage_view() noexcept = default;

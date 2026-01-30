@@ -9,6 +9,7 @@
 #include <vector>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
@@ -28,10 +29,8 @@ struct basic_dispatcher_handler {
     [[nodiscard]] virtual std::size_t size() const noexcept = 0;
 };
 
-template<typename Type, typename Allocator>
+template<cvref_unqualified Type, typename Allocator>
 class dispatcher_handler final: public basic_dispatcher_handler {
-    static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Invalid type");
-
     using alloc_traits = std::allocator_traits<Allocator>;
     using signal_type = sigh<void(Type &), Allocator>;
     using container_type = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
@@ -116,9 +115,8 @@ class basic_dispatcher {
     using container_allocator = alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
     using container_type = dense_map<key_type, mapped_type, stl::identity, std::equal_to<>, container_allocator>;
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] handler_type<Type> &assure(const id_type id) {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
         auto &&ptr = pools.first()[id];
 
         if(!ptr) {
@@ -129,10 +127,8 @@ class basic_dispatcher {
         return static_cast<handler_type<Type> &>(*ptr);
     }
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] const handler_type<Type> *assure(const id_type id) const {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-
         if(auto it = pools.first().find(id); it != pools.first().cend()) {
             return static_cast<const handler_type<Type> *>(it->second.get());
         }

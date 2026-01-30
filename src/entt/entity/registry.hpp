@@ -17,6 +17,7 @@
 #include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
@@ -218,10 +219,8 @@ class basic_registry {
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
     using traits_type = entt_traits<Entity>;
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] auto &assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-
         if constexpr(std::is_same_v<Type, entity_type>) {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
@@ -241,10 +240,8 @@ class basic_registry {
         }
     }
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] const auto *assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) const {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Non-decayed types not allowed");
-
         if constexpr(std::is_same_v<Type, entity_type>) {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return &entities;

@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 
@@ -43,7 +44,7 @@ enum class deletion_policy : std::uint8_t {
     unspecified = swap_and_pop
 };
 
-template<typename Type, entity_like Entity = entity, typename = void>
+template<cvref_unqualified Type, entity_like Entity = entity, typename = void>
 struct component_traits;
 
 template<entity_like Entity = entity, typename = std::allocator<Entity>>

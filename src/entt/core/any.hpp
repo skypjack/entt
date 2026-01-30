@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 #include "fwd.hpp"
 #include "type_info.hpp"
 #include "type_traits.hpp"
@@ -66,10 +67,8 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     template<typename Type>
     static constexpr bool in_situ_v = internal::in_situ<Type, Len, Align>::value;
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
-        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
-
         switch(const auto *elem = static_cast<const Type *>(value.data()); req) {
             using enum internal::any_request;
         case info:
@@ -110,9 +109,8 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         return nullptr;
     }
 
-    template<typename Type>
+    template<cvref_unqualified Type>
     static void basic_deleter(const basic_any &value) {
-        static_assert(std::is_same_v<std::remove_cvref_t<Type>, Type>, "Invalid type");
         ENTT_ASSERT((value.mode == any_policy::dynamic) || ((value.mode == any_policy::embedded) && !std::is_trivially_destructible_v<Type>), "Unexpected policy");
 
         const auto *elem = static_cast<const Type *>(value.data());
