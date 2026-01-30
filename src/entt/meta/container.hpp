@@ -52,7 +52,7 @@ template<typename>
 struct reserve_aware_container: std::false_type {};
 
 template<typename Type>
-requires requires { typename Type::reserve; }
+requires requires(Type cont) { cont.reserve(0u); }
 struct reserve_aware_container<Type>: std::true_type {};
 
 template<typename Type>
