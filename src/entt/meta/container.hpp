@@ -28,29 +28,32 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Type, typename = void>
+template<typename Type>
 struct sequence_container_extent: integral_constant<meta_dynamic_extent> {};
 
 template<typename Type>
-struct sequence_container_extent<Type, std::enable_if_t<is_complete_v<std::tuple_size<Type>>>>: integral_constant<std::tuple_size_v<Type>> {};
+requires is_complete_v<std::tuple_size<Type>>
+struct sequence_container_extent<Type>: integral_constant<std::tuple_size_v<Type>> {};
 
 template<typename Type>
 inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
 
-template<typename, typename = void>
+template<typename>
 struct key_only_associative_container: std::true_type {};
 
 template<typename Type>
-struct key_only_associative_container<Type, std::void_t<typename Type::mapped_type>>: std::false_type {};
+requires requires { typename Type::mapped_type; }
+struct key_only_associative_container<Type>: std::false_type {};
 
 template<typename Type>
 inline constexpr bool key_only_associative_container_v = key_only_associative_container<Type>::value;
 
-template<typename, typename = void>
+template<typename>
 struct reserve_aware_container: std::false_type {};
 
 template<typename Type>
-struct reserve_aware_container<Type, std::void_t<decltype(&Type::reserve)>>: std::true_type {};
+requires requires { typename Type::reserve; }
+struct reserve_aware_container<Type>: std::true_type {};
 
 template<typename Type>
 inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>::value;
