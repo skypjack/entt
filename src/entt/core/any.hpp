@@ -205,10 +205,9 @@ public:
      * @param value A pointer to an object to take ownership of.
      */
     template<typename Type>
+    requires (!std::is_const_v<Type> && !std::is_void_v<Type>)
     explicit basic_any(std::in_place_t, Type *value)
         : base_type{} {
-        static_assert(!std::is_const_v<Type> && !std::is_void_v<Type>, "Non-const non-void pointer required");
-
         if(value == nullptr) {
             initialize<void>();
         } else {
@@ -339,9 +338,8 @@ public:
      * @return False if the wrapper does not contain the expected type, true
      * otherwise.
      */
-    template<typename Type>
+    template<cvref_unqualified Type>
     [[nodiscard]] bool has_value() const noexcept {
-        static_assert(std::is_same_v<std::remove_const_t<Type>, Type>, "Invalid type");
         return (underlying_type == type_hash<Type>::value());
     }
 
