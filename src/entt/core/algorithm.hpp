@@ -76,9 +76,8 @@ struct insertion_sort {
  * @tparam N Maximum number of bits to sort.
  */
 template<std::size_t Bit, std::size_t N>
+requires ((N % Bit) == 0) // The maximum number of bits to sort must be a multiple of the number of bits processed per pass
 struct radix_sort {
-    static_assert((N % Bit) == 0, "The maximum number of bits to sort must be a multiple of the number of bits processed per pass");
-
     /**
      * @brief Sorts the elements in a range.
      *

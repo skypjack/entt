@@ -1,6 +1,7 @@
 #ifndef ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 #define ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <memory>
@@ -83,10 +84,9 @@ private:
  * @tparam Category Either a directed or undirected category tag.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Category, typename Allocator>
+template<std::derived_from<directed_tag> Category, typename Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_base_of_v<directed_tag, Category>, "Invalid graph category");
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
     using container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
 

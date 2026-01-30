@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_VIEW_HPP
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
@@ -648,8 +649,8 @@ public:
      * @param other The storage for the type to combine the view with.
      * @return A more specific view.
      */
-    template<typename OGet>
-    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>>> operator|(OGet &other) const noexcept {
+    template<std::derived_from<common_type> OGet>
+    [[nodiscard]] basic_view<get_t<Get..., OGet>, exclude_t<Exclude...>> operator|(OGet &other) const noexcept {
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
@@ -660,7 +661,7 @@ public:
      * @param other The view to combine with.
      * @return A more specific view.
      */
-    template<typename... OGet, typename... OExclude>
+    template<std::derived_from<common_type>... OGet, std::derived_from<common_type>... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack<basic_view<get_t<Get..., OGet...>, exclude_t<Exclude..., OExclude...>>>(
             *this, other, std::index_sequence_for<Get...>{}, std::index_sequence_for<Exclude...>{}, std::index_sequence_for<OGet...>{}, std::index_sequence_for<OExclude...>{});
@@ -1105,8 +1106,8 @@ public:
      * @param other The storage for the type to combine the view with.
      * @return A more specific view.
      */
-    template<typename OGet>
-    [[nodiscard]] std::enable_if_t<std::is_base_of_v<common_type, OGet>, basic_view<get_t<Get, OGet>, exclude_t<>>> operator|(OGet &other) const noexcept {
+    template<std::derived_from<common_type> OGet>
+    [[nodiscard]] basic_view<get_t<Get, OGet>, exclude_t<>> operator|(OGet &other) const noexcept {
         return *this | basic_view<get_t<OGet>, exclude_t<>>{other};
     }
 
@@ -1117,7 +1118,7 @@ public:
      * @param other The view to combine with.
      * @return A more specific view.
      */
-    template<typename... OGet, typename... OExclude>
+    template<std::derived_from<common_type>... OGet, std::derived_from<common_type>... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack<basic_view<get_t<Get, OGet...>, exclude_t<OExclude...>>>(
             *this, other, std::index_sequence_for<Get>{}, std::index_sequence_for<>{}, std::index_sequence_for<OGet...>{}, std::index_sequence_for<OExclude...>{});

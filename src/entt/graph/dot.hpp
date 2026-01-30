@@ -1,8 +1,8 @@
 #ifndef ENTT_GRAPH_DOT_HPP
 #define ENTT_GRAPH_DOT_HPP
 
+#include <concepts>
 #include <ostream>
-#include <type_traits>
 #include "fwd.hpp"
 
 namespace entt {
@@ -10,16 +10,14 @@ namespace entt {
 /**
  * @brief Outputs a graph in dot format.
  * @tparam Graph Graph type, valid as long as it exposes edges and vertices.
- * @tparam Writer Vertex decorator type.
  * @param out A standard output stream.
  * @param graph The graph to output.
  * @param writer Vertex decorator object.
  */
-template<typename Graph, typename Writer>
-void dot(std::ostream &out, const Graph &graph, Writer writer) {
-    static_assert(std::is_base_of_v<directed_tag, typename Graph::graph_category>, "Invalid graph category");
-
-    if constexpr(std::is_same_v<typename Graph::graph_category, undirected_tag>) {
+template<typename Graph>
+requires std::derived_from<typename Graph::graph_category, directed_tag>
+void dot(std::ostream &out, const Graph &graph, std::invocable<std::ostream &, typename Graph::vertex_type> auto writer) {
+    if constexpr(std::same_as<typename Graph::graph_category, undirected_tag>) {
         out << "graph{";
     } else {
         out << "digraph{";
@@ -32,7 +30,7 @@ void dot(std::ostream &out, const Graph &graph, Writer writer) {
     }
 
     for(auto [lhs, rhs]: graph.edges()) {
-        if constexpr(std::is_same_v<typename Graph::graph_category, undirected_tag>) {
+        if constexpr(std::same_as<typename Graph::graph_category, undirected_tag>) {
             out << lhs << "--" << rhs << ";";
         } else {
             out << lhs << "->" << rhs << ";";

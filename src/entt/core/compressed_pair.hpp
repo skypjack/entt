@@ -205,22 +205,22 @@ public:
      * reference to the second element if `Index` is 1.
      */
     template<std::size_t Index>
+    requires (Index <= 1u)
     [[nodiscard]] constexpr decltype(auto) get() noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
-            static_assert(Index == 1u, "Index out of bounds");
             return second();
         }
     }
 
     /*! @copydoc get */
     template<std::size_t Index>
+    requires (Index <= 1u)
     [[nodiscard]] constexpr decltype(auto) get() const noexcept {
         if constexpr(Index == 0u) {
             return first();
         } else {
-            static_assert(Index == 1u, "Index out of bounds");
             return second();
         }
     }
@@ -265,9 +265,8 @@ struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<size_
  * @tparam Second The type of the second element that the pair stores.
  */
 template<size_t Index, typename First, typename Second>
-struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {
-    static_assert(Index < 2u, "Index out of bounds");
-};
+requires (Index <= 1u)
+struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {};
 
 } // namespace std
 

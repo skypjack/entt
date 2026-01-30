@@ -1,6 +1,7 @@
 #ifndef ENTT_POLY_POLY_HPP
 #define ENTT_POLY_POLY_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <tuple>
@@ -48,20 +49,23 @@ class poly_vtable {
     using inspector = Concept::template type<poly_inspector>;
 
     template<typename Ret, typename Clazz, typename... Args>
+    requires std::derived_from<inspector, std::remove_const_t<Clazz>>
     static auto vtable_entry(Ret (*)(Clazz &, Args...))
-        -> std::enable_if_t<std::is_base_of_v<std::remove_const_t<Clazz>, inspector>, Ret (*)(constness_as_t<basic_any<Len, Align>, Clazz> &, Args...)>;
+        -> Ret (*)(constness_as_t<basic_any<Len, Align>, Clazz> &, Args...);
 
     template<typename Ret, typename... Args>
     static auto vtable_entry(Ret (*)(Args...))
         -> Ret (*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename Clazz, typename... Args>
+    requires std::derived_from<inspector, Clazz>
     static auto vtable_entry(Ret (Clazz::*)(Args...))
-        -> std::enable_if_t<std::is_base_of_v<Clazz, inspector>, Ret (*)(basic_any<Len, Align> &, Args...)>;
+        -> Ret (*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename Clazz, typename... Args>
+    requires std::derived_from<inspector, Clazz>
     static auto vtable_entry(Ret (Clazz::*)(Args...) const)
-        -> std::enable_if_t<std::is_base_of_v<Clazz, inspector>, Ret (*)(const basic_any<Len, Align> &, Args...)>;
+        -> Ret (*)(const basic_any<Len, Align> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>) noexcept

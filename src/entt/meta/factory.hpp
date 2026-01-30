@@ -1,6 +1,7 @@
 #ifndef ENTT_META_FACTORY_HPP
 #define ENTT_META_FACTORY_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -208,15 +209,17 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Base>
+    requires std::derived_from<Type, Base>
     meta_factory base() noexcept {
-        static_assert(!std::is_same_v<Type, Base> && std::is_base_of_v<Base, Type>, "Invalid base type");
-        auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
+        if constexpr(!std::same_as<Type, Base>) {
+            auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const Type *>(instance))); };
 
-        base_type::insert_or_assign(
-            internal::meta_base_node{
-                type_id<Base>().hash(),
-                &internal::resolve<Base>,
-                op});
+            base_type::insert_or_assign(
+                internal::meta_base_node{
+                    type_id<Base>().hash(),
+                    &internal::resolve<Base>,
+                    op});
+        }
 
         return *this;
     }

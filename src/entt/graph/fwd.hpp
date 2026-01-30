@@ -1,6 +1,7 @@
 #ifndef ENTT_GRAPH_FWD_HPP
 #define ENTT_GRAPH_FWD_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <memory>
 #include "../core/fwd.hpp"
@@ -13,7 +14,7 @@ struct directed_tag {};
 /*! @brief Directed graph category tag. */
 struct undirected_tag: directed_tag {};
 
-template<typename, typename = std::allocator<std::size_t>>
+template<std::derived_from<directed_tag>, typename = std::allocator<std::size_t>>
 class adjacency_matrix;
 
 template<typename = std::allocator<id_type>>
