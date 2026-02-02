@@ -38,3 +38,4 @@ TODO:
 * auto-detect meta pointer-like types from dedicated type member
 * export optional as meta_pointer like (or refine meta-pointer like detection)
 * ENTT_FORCE_STL on the CI
+* redesign snapshot as a whole
