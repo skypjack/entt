@@ -2,6 +2,7 @@
 #define ENTT_RESOURCE_RESOURCE_CACHE_HPP
 
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -41,7 +42,8 @@ public:
     constexpr resource_cache_iterator(const It iter) noexcept
         : it{iter} {}
 
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    template<typename Other>
+    requires !std::same_as<It, Other> && std::constructible_from<It, Other>
     constexpr resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) noexcept
         : it{other.it} {}
 

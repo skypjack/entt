@@ -2,8 +2,8 @@
 #define ENTT_RESOURCE_RESOURCE_HPP
 
 #include <compare>
+#include <concepts>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "fwd.hpp"
 
@@ -23,9 +23,6 @@ template<typename Type>
 class resource {
     template<typename>
     friend class resource;
-
-    template<typename Other>
-    static constexpr bool is_acceptable = !std::is_same_v<Type, Other> && std::is_constructible_v<Type &, Other &>;
 
 public:
     /*! @brief Resource type. */
@@ -65,7 +62,8 @@ public:
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to copy from.
      */
-    template<typename Other, typename = std::enable_if_t<is_acceptable<Other>>>
+    template<typename Other>
+    requires !std::same_as<Type, Other> && std::constructible_from<Type &, Other &>
     resource(const resource<Other> &other) noexcept
         : value{other.value} {}
 
@@ -74,8 +72,9 @@ public:
      * @tparam Other Type of resource managed by the received handle.
      * @param other The handle to move from.
      */
-    template<typename Other, typename = std::enable_if_t<is_acceptable<Other>>>
-    resource(resource<Other> &&other) noexcept
+    template<typename Other>
+    requires !std::same_as<Type, Other> && std::constructible_from<Type &, Other &>
+    resource(resource<Other> && other) noexcept
         : value{std::move(other.value)} {}
 
     /*! @brief Default destructor. */
@@ -99,7 +98,8 @@ public:
      * @param other The handle to copy from.
      * @return This resource handle.
      */
-    template<typename Other, typename = std::enable_if_t<is_acceptable<Other>>>
+    template<typename Other>
+    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
     resource &operator=(const resource<Other> &other) noexcept {
         value = other.value;
         return *this;
@@ -111,7 +111,8 @@ public:
      * @param other The handle to move from.
      * @return This resource handle.
      */
-    template<typename Other, typename = std::enable_if_t<is_acceptable<Other>>>
+    template<typename Other>
+    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
     resource &operator=(resource<Other> &&other) noexcept {
         value = std::move(other.value);
         return *this;
