@@ -1,6 +1,7 @@
 #ifndef ENTT_COMMON_THROWING_ALLOCATOR_HPP
 #define ENTT_COMMON_THROWING_ALLOCATOR_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <limits>
 #include <memory>
@@ -18,12 +19,14 @@ class throwing_allocator {
     template<typename Other>
     friend class throwing_allocator;
 
-    template<typename Other, typename = std::enable_if_t<!std::is_void_v<Type> || std::is_constructible_v<std::allocator<Type>, std::allocator<Other>>>>
+    template<typename Other>
+    requires !std::is_void_v<Type> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>
     throwing_allocator(int, const throwing_allocator<Other> &other)
         : allocator{other.allocator},
           config{other.config} {}
 
-    template<typename Other, typename = std::enable_if_t<std::is_void_v<Type> && !std::is_constructible_v<std::allocator<Type>, std::allocator<Other>>>>
+    template<typename Other>
+    requires std::is_void_v<Type> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>
     throwing_allocator(char, const throwing_allocator<Other> &other)
         : allocator{},
           config{other.config} {}
