@@ -48,7 +48,8 @@ public:
     constexpr dense_set_iterator(const It iter) noexcept
         : it{iter} {}
 
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    template<typename Other>
+    requires !std::same_as<It, Other> && std::constructible_from<It, Other>
     constexpr dense_set_iterator(const dense_set_iterator<Other> &other) noexcept
         : it{other.it} {}
 
@@ -139,7 +140,8 @@ public:
         : it{iter},
           offset{pos} {}
 
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    template<typename Other>
+    requires !std::same_as<It, Other> && std::constructible_from<It, Other>
     constexpr dense_set_local_iterator(const dense_set_local_iterator<Other> &other) noexcept
         : it{other.it},
           offset{other.offset} {}

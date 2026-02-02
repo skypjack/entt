@@ -1,10 +1,10 @@
 #ifndef ENTT_CONTAINER_TABLE_HPP
 #define ENTT_CONTAINER_TABLE_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
@@ -34,7 +34,8 @@ public:
     constexpr table_iterator(It... from) noexcept
         : it{from...} {}
 
-    template<typename... Other, typename = std::enable_if_t<(std::is_constructible_v<It, Other> && ...)>>
+    template<typename... Other>
+    requires (std::constructible_from<It, Other> && ...)
     constexpr table_iterator(const table_iterator<Other...> &other) noexcept
         : table_iterator{std::get<Other>(other.it)...} {}
 
