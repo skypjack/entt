@@ -82,7 +82,7 @@ public:
         : it{iter} {}
 
     template<typename Other>
-    requires !std::same_as<It, Other> && std::constructible_from<It, Other>
+    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
     constexpr dense_map_iterator(const dense_map_iterator<Other> &other) noexcept
         : it{other.it} {}
 
@@ -177,7 +177,7 @@ public:
           offset{pos} {}
 
     template<typename Other>
-    requires !std::same_as<It, Other> && std::constructible_from<It, Other>
+    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
     constexpr dense_map_local_iterator(const dense_map_local_iterator<Other> &other) noexcept
         : it{other.it},
           offset{other.offset} {}
