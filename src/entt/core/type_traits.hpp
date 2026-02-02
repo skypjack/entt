@@ -1,6 +1,7 @@
 #ifndef ENTT_CORE_TYPE_TRAITS_HPP
 #define ENTT_CORE_TYPE_TRAITS_HPP
 
+#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <tuple>
@@ -36,12 +37,13 @@ inline constexpr choice_t<N> choice{};
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
  * @tparam Type The type of which to return the size.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct size_of: std::integral_constant<std::size_t, 0u> {};
 
 /*! @copydoc size_of */
 template<typename Type>
-struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
+requires requires { sizeof(Type); }
+struct size_of<Type>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
     : std::integral_constant<std::size_t, sizeof(Type)> {};
 
@@ -634,12 +636,13 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct is_complete: std::false_type {};
 
 /*! @copydoc is_complete */
 template<typename Type>
-struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {};
+requires requires { sizeof(Type); }
+struct is_complete<Type>: std::true_type {};
 
 /**
  * @brief Helper variable template.
@@ -653,17 +656,18 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct is_iterator: std::false_type {};
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename, typename = void>
+template<typename>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
-struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
+requires requires { typename std::iterator_traits<Type>::iterator_category; }
+struct has_iterator_category<Type>: std::true_type {};
 
 } // namespace internal
 /*! @endcond */
@@ -671,8 +675,7 @@ struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Typ
 /*! @copydoc is_iterator */
 template<typename Type>
 requires (!std::is_void_v<std::remove_const_t<std::remove_pointer_t<Type>>>)
-struct is_iterator<Type>
-    : internal::has_iterator_category<Type> {};
+struct is_iterator<Type>: internal::has_iterator_category<Type> {};
 
 /**
  * @brief Helper variable template.
@@ -687,8 +690,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
  * @tparam Type The type to test
  */
 template<typename Type>
-struct is_ebco_eligible
-    : std::bool_constant<std::is_empty_v<Type> && !std::is_final_v<Type>> {};
+struct is_ebco_eligible: std::bool_constant<std::is_empty_v<Type> && !std::is_final_v<Type>> {};
 
 /**
  * @brief Helper variable template.
@@ -720,11 +722,12 @@ inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename, typename = void>
+template<typename>
 struct has_tuple_size_value: std::false_type {};
 
 template<typename Type>
-struct has_tuple_size_value<Type, std::void_t<decltype(std::tuple_size<const Type>::value)>>: std::true_type {};
+requires is_complete_v<std::tuple_size<const Type>>
+struct has_tuple_size_value<Type>: std::true_type {};
 
 template<typename>
 struct has_value_type: std::false_type {};
