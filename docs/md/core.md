@@ -524,12 +524,13 @@ Basically, the whole system relies on a handful of classes. In particular:
   associative containers or for positional accesses in a vector or an array.
   
   An external generator can also be used if needed. In fact, `type_index` can be
-  specialized by type and is also _sfinae-friendly_ in order to allow more
+  specialized by type or constrained with a concept in order to allow more
   refined specializations such as:
   
   ```cpp
   template<typename Type>
-  struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
+  requires requires { { Type::index() } -> std::same_as<entt::id_type>; }
+  struct entt::type_index<Type> {
       static entt::id_type value() noexcept {
           return Type::index();
       }
@@ -558,8 +559,8 @@ Basically, the whole system relies on a handful of classes. In particular:
   identifiers remain stable across executions. Moreover, they are generated
   at runtime and are no longer a compile-time thing.
 
-  As it happens with `type_index`, also `type_hash` is a _sfinae-friendly_ class
-  that can be specialized in order to customize its behavior globally or on a
+  As it happens with `type_index`, also `type_hash` can be specialized or
+  constrained with a concept in order to customize its behavior globally or on a
   per-type or per-traits basis.
 
 * The name associated with a given type:
@@ -589,8 +590,8 @@ Basically, the whole system relies on a handful of classes. In particular:
   purposes. Users can prevent the library from using these features by means of
   the `ENTT_STANDARD_CPP` definition. In this case, the name is just empty.
 
-  As it happens with `type_index`, also `type_name` is a _sfinae-friendly_ class
-  that can be specialized in order to customize its behavior globally or on a
+  As it happens with `type_index`, also `type_name` can be specialized or
+  constrained with a concept in order to customize its behavior globally or on a
   per-type or per-traits basis.
 
 These are then combined into utilities that aim to offer an API that is somewhat

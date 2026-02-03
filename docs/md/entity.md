@@ -1350,7 +1350,8 @@ struct transform {
 
 The `component_traits` class template takes care of _extracting_ the properties
 from the supplied type.<br/>
-Plus, it is _sfinae-friendly_ and also supports feature-based specializations.
+Plus, it can be specialized and constrained with a concept to further customize
+it on a per type or per feature basis.
 
 ## Empty type optimization
 
