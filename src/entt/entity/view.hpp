@@ -488,7 +488,8 @@ public:
      * @tparam Args Storage types managed by the other view.
      * @param other A view to convert from.
      */
-    template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
+    template<typename... Args>
+    requires (!std::same_as<basic_view, basic_view<Args...>>)
     basic_view(const basic_view<Args...> &other) noexcept
         : basic_view{} {
         (storage_if(other.template storage<typename Get::element_type>()), ...);
@@ -945,7 +946,8 @@ public:
      * @tparam Args Storage types managed by the other view.
      * @param other A view to convert from.
      */
-    template<typename... Args, typename = std::enable_if_t<!std::is_same_v<basic_view, basic_view<Args...>>>>
+    template<typename... Args>
+    requires (!std::same_as<basic_view, basic_view<Args...>>)
     basic_view(const basic_view<Args...> &other) noexcept
         : base_type{} {
         storage_if(other.template storage<typename Get::element_type>());
