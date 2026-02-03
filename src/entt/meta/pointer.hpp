@@ -51,7 +51,8 @@ struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
  * @tparam Type Element type.
  */
 template<typename Type>
-struct is_meta_pointer_like<Type, std::void_t<typename Type::is_meta_pointer_like>>
+requires requires { typename Type::is_meta_pointer_like; }
+struct is_meta_pointer_like<Type>
     : std::true_type {};
 
 } // namespace entt
