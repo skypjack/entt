@@ -41,7 +41,7 @@ struct page_size<Type>: std::integral_constant<std::size_t, Type::page_size> {};
  * @tparam Type Element type.
  * @tparam Entity A valid entity type.
  */
-template<cvref_unqualified Type, entity_like Entity, typename>
+template<cvref_unqualified Type, entity_like Entity>
 struct component_traits {
     /*! @brief Element type. */
     using element_type = Type;

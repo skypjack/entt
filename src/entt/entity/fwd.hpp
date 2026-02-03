@@ -44,7 +44,7 @@ enum class deletion_policy : std::uint8_t {
     unspecified = swap_and_pop
 };
 
-template<cvref_unqualified Type, entity_like Entity = entity, typename = void>
+template<cvref_unqualified Type, entity_like Entity = entity>
 struct component_traits;
 
 template<entity_like Entity = entity, typename = std::allocator<Entity>>
