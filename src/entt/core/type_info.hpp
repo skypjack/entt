@@ -76,7 +76,7 @@ template<typename Type>
  * @brief Type sequential identifier.
  * @tparam Type Type for which to generate a sequential identifier.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct ENTT_API type_index final {
     /**
      * @brief Returns the sequential identifier of a given type.
@@ -97,7 +97,7 @@ struct ENTT_API type_index final {
  * @brief Type hash.
  * @tparam Type Type for which to generate a hash value.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct type_hash final {
     /**
      * @brief Returns the numeric representation of a given type.
@@ -122,7 +122,7 @@ struct type_hash final {
  * @brief Type name.
  * @tparam Type Type for which to generate a name.
  */
-template<typename Type, typename = void>
+template<typename Type>
 struct type_name final {
     /**
      * @brief Returns the name of a given type.
