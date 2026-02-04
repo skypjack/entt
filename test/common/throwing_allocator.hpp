@@ -20,13 +20,13 @@ class throwing_allocator {
     friend class throwing_allocator;
 
     template<typename Other>
-    requires (!std::is_void_v<Type> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>)
+    requires (!std::same_as<Type, void> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>)
     throwing_allocator(int, const throwing_allocator<Other> &other)
         : allocator{other.allocator},
           config{other.config} {}
 
     template<typename Other>
-    requires std::is_void_v<Type> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>
+    requires std::same_as<Type, void> || std::constructible_from<std::allocator<Type>, std::allocator<Other>>
     throwing_allocator(char, const throwing_allocator<Other> &other)
         : allocator{},
           config{other.config} {}

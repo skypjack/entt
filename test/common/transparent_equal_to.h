@@ -2,7 +2,6 @@
 #define ENTT_COMMON_TRANSPARENT_EQUAL_TO_H
 
 #include <concepts>
-#include <type_traits>
 
 namespace test {
 
