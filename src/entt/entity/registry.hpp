@@ -59,7 +59,8 @@ public:
     constexpr registry_storage_iterator(It iter) noexcept
         : it{iter} {}
 
-    template<typename Other, typename = std::enable_if_t<!std::is_same_v<It, Other> && std::is_constructible_v<It, Other>>>
+    template<typename Other>
+    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
     constexpr registry_storage_iterator(const registry_storage_iterator<Other> &other) noexcept
         : registry_storage_iterator{other.it} {}
 
@@ -613,7 +614,8 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of elements.
      */
-    template<typename Type, typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, Type>>>
+    template<typename Type, typename EIt, typename CIt>
+    requires std::same_as<typename std::iterator_traits<CIt>::value_type, Type>
     void insert(EIt first, EIt last, CIt from) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(first, last, from);

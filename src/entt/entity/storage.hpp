@@ -53,8 +53,9 @@ public:
         : payload{ref},
           offset{idx} {}
 
-    template<bool Const = std::is_const_v<Container>, typename = std::enable_if_t<Const>>
-    constexpr storage_iterator(const storage_iterator<std::remove_const_t<Container>, Page> &other) noexcept
+    template<std::same_as<std::remove_const_t<Container>> Other>
+    requires std::is_const_v<Container>
+    constexpr storage_iterator(const storage_iterator<Other, Page> &other) noexcept
         : storage_iterator{other.payload, other.offset} {}
 
     constexpr storage_iterator &operator++() noexcept {
@@ -152,7 +153,8 @@ public:
     constexpr extended_storage_iterator(iterator_type base, Other... other)
         : it{base, other...} {}
 
-    template<typename... Args, typename = std::enable_if_t<(!std::is_same_v<Other, Args> && ...) && (std::is_constructible_v<Other, Args> && ...)>>
+    template<typename... Args>
+    requires (!std::same_as<Other, Args> && ...) && (std::constructible_from<Other, Args> && ...)
     constexpr extended_storage_iterator(const extended_storage_iterator<It, Args...> &other)
         : it{other.it} {}
 
@@ -715,7 +717,8 @@ public:
      * @param from An iterator to the first element of the range of objects.
      * @return Iterator pointing to the first element inserted, if any.
      */
-    template<typename EIt, typename CIt, typename = std::enable_if_t<std::is_same_v<typename std::iterator_traits<CIt>::value_type, value_type>>>
+    template<typename EIt, typename CIt>
+    requires std::same_as<typename std::iterator_traits<CIt>::value_type, value_type>
     iterator insert(EIt first, EIt last, CIt from) {
         for(; first != last; ++first, ++from) {
             emplace_element(*first, true, *from);
