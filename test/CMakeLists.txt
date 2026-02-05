@@ -367,6 +367,7 @@ SETUP_BASIC_TEST(
     NAME stl
     SOURCES
         entt/stl/functional.cpp
+        entt/stl/iterator.cpp
         entt/stl/memory.cpp
     DEFS ENTT_USE_STL
 )
