@@ -33,9 +33,6 @@ TODO:
 * meta: conversion_helper machinery has lot of room for improvements
 * organizer: view/storage only based model, no registry
 * introduce a way to inject stl from outside too
-* review sentinels (std::default_sentinel and the like)
 * review non-const to const iterator conversions
-* auto-detect meta pointer-like types from dedicated type member
 * export optional as meta_pointer like (or refine meta-pointer like detection)
-* ENTT_FORCE_STL on the CI
 * redesign snapshot as a whole
