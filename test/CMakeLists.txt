@@ -240,6 +240,7 @@ SETUP_BASIC_TEST(
         entt/core/any.cpp
         entt/core/bit.cpp
         entt/core/compressed_pair.cpp
+        entt/core/concepts.cpp
         entt/core/enum.cpp
         entt/core/family.cpp
         entt/core/hashed_string.cpp
