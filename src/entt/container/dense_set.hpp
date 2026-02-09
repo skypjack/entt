@@ -203,13 +203,11 @@ class dense_set {
     using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
-    template<typename Other>
-    [[nodiscard]] std::size_t value_to_bucket(const Other &value) const noexcept {
+    [[nodiscard]] std::size_t value_to_bucket(const auto &value) const noexcept {
         return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
-    template<typename Other>
-    [[nodiscard]] auto constrained_find(const Other &value, const std::size_t bucket) {
+    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return begin() + static_cast<iterator::difference_type>(offset);
@@ -219,8 +217,7 @@ class dense_set {
         return end();
     }
 
-    template<typename Other>
-    [[nodiscard]] auto constrained_find(const Other &value, const std::size_t bucket) const {
+    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return cbegin() + static_cast<const_iterator::difference_type>(offset);
