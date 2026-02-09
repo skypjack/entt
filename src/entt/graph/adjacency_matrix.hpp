@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "fwd.hpp"
 
@@ -84,7 +85,7 @@ private:
  * @tparam Category Either a directed or undirected category tag.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<std::derived_from<directed_tag> Category, typename Allocator>
+template<std::derived_from<directed_tag> Category, allocator_like Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");

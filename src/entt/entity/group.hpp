@@ -10,6 +10,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
@@ -205,8 +206,8 @@ class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
 public:
     using common_type = Type;
 
-    template<typename Allocator, typename... GType, typename... EType>
-    group_handler(const Allocator &allocator, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
+    template<typename... GType, typename... EType>
+    group_handler(const allocator_like auto &allocator, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
         : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, Get>{&cpool...}; }, gpool)},
           filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
           elem{allocator} {

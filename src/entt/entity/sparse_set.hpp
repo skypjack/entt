@@ -13,6 +13,7 @@
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/bit.hpp"
+#include "../core/concepts.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/iterator.hpp"
 #include "entity.hpp"
@@ -136,7 +137,7 @@ private:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<entity_like Entity, typename Allocator>
+template<entity_like Entity, allocator_like Allocator>
 class basic_sparse_set {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");

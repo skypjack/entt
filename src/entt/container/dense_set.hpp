@@ -190,9 +190,8 @@ private:
  * @tparam Type Value type of the associative container.
  * @tparam Hash Type of function to use to hash the values.
  * @tparam KeyEqual Type of function to use to compare the values for equality.
- * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Hash, typename KeyEqual, typename Allocator>
+template<typename Type, typename Hash, typename KeyEqual, allocator_like Allocator>
 class dense_set {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;

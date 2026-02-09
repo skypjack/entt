@@ -12,6 +12,7 @@
 #include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
+#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../stl/functional.hpp"
@@ -123,7 +124,7 @@ private:
  * @tparam Loader Type of loader used to create the resources.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Loader, typename Allocator>
+template<typename Type, typename Loader, allocator_like Allocator>
 class resource_cache {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");

@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 #include "../config/config.h"
+#include "../core/concepts.hpp"
 
 namespace entt {
 
@@ -108,15 +109,14 @@ public:
     /**
      * @brief Sets or replaces a service using a given allocator.
      * @tparam Type Service type.
-     * @tparam Allocator Type of allocator used to manage memory and elements.
      * @tparam Args Types of arguments to use to construct the service.
      * @param alloc The allocator to use.
      * @param args Parameters to use to construct the service.
      * @return A reference to a valid service.
      */
-    template<std::derived_from<Service> Type = Service, typename Allocator, typename... Args>
+    template<std::derived_from<Service> Type = Service, typename... Args>
     requires std::constructible_from<Type, Args...>
-    static Service &emplace(std::allocator_arg_t, Allocator alloc, Args &&...args) {
+    static Service &emplace(std::allocator_arg_t, allocator_like auto alloc, Args &&...args) {
         service = std::allocate_shared<Type>(alloc, std::forward<Args>(args)...);
         return *service;
     }

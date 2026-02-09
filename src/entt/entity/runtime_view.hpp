@@ -6,6 +6,7 @@
 #include <iterator>
 #include <utility>
 #include <vector>
+#include "../core/concepts.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -115,7 +116,7 @@ private:
  * @tparam Type Common base type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, typename Allocator>
+template<typename Type, allocator_like Allocator>
 class basic_runtime_view {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");

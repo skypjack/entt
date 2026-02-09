@@ -17,6 +17,7 @@
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
+#include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
@@ -39,18 +40,16 @@ struct dense_map_node final {
         : next{pos},
           element{std::forward<Args>(args)...} {}
 
-    template<typename Allocator, typename... Args>
-    dense_map_node(std::allocator_arg_t, const Allocator &allocator, const std::size_t pos, Args &&...args)
+    template<typename... Args>
+    dense_map_node(std::allocator_arg_t, const allocator_like auto &allocator, const std::size_t pos, Args &&...args)
         : next{pos},
           element{entt::make_obj_using_allocator<value_type>(allocator, std::forward<Args>(args)...)} {}
 
-    template<typename Allocator>
-    dense_map_node(std::allocator_arg_t, const Allocator &allocator, const dense_map_node &other)
+    dense_map_node(std::allocator_arg_t, const allocator_like auto &allocator, const dense_map_node &other)
         : next{other.next},
           element{entt::make_obj_using_allocator<value_type>(allocator, other.element)} {}
 
-    template<typename Allocator>
-    dense_map_node(std::allocator_arg_t, const Allocator &allocator, dense_map_node &&other)
+    dense_map_node(std::allocator_arg_t, const allocator_like auto &allocator, dense_map_node &&other)
         : next{other.next},
           element{entt::make_obj_using_allocator<value_type>(allocator, std::move(other.element))} {}
 
@@ -228,9 +227,8 @@ private:
  * @tparam Type Mapped type of the associative container.
  * @tparam Hash Type of function to use to hash the keys.
  * @tparam KeyEqual Type of function to use to compare the keys for equality.
- * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Key, typename Type, typename Hash, typename KeyEqual, typename Allocator>
+template<typename Key, typename Type, typename Hash, typename KeyEqual, allocator_like Allocator>
 class dense_map {
     static constexpr float default_threshold = 0.875f;
     static constexpr std::size_t minimum_capacity = 8u;
@@ -1020,7 +1018,7 @@ private:
 /*! @cond ENTT_INTERNAL */
 namespace std {
 
-template<typename Key, typename Value, typename Allocator>
+template<typename Key, typename Value, entt::allocator_like Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
 

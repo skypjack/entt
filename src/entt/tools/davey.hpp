@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <imgui.h>
+#include "../core/concepts.hpp"
 #include "../entity/mixin.hpp"
 #include "../entity/registry.hpp"
 #include "../entity/sparse_set.hpp"
@@ -133,7 +134,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
     }
 }
 
-template<entity_like Entity, typename Allocator>
+template<entity_like Entity, allocator_like Allocator>
 static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, Allocator> &storage) {
     if(auto type = resolve(ctx, storage.info()); type) {
         for(auto entt: storage) {
@@ -234,7 +235,7 @@ static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, ex
  * @param ctx The context from which to search for meta types.
  * @param storage An instance of the storage type.
  */
-template<typename Type, entity_like Entity, typename Allocator>
+template<typename Type, entity_like Entity, allocator_like Allocator>
 void davey(const meta_ctx &ctx, const basic_storage<Type, Entity, Allocator> &storage) {
     internal::present_storage(ctx, storage);
 }
@@ -246,7 +247,7 @@ void davey(const meta_ctx &ctx, const basic_storage<Type, Entity, Allocator> &st
  * @tparam Allocator Storage allocator type.
  * @param storage An instance of the storage type.
  */
-template<typename Type, entity_like Entity, typename Allocator>
+template<typename Type, entity_like Entity, allocator_like Allocator>
 void davey(const basic_storage<Type, Entity, Allocator> &storage) {
     davey(locator<meta_ctx>::value_or(), storage);
 }
@@ -281,7 +282,7 @@ void davey(const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
  * @param ctx The context from which to search for meta types.
  * @param registry An instance of the registry type.
  */
-template<entity_like Entity, typename Allocator>
+template<entity_like Entity, allocator_like Allocator>
 void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registry) {
     ImGui::BeginTabBar("#tabs");
 
@@ -325,7 +326,7 @@ void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registr
  * @tparam Allocator Registry allocator type.
  * @param registry An instance of the registry type.
  */
-template<entity_like Entity, typename Allocator>
+template<entity_like Entity, allocator_like Allocator>
 void davey(const basic_registry<Entity, Allocator> &registry) {
     davey(locator<meta_ctx>::value_or(), registry);
 }

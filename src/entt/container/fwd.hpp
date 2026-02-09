@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include "../core/concepts.hpp"
 
 namespace entt {
 
@@ -13,14 +14,14 @@ template<
     typename Type,
     typename = std::hash<Key>,
     typename = std::equal_to<>,
-    typename = std::allocator<std::pair<const Key, Type>>>
+    allocator_like = std::allocator<std::pair<const Key, Type>>>
 class dense_map;
 
 template<
     typename Type,
     typename = std::hash<Type>,
     typename = std::equal_to<>,
-    typename = std::allocator<Type>>
+    allocator_like = std::allocator<Type>>
 class dense_set;
 
 template<typename...>
