@@ -170,11 +170,9 @@ public:
 
     /**
      * @brief Constructs the underlying containers using a given allocator.
-     * @tparam Allocator Type of allocator.
      * @param allocator A valid allocator.
      */
-    template<typename Allocator>
-    explicit basic_table(const Allocator &allocator)
+    explicit basic_table(const auto &allocator)
         : payload{Container{allocator}...} {}
 
     /**
