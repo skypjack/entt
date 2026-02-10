@@ -4,7 +4,6 @@
 #include <concepts>
 #include <cstddef>
 #include <memory>
-#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 
 namespace entt {
@@ -15,10 +14,10 @@ struct directed_tag {};
 /*! @brief Directed graph category tag. */
 struct undirected_tag: directed_tag {};
 
-template<std::derived_from<directed_tag>, allocator_like = std::allocator<std::size_t>>
+template<std::derived_from<directed_tag>, typename = std::allocator<std::size_t>>
 class adjacency_matrix;
 
-template<allocator_like = std::allocator<id_type>>
+template<typename = std::allocator<id_type>>
 class basic_flow;
 
 /*! @brief Alias declaration for the most common use case. */

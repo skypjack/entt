@@ -8,7 +8,6 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/compressed_pair.hpp"
-#include "../core/concepts.hpp"
 #include "fwd.hpp"
 #include "process.hpp"
 
@@ -33,7 +32,7 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Delta, allocator_like Allocator>
+template<typename Delta, typename Allocator>
 class basic_scheduler {
     using base_type = basic_process<Delta, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;

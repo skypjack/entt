@@ -170,9 +170,11 @@ public:
 
     /**
      * @brief Constructs the underlying containers using a given allocator.
+     * @tparam Allocator Type of allocator.
      * @param allocator A valid allocator.
      */
-    explicit basic_table(const allocator_like auto &allocator)
+    template<typename Allocator>
+    explicit basic_table(const Allocator &allocator)
         : payload{Container{allocator}...} {}
 
     /**
@@ -422,7 +424,7 @@ private:
 /*! @cond ENTT_INTERNAL */
 namespace std {
 
-template<typename... Container, entt::allocator_like Allocator>
+template<typename... Container, typename Allocator>
 struct uses_allocator<entt::basic_table<Container...>, Allocator>
     : std::bool_constant<(std::uses_allocator_v<Container, Allocator> && ...)> {};
 

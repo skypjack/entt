@@ -131,7 +131,7 @@ private:
     It it;
 };
 
-template<allocator_like Allocator>
+template<typename Allocator>
 class registry_context {
     using alloc_traits = std::allocator_traits<Allocator>;
     using allocator_type = alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
@@ -210,7 +210,7 @@ private:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<entity_like Entity, allocator_like Allocator>
+template<entity_like Entity, typename Allocator>
 class basic_registry {
     using base_type = basic_sparse_set<Entity, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;

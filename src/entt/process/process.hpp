@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <utility>
 #include "../core/compressed_pair.hpp"
-#include "../core/concepts.hpp"
 #include "../core/type_traits.hpp"
 #include "fwd.hpp"
 
@@ -15,7 +14,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename, typename, allocator_like>
+template<typename, typename, typename>
 struct process_adaptor;
 
 } // namespace internal
@@ -69,7 +68,7 @@ struct process_adaptor;
  * @tparam Delta Type to use to provide elapsed time.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Delta, allocator_like Allocator>
+template<typename Delta, typename Allocator>
 class basic_process: public std::enable_shared_from_this<basic_process<Delta, Allocator>> {
     enum class state : std::uint8_t {
         idle = 0,
@@ -291,7 +290,7 @@ private:
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Delta, typename Func, allocator_like Allocator>
+template<typename Delta, typename Func, typename Allocator>
 struct process_adaptor: public basic_process<Delta, Allocator> {
     using allocator_type = Allocator;
     using base_type = basic_process<Delta, Allocator>;

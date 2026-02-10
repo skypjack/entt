@@ -29,7 +29,7 @@ struct basic_dispatcher_handler {
     [[nodiscard]] virtual std::size_t size() const noexcept = 0;
 };
 
-template<cvref_unqualified Type, allocator_like Allocator>
+template<cvref_unqualified Type, typename Allocator>
 class dispatcher_handler final: public basic_dispatcher_handler {
     using alloc_traits = std::allocator_traits<Allocator>;
     using signal_type = sigh<void(Type &), Allocator>;
@@ -102,7 +102,7 @@ private:
  *
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<allocator_like Allocator>
+template<typename Allocator>
 class basic_dispatcher {
     template<typename Type>
     using handler_type = internal::dispatcher_handler<Type, Allocator>;

@@ -6,7 +6,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include "../core/concepts.hpp"
 #include "delegate.hpp"
 #include "fwd.hpp"
 
@@ -32,7 +31,7 @@ class sink;
  * @tparam Type A valid function type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, allocator_like Allocator>
+template<typename Type, typename Allocator>
 class sigh;
 
 /**
@@ -51,7 +50,7 @@ class sigh;
  * @tparam Args Types of arguments of a function type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Ret, typename... Args, allocator_like Allocator>
+template<typename Ret, typename... Args, typename Allocator>
 class sigh<Ret(Args...), Allocator> {
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
@@ -355,7 +354,7 @@ private:
  * @tparam Args Types of arguments of a function type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Ret, typename... Args, allocator_like Allocator>
+template<typename Ret, typename... Args, typename Allocator>
 class sink<sigh<Ret(Args...), Allocator>> {
     using signal_type = sigh<Ret(Args...), Allocator>;
     using delegate_type = signal_type::delegate_type;
@@ -566,7 +565,7 @@ private:
  * @tparam Args Types of arguments of a function type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Ret, typename... Args, allocator_like Allocator>
+template<typename Ret, typename... Args, typename Allocator>
 sink(sigh<Ret(Args...), Allocator> &) -> sink<sigh<Ret(Args...), Allocator>>;
 
 } // namespace entt

@@ -14,7 +14,6 @@
 #include "../container/dense_map.hpp"
 #include "../container/dense_set.hpp"
 #include "../core/compressed_pair.hpp"
-#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../stl/functional.hpp"
@@ -28,7 +27,7 @@ namespace entt {
  * @brief Utility class for creating task graphs.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<allocator_like Allocator>
+template<typename Allocator>
 class basic_flow {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, id_type>, "Invalid value type");

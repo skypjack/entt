@@ -6,7 +6,6 @@
 #include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
-#include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
@@ -33,7 +32,7 @@ namespace entt {
  * @tparam Derived Emitter type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Derived, allocator_like Allocator>
+template<typename Derived, typename Allocator>
 class emitter {
     using key_type = id_type;
     using mapped_type = std::function<void(void *)>;

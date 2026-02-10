@@ -12,7 +12,6 @@
 #include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
-#include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
@@ -207,7 +206,7 @@ private:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, entity_like Entity, allocator_like Allocator>
+template<typename Type, entity_like Entity, typename Allocator>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
@@ -766,7 +765,7 @@ private:
 };
 
 /*! @copydoc basic_storage */
-template<typename Type, entity_like Entity, allocator_like Allocator>
+template<typename Type, entity_like Entity, typename Allocator>
 requires (component_traits<Type, Entity>::page_size == 0u)
 class basic_storage<Type, Entity, Allocator>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
@@ -951,7 +950,7 @@ public:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<entity_like Entity, allocator_like Allocator>
+template<entity_like Entity, typename Allocator>
 class basic_storage<Entity, Entity, Allocator>
     : public basic_sparse_set<Entity, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;
