@@ -335,7 +335,12 @@ public:
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    meta_any(const meta_any &other) = default;
+    meta_any(const meta_any &other)
+        : storage{other.storage},
+          ctx{other.ctx},
+          node{(other.storage && !storage) ? nullptr : other.node},
+          vtable{(other.storage && !storage) ? nullptr : other.vtable} {
+    }
 
     /**
      * @brief Move constructor.
@@ -357,10 +362,10 @@ public:
      */
     meta_any &operator=(const meta_any &other) {
         if(this != &other) {
-            storage = other.storage;
             ctx = other.ctx;
-            node = other.node;
-            vtable = other.vtable;
+            storage = other.storage;
+            node = (other.storage && !storage) ? nullptr : other.node;
+            vtable = (other.storage && !storage) ? nullptr : other.vtable;
         }
 
         return *this;
