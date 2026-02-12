@@ -57,6 +57,26 @@ TEST(Any, Empty) {
     ASSERT_EQ(any.data(), nullptr);
 }
 
+TEST(Any, EmptyAsRef) {
+    entt::any any{};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.owner());
+    ASSERT_EQ(any.policy(), entt::any_policy::empty);
+    ASSERT_EQ(any.info(), entt::type_id<void>());
+    ASSERT_EQ(entt::any_cast<double>(&any), nullptr);
+    ASSERT_EQ(any.data(), nullptr);
+
+    auto other = any.as_ref();
+
+    ASSERT_FALSE(other);
+    ASSERT_FALSE(other.owner());
+    ASSERT_EQ(other.policy(), entt::any_policy::empty);
+    ASSERT_EQ(other.info(), entt::type_id<void>());
+    ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
+    ASSERT_EQ(other.data(), nullptr);
+}
+
 TEST(Any, HasValue) {
     entt::any any{};
 

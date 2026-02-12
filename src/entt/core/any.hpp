@@ -484,7 +484,18 @@ public:
      */
     [[nodiscard]] basic_any as_ref() noexcept {
         basic_any other = std::as_const(*this).as_ref();
-        other.mode = (mode == any_policy::cref ? any_policy::cref : any_policy::ref);
+
+        switch(mode) {
+            using enum any_policy;
+        case cref:
+        case empty:
+            other.mode = mode;
+            break;
+        default:
+            other.mode = any_policy::ref;
+            break;
+        }
+
         return other;
     }
 

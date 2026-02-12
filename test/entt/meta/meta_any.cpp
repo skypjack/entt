@@ -131,6 +131,22 @@ TEST_F(MetaAny, Empty) {
     ASSERT_FALSE(std::as_const(any).as_associative_container());
 }
 
+TEST_F(MetaAny, EmptyAsRef) {
+    entt::meta_any any{};
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(any.type());
+    ASSERT_EQ(any.base().data(), nullptr);
+    ASSERT_EQ(any, entt::meta_any{});
+
+    auto other = any.as_ref();
+
+    ASSERT_FALSE(other);
+    ASSERT_FALSE(other.type());
+    ASSERT_EQ(other.base().data(), nullptr);
+    ASSERT_EQ(other, entt::meta_any{});
+}
+
 TEST_F(MetaAny, Context) {
     entt::meta_any any{};
     const entt::meta_ctx ctx{};
