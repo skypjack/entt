@@ -175,10 +175,10 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any {
-    using vtable_type = void(const internal::meta_traits, const meta_any &, const void *);
+    using vtable_type = void(const internal::meta_traits, const meta_any &, void *);
 
     template<cvref_unqualified Type>
-    static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] const void *other) {
+    static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] void *other) {
         if(req == internal::meta_traits::is_none) {
             value.node = &internal::resolve<Type>(internal::meta_context::from(*value.ctx));
         }
@@ -186,16 +186,16 @@ class meta_any {
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer_like) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
-                    const_cast<meta_any &>(value).emplace<Type>(*static_cast<const Type *>(other));
+                    static_cast<meta_any *>(other)->emplace<Type>(any_cast<Type>(value.storage));
                 } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                     using in_place_type = decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()));
 
                     if constexpr(std::is_constructible_v<bool, Type>) {
-                        if(const auto &pointer_like = *static_cast<const Type *>(other); pointer_like) {
-                            const_cast<meta_any &>(value).emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
+                        if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
+                            static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                         }
                     } else {
-                        const_cast<meta_any &>(value).emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(*static_cast<const Type *>(other)));
+                        static_cast<meta_any *>(other)->emplace<in_place_type>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value.storage)));
                     }
                 }
             }
@@ -207,10 +207,10 @@ class meta_any {
 
                 if(!!(req & internal::meta_traits::is_const) || (value.storage.policy() == any_policy::cref)) {
                     // NOLINTNEXTLINE(bugprone-casting-through-void)
-                    *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<const Type &>(value.storage)};
+                    *static_cast<container_type *>(other) = container_type{*value.ctx, any_cast<const Type &>(value.storage)};
                 } else {
                     // NOLINTNEXTLINE(bugprone-casting-through-void)
-                    *static_cast<container_type *>(const_cast<void *>(other)) = container_type{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
+                    *static_cast<container_type *>(other) = container_type{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
                 }
             }
         }
@@ -611,7 +611,7 @@ public:
      */
     [[nodiscard]] meta_any operator*() const noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
-        if(*this) { vtable(internal::meta_traits::is_pointer_like, ret, storage.data()); }
+        if(*this) { vtable(internal::meta_traits::is_pointer_like, *this, &ret); }
         return ret;
     }
 
