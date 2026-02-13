@@ -184,7 +184,7 @@ class meta_any {
         }
 
         if constexpr(is_meta_pointer_like_v<Type>) {
-            if(req == internal::meta_traits::is_pointer_like) {
+            if(!!(req & internal::meta_traits::is_pointer_like)) {
                 if constexpr(std::is_function_v<typename std::pointer_traits<Type>::element_type>) {
                     static_cast<meta_any *>(other)->emplace<Type>(any_cast<Type>(value.storage));
                 } else if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
@@ -609,9 +609,16 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object if the
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
-    [[nodiscard]] meta_any operator*() const noexcept {
+    [[nodiscard]] meta_any operator*() noexcept {
         meta_any ret{meta_ctx_arg, *ctx};
         if(*this) { vtable(internal::meta_traits::is_pointer_like, *this, &ret); }
+        return ret;
+    }
+
+    /*! @copydoc operator* */
+    [[nodiscard]] meta_any operator*() const noexcept {
+        meta_any ret{meta_ctx_arg, *ctx};
+        if(*this) { vtable(internal::meta_traits::is_pointer_like | internal::meta_traits::is_const, *this, &ret); }
         return ret;
     }
 
