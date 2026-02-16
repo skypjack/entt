@@ -197,7 +197,11 @@ class meta_any {
             }
         } else if constexpr(requires(Type elem) { *elem; }) {
             if(req == internal::meta_traits::is_pointer) {
-                if constexpr(std::is_pointer_v<Type> && !std::is_void_v<std::remove_const_t<std::remove_pointer_t<Type>>>) {
+                if constexpr(std::is_class_v<Type>) {
+                    if(const auto &elem = any_cast<const Type &>(value.storage); elem) {
+                        return (value.storage.policy() == any_policy::cref) ? static_cast<meta_any *>(other)->emplace<decltype(*elem)>(*elem) : static_cast<meta_any *>(other)->emplace<decltype(*const_cast<Type &>(elem))>(*const_cast<Type &>(elem));
+                    }
+                } else if constexpr(!std::is_array_v<Type> && !std::is_void_v<std::remove_const_t<std::remove_pointer_t<Type>>>) {
                     if(auto *pointer = any_cast<Type>(value.storage); pointer) {
                         static_cast<meta_any *>(other)->emplace<std::conditional_t<std::is_function_v<std::remove_const_t<std::remove_pointer_t<Type>>>, Type, std::remove_pointer_t<Type> &>>(*pointer);
                     }

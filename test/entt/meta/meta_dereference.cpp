@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
@@ -212,6 +213,40 @@ TEST_F(MetaDereference, SmartPointer) {
 
     ASSERT_EQ(*any.cast<std::shared_ptr<int>>(), 3);
     ASSERT_EQ(*value, 3);
+}
+
+TEST_F(MetaDereference, Optional) {
+    auto value = std::optional<int>(0);
+    entt::meta_any any{entt::forward_as_meta(value)};
+
+    ASSERT_FALSE(any.type().is_pointer());
+    ASSERT_FALSE(any.type().is_pointer_like());
+    ASSERT_EQ(any.type(), entt::resolve<std::optional<int>>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_pointer_like());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int &>() = 3;
+
+    ASSERT_EQ(*any.cast<std::optional<int>>(), 3);
+    ASSERT_EQ(*value, 3);
+}
+
+TEST_F(MetaDereference, EmptyOptional) {
+    auto value = std::optional<int>();
+    entt::meta_any any{entt::forward_as_meta(value)};
+
+    ASSERT_FALSE(any.type().is_pointer());
+    ASSERT_FALSE(any.type().is_pointer_like());
+    ASSERT_EQ(any.type(), entt::resolve<std::optional<int>>());
+
+    auto deref = *any;
+
+    ASSERT_FALSE(deref);
 }
 
 TEST_F(MetaDereference, PointerToConstMoveOnlyType) {
