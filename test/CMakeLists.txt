@@ -315,10 +315,10 @@ SETUP_BASIC_TEST(
         entt/meta/meta_ctor.cpp
         entt/meta/meta_custom.cpp
         entt/meta/meta_data.cpp
+        entt/meta/meta_dereference.cpp
         entt/meta/meta_factory.cpp
         entt/meta/meta_func.cpp
         entt/meta/meta_handle.cpp
-        entt/meta/meta_pointer.cpp
         entt/meta/meta_range.cpp
         entt/meta/meta_template.cpp
         entt/meta/meta_type.cpp
