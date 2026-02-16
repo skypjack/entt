@@ -357,7 +357,7 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
     ASSERT_FALSE(entt::resolve<int>().is_pointer());
 
-    ASSERT_TRUE(entt::resolve<int *>().is_pointer_like());
+    ASSERT_FALSE(entt::resolve<int *>().is_pointer_like());
     ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_pointer_like());
     ASSERT_FALSE(entt::resolve<int>().is_pointer_like());
 

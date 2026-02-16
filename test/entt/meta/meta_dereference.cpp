@@ -108,7 +108,7 @@ TEST_F(MetaDereference, ConstType) {
     const entt::meta_any any{&value};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
     ASSERT_EQ(any.type(), entt::resolve<const int *>());
 
     auto deref = *any;
@@ -177,7 +177,7 @@ TEST_F(MetaDereference, RawPointer) {
     entt::meta_any any{&value};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
     ASSERT_EQ(any.type(), entt::resolve<int *>());
 
     auto deref = *any;
@@ -233,7 +233,7 @@ TEST_F(MetaDereference, AsRef) {
     entt::meta_any any{entt::forward_as_meta(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
     ASSERT_EQ(any.type(), entt::resolve<int *>());
 
     auto deref = *any;
@@ -255,7 +255,7 @@ TEST_F(MetaDereference, AsConstRef) {
     entt::meta_any any{entt::forward_as_meta(ptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
     ASSERT_EQ(any.type(), entt::resolve<int *>());
 
     auto deref = *any;
@@ -357,7 +357,7 @@ TEST_F(MetaDereference, PointerToVoid) {
     const entt::meta_any any{static_cast<void *>(nullptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
 
     auto deref = *any;
 
@@ -368,7 +368,7 @@ TEST_F(MetaDereference, PointerToConstVoid) {
     const entt::meta_any any{static_cast<const void *>(nullptr)};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE(any.type().is_pointer_like());
+    ASSERT_FALSE(any.type().is_pointer_like());
 
     auto deref = *any;
 
@@ -403,7 +403,7 @@ TEST_F(MetaDereference, PointerToFunction) {
     entt::meta_any any{&test_function};
 
     ASSERT_TRUE(any.type().is_pointer());
-    ASSERT_TRUE((*std::as_const(any)).type().is_pointer_like());
+    ASSERT_FALSE((*std::as_const(any)).type().is_pointer_like());
     ASSERT_NE((**any).try_cast<int (*)()>(), nullptr);
     ASSERT_EQ((***std::as_const(any)).cast<int (*)()>()(), 3);
 }
