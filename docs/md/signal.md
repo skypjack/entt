@@ -9,6 +9,7 @@
   * [Raw access](#raw-access)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
+  * [Connect, disconnect, publish](#connect-disconnect-publish)]
   * [Named queues](#named-queues)
 * [Event emitter](#event-emitter)
 
@@ -382,34 +383,45 @@ signal.collect(std::ref(collector));
 # Event dispatcher
 
 The event dispatcher class allows users to trigger immediate events or to queue
-and publish them all together later.<br/>
-This class lazily instantiates its queues. Therefore, it is not necessary to
-_announce_ the event types in advance:
+and publish them all together later:
 
 ```cpp
 // define a general purpose dispatcher
 entt::dispatcher dispatcher{};
 ```
 
-A listener registered with a dispatcher is such that its type offers one or more
-member functions that take arguments of type `Event &` for any type of event,
-regardless of the return value.<br/>
-These functions are linked directly via `connect` to a _sink_:
+This class lazily instantiates its queues. Therefore, it is not necessary to
+_announce_ the event types in advance.
+
+## Connect, disconnect, publish
+
+Listeners registered with a dispatcher are mainly of two types: free and member
+functions. Lambdas as template functions are also accepted and belong to the
+first group.<br/>
+In all cases, a listener accepts an argument of type `Event &` for any type
+of event, regardless of the return value.
+
+Listeners are linked directly via `connect` to a _sink_ object:
 
 ```cpp
 struct an_event { int value; };
 struct another_event {};
 
+void on_event(const an_event &event) { /* ... */ }
+
 struct listener {
-    void receive(const an_event &) { /* ... */ }
-    void method(const another_event &) { /* ... */ }
+    // Member function listener
+    void on_event(const another_event &) { /* ... */ }
 };
 
 // ...
 
+// free function listener
+dispatcher.sink<an_event>().connect<&on_event>();
+
 listener listener;
-dispatcher.sink<an_event>().connect<&listener::receive>(listener);
-dispatcher.sink<another_event>().connect<&listener::method>(listener);
+// member function listener
+dispatcher.sink<another_event>().connect<&listener::on_event>(listener);
 ```
 
 Note that connecting listeners within event handlers can result in undefined
@@ -418,7 +430,13 @@ The `disconnect` member function is used to remove one listener at a time or all
 of them at once:
 
 ```cpp
-dispatcher.sink<an_event>().disconnect<&listener::receive>(listener);
+// disconnects a free function
+dispatcher.sink<an_event>().disconnect<&on_event>();
+
+// disconnect a member function of an instance
+dispatcher.sink<another_event>().disconnect<&listener::on_event>(listener);
+
+// disconnect all member functions of an instance, if any
 dispatcher.sink<another_event>().disconnect(&listener);
 ```
 
