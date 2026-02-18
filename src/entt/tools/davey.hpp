@@ -131,6 +131,10 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             ImGui::Text("%s: %s", label, underlying_type.data());
         }
     }
+
+    for([[maybe_unused]] const auto [id, base]: obj.type().base()) {
+        present_element<Entity>(obj.allow_cast(base.type()), on_entity);
+    }
 }
 
 template<entity_like Entity, typename Allocator>
