@@ -5,7 +5,7 @@
 #include <ios>
 #include <sstream>
 #include <string>
-#include <imgui.h>
+#include "../config/config.h"
 #include "../entity/mixin.hpp"
 #include "../entity/registry.hpp"
 #include "../entity/sparse_set.hpp"
@@ -16,6 +16,10 @@
 #include "../meta/meta.hpp"
 #include "../meta/pointer.hpp"
 #include "../meta/resolve.hpp"
+
+#if __has_include(<imgui.h>)
+#    include <imgui.h>
+#endif
 
 namespace entt {
 
