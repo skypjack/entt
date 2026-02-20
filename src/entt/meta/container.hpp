@@ -4,6 +4,7 @@
 #define ENTT_META_CONTAINER_HPP
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <deque>
 #include <iterator>
@@ -47,16 +48,6 @@ struct key_only_associative_container<Type>: std::false_type {};
 
 template<typename Type>
 inline constexpr bool key_only_associative_container_v = key_only_associative_container<Type>::value;
-
-template<typename>
-struct reserve_aware_container: std::false_type {};
-
-template<typename Type>
-requires requires(Type cont) { cont.reserve(0u); }
-struct reserve_aware_container<Type>: std::true_type {};
-
-template<typename Type>
-inline constexpr bool reserve_aware_container_v = reserve_aware_container<Type>::value;
 
 } // namespace internal
 /*! @endcond */
@@ -105,7 +96,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(internal::reserve_aware_container_v<Type>) {
+        if constexpr(requires(Type elem) { { elem.reserve(sz) }; }) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
         } else {
@@ -223,7 +214,7 @@ struct basic_meta_associative_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(internal::reserve_aware_container_v<Type>) {
+        if constexpr(requires(Type elem) { { elem.reserve(sz) }; }) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
         } else {
