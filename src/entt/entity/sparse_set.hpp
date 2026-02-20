@@ -294,23 +294,11 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void pop_all() {
-        switch(mode) {
-        case deletion_policy::in_place:
-            if(head != max_size) {
-                for(auto &&elem: packed) {
-                    if(elem != tombstone) {
-                        sparse_ref(elem) = null;
-                    }
-                }
-                break;
+        // suboptimal with few entities, but exploits cache way more with many
+        for (auto&& elem : sparse) {
+            for (size_type pos{}; pos < traits_type::page_size; ++pos) {
+                elem[pos] = null;
             }
-            [[fallthrough]];
-        case deletion_policy::swap_only:
-        case deletion_policy::swap_and_pop:
-            for(auto &&elem: packed) {
-                sparse_ref(elem) = null;
-            }
-            break;
         }
 
         head = policy_to_head();
