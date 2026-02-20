@@ -55,7 +55,7 @@ function(SETUP_TARGET TARGET_NAME)
                     -Wno-exceptions
                     -Wconversion
                 >
-                /EHsc /wd4324 /wd4996
+                /EHsc /wd4324 /wd4996 /bigobj
                 # disabling INCREMENTAL is required by SizeBench
                 $<$<CONFIG:Debug>:/Od /INCREMENTAL:NO>
                 $<$<CONFIG:Release>:/O2>

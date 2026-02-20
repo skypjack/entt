@@ -34,3 +34,4 @@ TODO:
 * organizer: view/storage only based model, no registry
 * introduce a way to inject stl from outside too
 * redesign snapshot as a whole
+* stoage: trivial destructor on exit (ie shrink_to_size) and clear/pop_all
