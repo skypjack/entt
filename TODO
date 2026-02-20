@@ -33,5 +33,4 @@ TODO:
 * meta: conversion_helper machinery has lot of room for improvements
 * organizer: view/storage only based model, no registry
 * introduce a way to inject stl from outside too
-* export optional as meta_pointer like (or refine meta-pointer like detection)
 * redesign snapshot as a whole
