@@ -3,6 +3,8 @@
 #include <list>
 #include <map>
 #include <set>
+#include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 #include <gtest/gtest.h>
@@ -61,6 +63,26 @@ TEST(SequenceContainer, Iterator) {
 
     ASSERT_EQ((first--)->cast<int>(), 4);
     ASSERT_EQ((--first)->cast<int>(), 2);
+}
+
+TEST(SequenceContainer, StdString) {
+    std::string str{};
+    auto any = entt::forward_as_meta(str);
+    auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
+
+    ASSERT_FALSE(view);
+    ASSERT_FALSE(cview);
+}
+
+TEST(SequenceContainer, StdStringView) {
+    std::string_view str{};
+    auto any = entt::forward_as_meta(str);
+    auto view = any.as_sequence_container();
+    auto cview = std::as_const(any).as_sequence_container();
+
+    ASSERT_FALSE(view);
+    ASSERT_FALSE(cview);
 }
 
 TEST(SequenceContainer, StdVector) {

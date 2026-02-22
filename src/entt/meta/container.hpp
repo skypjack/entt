@@ -3,20 +3,11 @@
 #ifndef ENTT_META_CONTAINER_HPP
 #define ENTT_META_CONTAINER_HPP
 
-#include <array>
 #include <concepts>
 #include <cstddef>
-#include <deque>
 #include <iterator>
-#include <list>
-#include <map>
-#include <set>
 #include <type_traits>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include "../container/dense_map.hpp"
-#include "../container/dense_set.hpp"
+#include <utility>
 #include "../core/concepts.hpp"
 #include "../core/type_traits.hpp"
 #include "context.hpp"
@@ -39,15 +30,27 @@ struct sequence_container_extent<Type>: integral_constant<std::tuple_size_v<Type
 template<typename Type>
 inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
 
-template<typename>
-struct key_only_associative_container: std::true_type {};
+template<typename Type>
+concept meta_sequence_container_like = requires(Type elem) {
+    typename Type::value_type;
+    typename Type::iterator;
+    requires std::forward_iterator<typename Type::iterator>;
+    { elem.begin() } -> std::same_as<typename Type::iterator>;
+    { elem.end() } -> std::same_as<typename Type::iterator>;
+    requires !requires { typename Type::key_type; };
+    requires !requires { elem.substr(); };
+};
 
 template<typename Type>
-requires requires { typename Type::mapped_type; }
-struct key_only_associative_container<Type>: std::false_type {};
-
-template<typename Type>
-inline constexpr bool key_only_associative_container_v = key_only_associative_container<Type>::value;
+concept meta_associative_container_like = requires(Type value) {
+    typename Type::key_type;
+    typename Type::value_type;
+    typename Type::iterator;
+    requires std::forward_iterator<typename Type::iterator>;
+    { value.begin() } -> std::same_as<typename Type::iterator>;
+    { value.end() } -> std::same_as<typename Type::iterator>;
+    value.find(std::declval<typename Type::key_type>());
+};
 
 } // namespace internal
 /*! @endcond */
@@ -81,7 +84,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool clear([[maybe_unused]] void *container) {
-        if constexpr(extent == meta_dynamic_extent) {
+        if constexpr(requires(Type elem) { elem.clear(); }) {
             static_cast<Type *>(container)->clear();
             return true;
         } else {
@@ -96,7 +99,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(requires(Type elem) { { elem.reserve(sz) }; }) {
+        if constexpr(requires(Type elem) { elem.reserve(sz); }) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
         } else {
@@ -111,7 +114,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr((extent == meta_dynamic_extent) && std::is_default_constructible_v<typename Type::value_type>) {
+        if constexpr(std::is_default_constructible_v<typename Type::value_type> && requires(Type elem) { elem.resize(sz); }) {
             static_cast<Type *>(container)->resize(sz);
             return true;
         } else {
@@ -147,7 +150,7 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator to the inserted element.
      */
     [[nodiscard]] static iterator insert([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] const iterator &it) {
-        if constexpr(extent == meta_dynamic_extent) {
+        if constexpr(requires(Type elem, typename Type::const_iterator it, Type::value_type instance) { elem.insert(it, instance); }) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->insert(
                               non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
@@ -165,7 +168,7 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator following the last removed element.
      */
     [[nodiscard]] static iterator erase([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const iterator &it) {
-        if constexpr(extent == meta_dynamic_extent) {
+        if constexpr(requires(Type elem, typename Type::const_iterator it) { elem.erase(it); }) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()))};
         } else {
@@ -186,7 +189,7 @@ struct basic_meta_associative_container_traits {
     using iterator = meta_associative_container::iterator;
 
     /*! @brief True in case of key-only containers, false otherwise. */
-    static constexpr bool key_only = internal::key_only_associative_container_v<Type>;
+    static constexpr bool key_only = !requires { typename Type::mapped_type; };
 
     /**
      * @brief Returns the number of elements in a container.
@@ -214,7 +217,7 @@ struct basic_meta_associative_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool reserve([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(requires(Type elem) { { elem.reserve(sz) }; }) {
+        if constexpr(requires(Type elem) { elem.reserve(sz); }) {
             static_cast<Type *>(container)->reserve(sz);
             return true;
         } else {
@@ -277,87 +280,18 @@ struct basic_meta_associative_container_traits {
 };
 
 /**
- * @brief Meta sequence container traits for `std::vector`s of any type.
- * @tparam Args Template arguments for the container.
+ * @brief Traits meta sequence container like types.
+ * @tparam Type Container type to inspect.
  */
-template<typename... Args>
-struct meta_sequence_container_traits<std::vector<Args...>>
-    : basic_meta_sequence_container_traits<std::vector<Args...>> {};
+template<internal::meta_sequence_container_like Type>
+struct meta_sequence_container_traits<Type>: basic_meta_sequence_container_traits<Type> {};
 
 /**
- * @brief Meta sequence container traits for `std::array`s of any type.
- * @tparam Type Template arguments for the container.
- * @tparam N Template arguments for the container.
+ * @brief Traits for meta associative container like types.
+ * @tparam Type Container type to inspect.
  */
-template<typename Type, auto N>
-struct meta_sequence_container_traits<std::array<Type, N>>
-    : basic_meta_sequence_container_traits<std::array<Type, N>> {};
-
-/**
- * @brief Meta sequence container traits for `std::list`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_sequence_container_traits<std::list<Args...>>
-    : basic_meta_sequence_container_traits<std::list<Args...>> {};
-
-/**
- * @brief Meta sequence container traits for `std::deque`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_sequence_container_traits<std::deque<Args...>>
-    : basic_meta_sequence_container_traits<std::deque<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `std::map`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<std::map<Args...>>
-    : basic_meta_associative_container_traits<std::map<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `std::unordered_map`s of any
- * type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<std::unordered_map<Args...>>
-    : basic_meta_associative_container_traits<std::unordered_map<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `std::set`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<std::set<Args...>>
-    : basic_meta_associative_container_traits<std::set<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `std::unordered_set`s of any
- * type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<std::unordered_set<Args...>>
-    : basic_meta_associative_container_traits<std::unordered_set<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `dense_map`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<dense_map<Args...>>
-    : basic_meta_associative_container_traits<dense_map<Args...>> {};
-
-/**
- * @brief Meta associative container traits for `dense_set`s of any type.
- * @tparam Args Template arguments for the container.
- */
-template<typename... Args>
-struct meta_associative_container_traits<dense_set<Args...>>
-    : basic_meta_associative_container_traits<dense_set<Args...>> {};
+template<internal::meta_associative_container_like Type>
+struct meta_associative_container_traits<Type>: basic_meta_associative_container_traits<Type> {};
 
 } // namespace entt
 
