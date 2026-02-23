@@ -35,3 +35,5 @@ TODO:
 * introduce a way to inject stl from outside too
 * redesign snapshot as a whole
 * stoage: trivial destructor on exit (ie shrink_to_size) and clear/pop_all
+* use the value type mixin more in the test suite to reduce the number of utility types
+* explore "runtime" mode for hashed string where the source is copied internally
