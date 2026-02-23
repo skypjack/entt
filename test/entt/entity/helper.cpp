@@ -9,7 +9,7 @@
 #include <entt/entity/storage.hpp>
 #include <entt/entity/view.hpp>
 #include <entt/signal/sigh.hpp>
-#include "../../common/pointer_stable.h"
+#include "../../common/value_type.h"
 
 struct Invoke: testing::Test {
     struct clazz {

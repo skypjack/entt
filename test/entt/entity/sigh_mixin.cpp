@@ -14,10 +14,10 @@
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 #include "../../common/non_default_constructible.h"
-#include "../../common/pointer_stable.h"
 #include "../../common/registry.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
+#include "../../common/value_type.h"
 
 struct SighMixinBase: testing::Test {
     enum class my_entity : std::uint32_t {};

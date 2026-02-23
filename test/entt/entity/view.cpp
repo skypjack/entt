@@ -10,7 +10,7 @@
 #include <entt/entity/view.hpp>
 #include "../../common/boxed_type.h"
 #include "../../common/empty.h"
-#include "../../common/pointer_stable.h"
+#include "../../common/value_type.h"
 
 TEST(ViewSingleStorage, Functionalities) {
     entt::storage<char> storage{};

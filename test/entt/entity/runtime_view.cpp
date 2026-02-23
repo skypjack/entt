@@ -9,7 +9,7 @@
 #include <entt/entity/runtime_view.hpp>
 #include <entt/entity/storage.hpp>
 #include "../../common/linter.hpp"
-#include "../../common/pointer_stable.h"
+#include "../../common/value_type.h"
 
 template<typename Type>
 struct RuntimeView: testing::Test {

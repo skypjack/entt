@@ -16,11 +16,10 @@
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 #include "../../common/new_delete.h"
-#include "../../common/non_trivially_destructible.h"
-#include "../../common/pointer_stable.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
 #include "../../common/tracked_memory_resource.hpp"
+#include "../../common/value_type.h"
 
 struct StorageBase: testing::Test {
     enum class my_entity : std::uint32_t {};
@@ -87,7 +86,7 @@ struct Storage: StorageBase {
 template<typename Type>
 using StorageDeathTest = Storage<Type>;
 
-using StorageTypes = ::testing::Types<int, test::pointer_stable, test::non_trivially_destructible>;
+using StorageTypes = ::testing::Types<int, test::pointer_stable, test::non_trivially_destructible, test::pointer_stable_non_trivially_destructible>;
 
 TYPED_TEST_SUITE(Storage, StorageTypes, );
 TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );

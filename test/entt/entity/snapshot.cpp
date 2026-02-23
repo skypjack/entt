@@ -13,7 +13,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
 #include "../../common/empty.h"
-#include "../../common/pointer_stable.h"
+#include "../../common/value_type.h"
 
 struct SnapshotCommonBase: testing::Test {
     struct shadow {
