@@ -10,6 +10,7 @@
 #include <utility>
 #include "../core/concepts.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/iterator.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
 #include "meta.hpp"
@@ -34,7 +35,7 @@ template<typename Type>
 concept meta_sequence_container_like = requires(Type elem) {
     typename Type::value_type;
     typename Type::iterator;
-    requires std::forward_iterator<typename Type::iterator>;
+    requires entt::stl::forward_iterator<typename Type::iterator>;
     { elem.begin() } -> std::same_as<typename Type::iterator>;
     { elem.end() } -> std::same_as<typename Type::iterator>;
     requires !requires { typename Type::key_type; };
@@ -46,7 +47,7 @@ concept meta_associative_container_like = requires(Type value) {
     typename Type::key_type;
     typename Type::value_type;
     typename Type::iterator;
-    requires std::forward_iterator<typename Type::iterator>;
+    requires entt::stl::forward_iterator<typename Type::iterator>;
     { value.begin() } -> std::same_as<typename Type::iterator>;
     { value.end() } -> std::same_as<typename Type::iterator>;
     value.find(std::declval<typename Type::key_type>());
