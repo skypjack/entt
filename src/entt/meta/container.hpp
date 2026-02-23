@@ -60,8 +60,7 @@ concept meta_associative_container_like = requires(Type value) {
  * @tparam Type Type of underlying sequence container.
  */
 template<cvref_unqualified Type>
-requires internal::meta_sequence_container_like<Type>
-struct meta_sequence_container_traits<Type> {
+struct basic_meta_sequence_container_traits {
     /*! @brief Unsigned integer type. */
     using size_type = meta_sequence_container::size_type;
     /*! @brief Meta iterator type. */
@@ -183,8 +182,7 @@ struct meta_sequence_container_traits<Type> {
  * @tparam Type Type of underlying associative container.
  */
 template<cvref_unqualified Type>
-requires internal::meta_associative_container_like<Type>
-struct meta_associative_container_traits<Type> {
+struct basic_meta_associative_container_traits {
     /*! @brief Unsigned integer type. */
     using size_type = meta_associative_container::size_type;
     /*! @brief Meta iterator type. */
@@ -280,6 +278,20 @@ struct meta_associative_container_traits<Type> {
                                       : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(*static_cast<const Type::key_type *>(key))};
     }
 };
+
+/**
+ * @brief Traits meta sequence container like types.
+ * @tparam Type Container type to inspect.
+ */
+template<internal::meta_sequence_container_like Type>
+struct meta_sequence_container_traits<Type>: basic_meta_sequence_container_traits<Type> {};
+
+/**
+ * @brief Traits for meta associative container like types.
+ * @tparam Type Container type to inspect.
+ */
+template<internal::meta_associative_container_like Type>
+struct meta_associative_container_traits<Type>: basic_meta_associative_container_traits<Type> {};
 
 } // namespace entt
 
