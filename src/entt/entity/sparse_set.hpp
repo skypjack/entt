@@ -294,10 +294,12 @@ protected:
 
     /*! @brief Erases all entities of a sparse set. */
     virtual void pop_all() {
-        // suboptimal with few entities, but exploits cache way more with many
-        for (auto&& elem : sparse) {
-            for (size_type pos{}; pos < traits_type::page_size; ++pos) {
-                elem[pos] = null;
+        if(!packed.empty()) {
+            // suboptimal with few entities, but exploits cache way more with many
+            for(auto &&elem: sparse) {
+                for(size_type pos{}; pos < traits_type::page_size; ++pos) {
+                    elem[pos] = null;
+                }
             }
         }
 
