@@ -236,6 +236,21 @@ TEST_F(MetaDereference, Optional) {
     ASSERT_EQ(*value, 3);
 }
 
+TEST_F(MetaDereference, OptionalConstCorrectness) {
+    auto value = std::optional<int>(0);
+    entt::meta_any any{entt::forward_as_meta(value)};
+
+    auto ref = any.as_ref();
+    auto cref = std::as_const(any).as_ref();
+    auto cderef = *std::as_const(any);
+    auto deref = *any;
+
+    ASSERT_EQ((*ref).base().policy(), entt::any_policy::ref);
+    ASSERT_EQ((*cref).base().policy(), entt::any_policy::cref);
+    ASSERT_EQ(cderef.base().policy(), entt::any_policy::cref);
+    ASSERT_EQ(deref.base().policy(), entt::any_policy::ref);
+}
+
 TEST_F(MetaDereference, EmptyOptional) {
     auto value = std::optional<int>();
     entt::meta_any any{entt::forward_as_meta(value)};
