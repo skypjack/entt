@@ -336,17 +336,21 @@ protected:
 
     /*! @brief Erases all entities of a storage. */
     void pop_all() override {
-        allocator_type allocator{get_allocator()};
+        if constexpr(std::is_trivially_destructible_v<element_type>) {
+            base_type::pop_all();
+        } else {
+            allocator_type allocator{get_allocator()};
 
-        for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
-            if constexpr(traits_type::in_place_delete) {
-                if(*first != tombstone) {
-                    base_type::in_place_pop(first);
+            for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
+                if constexpr(traits_type::in_place_delete) {
+                    if(*first != tombstone) {
+                        base_type::in_place_pop(first);
+                        alloc_traits::destroy(allocator, std::addressof(element_at(static_cast<size_type>(first.index()))));
+                    }
+                } else {
+                    base_type::swap_and_pop(first);
                     alloc_traits::destroy(allocator, std::addressof(element_at(static_cast<size_type>(first.index()))));
                 }
-            } else {
-                base_type::swap_and_pop(first);
-                alloc_traits::destroy(allocator, std::addressof(element_at(static_cast<size_type>(first.index()))));
             }
         }
     }
