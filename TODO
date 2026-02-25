@@ -34,6 +34,9 @@ TODO:
 * organizer: view/storage only based model, no registry
 * introduce a way to inject stl from outside too
 * redesign snapshot as a whole
-* stoage: trivial destructor on exit (ie shrink_to_size) and clear/pop_all
+* storage: trivial destructor on exit (ie shrink_to_size) and clear/pop_all
 * use the value type mixin more in the test suite to reduce the number of utility types
 * explore "runtime" mode for hashed string where the source is copied internally
+* swap_only/swap_and_pop/in_place_pop can (should?) accept the entity
+* we can likely improve storage::pop for trivially destructible non in_place_delete types
+* test trivially_destructible optimization
