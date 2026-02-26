@@ -326,6 +326,9 @@ protected:
             if constexpr(traits_type::in_place_delete) {
                 base_type::in_place_pop(first);
                 alloc_traits::destroy(allocator, std::addressof(elem));
+            } else if constexpr(std::is_trivially_destructible_v<element_type>) {
+                elem = std::move(element_at(base_type::size() - 1u));
+                base_type::swap_and_pop(first);
             } else {
                 auto &other = element_at(base_type::size() - 1u);
                 // destroying on exit allows reentrant destructors

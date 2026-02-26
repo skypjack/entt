@@ -16,6 +16,8 @@ struct throwing_type {
         }
     }
 
+    ~throwing_type() { /* make it non trivially destructible */ }
+
     throwing_type &operator=(const throwing_type &other) {
         trigger = other.trigger;
         return *this;
