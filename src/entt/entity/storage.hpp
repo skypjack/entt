@@ -261,13 +261,15 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
         allocator_type allocator{get_allocator()};
 
-        for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
-            if constexpr(traits_type::in_place_delete) {
-                if(base_type::data()[pos] != tombstone) {
+        if constexpr(!std::is_trivially_destructible_v<element_type>) {
+            for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
+                if constexpr(traits_type::in_place_delete) {
+                    if(base_type::data()[pos] != tombstone) {
+                        alloc_traits::destroy(allocator, std::addressof(element_at(pos)));
+                    }
+                } else {
                     alloc_traits::destroy(allocator, std::addressof(element_at(pos)));
                 }
-            } else {
-                alloc_traits::destroy(allocator, std::addressof(element_at(pos)));
             }
         }
 
