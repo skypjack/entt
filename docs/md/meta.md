@@ -335,31 +335,27 @@ Moreover, _containers_ does not necessarily mean those offered by the C++
 standard library. In fact, user defined data structures can also work with the
 meta system in many cases.
 
-To make a container be recognized as such by the meta system, users are required
-to provide specializations for either the `meta_sequence_container_traits` class
-or the `meta_associative_container_traits` class, according to the actual _type_
-of the container.<br/>
-`EnTT` already exports the specializations for some common classes. In
-particular:
+Containers are automatically _detected_ based on some common _traits_.<br/>
+For example, and not limited to, a sequence container must have a `begin`/`end`
+pair that returns a forward iterator, while an associative container must also
+provide a `key_type` member and a `find` function.<br/>
+If a container is not recognized as such, it is still possible to provide an
+_adapter_ by specializing the template classes `meta_sequence_container_traits`
+and `meta_associative_container_traits`. Similarly, users can _inhibit_ the
+detection of a type as a meta container by specializing the right traits class
+but without providing any definition.
 
-* `std::vector`, `std::array`, `std::deque` and `std::list` (but not
-  `std::forward_list`) are supported as _sequence containers_.
-
-* `std::map`, `std::set` and their unordered counterparts are supported as
-  _associative containers_.
-
-It is important to include the header file `container.hpp` to make these
-specializations available to the compiler when needed.<br/>
-The same file also contains many examples for the users that are interested in
+Standard library containers are generally exported as meta containers out of the
+box (with the exception of `std::string`, which is not considered a sequence
+container on purpose).<br/>
+However, it is important to include the header file `container.hpp` to make
+the right specializations available to the compiler when needed.<br/>
+The same file also contains some examples for the users that are interested in
 making their own containers available to the meta system.
 
-When a specialization of the `meta_sequence_container_traits` class exists, the
-meta system treats the wrapped type as a sequence container. In a similar way,
-a type is treated as an associative container if a specialization of the
-`meta_associative_container_traits` class is found for it.<br/>
-Proxy objects are returned by dedicated members of the `meta_any` class. The
-following is a deliberately verbose example of how users can access a proxy
-object for a sequence container:
+For meta containers, the `meta_any` class returns properly initialized proxy
+objects for ease of use. The following is a deliberately verbose example of how
+users can access a proxy object for a sequence container:
 
 ```cpp
 std::vector<int> vec{1, 2, 3};
@@ -372,7 +368,7 @@ if(any.type().is_sequence_container()) {
 }
 ```
 
-The method to use to get a proxy object for associative containers is
+Proxy object for associative containers are accessed in the same way by calling
 `as_associative_container` instead.<br/>
 It is not necessary to perform a double check actually. Instead, it is enough to
 query the meta type or verify that the proxy object is valid. In fact, proxies
