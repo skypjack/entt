@@ -6,22 +6,32 @@
 
 namespace test {
 
-template<typename... Type>
-struct pointer_stable_mixin: Type... {
+namespace internal {
+
+template<typename Type>
+struct pointer_stable_mixin: Type {
     static constexpr auto in_place_delete = true;
-    [[nodiscard]] constexpr bool operator==(const pointer_stable_mixin &) const noexcept = default;
-    [[nodiscard]] constexpr auto operator<=>(const pointer_stable_mixin &) const noexcept = default;
+    using Type::Type;
+    using Type::operator=;
 };
 
-template<typename... Type>
-struct non_trivially_destructible_mixin: Type... {
-    [[nodiscard]] constexpr bool operator==(const non_trivially_destructible_mixin &) const noexcept = default;
-    [[nodiscard]] constexpr auto operator<=>(const non_trivially_destructible_mixin &) const noexcept = default;
+template<typename Type>
+struct non_trivially_destructible_mixin: Type {
+    using Type::Type;
+    using Type::operator=;
     virtual ~non_trivially_destructible_mixin() = default;
 };
 
-template<typename... Type>
-struct value_type final: Type... {
+template<typename Type>
+struct non_movable_mixin: Type {
+    using Type::Type;
+    non_movable_mixin(non_movable_mixin &&) = delete;
+    non_movable_mixin(const non_movable_mixin &) = default;
+    non_movable_mixin &operator=(non_movable_mixin &&) = delete;
+    non_movable_mixin &operator=(const non_movable_mixin &) = default;
+};
+
+struct value_type {
     constexpr value_type() = default;
     constexpr value_type(int elem): value{elem} {}
     [[nodiscard]] constexpr bool operator==(const value_type &) const noexcept = default;
@@ -29,13 +39,17 @@ struct value_type final: Type... {
     int value{};
 };
 
-using pointer_stable = value_type<pointer_stable_mixin<>>;
-using non_trivially_destructible = value_type<non_trivially_destructible_mixin<>>;
-using pointer_stable_non_trivially_destructible = value_type<pointer_stable_mixin<non_trivially_destructible_mixin<>>>;
+} // namespace internal
+
+using pointer_stable = internal::pointer_stable_mixin<internal::value_type>;
+using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type>;
+using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<internal::value_type>>;
+using non_movable = internal::non_movable_mixin<internal::value_type>;
 
 static_assert(std::is_trivially_destructible_v<test::pointer_stable>, "Not a trivially destructible type");
 static_assert(!std::is_trivially_destructible_v<test::non_trivially_destructible>, "Trivially destructible type");
 static_assert(!std::is_trivially_destructible_v<test::pointer_stable_non_trivially_destructible>, "Trivially destructible type");
+static_assert(!std::is_move_constructible_v<test::non_movable> && !std::is_move_assignable_v<test::non_movable>, "Movable type");
 
 } // namespace test
 
