@@ -230,25 +230,25 @@ protected:
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param it An iterator to the element to pop.
+     * @param entt A valid identifier for the element to pop.
      */
-    void swap_only(const basic_iterator it) {
+    void swap_only(const Entity entt) {
         ENTT_ASSERT(mode == deletion_policy::swap_only, "Deletion policy mismatch");
-        const auto pos = index(*it);
-        bump(traits_type::next(*it));
+        const auto pos = index(entt);
+        bump(traits_type::next(entt));
         swap_at(pos, head -= (pos < head));
     }
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param it An iterator to the element to pop.
+     * @param entt A valid identifier for the element to pop.
      */
-    void swap_and_pop(const basic_iterator it) {
+    void swap_and_pop(const Entity entt) {
         ENTT_ASSERT(mode == deletion_policy::swap_and_pop, "Deletion policy mismatch");
-        auto &self = sparse_ref(*it);
-        const auto entt = traits_type::to_entity(self);
-        sparse_ref(packed.back()) = traits_type::combine(entt, traits_type::to_integral(packed.back()));
-        packed[static_cast<size_type>(entt)] = packed.back();
+        auto &self = sparse_ref(entt);
+        const auto pos = traits_type::to_entity(self);
+        sparse_ref(packed.back()) = traits_type::combine(pos, traits_type::to_integral(packed.back()));
+        packed[static_cast<size_type>(pos)] = packed.back();
         // unnecessary but it helps to detect nasty bugs
         // NOLINTNEXTLINE(bugprone-assert-side-effect)
         ENTT_ASSERT((packed.back() = null, true), "");
@@ -259,11 +259,11 @@ protected:
 
     /**
      * @brief Erases an entity from a sparse set.
-     * @param it An iterator to the element to pop.
+     * @param entt A valid identifier for the element to pop.
      */
-    void in_place_pop(const basic_iterator it) {
+    void in_place_pop(const Entity entt) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
-        const auto pos = entity_to_pos(std::exchange(sparse_ref(*it), null));
+        const auto pos = entity_to_pos(std::exchange(sparse_ref(entt), null));
         packed[pos] = traits_type::combine(static_cast<traits_type::entity_type>(std::exchange(head, pos)), tombstone);
     }
 
@@ -276,17 +276,17 @@ protected:
         switch(mode) {
         case deletion_policy::swap_and_pop:
             for(; first != last; ++first) {
-                swap_and_pop(first);
+                swap_and_pop(*first);
             }
             break;
         case deletion_policy::in_place:
             for(; first != last; ++first) {
-                in_place_pop(first);
+                in_place_pop(*first);
             }
             break;
         case deletion_policy::swap_only:
             for(; first != last; ++first) {
-                swap_only(first);
+                swap_only(*first);
             }
             break;
         }
