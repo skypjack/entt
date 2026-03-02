@@ -16,6 +16,13 @@ struct pointer_stable_mixin: Type {
 };
 
 template<typename Type>
+struct non_default_constructible_mixin: Type {
+    using Type::Type;
+    using Type::operator=;
+    non_default_constructible_mixin() = delete;
+};
+
+template<typename Type>
 struct non_trivially_destructible_mixin: Type {
     using Type::Type;
     using Type::operator=;
@@ -49,6 +56,7 @@ struct value_type {
 } // namespace internal
 
 using pointer_stable = internal::pointer_stable_mixin<internal::value_type>;
+using non_default_constructible = internal::non_default_constructible_mixin<internal::value_type>;
 using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type>;
 using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<internal::value_type>>;
 using non_comparable = internal::non_comparable_mixin<internal::value_type>;

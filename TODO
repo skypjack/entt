@@ -34,7 +34,6 @@ TODO:
 * organizer: view/storage only based model, no registry
 * introduce a way to inject stl from outside too
 * redesign snapshot as a whole
-* use the value type mixin more in the test suite to reduce the number of utility types
 * explore "runtime" mode for hashed string where the source is copied internally
 * storage: shrink_to_fit does not work with reentrant destructor?
 * test trivially_destructible optimization

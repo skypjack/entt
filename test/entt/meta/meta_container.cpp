@@ -15,7 +15,7 @@
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
 #include "../../common/empty.h"
-#include "../../common/non_default_constructible.h"
+#include "../../common/value_type.h"
 
 TEST(MetaContainer, Invalid) {
     ASSERT_FALSE(entt::meta_any{0}.as_sequence_container());

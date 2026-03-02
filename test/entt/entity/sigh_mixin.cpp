@@ -13,7 +13,6 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
-#include "../../common/non_default_constructible.h"
 #include "../../common/registry.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"

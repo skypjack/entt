@@ -23,7 +23,6 @@
 #include "../../common/config.h"
 #include "../../common/empty.h"
 #include "../../common/mixin.hpp"
-#include "../../common/non_default_constructible.h"
 #include "../../common/value_type.h"
 
 struct Registry: testing::Test {
