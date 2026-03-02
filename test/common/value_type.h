@@ -45,7 +45,7 @@ struct non_movable_mixin: Type {
     non_movable_mixin &operator=(const non_movable_mixin &) noexcept = default;
 };
 
-struct empty_mixin {};
+struct empty_type {};
 
 struct value_type {
     constexpr value_type() = default;
@@ -61,7 +61,7 @@ using pointer_stable = internal::pointer_stable_mixin<internal::value_type>;
 using non_default_constructible = internal::non_default_constructible_mixin<internal::value_type>;
 using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type>;
 using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<internal::value_type>>;
-using non_comparable = internal::non_comparable_mixin<internal::empty_mixin>;
+using non_comparable = internal::non_comparable_mixin<internal::empty_type>;
 using non_movable = internal::non_movable_mixin<internal::value_type>;
 
 static_assert(std::is_trivially_destructible_v<test::pointer_stable>, "Not a trivially destructible type");
