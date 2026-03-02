@@ -14,7 +14,7 @@
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
-#include "../../common/non_comparable.h"
+#include "../../common/value_type.h"
 
 struct MetaAny: ::testing::Test {
     struct clazz {

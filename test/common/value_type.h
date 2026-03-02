@@ -19,16 +19,23 @@ template<typename Type>
 struct non_trivially_destructible_mixin: Type {
     using Type::Type;
     using Type::operator=;
-    virtual ~non_trivially_destructible_mixin() = default;
+    virtual ~non_trivially_destructible_mixin() noexcept = default;
+};
+
+template<typename Type>
+struct non_comparable_mixin: Type {
+    using Type::Type;
+    using Type::operator=;
+    bool operator==(const non_comparable_mixin &) const noexcept = delete;
 };
 
 template<typename Type>
 struct non_movable_mixin: Type {
     using Type::Type;
-    non_movable_mixin(non_movable_mixin &&) = delete;
-    non_movable_mixin(const non_movable_mixin &) = default;
-    non_movable_mixin &operator=(non_movable_mixin &&) = delete;
-    non_movable_mixin &operator=(const non_movable_mixin &) = default;
+    non_movable_mixin(non_movable_mixin &&) noexcept = delete;
+    non_movable_mixin(const non_movable_mixin &) noexcept = default;
+    non_movable_mixin &operator=(non_movable_mixin &&) noexcept = delete;
+    non_movable_mixin &operator=(const non_movable_mixin &) noexcept = default;
 };
 
 struct value_type {
@@ -44,6 +51,7 @@ struct value_type {
 using pointer_stable = internal::pointer_stable_mixin<internal::value_type>;
 using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type>;
 using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<internal::value_type>>;
+using non_comparable = internal::non_comparable_mixin<internal::value_type>;
 using non_movable = internal::non_movable_mixin<internal::value_type>;
 
 static_assert(std::is_trivially_destructible_v<test::pointer_stable>, "Not a trivially destructible type");

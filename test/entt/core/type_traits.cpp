@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
-#include "../../common/non_comparable.h"
+#include "../../common/value_type.h"
 
 struct nlohmann_json_like final {
     using value_type = nlohmann_json_like;
