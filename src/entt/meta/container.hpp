@@ -151,7 +151,7 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator to the inserted element.
      */
     [[nodiscard]] static iterator insert([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const void *value, [[maybe_unused]] const void *cref, [[maybe_unused]] const iterator &it) {
-        if constexpr(requires(Type elem, typename Type::const_iterator it, Type::value_type instance) { elem.insert(it, instance); }) {
+        if constexpr(requires(Type elem, typename Type::const_iterator iter, Type::value_type instance) { elem.insert(iter, instance); }) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->insert(
                               non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
@@ -169,7 +169,7 @@ struct basic_meta_sequence_container_traits {
      * @return A possibly invalid iterator following the last removed element.
      */
     [[nodiscard]] static iterator erase([[maybe_unused]] const meta_ctx &area, [[maybe_unused]] void *container, [[maybe_unused]] const iterator &it) {
-        if constexpr(requires(Type elem, typename Type::const_iterator it) { elem.erase(it); }) {
+        if constexpr(requires(Type elem, typename Type::const_iterator iter) { elem.erase(iter); }) {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->erase(non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()))};
         } else {
