@@ -14,7 +14,6 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../../common/config.h"
-#include "../../common/empty.h"
 #include "../../common/value_type.h"
 
 TEST(MetaContainer, Invalid) {

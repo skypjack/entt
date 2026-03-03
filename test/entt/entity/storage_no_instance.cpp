@@ -12,8 +12,8 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
 #include "../../common/config.h"
-#include "../../common/empty.h"
 #include "../../common/linter.hpp"
+#include "../../common/value_type.h"
 
 template<typename Type>
 struct StorageNoInstance: testing::Test {

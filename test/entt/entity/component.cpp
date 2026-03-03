@@ -3,7 +3,6 @@
 #include <entt/config/config.h>
 #include <entt/entity/component.hpp>
 #include "../../common/boxed_type.h"
-#include "../../common/empty.h"
 #include "../../common/value_type.h"
 
 struct ComponentBase: testing::Test {

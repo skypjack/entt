@@ -6,7 +6,6 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/compressed_pair.hpp>
-#include "../../common/empty.h"
 #include "../../common/value_type.h"
 
 TEST(CompressedPair, Size) {

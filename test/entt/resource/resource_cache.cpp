@@ -9,9 +9,9 @@
 #include <entt/resource/cache.hpp>
 #include <entt/resource/loader.hpp>
 #include <entt/resource/resource.hpp>
-#include "../../common/empty.h"
 #include "../../common/linter.hpp"
 #include "../../common/throwing_allocator.hpp"
+#include "../../common/value_type.h"
 
 template<typename Type>
 struct loader {

@@ -13,10 +13,10 @@
 #include <entt/entity/storage.hpp>
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
-#include "../../common/empty.h"
 #include "../../common/linter.hpp"
 #include "../../common/registry.h"
 #include "../../common/throwing_allocator.hpp"
+#include "../../common/value_type.h"
 
 struct ReactiveMixinBase: testing::Test {
     enum class my_entity : std::uint32_t {};

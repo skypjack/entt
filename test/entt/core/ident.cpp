@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/ident.hpp>
 #include "../../common/boxed_type.h"
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 TEST(Ident, Uniqueness) {
     using id = entt::ident<test::empty, test::boxed_int>;

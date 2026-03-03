@@ -64,6 +64,9 @@ using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin
 using non_comparable = internal::non_comparable_mixin<internal::empty_type>;
 using non_movable = internal::non_movable_mixin<internal::value_type>;
 
+using empty = internal::empty_type;
+struct other_empty: internal::empty_type {};
+
 static_assert(std::is_trivially_destructible_v<test::pointer_stable>, "Not a trivially destructible type");
 static_assert(!std::is_trivially_destructible_v<test::non_trivially_destructible>, "Trivially destructible type");
 static_assert(!std::is_trivially_destructible_v<test::pointer_stable_non_trivially_destructible>, "Trivially destructible type");

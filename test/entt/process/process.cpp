@@ -2,7 +2,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 template<typename Delta>
 class test_process: public entt::basic_process<Delta> {

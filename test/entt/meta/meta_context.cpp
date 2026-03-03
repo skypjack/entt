@@ -12,7 +12,7 @@
 #include <entt/meta/pointer.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/template.hpp>
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 class MetaContext: public ::testing::Test {
     static void init_global_context() {

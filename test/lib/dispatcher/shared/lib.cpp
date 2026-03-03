@@ -1,7 +1,7 @@
 #include <entt/config/config.h>
 #include <entt/signal/dispatcher.hpp>
 #include "../../../common/boxed_type.h"
-#include "../../../common/empty.h"
+#include "../../../common/value_type.h"
 #include "lib.h"
 
 ENTT_API void trigger(entt::dispatcher &dispatcher) {

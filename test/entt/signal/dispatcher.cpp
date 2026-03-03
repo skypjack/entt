@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 // makes the type non-aggregate
 struct non_aggregate {

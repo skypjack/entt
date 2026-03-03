@@ -5,8 +5,8 @@
 #include <entt/signal/emitter.hpp>
 #include "../../common/boxed_type.h"
 #include "../../common/emitter.h"
-#include "../../common/empty.h"
 #include "../../common/linter.hpp"
+#include "../../common/value_type.h"
 
 TEST(Emitter, Move) {
     test::emitter emitter{};

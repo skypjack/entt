@@ -13,7 +13,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/boxed_type.h"
 #include "../../common/config.h"
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 TEST(GroupNonOwning, Functionalities) {
     entt::registry registry;

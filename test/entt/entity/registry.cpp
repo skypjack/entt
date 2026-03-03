@@ -21,7 +21,6 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/aggregate.h"
 #include "../../common/config.h"
-#include "../../common/empty.h"
 #include "../../common/mixin.hpp"
 #include "../../common/value_type.h"
 

@@ -8,7 +8,7 @@
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/utility.hpp>
 #include "../../common/config.h"
-#include "../../common/empty.h"
+#include "../../common/value_type.h"
 
 struct MetaUtility: ::testing::Test {
     struct clazz {

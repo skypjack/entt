@@ -12,7 +12,6 @@
 #include <entt/entity/snapshot.hpp>
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
-#include "../../common/empty.h"
 #include "../../common/value_type.h"
 
 struct SnapshotCommonBase: testing::Test {

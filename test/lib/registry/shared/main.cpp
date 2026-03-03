@@ -5,7 +5,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 #include "../../../common/boxed_type.h"
-#include "../../../common/empty.h"
+#include "../../../common/value_type.h"
 #include "lib.h"
 
 TEST(Registry, Shared) {

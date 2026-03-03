@@ -5,7 +5,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include "../../../common/boxed_type.h"
-#include "../../../common/empty.h"
+#include "../../../common/value_type.h"
 #include "lib.h"
 
 namespace {
