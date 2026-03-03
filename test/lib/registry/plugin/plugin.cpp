@@ -2,7 +2,6 @@
 #include <entt/entity/mixin.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
-#include "../../../common/boxed_type.h"
 #include "../../../common/value_type.h"
 
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {

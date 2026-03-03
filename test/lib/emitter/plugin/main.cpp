@@ -3,8 +3,8 @@
 #include <functional>
 #include <gtest/gtest.h>
 #include <cr.h>
-#include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
+#include "../../../common/value_type.h"
 
 TEST(Emitter, Plugin) {
     test::emitter emitter;

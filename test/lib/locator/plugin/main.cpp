@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <cr.h>
 #include <entt/locator/locator.hpp>
-#include "../../../common/boxed_type.h"
+#include "../../../common/value_type.h"
 #include "userdata.h"
 
 TEST(Locator, Plugin) {

@@ -1,5 +1,4 @@
 #include <cr.h>
-#include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
 #include "../../../common/value_type.h"
 

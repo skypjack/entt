@@ -1,8 +1,8 @@
 #include <functional>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
-#include "../../../common/boxed_type.h"
 #include "../../../common/emitter.h"
+#include "../../../common/value_type.h"
 #include "lib.h"
 
 TEST(Emitter, Shared) {

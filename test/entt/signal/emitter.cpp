@@ -3,7 +3,6 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/signal/emitter.hpp>
-#include "../../common/boxed_type.h"
 #include "../../common/emitter.h"
 #include "../../common/linter.hpp"
 #include "../../common/value_type.h"

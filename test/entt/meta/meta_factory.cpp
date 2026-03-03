@@ -9,9 +9,9 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
-#include "../../common/boxed_type.h"
 #include "../../common/config.h"
 #include "../../common/meta_traits.h"
+#include "../../common/value_type.h"
 
 struct MetaFactory: ::testing::Test {
     struct base {

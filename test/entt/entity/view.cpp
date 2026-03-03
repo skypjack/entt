@@ -8,7 +8,6 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
 #include <entt/entity/view.hpp>
-#include "../../common/boxed_type.h"
 #include "../../common/value_type.h"
 
 TEST(ViewSingleStorage, Functionalities) {

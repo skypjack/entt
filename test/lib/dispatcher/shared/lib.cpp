@@ -1,6 +1,5 @@
 #include <entt/config/config.h>
 #include <entt/signal/dispatcher.hpp>
-#include "../../../common/boxed_type.h"
 #include "../../../common/value_type.h"
 #include "lib.h"
 

@@ -3,7 +3,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/iterator.hpp>
-#include "../../common/boxed_type.h"
+#include "../../common/value_type.h"
 
 TEST(Iterator, InputIteratorPointer) {
     entt::input_iterator_pointer ptr{test::boxed_int{0}};

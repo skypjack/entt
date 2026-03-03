@@ -3,8 +3,8 @@
 #include <entt/core/utility.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <entt/signal/sigh.hpp>
-#include "../../../common/boxed_type.h"
 #include "../../../common/listener.h"
+#include "../../../common/value_type.h"
 #include "lib.h"
 
 TEST(Dispatcher, Shared) {
