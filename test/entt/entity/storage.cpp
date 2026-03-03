@@ -14,7 +14,6 @@
 #include <entt/entity/storage.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
-#include "../../common/new_delete.h"
 #include "../../common/throwing_allocator.hpp"
 #include "../../common/throwing_type.hpp"
 #include "../../common/tracked_memory_resource.hpp"

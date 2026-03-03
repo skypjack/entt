@@ -45,6 +45,17 @@ struct non_movable_mixin: Type {
     non_movable_mixin &operator=(const non_movable_mixin &) noexcept = default;
 };
 
+template<typename Type>
+struct new_delete_mixin: Type {
+    static void *operator new(std::size_t count) {
+        return ::operator new(count);
+    }
+
+    static void operator delete(void *ptr) {
+        ::operator delete(ptr);
+    }
+};
+
 struct empty_type {};
 
 struct aggregate_type {
@@ -74,6 +85,8 @@ using non_default_constructible = internal::non_default_constructible_mixin<inte
 using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type<int>>;
 using non_comparable = internal::non_comparable_mixin<internal::empty_type>;
 using non_movable = internal::non_movable_mixin<internal::value_type<int>>;
+
+using new_delete = internal::new_delete_mixin<internal::value_type<int>>;
 
 using boxed_int = internal::value_type<int>;
 using boxed_char = internal::value_type<char>;
