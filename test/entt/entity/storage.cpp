@@ -12,7 +12,6 @@
 #include <entt/entity/component.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/storage.hpp>
-#include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 #include "../../common/new_delete.h"

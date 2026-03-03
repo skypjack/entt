@@ -19,7 +19,6 @@
 #include <entt/entity/storage.hpp>
 #include <entt/entity/view.hpp>
 #include <entt/signal/sigh.hpp>
-#include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/mixin.hpp"
 #include "../../common/value_type.h"

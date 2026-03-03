@@ -47,13 +47,21 @@ struct non_movable_mixin: Type {
 
 struct empty_type {};
 
+struct aggregate_type {
+    [[nodiscard]] constexpr bool operator==(const aggregate_type &) const noexcept = default;
+    [[nodiscard]] constexpr auto operator<=>(const aggregate_type &) const noexcept = default;
+    int value{};
+};
+
 template<typename Type>
 struct value_type {
     constexpr value_type() = default;
     constexpr value_type(Type elem): value{elem} {}
     [[nodiscard]] constexpr bool operator==(const value_type &) const noexcept = default;
     [[nodiscard]] constexpr auto operator<=>(const value_type &) const noexcept = default;
-    operator Type() const noexcept { return value; }
+    operator Type() const noexcept {
+        return value;
+    }
     Type value{};
 };
 
@@ -73,10 +81,13 @@ using boxed_char = internal::value_type<char>;
 using empty = internal::empty_type;
 struct other_empty: internal::empty_type {};
 
-static_assert(std::is_trivially_destructible_v<test::pointer_stable>, "Not a trivially destructible type");
-static_assert(!std::is_trivially_destructible_v<test::non_trivially_destructible>, "Trivially destructible type");
-static_assert(!std::is_trivially_destructible_v<test::pointer_stable_non_trivially_destructible>, "Trivially destructible type");
-static_assert(!std::is_move_constructible_v<test::non_movable> && !std::is_move_assignable_v<test::non_movable>, "Movable type");
+using aggregate = internal::aggregate_type;
+
+static_assert(std::is_trivially_destructible_v<pointer_stable>, "Not a trivially destructible type");
+static_assert(!std::is_trivially_destructible_v<non_trivially_destructible>, "Trivially destructible type");
+static_assert(!std::is_trivially_destructible_v<pointer_stable_non_trivially_destructible>, "Trivially destructible type");
+static_assert(!std::is_move_constructible_v<non_movable> && !std::is_move_assignable_v<non_movable>, "Movable type");
+static_assert(std::is_aggregate_v<aggregate>, "Not an aggregate type");
 
 } // namespace test
 

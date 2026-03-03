@@ -9,7 +9,6 @@
 #include <gtest/gtest.h>
 #include <entt/core/any.hpp>
 #include <entt/core/type_info.hpp>
-#include "../../common/aggregate.h"
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 #include "../../common/new_delete.h"
