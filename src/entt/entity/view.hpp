@@ -53,7 +53,7 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
     elem.pools = {view.template storage<GLhs>()..., other.template storage<GRhs>()...};
-    auto filter_or_placeholder = [placeholder = elem.placeholder](auto *value) { return (value == nullptr) ? placeholder : value; };
+    [[maybe_unused]] const auto filter_or_placeholder = [placeholder = elem.placeholder](auto *value) { return (value == nullptr) ? placeholder : value; };
     elem.filter = {filter_or_placeholder(view.template storage<sizeof...(GLhs) + ELhs>())..., filter_or_placeholder(other.template storage<sizeof...(GRhs) + ERhs>())...};
     elem.refresh();
     return elem;

@@ -1654,6 +1654,22 @@ TEST(View, Pipe) {
     ASSERT_NE(pack32.storage<float>(), nullptr);
 }
 
+TEST(View, PipeNoFilter) {
+    std::tuple<entt::storage<int>, entt::storage<double>> storage{};
+    const std::array entity{entt::entity{1}, entt::entity{3}};
+
+    std::get<0>(storage).emplace(entity[0u]);
+    std::get<1>(storage).emplace(entity[0u]);
+
+    std::get<0>(storage).emplace(entity[1u]);
+
+    entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage))};
+    const entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
+
+    ASSERT_TRUE((view1 | view2).contains(entity[0u]));
+    ASSERT_FALSE((view1 | view2).contains(entity[1u]));
+}
+
 TEST(View, PipeWithPlaceholder) {
     entt::storage<void> storage{};
     const entt::entity entity{0};
