@@ -297,8 +297,10 @@ protected:
         if(!packed.empty()) {
             // suboptimal with few entities, but exploits cache way more with many
             for(auto &&elem: sparse) {
-                for(size_type pos{}; pos < traits_type::page_size; ++pos) {
-                    elem[pos] = null;
+                if(elem) {
+                    for(size_type pos{}; pos < traits_type::page_size; ++pos) {
+                        elem[pos] = null;
+                    }
                 }
             }
         }
