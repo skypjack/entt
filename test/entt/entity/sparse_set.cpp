@@ -1772,6 +1772,33 @@ TYPED_TEST(SparseSet, Clear) {
     }
 }
 
+TYPED_TEST(SparseSet, ClearWithNullPages) {
+    using entity_type = TestFixture::type;
+    using sparse_set_type = entt::basic_sparse_set<entity_type>;
+    using traits_type = entt::entt_traits<entity_type>;
+
+    for(const auto policy: this->deletion_policy) {
+        sparse_set_type set{policy};
+
+        ASSERT_EQ(set.capacity(), 0u);
+        ASSERT_EQ(set.extent(), 0u);
+        ASSERT_EQ(set.size(), 0u);
+
+        set.push(entity_type{traits_type::page_size});
+        set.push(entity_type{3u * traits_type::page_size});
+
+        ASSERT_EQ(set.capacity(), 2u);
+        ASSERT_EQ(set.extent(), 4u * traits_type::page_size);
+        ASSERT_EQ(set.size(), 2u);
+
+        set.clear();
+
+        ASSERT_EQ(set.capacity(), 2u);
+        ASSERT_EQ(set.extent(), 4u * traits_type::page_size);
+        ASSERT_EQ(set.size(), 0u);
+    }
+}
+
 TYPED_TEST(SparseSet, SortOrdered) {
     using entity_type = TestFixture::type;
     using sparse_set_type = entt::basic_sparse_set<entity_type>;
