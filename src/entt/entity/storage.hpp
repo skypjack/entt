@@ -890,9 +890,12 @@ public:
      * Attempting to use an entity that already belongs to the storage results
      * in undefined behavior.
      *
+     * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid identifier.
      */
-    void emplace(const entity_type entt) {
+    template<typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
+    auto emplace(const entity_type entt, Args &&...) {
         base_type::try_emplace(entt, false);
     }
 
@@ -911,11 +914,13 @@ public:
     /**
      * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
+     * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<stl::input_iterator It>
-    void insert(It first, It last) {
+    template<typename It, typename... Args>
+    // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
+    void insert(It first, It last, Args &&...) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
         }

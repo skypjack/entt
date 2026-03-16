@@ -22,12 +22,21 @@ struct StorageNoInstance: testing::Test {
     using type = Type;
 
     static auto emplace_instance(entt::storage<type> &pool, const entt::entity entt) {
-        return pool.emplace(entt);
+        if constexpr(std::is_void_v<type>) {
+            return pool.emplace(entt);
+        } else {
+            return pool.emplace(entt, type{});
+        }
     }
 
     template<typename It>
     static auto insert_instance(entt::storage<type> &pool, const It from, const It to) {
-        return pool.insert(from, to);
+        if constexpr(std::is_void_v<type>) {
+            return pool.insert(from, to);
+        } else {
+            const std::array<type, 2u> value{};
+            return pool.insert(from, to, value.begin());
+        }
     }
 
     static auto push_instance(entt::storage<type> &pool, const entt::entity entt) {
@@ -106,7 +115,7 @@ TYPED_TEST(StorageNoInstance, Move) {
     ASSERT_EQ(pool.index(entity[0u]), 0u);
 
     other = entt::storage<value_type>{};
-    other.emplace(entity[1u]);
+    other.emplace(entity[1u], 2);
     other = std::move(pool);
     test::is_initialized(pool);
 
@@ -153,7 +162,7 @@ TYPED_TEST(StorageNoInstance, Getters) {
     entt::storage<value_type> pool;
     const entt::entity entity{4};
 
-    pool.emplace(entity);
+    pool.emplace(entity, 3);
 
     testing::StaticAssertTypeEq<decltype(pool.get({})), void>();
     testing::StaticAssertTypeEq<decltype(std::as_const(pool).get({})), void>();

@@ -977,7 +977,7 @@ TEST_F(Registry, EmplaceEmpty) {
 
     ASSERT_FALSE(registry.all_of<test::empty>(entity));
 
-    registry.emplace<test::empty>(entity);
+    registry.emplace<test::empty>(entity, 4);
 
     ASSERT_TRUE(registry.all_of<test::empty>(entity));
 }

@@ -16,7 +16,7 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         static_cast<void>(registry.storage<test::empty>());
 
         const auto view = registry.view<test::boxed_int>();
-        registry.insert<test::empty>(view.begin(), view.end());
+        registry.insert(view.begin(), view.end(), test::empty{});
 
         registry.view<test::boxed_int, test::empty>().each([cnt = count](test::boxed_int &elem) {
             elem.value += cnt;

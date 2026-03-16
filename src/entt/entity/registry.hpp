@@ -579,25 +579,10 @@ public:
      * @tparam Type Type of element to create.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename Type>
-    void insert(stl::input_iterator auto first, stl::input_iterator auto last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
-        assure<Type>().insert(std::move(first), std::move(last));
-    }
-
-    /**
-     * @brief Assigns each entity in a range the given element.
-     *
-     * @sa emplace
-     *
-     * @tparam Type Type of element to create.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the element to assign.
      */
     template<typename Type>
-    void insert(stl::input_iterator auto first, stl::input_iterator auto last, const Type &value) {
+    void insert(stl::input_iterator auto first, stl::input_iterator auto last, const Type &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(std::move(first), std::move(last), value);
     }
