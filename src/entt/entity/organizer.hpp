@@ -402,9 +402,8 @@ public:
     [[nodiscard]] std::vector<vertex> graph() const {
         std::vector<vertex> adjacency_list{};
         adjacency_list.reserve(vertices.size());
-        auto adjacency_matrix = builder.graph();
 
-        for(auto curr: adjacency_matrix.vertices()) {
+        for(auto adjacency_matrix = builder.graph(); auto curr: adjacency_matrix.vertices()) {
             std::vector<std::size_t> in{};
             std::vector<std::size_t> out{};
 

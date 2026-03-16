@@ -194,9 +194,7 @@ class basic_sparse_set {
     }
 
     void release_sparse_pages() {
-        auto page_allocator{packed.get_allocator()};
-
-        for(auto &&page: sparse) {
+        for(auto page_allocator{packed.get_allocator()}; auto &&page: sparse) {
             if(page != nullptr) {
                 std::destroy(page, page + traits_type::page_size);
                 alloc_traits::deallocate(page_allocator, page, traits_type::page_size);
@@ -534,11 +532,9 @@ public:
     virtual void shrink_to_fit() {
         sparse_container_type other{sparse.get_allocator()};
         const auto len = sparse.size();
-        size_type cnt{};
-
         other.reserve(len);
 
-        for(auto &&elem: std::as_const(packed)) {
+        for(size_type cnt{}; auto &&elem: std::as_const(packed)) {
             if(elem != tombstone) {
                 if(const auto page = pos_to_page(entity_to_pos(elem)); sparse[page] != nullptr) {
                     if(const auto sz = page + 1u; sz > other.size()) {
