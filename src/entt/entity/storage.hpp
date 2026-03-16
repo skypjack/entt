@@ -719,16 +719,15 @@ public:
      *
      * @sa construct
      *
-     * @tparam EIt Type of input iterator.
-     * @tparam CIt Type of input iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
      * @return Iterator pointing to the first element inserted, if any.
      */
-    template<typename EIt, typename CIt>
-    requires std::same_as<typename std::iterator_traits<CIt>::value_type, value_type>
-    iterator insert(EIt first, EIt last, CIt from) {
+    template<stl::input_iterator It>
+    requires std::same_as<typename std::iterator_traits<It>::value_type, value_type>
+    iterator insert(stl::input_iterator auto first, stl::input_iterator auto last, It from) {
         for(; first != last; ++first, ++from) {
             emplace_element(*first, true, *from);
         }
@@ -913,14 +912,13 @@ public:
 
     /**
      * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
      * @tparam Args Types of optional arguments.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
-    template<typename It, typename... Args>
+    template<typename... Args>
     // NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-    void insert(It first, It last, Args &&...) {
+    void insert(stl::input_iterator auto first, stl::input_iterator auto last, Args &&...) {
         for(; first != last; ++first) {
             base_type::try_emplace(*first, true);
         }
