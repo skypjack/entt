@@ -5,7 +5,7 @@
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
     switch(operation) {
     case CR_STEP:
-        static_cast<entt::dispatcher *>(ctx->userdata)->trigger<test::empty>();
+        static_cast<entt::dispatcher *>(ctx->userdata)->trigger(test::empty{});
         static_cast<entt::dispatcher *>(ctx->userdata)->trigger(test::boxed_int{4});
         break;
     case CR_CLOSE:

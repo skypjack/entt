@@ -4,6 +4,6 @@
 #include "lib.h"
 
 ENTT_API void trigger(entt::dispatcher &dispatcher) {
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
     dispatcher.trigger(test::boxed_int{2});
 }

@@ -48,7 +48,7 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.update<non_aggregate>();
 
     dispatcher.sink<test::empty>().connect<&receiver::receive>(receiver);
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
     dispatcher.enqueue<test::empty>();
 
     ASSERT_EQ(dispatcher.size<non_aggregate>(), 0u);
@@ -65,7 +65,7 @@ TEST(Dispatcher, Functionalities) {
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.update<test::empty>();
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
 
     ASSERT_EQ(dispatcher.size<test::empty>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);
@@ -88,7 +88,7 @@ TEST(Dispatcher, Functionalities) {
     test::empty event{};
 
     dispatcher.sink<test::empty>().disconnect<&receiver::receive>(receiver);
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
     dispatcher.enqueue(event);
     dispatcher.update();
     dispatcher.trigger(std::as_const(event));
@@ -145,12 +145,12 @@ TEST(Dispatcher, OpaqueDisconnect) {
     receiver receiver{};
 
     dispatcher.sink<test::empty>().connect<&receiver::receive>(receiver);
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
 
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.disconnect(receiver);
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
 
     ASSERT_EQ(receiver.cnt, 1);
 }
@@ -162,7 +162,7 @@ TEST(Dispatcher, NamedQueue) {
     receiver receiver{};
 
     dispatcher.sink<test::empty>("named"_hs).connect<&receiver::receive>(receiver);
-    dispatcher.trigger<test::empty>();
+    dispatcher.trigger(test::empty{});
 
     ASSERT_EQ(receiver.cnt, 0);
 

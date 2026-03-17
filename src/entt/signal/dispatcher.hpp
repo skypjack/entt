@@ -63,7 +63,7 @@ public:
         return typename signal_type::sink_type{signal};
     }
 
-    void trigger(Type event) {
+    void trigger(Type &event) {
         signal.publish(event);
     }
 
@@ -266,8 +266,8 @@ public:
      * @param value An instance of the given type of event.
      */
     template<typename Type>
-    void trigger(Type &&value = {}) {
-        trigger(type_hash<std::decay_t<Type>>::value(), std::forward<Type>(value));
+    void trigger(Type value) {
+        trigger(type_hash<std::decay_t<Type>>::value(), value);
     }
 
     /**
@@ -277,8 +277,8 @@ public:
      * @param id Name used to map the event queue within the dispatcher.
      */
     template<typename Type>
-    void trigger(const id_type id, Type &&value = {}) {
-        assure<std::decay_t<Type>>(id).trigger(std::forward<Type>(value));
+    void trigger(const id_type id, Type value) {
+        assure<std::decay_t<Type>>(id).trigger(value);
     }
 
     /**

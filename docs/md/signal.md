@@ -445,7 +445,7 @@ to all the listeners registered so far:
 
 ```cpp
 dispatcher.trigger(an_event{42});
-dispatcher.trigger<another_event>();
+dispatcher.trigger(another_event{});
 ```
 
 Listeners are invoked immediately, order of execution is not guaranteed. This
