@@ -891,7 +891,7 @@ public:
      *
      * @param entt A valid identifier.
      */
-    auto emplace(const entity_type entt, const auto &...) {
+    void emplace(const entity_type entt, const auto &...) {
         base_type::try_emplace(entt, false);
     }
 
