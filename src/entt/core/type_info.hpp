@@ -223,8 +223,7 @@ template<typename Type>
 
 /*! @copydoc type_id */
 template<typename Type>
-// NOLINTNEXTLINE(cppcoreguidelines-missing-std-forward)
-[[nodiscard]] const type_info &type_id(Type &&) noexcept {
+[[nodiscard]] const type_info &type_id(const Type &) noexcept {
     return type_id<std::remove_cvref_t<Type>>();
 }
 
