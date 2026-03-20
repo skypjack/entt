@@ -9,6 +9,10 @@ conan/test_package/build
 CMakeSettings.json
 cpp.hint
 
+# Local builds
+/build/
+/build-*/
+
 # Bazel
 /bazel-*
 /test/bazel-*
