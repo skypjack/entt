@@ -7,9 +7,26 @@ namespace testbed {
 
 namespace internal {
 
-static void update_listeners(entt::registry &registry, input_listener_component::type command) {
+static void update_listeners(entt::registry &registry, SDL_Keycode key, bool pressed) {
     for([[maybe_unused]] auto [entt, elem]: registry.view<input_listener_component>().each()) {
-        elem.command = command;
+        switch(key) {
+        case SDLK_UP:
+        case SDLK_W:
+            elem.up = pressed;
+            break;
+        case SDLK_DOWN:
+        case SDLK_S:
+            elem.down = pressed;
+            break;
+        case SDLK_LEFT:
+        case SDLK_A:
+            elem.left = pressed;
+            break;
+        case SDLK_RIGHT:
+        case SDLK_D:
+            elem.right = pressed;
+            break;
+        }
     }
 }
 
@@ -25,19 +42,13 @@ void input_system(entt::registry &registry, const SDL_Event &event, bool &quit) 
         case SDLK_ESCAPE:
             quit = true;
             break;
-        case SDLK_UP:
-            internal::update_listeners(registry, input_listener_component::type::UP);
-            break;
-        case SDLK_DOWN:
-            internal::update_listeners(registry, input_listener_component::type::DOWN);
-            break;
-        case SDLK_LEFT:
-            internal::update_listeners(registry, input_listener_component::type::LEFT);
-            break;
-        case SDLK_RIGHT:
-            internal::update_listeners(registry, input_listener_component::type::RIGHT);
+        default:
+            internal::update_listeners(registry, event.key.key, true);
             break;
         }
+        break;
+    case SDL_EVENT_KEY_UP:
+        internal::update_listeners(registry, event.key.key, false);
         break;
     }
 }

@@ -1,4 +1,5 @@
 #include <SDL3/SDL_render.h>
+#include <component/color_component.h>
 #include <application/context.h>
 #include <component/position_component.h>
 #include <component/rect_component.h>
@@ -16,9 +17,11 @@ void rendering_system(entt::registry &registry, const context &ctx) {
     SDL_SetRenderDrawColor(ctx, 0u, 0u, 0u, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(ctx);
 
-    for(auto [entt, pos, rect]: registry.view<renderable_component, position_component, rect_component>().each()) {
+    for(auto [entt, pos, rect, color]: registry.view<renderable_component, position_component, rect_component, color_component>().each()) {
         SDL_FRect elem{rect.x + pos.x, rect.y + pos.y, rect.w, rect.h};
-        SDL_SetRenderDrawColor(ctx, 255u, 255u, 255u, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(ctx, color.red, color.green, color.blue, SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(ctx, &elem);
+        SDL_SetRenderDrawColor(ctx, 15u, 18u, 24u, SDL_ALPHA_OPAQUE);
         SDL_RenderRect(ctx, &elem);
     }
 

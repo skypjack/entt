@@ -22,6 +22,7 @@ public:
     int run();
 
 private:
+    void setup(entt::registry &) const;
     bool quit;
 };
 
