@@ -16,6 +16,7 @@
   * [ENTT_NO_ETO](#entt_no_eto)
   * [ENTT_NO_MIXIN](#entt_no_mixin)
   * [ENTT_STANDARD_CPP](#entt_standard_cpp)
+* [Configuration injection](#configuration-injection)
 
 # Introduction
 
@@ -130,3 +131,14 @@ This definition prevents the library from using non-standard techniques, that
 is, functionalities that are not fully compliant with the standard C++.<br/>
 While there are no known portability issues at the time of this writing, this
 should make the library fully portable anyway if needed.
+
+# Configuration injection
+
+Configuration variables are provided via code or injected directly from the
+outside via a dedicated file.<br/>
+`EnTT` uses `__has_include` internally and looks for a specific path, namely
+`<entt/ext/config.h>`. This can be provided by the user by setting the include
+paths appropriately.<br/>
+For example, `CMake` allows users to _bind_ additional include directories to a
+target with `target_include_directories`. See the test suite, and in particular
+the `config_ext` test for a practical example.

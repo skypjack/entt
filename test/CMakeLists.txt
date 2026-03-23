@@ -221,6 +221,12 @@ endif()
 # Test config
 
 SETUP_BASIC_TEST(
+    NAME config_ext
+    SOURCES entt/config/config.cpp
+    INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+SETUP_BASIC_TEST(
     NAME config
     SOURCES entt/config/version.cpp
 )
