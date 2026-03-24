@@ -50,7 +50,7 @@ struct component_traits;
 template<entity_like Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
-template<typename Type, entity_like = entity, typename = std::allocator<Type>>
+template<typename Type, typename = entity, typename = std::allocator<Type>>
 class basic_storage;
 
 template<typename, typename>
