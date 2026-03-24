@@ -26,7 +26,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<entity_like Entity, typename OnEntity>
+template<typename Entity, typename OnEntity>
 static void present_element(const meta_any &obj, OnEntity on_entity) {
     for([[maybe_unused]] const auto [id, data]: obj.type().data()) {
         const auto elem = data.get(obj);
@@ -141,7 +141,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
     }
 }
 
-template<entity_like Entity, typename Allocator>
+template<typename Entity, typename Allocator>
 static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, Allocator> &storage) {
     if(auto type = resolve(ctx, storage.info()); type) {
         for(auto entt: storage) {
@@ -166,7 +166,7 @@ static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, 
     }
 }
 
-template<entity_like Entity, typename It>
+template<typename Entity, typename It>
 static void present_entity(const meta_ctx &ctx, const Entity entt, const It from, const It to) {
     for(auto it = from; it != to; ++it) {
         if(const auto &storage = it->second; storage.contains(entt)) {
@@ -242,7 +242,7 @@ static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, ex
  * @param ctx The context from which to search for meta types.
  * @param storage An instance of the storage type.
  */
-template<typename Type, entity_like Entity, typename Allocator>
+template<typename Type, typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const basic_storage<Type, Entity, Allocator> &storage) {
     internal::present_storage(ctx, storage);
 }
@@ -254,7 +254,7 @@ void davey(const meta_ctx &ctx, const basic_storage<Type, Entity, Allocator> &st
  * @tparam Allocator Storage allocator type.
  * @param storage An instance of the storage type.
  */
-template<typename Type, entity_like Entity, typename Allocator>
+template<typename Type, typename Entity, typename Allocator>
 void davey(const basic_storage<Type, Entity, Allocator> &storage) {
     davey(locator<meta_ctx>::value_or(), storage);
 }
@@ -289,7 +289,7 @@ void davey(const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
  * @param ctx The context from which to search for meta types.
  * @param registry An instance of the registry type.
  */
-template<entity_like Entity, typename Allocator>
+template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registry) {
     ImGui::BeginTabBar("#tabs");
 
@@ -333,7 +333,7 @@ void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registr
  * @tparam Allocator Registry allocator type.
  * @param registry An instance of the registry type.
  */
-template<entity_like Entity, typename Allocator>
+template<typename Entity, typename Allocator>
 void davey(const basic_registry<Entity, Allocator> &registry) {
     davey(locator<meta_ctx>::value_or(), registry);
 }
