@@ -47,7 +47,7 @@ enum class deletion_policy : std::uint8_t {
 template<cvref_unqualified Type, typename Entity = entity>
 struct component_traits;
 
-template<entity_like Entity = entity, typename = std::allocator<Entity>>
+template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_sparse_set;
 
 template<typename Type, typename = entity, typename = std::allocator<Type>>
