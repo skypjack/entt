@@ -241,7 +241,7 @@ struct type_list_transform<owned_t<Type...>, Op> {
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<Type>>
+template<typename Type, typename Entity = entity, typename Allocator = std::allocator<Type>>
 struct storage_type {
     /*! @brief Type-to-storage conversion result. */
     using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
@@ -255,7 +255,7 @@ struct reactive final {};
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<entity_like Entity, typename Allocator>
+template<typename Entity, typename Allocator>
 struct storage_type<reactive, Entity, Allocator> {
     /*! @brief Type-to-storage conversion result. */
     using type = ENTT_STORAGE(reactive_mixin, basic_storage<reactive, Entity, Allocator>);
