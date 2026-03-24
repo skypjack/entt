@@ -274,7 +274,7 @@ using storage_type_t = storage_type<Args...>::type;
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<typename Type, entity_like Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
+template<typename Type, typename Entity = entity, typename Allocator = std::allocator<std::remove_const_t<Type>>>
 struct storage_for {
     /*! @brief Type-to-storage conversion result. */
     using type = constness_as_t<storage_type_t<std::remove_const_t<Type>, Entity, Allocator>, Type>;
