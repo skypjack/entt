@@ -210,7 +210,7 @@ private:
  * @tparam Entity A valid entity type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<entity_like Entity, typename Allocator>
+template<typename Entity, typename Allocator>
 class basic_registry {
     using base_type = basic_sparse_set<Entity, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;

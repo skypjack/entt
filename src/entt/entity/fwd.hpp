@@ -59,7 +59,7 @@ class basic_sigh_mixin;
 template<typename, typename>
 class basic_reactive_mixin;
 
-template<entity_like Entity = entity, typename = std::allocator<Entity>>
+template<typename Entity = entity, typename = std::allocator<Entity>>
 class basic_registry;
 
 template<typename, typename>
