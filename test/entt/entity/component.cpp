@@ -34,7 +34,7 @@ struct entt::component_traits<ComponentBase::traits_based, ComponentBase::other_
     static constexpr auto page_size = 16u;
 };
 
-template<entt::entity_like Entity>
+template<typename Entity>
 struct entt::component_traits<ComponentBase::traits_based, Entity> {
     using entity_type = Entity;
     using element_type = ComponentBase::traits_based;
