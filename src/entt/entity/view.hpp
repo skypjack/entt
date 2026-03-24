@@ -30,14 +30,12 @@ const Type *view_placeholder() {
     return &placeholder;
 }
 
-template<typename It>
-[[nodiscard]] bool all_of(It first, const It last, const entity_like auto entt) noexcept {
+[[nodiscard]] bool all_of(auto first, const auto last, const auto entt) noexcept {
     for(; (first != last) && (*first)->contains(entt); ++first) {}
     return first == last;
 }
 
-template<typename It>
-[[nodiscard]] bool none_of(It first, const It last, const entity_like auto entt) noexcept {
+[[nodiscard]] bool none_of(auto first, const auto last, const auto entt) noexcept {
     for(; (first != last) && !(*first)->contains(entt); ++first) {}
     return first == last;
 }
