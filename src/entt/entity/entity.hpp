@@ -61,6 +61,15 @@ struct entt_traits<std::uint64_t> {
 /*! @endcond */
 
 /**
+ * @brief Specifies that a type is an entity-like type.
+ * @tparam Type Type to check.
+ */
+template<typename Type>
+concept entity_like = requires {
+    typename internal::entt_traits<Type>::value_type;
+};
+
+/**
  * @brief Common basic entity traits implementation.
  * @tparam Traits Actual entity traits to use.
  */
