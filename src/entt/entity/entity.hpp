@@ -189,7 +189,7 @@ struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
  * @param value The value to convert.
  * @return The integral representation of the given value.
  */
-template<entity_like Entity>
+template<typename Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::entity_type to_integral(const Entity value) noexcept {
     return entt_traits<Entity>::to_integral(value);
 }
@@ -200,7 +200,7 @@ template<entity_like Entity>
  * @param value The value to convert.
  * @return The integral representation of the entity part.
  */
-template<entity_like Entity>
+template<typename Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::entity_type to_entity(const Entity value) noexcept {
     return entt_traits<Entity>::to_entity(value);
 }
@@ -211,7 +211,7 @@ template<entity_like Entity>
  * @param value The value to convert.
  * @return The integral representation of the version part.
  */
-template<entity_like Entity>
+template<typename Entity>
 [[nodiscard]] constexpr entt_traits<Entity>::version_type to_version(const Entity value) noexcept {
     return entt_traits<Entity>::to_version(value);
 }
