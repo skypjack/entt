@@ -4,8 +4,6 @@
 #include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
-namespace entt::stl {
-
 #ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
@@ -13,7 +11,13 @@ namespace entt::stl {
 #        if defined(__cpp_lib_to_address)
 #            define ENTT_HAS_TO_ADDRESS
 #            include <memory>
+
+namespace entt::stl {
+
 using std::to_address;
+
+} // namespace entt::stl
+
 #        endif
 #    endif
 #endif
@@ -21,6 +25,8 @@ using std::to_address;
 #ifndef ENTT_HAS_TO_ADDRESS
 #    include <memory>
 #    include <type_traits>
+
+namespace entt::stl {
 
 template<typename Type>
 constexpr Type *to_address(Type *ptr) noexcept {
@@ -36,9 +42,10 @@ constexpr auto to_address(const Type &ptr) noexcept {
         return to_address(ptr.operator->());
     }
 }
-#endif
-/*! @endcond */
 
 } // namespace entt::stl
+
+#endif
+/*! @endcond */
 
 #endif

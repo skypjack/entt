@@ -4,8 +4,6 @@
 #include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
-namespace entt::stl {
-
 #ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
@@ -13,13 +11,21 @@ namespace entt::stl {
 #        if defined(__cpp_lib_ranges)
 #            define ENTT_HAS_IDENTITY
 #            include <functional>
+
+namespace entt::stl {
+
 using std::identity;
+
+} // namespace entt::stl
+
 #        endif
 #    endif
 #endif
 
 #ifndef ENTT_HAS_IDENTITY
 #    include <utility>
+
+namespace entt::stl {
 
 struct identity {
     using is_transparent = void;
@@ -29,9 +35,10 @@ struct identity {
         return std::forward<Type>(value);
     }
 };
-#endif
 
 } // namespace entt::stl
+
+#endif
 /*! @endcond */
 
 #endif

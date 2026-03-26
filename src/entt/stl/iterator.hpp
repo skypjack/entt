@@ -4,8 +4,6 @@
 #include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
-namespace entt::stl {
-
 #ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
@@ -13,6 +11,9 @@ namespace entt::stl {
 #        if defined(__cpp_lib_ranges)
 #            define ENTT_HAS_ITERATOR_CONCEPTS
 #            include <iterator>
+
+namespace entt::stl {
+
 using std::bidirectional_iterator;
 using std::forward_iterator;
 using std::input_iterator;
@@ -20,6 +21,9 @@ using std::input_or_output_iterator;
 using std::output_iterator;
 using std::random_access_iterator;
 using std::sentinel_for;
+
+} // namespace entt::stl
+
 #        endif
 #    endif
 #endif
@@ -28,6 +32,8 @@ using std::sentinel_for;
 #    include <concepts>
 #    include <iterator>
 #    include <utility>
+
+namespace entt::stl {
 
 namespace internal {
 
@@ -87,9 +93,10 @@ template<class Sentinel, typename It>
 concept sentinel_for = input_or_output_iterator<It> && requires(Sentinel sentinel, It it) {
     { it == sentinel } -> std::same_as<bool>;
 };
-#endif
 
 } // namespace entt::stl
+
+#endif
 /*! @endcond */
 
 #endif
