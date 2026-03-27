@@ -12,7 +12,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
