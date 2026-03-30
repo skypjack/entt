@@ -4,10 +4,10 @@
 #include <concepts>
 #include <cstddef>
 #include <iterator>
-#include <tuple>
 #include <utility>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
+#include "../stl/tuple.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -21,7 +21,7 @@ class table_iterator {
     friend class table_iterator;
 
 public:
-    using value_type = decltype(std::forward_as_tuple(*std::declval<It>()...));
+    using value_type = decltype(stl::forward_as_tuple(*std::declval<It>()...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -75,7 +75,7 @@ public:
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        return std::forward_as_tuple(std::get<It>(it)[value]...);
+        return stl::forward_as_tuple(std::get<It>(it)[value]...);
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -102,7 +102,7 @@ public:
     }
 
 private:
-    std::tuple<It...> it;
+    stl::tuple<It...> it;
 };
 
 } // namespace internal
@@ -119,7 +119,7 @@ private:
  */
 template<typename... Container>
 class basic_table {
-    using container_type = std::tuple<Container...>;
+    using container_type = stl::tuple<Container...>;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -365,11 +365,11 @@ public:
      * @return A reference to the newly created row data.
      */
     template<typename... Args>
-    std::tuple<typename Container::value_type &...> emplace(Args &&...args) {
+    stl::tuple<typename Container::value_type &...> emplace(Args &&...args) {
         if constexpr(sizeof...(Args) == 0u) {
-            return std::forward_as_tuple(std::get<Container>(payload).emplace_back()...);
+            return stl::forward_as_tuple(std::get<Container>(payload).emplace_back()...);
         } else {
-            return std::forward_as_tuple(std::get<Container>(payload).emplace_back(std::forward<Args>(args))...);
+            return stl::forward_as_tuple(std::get<Container>(payload).emplace_back(std::forward<Args>(args))...);
         }
     }
 
@@ -397,15 +397,15 @@ public:
      * @param pos The row for which to return the data.
      * @return The row data at specified location.
      */
-    [[nodiscard]] std::tuple<const typename Container::value_type &...> operator[](const size_type pos) const {
+    [[nodiscard]] stl::tuple<const typename Container::value_type &...> operator[](const size_type pos) const {
         ENTT_ASSERT(pos < size(), "Index out of bounds");
-        return std::forward_as_tuple(std::get<Container>(payload)[pos]...);
+        return stl::forward_as_tuple(std::get<Container>(payload)[pos]...);
     }
 
     /*! @copydoc operator[] */
-    [[nodiscard]] std::tuple<typename Container::value_type &...> operator[](const size_type pos) {
+    [[nodiscard]] stl::tuple<typename Container::value_type &...> operator[](const size_type pos) {
         ENTT_ASSERT(pos < size(), "Index out of bounds");
-        return std::forward_as_tuple(std::get<Container>(payload)[pos]...);
+        return stl::forward_as_tuple(std::get<Container>(payload)[pos]...);
     }
 
     /*! @brief Clears a table. */

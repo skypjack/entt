@@ -72,5 +72,6 @@ namespace entt::stl {}
 #include "stl/functional.hpp"
 #include "stl/iterator.hpp"
 #include "stl/memory.hpp"
+#include "stl/tuple.hpp"
 #include "stl/vector.hpp"
 // IWYU pragma: end_exports

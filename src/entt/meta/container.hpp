@@ -25,8 +25,8 @@ template<typename Type>
 struct sequence_container_extent: integral_constant<meta_dynamic_extent> {};
 
 template<typename Type>
-requires is_complete_v<std::tuple_size<Type>>
-struct sequence_container_extent<Type>: integral_constant<std::tuple_size_v<Type>> {};
+requires is_complete_v<stl::tuple_size<Type>>
+struct sequence_container_extent<Type>: integral_constant<stl::tuple_size_v<Type>> {};
 
 template<typename Type>
 inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;

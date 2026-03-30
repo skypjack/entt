@@ -5,13 +5,13 @@
 #include <concepts>
 #include <cstddef>
 #include <iterator>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/tuple.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -131,7 +131,7 @@ private:
 template<typename It, typename... Get>
 struct extended_view_iterator final {
     using iterator_type = It;
-    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Get>().get_as_tuple({})...));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*std::declval<It>()), std::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -155,7 +155,7 @@ struct extended_view_iterator final {
 
     [[nodiscard]] reference operator*() const noexcept {
         return [this]<auto... Index>(std::index_sequence<Index...>) {
-            return std::tuple_cat(std::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
+            return stl::tuple_cat(stl::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
         }(std::index_sequence_for<Get...>{});
     }
 
@@ -418,9 +418,9 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t Curr, std::size_t Other, typename... Args>
-    [[nodiscard]] auto dispatch_get(const std::tuple<typename base_type::entity_type, Args...> &curr) const {
+    [[nodiscard]] auto dispatch_get(const stl::tuple<typename base_type::entity_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
-            return std::forward_as_tuple(std::get<Args>(curr)...);
+            return stl::forward_as_tuple(std::get<Args>(curr)...);
         } else {
             return storage<Other>()->get_as_tuple(std::get<0>(curr));
         }
@@ -430,10 +430,10 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = std::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
-                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
-                    std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
+                if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                    stl::apply(func, stl::tuple_cat(stl::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
-                    std::apply(func, std::tuple_cat(dispatch_get<Curr, Index>(curr)...));
+                    stl::apply(func, stl::tuple_cat(dispatch_get<Curr, Index>(curr)...));
                 }
             }
         }
@@ -478,8 +478,8 @@ public:
      * @param value The storage for the types to iterate.
      * @param excl The storage for the types used to filter the view.
      */
-    basic_view(std::tuple<Get &...> value, std::tuple<Exclude &...> excl = {}) noexcept
-        : basic_view{std::make_from_tuple<basic_view>(std::tuple_cat(value, excl))} {}
+    basic_view(stl::tuple<Get &...> value, stl::tuple<Exclude &...> excl = {}) noexcept
+        : basic_view{stl::make_from_tuple<basic_view>(stl::tuple_cat(value, excl))} {}
 
     /**
      * @brief Constructs a view from a convertible counterpart.
@@ -594,12 +594,12 @@ public:
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
             return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
-                return std::tuple_cat(this->storage<Idx>()->get_as_tuple(entt)...);
+                return stl::tuple_cat(this->storage<Idx>()->get_as_tuple(entt)...);
             }(std::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
         } else {
-            return std::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
+            return stl::tuple_cat(storage<Index>()->get_as_tuple(entt)...);
         }
     }
 
@@ -936,7 +936,7 @@ public:
      * @brief Constructs a view from a storage class.
      * @param value The storage for the type to iterate.
      */
-    basic_view(std::tuple<Get &> value, std::tuple<> = {}) noexcept
+    basic_view(stl::tuple<Get &> value, stl::tuple<> = {}) noexcept
         : basic_view{std::get<0>(value)} {}
 
     /**
@@ -1053,9 +1053,9 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+        if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
             for(const auto pack: each()) {
-                std::apply(func, pack);
+                stl::apply(func, pack);
             }
         } else if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
             if constexpr(std::is_void_v<typename Get::value_type>) {
@@ -1073,7 +1073,7 @@ public:
             static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
 
             for(const auto pack: each()) {
-                std::apply([&func](const auto, auto &&...elem) { func(std::forward<decltype(elem)>(elem)...); }, pack);
+                stl::apply([&func](const auto, auto &&...elem) { func(std::forward<decltype(elem)>(elem)...); }, pack);
             }
         }
     }
@@ -1135,7 +1135,7 @@ basic_view(Type &...storage) -> basic_view<get_t<Type...>, exclude_t<>>;
  * @tparam Exclude Types of elements used to filter the view.
  */
 template<typename... Get, typename... Exclude>
-basic_view(std::tuple<Get &...>, std::tuple<Exclude &...> = {}) -> basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+basic_view(stl::tuple<Get &...>, stl::tuple<Exclude &...> = {}) -> basic_view<get_t<Get...>, exclude_t<Exclude...>>;
 
 } // namespace entt
 

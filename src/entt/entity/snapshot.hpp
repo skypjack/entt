@@ -4,13 +4,13 @@
 #include <concepts>
 #include <cstddef>
 #include <iterator>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "view.hpp"
@@ -108,12 +108,12 @@ public:
                         archive(static_cast<entity_type>(null));
                     } else {
                         archive(entt);
-                        std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                        stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
                     }
                 }
             } else {
                 for(auto elem: storage->reach()) {
-                    std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
+                    stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
                 }
             }
         } else {
@@ -144,7 +144,7 @@ public:
             for(; first != last; ++first) {
                 if(const auto entt = *first; storage->contains(entt)) {
                     archive(entt);
-                    std::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                    stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
                 } else {
                     archive(static_cast<entity_type>(null));
                 }
@@ -251,7 +251,7 @@ public:
                     const auto entity = other.contains(entt) ? entt : other.generate(entt);
                     ENTT_ASSERT(entity == entt, "Entity not available for use");
 
-                    if constexpr(std::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
+                    if constexpr(stl::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
                         storage.emplace(entity);
                     } else {
                         Type elem{};
@@ -448,7 +448,7 @@ public:
                 if(archive(entt); entt != null) {
                     restore(entt);
 
-                    if constexpr(std::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
+                    if constexpr(stl::tuple_size_v<decltype(storage.get_as_tuple({}))> == 0u) {
                         storage.emplace(map(entt));
                     } else {
                         Type elem{};

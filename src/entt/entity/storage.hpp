@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -16,6 +15,7 @@
 #include "../core/type_info.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/memory.hpp"
+#include "../stl/tuple.hpp"
 #include "../stl/vector.hpp"
 #include "component.hpp"
 #include "entity.hpp"
@@ -140,7 +140,7 @@ class extended_storage_iterator final {
 
 public:
     using iterator_type = It;
-    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::forward_as_tuple(*std::declval<Other>()...)));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*std::declval<It>()), stl::forward_as_tuple(*std::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -185,7 +185,7 @@ public:
     }
 
 private:
-    std::tuple<It, Other...> it;
+    stl::tuple<It, Other...> it;
 };
 
 } // namespace internal
@@ -645,13 +645,13 @@ public:
      * @param entt A valid identifier.
      * @return The object assigned to the entity as a tuple.
      */
-    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const noexcept {
-        return std::forward_as_tuple(get(entt));
+    [[nodiscard]] stl::tuple<const value_type &> get_as_tuple(const entity_type entt) const noexcept {
+        return stl::forward_as_tuple(get(entt));
     }
 
     /*! @copydoc get_as_tuple */
-    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) noexcept {
-        return std::forward_as_tuple(get(entt));
+    [[nodiscard]] stl::tuple<value_type &> get_as_tuple(const entity_type entt) noexcept {
+        return stl::forward_as_tuple(get(entt));
     }
 
     /**
@@ -877,9 +877,9 @@ public:
      * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */
-    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
+    [[nodiscard]] stl::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
         ENTT_ASSERT(base_type::contains(entt), "Invalid entity");
-        return std::tuple{};
+        return stl::tuple{};
     }
 
     /**
@@ -1105,9 +1105,9 @@ public:
      * @param entt A valid identifier.
      * @return Returns an empty tuple.
      */
-    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
+    [[nodiscard]] stl::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const noexcept {
         ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
-        return std::tuple{};
+        return stl::tuple{};
     }
 
     /**

@@ -4,10 +4,10 @@
 #include <concepts>
 #include <cstddef>
 #include <iterator>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
+#include "../stl/tuple.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -619,7 +619,7 @@ struct is_applicable_r: std::false_type {};
  * @tparam Args The list of arguments to use to probe the function type.
  */
 template<typename Ret, typename Func, typename... Args>
-struct is_applicable_r<Ret, Func, std::tuple<Args...>>: std::is_invocable_r<Ret, Func, Args...> {};
+struct is_applicable_r<Ret, Func, stl::tuple<Args...>>: std::is_invocable_r<Ret, Func, Args...> {};
 
 /**
  * @brief Helper variable template.
@@ -726,7 +726,7 @@ template<typename>
 struct has_tuple_size_value: std::false_type {};
 
 template<typename Type>
-requires is_complete_v<std::tuple_size<const Type>>
+requires is_complete_v<stl::tuple_size<const Type>>
 struct has_tuple_size_value<Type>: std::true_type {};
 
 template<typename>
@@ -741,7 +741,7 @@ template<typename>
 
 template<typename Type, std::size_t... Index>
 [[nodiscard]] ENTT_CONSTEVAL bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
-    return (dispatch_is_equality_comparable<std::tuple_element_t<Index, Type>>() && ...);
+    return (dispatch_is_equality_comparable<stl::tuple_element_t<Index, Type>>() && ...);
 }
 
 template<typename>
@@ -759,9 +759,9 @@ template<typename Type>
     // NOLINTBEGIN(modernize-use-transparent-functors)
     if constexpr(std::is_array_v<Type>) {
         return false;
-    } else if constexpr(is_complete_v<std::tuple_size<std::remove_const_t<Type>>>) {
+    } else if constexpr(is_complete_v<stl::tuple_size<std::remove_const_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
-            return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
+            return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<stl::tuple_size<Type>::value>{});
         } else {
             return maybe_equality_comparable<Type>(0);
         }
@@ -892,15 +892,15 @@ using nth_argument_t = nth_argument<Index, Candidate>::type;
 } // namespace entt
 
 template<typename... Type>
-struct std::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t, entt::type_list<Type...>::size> {};
+struct entt::stl::tuple_size<entt::type_list<Type...>>: std::integral_constant<std::size_t, entt::type_list<Type...>::size> {};
 
 template<std::size_t Index, typename... Type>
-struct std::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
+struct entt::stl::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
 
 template<auto... Value>
-struct std::tuple_size<entt::value_list<Value...>>: std::integral_constant<std::size_t, entt::value_list<Value...>::size> {};
+struct entt::stl::tuple_size<entt::value_list<Value...>>: std::integral_constant<std::size_t, entt::value_list<Value...>::size> {};
 
 template<std::size_t Index, auto... Value>
-struct std::tuple_element<Index, entt::value_list<Value...>>: entt::value_list_element<Index, entt::value_list<Value...>> {};
+struct entt::stl::tuple_element<Index, entt::value_list<Value...>>: entt::value_list_element<Index, entt::value_list<Value...>> {};
 
 #endif

@@ -148,7 +148,7 @@ class basic_organizer final {
 
     template<typename... Args>
     [[nodiscard]] static auto to_args(Registry &reg, type_list<Args...>) {
-        return std::tuple<decltype(extract<Args>(reg))...>(extract<Args>(reg)...);
+        return stl::tuple<decltype(extract<Args>(reg))...>(extract<Args>(reg)...);
     }
 
     template<typename... Type>
@@ -320,7 +320,7 @@ public:
         using resource_type = decltype(internal::free_function_to_resource_traits<registry_type, Req...>(Candidate));
 
         callback_type *callback = +[](const void *, registry_type &reg) {
-            std::apply(Candidate, to_args(reg, typename resource_type::args{}));
+            stl::apply(Candidate, to_args(reg, typename resource_type::args{}));
         };
 
         vertex_data vdata{
@@ -352,7 +352,7 @@ public:
 
         callback_type *callback = +[](const void *payload, registry_type &reg) {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
-            std::apply(Candidate, std::tuple_cat(std::forward_as_tuple(*curr), to_args(reg, typename resource_type::args{})));
+            stl::apply(Candidate, stl::tuple_cat(stl::forward_as_tuple(*curr), to_args(reg, typename resource_type::args{})));
         };
 
         vertex_data vdata{

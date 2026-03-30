@@ -3,11 +3,11 @@
 
 #include <cstddef>
 #include <functional>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
+#include "../stl/tuple.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -71,7 +71,7 @@ class delegate<Ret(Args...)> {
     template<auto Candidate, std::size_t... Index>
     [[nodiscard]] auto wrap(std::index_sequence<Index...>) noexcept {
         return [](const void *, Args... args) -> return_type {
-            [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
+            [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
             [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };
@@ -81,7 +81,7 @@ class delegate<Ret(Args...)> {
     [[nodiscard]] auto wrap(Type &, std::index_sequence<Index...>) noexcept {
         return [](const void *payload, Args... args) -> return_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
-            [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
+            [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
             [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, *curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };
@@ -91,7 +91,7 @@ class delegate<Ret(Args...)> {
     [[nodiscard]] auto wrap(Type *, std::index_sequence<Index...>) noexcept {
         return [](const void *payload, Args... args) -> return_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
-            [[maybe_unused]] const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
+            [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
             [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };

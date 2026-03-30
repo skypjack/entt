@@ -9,7 +9,6 @@
 #include <functional>
 #include <iterator>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -24,6 +23,7 @@
 #include "../core/type_traits.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -710,8 +710,8 @@ public:
             }
 
         } else {
-            for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
-                count += std::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
+            for(auto cpools = stl::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
+                count += stl::apply([entt = *first](auto &...curr) { return (curr.remove(entt) + ... + 0u); }, cpools);
             }
         }
 
@@ -760,8 +760,8 @@ public:
                 (*from)->erase(first, last);
             }
         } else {
-            for(auto cpools = std::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
-                std::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
+            for(auto cpools = stl::forward_as_tuple(assure<Type>(), assure<Other>()...); first != last; ++first) {
+                stl::apply([entt = *first](auto &...curr) { (curr.erase(entt), ...); }, cpools);
             }
         }
     }
@@ -850,7 +850,7 @@ public:
         if constexpr(sizeof...(Type) == 1u) {
             return (assure<std::remove_const_t<Type>>()->get(entt), ...);
         } else {
-            return std::forward_as_tuple(get<Type>(entt)...);
+            return stl::forward_as_tuple(get<Type>(entt)...);
         }
     }
 
@@ -860,7 +860,7 @@ public:
         if constexpr(sizeof...(Type) == 1u) {
             return (static_cast<storage_for_type<Type> &>(assure<std::remove_const_t<Type>>()).get(entt), ...);
         } else {
-            return std::forward_as_tuple(get<Type>(entt)...);
+            return stl::forward_as_tuple(get<Type>(entt)...);
         }
     }
 
@@ -902,7 +902,7 @@ public:
             const auto *cpool = assure<std::remove_const_t<Type>...>();
             return (cpool && cpool->contains(entt)) ? std::addressof(cpool->get(entt)) : nullptr;
         } else {
-            return std::make_tuple(try_get<Type>(entt)...);
+            return stl::make_tuple(try_get<Type>(entt)...);
         }
     }
 
@@ -912,7 +912,7 @@ public:
         if constexpr(sizeof...(Type) == 1u) {
             return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entt)), ...);
         } else {
-            return std::make_tuple(try_get<Type>(entt)...);
+            return stl::make_tuple(try_get<Type>(entt)...);
         }
     }
 
@@ -1057,9 +1057,9 @@ public:
         std::shared_ptr<handler_type> handler{};
 
         if constexpr(sizeof...(Owned) == 0u) {
-            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
+            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), stl::forward_as_tuple(assure<std::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
         } else {
-            handler = std::allocate_shared<handler_type>(get_allocator(), std::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), std::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
+            handler = std::allocate_shared<handler_type>(get_allocator(), stl::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
             ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [](const auto &data) { return !(data.second->owned(type_id<Owned>().hash()) || ...); }), "Conflicting groups");
         }
 

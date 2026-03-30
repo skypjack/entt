@@ -2,12 +2,12 @@
 #define ENTT_ENTITY_HANDLE_HPP
 
 #include <iterator>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/tuple.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 

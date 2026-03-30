@@ -3,11 +3,11 @@
 
 #include <cstddef>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../stl/memory.hpp"
+#include "../stl/tuple.hpp"
 
 namespace entt {
 
@@ -120,15 +120,15 @@ struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
     static constexpr auto args([[maybe_unused]] const Allocator &allocator, Params &&...params) noexcept {
         if constexpr(!std::uses_allocator_v<Type, Allocator> && std::is_constructible_v<Type, Params...>) {
-            return std::forward_as_tuple(std::forward<Params>(params)...);
+            return stl::forward_as_tuple(std::forward<Params>(params)...);
         } else {
             static_assert(std::uses_allocator_v<Type, Allocator>, "Ill-formed request");
 
             if constexpr(std::is_constructible_v<Type, std::allocator_arg_t, const Allocator &, Params...>) {
-                return std::tuple<std::allocator_arg_t, const Allocator &, Params &&...>{std::allocator_arg, allocator, std::forward<Params>(params)...};
+                return stl::tuple<std::allocator_arg_t, const Allocator &, Params &&...>{std::allocator_arg, allocator, std::forward<Params>(params)...};
             } else {
                 static_assert(std::is_constructible_v<Type, Params..., const Allocator &>, "Ill-formed request");
-                return std::forward_as_tuple(std::forward<Params>(params)..., allocator);
+                return stl::forward_as_tuple(std::forward<Params>(params)..., allocator);
             }
         }
     }
@@ -140,29 +140,29 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, std::piecewise_construct_t, First &&first, Second &&second) noexcept {
-        return std::make_tuple(
+        return stl::make_tuple(
             std::piecewise_construct,
-            std::apply([&allocator](auto &&...curr) { return uses_allocator_construction<Type>::args(allocator, std::forward<decltype(curr)>(curr)...); }, std::forward<First>(first)),
-            std::apply([&allocator](auto &&...curr) { return uses_allocator_construction<Other>::args(allocator, std::forward<decltype(curr)>(curr)...); }, std::forward<Second>(second)));
+            stl::apply([&allocator](auto &&...curr) { return uses_allocator_construction<Type>::args(allocator, std::forward<decltype(curr)>(curr)...); }, std::forward<First>(first)),
+            stl::apply([&allocator](auto &&...curr) { return uses_allocator_construction<Other>::args(allocator, std::forward<decltype(curr)>(curr)...); }, std::forward<Second>(second)));
     }
 
     static constexpr auto args(const auto &allocator) noexcept {
-        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::tuple<>{}, std::tuple<>{});
+        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::tuple<>{}, stl::tuple<>{});
     }
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, First &&first, Second &&second) noexcept {
-        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::forward<First>(first)), std::forward_as_tuple(std::forward<Second>(second)));
+        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(std::forward<First>(first)), stl::forward_as_tuple(std::forward<Second>(second)));
     }
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, const std::pair<First, Second> &value) noexcept {
-        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(value.first), std::forward_as_tuple(value.second));
+        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(value.first), stl::forward_as_tuple(value.second));
     }
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, std::pair<First, Second> &&value) noexcept {
-        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, std::forward_as_tuple(std::move(value.first)), std::forward_as_tuple(std::move(value.second)));
+        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(std::move(value.first)), stl::forward_as_tuple(std::move(value.second)));
     }
 };
 
@@ -218,7 +218,7 @@ constexpr Type make_obj_using_allocator(const auto &allocator, Args &&...args) {
  */
 template<typename Type, typename... Args>
 constexpr Type *uninitialized_construct_using_allocator(Type *value, const auto &allocator, Args &&...args) {
-    return std::apply([value](auto &&...curr) { return ::new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
+    return stl::apply([value](auto &&...curr) { return ::new(value) Type(std::forward<decltype(curr)>(curr)...); }, internal::uses_allocator_construction<Type>::args(allocator, std::forward<Args>(args)...));
 }
 
 } // namespace entt

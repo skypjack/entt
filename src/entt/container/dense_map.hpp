@@ -10,7 +10,6 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -20,6 +19,7 @@
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
 
@@ -273,7 +273,7 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, std::forward_as_tuple(std::forward<Other>(key)), std::forward_as_tuple(std::forward<Args>(args)...));
+        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, stl::forward_as_tuple(std::forward<Other>(key)), stl::forward_as_tuple(std::forward<Args>(args)...));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
@@ -392,8 +392,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(const dense_map &other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(other.sparse.first(), allocator), std::forward_as_tuple(other.sparse.second())},
-          packed{std::piecewise_construct, std::forward_as_tuple(other.packed.first(), allocator), std::forward_as_tuple(other.packed.second())},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
+          packed{std::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
@@ -405,8 +405,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(dense_map &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(std::move(other.sparse.first()), allocator), std::forward_as_tuple(std::move(other.sparse.second()))},
-          packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(std::move(other.sparse.first()), allocator), stl::forward_as_tuple(std::move(other.sparse.second()))},
+          packed{std::piecewise_construct, stl::forward_as_tuple(std::move(other.packed.first()), allocator), stl::forward_as_tuple(std::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */

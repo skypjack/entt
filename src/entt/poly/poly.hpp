@@ -4,13 +4,13 @@
 #include <concepts>
 #include <cstddef>
 #include <functional>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../core/any.hpp"
 #include "../core/concepts.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/tuple.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -70,14 +70,14 @@ class poly_vtable {
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>) noexcept
-        -> decltype(std::make_tuple(vtable_entry(Candidate)...));
+        -> decltype(stl::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
     [[nodiscard]] static ENTT_CONSTEVAL auto make_vtable(type_list<Func...>) noexcept {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
         } else if constexpr((std::is_function_v<Func> && ...)) {
-            return decltype(std::make_tuple(vtable_entry(std::declval<Func inspector::*>())...)){};
+            return decltype(stl::make_tuple(vtable_entry(std::declval<Func inspector::*>())...)){};
         }
     }
 
@@ -102,11 +102,11 @@ class poly_vtable {
     }
 
     using vtable_type = decltype(make_vtable(Concept{}));
-    static constexpr bool is_mono = std::tuple_size_v<vtable_type> == 1u;
+    static constexpr bool is_mono = stl::tuple_size_v<vtable_type> == 1u;
 
 public:
     /*! @brief Virtual table type. */
-    using type = std::conditional_t<is_mono, std::tuple_element_t<0u, vtable_type>, const vtable_type *>;
+    using type = std::conditional_t<is_mono, stl::tuple_element_t<0u, vtable_type>, const vtable_type *>;
 
     /**
      * @brief Returns a static virtual table for a specific concept and type.

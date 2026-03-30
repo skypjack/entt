@@ -10,7 +10,6 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include "../config/config.h"
@@ -18,6 +17,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
 
@@ -341,8 +341,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(const dense_set &other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(other.sparse.first(), allocator), std::forward_as_tuple(other.sparse.second())},
-          packed{std::piecewise_construct, std::forward_as_tuple(other.packed.first(), allocator), std::forward_as_tuple(other.packed.second())},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
+          packed{std::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
@@ -354,8 +354,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(dense_set &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(std::move(other.sparse.first()), allocator), std::forward_as_tuple(std::move(other.sparse.second()))},
-          packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(std::move(other.sparse.first()), allocator), stl::forward_as_tuple(std::move(other.sparse.second()))},
+          packed{std::piecewise_construct, stl::forward_as_tuple(std::move(other.packed.first()), allocator), stl::forward_as_tuple(std::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
@@ -548,7 +548,7 @@ public:
         if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::decay_t<Args>, value_type>)) {
             return insert_or_do_nothing(std::forward<Args>(args)...);
         } else {
-            auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));
+            auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(std::forward<Args>(args)...));
             const auto index = value_to_bucket(node.second);
 
             if(auto it = constrained_find(node.second, index); it != end()) {
