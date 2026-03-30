@@ -1,6 +1,9 @@
 /*! @brief `EnTT` default namespace. */
 namespace entt {}
 
+/*! @brief Custom `EnTT` namespace for the standard template library. */
+namespace entt::stl {}
+
 // IWYU pragma: begin_exports
 #include "config/config.h"
 #include "config/macro.h"
