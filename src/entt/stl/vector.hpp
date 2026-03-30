@@ -1,9 +1,8 @@
 #ifndef ENTT_STL_VECTOR_HPP
 #define ENTT_STL_VECTOR_HPP
 
-#include "../config/config.h"
-
 #include <vector>
+#include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
