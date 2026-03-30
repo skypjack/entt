@@ -198,6 +198,7 @@ if(ENTT_INCLUDE_HEADERS)
         stl/functional.hpp
         stl/iterator.hpp
         stl/memory.hpp
+        stl/vector.hpp
         tools/davey.hpp
         entt.hpp
         fwd.hpp
