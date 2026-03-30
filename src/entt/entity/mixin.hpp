@@ -9,6 +9,7 @@
 #include "../core/type_info.hpp"
 #include "../signal/sigh.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -394,7 +395,7 @@ class basic_reactive_mixin final: public Type {
 
     using alloc_traits = std::allocator_traits<typename underlying_type::allocator_type>;
     using basic_registry_type = basic_registry<typename owner_type::entity_type, typename owner_type::allocator_type>;
-    using container_type = std::vector<connection, typename alloc_traits::template rebind_alloc<connection>>;
+    using container_type = stl::vector<connection, typename alloc_traits::template rebind_alloc<connection>>;
 
     static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
 

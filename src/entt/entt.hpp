@@ -69,4 +69,5 @@ namespace entt {}
 #include "stl/functional.hpp"
 #include "stl/iterator.hpp"
 #include "stl/memory.hpp"
+#include "stl/vector.hpp"
 // IWYU pragma: end_exports

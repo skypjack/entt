@@ -7,9 +7,9 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -88,7 +88,7 @@ template<std::derived_from<directed_tag> Category, typename Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
-    using container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
 
 public:
     /*! @brief Allocator type. */

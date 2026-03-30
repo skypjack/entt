@@ -7,7 +7,6 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/concepts.hpp"
@@ -16,6 +15,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "../stl/vector.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
 #include "type_traits.hpp"
@@ -123,11 +123,11 @@ struct meta_template_node {
 };
 
 struct meta_type_descriptor {
-    std::vector<meta_ctor_node> ctor{};
-    std::vector<meta_base_node> base{};
-    std::vector<meta_conv_node> conv{};
-    std::vector<meta_data_node> data{};
-    std::vector<meta_func_node> func{};
+    stl::vector<meta_ctor_node> ctor{};
+    stl::vector<meta_base_node> base{};
+    stl::vector<meta_conv_node> conv{};
+    stl::vector<meta_data_node> data{};
+    stl::vector<meta_func_node> func{};
 };
 
 struct meta_type_node {

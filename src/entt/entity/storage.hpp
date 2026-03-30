@@ -9,7 +9,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/iterator.hpp"
@@ -17,6 +16,7 @@
 #include "../core/type_info.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/memory.hpp"
+#include "../stl/vector.hpp"
 #include "component.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
@@ -210,7 +210,7 @@ template<typename Type, typename Entity, typename Allocator>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
+    using container_type = stl::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = underlying_type::basic_iterator;
     using traits_type = component_traits<Type, Entity>;

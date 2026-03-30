@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <iterator>
 #include <utility>
-#include <vector>
+#include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -38,7 +38,7 @@ public:
           it{},
           tombstone_check{} {}
 
-    runtime_view_iterator(const std::vector<Set *> &cpools, iterator_type curr, const std::vector<Set *> &ignore) noexcept
+    runtime_view_iterator(const stl::vector<Set *> &cpools, iterator_type curr, const stl::vector<Set *> &ignore) noexcept
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -83,8 +83,8 @@ public:
     }
 
 private:
-    const std::vector<Set *> *pools;
-    const std::vector<Set *> *filter;
+    const stl::vector<Set *> *pools;
+    const stl::vector<Set *> *filter;
     iterator_type it;
     bool tombstone_check;
 };
@@ -119,7 +119,7 @@ template<typename Type, typename Allocator>
 class basic_runtime_view {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
-    using container_type = std::vector<Type *, Allocator>;
+    using container_type = stl::vector<Type *, Allocator>;
 
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(!pools.empty(), "Invalid view");

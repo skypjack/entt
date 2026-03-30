@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <vector>
+#include "../stl/vector.hpp"
 
 namespace entt {
 
@@ -31,7 +31,7 @@ class basic_table;
  * @tparam Type Element types.
  */
 template<typename... Type>
-using table = basic_table<std::vector<Type>...>;
+using table = basic_table<stl::vector<Type>...>;
 
 } // namespace entt
 

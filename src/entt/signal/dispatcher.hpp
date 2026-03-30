@@ -6,13 +6,13 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "sigh.hpp"
 
@@ -33,7 +33,7 @@ template<cvref_unqualified Type, typename Allocator>
 class dispatcher_handler final: public basic_dispatcher_handler {
     using alloc_traits = std::allocator_traits<Allocator>;
     using signal_type = sigh<void(Type &), Allocator>;
-    using container_type = std::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
+    using container_type = stl::vector<Type, typename alloc_traits::template rebind_alloc<Type>>;
 
 public:
     using allocator_type = Allocator;

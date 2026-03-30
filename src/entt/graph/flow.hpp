@@ -9,7 +9,6 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../container/dense_set.hpp"
@@ -18,6 +17,7 @@
 #include "../core/iterator.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/vector.hpp"
 #include "adjacency_matrix.hpp"
 #include "fwd.hpp"
 
@@ -32,7 +32,7 @@ class basic_flow {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, id_type>, "Invalid value type");
     using task_container_type = dense_set<id_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<id_type>>;
-    using ro_rw_container_type = std::vector<std::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<std::pair<std::size_t, bool>>>;
+    using ro_rw_container_type = stl::vector<std::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<std::pair<std::size_t, bool>>>;
     using deps_container_type = dense_map<id_type, ro_rw_container_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, ro_rw_container_type>>>;
     using adjacency_matrix_type = adjacency_matrix<directed_tag, typename alloc_traits::template rebind_alloc<std::size_t>>;
 

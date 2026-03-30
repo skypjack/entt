@@ -4,12 +4,12 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "../graph/adjacency_matrix.hpp"
 #include "../graph/flow.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "helper.hpp"
 
@@ -195,7 +195,7 @@ public:
          * @param from List of in-edges of the vertex.
          * @param to List of out-edges of the vertex.
          */
-        vertex(vertex_data data, std::vector<std::size_t> from, std::vector<std::size_t> to)
+        vertex(vertex_data data, stl::vector<std::size_t> from, stl::vector<std::size_t> to)
             : node{std::move(data)},
               in{std::move(from)},
               out{std::move(to)} {}
@@ -282,7 +282,7 @@ public:
          * @brief Returns the list of in-edges of a vertex.
          * @return The list of in-edges of a vertex.
          */
-        [[nodiscard]] const std::vector<std::size_t> &in_edges() const noexcept {
+        [[nodiscard]] const stl::vector<std::size_t> &in_edges() const noexcept {
             return in;
         }
 
@@ -290,7 +290,7 @@ public:
          * @brief Returns the list of out-edges of a vertex.
          * @return The list of out-edges of a vertex.
          */
-        [[nodiscard]] const std::vector<std::size_t> &out_edges() const noexcept {
+        [[nodiscard]] const stl::vector<std::size_t> &out_edges() const noexcept {
             return out;
         }
 
@@ -305,8 +305,8 @@ public:
 
     private:
         vertex_data node;
-        std::vector<std::size_t> in;
-        std::vector<std::size_t> out;
+        stl::vector<std::size_t> in;
+        stl::vector<std::size_t> out;
     };
 
     /**
@@ -399,13 +399,13 @@ public:
      * @brief Generates a task graph for the current content.
      * @return The adjacency list of the task graph.
      */
-    [[nodiscard]] std::vector<vertex> graph() const {
-        std::vector<vertex> adjacency_list{};
+    [[nodiscard]] stl::vector<vertex> graph() const {
+        stl::vector<vertex> adjacency_list{};
         adjacency_list.reserve(vertices.size());
 
         for(auto adjacency_matrix = builder.graph(); auto curr: adjacency_matrix.vertices()) {
-            std::vector<std::size_t> in{};
-            std::vector<std::size_t> out{};
+            stl::vector<std::size_t> in{};
+            stl::vector<std::size_t> out{};
 
             for(auto &&edge: adjacency_matrix.in_edges(curr)) {
                 in.push_back(edge.first);
@@ -428,7 +428,7 @@ public:
     }
 
 private:
-    std::vector<vertex_data> vertices;
+    stl::vector<vertex_data> vertices;
     flow builder;
 };
 

@@ -8,13 +8,13 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/bit.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -140,8 +140,8 @@ template<typename Entity, typename Allocator>
 class basic_sparse_set {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
-    using sparse_container_type = std::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
-    using packed_container_type = std::vector<Entity, Allocator>;
+    using sparse_container_type = stl::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
+    using packed_container_type = stl::vector<Entity, Allocator>;
     using traits_type = entt_traits<Entity>;
 
     static constexpr auto max_size = static_cast<std::size_t>(traits_type::to_entity(null));

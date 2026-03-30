@@ -13,7 +13,6 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
@@ -21,6 +20,7 @@
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -237,8 +237,8 @@ class dense_map {
     using node_type = internal::dense_map_node<Key, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(std::is_same_v<typename alloc_traits::value_type, std::pair<const Key, Type>>, "Invalid value type");
-    using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
-    using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
+    using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
     [[nodiscard]] std::size_t key_to_bucket(const auto &key) const noexcept {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)

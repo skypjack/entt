@@ -5,9 +5,9 @@
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/compressed_pair.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "process.hpp"
 
@@ -37,7 +37,7 @@ class basic_scheduler {
     using base_type = basic_process<Delta, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;
     using container_allocator = alloc_traits::template rebind_alloc<std::shared_ptr<base_type>>;
-    using container_type = std::vector<std::shared_ptr<base_type>, container_allocator>;
+    using container_type = stl::vector<std::shared_ptr<base_type>, container_allocator>;
 
 public:
     /*! @brief Process type. */
