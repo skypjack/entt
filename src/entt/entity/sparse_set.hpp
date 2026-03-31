@@ -873,7 +873,7 @@ public:
                     ++first;
                 }
 
-                count += static_cast<size_type>(std::distance(it, first));
+                count += static_cast<size_type>(stl::distance(it, first));
                 erase(it, first);
             }
         } else {

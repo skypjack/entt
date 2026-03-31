@@ -99,7 +99,7 @@ struct radix_sort {
 
             using value_type = std::iterator_traits<It>::value_type;
             using difference_type = std::iterator_traits<It>::difference_type;
-            stl::vector<value_type> aux(static_cast<std::size_t>(std::distance(first, last)));
+            stl::vector<value_type> aux(static_cast<std::size_t>(stl::distance(first, last)));
 
             auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {
                 constexpr auto mask = (1 << Bit) - 1;

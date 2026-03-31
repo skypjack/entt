@@ -915,7 +915,7 @@ public:
      * @return The number of elements in the given bucket.
      */
     [[nodiscard]] size_type bucket_size(const size_type index) const {
-        return static_cast<size_type>(std::distance(begin(index), end(index)));
+        return static_cast<size_type>(stl::distance(begin(index), end(index)));
     }
 
     /**

@@ -138,7 +138,7 @@ public:
         static_assert(!std::is_same_v<Type, entity_type>, "Entity types not supported");
 
         if(const auto *storage = reg->template storage<Type>(id); storage && !storage->empty()) {
-            archive(static_cast<traits_type::entity_type>(std::distance(first, last)));
+            archive(static_cast<traits_type::entity_type>(stl::distance(first, last)));
 
             for(; first != last; ++first) {
                 if(const auto entt = *first; storage->contains(entt)) {
