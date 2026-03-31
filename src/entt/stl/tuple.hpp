@@ -2,7 +2,6 @@
 #define ENTT_STL_TUPLE_HPP
 
 #include <tuple>
-#include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
