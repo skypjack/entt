@@ -36,8 +36,8 @@
 #endif
 
 #ifdef ENTT_USE_ATOMIC
-#    include <atomic>
-#    define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
+#    include "../stl/atomic.hpp"
+#    define ENTT_MAYBE_ATOMIC(Type) stl::atomic<Type>
 #else
 #    define ENTT_MAYBE_ATOMIC(Type) Type
 #endif
