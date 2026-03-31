@@ -39,7 +39,7 @@ public:
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
-    using iterator_category = std::random_access_iterator_tag;
+    using iterator_category = stl::random_access_iterator_tag;
 
     constexpr dense_set_iterator() noexcept
         : it{} {}
@@ -131,7 +131,7 @@ public:
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = stl::forward_iterator_tag;
 
     constexpr dense_set_local_iterator() noexcept = default;
 

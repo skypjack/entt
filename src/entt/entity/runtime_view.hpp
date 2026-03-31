@@ -30,7 +30,7 @@ public:
     using pointer = iterator_traits::pointer;
     using reference = iterator_traits::reference;
     using difference_type = iterator_traits::difference_type;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = stl::bidirectional_iterator_tag;
 
     constexpr runtime_view_iterator() noexcept
         : pools{},

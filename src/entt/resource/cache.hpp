@@ -34,8 +34,8 @@ public:
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::random_access_iterator_tag;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::random_access_iterator_tag;
 
     constexpr resource_cache_iterator() noexcept = default;
 

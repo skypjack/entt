@@ -42,8 +42,8 @@ public:
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::forward_iterator_tag;
 
     constexpr extended_group_iterator()
         : it{},

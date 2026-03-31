@@ -64,7 +64,7 @@ struct iota_iterator final {
     /*! @brief Difference type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Iterator category. */
-    using iterator_category = std::input_iterator_tag;
+    using iterator_category = stl::input_iterator_tag;
 
     /*! @brief Default constructor. */
     constexpr iota_iterator() noexcept

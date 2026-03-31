@@ -28,7 +28,7 @@ struct sparse_set_iterator final {
     using pointer = Container::const_pointer;
     using reference = Container::const_reference;
     using difference_type = Container::difference_type;
-    using iterator_category = std::random_access_iterator_tag;
+    using iterator_category = stl::random_access_iterator_tag;
 
     constexpr sparse_set_iterator() noexcept
         : packed{},
