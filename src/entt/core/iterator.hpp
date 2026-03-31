@@ -123,7 +123,7 @@ private:
 template<stl::input_or_output_iterator It, stl::sentinel_for<It> Sentinel = It>
 struct iterable_adaptor final {
     /*! @brief Value type. */
-    using value_type = std::iterator_traits<It>::value_type;
+    using value_type = stl::iterator_traits<It>::value_type;
     /*! @brief Iterator type. */
     using iterator = It;
     /*! @brief Sentinel type. */

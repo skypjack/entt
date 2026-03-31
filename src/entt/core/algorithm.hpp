@@ -97,8 +97,8 @@ struct radix_sort {
         if(first < last) {
             constexpr auto passes = N / Bit;
 
-            using value_type = std::iterator_traits<It>::value_type;
-            using difference_type = std::iterator_traits<It>::difference_type;
+            using value_type = stl::iterator_traits<It>::value_type;
+            using difference_type = stl::iterator_traits<It>::difference_type;
             stl::vector<value_type> aux(static_cast<std::size_t>(stl::distance(first, last)));
 
             auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {

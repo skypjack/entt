@@ -34,7 +34,7 @@ class storage_iterator final {
     using container_type = std::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
 
-    using iterator_traits = std::iterator_traits<std::conditional_t<
+    using iterator_traits = stl::iterator_traits<std::conditional_t<
         std::is_const_v<Container>,
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::const_pointer,
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
@@ -725,7 +725,7 @@ public:
      * @return Iterator pointing to the first element inserted, if any.
      */
     template<stl::input_iterator It>
-    requires std::same_as<typename std::iterator_traits<It>::value_type, value_type>
+    requires std::same_as<typename stl::iterator_traits<It>::value_type, value_type>
     iterator insert(stl::input_iterator auto first, stl::input_iterator auto last, It from) {
         for(; first != last; ++first, ++from) {
             emplace_element(*first, true, *from);

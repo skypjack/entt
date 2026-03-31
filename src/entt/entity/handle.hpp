@@ -25,7 +25,7 @@ class handle_storage_iterator final {
     using entity_type = underlying_type::entity_type;
 
 public:
-    using value_type = std::iterator_traits<It>::value_type;
+    using value_type = stl::iterator_traits<It>::value_type;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

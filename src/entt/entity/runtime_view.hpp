@@ -17,7 +17,7 @@ namespace internal {
 template<typename Set>
 class runtime_view_iterator final {
     using iterator_type = Set::iterator;
-    using iterator_traits = std::iterator_traits<iterator_type>;
+    using iterator_traits = stl::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid() const {
         return (!tombstone_check || *it != tombstone)

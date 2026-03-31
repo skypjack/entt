@@ -666,7 +666,7 @@ template<typename>
 struct has_iterator_category: std::false_type {};
 
 template<typename Type>
-requires requires { typename std::iterator_traits<Type>::iterator_category; }
+requires requires { typename stl::iterator_traits<Type>::iterator_category; }
 struct has_iterator_category<Type>: std::true_type {};
 
 } // namespace internal

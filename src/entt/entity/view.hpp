@@ -41,7 +41,7 @@ const Type *view_placeholder() {
 }
 
 template<typename It>
-[[nodiscard]] bool fully_initialized(It first, const It last, const std::remove_pointer_t<typename std::iterator_traits<It>::value_type> *placeholder) noexcept {
+[[nodiscard]] bool fully_initialized(It first, const It last, const std::remove_pointer_t<typename stl::iterator_traits<It>::value_type> *placeholder) noexcept {
     for(; (first != last) && *first != placeholder; ++first) {}
     return first == last;
 }
@@ -63,7 +63,7 @@ class view_iterator final {
     friend struct extended_view_iterator;
 
     using iterator_type = Type::const_iterator;
-    using iterator_traits = std::iterator_traits<iterator_type>;
+    using iterator_traits = stl::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid(const iterator_traits::value_type entt) const noexcept {
         return (!Checked || (entt != tombstone))

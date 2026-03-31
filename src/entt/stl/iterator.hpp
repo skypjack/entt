@@ -11,6 +11,7 @@ using std::bidirectional_iterator_tag;
 using std::distance;
 using std::forward_iterator_tag;
 using std::input_iterator_tag;
+using std::iterator_traits;
 using std::make_reverse_iterator;
 using std::random_access_iterator_tag;
 using std::reverse_iterator;

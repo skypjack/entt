@@ -598,7 +598,7 @@ public:
      * @param from An iterator to the first element of the range of elements.
      */
     template<typename Type, typename EIt, typename CIt>
-    requires std::same_as<typename std::iterator_traits<CIt>::value_type, Type>
+    requires std::same_as<typename stl::iterator_traits<CIt>::value_type, Type>
     void insert(EIt first, EIt last, CIt from) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
         assure<Type>().insert(first, last, from);
