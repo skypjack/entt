@@ -406,9 +406,9 @@ public:
     /*! @brief Constant random access iterator type. */
     using const_iterator = internal::storage_iterator<const container_type, traits_type::page_size>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = std::reverse_iterator<iterator>;
+    using reverse_iterator = stl::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using const_reverse_iterator = stl::reverse_iterator<const_iterator>;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator, iterator>>;
     /*! @brief Constant extended iterable storage proxy. */

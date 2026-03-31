@@ -279,9 +279,9 @@ public:
     /*! @brief Constant random access iterator type. */
     using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_pointer>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = std::reverse_iterator<iterator>;
+    using reverse_iterator = stl::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using const_reverse_iterator = stl::reverse_iterator<const_iterator>;
     /*! @brief Forward iterator type. */
     using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::pointer>;
     /*! @brief Constant forward iterator type. */

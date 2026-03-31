@@ -8,12 +8,12 @@
 namespace entt::stl {
 
 using std::bidirectional_iterator_tag;
+using std::distance;
 using std::forward_iterator_tag;
 using std::input_iterator_tag;
-using std::random_access_iterator_tag;
-
-using std::distance;
 using std::make_reverse_iterator;
+using std::random_access_iterator_tag;
+using std::reverse_iterator;
 
 #ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
