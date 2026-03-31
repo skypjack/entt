@@ -2,7 +2,6 @@
 #define ENTT_CORE_ITERATOR_HPP
 
 #include <concepts>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>

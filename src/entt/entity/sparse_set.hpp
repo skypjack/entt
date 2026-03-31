@@ -4,7 +4,6 @@
 #include <compare>
 #include <concepts>
 #include <cstddef>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -651,7 +650,7 @@ public:
      * array.
      */
     [[nodiscard]] reverse_iterator rbegin() const noexcept {
-        return std::make_reverse_iterator(end());
+        return stl::make_reverse_iterator(end());
     }
 
     /*! @copydoc rbegin */
@@ -665,7 +664,7 @@ public:
      * reversed sparse set.
      */
     [[nodiscard]] reverse_iterator rend() const noexcept {
-        return std::make_reverse_iterator(begin());
+        return stl::make_reverse_iterator(begin());
     }
 
     /*! @copydoc rend */

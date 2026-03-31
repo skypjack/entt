@@ -4,7 +4,6 @@
 #include <compare>
 #include <concepts>
 #include <cstddef>
-#include <iterator>
 #include <utility>
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"

@@ -4,7 +4,6 @@
 #include <compare>
 #include <concepts>
 #include <cstddef>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -589,7 +588,7 @@ public:
      * @return An iterator to the first instance of the reversed internal array.
      */
     [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
-        return std::make_reverse_iterator(cend());
+        return stl::make_reverse_iterator(cend());
     }
 
     /*! @copydoc crbegin */
@@ -599,7 +598,7 @@ public:
 
     /*! @copydoc rbegin */
     [[nodiscard]] reverse_iterator rbegin() noexcept {
-        return std::make_reverse_iterator(end());
+        return stl::make_reverse_iterator(end());
     }
 
     /**
@@ -608,7 +607,7 @@ public:
      * reversed internal array.
      */
     [[nodiscard]] const_reverse_iterator crend() const noexcept {
-        return std::make_reverse_iterator(cbegin());
+        return stl::make_reverse_iterator(cbegin());
     }
 
     /*! @copydoc crend */
@@ -618,7 +617,7 @@ public:
 
     /*! @copydoc rend */
     [[nodiscard]] reverse_iterator rend() noexcept {
-        return std::make_reverse_iterator(begin());
+        return stl::make_reverse_iterator(begin());
     }
 
     /**

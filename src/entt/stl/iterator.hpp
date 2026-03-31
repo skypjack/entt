@@ -1,18 +1,20 @@
 #ifndef ENTT_STL_ITERATOR_HPP
 #define ENTT_STL_ITERATOR_HPP
 
+#include <iterator>
 #include "../config/config.h"
 
 /*! @cond ENTT_INTERNAL */
+namespace entt::stl {
+
+using std::make_reverse_iterator;
+
 #ifndef ENTT_FORCE_STL
 #    if __has_include(<version>)
 #        include <version>
 #
 #        if defined(__cpp_lib_ranges)
 #            define ENTT_HAS_ITERATOR_CONCEPTS
-#            include <iterator>
-
-namespace entt::stl {
 
 using std::bidirectional_iterator;
 using std::forward_iterator;
@@ -22,18 +24,13 @@ using std::output_iterator;
 using std::random_access_iterator;
 using std::sentinel_for;
 
-} // namespace entt::stl
-
 #        endif
 #    endif
 #endif
 
 #ifndef ENTT_HAS_ITERATOR_CONCEPTS
 #    include <concepts>
-#    include <iterator>
 #    include <utility>
-
-namespace entt::stl {
 
 namespace internal {
 
@@ -94,9 +91,9 @@ concept sentinel_for = input_or_output_iterator<It> && requires(Sentinel sentine
     { it == sentinel } -> std::same_as<bool>;
 };
 
-} // namespace entt::stl
-
 #endif
+
+} // namespace entt::stl
 /*! @endcond */
 
 #endif

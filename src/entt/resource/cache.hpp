@@ -5,7 +5,6 @@
 #include <concepts>
 #include <cstddef>
 #include <functional>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -14,6 +13,7 @@
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
 #include "fwd.hpp"
 #include "loader.hpp"
