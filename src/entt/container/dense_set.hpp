@@ -35,7 +35,7 @@ class dense_set_iterator final {
     static_assert(std::is_pointer_v<It>, "Not a pointer type");
 
 public:
-    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
+    using value_type = std::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;
@@ -127,7 +127,7 @@ class dense_set_local_iterator final {
     static_assert(std::is_pointer_v<It>, "Not a pointer type");
 
 public:
-    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
+    using value_type = std::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
     using difference_type = std::ptrdiff_t;

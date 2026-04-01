@@ -41,7 +41,7 @@ const Type *view_placeholder() {
 }
 
 template<typename It>
-[[nodiscard]] bool fully_initialized(It first, const It last, const std::remove_pointer_t<typename stl::iterator_traits<It>::value_type> *placeholder) noexcept {
+[[nodiscard]] bool fully_initialized(It first, const It last, const stl::remove_pointer_t<typename stl::iterator_traits<It>::value_type> *placeholder) noexcept {
     for(; (first != last) && *first != placeholder; ++first) {}
     return first == last;
 }

@@ -30,7 +30,7 @@ namespace entt {
 namespace internal {
 
 class basic_meta_factory {
-    using invoke_type = std::remove_pointer_t<decltype(meta_func_node::invoke)>;
+    using invoke_type = stl::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
     enum class mode {
         type,
@@ -370,7 +370,7 @@ public:
                     &meta_setter<Type, Data>,
                     &meta_getter<Type, Data, Policy>});
         } else {
-            using data_type = std::remove_pointer_t<decltype(Data)>;
+            using data_type = stl::remove_pointer_t<decltype(Data)>;
 
             if constexpr(std::is_pointer_v<decltype(Data)>) {
                 static_assert(Policy::template value<decltype(*Data)>, "Invalid return type for the given policy");

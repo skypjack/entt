@@ -291,7 +291,7 @@ private:
  * @tparam Candidate Function or member to connect to the delegate.
  */
 template<auto Candidate>
-delegate(connect_arg_t<Candidate>) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate)>>>;
+delegate(connect_arg_t<Candidate>) -> delegate<stl::remove_pointer_t<internal::function_pointer_t<decltype(Candidate)>>>;
 
 /**
  * @brief Deduction guide.
@@ -299,7 +299,7 @@ delegate(connect_arg_t<Candidate>) -> delegate<std::remove_pointer_t<internal::f
  * @tparam Type Type of class or type of payload.
  */
 template<auto Candidate, typename Type>
-delegate(connect_arg_t<Candidate>, Type &&) -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
+delegate(connect_arg_t<Candidate>, Type &&) -> delegate<stl::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
 
 /**
  * @brief Deduction guide.

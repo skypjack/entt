@@ -143,7 +143,7 @@ struct poly_base {
     [[nodiscard]] decltype(auto) invoke(const poly_base &self, Args &&...args) const {
         const auto &poly = static_cast<const Poly &>(self);
 
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(poly.vtable)>>) {
+        if constexpr(std::is_function_v<stl::remove_pointer_t<decltype(poly.vtable)>>) {
             return poly.vtable(poly.storage, stl::forward<Args>(args)...);
         } else {
             return std::get<Member>(*poly.vtable)(poly.storage, stl::forward<Args>(args)...);
@@ -155,7 +155,7 @@ struct poly_base {
     [[nodiscard]] decltype(auto) invoke(poly_base &self, Args &&...args) {
         auto &poly = static_cast<Poly &>(self);
 
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(poly.vtable)>>) {
+        if constexpr(std::is_function_v<stl::remove_pointer_t<decltype(poly.vtable)>>) {
             static_assert(Member == 0u, "Unknown member");
             return poly.vtable(poly.storage, stl::forward<Args>(args)...);
         } else {

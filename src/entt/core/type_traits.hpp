@@ -674,7 +674,7 @@ struct has_iterator_category<Type>: std::true_type {};
 
 /*! @copydoc is_iterator */
 template<typename Type>
-requires (!std::is_void_v<std::remove_const_t<std::remove_pointer_t<Type>>>)
+requires (!std::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>)
 struct is_iterator<Type>: internal::has_iterator_category<Type> {};
 
 /**
@@ -844,7 +844,7 @@ class member_class {
 
 public:
     /*! @brief The class of the given non-static member object or function. */
-    using type = std::remove_pointer_t<decltype(clazz(stl::declval<Member>()))>;
+    using type = stl::remove_pointer_t<decltype(clazz(stl::declval<Member>()))>;
 };
 
 /**

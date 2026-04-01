@@ -158,7 +158,7 @@ template<typename Type, typename Value>
     return static_cast<Type::value_type *>(nullptr);
 }
 
-[[nodiscard]] inline auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
+[[nodiscard]] inline auto *find_overload(meta_func_node *curr, stl::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
     while((curr != nullptr) && (curr->invoke != ref)) { curr = curr->next.get(); }
     return curr;
 }
@@ -226,7 +226,7 @@ auto setup_node_for() noexcept {
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve<std::remove_const_t<std::remove_pointer_t<Type>>>};
+        &resolve<std::remove_const_t<stl::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {

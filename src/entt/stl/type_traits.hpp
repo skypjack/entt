@@ -10,6 +10,7 @@ using std::is_invocable_r_v;
 using std::is_member_object_pointer_v;
 using std::is_same_v;
 using std::remove_cvref_t;
+using std::remove_pointer_t;
 
 } // namespace entt::stl
 /*! @endcond */
