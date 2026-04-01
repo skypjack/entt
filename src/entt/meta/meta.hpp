@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <memory>
 #include <string_view>
-#include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../core/concepts.hpp"
@@ -18,6 +17,7 @@
 #include "../locator/locator.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "adl_pointer.hpp"
 #include "context.hpp"
 #include "fwd.hpp"

@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/concepts.hpp"
@@ -12,6 +11,7 @@
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "sigh.hpp"

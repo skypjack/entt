@@ -4,7 +4,7 @@
 #include <compare>
 #include <concepts>
 #include <memory>
-#include <utility>
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {

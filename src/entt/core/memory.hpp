@@ -3,11 +3,11 @@
 
 #include <cstddef>
 #include <memory>
-#include <utility>
 #include "../config/config.h"
 #include "../stl/memory.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 
 namespace entt {
 

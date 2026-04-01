@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <concepts>
 #include <functional>
-#include <utility>
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 
 namespace entt {

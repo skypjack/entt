@@ -3,8 +3,8 @@
 
 #include <concepts>
 #include <memory>
-#include <utility>
 #include "../config/config.h"
+#include "../stl/utility.hpp"
 
 namespace entt {
 

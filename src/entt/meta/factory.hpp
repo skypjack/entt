@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <utility>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/fwd.hpp"
@@ -15,6 +14,7 @@
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
 #include "meta.hpp"

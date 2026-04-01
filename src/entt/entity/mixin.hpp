@@ -2,13 +2,13 @@
 #define ENTT_ENTITY_MIXIN_HPP
 
 #include <concepts>
-#include <utility>
 #include "../config/config.h"
 #include "../core/any.hpp"
 #include "../core/type_info.hpp"
 #include "../signal/sigh.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"

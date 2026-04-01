@@ -1,8 +1,8 @@
 #ifndef ENTT_CORE_UTILITY_HPP
 #define ENTT_CORE_UTILITY_HPP
 
-#include <utility>
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 
 namespace entt {
 

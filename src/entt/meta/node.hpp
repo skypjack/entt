@@ -5,7 +5,6 @@
 #include <bit>
 #include <cstddef>
 #include <memory>
-#include <utility>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/concepts.hpp"
@@ -15,6 +14,7 @@
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 #include "context.hpp"
 #include "fwd.hpp"

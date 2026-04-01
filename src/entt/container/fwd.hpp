@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <memory>
-#include <utility>
+#include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 
 namespace entt {

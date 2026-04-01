@@ -2,7 +2,7 @@
 #define ENTT_RESOURCE_LOADER_HPP
 
 #include <memory>
-#include <utility>
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {

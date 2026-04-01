@@ -2,13 +2,13 @@
 #define ENTT_SIGNAL_EMITTER_HPP
 
 #include <functional>
-#include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {

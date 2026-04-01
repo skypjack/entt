@@ -1,8 +1,8 @@
 #ifndef ENTT_META_TYPE_TRAITS_HPP
 #define ENTT_META_TYPE_TRAITS_HPP
 
-#include <utility>
 #include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 
 namespace entt {
 
