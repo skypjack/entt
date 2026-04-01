@@ -34,7 +34,7 @@ struct std_sort {
      */
     template<typename Compare = std::less<>, typename... Args>
     void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
-        std::sort(std::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
+        std::sort(stl::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
     }
 };
 

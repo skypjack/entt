@@ -249,7 +249,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
-        : meta_any{locator<meta_ctx>::value_or(), std::in_place_type<Type>, std::forward<Args>(args)...} {}
+        : meta_any{locator<meta_ctx>::value_or(), std::in_place_type<Type>, stl::forward<Args>(args)...} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -260,7 +260,7 @@ public:
      */
     template<typename Type, typename... Args>
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
-        : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
+        : storage{std::in_place_type<Type>, stl::forward<Args>(args)...},
           ctx{&area},
           vtable{&basic_vtable<stl::remove_cvref_t<Type>>} {}
 
@@ -294,7 +294,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(Type &&value)
-        : meta_any{locator<meta_ctx>::value_or(), std::forward<Type>(value)} {}
+        : meta_any{locator<meta_ctx>::value_or(), stl::forward<Type>(value)} {}
 
     /**
      * @brief Constructs a wrapper from a given value.
@@ -305,7 +305,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(const meta_ctx &area, Type &&value)
-        : meta_any{area, std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
+        : meta_any{area, std::in_place_type<std::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Context aware copy constructor.
@@ -391,7 +391,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any &operator=(Type &&value) {
-        emplace<std::decay_t<Type>>(std::forward<Type>(value));
+        emplace<std::decay_t<Type>>(stl::forward<Type>(value));
         return *this;
     }
 
@@ -550,7 +550,7 @@ public:
     /*! @copydoc any::emplace */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
-        storage.emplace<Type>(std::forward<Args>(args)...);
+        storage.emplace<Type>(stl::forward<Args>(args)...);
         auto *prev = stl::exchange(vtable, &basic_vtable<stl::remove_cvref_t<Type>>);
         node = (prev == vtable) ? node : nullptr;
     }
@@ -672,7 +672,7 @@ private:
  */
 template<typename Type>
 [[nodiscard]] meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
-    return meta_any{ctx, std::in_place_type<Type &&>, std::forward<Type>(value)};
+    return meta_any{ctx, std::in_place_type<Type &&>, stl::forward<Type>(value)};
 }
 
 /**
@@ -683,7 +683,7 @@ template<typename Type>
  */
 template<typename Type>
 [[nodiscard]] meta_any forward_as_meta(Type &&value) {
-    return forward_as_meta(locator<meta_ctx>::value_or(), std::forward<Type>(value));
+    return forward_as_meta(locator<meta_ctx>::value_or(), stl::forward<Type>(value));
 }
 
 /*! @brief Opaque pointers to instances of any type. */
@@ -691,11 +691,11 @@ class meta_handle {
     template<typename Type, typename... Args>
     requires std::same_as<stl::remove_cvref_t<Type>, meta_any>
     meta_handle(int, Type &value, Args &&...args)
-        : any{std::forward<Args>(args)..., value.as_ref()} {}
+        : any{stl::forward<Args>(args)..., value.as_ref()} {}
 
     template<typename Type, typename... Args>
     meta_handle(char, Type &value, Args &&...args)
-        : any{std::forward<Args>(args)..., std::in_place_type<Type &>, value} {}
+        : any{stl::forward<Args>(args)..., std::in_place_type<Type &>, value} {}
 
 public:
     /*! Default constructor. */
@@ -898,7 +898,7 @@ struct meta_data: meta_object<internal::meta_data_node> {
     template<typename Instance = meta_handle, typename Type>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(Instance &&instance, Type &&value) const {
-        return node_or_assert().set(meta_handle{*ctx, std::forward<Instance>(instance)}, meta_any{*ctx, std::forward<Type>(value)});
+        return node_or_assert().set(meta_handle{*ctx, stl::forward<Instance>(instance)}, meta_any{*ctx, stl::forward<Type>(value)});
     }
 
     /**
@@ -909,7 +909,7 @@ struct meta_data: meta_object<internal::meta_data_node> {
      */
     template<typename Instance = meta_handle>
     [[nodiscard]] meta_any get(Instance &&instance) const {
-        return node_or_assert().get(meta_handle{*ctx, std::forward<Instance>(instance)});
+        return node_or_assert().get(meta_handle{*ctx, stl::forward<Instance>(instance)});
     }
 
     /**
@@ -1000,7 +1000,7 @@ struct meta_func: meta_object<internal::meta_func_node> {
      */
     template<typename Instance = meta_handle>
     meta_any invoke(Instance &&instance, meta_any *const args, const size_type sz) const {
-        return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, std::forward<Instance>(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
+        return (sz == arity()) ? node_or_assert().invoke(meta_handle{*ctx, stl::forward<Instance>(instance)}, args) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /**
@@ -1014,7 +1014,7 @@ struct meta_func: meta_object<internal::meta_func_node> {
     template<typename Instance = meta_handle, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(Instance &&instance, Args &&...args) const {
-        return invoke(std::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return invoke(stl::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::traits */
@@ -1385,7 +1385,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        return construct(std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return construct(std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     }
 
@@ -1420,7 +1420,7 @@ public:
     template<typename Instance = meta_handle>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, meta_any *const args, const size_type sz) const {
-        meta_handle wrapped{*ctx, std::forward<Instance>(instance)};
+        meta_handle wrapped{*ctx, stl::forward<Instance>(instance)};
 
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member(ref.details->func, id); elem != nullptr) {
@@ -1451,7 +1451,7 @@ public:
     template<typename Instance = meta_handle, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, Args &&...args) const {
-        return invoke(id, std::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, std::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return invoke(id, stl::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /**
@@ -1467,7 +1467,7 @@ public:
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     bool set(const id_type id, Instance &&instance, Type &&value) const {
         const auto candidate = data(id);
-        return candidate && candidate.set(std::forward<Instance>(instance), std::forward<Type>(value));
+        return candidate && candidate.set(stl::forward<Instance>(instance), stl::forward<Type>(value));
     }
 
     /**
@@ -1480,7 +1480,7 @@ public:
     template<typename Instance = meta_handle>
     [[nodiscard]] meta_any get(const id_type id, Instance &&instance) const {
         const auto candidate = data(id);
-        return candidate ? candidate.get(std::forward<Instance>(instance)) : meta_any{meta_ctx_arg, *ctx};
+        return candidate ? candidate.get(stl::forward<Instance>(instance)) : meta_any{meta_ctx_arg, *ctx};
     }
 
     /*! @copydoc meta_data::traits */
@@ -1516,17 +1516,17 @@ private:
 template<typename... Args>
 // NOLINTNEXTLINE(modernize-use-nodiscard)
 meta_any meta_any::invoke(const id_type id, Args &&...args) const {
-    return type().invoke(id, *this, std::forward<Args>(args)...);
+    return type().invoke(id, *this, stl::forward<Args>(args)...);
 }
 
 template<typename... Args>
 meta_any meta_any::invoke(const id_type id, Args &&...args) {
-    return type().invoke(id, *this, std::forward<Args>(args)...);
+    return type().invoke(id, *this, stl::forward<Args>(args)...);
 }
 
 template<typename Type>
 bool meta_any::set(const id_type id, Type &&value) {
-    return type().set(id, *this, std::forward<Type>(value));
+    return type().set(id, *this, stl::forward<Type>(value));
 }
 
 [[nodiscard]] inline meta_any meta_any::get(const id_type id) const {

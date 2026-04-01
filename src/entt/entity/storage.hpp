@@ -246,7 +246,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
 
         ENTT_TRY {
             auto *elem = stl::to_address(assure_at_least(static_cast<size_type>(it.index())));
-            entt::uninitialized_construct_using_allocator(elem, get_allocator(), std::forward<Args>(args)...);
+            entt::uninitialized_construct_using_allocator(elem, get_allocator(), stl::forward<Args>(args)...);
         }
         ENTT_CATCH {
             base_type::pop(it, it + 1u);
@@ -668,10 +668,10 @@ public:
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
         if constexpr(std::is_aggregate_v<value_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<value_type>)) {
-            const auto it = emplace_element(entt, false, Type{std::forward<Args>(args)...});
+            const auto it = emplace_element(entt, false, Type{stl::forward<Args>(args)...});
             return element_at(static_cast<size_type>(it.index()));
         } else {
-            const auto it = emplace_element(entt, false, std::forward<Args>(args)...);
+            const auto it = emplace_element(entt, false, stl::forward<Args>(args)...);
             return element_at(static_cast<size_type>(it.index()));
         }
     }
@@ -687,7 +687,7 @@ public:
     value_type &patch(const entity_type entt, Func &&...func) {
         const auto idx = base_type::index(entt);
         auto &elem = element_at(idx);
-        (std::forward<Func>(func)(elem), ...);
+        (stl::forward<Func>(func)(elem), ...);
         return elem;
     }
 
@@ -903,7 +903,7 @@ public:
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
         ENTT_ASSERT(base_type::contains(entt), "Invalid entity");
-        (std::forward<Func>(func)(), ...);
+        (stl::forward<Func>(func)(), ...);
     }
 
     /**
@@ -1164,7 +1164,7 @@ public:
     template<typename... Func>
     void patch([[maybe_unused]] const entity_type entt, Func &&...func) {
         ENTT_ASSERT(base_type::index(entt) < base_type::free_list(), "The requested entity is not a live one");
-        (std::forward<Func>(func)(), ...);
+        (stl::forward<Func>(func)(), ...);
     }
 
     /**

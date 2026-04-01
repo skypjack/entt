@@ -8,6 +8,7 @@ namespace entt::stl {
 
 using std::declval;
 using std::exchange;
+using std::forward;
 
 } // namespace entt::stl
 /*! @endcond */

@@ -1073,7 +1073,7 @@ public:
             static_assert(Get::storage_policy == deletion_policy::in_place, "Unexpected storage policy");
 
             for(const auto pack: each()) {
-                stl::apply([&func](const auto, auto &&...elem) { func(std::forward<decltype(elem)>(elem)...); }, pack);
+                stl::apply([&func](const auto, auto &&...elem) { func(stl::forward<decltype(elem)>(elem)...); }, pack);
             }
         }
     }

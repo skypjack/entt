@@ -153,7 +153,7 @@ public:
     template<typename Type, typename... Args>
     type &attach(Args &&...args) {
         const auto &allocator = handlers.second();
-        return *handlers.first().emplace_back(std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+        return *handlers.first().emplace_back(std::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
     }
 
     /**

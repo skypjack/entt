@@ -235,7 +235,7 @@ class dense_set {
             return std::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(value));
+        packed.first().emplace_back(sparse.first()[index], stl::forward<Other>(value));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
@@ -545,9 +545,9 @@ public:
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
         if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<std::decay_t<Args>, value_type>)) {
-            return insert_or_do_nothing(std::forward<Args>(args)...);
+            return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
-            auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(std::forward<Args>(args)...));
+            auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(stl::forward<Args>(args)...));
             const auto index = value_to_bucket(node.second);
 
             if(auto it = constrained_find(node.second, index); it != end()) {

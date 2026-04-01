@@ -221,7 +221,7 @@ public:
     template<typename Type, typename... Args>
     basic_process &then(Args &&...args) {
         const auto &allocator = next.second();
-        return *(next.first() = std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+        return *(next.first() = std::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
     }
 
     /**

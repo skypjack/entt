@@ -152,22 +152,22 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             mode = any_policy::embedded;
 
             if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                ::new(&this->buffer) plain_type{std::forward<Args>(args)...};
+                ::new(&this->buffer) plain_type{stl::forward<Args>(args)...};
             } else {
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-                ::new(&this->buffer) plain_type(std::forward<Args>(args)...);
+                ::new(&this->buffer) plain_type(stl::forward<Args>(args)...);
             }
         } else {
             deleter = &basic_deleter<plain_type>;
             mode = any_policy::dynamic;
 
             if constexpr(std::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
-                this->instance = new plain_type{std::forward<Args>(args)...};
+                this->instance = new plain_type{stl::forward<Args>(args)...};
             } else if constexpr(std::is_array_v<plain_type>) {
                 static_assert(sizeof...(Args) == 0u, "Invalid arguments");
                 this->instance = new plain_type[std::extent_v<plain_type>]();
             } else {
-                this->instance = new plain_type(std::forward<Args>(args)...);
+                this->instance = new plain_type(stl::forward<Args>(args)...);
             }
         }
     }
@@ -197,7 +197,7 @@ public:
     template<typename Type, typename... Args>
     explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
         : base_type{} {
-        initialize<Type>(std::forward<Args>(args)...);
+        initialize<Type>(stl::forward<Args>(args)...);
     }
 
     /**
@@ -226,7 +226,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any(Type &&value)
-        : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
+        : basic_any{std::in_place_type<std::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
@@ -311,7 +311,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any &operator=(Type &&value) {
-        emplace<std::decay_t<Type>>(std::forward<Type>(value));
+        emplace<std::decay_t<Type>>(stl::forward<Type>(value));
         return *this;
     }
 
@@ -425,7 +425,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         invoke_deleter_if_exists();
-        initialize<Type>(std::forward<Args>(args)...);
+        initialize<Type>(stl::forward<Args>(args)...);
     }
 
     /**
@@ -601,7 +601,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
  */
 template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
 [[nodiscard]] basic_any<Len, Align> make_any(Args &&...args) {
-    return basic_any<Len, Align>{std::in_place_type<Type>, std::forward<Args>(args)...};
+    return basic_any<Len, Align>{std::in_place_type<Type>, stl::forward<Args>(args)...};
 }
 
 /**
@@ -614,7 +614,7 @@ template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align
  */
 template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
 [[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
-    return basic_any<Len, Align>{std::in_place_type<Type &&>, std::forward<Type>(value)};
+    return basic_any<Len, Align>{std::in_place_type<Type &&>, stl::forward<Type>(value)};
 }
 
 } // namespace entt

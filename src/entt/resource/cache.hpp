@@ -292,7 +292,7 @@ public:
             return {it, false};
         }
 
-        return pool.first().emplace(id, pool.second()(std::forward<Args>(args)...));
+        return pool.first().emplace(id, pool.second()(stl::forward<Args>(args)...));
     }
 
     /**
@@ -301,7 +301,7 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
-        return {pool.first().insert_or_assign(id, pool.second()(std::forward<Args>(args)...)).first, true};
+        return {pool.first().insert_or_assign(id, pool.second()(stl::forward<Args>(args)...)).first, true};
     }
 
     /**

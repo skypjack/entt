@@ -24,7 +24,7 @@ struct resource_loader {
      */
     template<typename... Args>
     result_type operator()(Args &&...args) const {
-        return std::make_shared<Type>(std::forward<Args>(args)...);
+        return std::make_shared<Type>(stl::forward<Args>(args)...);
     }
 };
 

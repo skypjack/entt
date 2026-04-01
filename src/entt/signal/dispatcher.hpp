@@ -70,9 +70,9 @@ public:
     template<typename... Args>
     void enqueue(Args &&...args) {
         if constexpr(std::is_aggregate_v<Type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<Type>)) {
-            events.push_back(Type{std::forward<Args>(args)...});
+            events.push_back(Type{stl::forward<Args>(args)...});
         } else {
-            events.emplace_back(std::forward<Args>(args)...);
+            events.emplace_back(stl::forward<Args>(args)...);
         }
     }
 
@@ -289,7 +289,7 @@ public:
      */
     template<typename Type, typename... Args>
     void enqueue(Args &&...args) {
-        enqueue_hint<Type>(type_hash<Type>::value(), std::forward<Args>(args)...);
+        enqueue_hint<Type>(type_hash<Type>::value(), stl::forward<Args>(args)...);
     }
 
     /**
@@ -299,7 +299,7 @@ public:
      */
     template<typename Type>
     void enqueue(Type &&value) {
-        enqueue_hint(type_hash<std::decay_t<Type>>::value(), std::forward<Type>(value));
+        enqueue_hint(type_hash<std::decay_t<Type>>::value(), stl::forward<Type>(value));
     }
 
     /**
@@ -311,7 +311,7 @@ public:
      */
     template<typename Type, typename... Args>
     void enqueue_hint(const id_type id, Args &&...args) {
-        assure<Type>(id).enqueue(std::forward<Args>(args)...);
+        assure<Type>(id).enqueue(stl::forward<Args>(args)...);
     }
 
     /**
@@ -322,7 +322,7 @@ public:
      */
     template<typename Type>
     void enqueue_hint(const id_type id, Type &&value) {
-        assure<std::decay_t<Type>>(id).enqueue(std::forward<Type>(value));
+        assure<std::decay_t<Type>>(id).enqueue(stl::forward<Type>(value));
     }
 
     /**

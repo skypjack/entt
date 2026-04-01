@@ -175,7 +175,7 @@ template<meta_policy Policy = as_value_t, typename Type>
     } else if constexpr(stl::is_same_v<Policy, as_void_t>) {
         return meta_any{ctx, std::in_place_type<void>};
     } else {
-        return meta_any{ctx, std::forward<Type>(value)};
+        return meta_any{ctx, stl::forward<Type>(value)};
     }
 }
 
@@ -188,7 +188,7 @@ template<meta_policy Policy = as_value_t, typename Type>
  */
 template<meta_policy Policy = as_value_t, typename Type>
 [[nodiscard]] meta_any meta_dispatch(Type &&value) {
-    return meta_dispatch<Policy, Type>(locator<meta_ctx>::value_or(), std::forward<Type>(value));
+    return meta_dispatch<Policy, Type>(locator<meta_ctx>::value_or(), stl::forward<Type>(value));
 }
 
 /*! @cond ENTT_INTERNAL */
@@ -196,11 +196,11 @@ namespace internal {
 
 template<typename Policy, typename Candidate, typename... Args>
 [[nodiscard]] meta_any meta_invoke_with_args(const meta_ctx &ctx, Candidate &&candidate, Args &&...args) {
-    if constexpr(std::is_void_v<decltype(std::invoke(std::forward<Candidate>(candidate), args...))>) {
-        std::invoke(std::forward<Candidate>(candidate), args...);
+    if constexpr(std::is_void_v<decltype(std::invoke(stl::forward<Candidate>(candidate), args...))>) {
+        std::invoke(stl::forward<Candidate>(candidate), args...);
         return meta_any{ctx, std::in_place_type<void>};
     } else {
-        return meta_dispatch<Policy>(ctx, std::invoke(std::forward<Candidate>(candidate), args...));
+        return meta_dispatch<Policy>(ctx, std::invoke(stl::forward<Candidate>(candidate), args...));
     }
 }
 
@@ -211,15 +211,15 @@ template<typename Type, typename Policy, typename Candidate, std::size_t... Inde
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
     if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(const auto *const clazz = instance.try_cast<const Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return meta_invoke_with_args<Policy>(instance.context(), std::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Policy>(instance.context(), stl::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else if constexpr(std::is_invocable_v<std::remove_reference_t<Candidate>, Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(auto *const clazz = instance.try_cast<Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return meta_invoke_with_args<Policy>(instance.context(), std::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Policy>(instance.context(), stl::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     } else {
         if(((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
-            return meta_invoke_with_args<Policy>(instance.context(), std::forward<Candidate>(candidate), (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
+            return meta_invoke_with_args<Policy>(instance.context(), stl::forward<Candidate>(candidate), (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
     }
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -355,7 +355,7 @@ template<typename Type, auto Data, meta_policy Policy = as_value_t>
  */
 template<typename Type, meta_policy Policy = as_value_t, typename Candidate>
 [[nodiscard]] meta_any meta_invoke(meta_handle instance, Candidate &&candidate, meta_any *const args) {
-    return internal::meta_invoke<Type, Policy>(*instance.operator->(), std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+    return internal::meta_invoke<Type, Policy>(*instance.operator->(), stl::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
 }
 
 /**
@@ -421,10 +421,10 @@ template<typename Type, typename Policy = as_value_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, Candidate &&candidate, meta_any *const args) {
     if constexpr(meta_function_helper_t<Type, Candidate>::is_static || std::is_class_v<stl::remove_cvref_t<Candidate>>) {
         meta_any placeholder{meta_ctx_arg, ctx};
-        return internal::meta_invoke<Type, Policy>(placeholder, std::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+        return internal::meta_invoke<Type, Policy>(placeholder, stl::forward<Candidate>(candidate), args, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     } else {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
-        return internal::meta_invoke<Type, Policy>(*args, std::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
+        return internal::meta_invoke<Type, Policy>(*args, stl::forward<Candidate>(candidate), args + 1u, std::make_index_sequence<meta_function_helper_t<Type, std::remove_reference_t<Candidate>>::args_type::size>{});
     }
 }
 
@@ -439,7 +439,7 @@ template<typename Type, typename Policy = as_value_t, typename Candidate>
  */
 template<typename Type, meta_policy Policy = as_value_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(Candidate &&candidate, meta_any *const args) {
-    return meta_construct<Type, Policy>(locator<meta_ctx>::value_or(), std::forward<Candidate>(candidate), args);
+    return meta_construct<Type, Policy>(locator<meta_ctx>::value_or(), stl::forward<Candidate>(candidate), args);
 }
 
 /**

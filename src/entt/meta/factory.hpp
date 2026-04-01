@@ -534,7 +534,7 @@ public:
      */
     template<typename Value, typename... Args>
     meta_factory custom(Args &&...args) {
-        base_type::custom(internal::meta_custom_node{type_id<Value>().hash(), std::make_shared<Value>(std::forward<Args>(args)...)});
+        base_type::custom(internal::meta_custom_node{type_id<Value>().hash(), std::make_shared<Value>(stl::forward<Args>(args)...)});
         return *this;
     }
 };

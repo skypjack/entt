@@ -144,22 +144,22 @@ public:
 
     template<typename Type, typename... Args>
     Type &emplace_as(const id_type id, Args &&...args) {
-        return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, std::forward<Args>(args)...).first->second);
+        return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, stl::forward<Args>(args)...).first->second);
     }
 
     template<typename Type, typename... Args>
     Type &emplace(Args &&...args) {
-        return emplace_as<Type>(type_id<Type>().hash(), std::forward<Args>(args)...);
+        return emplace_as<Type>(type_id<Type>().hash(), stl::forward<Args>(args)...);
     }
 
     template<typename Type>
     Type &insert_or_assign(const id_type id, Type &&value) {
-        return any_cast<stl::remove_cvref_t<Type> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
+        return any_cast<stl::remove_cvref_t<Type> &>(ctx.insert_or_assign(id, stl::forward<Type>(value)).first->second);
     }
 
     template<typename Type>
     Type &insert_or_assign(Type &&value) {
-        return insert_or_assign(type_id<Type>().hash(), std::forward<Type>(value));
+        return insert_or_assign(type_id<Type>().hash(), stl::forward<Type>(value));
     }
 
     template<typename Type>
@@ -566,7 +566,7 @@ public:
     template<typename Type, typename... Args>
     decltype(auto) emplace(const entity_type entt, Args &&...args) {
         ENTT_ASSERT(valid(entt), "Invalid entity");
-        return assure<Type>().emplace(entt, std::forward<Args>(args)...);
+        return assure<Type>().emplace(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -620,7 +620,7 @@ public:
     decltype(auto) emplace_or_replace(const entity_type entt, Args &&...args) {
         auto &cpool = assure<Type>();
         ENTT_ASSERT(valid(entt), "Invalid entity");
-        return cpool.contains(entt) ? cpool.patch(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); }) : cpool.emplace(entt, std::forward<Args>(args)...);
+        return cpool.contains(entt) ? cpool.patch(entt, [&args...](auto &...curr) { ((curr = Type{stl::forward<Args>(args)...}), ...); }) : cpool.emplace(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -644,7 +644,7 @@ public:
      */
     template<typename Type, typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
-        return assure<Type>().patch(entt, std::forward<Func>(func)...);
+        return assure<Type>().patch(entt, stl::forward<Func>(func)...);
     }
 
     /**
@@ -664,7 +664,7 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) replace(const entity_type entt, Args &&...args) {
-        return patch<Type>(entt, [&args...](auto &...curr) { ((curr = Type{std::forward<Args>(args)...}), ...); });
+        return patch<Type>(entt, [&args...](auto &...curr) { ((curr = Type{stl::forward<Args>(args)...}), ...); });
     }
 
     /**
@@ -882,7 +882,7 @@ public:
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entt, Args &&...args) {
         auto &cpool = assure<Type>();
         ENTT_ASSERT(valid(entt), "Invalid entity");
-        return cpool.contains(entt) ? cpool.get(entt) : cpool.emplace(entt, std::forward<Args>(args)...);
+        return cpool.contains(entt) ? cpool.get(entt) : cpool.emplace(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -1131,9 +1131,9 @@ public:
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
             auto comp = [&cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
-            cpool.sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            cpool.sort(std::move(comp), std::move(algo), stl::forward<Args>(args)...);
         } else {
-            cpool.sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            cpool.sort(std::move(compare), std::move(algo), stl::forward<Args>(args)...);
         }
     }
 

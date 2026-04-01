@@ -336,7 +336,7 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(const entity_type entt, Args &&...args) {
-        underlying_type::emplace(entt, std::forward<Args>(args)...);
+        underlying_type::emplace(entt, stl::forward<Args>(args)...);
         construction.publish(owner_or_assert(), entt);
         return this->get(entt);
     }
@@ -350,7 +350,7 @@ public:
      */
     template<typename... Func>
     decltype(auto) patch(const entity_type entt, Func &&...func) {
-        underlying_type::patch(entt, std::forward<Func>(func)...);
+        underlying_type::patch(entt, stl::forward<Func>(func)...);
         update.publish(owner_or_assert(), entt);
         return this->get(entt);
     }
@@ -366,7 +366,7 @@ public:
     template<typename... Args>
     void insert(stl::input_iterator auto first, stl::input_iterator auto last, Args &&...args) {
         auto from = underlying_type::size();
-        underlying_type::insert(first, last, std::forward<Args>(args)...);
+        underlying_type::insert(first, last, stl::forward<Args>(args)...);
 
         if(auto &reg = owner_or_assert(); !construction.empty()) {
             // fine as long as insert passes force_back true to try_emplace

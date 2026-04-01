@@ -39,9 +39,9 @@ inline constexpr bool is_tuple_v = is_tuple<Type>::value;
 template<typename Type>
 constexpr decltype(auto) unwrap_tuple(Type &&value) noexcept {
     if constexpr(stl::tuple_size_v<std::remove_reference_t<Type>> == 1u) {
-        return std::get<0>(std::forward<Type>(value));
+        return std::get<0>(stl::forward<Type>(value));
     } else {
-        return std::forward<Type>(value);
+        return stl::forward<Type>(value);
     }
 }
 
@@ -58,7 +58,7 @@ struct forward_apply: private Func {
      */
     template<typename... Args>
     constexpr forward_apply(Args &&...args) noexcept(std::is_nothrow_constructible_v<Func, Args...>)
-        : Func{std::forward<Args>(args)...} {}
+        : Func{stl::forward<Args>(args)...} {}
 
     /**
      * @brief Forwards and applies the arguments with the underlying function.
@@ -68,13 +68,13 @@ struct forward_apply: private Func {
      */
     template<typename Type>
     constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(stl::apply(stl::declval<Func &>(), args))) {
-        return stl::apply(static_cast<Func &>(*this), std::forward<Type>(args));
+        return stl::apply(static_cast<Func &>(*this), stl::forward<Type>(args));
     }
 
     /*! @copydoc operator()() */
     template<typename Type>
     constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(stl::apply(stl::declval<const Func &>(), args))) {
-        return stl::apply(static_cast<const Func &>(*this), std::forward<Type>(args));
+        return stl::apply(static_cast<const Func &>(*this), stl::forward<Type>(args));
     }
 };
 

@@ -107,12 +107,12 @@ public:
                         archive(static_cast<entity_type>(null));
                     } else {
                         archive(entt);
-                        stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                        stl::apply([&archive](auto &&...args) { (archive(stl::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
                     }
                 }
             } else {
                 for(auto elem: storage->reach()) {
-                    stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, elem);
+                    stl::apply([&archive](auto &&...args) { (archive(stl::forward<decltype(args)>(args)), ...); }, elem);
                 }
             }
         } else {
@@ -143,7 +143,7 @@ public:
             for(; first != last; ++first) {
                 if(const auto entt = *first; storage->contains(entt)) {
                     archive(entt);
-                    stl::apply([&archive](auto &&...args) { (archive(std::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
+                    stl::apply([&archive](auto &&...args) { (archive(stl::forward<decltype(args)>(args)), ...); }, storage->get_as_tuple(entt));
                 } else {
                     archive(static_cast<entity_type>(null));
                 }

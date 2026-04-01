@@ -26,11 +26,11 @@ struct compressed_pair_element {
     template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
-        : value{std::forward<Arg>(arg)} {}
+        : value{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
     constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<Type, Args...>)
-        : value{std::forward<Args>(std::get<Index>(args))...} {}
+        : value{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
         return value;
@@ -58,11 +58,11 @@ struct compressed_pair_element<Type, Tag>: Type {
     template<typename Arg>
     constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
-        : base_type{std::forward<Arg>(arg)} {}
+        : base_type{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
     constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<base_type, Args...>)
-        : base_type{std::forward<Args>(std::get<Index>(args))...} {}
+        : base_type{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
         return *this;
@@ -130,8 +130,8 @@ public:
      */
     template<typename Arg, typename Other>
     constexpr compressed_pair(Arg &&arg, Other &&other) noexcept(std::is_nothrow_constructible_v<first_base, Arg> && std::is_nothrow_constructible_v<second_base, Other>)
-        : first_base{std::forward<Arg>(arg)},
-          second_base{std::forward<Other>(other)} {}
+        : first_base{stl::forward<Arg>(arg)},
+          second_base{stl::forward<Other>(other)} {}
 
     /**
      * @brief Constructs a pair by forwarding the arguments to its parts.

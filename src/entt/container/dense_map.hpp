@@ -36,12 +36,12 @@ struct dense_map_node final {
     template<typename... Args>
     dense_map_node(const std::size_t pos, Args &&...args)
         : next{pos},
-          element{std::forward<Args>(args)...} {}
+          element{stl::forward<Args>(args)...} {}
 
     template<typename... Args>
     dense_map_node(std::allocator_arg_t, const auto &allocator, const std::size_t pos, Args &&...args)
         : next{pos},
-          element{entt::make_obj_using_allocator<value_type>(allocator, std::forward<Args>(args)...)} {}
+          element{entt::make_obj_using_allocator<value_type>(allocator, stl::forward<Args>(args)...)} {}
 
     dense_map_node(std::allocator_arg_t, const auto &allocator, const dense_map_node &other)
         : next{other.next},
@@ -272,7 +272,7 @@ class dense_map {
             return std::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, stl::forward_as_tuple(std::forward<Other>(key)), stl::forward_as_tuple(std::forward<Args>(args)...));
+        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, stl::forward_as_tuple(stl::forward<Other>(key)), stl::forward_as_tuple(stl::forward<Args>(args)...));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
@@ -284,11 +284,11 @@ class dense_map {
         const auto index = key_to_bucket(key);
 
         if(auto it = constrained_find(key, index); it != end()) {
-            it->second = std::forward<Arg>(value);
+            it->second = stl::forward<Arg>(value);
             return std::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(key), std::forward<Arg>(value));
+        packed.first().emplace_back(sparse.first()[index], stl::forward<Other>(key), stl::forward<Arg>(value));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
@@ -536,7 +536,7 @@ public:
     template<typename Arg>
     requires std::constructible_from<value_type, Arg &&>
     std::pair<iterator, bool> insert(Arg &&value) {
-        return insert_or_do_nothing(std::forward<Arg>(value).first, std::forward<Arg>(value).second);
+        return insert_or_do_nothing(stl::forward<Arg>(value).first, stl::forward<Arg>(value).second);
     }
 
     /**
@@ -561,13 +561,13 @@ public:
      */
     template<typename Arg>
     std::pair<iterator, bool> insert_or_assign(const key_type &key, Arg &&value) {
-        return insert_or_overwrite(key, std::forward<Arg>(value));
+        return insert_or_overwrite(key, stl::forward<Arg>(value));
     }
 
     /*! @copydoc insert_or_assign */
     template<typename Arg>
     std::pair<iterator, bool> insert_or_assign(key_type &&key, Arg &&value) {
-        return insert_or_overwrite(std::move(key), std::forward<Arg>(value));
+        return insert_or_overwrite(std::move(key), stl::forward<Arg>(value));
     }
 
     /**
@@ -588,11 +588,11 @@ public:
         if constexpr(sizeof...(Args) == 0u) {
             return insert_or_do_nothing(key_type{});
         } else if constexpr(sizeof...(Args) == 1u) {
-            return insert_or_do_nothing(std::forward<Args>(args).first..., std::forward<Args>(args).second...);
+            return insert_or_do_nothing(stl::forward<Args>(args).first..., stl::forward<Args>(args).second...);
         } else if constexpr(sizeof...(Args) == 2u) {
-            return insert_or_do_nothing(std::forward<Args>(args)...);
+            return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
-            auto &node = packed.first().emplace_back(packed.first().size(), std::forward<Args>(args)...);
+            auto &node = packed.first().emplace_back(packed.first().size(), stl::forward<Args>(args)...);
             const auto index = key_to_bucket(node.element.first);
 
             if(auto it = constrained_find(node.element.first, index); it != end()) {
@@ -620,13 +620,13 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> try_emplace(const key_type &key, Args &&...args) {
-        return insert_or_do_nothing(key, std::forward<Args>(args)...);
+        return insert_or_do_nothing(key, stl::forward<Args>(args)...);
     }
 
     /*! @copydoc try_emplace */
     template<typename... Args>
     std::pair<iterator, bool> try_emplace(key_type &&key, Args &&...args) {
-        return insert_or_do_nothing(std::move(key), std::forward<Args>(args)...);
+        return insert_or_do_nothing(std::move(key), stl::forward<Args>(args)...);
     }
 
     /**

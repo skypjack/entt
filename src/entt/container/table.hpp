@@ -369,7 +369,7 @@ public:
         if constexpr(sizeof...(Args) == 0u) {
             return stl::forward_as_tuple(std::get<Container>(payload).emplace_back()...);
         } else {
-            return stl::forward_as_tuple(std::get<Container>(payload).emplace_back(std::forward<Args>(args))...);
+            return stl::forward_as_tuple(std::get<Container>(payload).emplace_back(stl::forward<Args>(args))...);
         }
     }
 
