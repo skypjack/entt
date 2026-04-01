@@ -3,9 +3,9 @@
 
 #include <concepts>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../stl/iterator.hpp"
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 

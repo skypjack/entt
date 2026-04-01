@@ -5,7 +5,6 @@
 #include <concepts>
 #include <cstddef>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
@@ -13,6 +12,7 @@
 #include "../core/bit.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/type_traits.hpp"
 #include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"

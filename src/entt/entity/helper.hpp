@@ -2,10 +2,10 @@
 #define ENTT_ENTITY_HELPER_HPP
 
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/type_traits.hpp"
 #include "component.hpp"
 #include "fwd.hpp"
 #include "group.hpp"

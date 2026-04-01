@@ -1,9 +1,9 @@
 #ifndef ENTT_META_RESOLVE_HPP
 #define ENTT_META_RESOLVE_HPP
 
-#include <type_traits>
 #include "../core/type_info.hpp"
 #include "../locator/locator.hpp"
+#include "../stl/type_traits.hpp"
 #include "context.hpp"
 #include "meta.hpp"
 #include "node.hpp"

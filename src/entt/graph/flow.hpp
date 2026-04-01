@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
@@ -16,6 +15,7 @@
 #include "../core/iterator.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/type_traits.hpp"
 #include "../stl/vector.hpp"
 #include "adjacency_matrix.hpp"
 #include "fwd.hpp"

@@ -2,8 +2,8 @@
 #define ENTT_CORE_IDENT_HPP
 
 #include <cstddef>
-#include <type_traits>
 #include <utility>
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 #include "type_traits.hpp"
 

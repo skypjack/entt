@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
@@ -15,6 +14,7 @@
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 #include "loader.hpp"
 #include "resource.hpp"

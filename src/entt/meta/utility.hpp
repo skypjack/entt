@@ -3,10 +3,10 @@
 
 #include <cstddef>
 #include <functional>
-#include <type_traits>
 #include <utility>
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
+#include "../stl/type_traits.hpp"
 #include "meta.hpp"
 #include "node.hpp"
 #include "policy.hpp"

@@ -1,9 +1,9 @@
 #ifndef ENTT_CORE_TUPLE_HPP
 #define ENTT_CORE_TUPLE_HPP
 
-#include <type_traits>
 #include <utility>
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 

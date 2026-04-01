@@ -1,13 +1,13 @@
 #ifndef ENTT_ENTITY_HANDLE_HPP
 #define ENTT_ENTITY_HANDLE_HPP
 
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 

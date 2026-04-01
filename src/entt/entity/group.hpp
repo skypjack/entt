@@ -4,7 +4,6 @@
 #include <array>
 #include <concepts>
 #include <cstddef>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
@@ -14,6 +13,7 @@
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 

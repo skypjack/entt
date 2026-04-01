@@ -2,7 +2,7 @@
 #define ENTT_CORE_ENUM_HPP
 
 #include <concepts>
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 

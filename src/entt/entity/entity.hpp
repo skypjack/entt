@@ -5,9 +5,9 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
-#include <type_traits>
 #include "../config/config.h"
 #include "../core/bit.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {

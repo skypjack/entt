@@ -4,13 +4,13 @@
 #include <concepts>
 #include <cstddef>
 #include <functional>
-#include <type_traits>
 #include <utility>
 #include "../core/any.hpp"
 #include "../core/concepts.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {

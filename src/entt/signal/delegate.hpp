@@ -3,11 +3,11 @@
 
 #include <cstddef>
 #include <functional>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {

@@ -2,13 +2,13 @@
 #define ENTT_ENTITY_ORGANIZER_HPP
 
 #include <cstddef>
-#include <type_traits>
 #include <utility>
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "../graph/adjacency_matrix.hpp"
 #include "../graph/flow.hpp"
+#include "../stl/type_traits.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "helper.hpp"

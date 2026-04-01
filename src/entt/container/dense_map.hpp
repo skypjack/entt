@@ -9,7 +9,6 @@
 #include <functional>
 #include <limits>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../config/config.h"
 #include "../core/bit.hpp"
@@ -19,6 +18,7 @@
 #include "../core/type_traits.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
 

@@ -1,7 +1,7 @@
 #ifndef ENTT_CORE_CONCEPTS_HPP
 #define ENTT_CORE_CONCEPTS_HPP
 
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 

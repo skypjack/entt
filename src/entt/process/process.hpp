@@ -3,10 +3,10 @@
 
 #include <cstdint>
 #include <memory>
-#include <type_traits>
 #include <utility>
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {

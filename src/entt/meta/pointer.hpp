@@ -4,7 +4,7 @@
 #define ENTT_META_POINTER_HPP
 
 #include <memory>
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 #include "type_traits.hpp"
 
 namespace entt {

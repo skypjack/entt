@@ -1,7 +1,7 @@
 #ifndef ENTT_META_POLICY_HPP
 #define ENTT_META_POLICY_HPP
 
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 

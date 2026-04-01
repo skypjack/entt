@@ -3,8 +3,8 @@
 
 #include <cstddef>
 #include <memory>
-#include <type_traits>
 #include <utility>
+#include "../stl/type_traits.hpp"
 #include "../stl/vector.hpp"
 #include "delegate.hpp"
 #include "fwd.hpp"

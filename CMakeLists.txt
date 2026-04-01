@@ -200,6 +200,7 @@ if(ENTT_INCLUDE_HEADERS)
         stl/iterator.hpp
         stl/memory.hpp
         stl/tuple.hpp
+        stl/type_traits.hpp
         stl/vector.hpp
         tools/davey.hpp
         entt.hpp
