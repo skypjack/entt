@@ -173,7 +173,7 @@ public:
 
     /*! @brief Destroys the entity associated with a handle. */
     void destroy() {
-        owner_or_assert().destroy(std::exchange(entt, null));
+        owner_or_assert().destroy(stl::exchange(entt, null));
     }
 
     /**
@@ -181,7 +181,7 @@ public:
      * @param version A desired version upon destruction.
      */
     void destroy(const version_type version) {
-        owner_or_assert().destroy(std::exchange(entt, null), version);
+        owner_or_assert().destroy(stl::exchange(entt, null), version);
     }
 
     /**

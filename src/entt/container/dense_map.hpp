@@ -972,7 +972,7 @@ public:
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 const auto index = key_to_bucket(packed.first()[pos].element.first);
-                packed.first()[pos].next = std::exchange(sparse.first()[index], pos);
+                packed.first()[pos].next = stl::exchange(sparse.first()[index], pos);
             }
         }
     }

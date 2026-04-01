@@ -225,7 +225,7 @@ public:
         if(pools.empty() || !(base.size() < pools.front()->size())) {
             pools.push_back(&base);
         } else {
-            pools.push_back(std::exchange(pools.front(), &base));
+            pools.push_back(stl::exchange(pools.front(), &base));
         }
 
         return *this;

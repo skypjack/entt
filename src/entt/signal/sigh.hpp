@@ -285,7 +285,7 @@ struct scoped_connection {
      * @param other The scoped connection to move from.
      */
     scoped_connection(scoped_connection &&other) noexcept
-        : conn{std::exchange(other.conn, {})} {}
+        : conn{stl::exchange(other.conn, {})} {}
 
     /*! @brief Automatically breaks the link on destruction. */
     ~scoped_connection() {
@@ -304,7 +304,7 @@ struct scoped_connection {
      * @return This scoped connection.
      */
     scoped_connection &operator=(scoped_connection &&other) noexcept {
-        conn = std::exchange(other.conn, {});
+        conn = stl::exchange(other.conn, {});
         return *this;
     }
 

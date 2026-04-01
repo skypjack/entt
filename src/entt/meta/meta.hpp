@@ -326,8 +326,8 @@ public:
     meta_any(const meta_ctx &area, meta_any &&other)
         : storage{std::move(other.storage)},
           ctx{&area},
-          node{(ctx == other.ctx) ? std::exchange(other.node, nullptr) : nullptr},
-          vtable{std::exchange(other.vtable, nullptr)} {}
+          node{(ctx == other.ctx) ? stl::exchange(other.node, nullptr) : nullptr},
+          vtable{stl::exchange(other.vtable, nullptr)} {}
 
     /**
      * @brief Copy constructor.
@@ -347,8 +347,8 @@ public:
     meta_any(meta_any &&other) noexcept
         : storage{std::move(other.storage)},
           ctx{other.ctx},
-          node{std::exchange(other.node, nullptr)},
-          vtable{std::exchange(other.vtable, nullptr)} {}
+          node{stl::exchange(other.node, nullptr)},
+          vtable{stl::exchange(other.vtable, nullptr)} {}
 
     /*! @brief Default destructor. */
     ~meta_any() = default;
@@ -377,8 +377,8 @@ public:
     meta_any &operator=(meta_any &&other) noexcept {
         storage = std::move(other.storage);
         ctx = other.ctx;
-        node = std::exchange(other.node, nullptr);
-        vtable = std::exchange(other.vtable, nullptr);
+        node = stl::exchange(other.node, nullptr);
+        vtable = stl::exchange(other.vtable, nullptr);
         return *this;
     }
 
@@ -551,7 +551,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-        auto *prev = std::exchange(vtable, &basic_vtable<stl::remove_cvref_t<Type>>);
+        auto *prev = stl::exchange(vtable, &basic_vtable<stl::remove_cvref_t<Type>>);
         node = (prev == vtable) ? node : nullptr;
     }
 
@@ -1424,7 +1424,7 @@ public:
 
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member(ref.details->func, id); elem != nullptr) {
-                if(const auto *candidate = lookup(args, sz, (wrapped->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? std::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
+                if(const auto *candidate = lookup(args, sz, (wrapped->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? stl::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
                     return candidate->invoke(std::move(wrapped), args);
                 }
             }

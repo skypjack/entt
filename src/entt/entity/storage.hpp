@@ -331,7 +331,7 @@ protected:
             } else {
                 auto &other = element_at(base_type::size() - 1u);
                 // destroying on exit allows reentrant destructors
-                [[maybe_unused]] auto unused = std::exchange(elem, std::move(other));
+                [[maybe_unused]] auto unused = stl::exchange(elem, std::move(other));
                 alloc_traits::destroy(allocator, std::addressof(other));
                 base_type::swap_and_pop(*first);
             }

@@ -289,7 +289,7 @@ public:
             matrix[rev] = 1u;
         }
 
-        const auto inserted = !std::exchange(matrix[pos], 1u);
+        const auto inserted = !stl::exchange(matrix[pos], 1u);
         return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size(), 1u}, inserted};
     }
 
@@ -308,7 +308,7 @@ public:
             matrix[rev] = 0u;
         }
 
-        return std::exchange(matrix[pos], 0u);
+        return stl::exchange(matrix[pos], 0u);
     }
 
     /**

@@ -260,8 +260,8 @@ protected:
      */
     void in_place_pop(const Entity entt) {
         ENTT_ASSERT(mode == deletion_policy::in_place, "Deletion policy mismatch");
-        const auto pos = entity_to_pos(std::exchange(sparse_ref(entt), null));
-        packed[pos] = traits_type::combine(static_cast<traits_type::entity_type>(std::exchange(head, pos)), tombstone);
+        const auto pos = entity_to_pos(stl::exchange(sparse_ref(entt), null));
+        packed[pos] = traits_type::combine(static_cast<traits_type::entity_type>(stl::exchange(head, pos)), tombstone);
     }
 
     /**
@@ -323,7 +323,7 @@ protected:
                 pos = head;
                 ENTT_ASSERT(elem == null, "Slot not available");
                 elem = traits_type::combine(static_cast<traits_type::entity_type>(head), traits_type::to_integral(entt));
-                head = entity_to_pos(std::exchange(packed[pos], entt));
+                head = entity_to_pos(stl::exchange(packed[pos], entt));
                 break;
             }
             [[fallthrough]];
@@ -422,7 +422,7 @@ public:
           packed{std::move(other.packed)},
           descriptor{other.descriptor},
           mode{other.mode},
-          head{std::exchange(other.head, policy_to_head())} {}
+          head{stl::exchange(other.head, policy_to_head())} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -434,7 +434,7 @@ public:
           packed{std::move(other.packed), allocator},
           descriptor{other.descriptor},
           mode{other.mode},
-          head{std::exchange(other.head, policy_to_head())} {
+          head{stl::exchange(other.head, policy_to_head())} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a sparse set is not allowed");
     }
 
@@ -540,7 +540,7 @@ public:
                         other.resize(sz, nullptr);
                     }
 
-                    other[page] = std::exchange(sparse[page], nullptr);
+                    other[page] = stl::exchange(sparse[page], nullptr);
 
                     if(++cnt == len) {
                         // early exit due to lack of pages
@@ -889,12 +889,12 @@ public:
     void compact() {
         if(mode == deletion_policy::in_place) {
             size_type from = packed.size();
-            size_type pos = std::exchange(head, max_size);
+            size_type pos = stl::exchange(head, max_size);
 
             for(; from && packed[from - 1u] == tombstone; --from) {}
 
             while(pos != max_size) {
-                if(const auto to = std::exchange(pos, entity_to_pos(packed[pos])); to < from) {
+                if(const auto to = stl::exchange(pos, entity_to_pos(packed[pos])); to < from) {
                     --from;
                     swap_or_move(from, to);
 
@@ -980,7 +980,7 @@ public:
                 swap_or_move(next, idx);
                 const auto elem = static_cast<traits_type::entity_type>(curr);
                 sparse_ref(entt) = traits_type::combine(elem, traits_type::to_integral(packed[curr]));
-                curr = std::exchange(next, idx);
+                curr = stl::exchange(next, idx);
             }
         }
     }

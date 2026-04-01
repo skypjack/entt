@@ -848,7 +848,7 @@ public:
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 const auto index = value_to_bucket(packed.first()[pos].second);
-                packed.first()[pos].first = std::exchange(sparse.first()[index], pos);
+                packed.first()[pos].first = stl::exchange(sparse.first()[index], pos);
             }
         }
     }

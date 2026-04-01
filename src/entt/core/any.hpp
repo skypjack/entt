@@ -250,7 +250,7 @@ public:
         if(other.mode == any_policy::embedded) {
             other.vtable(request::move, other, this);
         } else if(other.mode != any_policy::empty) {
-            this->instance = std::exchange(other.instance, nullptr);
+            this->instance = stl::exchange(other.instance, nullptr);
         }
     }
 
@@ -290,7 +290,7 @@ public:
             if(other.mode == any_policy::embedded) {
                 other.vtable(request::move, other, this);
             } else if(other.mode != any_policy::empty) {
-                this->instance = std::exchange(other.instance, nullptr);
+                this->instance = stl::exchange(other.instance, nullptr);
             }
 
             vtable = other.vtable;
