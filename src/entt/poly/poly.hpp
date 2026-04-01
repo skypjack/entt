@@ -83,7 +83,7 @@ class poly_vtable {
 
     template<typename Type, auto Candidate, typename Ret, typename Any, typename... Args>
     static void fill_vtable_entry(Ret (*&entry)(Any &, Args...)) noexcept {
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
+        if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
             entry = +[](Any &, Args... args) -> Ret {
                 return std::invoke(Candidate, std::forward<Args>(args)...);
             };
@@ -215,7 +215,7 @@ public:
     template<typename Type, typename... Args>
     explicit basic_poly(std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_cvref_t<Type>>()} {}
+          vtable{poly_vtable<Concept, Len, Align>::template instance<stl::remove_cvref_t<Type>>()} {}
 
     /**
      * @brief Constructs a poly from a given value.
@@ -223,9 +223,9 @@ public:
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, basic_poly>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, basic_poly>)
     basic_poly(Type &&value) noexcept
-        : basic_poly{std::in_place_type<std::remove_cvref_t<Type>>, std::forward<Type>(value)} {}
+        : basic_poly{std::in_place_type<stl::remove_cvref_t<Type>>, std::forward<Type>(value)} {}
 
     /**
      * @brief Returns the object type info if any, `type_id<void>()` otherwise.
@@ -257,7 +257,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.template emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_cvref_t<Type>>();
+        vtable = poly_vtable<Concept, Len, Align>::template instance<stl::remove_cvref_t<Type>>();
     }
 
     /*! @brief Destroys contained object */

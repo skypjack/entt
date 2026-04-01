@@ -88,7 +88,7 @@ private:
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            if constexpr(std::is_same_v<typename underlying_type::element_type, entity_type>) {
+            if constexpr(stl::is_same_v<typename underlying_type::element_type, entity_type>) {
                 for(typename underlying_type::size_type pos{}, last = underlying_type::free_list(); pos < last; ++pos) {
                     destruction.publish(reg, underlying_type::base_type::operator[](pos));
                 }
@@ -121,7 +121,7 @@ private:
     void bind_any(any value) noexcept final {
         owner = any_cast<basic_registry_type>(&value);
 
-        if constexpr(!std::is_same_v<registry_type, basic_registry_type>) {
+        if constexpr(!stl::is_same_v<registry_type, basic_registry_type>) {
             if(owner == nullptr) {
                 owner = any_cast<registry_type>(&value);
             }
@@ -414,7 +414,7 @@ private:
     void bind_any(any value) noexcept final {
         owner = any_cast<basic_registry_type>(&value);
 
-        if constexpr(!std::is_same_v<registry_type, basic_registry_type>) {
+        if constexpr(!stl::is_same_v<registry_type, basic_registry_type>) {
             if(owner == nullptr) {
                 owner = any_cast<registry_type>(&value);
             }

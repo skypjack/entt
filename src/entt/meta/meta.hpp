@@ -68,7 +68,7 @@ public:
         : ctx{&area},
           data{&instance},
           value_type_node{&internal::resolve<typename Type::value_type>},
-          const_reference_node{&internal::resolve<std::remove_cvref_t<typename Type::const_reference>>},
+          const_reference_node{&internal::resolve<stl::remove_cvref_t<typename Type::const_reference>>},
           size_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::size},
           clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
           reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
@@ -262,7 +262,7 @@ public:
     explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
         : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
           ctx{&area},
-          vtable{&basic_vtable<std::remove_cvref_t<Type>>} {}
+          vtable{&basic_vtable<stl::remove_cvref_t<Type>>} {}
 
     /**
      * @brief Constructs a wrapper taking ownership of the passed object.
@@ -292,7 +292,7 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, meta_any>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(Type &&value)
         : meta_any{locator<meta_ctx>::value_or(), std::forward<Type>(value)} {}
 
@@ -303,7 +303,7 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, meta_any>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(const meta_ctx &area, Type &&value)
         : meta_any{area, std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
@@ -389,7 +389,7 @@ public:
      * @return This meta any object.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, meta_any>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any &operator=(Type &&value) {
         emplace<std::decay_t<Type>>(std::forward<Type>(value));
         return *this;
@@ -495,22 +495,22 @@ public:
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
         if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
-            if(storage.has_value<std::remove_cvref_t<Type>>()) {
+            if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
-                if constexpr(std::is_arithmetic_v<std::remove_cvref_t<Type>> || std::is_enum_v<std::remove_cvref_t<Type>>) {
+                if constexpr(std::is_arithmetic_v<stl::remove_cvref_t<Type>> || std::is_enum_v<stl::remove_cvref_t<Type>>) {
                     if(const auto &from = fetch_node(); from.conversion_helper) {
                         return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
                     }
                 }
 
                 if(const auto &from = fetch_node(); from.details != nullptr) {
-                    if(const auto *elem = internal::find_member(from.details->conv, entt::type_hash<std::remove_cvref_t<Type>>::value()); elem != nullptr) {
+                    if(const auto *elem = internal::find_member(from.details->conv, entt::type_hash<stl::remove_cvref_t<Type>>::value()); elem != nullptr) {
                         return elem->conv(*ctx, storage.data());
                     }
 
                     for(auto &&curr: from.details->base) {
-                        if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == entt::type_hash<std::remove_cvref_t<Type>>::value()) {
+                        if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == entt::type_hash<stl::remove_cvref_t<Type>>::value()) {
                             return other;
                         } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
                             return from_base;
@@ -533,9 +533,9 @@ public:
         if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
             return allow_cast<const std::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
-            if(storage.has_value<std::remove_cvref_t<Type>>()) {
+            if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return true;
-            } else if(auto other = std::as_const(*this).allow_cast<std::remove_cvref_t<Type>>(); other) {
+            } else if(auto other = std::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
                 if(other.storage.owner()) {
                     std::swap(*this, other);
                 }
@@ -551,7 +551,7 @@ public:
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         storage.emplace<Type>(std::forward<Args>(args)...);
-        auto *prev = std::exchange(vtable, &basic_vtable<std::remove_cvref_t<Type>>);
+        auto *prev = std::exchange(vtable, &basic_vtable<stl::remove_cvref_t<Type>>);
         node = (prev == vtable) ? node : nullptr;
     }
 
@@ -689,7 +689,7 @@ template<typename Type>
 /*! @brief Opaque pointers to instances of any type. */
 class meta_handle {
     template<typename Type, typename... Args>
-    requires std::same_as<std::remove_cvref_t<Type>, meta_any>
+    requires std::same_as<stl::remove_cvref_t<Type>, meta_any>
     meta_handle(int, Type &value, Args &&...args)
         : any{std::forward<Args>(args)..., value.as_ref()} {}
 
@@ -708,7 +708,7 @@ public:
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, meta_handle>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, meta_handle>)
     meta_handle(const meta_ctx &ctx, Type &value)
         : meta_handle{0, value, ctx} {}
 
@@ -718,7 +718,7 @@ public:
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, meta_handle>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, meta_handle>)
     meta_handle(Type &value)
         : meta_handle{0, value} {}
 
@@ -1058,7 +1058,7 @@ class meta_type {
         bool ambiguous{};
 
         for(auto curr = next(); curr; curr = next()) {
-            if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+            if constexpr(stl::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
                 if(constness && !(curr->traits & internal::meta_traits::is_const)) {
                     continue;
                 }
@@ -1087,7 +1087,7 @@ class meta_type {
                         same = match;
                         ambiguous = false;
                     } else if(match == same) {
-                        if constexpr(std::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+                        if constexpr(stl::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
                             if(!!(curr->traits & internal::meta_traits::is_const) != !!(candidate->traits & internal::meta_traits::is_const)) {
                                 candidate = !!(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
                                 ambiguous = false;

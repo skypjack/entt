@@ -127,7 +127,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<typename Type, typename... Args>
     void initialize([[maybe_unused]] Args &&...args) {
-        using plain_type = std::remove_cvref_t<Type>;
+        using plain_type = stl::remove_cvref_t<Type>;
 
         vtable = basic_vtable<plain_type>;
         underlying_type = type_hash<plain_type>::value();
@@ -224,7 +224,7 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, basic_any>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any(Type &&value)
         : basic_any{std::in_place_type<std::decay_t<Type>>, std::forward<Type>(value)} {}
 
@@ -309,7 +309,7 @@ public:
      * @return This any object.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, basic_any>)
+    requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any &operator=(Type &&value) {
         emplace<std::decay_t<Type>>(std::forward<Type>(value));
         return *this;
@@ -560,7 +560,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
-    if constexpr(std::is_copy_constructible_v<std::remove_cvref_t<Type>>) {
+    if constexpr(std::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(std::move(*instance));
         }

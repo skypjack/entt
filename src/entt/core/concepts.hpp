@@ -10,7 +10,7 @@ namespace entt {
  * @tparam Type Type to check.
  */
 template<typename Type>
-concept cvref_unqualified = std::is_same_v<std::remove_cvref_t<Type>, Type>;
+concept cvref_unqualified = stl::is_same_v<stl::remove_cvref_t<Type>, Type>;
 
 } // namespace entt
 

@@ -154,7 +154,7 @@ public:
 
     template<typename Type>
     Type &insert_or_assign(const id_type id, Type &&value) {
-        return any_cast<std::remove_cvref_t<Type> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
+        return any_cast<stl::remove_cvref_t<Type> &>(ctx.insert_or_assign(id, std::forward<Type>(value)).first->second);
     }
 
     template<typename Type>
@@ -212,7 +212,7 @@ template<typename Entity, typename Allocator>
 class basic_registry {
     using base_type = basic_sparse_set<Entity, Allocator>;
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     // std::shared_ptr because of its type erased allocator which is useful here
     using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
     using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
@@ -220,7 +220,7 @@ class basic_registry {
 
     template<cvref_unqualified Type>
     [[nodiscard]] auto &assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) {
-        if constexpr(std::is_same_v<Type, entity_type>) {
+        if constexpr(stl::is_same_v<Type, entity_type>) {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return entities;
         } else {
@@ -241,7 +241,7 @@ class basic_registry {
 
     template<cvref_unqualified Type>
     [[nodiscard]] const auto *assure([[maybe_unused]] const id_type id = type_hash<Type>::value()) const {
-        if constexpr(std::is_same_v<Type, entity_type>) {
+        if constexpr(stl::is_same_v<Type, entity_type>) {
             ENTT_ASSERT(id == type_hash<Type>::value(), "User entity storage not allowed");
             return &entities;
         } else {
@@ -695,7 +695,7 @@ public:
     size_type remove(It first, It last) {
         size_type count{};
 
-        if constexpr(std::is_same_v<It, typename common_type::iterator>) {
+        if constexpr(stl::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
             for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
@@ -746,7 +746,7 @@ public:
      */
     template<typename Type, typename... Other, stl::input_iterator It>
     void erase(It first, It last) {
-        if constexpr(std::is_same_v<It, typename common_type::iterator>) {
+        if constexpr(stl::is_same_v<It, typename common_type::iterator>) {
             std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
             for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {

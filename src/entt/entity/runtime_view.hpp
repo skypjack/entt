@@ -118,7 +118,7 @@ private:
 template<typename Type, typename Allocator>
 class basic_runtime_view {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
     using container_type = stl::vector<Type *, Allocator>;
 
     [[nodiscard]] auto offset() const noexcept {

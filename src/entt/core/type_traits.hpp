@@ -240,7 +240,7 @@ struct type_list_unique;
 
 template<typename First, typename... Other, typename... Type>
 struct type_list_unique<type_list<First, Other...>, Type...>
-    : std::conditional_t<(std::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
+    : std::conditional_t<(stl::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
 
 template<typename... Type>
 struct type_list_unique<type_list<>, Type...> {
@@ -283,7 +283,7 @@ struct type_list_contains;
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>
-    : std::bool_constant<(std::is_same_v<Type, Other> || ...)> {};
+    : std::bool_constant<(stl::is_same_v<Type, Other> || ...)> {};
 
 /**
  * @brief Helper variable template.
@@ -766,7 +766,7 @@ template<typename Type>
             return maybe_equality_comparable<Type>(0);
         }
     } else if constexpr(has_value_type<Type>::value) {
-        if constexpr(is_iterator_v<Type> || std::is_same_v<typename Type::value_type, Type> || dispatch_is_equality_comparable<typename Type::value_type>()) {
+        if constexpr(is_iterator_v<Type> || stl::is_same_v<typename Type::value_type, Type> || dispatch_is_equality_comparable<typename Type::value_type>()) {
             return maybe_equality_comparable<Type>(0);
         } else {
             return false;

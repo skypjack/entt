@@ -194,7 +194,7 @@ public:
     template<typename Type, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     decltype(auto) emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
@@ -207,7 +207,7 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template emplace_or_replace<Type>(entt, std::forward<Args>(args)...);
     }
 
@@ -220,7 +220,7 @@ public:
      */
     template<typename Type, typename... Func>
     decltype(auto) patch(Func &&...func) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template patch<Type>(entt, std::forward<Func>(func)...);
     }
 
@@ -233,7 +233,7 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template replace<Type>(entt, std::forward<Args>(args)...);
     }
 
@@ -300,7 +300,7 @@ public:
      */
     template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
         return owner_or_assert().template get_or_emplace<Type>(entt, std::forward<Args>(args)...);
     }
 
@@ -353,7 +353,7 @@ public:
      */
     template<typename Other, typename... Args>
     operator basic_handle<Other, Args...>() const noexcept {
-        static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
+        static_assert(stl::is_same_v<Other, Registry> || stl::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
         return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
     }

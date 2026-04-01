@@ -208,7 +208,7 @@ private:
 template<typename Type, typename Entity, typename Allocator>
 class basic_storage: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using container_type = stl::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using underlying_type = basic_sparse_set<Entity, typename alloc_traits::template rebind_alloc<Entity>>;
     using underlying_iterator = underlying_type::basic_iterator;
@@ -777,7 +777,7 @@ requires (component_traits<Type, Entity>::page_size == 0u)
 class basic_storage<Type, Entity, Allocator>
     : public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using traits_type = component_traits<Type, Entity>;
 
 public:
@@ -959,7 +959,7 @@ template<typename Entity, typename Allocator>
 class basic_storage<Entity, Entity, Allocator>
     : public basic_sparse_set<Entity, Allocator> {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using underlying_iterator = basic_sparse_set<Entity, Allocator>::basic_iterator;
     using traits_type = entt_traits<Entity>;
 

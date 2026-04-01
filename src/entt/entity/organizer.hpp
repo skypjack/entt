@@ -87,7 +87,7 @@ struct resource_traits<Registry, type_list<Args...>, type_list<Req...>> {
     using args = type_list<std::remove_const_t<Args>...>;
     using ro = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::ro..., typename unpack_type<Req, type_list<>>::ro...>;
     using rw = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::rw..., typename unpack_type<Req, type_list<>>::rw...>;
-    static constexpr auto sync_point = (std::is_same_v<Args, Registry> || ...);
+    static constexpr auto sync_point = (stl::is_same_v<Args, Registry> || ...);
 };
 
 template<typename Registry, typename... Req, typename Ret, typename... Args>
@@ -135,7 +135,7 @@ class basic_organizer final {
 
     template<typename Type>
     [[nodiscard]] static decltype(auto) extract(Registry &reg) {
-        if constexpr(std::is_same_v<Type, Registry>) {
+        if constexpr(stl::is_same_v<Type, Registry>) {
             return reg;
         } else if constexpr(internal::is_view_v<Type>) {
             return static_cast<Type>(as_view{reg});

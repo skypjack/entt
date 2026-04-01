@@ -87,7 +87,7 @@ private:
 template<std::derived_from<directed_tag> Category, typename Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
     using container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
 
 public:
@@ -283,7 +283,7 @@ public:
     std::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
 
-        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+        if constexpr(stl::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
             ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 1u;
@@ -302,7 +302,7 @@ public:
     size_type erase(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
 
-        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+        if constexpr(stl::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
             ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 0u;

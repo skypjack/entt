@@ -95,7 +95,7 @@ public:
 
             archive(static_cast<traits_type::entity_type>(storage->size()));
 
-            if constexpr(std::is_same_v<Type, entity_type>) {
+            if constexpr(stl::is_same_v<Type, entity_type>) {
                 archive(static_cast<traits_type::entity_type>(storage->free_list()));
 
                 for(auto first = base.rbegin(), last = base.rend(); first != last; ++first) {
@@ -135,7 +135,7 @@ public:
      */
     template<typename Type, typename Archive>
     const basic_snapshot &get(Archive &archive, stl::input_iterator auto first, stl::input_iterator auto last, const id_type id = type_hash<Type>::value()) const {
-        static_assert(!std::is_same_v<Type, entity_type>, "Entity types not supported");
+        static_assert(!stl::is_same_v<Type, entity_type>, "Entity types not supported");
 
         if(const auto *storage = reg->template storage<Type>(id); storage && !storage->empty()) {
             archive(static_cast<traits_type::entity_type>(stl::distance(first, last)));
@@ -226,7 +226,7 @@ public:
 
         archive(length);
 
-        if constexpr(std::is_same_v<Type, entity_type>) {
+        if constexpr(stl::is_same_v<Type, entity_type>) {
             typename traits_type::entity_type count{};
             entity_type placeholder{};
 
@@ -323,12 +323,12 @@ class basic_continuous_loader {
             using first_type = std::remove_const_t<typename std::decay_t<decltype(pair)>::first_type>;
             using second_type = std::decay_t<decltype(pair)>::second_type;
 
-            if constexpr(std::is_same_v<first_type, entity_type> && std::is_same_v<second_type, entity_type>) {
+            if constexpr(stl::is_same_v<first_type, entity_type> && stl::is_same_v<second_type, entity_type>) {
                 other.emplace(map(pair.first), map(pair.second));
-            } else if constexpr(std::is_same_v<first_type, entity_type>) {
+            } else if constexpr(stl::is_same_v<first_type, entity_type>) {
                 other.emplace(map(pair.first), std::move(pair.second));
             } else {
-                static_assert(std::is_same_v<second_type, entity_type>, "Neither the key nor the value are of entity type");
+                static_assert(stl::is_same_v<second_type, entity_type>, "Neither the key nor the value are of entity type");
                 other.emplace(std::move(pair.first), map(pair.second));
             }
         }
@@ -340,7 +340,7 @@ class basic_continuous_loader {
     template<typename Container>
     auto update(char, Container &container) -> decltype(typename Container::value_type{}, void()) {
         // vector like container
-        static_assert(std::is_same_v<typename Container::value_type, entity_type>, "Invalid value type");
+        static_assert(stl::is_same_v<typename Container::value_type, entity_type>, "Invalid value type");
 
         for(auto &&entt: container) {
             entt = map(entt);
@@ -349,9 +349,9 @@ class basic_continuous_loader {
 
     template<typename Component, typename Other, typename Member>
     void update([[maybe_unused]] Component &instance, [[maybe_unused]] Member Other::*member) {
-        if constexpr(!std::is_same_v<Component, Other>) {
+        if constexpr(!stl::is_same_v<Component, Other>) {
             return;
-        } else if constexpr(std::is_same_v<Member, entity_type>) {
+        } else if constexpr(stl::is_same_v<Member, entity_type>) {
             instance.*member = map(instance.*member);
         } else {
             // maybe a container? let's try...
@@ -416,7 +416,7 @@ public:
 
         archive(length);
 
-        if constexpr(std::is_same_v<Type, entity_type>) {
+        if constexpr(stl::is_same_v<Type, entity_type>) {
             typename traits_type::entity_type in_use{};
 
             storage.reserve(length);

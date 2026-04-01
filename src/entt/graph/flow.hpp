@@ -29,7 +29,7 @@ namespace entt {
 template<typename Allocator>
 class basic_flow {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, id_type>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, id_type>, "Invalid value type");
     using task_container_type = dense_set<id_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<id_type>>;
     using ro_rw_container_type = stl::vector<std::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<std::pair<std::size_t, bool>>>;
     using deps_container_type = dense_map<id_type, ro_rw_container_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, ro_rw_container_type>>>;

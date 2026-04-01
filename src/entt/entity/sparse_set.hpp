@@ -138,7 +138,7 @@ private:
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     using sparse_container_type = stl::vector<typename alloc_traits::pointer, typename alloc_traits::template rebind_alloc<typename alloc_traits::pointer>>;
     using packed_container_type = stl::vector<Entity, Allocator>;
     using traits_type = entt_traits<Entity>;
@@ -832,7 +832,7 @@ public:
      */
     template<stl::input_iterator It>
     void erase(It first, It last) {
-        if constexpr(std::is_same_v<It, basic_iterator>) {
+        if constexpr(stl::is_same_v<It, basic_iterator>) {
             pop(first, last);
         } else {
             for(; first != last; ++first) {
@@ -861,7 +861,7 @@ public:
     size_type remove(It first, It last) {
         size_type count{};
 
-        if constexpr(std::is_same_v<It, basic_iterator>) {
+        if constexpr(stl::is_same_v<It, basic_iterator>) {
             while(first != last) {
                 while(first != last && !contains(*first)) {
                     ++first;

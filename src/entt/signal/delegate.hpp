@@ -28,7 +28,7 @@ template<typename Class, typename Ret, typename... Args, typename... Other>
 auto function_pointer(Ret (Class::*)(Args...) const, Other &&...) -> Ret (*)(Args...);
 
 template<typename Class, typename Type, typename... Other>
-requires std::is_member_object_pointer_v<Type Class::*>
+requires stl::is_member_object_pointer_v<Type Class::*>
 auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
@@ -72,7 +72,7 @@ class delegate<Ret(Args...)> {
     [[nodiscard]] auto wrap(std::index_sequence<Index...>) noexcept {
         return [](const void *, Args... args) -> return_type {
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };
     }
@@ -82,7 +82,7 @@ class delegate<Ret(Args...)> {
         return [](const void *payload, Args... args) -> return_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, *curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };
     }
@@ -92,7 +92,7 @@ class delegate<Ret(Args...)> {
         return [](const void *payload, Args... args) -> return_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(std::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !std::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
             return static_cast<Ret>(std::invoke(Candidate, curr, std::forward<type_list_element_t<Index + offset, type_list<Args...>>>(std::get<Index + offset>(arguments))...));
         };
     }
@@ -137,7 +137,7 @@ public:
     void connect() noexcept {
         instance = nullptr;
 
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
+        if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
             fn = [](const void *, Args... args) -> return_type {
                 return Ret(std::invoke(Candidate, std::forward<Args>(args)...));
             };
@@ -167,7 +167,7 @@ public:
     void connect(Type &value_or_instance) noexcept {
         instance = &value_or_instance;
 
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
+        if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
             fn = [](const void *payload, Args... args) -> return_type {
                 Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(std::invoke(Candidate, *curr, std::forward<Args>(args)...));
@@ -191,7 +191,7 @@ public:
     void connect(Type *value_or_instance) noexcept {
         instance = value_or_instance;
 
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>) {
+        if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>) {
             fn = [](const void *payload, Args... args) -> return_type {
                 Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(std::invoke(Candidate, curr, std::forward<Args>(args)...));

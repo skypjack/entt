@@ -190,7 +190,7 @@ const meta_type_node &resolve(const meta_context &) noexcept;
 template<typename... Args>
 [[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const std::size_t index) noexcept {
     using resolve_type = const meta_type_node &(*)(const meta_context &) noexcept;
-    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<std::remove_cvref_t<Args>>...};
+    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<stl::remove_cvref_t<Args>>...};
     ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
     return list[index](context);
 }

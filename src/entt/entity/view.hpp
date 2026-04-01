@@ -958,7 +958,7 @@ public:
      */
     template<typename Type = Get::element_type>
     [[nodiscard]] auto *storage() const noexcept {
-        static_assert(std::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
+        static_assert(stl::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
         return storage<0>();
     }
 
@@ -1017,7 +1017,7 @@ public:
      */
     template<typename Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid element type");
+        static_assert(stl::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid element type");
         return get<0>(entt);
     }
 

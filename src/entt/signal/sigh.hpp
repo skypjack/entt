@@ -203,7 +203,7 @@ public:
                 } else {
                     func();
                 }
-            } else if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
+            } else if constexpr(stl::is_invocable_r_v<bool, Func, Ret>) {
                 if(func(calls[pos - 1u](args...))) {
                     break;
                 }

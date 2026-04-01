@@ -83,7 +83,7 @@ struct forward_apply: private Func {
  * @tparam Func Type of underlying invocable object.
  */
 template<typename Func>
-forward_apply(Func) -> forward_apply<std::remove_cvref_t<Func>>;
+forward_apply(Func) -> forward_apply<stl::remove_cvref_t<Func>>;
 
 } // namespace entt
 

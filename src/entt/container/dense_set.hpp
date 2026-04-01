@@ -199,7 +199,7 @@ class dense_set {
 
     using node_type = std::pair<std::size_t, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
@@ -544,7 +544,7 @@ public:
      */
     template<typename... Args>
     std::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::decay_t<Args>, value_type>)) {
+        if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<std::decay_t<Args>, value_type>)) {
             return insert_or_do_nothing(std::forward<Args>(args)...);
         } else {
             auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(std::forward<Args>(args)...));
