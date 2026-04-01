@@ -6,6 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
+using std::invoke_result_t;
 using std::is_invocable_r_v;
 using std::is_member_object_pointer_v;
 using std::is_same_v;

@@ -237,7 +237,7 @@ public:
      */
     template<auto Candidate>
     auto conv() noexcept {
-        using conv_type = stl::remove_cvref_t<std::invoke_result_t<decltype(Candidate), Type &>>;
+        using conv_type = stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), Type &>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, std::invoke(Candidate, *static_cast<const Type *>(instance))); };
 
         base_type::insert_or_assign(
@@ -355,7 +355,7 @@ public:
     template<auto Data, typename Policy = as_value_t>
     meta_factory data(const id_type id, const char *name = nullptr) noexcept {
         if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
-            using data_type = std::invoke_result_t<decltype(Data), Type &>;
+            using data_type = stl::invoke_result_t<decltype(Data), Type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
 
             base_type::data(
