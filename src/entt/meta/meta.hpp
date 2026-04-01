@@ -449,7 +449,7 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(std::as_const(*this).try_cast<std::remove_const_t<Type>>());
+        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(stl::as_const(*this).try_cast<std::remove_const_t<Type>>());
     }
 
     /**
@@ -512,7 +512,7 @@ public:
                     for(auto &&curr: from.details->base) {
                         if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == entt::type_hash<stl::remove_cvref_t<Type>>::value()) {
                             return other;
-                        } else if(auto from_base = std::as_const(other).template allow_cast<Type>(); from_base) {
+                        } else if(auto from_base = stl::as_const(other).template allow_cast<Type>(); from_base) {
                             return from_base;
                         }
                     }
@@ -535,7 +535,7 @@ public:
         } else {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return true;
-            } else if(auto other = std::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
+            } else if(auto other = stl::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
                 if(other.storage.owner()) {
                     std::swap(*this, other);
                 }
@@ -1556,7 +1556,7 @@ bool meta_any::set(const id_type id, Type &&value) {
             for(auto &&curr: from.details->base) {
                 if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == type.info().hash()) {
                     return other;
-                } else if(auto from_base = std::as_const(other).allow_cast(type); from_base) {
+                } else if(auto from_base = stl::as_const(other).allow_cast(type); from_base) {
                     return from_base;
                 }
             }
@@ -1569,7 +1569,7 @@ bool meta_any::set(const id_type id, Type &&value) {
 [[nodiscard]] inline bool meta_any::allow_cast(const meta_type &type) {
     if(storage.has_value(type.info())) {
         return true;
-    } else if(auto other = std::as_const(*this).allow_cast(type); other) {
+    } else if(auto other = stl::as_const(*this).allow_cast(type); other) {
         if(other.storage.owner()) {
             std::swap(*this, other);
         }
@@ -1590,7 +1590,7 @@ inline bool meta_any::assign(const meta_any &other) {
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    return storage.assign(stl::move(other.storage)) || storage.assign(std::as_const(other).allow_cast(type()).storage);
+    return storage.assign(stl::move(other.storage)) || storage.assign(stl::as_const(other).allow_cast(type()).storage);
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {

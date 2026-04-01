@@ -393,7 +393,7 @@ public:
      * @return A pointer to the storage if it exists, a null pointer otherwise.
      */
     [[nodiscard]] common_type *storage(const id_type id) {
-        return const_cast<common_type *>(std::as_const(*this).storage(id));
+        return const_cast<common_type *>(stl::as_const(*this).storage(id));
     }
 
     /**
@@ -783,7 +783,7 @@ public:
     template<typename Func>
     void erase_if(const entity_type entt, Func func) {
         for(auto [id, cpool]: storage()) {
-            if(cpool.contains(entt) && func(id, std::as_const(cpool))) {
+            if(cpool.contains(entt) && func(id, stl::as_const(cpool))) {
                 cpool.erase(entt);
             }
         }
@@ -909,7 +909,7 @@ public:
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) {
         if constexpr(sizeof...(Type) == 1u) {
-            return (const_cast<Type *>(std::as_const(*this).template try_get<Type>(entt)), ...);
+            return (const_cast<Type *>(stl::as_const(*this).template try_get<Type>(entt)), ...);
         } else {
             return stl::make_tuple(try_get<Type>(entt)...);
         }
@@ -1130,7 +1130,7 @@ public:
         auto &cpool = assure<Type>();
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
-            auto comp = [&cpool, compare = stl::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
+            auto comp = [&cpool, compare = stl::move(compare)](const auto lhs, const auto rhs) { return compare(stl::as_const(cpool.get(lhs)), stl::as_const(cpool.get(rhs))); };
             cpool.sort(stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
         } else {
             cpool.sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);

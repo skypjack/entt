@@ -390,7 +390,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data() noexcept {
-        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(std::as_const(*this).data());
+        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(stl::as_const(*this).data());
     }
 
     /**
@@ -399,7 +399,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data(const type_info &req) noexcept {
-        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
+        return (mode == any_policy::cref) ? nullptr : const_cast<void *>(stl::as_const(*this).data(req));
     }
 
     /**
@@ -410,9 +410,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type *data() noexcept {
         if constexpr(std::is_const_v<Type>) {
-            return std::as_const(*this).template data<std::remove_const_t<Type>>();
+            return stl::as_const(*this).template data<std::remove_const_t<Type>>();
         } else {
-            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(std::as_const(*this).template data<std::remove_const_t<Type>>());
+            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(stl::as_const(*this).template data<std::remove_const_t<Type>>());
         }
     }
 
@@ -445,7 +445,7 @@ public:
     // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
     bool assign(basic_any &&other) {
         if(other && (mode != any_policy::cref) && (underlying_type == other.underlying_type)) {
-            return (other.mode == any_policy::cref) ? (vtable(request::assign, *this, std::as_const(other).data()) != nullptr) : (vtable(request::transfer, *this, other.data()) != nullptr);
+            return (other.mode == any_policy::cref) ? (vtable(request::assign, *this, stl::as_const(other).data()) != nullptr) : (vtable(request::transfer, *this, other.data()) != nullptr);
         }
 
         return false;
@@ -483,7 +483,7 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] basic_any as_ref() noexcept {
-        basic_any other = std::as_const(*this).as_ref();
+        basic_any other = stl::as_const(*this).as_ref();
 
         switch(mode) {
             using enum any_policy;
@@ -584,7 +584,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] Type *any_cast(basic_any<Len, Align> *data) noexcept {
     if constexpr(std::is_const_v<Type>) {
         // last attempt to make wrappers for const references return their values
-        return any_cast<Type>(&std::as_const(*data));
+        return any_cast<Type>(&stl::as_const(*data));
     } else {
         return data->template data<Type>();
     }

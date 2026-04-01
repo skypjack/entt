@@ -6,6 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
+using std::as_const;
 using std::declval;
 using std::exchange;
 using std::forward;

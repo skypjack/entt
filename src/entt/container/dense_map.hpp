@@ -61,7 +61,7 @@ class dense_map_iterator final {
     friend class dense_map_iterator;
 
     static_assert(std::is_pointer_v<It>, "Not a pointer type");
-    using first_type = decltype(std::as_const(stl::declval<It>()->element.first));
+    using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
     using second_type = decltype((stl::declval<It>()->element.second));
 
 public:
@@ -156,7 +156,7 @@ class dense_map_local_iterator final {
     friend class dense_map_local_iterator;
 
     static_assert(std::is_pointer_v<It>, "Not a pointer type");
-    using first_type = decltype(std::as_const(stl::declval<It>()->element.first));
+    using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
     using second_type = decltype((stl::declval<It>()->element.second));
 
 public:

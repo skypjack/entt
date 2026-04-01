@@ -636,7 +636,7 @@ public:
 
     /*! @copydoc get */
     [[nodiscard]] value_type &get(const entity_type entt) noexcept {
-        return const_cast<value_type &>(std::as_const(*this).get(entt));
+        return const_cast<value_type &>(stl::as_const(*this).get(entt));
     }
 
     /**
@@ -1175,7 +1175,7 @@ public:
      * @return An iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] iterable each() noexcept {
-        return std::as_const(*this).each();
+        return stl::as_const(*this).each();
     }
 
     /*! @copydoc each */
@@ -1193,7 +1193,7 @@ public:
      * @return A reverse iterable object to use to _visit_ the storage.
      */
     [[nodiscard]] reverse_iterable reach() noexcept {
-        return std::as_const(*this).reach();
+        return stl::as_const(*this).reach();
     }
 
     /*! @copydoc reach */

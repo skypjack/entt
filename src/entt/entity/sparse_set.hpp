@@ -533,7 +533,7 @@ public:
         const auto len = sparse.size();
         other.reserve(len);
 
-        for(size_type cnt{}; auto &&elem: std::as_const(packed)) {
+        for(size_type cnt{}; auto &&elem: stl::as_const(packed)) {
             if(elem != tombstone) {
                 if(const auto page = pos_to_page(entity_to_pos(elem)); sparse[page] != nullptr) {
                     if(const auto sz = page + 1u; sz > other.size()) {
@@ -748,7 +748,7 @@ public:
 
     /*! @copydoc value */
     [[nodiscard]] void *value(const entity_type entt) noexcept {
-        return const_cast<void *>(std::as_const(*this).value(entt));
+        return const_cast<void *>(stl::as_const(*this).value(entt));
     }
 
     /**
