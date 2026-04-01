@@ -174,8 +174,8 @@ public:
      * @param allocator The allocator to use.
      */
     basic_runtime_view(basic_runtime_view &&other, const allocator_type &allocator)
-        : pools{std::move(other.pools), allocator},
-          filter{std::move(other.filter), allocator} {}
+        : pools{stl::move(other.pools), allocator},
+          filter{stl::move(other.filter), allocator} {}
 
     /*! @brief Default destructor. */
     ~basic_runtime_view() = default;

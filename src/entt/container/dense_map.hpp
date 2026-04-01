@@ -49,7 +49,7 @@ struct dense_map_node final {
 
     dense_map_node(std::allocator_arg_t, const auto &allocator, dense_map_node &&other)
         : next{other.next},
-          element{entt::make_obj_using_allocator<value_type>(allocator, std::move(other.element))} {}
+          element{entt::make_obj_using_allocator<value_type>(allocator, stl::move(other.element))} {}
 
     std::size_t next;
     value_type element;
@@ -298,7 +298,7 @@ class dense_map {
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             size_type *curr = &sparse.first()[key_to_bucket(packed.first().back().element.first)];
-            packed.first()[pos] = std::move(packed.first().back());
+            packed.first()[pos] = stl::move(packed.first().back());
             for(; *curr != last; curr = &packed.first()[*curr].next) {}
             *curr = pos;
         }
@@ -404,8 +404,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(dense_map &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(std::move(other.sparse.first()), allocator), stl::forward_as_tuple(std::move(other.sparse.second()))},
-          packed{std::piecewise_construct, stl::forward_as_tuple(std::move(other.packed.first()), allocator), stl::forward_as_tuple(std::move(other.packed.second()))},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
+          packed{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
@@ -526,7 +526,7 @@ public:
 
     /*! @copydoc insert */
     std::pair<iterator, bool> insert(value_type &&value) {
-        return insert_or_do_nothing(std::move(value.first), std::move(value.second));
+        return insert_or_do_nothing(stl::move(value.first), stl::move(value.second));
     }
 
     /**
@@ -567,7 +567,7 @@ public:
     /*! @copydoc insert_or_assign */
     template<typename Arg>
     std::pair<iterator, bool> insert_or_assign(key_type &&key, Arg &&value) {
-        return insert_or_overwrite(std::move(key), stl::forward<Arg>(value));
+        return insert_or_overwrite(stl::move(key), stl::forward<Arg>(value));
     }
 
     /**
@@ -626,7 +626,7 @@ public:
     /*! @copydoc try_emplace */
     template<typename... Args>
     std::pair<iterator, bool> try_emplace(key_type &&key, Args &&...args) {
-        return insert_or_do_nothing(std::move(key), stl::forward<Args>(args)...);
+        return insert_or_do_nothing(stl::move(key), stl::forward<Args>(args)...);
     }
 
     /**
@@ -727,7 +727,7 @@ public:
      * @return A reference to the mapped value of the requested element.
      */
     [[nodiscard]] mapped_type &operator[](key_type &&key) {
-        return insert_or_do_nothing(std::move(key)).first->second;
+        return insert_or_do_nothing(stl::move(key)).first->second;
     }
 
     /**

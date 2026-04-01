@@ -27,7 +27,7 @@ struct input_iterator_pointer final {
      * @param val Value to use to initialize the proxy object.
      */
     constexpr input_iterator_pointer(value_type &&val) noexcept(std::is_nothrow_move_constructible_v<value_type>)
-        : value{std::move(val)} {}
+        : value{stl::move(val)} {}
 
     /**
      * @brief Access operator for accessing wrapped values.
@@ -140,8 +140,8 @@ struct iterable_adaptor final {
      * @param to End iterator.
      */
     constexpr iterable_adaptor(iterator from, sentinel to) noexcept(std::is_nothrow_move_constructible_v<iterator> && std::is_nothrow_move_constructible_v<sentinel>)
-        : first{std::move(from)},
-          last{std::move(to)} {}
+        : first{stl::move(from)},
+          last{stl::move(to)} {}
 
     /**
      * @brief Returns an iterator to the beginning.

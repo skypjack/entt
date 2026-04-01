@@ -33,7 +33,7 @@ constexpr void propagate_on_container_copy_assignment([[maybe_unused]] Allocator
 template<typename Allocator>
 constexpr void propagate_on_container_move_assignment([[maybe_unused]] Allocator &lhs, [[maybe_unused]] Allocator &rhs) noexcept {
     if constexpr(std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value) {
-        lhs = std::move(rhs);
+        lhs = stl::move(rhs);
     }
 }
 
@@ -162,7 +162,7 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, std::pair<First, Second> &&value) noexcept {
-        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(std::move(value.first)), stl::forward_as_tuple(std::move(value.second)));
+        return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(stl::move(value.first)), stl::forward_as_tuple(stl::move(value.second)));
     }
 };
 

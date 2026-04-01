@@ -56,7 +56,7 @@ struct y_combinator {
      * @param recursive A potentially recursive function.
      */
     constexpr y_combinator(Func recursive) noexcept(std::is_nothrow_move_constructible_v<Func>)
-        : func{std::move(recursive)} {}
+        : func{stl::move(recursive)} {}
 
     /**
      * @brief Invokes a y-combinator and therefore its underlying function.

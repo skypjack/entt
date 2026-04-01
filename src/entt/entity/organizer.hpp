@@ -196,9 +196,9 @@ public:
          * @param to List of out-edges of the vertex.
          */
         vertex(vertex_data data, stl::vector<std::size_t> from, stl::vector<std::size_t> to)
-            : node{std::move(data)},
-              in{std::move(from)},
-              out{std::move(to)} {}
+            : node{stl::move(data)},
+              in{stl::move(from)},
+              out{stl::move(to)} {}
 
         /**
          * @brief Fills a buffer with the type info objects for the writable
@@ -334,7 +334,7 @@ public:
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
-        vertices.push_back(std::move(vdata));
+        vertices.push_back(stl::move(vdata));
     }
 
     /**
@@ -366,7 +366,7 @@ public:
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
-        vertices.push_back(std::move(vdata));
+        vertices.push_back(stl::move(vdata));
     }
 
     /**
@@ -392,7 +392,7 @@ public:
             nullptr,
             &type_id<void>()};
 
-        vertices.push_back(std::move(vdata));
+        vertices.push_back(stl::move(vdata));
     }
 
     /**
@@ -415,7 +415,7 @@ public:
                 out.push_back(edge.second);
             }
 
-            adjacency_list.emplace_back(vertices[curr], std::move(in), std::move(out));
+            adjacency_list.emplace_back(vertices[curr], stl::move(in), stl::move(out));
         }
 
         return adjacency_list;

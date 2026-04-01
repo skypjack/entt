@@ -39,7 +39,7 @@ public:
      * @param res A handle to a resource.
      */
     explicit resource(handle_type res) noexcept
-        : value{std::move(res)} {}
+        : value{stl::move(res)} {}
 
     /*! @brief Default copy constructor. */
     resource(const resource &) noexcept = default;
@@ -75,7 +75,7 @@ public:
     template<typename Other>
     requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
     resource(resource<Other> &&other) noexcept
-        : value{std::move(other.value)} {}
+        : value{stl::move(other.value)} {}
 
     /*! @brief Default destructor. */
     ~resource() = default;
@@ -114,7 +114,7 @@ public:
     template<typename Other>
     requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
     resource &operator=(resource<Other> &&other) noexcept {
-        value = std::move(other.value);
+        value = stl::move(other.value);
         return *this;
     }
 
@@ -192,7 +192,7 @@ public:
      * @param other A handle to a resource.
      */
     void reset(handle_type other) {
-        value = std::move(other);
+        value = stl::move(other);
     }
 
     /**

@@ -51,7 +51,7 @@ public:
 
     extended_group_iterator(iterator_type from, stl::tuple<Owned *..., Get *...> cpools)
         : it{from},
-          pools{std::move(cpools)} {}
+          pools{stl::move(cpools)} {}
 
     extended_group_iterator &operator++() noexcept {
         return ++it, *this;
@@ -597,7 +597,7 @@ public:
      */
     template<typename Type, typename... Other, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        sort<index_of<Type>, index_of<Other>...>(std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+        sort<index_of<Type>, index_of<Other>...>(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
     }
 
     /**
@@ -618,7 +618,7 @@ public:
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
                 static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                descriptor->handle().sort(std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+                descriptor->handle().sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
             } else {
                 auto comp = [&compare, cpools = pools_for(std::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
@@ -628,7 +628,7 @@ public:
                     }
                 };
 
-                descriptor->handle().sort(std::move(comp), std::move(algo), stl::forward<Args>(args)...);
+                descriptor->handle().sort(stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
             }
         }
     }
@@ -997,7 +997,7 @@ public:
      */
     template<typename Type, typename... Other, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        sort<index_of<Type>, index_of<Other>...>(std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+        sort<index_of<Type>, index_of<Other>...>(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
     }
 
     /**
@@ -1019,7 +1019,7 @@ public:
 
         if constexpr(sizeof...(Index) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            storage<0>()->sort_n(descriptor->length(), std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+            storage<0>()->sort_n(descriptor->length(), stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
         } else {
             auto comp = [&compare, &cpools](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Index) == 1) {
@@ -1029,7 +1029,7 @@ public:
                 }
             };
 
-            storage<0>()->sort_n(descriptor->length(), std::move(comp), std::move(algo), stl::forward<Args>(args)...);
+            storage<0>()->sort_n(descriptor->length(), stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {

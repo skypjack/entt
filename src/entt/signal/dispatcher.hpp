@@ -161,7 +161,7 @@ public:
      * @param other The instance to move from.
      */
     basic_dispatcher(basic_dispatcher &&other) noexcept
-        : pools{std::move(other.pools)} {}
+        : pools{stl::move(other.pools)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -169,7 +169,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_dispatcher(basic_dispatcher &&other, const allocator_type &allocator)
-        : pools{container_type{std::move(other.pools.first()), allocator}, allocator} {
+        : pools{container_type{stl::move(other.pools.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a dispatcher is not allowed");
     }
 

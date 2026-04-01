@@ -183,7 +183,7 @@ public:
      * @param allocator The allocator to use.
      */
     resource_cache(resource_cache &&other, const allocator_type &allocator)
-        : pool{std::piecewise_construct, stl::forward_as_tuple(std::move(other.pool.first()), allocator), stl::forward_as_tuple(std::move(other.pool.second()))} {}
+        : pool{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.pool.first()), allocator), stl::forward_as_tuple(stl::move(other.pool.second()))} {}
 
     /*! @brief Default destructor. */
     ~resource_cache() = default;

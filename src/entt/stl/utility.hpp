@@ -9,6 +9,7 @@ namespace entt::stl {
 using std::declval;
 using std::exchange;
 using std::forward;
+using std::move;
 
 } // namespace entt::stl
 /*! @endcond */

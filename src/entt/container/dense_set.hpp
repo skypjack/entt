@@ -245,7 +245,7 @@ class dense_set {
     void move_and_pop(const std::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             size_type *curr = &sparse.first()[value_to_bucket(packed.first().back().second)];
-            packed.first()[pos] = std::move(packed.first().back());
+            packed.first()[pos] = stl::move(packed.first().back());
             for(; *curr != last; curr = &packed.first()[*curr].first) {}
             *curr = pos;
         }
@@ -353,8 +353,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(dense_set &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(std::move(other.sparse.first()), allocator), stl::forward_as_tuple(std::move(other.sparse.second()))},
-          packed{std::piecewise_construct, stl::forward_as_tuple(std::move(other.packed.first()), allocator), stl::forward_as_tuple(std::move(other.packed.second()))},
+        : sparse{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
+          packed{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
@@ -515,7 +515,7 @@ public:
 
     /*! @copydoc insert */
     std::pair<iterator, bool> insert(value_type &&value) {
-        return insert_or_do_nothing(std::move(value));
+        return insert_or_do_nothing(stl::move(value));
     }
 
     /**

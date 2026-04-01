@@ -37,7 +37,7 @@ public:
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
-        : it{std::move(base)},
+        : it{stl::move(base)},
           vert{vertices},
           pos{from},
           last{to},
@@ -153,7 +153,7 @@ public:
      * @param allocator The allocator to use.
      */
     adjacency_matrix(adjacency_matrix &&other, const allocator_type &allocator)
-        : matrix{std::move(other.matrix), allocator},
+        : matrix{stl::move(other.matrix), allocator},
           vert{other.vert} {}
 
     /*! @brief Default destructor. */

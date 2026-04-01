@@ -162,8 +162,8 @@ public:
      */
     basic_flow(basic_flow &&other, const allocator_type &allocator)
         : index{other.index.first(), allocator},
-          vertices{std::move(other.vertices), allocator},
-          deps{std::move(other.deps), allocator},
+          vertices{stl::move(other.vertices), allocator},
+          deps{stl::move(other.deps), allocator},
           sync_on{other.sync_on} {}
 
     /*! @brief Default destructor. */

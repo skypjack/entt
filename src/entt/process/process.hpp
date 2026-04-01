@@ -234,7 +234,7 @@ public:
     basic_process &then(Func func) {
         const auto &allocator = next.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *(next.first() = std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
+        return *(next.first() = std::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
     }
 
     /**
@@ -298,7 +298,7 @@ struct process_adaptor: public basic_process<Delta, Allocator> {
 
     process_adaptor(const allocator_type &allocator, Func proc)
         : base_type{allocator},
-          func{std::move(proc)} {}
+          func{stl::move(proc)} {}
 
     void update(const delta_type delta, void *data) override {
         func(*this, delta, data);

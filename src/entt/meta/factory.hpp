@@ -81,9 +81,9 @@ protected:
         bucket = node.id;
 
         if(auto *member = find_member(parent->details->data, node.id); member == nullptr) {
-            parent->details->data.emplace_back(std::move(node));
+            parent->details->data.emplace_back(stl::move(node));
         } else if(member->set != node.set || member->get != node.get) {
-            *member = std::move(node);
+            *member = stl::move(node);
         }
     }
 
@@ -93,10 +93,10 @@ protected:
         invoke = node.invoke;
 
         if(auto *member = find_member(parent->details->func, node.id); member == nullptr) {
-            parent->details->func.emplace_back(std::move(node));
+            parent->details->func.emplace_back(stl::move(node));
         } else if(auto *overload = find_overload(member, node.invoke); overload == nullptr) {
             while(member->next != nullptr) { member = member->next.get(); }
-            member->next = std::make_unique<meta_func_node>(std::move(node));
+            member->next = std::make_unique<meta_func_node>(stl::move(node));
         }
     }
 
@@ -121,13 +121,13 @@ protected:
     void custom(meta_custom_node node) {
         switch(state) {
         case mode::type:
-            parent->custom = std::move(node);
+            parent->custom = stl::move(node);
             break;
         case mode::data:
-            find_member_or_assert()->custom = std::move(node);
+            find_member_or_assert()->custom = stl::move(node);
             break;
         case mode::func:
-            find_overload_or_assert()->custom = std::move(node);
+            find_overload_or_assert()->custom = stl::move(node);
             break;
         }
     }
@@ -138,7 +138,7 @@ public:
           bucket{node.info->hash()},
           state{mode::type} {
         if(const auto it = meta_context::from(*ctx).bucket.find(bucket); it == meta_context::from(*ctx).bucket.cend()) {
-            parent = meta_context::from(*ctx).bucket.emplace(node.info->hash(), std::make_unique<meta_type_node>(std::move(node))).first->second.get();
+            parent = meta_context::from(*ctx).bucket.emplace(node.info->hash(), std::make_unique<meta_type_node>(stl::move(node))).first->second.get();
             parent->details = std::make_unique<meta_type_descriptor>();
         } else {
             parent = it->second.get();

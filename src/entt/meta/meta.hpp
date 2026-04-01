@@ -225,7 +225,7 @@ class meta_any {
     }
 
     meta_any(const meta_any &other, any elem)
-        : storage{std::move(elem)},
+        : storage{stl::move(elem)},
           ctx{other.ctx},
           node{other.node},
           vtable{other.vtable} {}
@@ -324,7 +324,7 @@ public:
      * @param other The instance to move from.
      */
     meta_any(const meta_ctx &area, meta_any &&other)
-        : storage{std::move(other.storage)},
+        : storage{stl::move(other.storage)},
           ctx{&area},
           node{(ctx == other.ctx) ? stl::exchange(other.node, nullptr) : nullptr},
           vtable{stl::exchange(other.vtable, nullptr)} {}
@@ -345,7 +345,7 @@ public:
      * @param other The instance to move from.
      */
     meta_any(meta_any &&other) noexcept
-        : storage{std::move(other.storage)},
+        : storage{stl::move(other.storage)},
           ctx{other.ctx},
           node{stl::exchange(other.node, nullptr)},
           vtable{stl::exchange(other.vtable, nullptr)} {}
@@ -375,7 +375,7 @@ public:
      * @return This meta any object.
      */
     meta_any &operator=(meta_any &&other) noexcept {
-        storage = std::move(other.storage);
+        storage = stl::move(other.storage);
         ctx = other.ctx;
         node = stl::exchange(other.node, nullptr);
         vtable = stl::exchange(other.vtable, nullptr);
@@ -728,7 +728,7 @@ public:
      * @param other The instance to move from.
      */
     meta_handle(const meta_ctx &area, meta_handle &&other)
-        : any{area, std::move(other.any)} {}
+        : any{area, stl::move(other.any)} {}
 
     /*! @brief Default copy constructor, deleted on purpose. */
     meta_handle(const meta_handle &) = delete;
@@ -1425,7 +1425,7 @@ public:
         if(const auto &ref = fetch_node(); ref.details) {
             if(auto *elem = internal::find_member(ref.details->func, id); elem != nullptr) {
                 if(const auto *candidate = lookup(args, sz, (wrapped->base().policy() == any_policy::cref), [curr = elem]() mutable { return (curr != nullptr) ? stl::exchange(curr, curr->next.get()) : nullptr; }); candidate) {
-                    return candidate->invoke(std::move(wrapped), args);
+                    return candidate->invoke(stl::move(wrapped), args);
                 }
             }
         }
@@ -1590,7 +1590,7 @@ inline bool meta_any::assign(const meta_any &other) {
 }
 
 inline bool meta_any::assign(meta_any &&other) {
-    return storage.assign(std::move(other.storage)) || storage.assign(std::as_const(other).allow_cast(type()).storage);
+    return storage.assign(stl::move(other.storage)) || storage.assign(std::as_const(other).allow_cast(type()).storage);
 }
 
 [[nodiscard]] inline meta_type meta_data::type() const noexcept {

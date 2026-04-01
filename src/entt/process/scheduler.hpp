@@ -68,7 +68,7 @@ public:
      * @param other The instance to move from.
      */
     basic_scheduler(basic_scheduler &&other) noexcept
-        : handlers{std::move(other.handlers)} {}
+        : handlers{stl::move(other.handlers)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -76,7 +76,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_scheduler(basic_scheduler &&other, const allocator_type &allocator)
-        : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
+        : handlers{container_type{stl::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a scheduler is not allowed");
     }
 
@@ -166,7 +166,7 @@ public:
     type &attach(Func func) {
         const auto &allocator = handlers.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *handlers.first().emplace_back(std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
+        return *handlers.first().emplace_back(std::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
     }
 
     /**
@@ -192,7 +192,7 @@ public:
             }
 
             if(!elem || elem->rejected()) {
-                elem = std::move(handlers.first().back());
+                elem = stl::move(handlers.first().back());
                 handlers.first().pop_back();
             }
         }

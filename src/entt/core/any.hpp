@@ -77,7 +77,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         case transfer:
             if constexpr(std::is_move_assignable_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *const_cast<Type *>(elem) = std::move(*static_cast<Type *>(const_cast<void *>(other)));
+                *const_cast<Type *>(elem) = stl::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
             }
             [[fallthrough]];
@@ -103,7 +103,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{std::move(*const_cast<Type *>(elem))};
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{stl::move(*const_cast<Type *>(elem))};
             }
         }
 
@@ -562,14 +562,14 @@ template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
         if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
-            return static_cast<Type>(std::move(*instance));
+            return static_cast<Type>(stl::move(*instance));
         }
 
         return any_cast<Type>(data);
     } else {
         auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
         ENTT_ASSERT(instance, "Invalid instance");
-        return static_cast<Type>(std::move(*instance));
+        return static_cast<Type>(stl::move(*instance));
     }
 }
 

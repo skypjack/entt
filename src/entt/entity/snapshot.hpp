@@ -255,7 +255,7 @@ public:
                     } else {
                         Type elem{};
                         archive(elem);
-                        storage.emplace(entity, std::move(elem));
+                        storage.emplace(entity, stl::move(elem));
                     }
                 }
             }
@@ -326,10 +326,10 @@ class basic_continuous_loader {
             if constexpr(stl::is_same_v<first_type, entity_type> && stl::is_same_v<second_type, entity_type>) {
                 other.emplace(map(pair.first), map(pair.second));
             } else if constexpr(stl::is_same_v<first_type, entity_type>) {
-                other.emplace(map(pair.first), std::move(pair.second));
+                other.emplace(map(pair.first), stl::move(pair.second));
             } else {
                 static_assert(stl::is_same_v<second_type, entity_type>, "Neither the key nor the value are of entity type");
-                other.emplace(std::move(pair.first), map(pair.second));
+                other.emplace(stl::move(pair.first), map(pair.second));
             }
         }
 
@@ -452,7 +452,7 @@ public:
                     } else {
                         Type elem{};
                         archive(elem);
-                        storage.emplace(map(entt), std::move(elem));
+                        storage.emplace(map(entt), stl::move(elem));
                     }
                 }
             }

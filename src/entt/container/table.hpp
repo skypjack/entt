@@ -154,7 +154,7 @@ public:
      * @param container The containers to move from.
      */
     explicit basic_table(Container &&...container) noexcept
-        : payload{std::move(container)...} {
+        : payload{stl::move(container)...} {
         ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
     }
 
@@ -166,7 +166,7 @@ public:
      * @param other The instance to move from.
      */
     basic_table(basic_table &&other) noexcept
-        : payload{std::move(other.payload)} {}
+        : payload{stl::move(other.payload)} {}
 
     /**
      * @brief Constructs the underlying containers using a given allocator.
@@ -195,7 +195,7 @@ public:
      */
     template<class Allocator>
     basic_table(Container &&...container, const Allocator &allocator) noexcept
-        : payload{Container{std::move(container), allocator}...} {
+        : payload{Container{stl::move(container), allocator}...} {
         ENTT_ASSERT((((std::get<Container>(payload).size() * sizeof...(Container)) == (std::get<Container>(payload).size() + ...)) && ...), "Unexpected container size");
     }
 
@@ -207,7 +207,7 @@ public:
      */
     template<class Allocator>
     basic_table(basic_table &&other, const Allocator &allocator)
-        : payload{Container{std::move(std::get<Container>(other.payload)), allocator}...} {}
+        : payload{Container{stl::move(std::get<Container>(other.payload)), allocator}...} {}
 
     /*! @brief Default destructor. */
     ~basic_table() = default;

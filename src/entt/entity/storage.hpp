@@ -288,7 +288,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     void move_to(const std::size_t lhs, const std::size_t rhs) {
         auto &elem = element_at(lhs);
         allocator_type allocator{get_allocator()};
-        entt::uninitialized_construct_using_allocator(stl::to_address(assure_at_least(rhs)), allocator, std::move(elem));
+        entt::uninitialized_construct_using_allocator(stl::to_address(assure_at_least(rhs)), allocator, stl::move(elem));
         alloc_traits::destroy(allocator, std::addressof(elem));
     }
 
@@ -326,12 +326,12 @@ protected:
                 base_type::in_place_pop(*first);
                 alloc_traits::destroy(allocator, std::addressof(elem));
             } else if constexpr(std::is_trivially_destructible_v<element_type>) {
-                elem = std::move(element_at(base_type::size() - 1u));
+                elem = stl::move(element_at(base_type::size() - 1u));
                 base_type::swap_and_pop(*first);
             } else {
                 auto &other = element_at(base_type::size() - 1u);
                 // destroying on exit allows reentrant destructors
-                [[maybe_unused]] auto unused = stl::exchange(elem, std::move(other));
+                [[maybe_unused]] auto unused = stl::exchange(elem, stl::move(other));
                 alloc_traits::destroy(allocator, std::addressof(other));
                 base_type::swap_and_pop(*first);
             }
@@ -441,7 +441,7 @@ public:
      */
     basic_storage(basic_storage &&other) noexcept
         : base_type{static_cast<base_type &&>(other)},
-          payload{std::move(other.payload)} {}
+          payload{stl::move(other.payload)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -450,7 +450,7 @@ public:
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator)
         : base_type{static_cast<base_type &&>(other), allocator},
-          payload{std::move(other.payload), allocator} {
+          payload{stl::move(other.payload), allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a storage is not allowed");
     }
 
@@ -832,7 +832,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_storage(basic_storage &&other, const allocator_type &allocator)
-        : base_type{std::move(other), allocator} {}
+        : base_type{stl::move(other), allocator} {}
 
     /*! @brief Default destructor. */
     ~basic_storage() override = default;
@@ -1072,7 +1072,7 @@ public:
      */
     basic_storage &operator=(basic_storage &&other) noexcept {
         placeholder = other.placeholder;
-        base_type::operator=(std::move(other));
+        base_type::operator=(stl::move(other));
         return *this;
     }
 

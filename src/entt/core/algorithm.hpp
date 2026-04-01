@@ -34,7 +34,7 @@ struct std_sort {
      */
     template<typename Compare = std::less<>, typename... Args>
     void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
-        std::sort(stl::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
+        std::sort(stl::forward<Args>(args)..., stl::move(first), stl::move(last), stl::move(compare));
     }
 };
 
@@ -54,16 +54,16 @@ struct insertion_sort {
     void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}) const {
         if(first < last) {
             for(auto it = first + 1; it < last; ++it) {
-                auto value = std::move(*it);
+                auto value = stl::move(*it);
                 auto pre = it;
 
                 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 for(; pre > first && compare(value, *(pre - 1)); --pre) {
-                    *pre = std::move(*(pre - 1));
+                    *pre = stl::move(*(pre - 1));
                 }
                 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-                *pre = std::move(value);
+                *pre = stl::move(value);
             }
         }
     }
@@ -101,7 +101,7 @@ struct radix_sort {
             using difference_type = stl::iterator_traits<It>::difference_type;
             stl::vector<value_type> aux(static_cast<std::size_t>(stl::distance(first, last)));
 
-            auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {
+            auto part = [getter = stl::move(getter)](auto from, auto to, auto out, auto start) {
                 constexpr auto mask = (1 << Bit) - 1;
                 constexpr auto buckets = 1 << Bit;
 
@@ -121,7 +121,7 @@ struct radix_sort {
 
                 for(auto it = from; it != to; ++it) {
                     const auto pos = index[(getter(*it) >> start) & mask]++;
-                    out[static_cast<difference_type>(pos)] = std::move(*it);
+                    out[static_cast<difference_type>(pos)] = stl::move(*it);
                 }
             };
 
@@ -132,7 +132,7 @@ struct radix_sort {
 
             if constexpr(passes & 1) {
                 part(first, last, aux.begin(), (passes - 1) * Bit);
-                std::move(aux.begin(), aux.end(), first);
+                stl::move(aux.begin(), aux.end(), first);
             }
         }
     }

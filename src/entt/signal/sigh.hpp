@@ -97,7 +97,7 @@ public:
      * @param other The instance to move from.
      */
     sigh(sigh &&other) noexcept
-        : calls{std::move(other.calls)} {}
+        : calls{stl::move(other.calls)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -105,7 +105,7 @@ public:
      * @param allocator The allocator to use.
      */
     sigh(sigh &&other, const allocator_type &allocator)
-        : calls{std::move(other.calls), allocator} {}
+        : calls{stl::move(other.calls), allocator} {}
 
     /*! @brief Default destructor. */
     ~sigh() = default;
@@ -376,7 +376,7 @@ class sink<sigh<Ret(Args...), Allocator>> {
 
         for(auto pos = ref.calls.size(); pos; --pos) {
             if(auto &elem = ref.calls[pos - 1u]; callback(elem)) {
-                elem = std::move(ref.calls.back());
+                elem = stl::move(ref.calls.back());
                 ref.calls.pop_back();
             }
         }
@@ -418,7 +418,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>();
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate>>();
@@ -447,7 +447,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance);
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type &>>(value_or_instance);
@@ -471,7 +471,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance);
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type *>>(value_or_instance);

@@ -622,7 +622,7 @@ public:
     void each(Func func) const {
         [this, &func]<auto... Index>(std::index_sequence<Index...> seq) {
             if(const auto *view = base_type::handle(); view != nullptr) {
-                ((view == base_type::pool_at(Index) ? each<Index>(std::move(func), seq) : void()), ...);
+                ((view == base_type::pool_at(Index) ? each<Index>(stl::move(func), seq) : void()), ...);
             }
         }(std::index_sequence_for<Get...>{});
     }

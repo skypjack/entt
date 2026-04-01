@@ -127,7 +127,7 @@ private:
             }
         }
 
-        underlying_type::bind_any(std::move(value));
+        underlying_type::bind_any(stl::move(value));
     }
 
 public:
@@ -175,9 +175,9 @@ public:
     basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
         : underlying_type{static_cast<underlying_type &&>(other)},
           owner{other.owner},
-          construction{std::move(other.construction)},
-          destruction{std::move(other.destruction)},
-          update{std::move(other.update)} {}
+          construction{stl::move(other.construction)},
+          destruction{stl::move(other.destruction)},
+          update{stl::move(other.update)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -187,9 +187,9 @@ public:
     basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator)
         : underlying_type{static_cast<underlying_type &&>(other), allocator},
           owner{other.owner},
-          construction{std::move(other.construction), allocator},
-          destruction{std::move(other.destruction), allocator},
-          update{std::move(other.update), allocator} {}
+          construction{stl::move(other.construction), allocator},
+          destruction{stl::move(other.destruction), allocator},
+          update{stl::move(other.update), allocator} {}
 
     /*! @brief Default destructor. */
     ~basic_sigh_mixin() override = default;
@@ -420,7 +420,7 @@ private:
             }
         }
 
-        underlying_type::bind_any(std::move(value));
+        underlying_type::bind_any(stl::move(value));
     }
 
 public:
@@ -455,7 +455,7 @@ public:
     basic_reactive_mixin(basic_reactive_mixin &&other) noexcept
         : underlying_type{static_cast<underlying_type &&>(other)},
           owner{other.owner},
-          conn{std::move(other.conn)} {
+          conn{stl::move(other.conn)} {
     }
 
     /**
@@ -466,7 +466,7 @@ public:
     basic_reactive_mixin(basic_reactive_mixin &&other, const allocator_type &allocator)
         : underlying_type{static_cast<underlying_type &&>(other), allocator},
           owner{other.owner},
-          conn{std::move(other.conn), allocator} {
+          conn{stl::move(other.conn), allocator} {
     }
 
     /*! @brief Default destructor. */
@@ -498,7 +498,7 @@ public:
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_construct(const id_type id = type_hash<Clazz>::value()) {
         auto curr = owner_or_assert().template storage<Clazz>(id).on_construct().template connect<Candidate>(*this);
-        conn.push_back(std::move(curr));
+        conn.push_back(stl::move(curr));
         return *this;
     }
 
@@ -512,7 +512,7 @@ public:
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_update(const id_type id = type_hash<Clazz>::value()) {
         auto curr = owner_or_assert().template storage<Clazz>(id).on_update().template connect<Candidate>(*this);
-        conn.push_back(std::move(curr));
+        conn.push_back(stl::move(curr));
         return *this;
     }
 
@@ -526,7 +526,7 @@ public:
     template<typename Clazz, auto Candidate = &basic_reactive_mixin::emplace_element>
     basic_reactive_mixin &on_destroy(const id_type id = type_hash<Clazz>::value()) {
         auto curr = owner_or_assert().template storage<Clazz>(id).on_destroy().template connect<Candidate>(*this);
-        conn.push_back(std::move(curr));
+        conn.push_back(stl::move(curr));
         return *this;
     }
 

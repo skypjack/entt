@@ -418,8 +418,8 @@ public:
      * @param other The instance to move from.
      */
     basic_sparse_set(basic_sparse_set &&other) noexcept
-        : sparse{std::move(other.sparse)},
-          packed{std::move(other.packed)},
+        : sparse{stl::move(other.sparse)},
+          packed{stl::move(other.packed)},
           descriptor{other.descriptor},
           mode{other.mode},
           head{stl::exchange(other.head, policy_to_head())} {}
@@ -430,8 +430,8 @@ public:
      * @param allocator The allocator to use.
      */
     basic_sparse_set(basic_sparse_set &&other, const allocator_type &allocator)
-        : sparse{std::move(other.sparse), allocator},
-          packed{std::move(other.packed), allocator},
+        : sparse{stl::move(other.sparse), allocator},
+          packed{stl::move(other.packed), allocator},
           descriptor{other.descriptor},
           mode{other.mode},
           head{stl::exchange(other.head, policy_to_head())} {
@@ -967,7 +967,7 @@ public:
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
         ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
 
-        algo(packed.rend() - static_cast<difference_type>(length), packed.rend(), std::move(compare), stl::forward<Args>(args)...);
+        algo(packed.rend() - static_cast<difference_type>(length), packed.rend(), stl::move(compare), stl::forward<Args>(args)...);
 
         for(size_type pos{}; pos < length; ++pos) {
             auto curr = pos;
@@ -1000,7 +1000,7 @@ public:
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         const size_type len = (mode == deletion_policy::swap_only) ? head : packed.size();
-        sort_n(len, std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+        sort_n(len, stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
     }
 
     /**

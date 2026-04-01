@@ -320,10 +320,10 @@ public:
      * @param other The instance to move from.
      */
     basic_registry(basic_registry &&other) noexcept
-        : vars{std::move(other.vars)},
-          pools{std::move(other.pools)},
-          groups{std::move(other.groups)},
-          entities{std::move(other.entities)} {
+        : vars{stl::move(other.vars)},
+          pools{stl::move(other.pools)},
+          groups{stl::move(other.groups)},
+          entities{stl::move(other.entities)} {
         rebind();
     }
 
@@ -489,7 +489,7 @@ public:
      */
     template<stl::output_iterator<entity_type> It>
     void create(It first, It last) {
-        entities.generate(std::move(first), std::move(last));
+        entities.generate(stl::move(first), stl::move(last));
     }
 
     /**
@@ -582,7 +582,7 @@ public:
     template<typename Type>
     void insert(stl::input_iterator auto first, stl::input_iterator auto last, const Type &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entt) { return valid(entt); }), "Invalid entity");
-        assure<Type>().insert(std::move(first), std::move(last), value);
+        assure<Type>().insert(stl::move(first), stl::move(last), value);
     }
 
     /**
@@ -1130,10 +1130,10 @@ public:
         auto &cpool = assure<Type>();
 
         if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
-            auto comp = [&cpool, compare = std::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
-            cpool.sort(std::move(comp), std::move(algo), stl::forward<Args>(args)...);
+            auto comp = [&cpool, compare = stl::move(compare)](const auto lhs, const auto rhs) { return compare(std::as_const(cpool.get(lhs)), std::as_const(cpool.get(rhs))); };
+            cpool.sort(stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
         } else {
-            cpool.sort(std::move(compare), std::move(algo), stl::forward<Args>(args)...);
+            cpool.sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
         }
     }
 

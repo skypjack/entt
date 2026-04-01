@@ -147,7 +147,7 @@ public:
      */
     template<std::derived_from<Service> Type, typename Deleter = std::default_delete<Type>>
     static void reset(Type *elem, Deleter deleter = {}) {
-        service = std::shared_ptr<Service>{elem, std::move(deleter)};
+        service = std::shared_ptr<Service>{elem, stl::move(deleter)};
     }
 
 private:
