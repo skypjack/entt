@@ -187,10 +187,10 @@ class meta_any {
                 if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                     if constexpr(std::is_constructible_v<bool, Type>) {
                         if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
-                            static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
+                            static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                         }
                     } else {
-                        static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(std::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value.storage)));
+                        static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value.storage)));
                     }
                 }
             }

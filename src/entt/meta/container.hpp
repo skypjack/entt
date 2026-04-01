@@ -49,7 +49,7 @@ concept meta_associative_container_like = requires(Type value) {
     requires entt::stl::forward_iterator<typename Type::iterator>;
     { value.begin() } -> std::same_as<typename Type::iterator>;
     { value.end() } -> std::same_as<typename Type::iterator>;
-    value.find(std::declval<typename Type::key_type>());
+    value.find(stl::declval<typename Type::key_type>());
 };
 
 } // namespace internal

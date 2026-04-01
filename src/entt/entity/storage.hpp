@@ -139,7 +139,7 @@ class extended_storage_iterator final {
 
 public:
     using iterator_type = It;
-    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*std::declval<It>()), stl::forward_as_tuple(*std::declval<Other>()...)));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::forward_as_tuple(*stl::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

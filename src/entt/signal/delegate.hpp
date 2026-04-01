@@ -32,7 +32,7 @@ requires stl::is_member_object_pointer_v<Type Class::*>
 auto function_pointer(Type Class::*, Other &&...) -> Type (*)();
 
 template<typename... Type>
-using function_pointer_t = decltype(function_pointer(std::declval<Type>()...));
+using function_pointer_t = decltype(function_pointer(stl::declval<Type>()...));
 
 template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] ENTT_CONSTEVAL auto index_sequence_for(Ret (*)(Args...)) {

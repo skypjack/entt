@@ -105,7 +105,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Iterable handle type. */
-    using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(std::declval<registry_type>().storage())::iterator>>;
+    using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(stl::declval<registry_type>().storage())::iterator>>;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() noexcept

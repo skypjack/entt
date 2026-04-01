@@ -6,6 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
+using std::declval;
 using std::exchange;
 
 } // namespace entt::stl

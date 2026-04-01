@@ -41,7 +41,7 @@ class registry_storage_iterator final {
     template<typename>
     friend class registry_storage_iterator;
 
-    using mapped_type = std::remove_reference_t<decltype(std::declval<It>()->second)>;
+    using mapped_type = std::remove_reference_t<decltype(stl::declval<It>()->second)>;
 
 public:
     using value_type = std::pair<id_type, constness_as_t<typename mapped_type::element_type, mapped_type> &>;

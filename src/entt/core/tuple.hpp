@@ -67,13 +67,13 @@ struct forward_apply: private Func {
      * @return Return value of the underlying function, if any.
      */
     template<typename Type>
-    constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(stl::apply(std::declval<Func &>(), args))) {
+    constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(stl::apply(stl::declval<Func &>(), args))) {
         return stl::apply(static_cast<Func &>(*this), std::forward<Type>(args));
     }
 
     /*! @copydoc operator()() */
     template<typename Type>
-    constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(stl::apply(std::declval<const Func &>(), args))) {
+    constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(stl::apply(stl::declval<const Func &>(), args))) {
         return stl::apply(static_cast<const Func &>(*this), std::forward<Type>(args));
     }
 };

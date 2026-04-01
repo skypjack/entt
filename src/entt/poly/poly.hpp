@@ -77,7 +77,7 @@ class poly_vtable {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
         } else if constexpr((std::is_function_v<Func> && ...)) {
-            return decltype(stl::make_tuple(vtable_entry(std::declval<Func inspector::*>())...)){};
+            return decltype(stl::make_tuple(vtable_entry(stl::declval<Func inspector::*>())...)){};
         }
     }
 

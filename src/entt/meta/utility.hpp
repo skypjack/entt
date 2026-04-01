@@ -141,7 +141,7 @@ class meta_function_helper {
 
 public:
     /*! @brief The meta function descriptor of the given function. */
-    using type = decltype(get_rid_of_noexcept(std::declval<Candidate>()));
+    using type = decltype(get_rid_of_noexcept(stl::declval<Candidate>()));
 };
 
 /**

@@ -21,7 +21,7 @@ class table_iterator {
     friend class table_iterator;
 
 public:
-    using value_type = decltype(stl::forward_as_tuple(*std::declval<It>()...));
+    using value_type = decltype(stl::forward_as_tuple(*stl::declval<It>()...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

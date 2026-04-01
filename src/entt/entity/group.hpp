@@ -38,7 +38,7 @@ class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
 
 public:
     using iterator_type = It;
-    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*std::declval<It>()), std::declval<Owned>().get_as_tuple({})..., std::declval<Get>().get_as_tuple({})...));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::declval<Owned>().get_as_tuple({})..., stl::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -536,7 +536,7 @@ public:
     template<typename Func>
     void each(Func func) const {
         for(const auto entt: *this) {
-            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
+            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_group>().get({})))>) {
                 stl::apply(func, stl::tuple_cat(stl::make_tuple(entt), get(entt)));
             } else {
                 stl::apply(func, get(entt));
@@ -935,7 +935,7 @@ public:
     template<typename Func>
     void each(Func func) const {
         for(auto args: each()) {
-            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
+            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_group>().get({})))>) {
                 stl::apply(func, args);
             } else {
                 stl::apply([&func](auto, auto &&...less) { func(std::forward<decltype(less)>(less)...); }, args);

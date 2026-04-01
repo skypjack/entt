@@ -750,7 +750,7 @@ template<typename>
 }
 
 template<typename Type>
-[[nodiscard]] ENTT_CONSTEVAL auto maybe_equality_comparable(int) -> decltype(std::declval<Type>() == std::declval<Type>()) {
+[[nodiscard]] ENTT_CONSTEVAL auto maybe_equality_comparable(int) -> decltype(stl::declval<Type>() == stl::declval<Type>()) {
     return true;
 }
 
@@ -844,7 +844,7 @@ class member_class {
 
 public:
     /*! @brief The class of the given non-static member object or function. */
-    using type = std::remove_pointer_t<decltype(clazz(std::declval<Member>()))>;
+    using type = std::remove_pointer_t<decltype(clazz(stl::declval<Member>()))>;
 };
 
 /**
@@ -878,7 +878,7 @@ class nth_argument {
 
 public:
     /*! @brief N-th argument of the _callable_ type. */
-    using type = type_list_element_t<Index, decltype(pick_up(std::declval<Candidate>()))>;
+    using type = type_list_element_t<Index, decltype(pick_up(stl::declval<Candidate>()))>;
 };
 
 /**

@@ -131,7 +131,7 @@ private:
 template<typename It, typename... Get>
 struct extended_view_iterator final {
     using iterator_type = It;
-    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*std::declval<It>()), std::declval<Get>().get_as_tuple({})...));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -430,7 +430,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = std::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
-                if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+                if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_view>().get({})))>) {
                     stl::apply(func, stl::tuple_cat(stl::make_tuple(entt), dispatch_get<Curr, Index>(curr)...));
                 } else {
                     stl::apply(func, stl::tuple_cat(dispatch_get<Curr, Index>(curr)...));
@@ -918,7 +918,7 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = base_type::reverse_iterator;
     /*! @brief Iterable view type. */
-    using iterable = std::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(std::declval<Get>().each())>;
+    using iterable = std::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(stl::declval<Get>().each())>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept
@@ -1053,7 +1053,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
+        if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_view>().get({})))>) {
             for(const auto pack: each()) {
                 stl::apply(func, pack);
             }
