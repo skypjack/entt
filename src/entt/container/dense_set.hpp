@@ -197,7 +197,7 @@ class dense_set {
     static constexpr std::size_t minimum_capacity = 8u;
     static constexpr std::size_t placeholder_position = internal::dense_set_placeholder_position;
 
-    using node_type = std::pair<std::size_t, Type>;
+    using node_type = stl::pair<std::size_t, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
     using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
@@ -232,14 +232,14 @@ class dense_set {
         const auto index = value_to_bucket(value);
 
         if(auto it = constrained_find(value, index); it != end()) {
-            return std::make_pair(it, false);
+            return stl::make_pair(it, false);
         }
 
         packed.first().emplace_back(sparse.first()[index], stl::forward<Other>(value));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
-        return std::make_pair(--end(), true);
+        return stl::make_pair(--end(), true);
     }
 
     void move_and_pop(const std::size_t pos) {
@@ -509,12 +509,12 @@ public:
      * the element that prevented the insertion) and a bool denoting whether the
      * insertion took place.
      */
-    std::pair<iterator, bool> insert(const value_type &value) {
+    stl::pair<iterator, bool> insert(const value_type &value) {
         return insert_or_do_nothing(value);
     }
 
     /*! @copydoc insert */
-    std::pair<iterator, bool> insert(value_type &&value) {
+    stl::pair<iterator, bool> insert(value_type &&value) {
         return insert_or_do_nothing(stl::move(value));
     }
 
@@ -543,7 +543,7 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> emplace(Args &&...args) {
+    stl::pair<iterator, bool> emplace(Args &&...args) {
         if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<std::decay_t<Args>, value_type>)) {
             return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
@@ -552,13 +552,13 @@ public:
 
             if(auto it = constrained_find(node.second, index); it != end()) {
                 packed.first().pop_back();
-                return std::make_pair(it, false);
+                return stl::make_pair(it, false);
             }
 
             std::swap(node.first, sparse.first()[index]);
             rehash_if_required();
 
-            return std::make_pair(--end(), true);
+            return stl::make_pair(--end(), true);
         }
     }
 
@@ -664,13 +664,13 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const value_type &value) {
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const value_type &value) {
         const auto it = find(value);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const value_type &value) const {
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const value_type &value) const {
         const auto it = find(value);
         return {it, it + !(it == cend())};
     }
@@ -682,14 +682,14 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const auto &value)
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const auto &value)
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const auto &value) const
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const auto &value) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == cend())};

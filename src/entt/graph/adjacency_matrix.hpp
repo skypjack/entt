@@ -26,7 +26,7 @@ class edge_iterator {
     }
 
 public:
-    using value_type = std::pair<size_type, size_type>;
+    using value_type = stl::pair<size_type, size_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -61,7 +61,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::make_pair<size_type>(pos / vert, pos % vert);
+        return stl::make_pair<size_type>(pos / vert, pos % vert);
     }
 
     [[nodiscard]] constexpr bool operator==(const edge_iterator &other) const noexcept {
@@ -98,7 +98,7 @@ public:
     /*! @brief Vertex type. */
     using vertex_type = size_type;
     /*! @brief Edge type. */
-    using edge_type = std::pair<vertex_type, vertex_type>;
+    using edge_type = stl::pair<vertex_type, vertex_type>;
     /*! @brief Vertex iterator type. */
     using vertex_iterator = iota_iterator<vertex_type>;
     /*! @brief Edge iterator type. */
@@ -280,7 +280,7 @@ public:
      * the element that prevented the insertion) and a bool denoting whether the
      * insertion took place.
      */
-    std::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
+    stl::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
 
         if constexpr(stl::is_same_v<graph_category, undirected_tag>) {

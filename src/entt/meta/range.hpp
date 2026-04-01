@@ -19,7 +19,7 @@ struct meta_base_node;
 
 template<typename Type, typename It>
 struct meta_range_iterator final {
-    using value_type = std::pair<id_type, Type>;
+    using value_type = stl::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

@@ -31,7 +31,7 @@ static constexpr std::size_t dense_map_placeholder_position = (std::numeric_limi
 
 template<typename Key, typename Type>
 struct dense_map_node final {
-    using value_type = std::pair<Key, Type>;
+    using value_type = stl::pair<Key, Type>;
 
     template<typename... Args>
     dense_map_node(const std::size_t pos, Args &&...args)
@@ -65,7 +65,7 @@ class dense_map_iterator final {
     using second_type = decltype((stl::declval<It>()->element.second));
 
 public:
-    using value_type = std::pair<first_type, second_type>;
+    using value_type = stl::pair<first_type, second_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -160,7 +160,7 @@ class dense_map_local_iterator final {
     using second_type = decltype((stl::declval<It>()->element.second));
 
 public:
-    using value_type = std::pair<first_type, second_type>;
+    using value_type = stl::pair<first_type, second_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -235,7 +235,7 @@ class dense_map {
 
     using node_type = internal::dense_map_node<Key, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(stl::is_same_v<typename alloc_traits::value_type, std::pair<const Key, Type>>, "Invalid value type");
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, stl::pair<const Key, Type>>, "Invalid value type");
     using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
     using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
@@ -269,14 +269,14 @@ class dense_map {
         const auto index = key_to_bucket(key);
 
         if(auto it = constrained_find(key, index); it != end()) {
-            return std::make_pair(it, false);
+            return stl::make_pair(it, false);
         }
 
         packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, stl::forward_as_tuple(stl::forward<Other>(key)), stl::forward_as_tuple(stl::forward<Args>(args)...));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
-        return std::make_pair(--end(), true);
+        return stl::make_pair(--end(), true);
     }
 
     template<typename Other, typename Arg>
@@ -285,14 +285,14 @@ class dense_map {
 
         if(auto it = constrained_find(key, index); it != end()) {
             it->second = stl::forward<Arg>(value);
-            return std::make_pair(it, false);
+            return stl::make_pair(it, false);
         }
 
         packed.first().emplace_back(sparse.first()[index], stl::forward<Other>(key), stl::forward<Arg>(value));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
-        return std::make_pair(--end(), true);
+        return stl::make_pair(--end(), true);
     }
 
     void move_and_pop(const std::size_t pos) {
@@ -320,7 +320,7 @@ public:
     /*! @brief Mapped type of the container. */
     using mapped_type = Type;
     /*! @brief Key-value type of the container. */
-    using value_type = std::pair<const Key, Type>;
+    using value_type = stl::pair<const Key, Type>;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Signed integer type. */
@@ -520,12 +520,12 @@ public:
      * the element that prevented the insertion) and a bool denoting whether the
      * insertion took place.
      */
-    std::pair<iterator, bool> insert(const value_type &value) {
+    stl::pair<iterator, bool> insert(const value_type &value) {
         return insert_or_do_nothing(value.first, value.second);
     }
 
     /*! @copydoc insert */
-    std::pair<iterator, bool> insert(value_type &&value) {
+    stl::pair<iterator, bool> insert(value_type &&value) {
         return insert_or_do_nothing(stl::move(value.first), stl::move(value.second));
     }
 
@@ -535,7 +535,7 @@ public:
      */
     template<typename Arg>
     requires std::constructible_from<value_type, Arg &&>
-    std::pair<iterator, bool> insert(Arg &&value) {
+    stl::pair<iterator, bool> insert(Arg &&value) {
         return insert_or_do_nothing(stl::forward<Arg>(value).first, stl::forward<Arg>(value).second);
     }
 
@@ -560,13 +560,13 @@ public:
      * denoting whether the insertion took place.
      */
     template<typename Arg>
-    std::pair<iterator, bool> insert_or_assign(const key_type &key, Arg &&value) {
+    stl::pair<iterator, bool> insert_or_assign(const key_type &key, Arg &&value) {
         return insert_or_overwrite(key, stl::forward<Arg>(value));
     }
 
     /*! @copydoc insert_or_assign */
     template<typename Arg>
-    std::pair<iterator, bool> insert_or_assign(key_type &&key, Arg &&value) {
+    stl::pair<iterator, bool> insert_or_assign(key_type &&key, Arg &&value) {
         return insert_or_overwrite(stl::move(key), stl::forward<Arg>(value));
     }
 
@@ -584,7 +584,7 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> emplace([[maybe_unused]] Args &&...args) {
+    stl::pair<iterator, bool> emplace([[maybe_unused]] Args &&...args) {
         if constexpr(sizeof...(Args) == 0u) {
             return insert_or_do_nothing(key_type{});
         } else if constexpr(sizeof...(Args) == 1u) {
@@ -597,13 +597,13 @@ public:
 
             if(auto it = constrained_find(node.element.first, index); it != end()) {
                 packed.first().pop_back();
-                return std::make_pair(it, false);
+                return stl::make_pair(it, false);
             }
 
             std::swap(node.next, sparse.first()[index]);
             rehash_if_required();
 
-            return std::make_pair(--end(), true);
+            return stl::make_pair(--end(), true);
         }
     }
 
@@ -619,13 +619,13 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> try_emplace(const key_type &key, Args &&...args) {
+    stl::pair<iterator, bool> try_emplace(const key_type &key, Args &&...args) {
         return insert_or_do_nothing(key, stl::forward<Args>(args)...);
     }
 
     /*! @copydoc try_emplace */
     template<typename... Args>
-    std::pair<iterator, bool> try_emplace(key_type &&key, Args &&...args) {
+    stl::pair<iterator, bool> try_emplace(key_type &&key, Args &&...args) {
         return insert_or_do_nothing(stl::move(key), stl::forward<Args>(args)...);
     }
 
@@ -788,13 +788,13 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const key_type &key) {
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const key_type &key) {
         const auto it = find(key);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
         const auto it = find(key);
         return {it, it + !(it == cend())};
     }
@@ -806,14 +806,14 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const auto &key)
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const auto &key)
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const auto &key) const
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const auto &key) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
         return {it, it + !(it == cend())};

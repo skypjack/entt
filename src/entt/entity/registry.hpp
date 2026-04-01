@@ -44,7 +44,7 @@ class registry_storage_iterator final {
     using mapped_type = std::remove_reference_t<decltype(stl::declval<It>()->second)>;
 
 public:
-    using value_type = std::pair<id_type, constness_as_t<typename mapped_type::element_type, mapped_type> &>;
+    using value_type = stl::pair<id_type, constness_as_t<typename mapped_type::element_type, mapped_type> &>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -132,7 +132,7 @@ private:
 template<typename Allocator>
 class registry_context {
     using alloc_traits = std::allocator_traits<Allocator>;
-    using allocator_type = alloc_traits::template rebind_alloc<std::pair<const id_type, basic_any<0u>>>;
+    using allocator_type = alloc_traits::template rebind_alloc<stl::pair<const id_type, basic_any<0u>>>;
 
 public:
     explicit registry_context(const allocator_type &allocator)
@@ -214,8 +214,8 @@ class basic_registry {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, Entity>, "Invalid value type");
     // std::shared_ptr because of its type erased allocator which is useful here
-    using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<base_type>>>>;
-    using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<std::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
+    using pool_container_type = dense_map<id_type, std::shared_ptr<base_type>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<stl::pair<const id_type, std::shared_ptr<base_type>>>>;
+    using group_container_type = dense_map<id_type, std::shared_ptr<internal::group_descriptor>, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<stl::pair<const id_type, std::shared_ptr<internal::group_descriptor>>>>;
     using traits_type = entt_traits<Entity>;
 
     template<cvref_unqualified Type>

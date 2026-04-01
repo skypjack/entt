@@ -1688,10 +1688,10 @@ private:
 };
 
 class meta_associative_container::meta_iterator final {
-    using vtable_type = void(const void *, std::pair<meta_any, meta_any> *);
+    using vtable_type = void(const void *, stl::pair<meta_any, meta_any> *);
 
     template<bool KeyOnly, typename It>
-    static void basic_vtable(const void *value, std::pair<meta_any, meta_any> *other) {
+    static void basic_vtable(const void *value, stl::pair<meta_any, meta_any> *other) {
         if(const auto &it = *static_cast<const It *>(value); other) {
             if constexpr(KeyOnly) {
                 other->first.emplace<decltype(*it)>(*it);
@@ -1705,7 +1705,7 @@ class meta_associative_container::meta_iterator final {
     }
 
 public:
-    using value_type = std::pair<meta_any, meta_any>;
+    using value_type = stl::pair<meta_any, meta_any>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;

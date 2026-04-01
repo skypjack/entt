@@ -135,8 +135,8 @@ struct uses_allocator_construction {
 };
 
 template<typename Type, typename Other>
-struct uses_allocator_construction<std::pair<Type, Other>> {
-    using type = std::pair<Type, Other>;
+struct uses_allocator_construction<stl::pair<Type, Other>> {
+    using type = stl::pair<Type, Other>;
 
     template<typename First, typename Second>
     static constexpr auto args(const auto &allocator, std::piecewise_construct_t, First &&first, Second &&second) noexcept {
@@ -156,12 +156,12 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
     }
 
     template<typename First, typename Second>
-    static constexpr auto args(const auto &allocator, const std::pair<First, Second> &value) noexcept {
+    static constexpr auto args(const auto &allocator, const stl::pair<First, Second> &value) noexcept {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(value.first), stl::forward_as_tuple(value.second));
     }
 
     template<typename First, typename Second>
-    static constexpr auto args(const auto &allocator, std::pair<First, Second> &&value) noexcept {
+    static constexpr auto args(const auto &allocator, stl::pair<First, Second> &&value) noexcept {
         return uses_allocator_construction<type>::args(allocator, std::piecewise_construct, stl::forward_as_tuple(stl::move(value.first)), stl::forward_as_tuple(stl::move(value.second)));
     }
 };

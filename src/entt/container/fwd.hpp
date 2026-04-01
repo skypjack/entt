@@ -13,7 +13,7 @@ template<
     typename Type,
     typename = std::hash<Key>,
     typename = std::equal_to<>,
-    typename = std::allocator<std::pair<const Key, Type>>>
+    typename = std::allocator<stl::pair<const Key, Type>>>
 class dense_map;
 
 template<

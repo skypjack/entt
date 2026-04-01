@@ -30,7 +30,7 @@ class resource_cache_iterator final {
     friend class resource_cache_iterator;
 
 public:
-    using value_type = std::pair<id_type, resource<Type>>;
+    using value_type = stl::pair<id_type, resource<Type>>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
@@ -127,7 +127,7 @@ template<typename Type, typename Loader, typename Allocator>
 class resource_cache {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using container_allocator = alloc_traits::template rebind_alloc<std::pair<const id_type, typename Loader::result_type>>;
+    using container_allocator = alloc_traits::template rebind_alloc<stl::pair<const id_type, typename Loader::result_type>>;
     using container_type = dense_map<id_type, typename Loader::result_type, stl::identity, std::equal_to<>, container_allocator>;
 
 public:
@@ -287,7 +287,7 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> load(const id_type id, Args &&...args) {
+    stl::pair<iterator, bool> load(const id_type id, Args &&...args) {
         if(auto it = pool.first().find(id); it != pool.first().end()) {
             return {it, false};
         }
@@ -300,7 +300,7 @@ public:
      * @copydetails load
      */
     template<typename... Args>
-    std::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
+    stl::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
         return {pool.first().insert_or_assign(id, pool.second()(stl::forward<Args>(args)...)).first, true};
     }
 

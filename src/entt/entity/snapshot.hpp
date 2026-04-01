@@ -310,7 +310,7 @@ class basic_continuous_loader {
                 remloc[entity].second = reg->create();
             }
         } else {
-            remloc.insert_or_assign(entity, std::make_pair(entt, reg->create()));
+            remloc.insert_or_assign(entity, stl::make_pair(entt, reg->create()));
         }
     }
 
@@ -500,7 +500,7 @@ public:
     }
 
 private:
-    dense_map<typename traits_type::entity_type, std::pair<entity_type, entity_type>> remloc;
+    dense_map<typename traits_type::entity_type, stl::pair<entity_type, entity_type>> remloc;
     registry_type *reg;
 };
 
