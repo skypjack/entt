@@ -136,10 +136,10 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             deleter = nullptr;
             mode = any_policy::empty;
             this->instance = nullptr;
-        } else if constexpr(std::is_lvalue_reference_v<Type>) {
+        } else if constexpr(stl::is_lvalue_reference_v<Type>) {
             deleter = nullptr;
             mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
-            static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
+            static_assert((stl::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (std::addressof(args), ...);
         } else if constexpr(in_situ_v<plain_type>) {
