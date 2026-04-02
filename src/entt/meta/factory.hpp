@@ -372,7 +372,7 @@ public:
         } else {
             using data_type = stl::remove_pointer_t<decltype(Data)>;
 
-            if constexpr(std::is_pointer_v<decltype(Data)>) {
+            if constexpr(stl::is_pointer_v<decltype(Data)>) {
                 static_assert(Policy::template value<decltype(*Data)>, "Invalid return type for the given policy");
             } else {
                 static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -382,7 +382,7 @@ public:
                 internal::meta_data_node{
                     id,
                     name,
-                    ((!std::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                    ((!stl::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<stl::remove_cvref_t<data_type>>,
                     &meta_arg<type_list<stl::remove_cvref_t<data_type>>>,

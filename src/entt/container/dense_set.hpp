@@ -32,7 +32,7 @@ class dense_set_iterator final {
     template<typename>
     friend class dense_set_iterator;
 
-    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+    static_assert(stl::is_pointer_v<It>, "Not a pointer type");
 
 public:
     using value_type = std::remove_const_t<stl::remove_pointer_t<It>>::second_type;
@@ -124,7 +124,7 @@ class dense_set_local_iterator final {
     template<typename>
     friend class dense_set_local_iterator;
 
-    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+    static_assert(stl::is_pointer_v<It>, "Not a pointer type");
 
 public:
     using value_type = std::remove_const_t<stl::remove_pointer_t<It>>::second_type;

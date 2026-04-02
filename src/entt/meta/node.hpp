@@ -221,7 +221,7 @@ auto setup_node_for() noexcept {
             | (std::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
             | (std::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
             | (std::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
-            | (std::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
+            | (stl::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
             | (is_meta_pointer_like_v<Type> ? meta_traits::is_pointer_like : meta_traits::is_none)
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_associative_container : meta_traits::is_none),

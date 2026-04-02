@@ -292,7 +292,7 @@ template<typename Type, auto Data>
                 return true;
             }
         }
-    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+    } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
         using data_type = std::remove_reference_t<decltype(*Data)>;
 
         if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
@@ -332,7 +332,7 @@ template<typename Type, auto Data, meta_policy Policy = as_value_t>
         }
 
         return meta_any{meta_ctx_arg, instance->context()};
-    } else if constexpr(std::is_pointer_v<decltype(Data)>) {
+    } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
         if constexpr(std::is_array_v<stl::remove_pointer_t<decltype(Data)>>) {
             return meta_any{meta_ctx_arg, instance->context()};
         } else {
