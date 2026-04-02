@@ -88,7 +88,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             }
             break;
         case compare:
-            if constexpr(!std::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
+            if constexpr(!stl::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
                 return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
             } else {
                 return (elem == other) ? other : nullptr;

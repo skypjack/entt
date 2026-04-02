@@ -202,7 +202,7 @@ class meta_any {
                     }
                 } else if constexpr(!std::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
                     if(auto *pointer = any_cast<Type>(value.storage); pointer) {
-                        static_cast<meta_any *>(other)->emplace<std::conditional_t<std::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
+                        static_cast<meta_any *>(other)->emplace<std::conditional_t<stl::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
                     }
                 }
             }

@@ -275,7 +275,7 @@ template<typename Type>
  */
 template<typename Type, auto Data>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
-    if constexpr(std::is_member_function_pointer_v<decltype(Data)> || std::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
+    if constexpr(std::is_member_function_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
         using descriptor = meta_function_helper_t<Type, decltype(Data)>;
         using data_type = type_list_element_t<descriptor::is_static, typename descriptor::args_type>;
 
@@ -316,7 +316,7 @@ template<typename Type, auto Data>
  */
 template<typename Type, auto Data, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
-    if constexpr(std::is_member_pointer_v<decltype(Data)> || std::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
+    if constexpr(std::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!std::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
                 if(auto *clazz = instance->try_cast<Type>(); clazz) {
