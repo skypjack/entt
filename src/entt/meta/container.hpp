@@ -114,7 +114,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(std::is_default_constructible_v<typename Type::value_type> && requires(Type elem) { elem.resize(sz); }) {
+        if constexpr(stl::is_default_constructible_v<typename Type::value_type> && requires(Type elem) { elem.resize(sz); }) {
             static_cast<Type *>(container)->resize(sz);
             return true;
         } else {

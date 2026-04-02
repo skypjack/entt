@@ -228,7 +228,7 @@ auto setup_node_for() noexcept {
         size_of_v<Type>,
         &resolve<stl::remove_const_t<stl::remove_pointer_t<Type>>>};
 
-    if constexpr(std::is_default_constructible_v<Type>) {
+    if constexpr(stl::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {
             return meta_any{ctx, std::in_place_type<Type>};
         };

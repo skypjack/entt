@@ -374,7 +374,7 @@ protected:
                 return base_type::end();
             }
         } else {
-            if constexpr(std::is_default_constructible_v<element_type>) {
+            if constexpr(stl::is_default_constructible_v<element_type>) {
                 return emplace_element(entt, force_back);
             } else {
                 return base_type::end();
@@ -667,7 +667,7 @@ public:
      */
     template<typename... Args>
     value_type &emplace(const entity_type entt, Args &&...args) {
-        if constexpr(stl::is_aggregate_v<value_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<value_type>)) {
+        if constexpr(stl::is_aggregate_v<value_type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<value_type>)) {
             const auto it = emplace_element(entt, false, Type{stl::forward<Args>(args)...});
             return element_at(static_cast<size_type>(it.index()));
         } else {

@@ -69,7 +69,7 @@ public:
 
     template<typename... Args>
     void enqueue(Args &&...args) {
-        if constexpr(stl::is_aggregate_v<Type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<Type>)) {
+        if constexpr(stl::is_aggregate_v<Type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<Type>)) {
             events.push_back(Type{stl::forward<Args>(args)...});
         } else {
             events.emplace_back(stl::forward<Args>(args)...);

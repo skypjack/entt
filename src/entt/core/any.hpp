@@ -151,7 +151,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
             mode = any_policy::embedded;
 
-            if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
+            if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<plain_type>)) {
                 ::new(&this->buffer) plain_type{stl::forward<Args>(args)...};
             } else {
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
@@ -161,7 +161,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             deleter = &basic_deleter<plain_type>;
             mode = any_policy::dynamic;
 
-            if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<plain_type>)) {
+            if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<plain_type>)) {
                 this->instance = new plain_type{stl::forward<Args>(args)...};
             } else if constexpr(std::is_array_v<plain_type>) {
                 static_assert(sizeof...(Args) == 0u, "Invalid arguments");
