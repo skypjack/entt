@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 #include <algorithm>
-#include <array>
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -18,6 +17,7 @@
 #include "../core/memory.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/array.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"

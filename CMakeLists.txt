@@ -195,6 +195,7 @@ if(ENTT_INCLUDE_HEADERS)
         signal/emitter.hpp
         signal/fwd.hpp
         signal/sigh.hpp
+        stl/array.hpp
         stl/atomic.hpp
         stl/functional.hpp
         stl/iterator.hpp

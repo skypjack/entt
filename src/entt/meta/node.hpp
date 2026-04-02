@@ -1,7 +1,6 @@
 #ifndef ENTT_META_NODE_HPP
 #define ENTT_META_NODE_HPP
 
-#include <array>
 #include <bit>
 #include <cstddef>
 #include <memory>
@@ -13,6 +12,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "../stl/array.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
