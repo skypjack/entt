@@ -757,7 +757,7 @@ template<typename Type>
 template<typename Type>
 [[nodiscard]] ENTT_CONSTEVAL bool dispatch_is_equality_comparable() {
     // NOLINTBEGIN(modernize-use-transparent-functors)
-    if constexpr(std::is_array_v<Type>) {
+    if constexpr(stl::is_array_v<Type>) {
         return false;
     } else if constexpr(is_complete_v<stl::tuple_size<stl::remove_const_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {

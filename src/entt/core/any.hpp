@@ -88,7 +88,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             }
             break;
         case compare:
-            if constexpr(!stl::is_function_v<Type> && !std::is_array_v<Type> && is_equality_comparable_v<Type>) {
+            if constexpr(!stl::is_function_v<Type> && !stl::is_array_v<Type> && is_equality_comparable_v<Type>) {
                 return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
             } else {
                 return (elem == other) ? other : nullptr;
@@ -118,7 +118,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
         if constexpr(in_situ_v<Type>) {
             (value.mode == any_policy::embedded) ? elem->~Type() : (delete elem);
-        } else if constexpr(std::is_array_v<Type>) {
+        } else if constexpr(stl::is_array_v<Type>) {
             delete[] elem;
         } else {
             delete elem;
@@ -163,7 +163,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
             if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<plain_type>)) {
                 this->instance = new plain_type{stl::forward<Args>(args)...};
-            } else if constexpr(std::is_array_v<plain_type>) {
+            } else if constexpr(stl::is_array_v<plain_type>) {
                 static_assert(sizeof...(Args) == 0u, "Invalid arguments");
                 this->instance = new plain_type[std::extent_v<plain_type>]();
             } else {

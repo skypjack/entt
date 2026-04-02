@@ -286,7 +286,7 @@ template<typename Type, auto Data>
     } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
 
-        if constexpr(!std::is_array_v<data_type> && !stl::is_const_v<data_type>) {
+        if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 std::invoke(Data, *clazz) = value.cast<data_type>();
                 return true;
@@ -295,7 +295,7 @@ template<typename Type, auto Data>
     } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<decltype(*Data)>;
 
-        if constexpr(!std::is_array_v<data_type> && !stl::is_const_v<data_type>) {
+        if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(value.allow_cast<data_type>()) {
                 *Data = value.cast<data_type>();
                 return true;
@@ -317,7 +317,7 @@ template<typename Type, auto Data>
 template<typename Type, auto Data, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
-        if constexpr(!std::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
+        if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
             if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
                 if(auto *clazz = instance->try_cast<Type>(); clazz) {
                     return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *clazz));
@@ -333,7 +333,7 @@ template<typename Type, auto Data, meta_policy Policy = as_value_t>
 
         return meta_any{meta_ctx_arg, instance->context()};
     } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
-        if constexpr(std::is_array_v<stl::remove_pointer_t<decltype(Data)>>) {
+        if constexpr(stl::is_array_v<stl::remove_pointer_t<decltype(Data)>>) {
             return meta_any{meta_ctx_arg, instance->context()};
         } else {
             return meta_dispatch<Policy>(instance->context(), *Data);
