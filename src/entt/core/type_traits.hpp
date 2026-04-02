@@ -283,7 +283,7 @@ struct type_list_contains;
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>
-    : std::bool_constant<(stl::is_same_v<Type, Other> || ...)> {};
+    : stl::bool_constant<(stl::is_same_v<Type, Other> || ...)> {};
 
 /**
  * @brief Helper variable template.
@@ -545,7 +545,7 @@ struct value_list_contains;
  */
 template<auto... Value, auto Other>
 struct value_list_contains<value_list<Value...>, Other>
-    : std::bool_constant<((Value == Other) || ...)> {};
+    : stl::bool_constant<((Value == Other) || ...)> {};
 
 /**
  * @brief Helper variable template.
@@ -690,7 +690,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
  * @tparam Type The type to test
  */
 template<typename Type>
-struct is_ebco_eligible: std::bool_constant<std::is_empty_v<Type> && !std::is_final_v<Type>> {};
+struct is_ebco_eligible: stl::bool_constant<std::is_empty_v<Type> && !std::is_final_v<Type>> {};
 
 /**
  * @brief Helper variable template.
@@ -786,7 +786,7 @@ template<typename Type>
  * @tparam Type The type to test.
  */
 template<typename Type>
-struct is_equality_comparable: std::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
+struct is_equality_comparable: stl::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
 
 /*! @copydoc is_equality_comparable */
 template<typename Type>

@@ -45,7 +45,7 @@ struct basic_any_storage<0u, Align> {
 
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(bugprone-sizeof-expression)
-struct in_situ: std::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && stl::is_nothrow_move_constructible_v<Type>> {};
+struct in_situ: stl::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && stl::is_nothrow_move_constructible_v<Type>> {};
 
 template<std::size_t Len, std::size_t Align>
 struct in_situ<void, Len, Align>: stl::false_type {};

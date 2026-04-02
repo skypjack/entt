@@ -424,7 +424,7 @@ namespace std {
 
 template<typename... Container, typename Allocator>
 struct uses_allocator<entt::basic_table<Container...>, Allocator>
-    : std::bool_constant<(std::uses_allocator_v<Container, Allocator> && ...)> {};
+    : entt::stl::bool_constant<(std::uses_allocator_v<Container, Allocator> && ...)> {};
 
 } // namespace std
 /*! @endcond */

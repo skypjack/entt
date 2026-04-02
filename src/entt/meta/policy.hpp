@@ -60,7 +60,7 @@ struct as_is_t final: private internal::meta_policy {
  */
 template<typename Type>
 struct is_meta_policy
-    : std::bool_constant<std::is_base_of_v<internal::meta_policy, Type>> {};
+    : stl::bool_constant<std::is_base_of_v<internal::meta_policy, Type>> {};
 
 /**
  * @brief Helper variable template.
