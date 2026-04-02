@@ -91,16 +91,16 @@ struct resource_traits<Registry, type_list<Args...>, type_list<Req...>> {
 };
 
 template<typename Registry, typename... Req, typename Ret, typename... Args>
-resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource_traits(Ret (*)(Args...));
+resource_traits<Registry, type_list<stl::remove_reference_t<Args>...>, type_list<Req...>> free_function_to_resource_traits(Ret (*)(Args...));
 
 template<typename Registry, typename... Req, typename Ret, typename Type, typename... Args>
-resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (*)(Type &, Args...));
+resource_traits<Registry, type_list<stl::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (*)(Type &, Args...));
 
 template<typename Registry, typename... Req, typename Ret, typename Class, typename... Args>
-resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...));
+resource_traits<Registry, type_list<stl::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...));
 
 template<typename Registry, typename... Req, typename Ret, typename Class, typename... Args>
-resource_traits<Registry, type_list<std::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
+resource_traits<Registry, type_list<stl::remove_reference_t<Args>...>, type_list<Req...>> constrained_function_to_resource_traits(Ret (Class::*)(Args...) const);
 
 } // namespace internal
 /*! @endcond */
@@ -142,7 +142,7 @@ class basic_organizer final {
         } else if constexpr(internal::is_group_v<Type>) {
             return static_cast<Type>(as_group{reg});
         } else {
-            return reg.ctx().template emplace<std::remove_reference_t<Type>>();
+            return reg.ctx().template emplace<stl::remove_reference_t<Type>>();
         }
     }
 

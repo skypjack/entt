@@ -165,7 +165,7 @@ template<typename Type, typename Value>
 
 template<auto Member>
 [[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id, bool recursive) {
-    using value_type = std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
+    using value_type = stl::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
         if(auto *member = find_member((node.details.get()->*Member), id); member != nullptr) {

@@ -16,6 +16,7 @@ using std::is_same_v;
 using std::is_void_v;
 using std::remove_cvref_t;
 using std::remove_pointer_t;
+using std::remove_reference_t;
 using std::true_type;
 
 } // namespace entt::stl

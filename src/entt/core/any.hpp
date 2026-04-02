@@ -138,7 +138,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             this->instance = nullptr;
         } else if constexpr(stl::is_lvalue_reference_v<Type>) {
             deleter = nullptr;
-            mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+            mode = std::is_const_v<stl::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
             static_assert((stl::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (std::addressof(args), ...);
@@ -542,7 +542,7 @@ private:
  */
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] std::remove_const_t<Type> any_cast(const basic_any<Len, Align> &data) noexcept {
-    const auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
+    const auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
 }
@@ -551,7 +551,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
-    auto *const instance = any_cast<std::remove_reference_t<const Type>>(&data);
+    auto *const instance = any_cast<stl::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
 }
@@ -561,13 +561,13 @@ template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
-        if(auto *const instance = any_cast<std::remove_reference_t<Type>>(&data); instance) {
+        if(auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(stl::move(*instance));
         }
 
         return any_cast<Type>(data);
     } else {
-        auto *const instance = any_cast<std::remove_reference_t<Type>>(&data);
+        auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data);
         ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(stl::move(*instance));
     }

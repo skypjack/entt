@@ -459,7 +459,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] std::remove_const_t<Type> cast() const {
-        auto *const instance = try_cast<std::remove_reference_t<Type>>();
+        auto *const instance = try_cast<stl::remove_reference_t<Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(*instance);
     }
@@ -468,7 +468,7 @@ public:
     template<typename Type>
     [[nodiscard]] std::remove_const_t<Type> cast() {
         // forces const on non-reference types to make them work also with wrappers for const references
-        auto *const instance = try_cast<std::remove_reference_t<const Type>>();
+        auto *const instance = try_cast<stl::remove_reference_t<const Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(*instance);
     }
@@ -494,7 +494,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(!std::is_reference_v<Type> || std::is_const_v<std::remove_reference_t<Type>>) {
+        if constexpr(!std::is_reference_v<Type> || std::is_const_v<stl::remove_reference_t<Type>>) {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
@@ -530,8 +530,8 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) {
-            return allow_cast<const std::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
+        if constexpr(std::is_reference_v<Type> && !std::is_const_v<stl::remove_reference_t<Type>>) {
+            return allow_cast<const stl::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return true;

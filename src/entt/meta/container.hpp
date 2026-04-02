@@ -154,7 +154,7 @@ struct basic_meta_sequence_container_traits {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->insert(
                               non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
-                              (value != nullptr) ? *static_cast<const Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref))};
+                              (value != nullptr) ? *static_cast<const Type::value_type *>(value) : *static_cast<const stl::remove_reference_t<typename Type::const_reference> *>(cref))};
         } else {
             return iterator{};
         }
