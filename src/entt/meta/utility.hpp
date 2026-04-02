@@ -97,7 +97,7 @@ struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)>
               type_list<Args...>,
               type_list<MaybeType, Args...>>,
           !(stl::is_same_v<stl::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<stl::remove_cvref_t<MaybeType>, Type>),
-          std::is_const_v<stl::remove_reference_t<MaybeType>> && (stl::is_same_v<stl::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<stl::remove_cvref_t<MaybeType>, Type>)> {};
+          stl::is_const_v<stl::remove_reference_t<MaybeType>> && (stl::is_same_v<stl::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<stl::remove_cvref_t<MaybeType>, Type>)> {};
 
 /**
  * @brief Meta function descriptor.
@@ -286,7 +286,7 @@ template<typename Type, auto Data>
     } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
 
-        if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+        if constexpr(!std::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
                 std::invoke(Data, *clazz) = value.cast<data_type>();
                 return true;
@@ -295,7 +295,7 @@ template<typename Type, auto Data>
     } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<decltype(*Data)>;
 
-        if constexpr(!std::is_array_v<data_type> && !std::is_const_v<data_type>) {
+        if constexpr(!std::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(value.allow_cast<data_type>()) {
                 *Data = value.cast<data_type>();
                 return true;

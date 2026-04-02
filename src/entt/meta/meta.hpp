@@ -76,7 +76,7 @@ public:
           begin_end_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::iter},
           insert_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::insert},
           erase_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::erase},
-          const_only{std::is_const_v<Type>} {}
+          const_only{stl::is_const_v<Type>} {}
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
     [[nodiscard]] inline size_type size() const noexcept;
@@ -137,7 +137,7 @@ public:
           insert_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::insert},
           erase_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::erase},
           find_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::find},
-          const_only{std::is_const_v<Type>} {
+          const_only{stl::is_const_v<Type>} {
         if constexpr(!meta_associative_container_traits<stl::remove_const_t<Type>>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
@@ -449,7 +449,7 @@ public:
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(stl::as_const(*this).try_cast<stl::remove_const_t<Type>>());
+        return ((storage.policy() == any_policy::cref) && !stl::is_const_v<Type>) ? nullptr : const_cast<Type *>(stl::as_const(*this).try_cast<stl::remove_const_t<Type>>());
     }
 
     /**
@@ -494,7 +494,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(!std::is_reference_v<Type> || std::is_const_v<stl::remove_reference_t<Type>>) {
+        if constexpr(!std::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>) {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
@@ -530,7 +530,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        if constexpr(std::is_reference_v<Type> && !std::is_const_v<stl::remove_reference_t<Type>>) {
+        if constexpr(std::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>) {
             return allow_cast<const stl::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {

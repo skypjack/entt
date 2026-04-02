@@ -363,7 +363,7 @@ public:
                     id,
                     name,
                     /* this is never static */
-                    std::is_const_v<stl::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
+                    stl::is_const_v<stl::remove_reference_t<data_type>> ? internal::meta_traits::is_const : internal::meta_traits::is_none,
                     1u,
                     &internal::resolve<stl::remove_cvref_t<data_type>>,
                     &meta_arg<type_list<stl::remove_cvref_t<data_type>>>,
@@ -382,7 +382,7 @@ public:
                 internal::meta_data_node{
                     id,
                     name,
-                    ((!stl::is_pointer_v<decltype(Data)> || std::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
+                    ((!stl::is_pointer_v<decltype(Data)> || stl::is_const_v<data_type>) ? internal::meta_traits::is_const : internal::meta_traits::is_none) | internal::meta_traits::is_static,
                     1u,
                     &internal::resolve<stl::remove_cvref_t<data_type>>,
                     &meta_arg<type_list<stl::remove_cvref_t<data_type>>>,

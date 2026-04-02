@@ -35,7 +35,7 @@ class storage_iterator final {
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
 
     using iterator_traits = stl::iterator_traits<std::conditional_t<
-        std::is_const_v<Container>,
+        stl::is_const_v<Container>,
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::const_pointer,
         typename alloc_traits::template rebind_traits<typename std::pointer_traits<typename container_type::value_type>::element_type>::pointer>>;
 
@@ -53,7 +53,7 @@ public:
           offset{idx} {}
 
     template<std::same_as<stl::remove_const_t<Container>> Other>
-    requires std::is_const_v<Container>
+    requires stl::is_const_v<Container>
     constexpr storage_iterator(const storage_iterator<Other, Page> &other) noexcept
         : storage_iterator{other.payload, other.offset} {}
 

@@ -138,7 +138,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             this->instance = nullptr;
         } else if constexpr(stl::is_lvalue_reference_v<Type>) {
             deleter = nullptr;
-            mode = std::is_const_v<stl::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+            mode = stl::is_const_v<stl::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
             static_assert((stl::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (std::addressof(args), ...);
@@ -206,7 +206,7 @@ public:
      * @param value A pointer to an object to take ownership of.
      */
     template<typename Type>
-    requires (!std::is_const_v<Type> && !stl::is_void_v<Type>)
+    requires (!stl::is_const_v<Type> && !stl::is_void_v<Type>)
     explicit basic_any(std::in_place_t, Type *value)
         : base_type{} {
         if(value == nullptr) {
@@ -409,7 +409,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] Type *data() noexcept {
-        if constexpr(std::is_const_v<Type>) {
+        if constexpr(stl::is_const_v<Type>) {
             return stl::as_const(*this).template data<stl::remove_const_t<Type>>();
         } else {
             return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(stl::as_const(*this).template data<stl::remove_const_t<Type>>());
@@ -582,7 +582,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] Type *any_cast(basic_any<Len, Align> *data) noexcept {
-    if constexpr(std::is_const_v<Type>) {
+    if constexpr(stl::is_const_v<Type>) {
         // last attempt to make wrappers for const references return their values
         return any_cast<Type>(&stl::as_const(*data));
     } else {
