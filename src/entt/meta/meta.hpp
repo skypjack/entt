@@ -1014,7 +1014,7 @@ struct meta_func: meta_object<internal::meta_func_node> {
     template<typename Instance = meta_handle, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(Instance &&instance, Args &&...args) const {
-        return invoke(stl::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return invoke(stl::forward<Instance>(instance), stl::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_data::traits */
@@ -1385,7 +1385,7 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&...args) const {
-        return construct(std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return construct(stl::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     }
 
@@ -1451,7 +1451,7 @@ public:
     template<typename Instance = meta_handle, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(const id_type id, Instance &&instance, Args &&...args) const {
-        return invoke(id, stl::forward<Instance>(instance), std::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
+        return invoke(id, stl::forward<Instance>(instance), stl::array<meta_any, sizeof...(Args)>{meta_any{*ctx, stl::forward<Args>(args)}...}.data(), sizeof...(Args));
     }
 
     /**

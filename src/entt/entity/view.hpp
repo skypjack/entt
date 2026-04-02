@@ -88,7 +88,7 @@ public:
           filter{},
           index{} {}
 
-    view_iterator(iterator_type first, std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
+    view_iterator(iterator_type first, stl::array<const Type *, Get> value, stl::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
         : it{first},
           pools{value},
           filter{excl},
@@ -123,8 +123,8 @@ public:
 
 private:
     iterator_type it;
-    std::array<const Type *, Get> pools;
-    std::array<const Type *, Exclude> filter;
+    stl::array<const Type *, Get> pools;
+    stl::array<const Type *, Exclude> filter;
     difference_type index;
 };
 
@@ -238,7 +238,7 @@ protected:
         }
     }
 
-    basic_common_view(std::array<const Type *, Get> value, std::array<const Type *, Exclude> excl) noexcept
+    basic_common_view(stl::array<const Type *, Get> value, stl::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
           index{Get} {
@@ -387,8 +387,8 @@ public:
     }
 
 private:
-    std::array<const common_type *, Get> pools{};
-    std::array<const common_type *, Exclude> filter{};
+    stl::array<const common_type *, Get> pools{};
+    stl::array<const common_type *, Exclude> filter{};
     const common_type *placeholder{internal::view_placeholder<common_type>()};
     size_type index{Get};
 };

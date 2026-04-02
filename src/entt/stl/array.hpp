@@ -6,6 +6,8 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
+using std::array;
+
 } // namespace entt::stl
 /*! @endcond */
 

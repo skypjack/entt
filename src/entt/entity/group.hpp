@@ -135,8 +135,8 @@ public:
 
     template<typename... OGType, typename... EType>
     group_handler(stl::tuple<OGType &...> ogpool, stl::tuple<EType &...> epool)
-        : pools{stl::apply([](auto &&...cpool) { return std::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
-          filter{stl::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)} {
+        : pools{stl::apply([](auto &&...cpool) { return stl::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
+          filter{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Exclude>{&cpool...}; }, epool)} {
         stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
         stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
         common_setup();
@@ -166,8 +166,8 @@ public:
     }
 
 private:
-    std::array<common_type *, (Owned + Get)> pools;
-    std::array<common_type *, Exclude> filter;
+    stl::array<common_type *, (Owned + Get)> pools;
+    stl::array<common_type *, Exclude> filter;
     std::size_t len{};
 };
 
@@ -206,8 +206,8 @@ public:
 
     template<typename Allocator, typename... GType, typename... EType>
     group_handler(const Allocator &allocator, stl::tuple<GType &...> gpool, stl::tuple<EType &...> epool)
-        : pools{stl::apply([](auto &&...cpool) { return std::array<common_type *, Get>{&cpool...}; }, gpool)},
-          filter{stl::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
+        : pools{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Get>{&cpool...}; }, gpool)},
+          filter{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Exclude>{&cpool...}; }, epool)},
           elem{allocator} {
         stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
         stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
@@ -232,8 +232,8 @@ public:
     }
 
 private:
-    std::array<common_type *, Get> pools;
-    std::array<common_type *, Exclude> filter;
+    stl::array<common_type *, Get> pools;
+    stl::array<common_type *, Exclude> filter;
     common_type elem;
 };
 

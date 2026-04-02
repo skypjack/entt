@@ -696,7 +696,7 @@ public:
         size_type count{};
 
         if constexpr(stl::is_same_v<It, typename common_type::iterator>) {
-            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
+            stl::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
             for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {
@@ -747,7 +747,7 @@ public:
     template<typename Type, typename... Other, stl::input_iterator It>
     void erase(It first, It last) {
         if constexpr(stl::is_same_v<It, typename common_type::iterator>) {
-            std::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
+            stl::array cpools{static_cast<common_type *>(&assure<Type>()), static_cast<common_type *>(&assure<Other>())...};
 
             for(auto from = cpools.begin(), to = cpools.end(); from != to; ++from) {
                 if constexpr(sizeof...(Other) != 0u) {

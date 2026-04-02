@@ -197,7 +197,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
 template<typename... Get, typename... Exclude, std::size_t... Index>
 static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view, std::index_sequence<Index...>) {
     using view_type = basic_view<get_t<Get...>, exclude_t<Exclude...>>;
-    const std::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
+    const stl::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
 
     for(auto tup: view.each()) {
         const auto entt = std::get<0>(tup);
