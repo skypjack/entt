@@ -112,7 +112,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<cvref_unqualified Type>
     static void basic_deleter(const basic_any &value) {
-        ENTT_ASSERT((value.mode == any_policy::dynamic) || ((value.mode == any_policy::embedded) && !std::is_trivially_destructible_v<Type>), "Unexpected policy");
+        ENTT_ASSERT((value.mode == any_policy::dynamic) || ((value.mode == any_policy::embedded) && !stl::is_trivially_destructible_v<Type>), "Unexpected policy");
 
         const auto *elem = static_cast<const Type *>(value.data());
 
@@ -143,7 +143,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (std::addressof(args), ...);
         } else if constexpr(in_situ_v<plain_type>) {
-            if constexpr(std::is_trivially_destructible_v<plain_type>) {
+            if constexpr(stl::is_trivially_destructible_v<plain_type>) {
                 deleter = nullptr;
             } else {
                 deleter = &basic_deleter<plain_type>;

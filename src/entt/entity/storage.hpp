@@ -260,7 +260,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
         allocator_type allocator{get_allocator()};
 
-        if constexpr(!std::is_trivially_destructible_v<element_type>) {
+        if constexpr(!stl::is_trivially_destructible_v<element_type>) {
             for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
                 if constexpr(traits_type::in_place_delete) {
                     if(base_type::data()[pos] != tombstone) {
@@ -325,7 +325,7 @@ protected:
             if constexpr(traits_type::in_place_delete) {
                 base_type::in_place_pop(*first);
                 alloc_traits::destroy(allocator, std::addressof(elem));
-            } else if constexpr(std::is_trivially_destructible_v<element_type>) {
+            } else if constexpr(stl::is_trivially_destructible_v<element_type>) {
                 elem = stl::move(element_at(base_type::size() - 1u));
                 base_type::swap_and_pop(*first);
             } else {
@@ -340,7 +340,7 @@ protected:
 
     /*! @brief Erases all entities of a storage. */
     void pop_all() override {
-        if constexpr(std::is_trivially_destructible_v<element_type>) {
+        if constexpr(stl::is_trivially_destructible_v<element_type>) {
             base_type::pop_all();
         } else {
             allocator_type allocator{get_allocator()};
