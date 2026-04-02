@@ -69,13 +69,13 @@ public:
           data{&instance},
           value_type_node{&internal::resolve<typename Type::value_type>},
           const_reference_node{&internal::resolve<stl::remove_cvref_t<typename Type::const_reference>>},
-          size_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::size},
-          clear_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::clear},
-          reserve_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::reserve},
-          resize_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::resize},
-          begin_end_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::iter},
-          insert_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::insert},
-          erase_fn{meta_sequence_container_traits<std::remove_const_t<Type>>::erase},
+          size_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::size},
+          clear_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::clear},
+          reserve_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::reserve},
+          resize_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::resize},
+          begin_end_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::iter},
+          insert_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::insert},
+          erase_fn{meta_sequence_container_traits<stl::remove_const_t<Type>>::erase},
           const_only{std::is_const_v<Type>} {}
 
     [[nodiscard]] inline meta_type value_type() const noexcept;
@@ -130,15 +130,15 @@ public:
           data{&instance},
           key_type_node{&internal::resolve<typename Type::key_type>},
           value_type_node{&internal::resolve<typename Type::value_type>},
-          size_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::size},
-          clear_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::clear},
-          reserve_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::reserve},
-          begin_end_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::iter},
-          insert_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::insert},
-          erase_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::erase},
-          find_fn{&meta_associative_container_traits<std::remove_const_t<Type>>::find},
+          size_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::size},
+          clear_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::clear},
+          reserve_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::reserve},
+          begin_end_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::iter},
+          insert_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::insert},
+          erase_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::erase},
+          find_fn{&meta_associative_container_traits<stl::remove_const_t<Type>>::find},
           const_only{std::is_const_v<Type>} {
-        if constexpr(!meta_associative_container_traits<std::remove_const_t<Type>>::key_only) {
+        if constexpr(!meta_associative_container_traits<stl::remove_const_t<Type>>::key_only) {
             mapped_type_node = &internal::resolve<typename Type::mapped_type>;
         }
     }
@@ -184,7 +184,7 @@ class meta_any {
 
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer) {
-                if constexpr(!stl::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
+                if constexpr(!stl::is_void_v<stl::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                     if constexpr(std::is_constructible_v<bool, Type>) {
                         if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
                             static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
@@ -200,9 +200,9 @@ class meta_any {
                     if(const auto &elem = any_cast<const Type &>(value.storage); elem) {
                         return (value.storage.policy() == any_policy::cref) ? static_cast<meta_any *>(other)->emplace<decltype(*elem)>(*elem) : static_cast<meta_any *>(other)->emplace<decltype(*const_cast<Type &>(elem))>(*const_cast<Type &>(elem));
                     }
-                } else if constexpr(!std::is_array_v<Type> && !stl::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>) {
+                } else if constexpr(!std::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
                     if(auto *pointer = any_cast<Type>(value.storage); pointer) {
-                        static_cast<meta_any *>(other)->emplace<std::conditional_t<std::is_function_v<std::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
+                        static_cast<meta_any *>(other)->emplace<std::conditional_t<std::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
                     }
                 }
             }
@@ -443,13 +443,13 @@ public:
     template<typename Type>
     [[nodiscard]] const Type *try_cast() const {
         const auto *elem = any_cast<const Type>(&storage);
-        return ((elem != nullptr) || !*this) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<std::remove_const_t<Type>>::value(), storage.data()));
+        return ((elem != nullptr) || !*this) ? elem : static_cast<const Type *>(internal::try_cast(internal::meta_context::from(*ctx), fetch_node(), type_hash<stl::remove_const_t<Type>>::value(), storage.data()));
     }
 
     /*! @copydoc try_cast */
     template<typename Type>
     [[nodiscard]] Type *try_cast() {
-        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(stl::as_const(*this).try_cast<std::remove_const_t<Type>>());
+        return ((storage.policy() == any_policy::cref) && !std::is_const_v<Type>) ? nullptr : const_cast<Type *>(stl::as_const(*this).try_cast<stl::remove_const_t<Type>>());
     }
 
     /**
@@ -458,7 +458,7 @@ public:
      * @return A reference to the contained instance.
      */
     template<typename Type>
-    [[nodiscard]] std::remove_const_t<Type> cast() const {
+    [[nodiscard]] stl::remove_const_t<Type> cast() const {
         auto *const instance = try_cast<stl::remove_reference_t<Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
         return static_cast<Type>(*instance);
@@ -466,7 +466,7 @@ public:
 
     /*! @copydoc cast */
     template<typename Type>
-    [[nodiscard]] std::remove_const_t<Type> cast() {
+    [[nodiscard]] stl::remove_const_t<Type> cast() {
         // forces const on non-reference types to make them work also with wrappers for const references
         auto *const instance = try_cast<stl::remove_reference_t<const Type>>();
         ENTT_ASSERT(instance, "Invalid instance");
@@ -789,7 +789,7 @@ struct meta_custom {
      */
     template<typename Type>
     [[nodiscard]] operator Type *() const noexcept {
-        return ((node != nullptr) && (type_hash<std::remove_const_t<Type>>::value() == node->id)) ? static_cast<Type *>(node->value.get()) : nullptr;
+        return ((node != nullptr) && (type_hash<stl::remove_const_t<Type>>::value() == node->id)) ? static_cast<Type *>(node->value.get()) : nullptr;
     }
 
     /**

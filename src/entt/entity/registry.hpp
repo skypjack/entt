@@ -285,7 +285,7 @@ public:
      * @tparam Type Storage value type, eventually const.
      */
     template<typename Type>
-    using storage_for_type = storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<std::remove_const_t<Type>>>::type;
+    using storage_for_type = storage_for<Type, Entity, typename alloc_traits::template rebind_alloc<stl::remove_const_t<Type>>>::type;
 
     /*! @brief Default constructor. */
     basic_registry()
@@ -414,7 +414,7 @@ public:
      */
     template<typename Type>
     storage_for_type<Type> &storage(const id_type id = type_hash<Type>::value()) {
-        return assure<std::remove_const_t<Type>>(id);
+        return assure<stl::remove_const_t<Type>>(id);
     }
 
     /**
@@ -425,7 +425,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const storage_for_type<Type> *storage(const id_type id = type_hash<Type>::value()) const {
-        return assure<std::remove_const_t<Type>>(id);
+        return assure<stl::remove_const_t<Type>>(id);
     }
 
     /**
@@ -814,7 +814,7 @@ public:
     template<typename... Type>
     [[nodiscard]] bool all_of([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1u) {
-            auto *cpool = assure<std::remove_const_t<Type>...>();
+            auto *cpool = assure<stl::remove_const_t<Type>...>();
             return cpool && cpool->contains(entt);
         } else {
             return (all_of<Type>(entt) && ...);
@@ -847,7 +847,7 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1u) {
-            return (assure<std::remove_const_t<Type>>()->get(entt), ...);
+            return (assure<stl::remove_const_t<Type>>()->get(entt), ...);
         } else {
             return stl::forward_as_tuple(get<Type>(entt)...);
         }
@@ -857,7 +857,7 @@ public:
     template<typename... Type>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) {
         if constexpr(sizeof...(Type) == 1u) {
-            return (static_cast<storage_for_type<Type> &>(assure<std::remove_const_t<Type>>()).get(entt), ...);
+            return (static_cast<storage_for_type<Type> &>(assure<stl::remove_const_t<Type>>()).get(entt), ...);
         } else {
             return stl::forward_as_tuple(get<Type>(entt)...);
         }
@@ -898,7 +898,7 @@ public:
     template<typename... Type>
     [[nodiscard]] auto try_get([[maybe_unused]] const entity_type entt) const {
         if constexpr(sizeof...(Type) == 1u) {
-            const auto *cpool = assure<std::remove_const_t<Type>...>();
+            const auto *cpool = assure<stl::remove_const_t<Type>...>();
             return (cpool && cpool->contains(entt)) ? std::addressof(cpool->get(entt)) : nullptr;
         } else {
             return stl::make_tuple(try_get<Type>(entt)...);
@@ -1025,7 +1025,7 @@ public:
     [[nodiscard]] basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) const {
         basic_view<get_t<storage_for_type<const Type>, storage_for_type<const Other>...>, exclude_t<storage_for_type<const Exclude>...>> elem{};
-        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(assure<std::remove_const_t<Exclude>>()..., assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Type>>());
+        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(assure<stl::remove_const_t<Exclude>>()..., assure<stl::remove_const_t<Other>>()..., assure<stl::remove_const_t<Type>>());
         return elem;
     }
 
@@ -1033,7 +1033,7 @@ public:
     template<typename Type, typename... Other, typename... Exclude>
     [[nodiscard]] basic_view<get_t<storage_for_type<Type>, storage_for_type<Other>...>, exclude_t<storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) {
-        return {assure<std::remove_const_t<Type>>(), assure<std::remove_const_t<Other>>()..., assure<std::remove_const_t<Exclude>>()...};
+        return {assure<stl::remove_const_t<Type>>(), assure<stl::remove_const_t<Other>>()..., assure<stl::remove_const_t<Exclude>>()...};
     }
 
     /**
@@ -1056,9 +1056,9 @@ public:
         std::shared_ptr<handler_type> handler{};
 
         if constexpr(sizeof...(Owned) == 0u) {
-            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), stl::forward_as_tuple(assure<std::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
+            handler = std::allocate_shared<handler_type>(get_allocator(), get_allocator(), stl::forward_as_tuple(assure<stl::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<stl::remove_const_t<Exclude>>()...));
         } else {
-            handler = std::allocate_shared<handler_type>(get_allocator(), stl::forward_as_tuple(assure<std::remove_const_t<Owned>>()..., assure<std::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<std::remove_const_t<Exclude>>()...));
+            handler = std::allocate_shared<handler_type>(get_allocator(), stl::forward_as_tuple(assure<stl::remove_const_t<Owned>>()..., assure<stl::remove_const_t<Get>>()...), stl::forward_as_tuple(assure<stl::remove_const_t<Exclude>>()...));
             ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [](const auto &data) { return !(data.second->owned(type_id<Owned>().hash()) || ...); }), "Conflicting groups");
         }
 

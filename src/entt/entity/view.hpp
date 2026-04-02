@@ -415,7 +415,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     using element_at = type_list_element_t<Index, type_list<Get..., Exclude...>>;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t Curr, std::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const stl::tuple<typename base_type::entity_type, Args...> &curr) const {
@@ -958,7 +958,7 @@ public:
      */
     template<typename Type = Get::element_type>
     [[nodiscard]] auto *storage() const noexcept {
-        static_assert(stl::is_same_v<std::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
+        static_assert(stl::is_same_v<stl::remove_const_t<Type>, typename Get::element_type>, "Invalid element type");
         return storage<0>();
     }
 
@@ -1017,7 +1017,7 @@ public:
      */
     template<typename Elem>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(stl::is_same_v<std::remove_const_t<Elem>, typename Get::element_type>, "Invalid element type");
+        static_assert(stl::is_same_v<stl::remove_const_t<Elem>, typename Get::element_type>, "Invalid element type");
         return get<0>(entt);
     }
 

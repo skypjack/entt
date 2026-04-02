@@ -562,7 +562,7 @@ public:
     view(exclude_t<Exclude...> = exclude_t{}) const {
         const owner_type &parent = owner_or_assert();
         basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<const Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<const Exclude>...>> elem{};
-        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.template storage<std::remove_const_t<Exclude>>()..., parent.template storage<std::remove_const_t<Get>>()..., this);
+        [&elem](const auto *...curr) { ((curr ? elem.storage(*curr) : void()), ...); }(parent.template storage<stl::remove_const_t<Exclude>>()..., parent.template storage<stl::remove_const_t<Get>>()..., this);
         return elem;
     }
 
@@ -571,7 +571,7 @@ public:
     [[nodiscard]] basic_view<get_t<const basic_reactive_mixin, typename basic_registry_type::template storage_for_type<Get>...>, exclude_t<typename basic_registry_type::template storage_for_type<Exclude>...>>
     view(exclude_t<Exclude...> = exclude_t{}) {
         std::conditional_t<((std::is_const_v<Get> && ...) && (std::is_const_v<Exclude> && ...)), const owner_type, owner_type> &parent = owner_or_assert();
-        return {*this, parent.template storage<std::remove_const_t<Get>>()..., parent.template storage<std::remove_const_t<Exclude>>()...};
+        return {*this, parent.template storage<stl::remove_const_t<Get>>()..., parent.template storage<stl::remove_const_t<Exclude>>()...};
     }
 
     /*! @brief Releases all connections to the underlying registry, if any. */

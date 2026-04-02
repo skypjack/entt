@@ -39,12 +39,12 @@ inline constexpr bool is_group_v = is_group<Type>::value;
 template<typename Type, typename Override>
 struct unpack_type {
     using ro = std::conditional_t<
-        type_list_contains_v<Override, const Type> || (std::is_const_v<Type> && !type_list_contains_v<Override, std::remove_const_t<Type>>),
-        type_list<std::remove_const_t<Type>>,
+        type_list_contains_v<Override, const Type> || (std::is_const_v<Type> && !type_list_contains_v<Override, stl::remove_const_t<Type>>),
+        type_list<stl::remove_const_t<Type>>,
         type_list<>>;
 
     using rw = std::conditional_t<
-        type_list_contains_v<Override, std::remove_const_t<Type>> || (!std::is_const_v<Type> && !type_list_contains_v<Override, const Type>),
+        type_list_contains_v<Override, stl::remove_const_t<Type>> || (!std::is_const_v<Type> && !type_list_contains_v<Override, const Type>),
         type_list<Type>,
         type_list<>>;
 };
@@ -84,7 +84,7 @@ struct resource_traits;
 
 template<typename Registry, typename... Args, typename... Req>
 struct resource_traits<Registry, type_list<Args...>, type_list<Req...>> {
-    using args = type_list<std::remove_const_t<Args>...>;
+    using args = type_list<stl::remove_const_t<Args>...>;
     using ro = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::ro..., typename unpack_type<Req, type_list<>>::ro...>;
     using rw = type_list_cat_t<typename unpack_type<Args, type_list<Req...>>::rw..., typename unpack_type<Req, type_list<>>::rw...>;
     static constexpr auto sync_point = (stl::is_same_v<Args, Registry> || ...);

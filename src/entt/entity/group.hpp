@@ -277,7 +277,7 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index>
     [[nodiscard]] auto pools_for(std::index_sequence<Index...>) const noexcept {
@@ -308,7 +308,7 @@ public:
      * @return Group opaque identifier.
      */
     static id_type group_id() noexcept {
-        return type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+        return type_hash<basic_group<owned_t<>, get_t<stl::remove_const_t<Get>...>, exclude_t<stl::remove_const_t<Exclude>...>>>::value();
     }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
@@ -691,7 +691,7 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<std::size_t... Index, std::size_t... Other>
     [[nodiscard]] auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
@@ -722,7 +722,7 @@ public:
      * @return Group opaque identifier.
      */
     static id_type group_id() noexcept {
-        return type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+        return type_hash<basic_group<owned_t<stl::remove_const_t<Owned>...>, get_t<stl::remove_const_t<Get>...>, exclude_t<stl::remove_const_t<Exclude>...>>>::value();
     }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */

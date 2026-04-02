@@ -65,7 +65,7 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using return_type = std::remove_const_t<Ret>;
+    using return_type = stl::remove_const_t<Ret>;
     using delegate_type = return_type(const void *, Args...);
 
     template<auto Candidate, std::size_t... Index>

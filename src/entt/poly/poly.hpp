@@ -50,7 +50,7 @@ class poly_vtable {
     using inspector = Concept::template type<poly_inspector>;
 
     template<typename Ret, typename Clazz, typename... Args>
-    requires std::derived_from<inspector, std::remove_const_t<Clazz>>
+    requires std::derived_from<inspector, stl::remove_const_t<Clazz>>
     static auto vtable_entry(Ret (*)(Clazz &, Args...))
         -> Ret (*)(constness_as_t<basic_any<Len, Align>, Clazz> &, Args...);
 

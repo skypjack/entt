@@ -353,7 +353,7 @@ public:
      */
     template<typename Other, typename... Args>
     operator basic_handle<Other, Args...>() const noexcept {
-        static_assert(stl::is_same_v<Other, Registry> || stl::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
+        static_assert(stl::is_same_v<Other, Registry> || stl::is_same_v<stl::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
         return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
     }

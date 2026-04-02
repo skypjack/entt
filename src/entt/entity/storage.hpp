@@ -31,7 +31,7 @@ class storage_iterator final {
     template<typename, auto>
     friend class storage_iterator;
 
-    using container_type = std::remove_const_t<Container>;
+    using container_type = stl::remove_const_t<Container>;
     using alloc_traits = std::allocator_traits<typename container_type::allocator_type>;
 
     using iterator_traits = stl::iterator_traits<std::conditional_t<
@@ -52,7 +52,7 @@ public:
         : payload{ref},
           offset{idx} {}
 
-    template<std::same_as<std::remove_const_t<Container>> Other>
+    template<std::same_as<stl::remove_const_t<Container>> Other>
     requires std::is_const_v<Container>
     constexpr storage_iterator(const storage_iterator<Other, Page> &other) noexcept
         : storage_iterator{other.payload, other.offset} {}

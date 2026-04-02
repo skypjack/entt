@@ -226,7 +226,7 @@ auto setup_node_for() noexcept {
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve<std::remove_const_t<stl::remove_pointer_t<Type>>>};
+        &resolve<stl::remove_const_t<stl::remove_pointer_t<Type>>>};
 
     if constexpr(std::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {

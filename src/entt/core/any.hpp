@@ -382,7 +382,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type *data() const noexcept {
-        return has_value<std::remove_const_t<Type>>() ? static_cast<const Type *>(data()) : nullptr;
+        return has_value<stl::remove_const_t<Type>>() ? static_cast<const Type *>(data()) : nullptr;
     }
 
     /**
@@ -410,9 +410,9 @@ public:
     template<typename Type>
     [[nodiscard]] Type *data() noexcept {
         if constexpr(std::is_const_v<Type>) {
-            return stl::as_const(*this).template data<std::remove_const_t<Type>>();
+            return stl::as_const(*this).template data<stl::remove_const_t<Type>>();
         } else {
-            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(stl::as_const(*this).template data<std::remove_const_t<Type>>());
+            return (mode == any_policy::cref) ? nullptr : const_cast<Type *>(stl::as_const(*this).template data<stl::remove_const_t<Type>>());
         }
     }
 
@@ -541,7 +541,7 @@ private:
  * @return The element converted to the requested type.
  */
 template<typename Type, std::size_t Len, std::size_t Align>
-[[nodiscard]] std::remove_const_t<Type> any_cast(const basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] stl::remove_const_t<Type> any_cast(const basic_any<Len, Align> &data) noexcept {
     const auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
     return static_cast<Type>(*instance);
@@ -549,7 +549,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
-[[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &data) noexcept {
+[[nodiscard]] stl::remove_const_t<Type> any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto *const instance = any_cast<stl::remove_reference_t<const Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
@@ -559,7 +559,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
-[[nodiscard]] std::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
+[[nodiscard]] stl::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(std::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
         if(auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(stl::move(*instance));
@@ -576,7 +576,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 /*! @copydoc any_cast */
 template<typename Type, std::size_t Len, std::size_t Align>
 [[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
-    return data->template data<std::remove_const_t<Type>>();
+    return data->template data<stl::remove_const_t<Type>>();
 }
 
 /*! @copydoc any_cast */

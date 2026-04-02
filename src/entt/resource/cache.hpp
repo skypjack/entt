@@ -44,7 +44,7 @@ public:
 
     template<typename Other>
     requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
-    constexpr resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) noexcept
+    constexpr resource_cache_iterator(const resource_cache_iterator<stl::remove_const_t<Type>, Other> &other) noexcept
         : it{other.it} {}
 
     constexpr resource_cache_iterator &operator++() noexcept {

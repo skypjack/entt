@@ -674,7 +674,7 @@ struct has_iterator_category<Type>: stl::true_type {};
 
 /*! @copydoc is_iterator */
 template<typename Type>
-requires (!stl::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>)
+requires (!stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>)
 struct is_iterator<Type>: internal::has_iterator_category<Type> {};
 
 /**
@@ -759,7 +759,7 @@ template<typename Type>
     // NOLINTBEGIN(modernize-use-transparent-functors)
     if constexpr(std::is_array_v<Type>) {
         return false;
-    } else if constexpr(is_complete_v<stl::tuple_size<std::remove_const_t<Type>>>) {
+    } else if constexpr(is_complete_v<stl::tuple_size<stl::remove_const_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
             return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<stl::tuple_size<Type>::value>{});
         } else {
@@ -807,7 +807,7 @@ inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::v
 template<typename To, typename From>
 struct constness_as {
     /*! @brief The type resulting from the transcription of the constness. */
-    using type = std::remove_const_t<To>;
+    using type = stl::remove_const_t<To>;
 };
 
 /*! @copydoc constness_as */
