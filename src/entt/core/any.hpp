@@ -82,7 +82,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             }
             [[fallthrough]];
         case assign:
-            if constexpr(std::is_copy_assignable_v<Type>) {
+            if constexpr(stl::is_copy_assignable_v<Type>) {
                 *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
                 return other;
             }

@@ -11,6 +11,7 @@ using std::false_type;
 using std::invoke_result_t;
 using std::is_aggregate_v;
 using std::is_const_v;
+using std::is_copy_assignable_v;
 using std::is_default_constructible_v;
 using std::is_invocable_r_v;
 using std::is_lvalue_reference_v;
