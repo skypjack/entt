@@ -75,7 +75,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         case info:
             return &type_id<Type>();
         case transfer:
-            if constexpr(std::is_move_assignable_v<Type>) {
+            if constexpr(stl::is_move_assignable_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
                 *const_cast<Type *>(elem) = stl::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
