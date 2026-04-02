@@ -244,7 +244,7 @@ auto setup_node_for() noexcept {
         };
     }
 
-    if constexpr(!std::is_void_v<Type> && !std::is_function_v<Type>) {
+    if constexpr(!stl::is_void_v<Type> && !std::is_function_v<Type>) {
         node.from_void = +[](const meta_ctx &ctx, void *elem, const void *celem) {
             if(elem && celem) { // ownership construction request
                 return meta_any{ctx, std::in_place, static_cast<std::decay_t<Type> *>(elem)};

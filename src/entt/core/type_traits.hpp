@@ -674,7 +674,7 @@ struct has_iterator_category<Type>: stl::true_type {};
 
 /*! @copydoc is_iterator */
 template<typename Type>
-requires (!std::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>)
+requires (!stl::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>)
 struct is_iterator<Type>: internal::has_iterator_category<Type> {};
 
 /**

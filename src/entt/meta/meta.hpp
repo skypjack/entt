@@ -184,7 +184,7 @@ class meta_any {
 
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer) {
-                if constexpr(!std::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
+                if constexpr(!stl::is_void_v<std::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
                     if constexpr(std::is_constructible_v<bool, Type>) {
                         if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
                             static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
@@ -200,7 +200,7 @@ class meta_any {
                     if(const auto &elem = any_cast<const Type &>(value.storage); elem) {
                         return (value.storage.policy() == any_policy::cref) ? static_cast<meta_any *>(other)->emplace<decltype(*elem)>(*elem) : static_cast<meta_any *>(other)->emplace<decltype(*const_cast<Type &>(elem))>(*const_cast<Type &>(elem));
                     }
-                } else if constexpr(!std::is_array_v<Type> && !std::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>) {
+                } else if constexpr(!std::is_array_v<Type> && !stl::is_void_v<std::remove_const_t<stl::remove_pointer_t<Type>>>) {
                     if(auto *pointer = any_cast<Type>(value.storage); pointer) {
                         static_cast<meta_any *>(other)->emplace<std::conditional_t<std::is_function_v<std::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
                     }

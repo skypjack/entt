@@ -29,7 +29,7 @@ template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
     [[nodiscard]] auto index_to_element([[maybe_unused]] Type &cpool) const {
-        if constexpr(std::is_void_v<typename Type::value_type>) {
+        if constexpr(stl::is_void_v<typename Type::value_type>) {
             return stl::make_tuple();
         } else {
             return stl::forward_as_tuple(cpool.rbegin()[it.index()]);

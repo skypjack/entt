@@ -193,7 +193,7 @@ public:
     template<typename Func>
     void collect(Func func, Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
-            if constexpr(std::is_void_v<Ret> || !std::is_invocable_v<Func, Ret>) {
+            if constexpr(stl::is_void_v<Ret> || !std::is_invocable_v<Func, Ret>) {
                 calls[pos - 1u](args...);
 
                 if constexpr(std::is_invocable_r_v<bool, Func>) {

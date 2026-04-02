@@ -1058,7 +1058,7 @@ public:
                 stl::apply(func, pack);
             }
         } else if constexpr(Get::storage_policy == deletion_policy::swap_and_pop || Get::storage_policy == deletion_policy::swap_only) {
-            if constexpr(std::is_void_v<typename Get::value_type>) {
+            if constexpr(stl::is_void_v<typename Get::value_type>) {
                 for(size_type pos = base_type::size(); pos; --pos) {
                     func();
                 }

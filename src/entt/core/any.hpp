@@ -132,7 +132,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
         vtable = basic_vtable<plain_type>;
         underlying_type = type_hash<plain_type>::value();
 
-        if constexpr(std::is_void_v<Type>) {
+        if constexpr(stl::is_void_v<Type>) {
             deleter = nullptr;
             mode = any_policy::empty;
             this->instance = nullptr;
@@ -206,7 +206,7 @@ public:
      * @param value A pointer to an object to take ownership of.
      */
     template<typename Type>
-    requires (!std::is_const_v<Type> && !std::is_void_v<Type>)
+    requires (!std::is_const_v<Type> && !stl::is_void_v<Type>)
     explicit basic_any(std::in_place_t, Type *value)
         : base_type{} {
         if(value == nullptr) {
