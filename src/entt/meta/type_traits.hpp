@@ -32,7 +32,7 @@ struct meta_associative_container_traits;
  * pointer-like type from the point of view of the meta system, false otherwise.
  */
 template<typename>
-struct is_meta_pointer_like: std::false_type {};
+struct is_meta_pointer_like: stl::false_type {};
 
 /**
  * @brief Partial specialization to ensure that const pointer-like types are

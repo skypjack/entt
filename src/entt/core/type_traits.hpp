@@ -579,7 +579,7 @@ using value_list_diff_t = value_list_diff<List...>::type;
 
 /*! @brief Same as std::is_invocable, but with tuples. */
 template<typename, typename>
-struct is_applicable: std::false_type {};
+struct is_applicable: stl::false_type {};
 
 /**
  * @copybrief is_applicable
@@ -609,7 +609,7 @@ inline constexpr bool is_applicable_v = is_applicable<Func, Args>::value;
 
 /*! @brief Same as std::is_invocable_r, but with tuples for arguments. */
 template<typename, typename, typename>
-struct is_applicable_r: std::false_type {};
+struct is_applicable_r: stl::false_type {};
 
 /**
  * @copybrief is_applicable_r
@@ -637,12 +637,12 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
  * @tparam Type The type to test.
  */
 template<typename Type>
-struct is_complete: std::false_type {};
+struct is_complete: stl::false_type {};
 
 /*! @copydoc is_complete */
 template<typename Type>
 requires requires { sizeof(Type); }
-struct is_complete<Type>: std::true_type {};
+struct is_complete<Type>: stl::true_type {};
 
 /**
  * @brief Helper variable template.
@@ -657,17 +657,17 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
  * @tparam Type The type to test.
  */
 template<typename Type>
-struct is_iterator: std::false_type {};
+struct is_iterator: stl::false_type {};
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
 template<typename>
-struct has_iterator_category: std::false_type {};
+struct has_iterator_category: stl::false_type {};
 
 template<typename Type>
 requires requires { typename stl::iterator_traits<Type>::iterator_category; }
-struct has_iterator_category<Type>: std::true_type {};
+struct has_iterator_category<Type>: stl::true_type {};
 
 } // namespace internal
 /*! @endcond */
@@ -705,12 +705,12 @@ inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
  * @tparam Type The type to test.
  */
 template<typename Type>
-struct is_transparent: std::false_type {};
+struct is_transparent: stl::false_type {};
 
 /*! @copydoc is_transparent */
 template<typename Type>
 requires requires { typename Type::is_transparent; }
-struct is_transparent<Type>: std::true_type {};
+struct is_transparent<Type>: stl::true_type {};
 
 /**
  * @brief Helper variable template.
@@ -723,18 +723,18 @@ inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 namespace internal {
 
 template<typename>
-struct has_tuple_size_value: std::false_type {};
+struct has_tuple_size_value: stl::false_type {};
 
 template<typename Type>
 requires is_complete_v<stl::tuple_size<const Type>>
-struct has_tuple_size_value<Type>: std::true_type {};
+struct has_tuple_size_value<Type>: stl::true_type {};
 
 template<typename>
-struct has_value_type: std::false_type {};
+struct has_value_type: stl::false_type {};
 
 template<typename Type>
 requires requires { typename Type::value_type; }
-struct has_value_type<Type>: std::true_type {};
+struct has_value_type<Type>: stl::true_type {};
 
 template<typename>
 [[nodiscard]] ENTT_CONSTEVAL bool dispatch_is_equality_comparable();

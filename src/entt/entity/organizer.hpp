@@ -19,19 +19,19 @@ namespace entt {
 namespace internal {
 
 template<typename>
-struct is_view: std::false_type {};
+struct is_view: stl::false_type {};
 
 template<typename... Args>
-struct is_view<basic_view<Args...>>: std::true_type {};
+struct is_view<basic_view<Args...>>: stl::true_type {};
 
 template<typename Type>
 inline constexpr bool is_view_v = is_view<Type>::value;
 
 template<typename>
-struct is_group: std::false_type {};
+struct is_group: stl::false_type {};
 
 template<typename... Args>
-struct is_group<basic_group<Args...>>: std::true_type {};
+struct is_group<basic_group<Args...>>: stl::true_type {};
 
 template<typename Type>
 inline constexpr bool is_group_v = is_group<Type>::value;

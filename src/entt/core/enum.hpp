@@ -11,7 +11,7 @@ namespace entt {
  * @tparam Type The enum type for which to enable bitmask support.
  */
 template<typename Type>
-struct enum_as_bitmask: std::false_type {};
+struct enum_as_bitmask: stl::false_type {};
 
 /*! @copydoc enum_as_bitmask */
 template<typename Type>
@@ -19,7 +19,7 @@ requires requires {
     requires std::is_enum_v<Type>;
     { Type::_entt_enum_as_bitmask } -> std::same_as<Type>;
 }
-struct enum_as_bitmask<Type>: std::true_type {};
+struct enum_as_bitmask<Type>: stl::true_type {};
 
 /**
  * @brief Helper variable template.

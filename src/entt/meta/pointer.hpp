@@ -16,7 +16,7 @@ namespace entt {
  */
 template<typename Type>
 struct is_meta_pointer_like<std::shared_ptr<Type>>
-    : std::true_type {};
+    : stl::true_type {};
 
 /**
  * @brief Makes `std::unique_ptr`s of any type pointer-like types for the meta
@@ -26,7 +26,7 @@ struct is_meta_pointer_like<std::shared_ptr<Type>>
  */
 template<typename Type, typename... Args>
 struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
-    : std::true_type {};
+    : stl::true_type {};
 
 /**
  * @brief Specialization for self-proclaimed meta pointer like types.
@@ -35,7 +35,7 @@ struct is_meta_pointer_like<std::unique_ptr<Type, Args...>>
 template<typename Type>
 requires requires { typename Type::is_meta_pointer_like; }
 struct is_meta_pointer_like<Type>
-    : std::true_type {};
+    : stl::true_type {};
 
 } // namespace entt
 

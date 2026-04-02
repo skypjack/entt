@@ -13,14 +13,14 @@ namespace entt {
  * @tparam Type The type to test.
  */
 template<typename Type>
-struct is_tuple: std::false_type {};
+struct is_tuple: stl::false_type {};
 
 /**
  * @copybrief is_tuple
  * @tparam Args Tuple template arguments.
  */
 template<typename... Args>
-struct is_tuple<stl::tuple<Args...>>: std::true_type {};
+struct is_tuple<stl::tuple<Args...>>: stl::true_type {};
 
 /**
  * @brief Helper variable template.

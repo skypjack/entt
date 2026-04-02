@@ -17,11 +17,11 @@ template<typename Type>
 struct in_place_delete: std::bool_constant<!(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>)> {};
 
 template<>
-struct in_place_delete<void>: std::false_type {};
+struct in_place_delete<void>: stl::false_type {};
 
 template<typename Type>
 requires Type::in_place_delete
-struct in_place_delete<Type>: std::true_type {};
+struct in_place_delete<Type>: stl::true_type {};
 
 template<typename Type>
 struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};

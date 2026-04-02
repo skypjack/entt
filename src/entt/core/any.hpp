@@ -48,7 +48,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 struct in_situ: std::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && std::is_nothrow_move_constructible_v<Type>> {};
 
 template<std::size_t Len, std::size_t Align>
-struct in_situ<void, Len, Align>: std::false_type {};
+struct in_situ<void, Len, Align>: stl::false_type {};
 
 } // namespace internal
 /*! @endcond */

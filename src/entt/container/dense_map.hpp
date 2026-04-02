@@ -1016,7 +1016,7 @@ namespace std {
 
 template<typename Key, typename Value, typename Allocator>
 struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
-    : std::true_type {};
+    : entt::stl::true_type {};
 
 } // namespace std
 /*! @endcond */
