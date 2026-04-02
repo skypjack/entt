@@ -48,19 +48,19 @@ concept enum_bitmask = std::is_enum_v<Type> && enum_as_bitmask_v<Type>;
  */
 template<entt::enum_bitmask Type>
 [[nodiscard]] constexpr Type operator|(const Type lhs, const Type rhs) noexcept {
-    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) | static_cast<std::underlying_type_t<Type>>(rhs));
+    return static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(lhs) | static_cast<stl::underlying_type_t<Type>>(rhs));
 }
 
 /*! @copydoc operator| */
 template<entt::enum_bitmask Type>
 [[nodiscard]] constexpr Type operator&(const Type lhs, const Type rhs) noexcept {
-    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) & static_cast<std::underlying_type_t<Type>>(rhs));
+    return static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(lhs) & static_cast<stl::underlying_type_t<Type>>(rhs));
 }
 
 /*! @copydoc operator| */
 template<entt::enum_bitmask Type>
 [[nodiscard]] constexpr Type operator^(const Type lhs, const Type rhs) noexcept {
-    return static_cast<Type>(static_cast<std::underlying_type_t<Type>>(lhs) ^ static_cast<std::underlying_type_t<Type>>(rhs));
+    return static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(lhs) ^ static_cast<stl::underlying_type_t<Type>>(rhs));
 }
 
 /**
@@ -72,13 +72,13 @@ template<entt::enum_bitmask Type>
  */
 template<entt::enum_bitmask Type>
 [[nodiscard]] constexpr Type operator~(const Type value) noexcept {
-    return static_cast<Type>(~static_cast<std::underlying_type_t<Type>>(value));
+    return static_cast<Type>(~static_cast<stl::underlying_type_t<Type>>(value));
 }
 
 /*! @copydoc operator~ */
 template<entt::enum_bitmask Type>
 [[nodiscard]] constexpr bool operator!(const Type value) noexcept {
-    return !static_cast<std::underlying_type_t<Type>>(value);
+    return !static_cast<stl::underlying_type_t<Type>>(value);
 }
 
 /*! @copydoc operator| */

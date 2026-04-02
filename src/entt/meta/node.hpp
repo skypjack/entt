@@ -46,16 +46,16 @@ enum class meta_traits : std::uint32_t {
 template<typename Type>
 requires std::is_enum_v<Type>
 [[nodiscard]] auto meta_to_user_traits(const meta_traits traits) noexcept {
-    constexpr auto shift = std::popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
-    return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<meta_traits>>(traits) >> shift)};
+    constexpr auto shift = std::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    return Type{static_cast<stl::underlying_type_t<Type>>(static_cast<stl::underlying_type_t<meta_traits>>(traits) >> shift)};
 }
 
 template<typename Type>
 requires std::is_enum_v<Type>
 [[nodiscard]] auto user_to_meta_traits(const Type value) noexcept {
-    constexpr auto shift = std::popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
-    const auto traits = static_cast<std::underlying_type_t<internal::meta_traits>>(static_cast<std::underlying_type_t<Type>>(value));
-    ENTT_ASSERT(traits < ((~static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits)) >> shift), "Invalid traits");
+    constexpr auto shift = std::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    const auto traits = static_cast<stl::underlying_type_t<internal::meta_traits>>(static_cast<stl::underlying_type_t<Type>>(value));
+    ENTT_ASSERT(traits < ((~static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits)) >> shift), "Invalid traits");
     return meta_traits{traits << shift};
 }
 
@@ -240,7 +240,7 @@ auto setup_node_for() noexcept {
         };
     } else if constexpr(std::is_enum_v<Type>) {
         node.conversion_helper = +[](void *lhs, const void *rhs) {
-            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
+            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
     }
 
