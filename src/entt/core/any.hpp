@@ -226,7 +226,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any(Type &&value)
-        : basic_any{std::in_place_type<std::decay_t<Type>>, stl::forward<Type>(value)} {}
+        : basic_any{std::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
@@ -311,7 +311,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any &operator=(Type &&value) {
-        emplace<std::decay_t<Type>>(stl::forward<Type>(value));
+        emplace<stl::decay_t<Type>>(stl::forward<Type>(value));
         return *this;
     }
 

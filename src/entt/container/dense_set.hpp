@@ -544,7 +544,7 @@ public:
      */
     template<typename... Args>
     stl::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<std::decay_t<Args>, value_type>)) {
+        if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<stl::decay_t<Args>, value_type>)) {
             return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
             auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(stl::forward<Args>(args)...));

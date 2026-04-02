@@ -232,7 +232,7 @@ public:
  * @tparam Other Type of value to use to initialize the second element.
  */
 template<typename Type, typename Other>
-compressed_pair(Type &&, Other &&) -> compressed_pair<std::decay_t<Type>, std::decay_t<Other>>;
+compressed_pair(Type &&, Other &&) -> compressed_pair<stl::decay_t<Type>, stl::decay_t<Other>>;
 
 /**
  * @brief Swaps two compressed pair objects.

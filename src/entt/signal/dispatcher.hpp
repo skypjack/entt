@@ -218,7 +218,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] size_type size(const id_type id = type_hash<Type>::value()) const noexcept {
-        const auto *cpool = assure<std::decay_t<Type>>(id);
+        const auto *cpool = assure<stl::decay_t<Type>>(id);
         return cpool ? cpool->size() : 0u;
     }
 
@@ -267,7 +267,7 @@ public:
      */
     template<typename Type>
     void trigger(Type value) {
-        trigger(type_hash<std::decay_t<Type>>::value(), value);
+        trigger(type_hash<stl::decay_t<Type>>::value(), value);
     }
 
     /**
@@ -278,7 +278,7 @@ public:
      */
     template<typename Type>
     void trigger(const id_type id, Type value) {
-        assure<std::decay_t<Type>>(id).trigger(value);
+        assure<stl::decay_t<Type>>(id).trigger(value);
     }
 
     /**
@@ -299,7 +299,7 @@ public:
      */
     template<typename Type>
     void enqueue(Type &&value) {
-        enqueue_hint(type_hash<std::decay_t<Type>>::value(), stl::forward<Type>(value));
+        enqueue_hint(type_hash<stl::decay_t<Type>>::value(), stl::forward<Type>(value));
     }
 
     /**
@@ -322,7 +322,7 @@ public:
      */
     template<typename Type>
     void enqueue_hint(const id_type id, Type &&value) {
-        assure<std::decay_t<Type>>(id).enqueue(stl::forward<Type>(value));
+        assure<stl::decay_t<Type>>(id).enqueue(stl::forward<Type>(value));
     }
 
     /**

@@ -320,8 +320,8 @@ class basic_continuous_loader {
         Container other;
 
         for(auto &&pair: container) {
-            using first_type = stl::remove_const_t<typename std::decay_t<decltype(pair)>::first_type>;
-            using second_type = std::decay_t<decltype(pair)>::second_type;
+            using first_type = stl::remove_const_t<typename stl::decay_t<decltype(pair)>::first_type>;
+            using second_type = stl::decay_t<decltype(pair)>::second_type;
 
             if constexpr(stl::is_same_v<first_type, entity_type> && stl::is_same_v<second_type, entity_type>) {
                 other.emplace(map(pair.first), map(pair.second));

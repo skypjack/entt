@@ -149,7 +149,7 @@ static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, 
 
             if(ImGui::TreeNode(&storage.info(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
                 if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                    present_element<typename std::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const Entity entt) {
+                    present_element<typename stl::decay_t<decltype(storage)>::entity_type>(obj, [](const char *name, const Entity entt) {
                         ImGui::Text("%s: %d [%d/%d]", name, to_integral(entt), to_entity(entt), to_version(entt));
                     });
                 }

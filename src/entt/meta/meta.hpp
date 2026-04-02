@@ -305,7 +305,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(const meta_ctx &area, Type &&value)
-        : meta_any{area, std::in_place_type<std::decay_t<Type>>, stl::forward<Type>(value)} {}
+        : meta_any{area, std::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Context aware copy constructor.
@@ -391,7 +391,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any &operator=(Type &&value) {
-        emplace<std::decay_t<Type>>(stl::forward<Type>(value));
+        emplace<stl::decay_t<Type>>(stl::forward<Type>(value));
         return *this;
     }
 
@@ -1058,7 +1058,7 @@ class meta_type {
         bool ambiguous{};
 
         for(auto curr = next(); curr; curr = next()) {
-            if constexpr(stl::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+            if constexpr(stl::is_same_v<stl::decay_t<decltype(*curr)>, internal::meta_func_node>) {
                 if(constness && !(curr->traits & internal::meta_traits::is_const)) {
                     continue;
                 }
@@ -1087,7 +1087,7 @@ class meta_type {
                         same = match;
                         ambiguous = false;
                     } else if(match == same) {
-                        if constexpr(stl::is_same_v<std::decay_t<decltype(*curr)>, internal::meta_func_node>) {
+                        if constexpr(stl::is_same_v<stl::decay_t<decltype(*curr)>, internal::meta_func_node>) {
                             if(!!(curr->traits & internal::meta_traits::is_const) != !!(candidate->traits & internal::meta_traits::is_const)) {
                                 candidate = !!(candidate->traits & internal::meta_traits::is_const) ? curr : candidate;
                                 ambiguous = false;
