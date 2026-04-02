@@ -94,7 +94,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 return (elem == other) ? other : nullptr;
             }
         case copy:
-            if constexpr(std::is_copy_constructible_v<Type>) {
+            if constexpr(stl::is_copy_constructible_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
                 static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
             }
@@ -560,7 +560,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 template<typename Type, std::size_t Len, std::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] stl::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
-    if constexpr(std::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
+    if constexpr(stl::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
         if(auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data); instance) {
             return static_cast<Type>(stl::move(*instance));
         }
