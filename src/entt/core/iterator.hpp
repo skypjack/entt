@@ -26,7 +26,7 @@ struct input_iterator_pointer final {
      * @brief Constructs a proxy object by move.
      * @param val Value to use to initialize the proxy object.
      */
-    constexpr input_iterator_pointer(value_type &&val) noexcept(std::is_nothrow_move_constructible_v<value_type>)
+    constexpr input_iterator_pointer(value_type &&val) noexcept(stl::is_nothrow_move_constructible_v<value_type>)
         : value{stl::move(val)} {}
 
     /**
@@ -139,7 +139,7 @@ struct iterable_adaptor final {
      * @param from Begin iterator.
      * @param to End iterator.
      */
-    constexpr iterable_adaptor(iterator from, sentinel to) noexcept(std::is_nothrow_move_constructible_v<iterator> && std::is_nothrow_move_constructible_v<sentinel>)
+    constexpr iterable_adaptor(iterator from, sentinel to) noexcept(stl::is_nothrow_move_constructible_v<iterator> && stl::is_nothrow_move_constructible_v<sentinel>)
         : first{stl::move(from)},
           last{stl::move(to)} {}
 
