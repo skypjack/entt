@@ -24,12 +24,12 @@ struct compressed_pair_element {
     requires std::default_initializable<Type> {}
 
     template<typename Arg>
-    constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<Type, Arg>)
+    constexpr compressed_pair_element(Arg &&arg) noexcept(stl::is_nothrow_constructible_v<Type, Arg>)
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
         : value{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
-    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<Type, Args...>)
+    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<Type, Args...>)
         : value{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
@@ -56,12 +56,12 @@ struct compressed_pair_element<Type, Tag>: Type {
         : base_type{} {}
 
     template<typename Arg>
-    constexpr compressed_pair_element(Arg &&arg) noexcept(std::is_nothrow_constructible_v<base_type, Arg>)
+    constexpr compressed_pair_element(Arg &&arg) noexcept(stl::is_nothrow_constructible_v<base_type, Arg>)
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
         : base_type{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, std::size_t... Index>
-    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(std::is_nothrow_constructible_v<base_type, Args...>)
+    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<base_type, Args...>)
         : base_type{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
@@ -129,7 +129,7 @@ public:
      * @param other Value to use to initialize the second element.
      */
     template<typename Arg, typename Other>
-    constexpr compressed_pair(Arg &&arg, Other &&other) noexcept(std::is_nothrow_constructible_v<first_base, Arg> && std::is_nothrow_constructible_v<second_base, Other>)
+    constexpr compressed_pair(Arg &&arg, Other &&other) noexcept(stl::is_nothrow_constructible_v<first_base, Arg> && stl::is_nothrow_constructible_v<second_base, Other>)
         : first_base{stl::forward<Arg>(arg)},
           second_base{stl::forward<Other>(other)} {}
 
@@ -141,7 +141,7 @@ public:
      * @param other Arguments to use to initialize the second element.
      */
     template<typename... Args, typename... Other>
-    constexpr compressed_pair(std::piecewise_construct_t, stl::tuple<Args...> args, stl::tuple<Other...> other) noexcept(std::is_nothrow_constructible_v<first_base, Args...> && std::is_nothrow_constructible_v<second_base, Other...>)
+    constexpr compressed_pair(std::piecewise_construct_t, stl::tuple<Args...> args, stl::tuple<Other...> other) noexcept(stl::is_nothrow_constructible_v<first_base, Args...> && stl::is_nothrow_constructible_v<second_base, Other...>)
         : first_base{stl::move(args), std::index_sequence_for<Args...>{}},
           second_base{stl::move(other), std::index_sequence_for<Other...>{}} {}
 

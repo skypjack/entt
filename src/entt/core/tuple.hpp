@@ -57,7 +57,7 @@ struct forward_apply: private Func {
      * @param args Parameters to use to construct the instance.
      */
     template<typename... Args>
-    constexpr forward_apply(Args &&...args) noexcept(std::is_nothrow_constructible_v<Func, Args...>)
+    constexpr forward_apply(Args &&...args) noexcept(stl::is_nothrow_constructible_v<Func, Args...>)
         : Func{stl::forward<Args>(args)...} {}
 
     /**
