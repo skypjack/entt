@@ -240,7 +240,7 @@ struct type_list_unique;
 
 template<typename First, typename... Other, typename... Type>
 struct type_list_unique<type_list<First, Other...>, Type...>
-    : std::conditional_t<(stl::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
+    : stl::conditional_t<(stl::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
 
 template<typename... Type>
 struct type_list_unique<type_list<>, Type...> {
@@ -305,7 +305,7 @@ struct type_list_diff;
 template<typename... Type, typename... Other>
 struct type_list_diff<type_list<Type...>, type_list<Other...>> {
     /*! @brief A type list that is the difference between the two type lists. */
-    using type = type_list_cat_t<std::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
+    using type = type_list_cat_t<stl::conditional_t<type_list_contains_v<type_list<Other...>, Type>, type_list<>, type_list<Type>>...>;
 };
 
 /**
@@ -509,7 +509,7 @@ struct value_list_unique;
 template<auto Value, auto... Other>
 struct value_list_unique<value_list<Value, Other...>> {
     /*! @brief A value list without duplicate types. */
-    using type = std::conditional_t<
+    using type = stl::conditional_t<
         ((Value == Other) || ...),
         typename value_list_unique<value_list<Other...>>::type,
         value_list_cat_t<value_list<Value>, typename value_list_unique<value_list<Other...>>::type>>;
@@ -567,7 +567,7 @@ struct value_list_diff;
 template<auto... Value, auto... Other>
 struct value_list_diff<value_list<Value...>, value_list<Other...>> {
     /*! @brief A value list that is the difference between the two value lists. */
-    using type = value_list_cat_t<std::conditional_t<value_list_contains_v<value_list<Other...>, Value>, value_list<>, value_list<Value>>...>;
+    using type = value_list_cat_t<stl::conditional_t<value_list_contains_v<value_list<Other...>, Value>, value_list<>, value_list<Value>>...>;
 };
 
 /**

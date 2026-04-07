@@ -501,7 +501,7 @@ public:
                 name,
                 (descriptor::is_const ? internal::meta_traits::is_const : internal::meta_traits::is_none) | (descriptor::is_static ? internal::meta_traits::is_static : internal::meta_traits::is_none),
                 descriptor::args_type::size,
-                &internal::resolve<std::conditional_t<stl::is_same_v<Policy, as_void_t>, void, stl::remove_cvref_t<typename descriptor::return_type>>>,
+                &internal::resolve<stl::conditional_t<stl::is_same_v<Policy, as_void_t>, void, stl::remove_cvref_t<typename descriptor::return_type>>>,
                 &meta_arg<typename descriptor::args_type>,
                 &meta_invoke<Type, Candidate, Policy>});
 

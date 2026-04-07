@@ -48,7 +48,7 @@ template<typename Type, typename Ret, typename Class, typename... Args>
 struct meta_function_descriptor<Type, Ret (Class::*)(Args...) const>
     : meta_function_descriptor_traits<
           Ret,
-          std::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<const Class &, Args...>>,
+          stl::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<const Class &, Args...>>,
           !std::is_base_of_v<Class, Type>,
           true> {};
 
@@ -63,7 +63,7 @@ template<typename Type, typename Ret, typename Class, typename... Args>
 struct meta_function_descriptor<Type, Ret (Class::*)(Args...)>
     : meta_function_descriptor_traits<
           Ret,
-          std::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<Class &, Args...>>,
+          stl::conditional_t<std::is_base_of_v<Class, Type>, type_list<Args...>, type_list<Class &, Args...>>,
           !std::is_base_of_v<Class, Type>,
           false> {};
 
@@ -77,7 +77,7 @@ template<typename Type, typename Ret, typename Class>
 struct meta_function_descriptor<Type, Ret Class::*>
     : meta_function_descriptor_traits<
           Ret &,
-          std::conditional_t<std::is_base_of_v<Class, Type>, type_list<>, type_list<Class &>>,
+          stl::conditional_t<std::is_base_of_v<Class, Type>, type_list<>, type_list<Class &>>,
           !std::is_base_of_v<Class, Type>,
           false> {};
 
@@ -92,7 +92,7 @@ template<typename Type, typename Ret, typename MaybeType, typename... Args>
 struct meta_function_descriptor<Type, Ret (*)(MaybeType, Args...)>
     : meta_function_descriptor_traits<
           Ret,
-          std::conditional_t<
+          stl::conditional_t<
               stl::is_same_v<stl::remove_cvref_t<MaybeType>, Type> || std::is_base_of_v<stl::remove_cvref_t<MaybeType>, Type>,
               type_list<Args...>,
               type_list<MaybeType, Args...>>,

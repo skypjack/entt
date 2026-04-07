@@ -202,13 +202,13 @@ class meta_any {
                     }
                 } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
                     if(auto *pointer = any_cast<Type>(value.storage); pointer) {
-                        static_cast<meta_any *>(other)->emplace<std::conditional_t<stl::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
+                        static_cast<meta_any *>(other)->emplace<stl::conditional_t<stl::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
                     }
                 }
             }
         } else if constexpr(is_complete_v<meta_sequence_container_traits<Type>> || is_complete_v<meta_associative_container_traits<Type>>) {
             if(constexpr auto flag = (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_sequence_container : internal::meta_traits::is_associative_container); req == flag) {
-                using container_type = std::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
+                using container_type = stl::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
                 *static_cast<container_type *>(other) = (value.storage.policy() == any_policy::cref) ? container_type{*value.ctx, any_cast<const Type &>(value.storage)} : container_type{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
             }
         }

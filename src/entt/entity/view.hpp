@@ -693,9 +693,9 @@ public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Random access iterator type. */
-    using iterator = std::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, true, 1u, 0u>, typename common_type::iterator>;
+    using iterator = stl::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, true, 1u, 0u>, typename common_type::iterator>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = std::conditional_t<Policy == deletion_policy::in_place, void, typename common_type::reverse_iterator>;
+    using reverse_iterator = stl::conditional_t<Policy == deletion_policy::in_place, void, typename common_type::reverse_iterator>;
 
     /**
      * @brief Returns the leading storage of a view, if any.
@@ -918,7 +918,7 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = base_type::reverse_iterator;
     /*! @brief Iterable view type. */
-    using iterable = std::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(stl::declval<Get>().each())>;
+    using iterable = stl::conditional_t<Get::storage_policy == deletion_policy::in_place, iterable_adaptor<internal::extended_view_iterator<iterator, Get>>, decltype(stl::declval<Get>().each())>;
 
     /*! @brief Default constructor to use to create empty, invalid views. */
     basic_view() noexcept

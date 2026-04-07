@@ -106,7 +106,7 @@ class poly_vtable {
 
 public:
     /*! @brief Virtual table type. */
-    using type = std::conditional_t<is_mono, stl::tuple_element_t<0u, vtable_type>, const vtable_type *>;
+    using type = stl::conditional_t<is_mono, stl::tuple_element_t<0u, vtable_type>, const vtable_type *>;
 
     /**
      * @brief Returns a static virtual table for a specific concept and type.
