@@ -185,7 +185,7 @@ class meta_any {
         if constexpr(is_meta_pointer_like_v<Type>) {
             if(req == internal::meta_traits::is_pointer) {
                 if constexpr(!stl::is_void_v<stl::remove_const_t<typename std::pointer_traits<Type>::element_type>>) {
-                    if constexpr(std::is_constructible_v<bool, Type>) {
+                    if constexpr(stl::is_constructible_v<bool, Type>) {
                         if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
                             static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
                         }

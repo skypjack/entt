@@ -119,15 +119,15 @@ template<typename Type>
 struct uses_allocator_construction {
     template<typename Allocator, typename... Params>
     static constexpr auto args([[maybe_unused]] const Allocator &allocator, Params &&...params) noexcept {
-        if constexpr(!std::uses_allocator_v<Type, Allocator> && std::is_constructible_v<Type, Params...>) {
+        if constexpr(!std::uses_allocator_v<Type, Allocator> && stl::is_constructible_v<Type, Params...>) {
             return stl::forward_as_tuple(stl::forward<Params>(params)...);
         } else {
             static_assert(std::uses_allocator_v<Type, Allocator>, "Ill-formed request");
 
-            if constexpr(std::is_constructible_v<Type, std::allocator_arg_t, const Allocator &, Params...>) {
+            if constexpr(stl::is_constructible_v<Type, std::allocator_arg_t, const Allocator &, Params...>) {
                 return stl::tuple<std::allocator_arg_t, const Allocator &, Params &&...>{std::allocator_arg, allocator, stl::forward<Params>(params)...};
             } else {
-                static_assert(std::is_constructible_v<Type, Params..., const Allocator &>, "Ill-formed request");
+                static_assert(stl::is_constructible_v<Type, Params..., const Allocator &>, "Ill-formed request");
                 return stl::forward_as_tuple(stl::forward<Params>(params)..., allocator);
             }
         }
