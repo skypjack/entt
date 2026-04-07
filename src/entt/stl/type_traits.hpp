@@ -8,6 +8,7 @@ namespace entt::stl {
 
 using std::bool_constant;
 using std::decay_t;
+using std::extent_v;
 using std::false_type;
 using std::invoke_result_t;
 using std::is_aggregate_v;

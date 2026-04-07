@@ -165,7 +165,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
                 this->instance = new plain_type{stl::forward<Args>(args)...};
             } else if constexpr(stl::is_array_v<plain_type>) {
                 static_assert(sizeof...(Args) == 0u, "Invalid arguments");
-                this->instance = new plain_type[std::extent_v<plain_type>]();
+                this->instance = new plain_type[stl::extent_v<plain_type>]();
             } else {
                 this->instance = new plain_type(stl::forward<Args>(args)...);
             }
