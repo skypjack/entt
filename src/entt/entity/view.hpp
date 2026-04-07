@@ -554,7 +554,7 @@ public:
      */
     template<std::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
-        static_assert(std::is_convertible_v<Type &, element_at<Index> &>, "Unexpected type");
+        static_assert(stl::is_convertible_v<Type &, element_at<Index> &>, "Unexpected type");
 
         if constexpr(Index < sizeof...(Get)) {
             base_type::pool_at(Index, &elem);
