@@ -130,7 +130,7 @@ struct iterable_adaptor final {
     using sentinel = Sentinel;
 
     /*! @brief Default constructor. */
-    constexpr iterable_adaptor() noexcept(std::is_nothrow_default_constructible_v<iterator> && std::is_nothrow_default_constructible_v<sentinel>)
+    constexpr iterable_adaptor() noexcept(stl::is_nothrow_default_constructible_v<iterator> && stl::is_nothrow_default_constructible_v<sentinel>)
         : first{},
           last{} {}
 

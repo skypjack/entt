@@ -65,13 +65,13 @@ struct y_combinator {
      * @return Return value of the underlying function, if any.
      */
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) const noexcept(std::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
+    constexpr decltype(auto) operator()(Args &&...args) const noexcept(stl::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
         return func(*this, stl::forward<Args>(args)...);
     }
 
     /*! @copydoc operator()() */
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) noexcept(std::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
+    constexpr decltype(auto) operator()(Args &&...args) noexcept(stl::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
         return func(*this, stl::forward<Args>(args)...);
     }
 
