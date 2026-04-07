@@ -1,7 +1,6 @@
 #ifndef ENTT_GRAPH_FLOW_HPP
 #define ENTT_GRAPH_FLOW_HPP
 
-#include <algorithm>
 #include <concepts>
 #include <cstddef>
 #include <functional>
@@ -12,6 +11,7 @@
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../stl/algorithm.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/type_traits.hpp"

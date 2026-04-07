@@ -1,9 +1,9 @@
 #ifndef ENTT_CORE_ALGORITHM_HPP
 #define ENTT_CORE_ALGORITHM_HPP
 
-#include <algorithm>
 #include <concepts>
 #include <functional>
+#include "../stl/algorithm.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/utility.hpp"

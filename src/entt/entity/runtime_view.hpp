@@ -1,8 +1,8 @@
 #ifndef ENTT_ENTITY_RUNTIME_VIEW_HPP
 #define ENTT_ENTITY_RUNTIME_VIEW_HPP
 
-#include <algorithm>
 #include <cstddef>
+#include "../stl/algorithm.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
