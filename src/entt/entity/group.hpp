@@ -617,7 +617,7 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
-                static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
+                static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 descriptor->handle().sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
             } else {
                 auto comp = [&compare, cpools = pools_for(std::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
@@ -1018,7 +1018,7 @@ public:
         const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
-            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
+            static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             storage<0>()->sort_n(descriptor->length(), stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
         } else {
             auto comp = [&compare, &cpools](const entity_type lhs, const entity_type rhs) {

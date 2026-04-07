@@ -209,11 +209,11 @@ template<typename Type, typename Policy, typename Candidate, std::size_t... Inde
     using descriptor = meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>;
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
-    if constexpr(std::is_invocable_v<stl::remove_reference_t<Candidate>, const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+    if constexpr(stl::is_invocable_v<stl::remove_reference_t<Candidate>, const Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(const auto *const clazz = instance.try_cast<const Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
             return meta_invoke_with_args<Policy>(instance.context(), stl::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
-    } else if constexpr(std::is_invocable_v<stl::remove_reference_t<Candidate>, Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
+    } else if constexpr(stl::is_invocable_v<stl::remove_reference_t<Candidate>, Type &, type_list_element_t<Index, typename descriptor::args_type>...>) {
         if(auto *const clazz = instance.try_cast<Type>(); clazz && ((args + Index)->allow_cast<type_list_element_t<Index, typename descriptor::args_type>>() && ...)) {
             return meta_invoke_with_args<Policy>(instance.context(), stl::forward<Candidate>(candidate), *clazz, (args + Index)->cast<type_list_element_t<Index, typename descriptor::args_type>>()...);
         }
@@ -318,13 +318,13 @@ template<typename Type, auto Data, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
     if constexpr(std::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
-            if constexpr(std::is_invocable_v<decltype(Data), Type &>) {
+            if constexpr(stl::is_invocable_v<decltype(Data), Type &>) {
                 if(auto *clazz = instance->try_cast<Type>(); clazz) {
                     return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *clazz));
                 }
             }
 
-            if constexpr(std::is_invocable_v<decltype(Data), const Type &>) {
+            if constexpr(stl::is_invocable_v<decltype(Data), const Type &>) {
                 if(auto *fallback = instance->try_cast<const Type>(); fallback) {
                     return meta_dispatch<Policy>(instance->context(), std::invoke(Data, *fallback));
                 }

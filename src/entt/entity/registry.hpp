@@ -1129,7 +1129,7 @@ public:
         ENTT_ASSERT(!owned<Type>(), "Cannot sort owned storage");
         auto &cpool = assure<Type>();
 
-        if constexpr(std::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
+        if constexpr(stl::is_invocable_v<Compare, decltype(cpool.get({})), decltype(cpool.get({}))>) {
             auto comp = [&cpool, compare = stl::move(compare)](const auto lhs, const auto rhs) { return compare(stl::as_const(cpool.get(lhs)), stl::as_const(cpool.get(rhs))); };
             cpool.sort(stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
         } else {

@@ -588,7 +588,7 @@ struct is_applicable: stl::false_type {};
  * @tparam Args The list of arguments to use to probe the function type.
  */
 template<typename Func, template<typename...> class Tuple, typename... Args>
-struct is_applicable<Func, Tuple<Args...>>: std::is_invocable<Func, Args...> {};
+struct is_applicable<Func, Tuple<Args...>>: stl::is_invocable<Func, Args...> {};
 
 /**
  * @copybrief is_applicable
@@ -597,7 +597,7 @@ struct is_applicable<Func, Tuple<Args...>>: std::is_invocable<Func, Args...> {};
  * @tparam Args The list of arguments to use to probe the function type.
  */
 template<typename Func, template<typename...> class Tuple, typename... Args>
-struct is_applicable<Func, const Tuple<Args...>>: std::is_invocable<Func, Args...> {};
+struct is_applicable<Func, const Tuple<Args...>>: stl::is_invocable<Func, Args...> {};
 
 /**
  * @brief Helper variable template.
@@ -619,7 +619,7 @@ struct is_applicable_r: stl::false_type {};
  * @tparam Args The list of arguments to use to probe the function type.
  */
 template<typename Ret, typename Func, typename... Args>
-struct is_applicable_r<Ret, Func, stl::tuple<Args...>>: std::is_invocable_r<Ret, Func, Args...> {};
+struct is_applicable_r<Ret, Func, stl::tuple<Args...>>: stl::is_invocable_r<Ret, Func, Args...> {};
 
 /**
  * @brief Helper variable template.
