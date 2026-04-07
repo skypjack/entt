@@ -7,6 +7,7 @@
 namespace entt::stl {
 
 using std::bool_constant;
+using std::common_type_t;
 using std::decay_t;
 using std::extent_v;
 using std::false_type;

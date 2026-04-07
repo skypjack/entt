@@ -273,7 +273,7 @@ class basic_group;
  */
 template<typename... Get, typename... Exclude>
 class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
-    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = stl::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
@@ -687,7 +687,7 @@ template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     static_assert(((Owned::storage_policy != deletion_policy::in_place) && ...), "Groups do not support in-place delete");
 
-    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = stl::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = base_type::entity_type;
 
     template<typename Type>

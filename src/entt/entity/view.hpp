@@ -408,8 +408,8 @@ private:
 template<typename... Get, typename... Exclude>
 requires (sizeof...(Get) != 0u)
 class basic_view<get_t<Get...>, exclude_t<Exclude...>>
-    : public basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
-    using base_type = basic_common_view<std::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
+    : public basic_common_view<stl::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
+    using base_type = basic_common_view<stl::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
 
     template<std::size_t Index>
     using element_at = type_list_element_t<Index, type_list<Get..., Exclude...>>;
