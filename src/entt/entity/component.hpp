@@ -24,7 +24,7 @@ requires Type::in_place_delete
 struct in_place_delete<Type>: stl::true_type {};
 
 template<typename Type>
-struct page_size: std::integral_constant<std::size_t, !std::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
+struct page_size: std::integral_constant<std::size_t, !stl::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
 
 template<>
 struct page_size<void>: std::integral_constant<std::size_t, 0u> {};
