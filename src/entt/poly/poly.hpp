@@ -213,8 +213,8 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit basic_poly(std::in_place_type_t<Type>, Args &&...args)
-        : storage{std::in_place_type<Type>, stl::forward<Args>(args)...},
+    explicit basic_poly(stl::in_place_type_t<Type>, Args &&...args)
+        : storage{stl::in_place_type<Type>, stl::forward<Args>(args)...},
           vtable{poly_vtable<Concept, Len, Align>::template instance<stl::remove_cvref_t<Type>>()} {}
 
     /**
@@ -225,7 +225,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_poly>)
     basic_poly(Type &&value) noexcept
-        : basic_poly{std::in_place_type<stl::remove_cvref_t<Type>>, stl::forward<Type>(value)} {}
+        : basic_poly{stl::in_place_type<stl::remove_cvref_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Returns the object type info if any, `type_id<void>()` otherwise.

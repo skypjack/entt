@@ -169,11 +169,11 @@ template<meta_policy Policy = as_value_t, typename Type>
 [[nodiscard]] meta_any meta_dispatch(const meta_ctx &ctx, [[maybe_unused]] Type &&value) {
     if constexpr(stl::is_same_v<Policy, as_cref_t>) {
         static_assert(stl::is_lvalue_reference_v<Type>, "Invalid type");
-        return meta_any{ctx, std::in_place_type<const stl::remove_reference_t<Type> &>, stl::as_const(value)};
+        return meta_any{ctx, stl::in_place_type<const stl::remove_reference_t<Type> &>, stl::as_const(value)};
     } else if constexpr(stl::is_same_v<Policy, as_ref_t> || (stl::is_same_v<Policy, as_is_t> && stl::is_lvalue_reference_v<Type>)) {
-        return meta_any{ctx, std::in_place_type<Type>, value};
+        return meta_any{ctx, stl::in_place_type<Type>, value};
     } else if constexpr(stl::is_same_v<Policy, as_void_t>) {
-        return meta_any{ctx, std::in_place_type<void>};
+        return meta_any{ctx, stl::in_place_type<void>};
     } else {
         return meta_any{ctx, stl::forward<Type>(value)};
     }
@@ -198,7 +198,7 @@ template<typename Policy, typename Candidate, typename... Args>
 [[nodiscard]] meta_any meta_invoke_with_args(const meta_ctx &ctx, Candidate &&candidate, Args &&...args) {
     if constexpr(stl::is_void_v<decltype(std::invoke(stl::forward<Candidate>(candidate), args...))>) {
         std::invoke(stl::forward<Candidate>(candidate), args...);
-        return meta_any{ctx, std::in_place_type<void>};
+        return meta_any{ctx, stl::in_place_type<void>};
     } else {
         return meta_dispatch<Policy>(ctx, std::invoke(stl::forward<Candidate>(candidate), args...));
     }
@@ -231,7 +231,7 @@ template<typename Type, typename... Args, std::size_t... Index>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args, std::index_sequence<Index...>) {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
     if(((args + Index)->allow_cast<Args>() && ...)) {
-        return meta_any{ctx, std::in_place_type<Type>, (args + Index)->cast<Args>()...};
+        return meta_any{ctx, stl::in_place_type<Type>, (args + Index)->cast<Args>()...};
     }
     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 

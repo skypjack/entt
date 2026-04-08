@@ -230,7 +230,7 @@ auto setup_node_for() noexcept {
 
     if constexpr(stl::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {
-            return meta_any{ctx, std::in_place_type<Type>};
+            return meta_any{ctx, stl::in_place_type<Type>};
         };
     }
 
@@ -247,15 +247,15 @@ auto setup_node_for() noexcept {
     if constexpr(!stl::is_void_v<Type> && !stl::is_function_v<Type>) {
         node.from_void = +[](const meta_ctx &ctx, void *elem, const void *celem) {
             if(elem && celem) { // ownership construction request
-                return meta_any{ctx, std::in_place, static_cast<stl::decay_t<Type> *>(elem)};
+                return meta_any{ctx, stl::in_place, static_cast<stl::decay_t<Type> *>(elem)};
             }
 
             if(elem) { // non-const reference construction request
-                return meta_any{ctx, std::in_place_type<stl::decay_t<Type> &>, *static_cast<stl::decay_t<Type> *>(elem)};
+                return meta_any{ctx, stl::in_place_type<stl::decay_t<Type> &>, *static_cast<stl::decay_t<Type> *>(elem)};
             }
 
             // const reference construction request
-            return meta_any{ctx, std::in_place_type<const stl::decay_t<Type> &>, *static_cast<const stl::decay_t<Type> *>(celem)};
+            return meta_any{ctx, stl::in_place_type<const stl::decay_t<Type> &>, *static_cast<const stl::decay_t<Type> *>(celem)};
         };
     }
 

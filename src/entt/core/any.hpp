@@ -186,7 +186,7 @@ public:
 
     /*! @brief Default constructor. */
     constexpr basic_any() noexcept
-        : basic_any{std::in_place_type<void>} {}
+        : basic_any{stl::in_place_type<void>} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -195,7 +195,7 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit basic_any(std::in_place_type_t<Type>, Args &&...args)
+    explicit basic_any(stl::in_place_type_t<Type>, Args &&...args)
         : base_type{} {
         initialize<Type>(stl::forward<Args>(args)...);
     }
@@ -207,7 +207,7 @@ public:
      */
     template<typename Type>
     requires (!stl::is_const_v<Type> && !stl::is_void_v<Type>)
-    explicit basic_any(std::in_place_t, Type *value)
+    explicit basic_any(stl::in_place_t, Type *value)
         : base_type{} {
         if(value == nullptr) {
             initialize<void>();
@@ -226,7 +226,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, basic_any>)
     basic_any(Type &&value)
-        : basic_any{std::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
+        : basic_any{stl::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Copy constructor.
@@ -601,7 +601,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
  */
 template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
 [[nodiscard]] basic_any<Len, Align> make_any(Args &&...args) {
-    return basic_any<Len, Align>{std::in_place_type<Type>, stl::forward<Args>(args)...};
+    return basic_any<Len, Align>{stl::in_place_type<Type>, stl::forward<Args>(args)...};
 }
 
 /**
@@ -614,7 +614,7 @@ template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align
  */
 template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
 [[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
-    return basic_any<Len, Align>{std::in_place_type<Type &&>, stl::forward<Type>(value)};
+    return basic_any<Len, Align>{stl::in_place_type<Type &&>, stl::forward<Type>(value)};
 }
 
 } // namespace entt

@@ -144,7 +144,7 @@ public:
 
     template<typename Type, typename... Args>
     Type &emplace_as(const id_type id, Args &&...args) {
-        return any_cast<Type &>(ctx.try_emplace(id, std::in_place_type<Type>, stl::forward<Args>(args)...).first->second);
+        return any_cast<Type &>(ctx.try_emplace(id, stl::in_place_type<Type>, stl::forward<Args>(args)...).first->second);
     }
 
     template<typename Type, typename... Args>

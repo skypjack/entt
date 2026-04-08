@@ -146,7 +146,7 @@ struct type_info final {
      */
     template<typename Type>
     // NOLINTBEGIN(modernize-use-transparent-functors)
-    constexpr type_info(std::in_place_type_t<Type>) noexcept
+    constexpr type_info(stl::in_place_type_t<Type>) noexcept
         : seq{type_index<stl::remove_cvref_t<Type>>::value()},
           identifier{type_hash<stl::remove_cvref_t<Type>>::value()},
           alias{type_name<stl::remove_cvref_t<Type>>::value()} {}
@@ -214,7 +214,7 @@ private:
 template<typename Type>
 [[nodiscard]] const type_info &type_id() noexcept {
     if constexpr(stl::is_same_v<Type, stl::remove_cvref_t<Type>>) {
-        static const type_info instance{std::in_place_type<Type>};
+        static const type_info instance{stl::in_place_type<Type>};
         return instance;
     } else {
         return type_id<stl::remove_cvref_t<Type>>();

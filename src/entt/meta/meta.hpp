@@ -248,8 +248,8 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit meta_any(std::in_place_type_t<Type>, Args &&...args)
-        : meta_any{locator<meta_ctx>::value_or(), std::in_place_type<Type>, stl::forward<Args>(args)...} {}
+    explicit meta_any(stl::in_place_type_t<Type>, Args &&...args)
+        : meta_any{locator<meta_ctx>::value_or(), stl::in_place_type<Type>, stl::forward<Args>(args)...} {}
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
@@ -259,8 +259,8 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit meta_any(const meta_ctx &area, std::in_place_type_t<Type>, Args &&...args)
-        : storage{std::in_place_type<Type>, stl::forward<Args>(args)...},
+    explicit meta_any(const meta_ctx &area, stl::in_place_type_t<Type>, Args &&...args)
+        : storage{stl::in_place_type<Type>, stl::forward<Args>(args)...},
           ctx{&area},
           vtable{&basic_vtable<stl::remove_cvref_t<Type>>} {}
 
@@ -270,8 +270,8 @@ public:
      * @param value A pointer to an object to take ownership of.
      */
     template<typename Type>
-    explicit meta_any(std::in_place_t, Type *value)
-        : meta_any{locator<meta_ctx>::value_or(), std::in_place, value} {}
+    explicit meta_any(stl::in_place_t, Type *value)
+        : meta_any{locator<meta_ctx>::value_or(), stl::in_place, value} {}
 
     /**
      * @brief Constructs a wrapper taking ownership of the passed object.
@@ -280,8 +280,8 @@ public:
      * @param value A pointer to an object to take ownership of.
      */
     template<typename Type>
-    explicit meta_any(const meta_ctx &area, std::in_place_t, Type *value)
-        : storage{std::in_place, value},
+    explicit meta_any(const meta_ctx &area, stl::in_place_t, Type *value)
+        : storage{stl::in_place, value},
           ctx{&area},
           vtable{storage ? &basic_vtable<Type> : nullptr} {
     }
@@ -305,7 +305,7 @@ public:
     template<typename Type>
     requires (!std::same_as<stl::remove_cvref_t<Type>, meta_any>)
     meta_any(const meta_ctx &area, Type &&value)
-        : meta_any{area, std::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
+        : meta_any{area, stl::in_place_type<stl::decay_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Context aware copy constructor.
@@ -672,7 +672,7 @@ private:
  */
 template<typename Type>
 [[nodiscard]] meta_any forward_as_meta(const meta_ctx &ctx, Type &&value) {
-    return meta_any{ctx, std::in_place_type<Type &&>, stl::forward<Type>(value)};
+    return meta_any{ctx, stl::in_place_type<Type &&>, stl::forward<Type>(value)};
 }
 
 /**
@@ -695,7 +695,7 @@ class meta_handle {
 
     template<typename Type, typename... Args>
     meta_handle(char, Type &value, Args &&...args)
-        : any{stl::forward<Args>(args)..., std::in_place_type<Type &>, value} {}
+        : any{stl::forward<Args>(args)..., stl::in_place_type<Type &>, value} {}
 
 public:
     /*! Default constructor. */
