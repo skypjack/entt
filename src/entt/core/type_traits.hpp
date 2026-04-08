@@ -690,7 +690,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
  * @tparam Type The type to test
  */
 template<typename Type>
-struct is_ebco_eligible: stl::bool_constant<stl::is_empty_v<Type> && !std::is_final_v<Type>> {};
+struct is_ebco_eligible: stl::bool_constant<stl::is_empty_v<Type> && !stl::is_final_v<Type>> {};
 
 /**
  * @brief Helper variable template.
