@@ -13,6 +13,8 @@ using std::forward;
 using std::make_pair;
 using std::move;
 using std::pair;
+using std::piecewise_construct;
+using std::piecewise_construct_t;
 
 } // namespace entt::stl
 /*! @endcond */

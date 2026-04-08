@@ -340,8 +340,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(const dense_set &other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
-          packed{std::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
@@ -353,8 +353,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(dense_set &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
-          packed{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
@@ -547,7 +547,7 @@ public:
         if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<stl::decay_t<Args>, value_type>)) {
             return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
-            auto &node = packed.first().emplace_back(std::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(stl::forward<Args>(args)...));
+            auto &node = packed.first().emplace_back(stl::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(stl::forward<Args>(args)...));
             const auto index = value_to_bucket(node.second);
 
             if(auto it = constrained_find(node.second, index); it != end()) {

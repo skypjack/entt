@@ -172,7 +172,7 @@ public:
      * @param allocator The allocator to use.
      */
     resource_cache(const resource_cache &other, const allocator_type &allocator)
-        : pool{std::piecewise_construct, stl::forward_as_tuple(other.pool.first(), allocator), stl::forward_as_tuple(other.pool.second())} {}
+        : pool{stl::piecewise_construct, stl::forward_as_tuple(other.pool.first(), allocator), stl::forward_as_tuple(other.pool.second())} {}
 
     /*! @brief Default move constructor. */
     resource_cache(resource_cache &&) noexcept = default;
@@ -183,7 +183,7 @@ public:
      * @param allocator The allocator to use.
      */
     resource_cache(resource_cache &&other, const allocator_type &allocator)
-        : pool{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.pool.first()), allocator), stl::forward_as_tuple(stl::move(other.pool.second()))} {}
+        : pool{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.pool.first()), allocator), stl::forward_as_tuple(stl::move(other.pool.second()))} {}
 
     /*! @brief Default destructor. */
     ~resource_cache() = default;

@@ -272,7 +272,7 @@ class dense_map {
             return stl::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::piecewise_construct, stl::forward_as_tuple(stl::forward<Other>(key)), stl::forward_as_tuple(stl::forward<Args>(args)...));
+        packed.first().emplace_back(sparse.first()[index], stl::piecewise_construct, stl::forward_as_tuple(stl::forward<Other>(key)), stl::forward_as_tuple(stl::forward<Args>(args)...));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
@@ -391,8 +391,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(const dense_map &other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
-          packed{std::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
@@ -404,8 +404,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_map(dense_map &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
-          packed{std::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
