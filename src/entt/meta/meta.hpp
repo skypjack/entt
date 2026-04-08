@@ -498,7 +498,7 @@ public:
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
-                if constexpr(std::is_arithmetic_v<stl::remove_cvref_t<Type>> || std::is_enum_v<stl::remove_cvref_t<Type>>) {
+                if constexpr(std::is_arithmetic_v<stl::remove_cvref_t<Type>> || stl::is_enum_v<stl::remove_cvref_t<Type>>) {
                     if(const auto &from = fetch_node(); from.conversion_helper) {
                         return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
                     }

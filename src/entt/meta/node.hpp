@@ -44,14 +44,14 @@ enum class meta_traits : std::uint32_t {
 };
 
 template<typename Type>
-requires std::is_enum_v<Type>
+requires stl::is_enum_v<Type>
 [[nodiscard]] auto meta_to_user_traits(const meta_traits traits) noexcept {
     constexpr auto shift = std::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
     return Type{static_cast<stl::underlying_type_t<Type>>(static_cast<stl::underlying_type_t<meta_traits>>(traits) >> shift)};
 }
 
 template<typename Type>
-requires std::is_enum_v<Type>
+requires stl::is_enum_v<Type>
 [[nodiscard]] auto user_to_meta_traits(const Type value) noexcept {
     constexpr auto shift = std::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
     const auto traits = static_cast<stl::underlying_type_t<internal::meta_traits>>(static_cast<stl::underlying_type_t<Type>>(value));
@@ -219,7 +219,7 @@ auto setup_node_for() noexcept {
             | (std::is_integral_v<Type> ? meta_traits::is_integral : meta_traits::is_none)
             | (std::is_signed_v<Type> ? meta_traits::is_signed : meta_traits::is_none)
             | (stl::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
-            | (std::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
+            | (stl::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
             | (std::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
             | (stl::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
             | (is_meta_pointer_like_v<Type> ? meta_traits::is_pointer_like : meta_traits::is_none)
@@ -238,7 +238,7 @@ auto setup_node_for() noexcept {
         node.conversion_helper = +[](void *lhs, const void *rhs) {
             return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(*static_cast<const double *>(rhs))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
-    } else if constexpr(std::is_enum_v<Type>) {
+    } else if constexpr(stl::is_enum_v<Type>) {
         node.conversion_helper = +[](void *lhs, const void *rhs) {
             return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };

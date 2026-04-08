@@ -520,7 +520,7 @@ public:
      */
     template<typename Value>
     meta_factory traits(const Value value, const bool unset = false) {
-        static_assert(std::is_enum_v<Value>, "Invalid enum type");
+        static_assert(stl::is_enum_v<Value>, "Invalid enum type");
         base_type::traits(internal::user_to_meta_traits(value), unset);
         return *this;
     }

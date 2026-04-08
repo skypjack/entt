@@ -20,7 +20,7 @@ struct entt_traits;
 
 template<typename Type>
 requires requires {
-    requires std::is_enum_v<Type>;
+    requires stl::is_enum_v<Type>;
     typename internal::entt_traits<stl::underlying_type_t<Type>>::value_type;
 }
 struct entt_traits<Type>: entt_traits<stl::underlying_type_t<Type>> {
