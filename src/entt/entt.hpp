@@ -73,6 +73,7 @@ namespace entt::stl {}
 #include "stl/array.hpp"
 #include "stl/atomic.hpp"
 #include "stl/cstddef.hpp"
+#include "stl/cstdint.hpp"
 #include "stl/functional.hpp"
 #include "stl/iterator.hpp"
 #include "stl/memory.hpp"

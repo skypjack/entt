@@ -1,8 +1,8 @@
 #ifndef ENTT_CORE_HASHED_STRING_HPP
 #define ENTT_CORE_HASHED_STRING_HPP
 
-#include <cstdint>
 #include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
 #include "fwd.hpp"
 
 namespace entt {

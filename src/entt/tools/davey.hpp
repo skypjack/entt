@@ -1,7 +1,6 @@
 #ifndef ENTT_TOOLS_DAVEY_HPP
 #define ENTT_TOOLS_DAVEY_HPP
 
-#include <cstdint>
 #include <ios>
 #include <sstream>
 #include <string>
@@ -16,6 +15,7 @@
 #include "../meta/meta.hpp"
 #include "../meta/pointer.hpp"
 #include "../meta/resolve.hpp"
+#include "../stl/cstdint.hpp"
 
 #if __has_include(<imgui.h>)
 #    include <imgui.h>

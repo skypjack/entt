@@ -199,6 +199,7 @@ if(ENTT_INCLUDE_HEADERS)
         stl/array.hpp
         stl/atomic.hpp
         stl/cstddef.hpp
+        stl/cstdint.hpp
         stl/functional.hpp
         stl/iterator.hpp
         stl/memory.hpp

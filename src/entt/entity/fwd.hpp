@@ -1,12 +1,12 @@
 #ifndef ENTT_ENTITY_FWD_HPP
 #define ENTT_ENTITY_FWD_HPP
 
-#include <cstdint>
 #include <memory>
 #include "../config/config.h"
 #include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/cstdint.hpp"
 #include "../stl/type_traits.hpp"
 
 namespace entt {

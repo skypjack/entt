@@ -1,10 +1,10 @@
 #ifndef ENTT_PROCESS_PROCESS_HPP
 #define ENTT_PROCESS_PROCESS_HPP
 
-#include <cstdint>
 #include <memory>
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/cstdint.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "fwd.hpp"

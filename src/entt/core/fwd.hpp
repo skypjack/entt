@@ -1,9 +1,9 @@
 #ifndef ENTT_CORE_FWD_HPP
 #define ENTT_CORE_FWD_HPP
 
-#include <cstdint>
 #include "../config/config.h"
 #include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
 
 namespace entt {
 
