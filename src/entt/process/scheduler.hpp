@@ -1,10 +1,10 @@
 #ifndef ENTT_PROCESS_SCHEDULER_HPP
 #define ENTT_PROCESS_SCHEDULER_HPP
 
-#include <cstddef>
 #include <memory>
 #include "../config/config.h"
 #include "../core/compressed_pair.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"

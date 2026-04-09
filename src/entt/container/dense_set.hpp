@@ -5,7 +5,6 @@
 #include <cmath>
 #include <compare>
 #include <concepts>
-#include <cstddef>
 #include <functional>
 #include <limits>
 #include <memory>
@@ -13,6 +12,7 @@
 #include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"

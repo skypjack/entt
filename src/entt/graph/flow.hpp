@@ -2,7 +2,6 @@
 #define ENTT_GRAPH_FLOW_HPP
 
 #include <concepts>
-#include <cstddef>
 #include <functional>
 #include <memory>
 #include "../config/config.h"
@@ -12,6 +11,7 @@
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../stl/algorithm.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/type_traits.hpp"

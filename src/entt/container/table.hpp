@@ -2,9 +2,9 @@
 #define ENTT_CONTAINER_TABLE_HPP
 
 #include <concepts>
-#include <cstddef>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/utility.hpp"

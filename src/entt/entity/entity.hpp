@@ -3,10 +3,10 @@
 
 #include <bit>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include "../config/config.h"
 #include "../core/bit.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 

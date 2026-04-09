@@ -1,8 +1,8 @@
 #ifndef ENTT_SIGNAL_SIGH_HPP
 #define ENTT_SIGNAL_SIGH_HPP
 
-#include <cstddef>
 #include <memory>
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"

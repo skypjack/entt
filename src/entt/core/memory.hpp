@@ -1,9 +1,9 @@
 #ifndef ENTT_CORE_MEMORY_HPP
 #define ENTT_CORE_MEMORY_HPP
 
-#include <cstddef>
 #include <memory>
 #include "../config/config.h"
+#include "../stl/cstddef.hpp"
 #include "../stl/memory.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"

@@ -1,7 +1,7 @@
 #ifndef ENTT_CORE_IDENT_HPP
 #define ENTT_CORE_IDENT_HPP
 
-#include <cstddef>
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "fwd.hpp"

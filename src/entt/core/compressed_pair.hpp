@@ -2,7 +2,7 @@
 #define ENTT_CORE_COMPRESSED_PAIR_HPP
 
 #include <concepts>
-#include <cstddef>
+#include "../stl/cstddef.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"

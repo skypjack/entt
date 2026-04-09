@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_GROUP_HPP
 
 #include <concepts>
-#include <cstddef>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/fwd.hpp"
@@ -10,6 +9,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/array.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"

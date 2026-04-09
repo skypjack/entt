@@ -3,8 +3,8 @@
 
 #include <bit>
 #include <concepts>
-#include <cstddef>
 #include "../config/config.h"
+#include "../stl/cstddef.hpp"
 
 namespace entt {
 

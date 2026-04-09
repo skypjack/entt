@@ -2,12 +2,12 @@
 #define ENTT_ENTITY_VIEW_HPP
 
 #include <concepts>
-#include <cstddef>
 #include "../config/config.h"
 #include "../core/concepts.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/array.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"

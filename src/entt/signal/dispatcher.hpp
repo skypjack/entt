@@ -1,7 +1,6 @@
 #ifndef ENTT_SIGNAL_DISPATCHER_HPP
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
-#include <cstddef>
 #include <functional>
 #include <memory>
 #include "../container/dense_map.hpp"
@@ -9,6 +8,7 @@
 #include "../core/concepts.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"

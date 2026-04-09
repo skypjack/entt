@@ -1,10 +1,10 @@
 #ifndef ENTT_META_UTILITY_HPP
 #define ENTT_META_UTILITY_HPP
 
-#include <cstddef>
 #include <functional>
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "meta.hpp"

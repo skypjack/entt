@@ -1,7 +1,7 @@
 #ifndef ENTT_POLY_FWD_HPP
 #define ENTT_POLY_FWD_HPP
 
-#include <cstddef>
+#include "../stl/cstddef.hpp"
 
 namespace entt {
 

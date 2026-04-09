@@ -1,10 +1,10 @@
 #ifndef ENTT_SIGNAL_DELEGATE_HPP
 #define ENTT_SIGNAL_DELEGATE_HPP
 
-#include <cstddef>
 #include <functional>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"

@@ -2,10 +2,10 @@
 #define ENTT_CORE_ANY_HPP
 
 #include <concepts>
-#include <cstddef>
 #include <memory>
 #include "../config/config.h"
 #include "../core/concepts.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "fwd.hpp"

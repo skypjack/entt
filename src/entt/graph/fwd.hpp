@@ -2,9 +2,9 @@
 #define ENTT_GRAPH_FWD_HPP
 
 #include <concepts>
-#include <cstddef>
 #include <memory>
 #include "../core/fwd.hpp"
+#include "../stl/cstddef.hpp"
 
 namespace entt {
 

@@ -2,7 +2,6 @@
 #define ENTT_META_NODE_HPP
 
 #include <bit>
-#include <cstddef>
 #include <memory>
 #include "../config/config.h"
 #include "../core/bit.hpp"
@@ -13,6 +12,7 @@
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "../stl/array.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"

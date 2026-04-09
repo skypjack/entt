@@ -2,7 +2,6 @@
 #define ENTT_META_FACTORY_HPP
 
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -13,6 +12,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../locator/locator.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "context.hpp"
