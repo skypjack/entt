@@ -86,7 +86,7 @@ struct sparse_set_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const sparse_set_iterator &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const sparse_set_iterator &other) const noexcept {
         // intentionally reversed due to backward iteration
         return other.offset - offset;
     }
@@ -363,7 +363,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Pointer type to contained entities. */
     using pointer = packed_container_type::const_pointer;
     /*! @brief Random access iterator type. */

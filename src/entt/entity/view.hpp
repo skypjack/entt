@@ -134,7 +134,7 @@ struct extended_view_iterator final {
     using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::forward_iterator_tag;
 
@@ -281,7 +281,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Forward iterator type. */
     using iterator = internal::view_iterator<common_type, Checked, Get, Exclude>;
 
@@ -454,7 +454,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = base_type::size_type;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Forward iterator type. */
     using iterator = base_type::iterator;
     /*! @brief Iterable view type. */
@@ -691,7 +691,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Random access iterator type. */
     using iterator = stl::conditional_t<Policy == deletion_policy::in_place, internal::view_iterator<common_type, true, 1u, 0u>, typename common_type::iterator>;
     /*! @brief Reverse iterator type. */
@@ -912,7 +912,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = base_type::size_type;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Random access iterator type. */
     using iterator = base_type::iterator;
     /*! @brief Reverse iterator type. */

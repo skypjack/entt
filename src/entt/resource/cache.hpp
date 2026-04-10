@@ -33,7 +33,7 @@ public:
     using value_type = stl::pair<id_type, resource<Type>>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::random_access_iterator_tag;
 
@@ -96,7 +96,7 @@ public:
     }
 
     template<typename... Args>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const resource_cache_iterator<Args...> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const resource_cache_iterator<Args...> &other) const noexcept {
         return it - other.it;
     }
 

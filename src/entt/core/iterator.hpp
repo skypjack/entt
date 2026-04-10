@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <memory>
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
@@ -62,7 +63,7 @@ struct iota_iterator final {
     /*! @brief Non-reference type, same as value type. */
     using reference = value_type;
     /*! @brief Difference type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Iterator category. */
     using iterator_category = stl::input_iterator_tag;
 

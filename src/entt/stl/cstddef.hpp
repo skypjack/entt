@@ -6,6 +6,7 @@
 /*! @cond ENTT_INTERNAL */
 namespace entt::stl {
 
+using std::ptrdiff_t;
 using std::size_t;
 
 } // namespace entt::stl

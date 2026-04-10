@@ -1615,10 +1615,10 @@ inline bool meta_any::assign(meta_any &&other) {
 
 /*! @cond ENTT_INTERNAL */
 class meta_sequence_container::meta_iterator final {
-    using vtable_type = void(const void *, const std::ptrdiff_t, meta_any *);
+    using vtable_type = void(const void *, const stl::ptrdiff_t, meta_any *);
 
     template<typename It>
-    static void basic_vtable(const void *value, const std::ptrdiff_t offset, meta_any *other) {
+    static void basic_vtable(const void *value, const stl::ptrdiff_t offset, meta_any *other) {
         const auto &it = *static_cast<const It *>(value);
         other ? other->emplace<decltype(*it)>(*it) : std::advance(const_cast<It &>(it), offset);
     }
@@ -1627,7 +1627,7 @@ public:
     using value_type = meta_any;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::bidirectional_iterator_tag;
 
@@ -1708,7 +1708,7 @@ public:
     using value_type = stl::pair<meta_any, meta_any>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::forward_iterator_tag;
 

@@ -135,7 +135,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Bidirectional iterator type. */

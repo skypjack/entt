@@ -41,7 +41,7 @@ public:
     using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::declval<Owned>().get_as_tuple({})..., stl::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::forward_iterator_tag;
 
@@ -291,7 +291,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */
@@ -705,7 +705,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */

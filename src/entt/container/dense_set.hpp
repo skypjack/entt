@@ -38,7 +38,7 @@ public:
     using value_type = stl::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::random_access_iterator_tag;
 
     constexpr dense_set_iterator() noexcept
@@ -101,7 +101,7 @@ public:
     }
 
     template<typename Other>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<Other> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const dense_set_iterator<Other> &other) const noexcept {
         return it - other.it;
     }
 
@@ -130,7 +130,7 @@ public:
     using value_type = stl::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::forward_iterator_tag;
 
     constexpr dense_set_local_iterator() noexcept = default;
@@ -269,7 +269,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Type of function to use to hash the elements. */
     using hasher = Hash;
     /*! @brief Type of function to use to compare the elements for equality. */

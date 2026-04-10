@@ -68,7 +68,7 @@ public:
     using value_type = stl::pair<first_type, second_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::random_access_iterator_tag;
 
@@ -132,7 +132,7 @@ public:
     }
 
     template<typename Other>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_map_iterator<Other> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const dense_map_iterator<Other> &other) const noexcept {
         return it - other.it;
     }
 
@@ -163,7 +163,7 @@ public:
     using value_type = stl::pair<first_type, second_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::forward_iterator_tag;
 
@@ -324,7 +324,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Type of function to use to hash the keys. */
     using hasher = Hash;
     /*! @brief Type of function to use to compare the keys for equality. */

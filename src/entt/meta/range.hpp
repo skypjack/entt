@@ -22,7 +22,7 @@ struct meta_range_iterator final {
     using value_type = stl::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::random_access_iterator_tag;
 
@@ -86,7 +86,7 @@ struct meta_range_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
         return it - other.it;
     }
 

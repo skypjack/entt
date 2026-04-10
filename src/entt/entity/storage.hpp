@@ -107,7 +107,7 @@ public:
     }
 
     template<typename Other, auto Arg>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const storage_iterator<Other, Arg> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const storage_iterator<Other, Arg> &other) const noexcept {
         // intentionally reversed due to backward iteration
         return other.offset - offset;
     }
@@ -142,7 +142,7 @@ public:
     using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::forward_as_tuple(*stl::declval<Other>()...)));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     using iterator_category = stl::input_iterator_tag;
     using iterator_concept = stl::forward_iterator_tag;
 
@@ -396,7 +396,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Pointer type to contained elements. */
     using pointer = container_type::pointer;
     /*! @brief Constant pointer type to contained elements. */
@@ -794,7 +794,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
@@ -1010,7 +1010,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */
     using iterable = iterable_adaptor<internal::extended_storage_iterator<typename base_type::iterator>>;
     /*! @brief Constant extended iterable storage proxy. */
