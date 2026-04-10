@@ -4,6 +4,7 @@
 #include <concepts>
 #include <functional>
 #include "../stl/algorithm.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
 #include "../stl/utility.hpp"
@@ -74,7 +75,7 @@ struct insertion_sort {
  * @tparam Bit Number of bits processed per pass.
  * @tparam N Maximum number of bits to sort.
  */
-template<std::size_t Bit, std::size_t N>
+template<stl::size_t Bit, stl::size_t N>
 requires ((N % Bit) == 0) // The maximum number of bits to sort must be a multiple of the number of bits processed per pass
 struct radix_sort {
     /**
@@ -99,23 +100,23 @@ struct radix_sort {
 
             using value_type = stl::iterator_traits<It>::value_type;
             using difference_type = stl::iterator_traits<It>::difference_type;
-            stl::vector<value_type> aux(static_cast<std::size_t>(stl::distance(first, last)));
+            stl::vector<value_type> aux(static_cast<stl::size_t>(stl::distance(first, last)));
 
             auto part = [getter = stl::move(getter)](auto from, auto to, auto out, auto start) {
                 constexpr auto mask = (1 << Bit) - 1;
                 constexpr auto buckets = 1 << Bit;
 
                 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, misc-const-correctness)
-                std::size_t count[buckets]{};
+                stl::size_t count[buckets]{};
 
                 for(auto it = from; it != to; ++it) {
                     ++count[(getter(*it) >> start) & mask];
                 }
 
                 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-                std::size_t index[buckets]{};
+                stl::size_t index[buckets]{};
 
-                for(std::size_t pos{}, end = buckets - 1u; pos < end; ++pos) {
+                for(stl::size_t pos{}, end = buckets - 1u; pos < end; ++pos) {
                     index[pos + 1u] = index[pos] + count[pos];
                 }
 
@@ -125,7 +126,7 @@ struct radix_sort {
                 }
             };
 
-            for(std::size_t pass = 0; pass < (passes & ~1u); pass += 2) {
+            for(stl::size_t pass = 0; pass < (passes & ~1u); pass += 2) {
                 part(first, last, aux.begin(), pass * Bit);
                 part(aux.begin(), aux.end(), first, (pass + 1) * Bit);
             }

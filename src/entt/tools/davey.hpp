@@ -83,7 +83,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             if(ImGui::TreeNode(label)) {
                 meta_sequence_container view = elem.as_sequence_container();
 
-                for(std::size_t pos{}, last = view.size(); pos < last; ++pos) {
+                for(stl::size_t pos{}, last = view.size(); pos < last; ++pos) {
                     ImGui::PushID(static_cast<int>(pos));
 
                     if(ImGui::TreeNode(label, "%zu", pos)) {
@@ -101,7 +101,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
                 meta_associative_container view = elem.as_associative_container();
                 auto it = view.begin();
 
-                for(std::size_t pos{}, last = view.size(); pos < last; ++pos, ++it) {
+                for(stl::size_t pos{}, last = view.size(); pos < last; ++pos, ++it) {
                     ImGui::PushID(static_cast<int>(pos));
 
                     if(ImGui::TreeNode(label, "%zu", pos)) {
@@ -194,7 +194,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
     }
 }
 
-template<typename... Get, typename... Exclude, std::size_t... Index>
+template<typename... Get, typename... Exclude, stl::size_t... Index>
 static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view, std::index_sequence<Index...>) {
     using view_type = basic_view<get_t<Get...>, exclude_t<Exclude...>>;
     const stl::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};

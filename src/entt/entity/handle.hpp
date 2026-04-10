@@ -103,7 +103,7 @@ public:
     /*! @brief Underlying version type. */
     using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Iterable handle type. */
     using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(stl::declval<registry_type>().storage())::iterator>>;
 

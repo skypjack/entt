@@ -95,7 +95,7 @@ public:
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
         const auto pos = static_cast<Container::size_type>(index() - value);
-        return (*payload)[pos / Page][fast_mod(static_cast<std::size_t>(pos), Page)];
+        return (*payload)[pos / Page][fast_mod(static_cast<stl::size_t>(pos), Page)];
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
@@ -214,11 +214,11 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     using underlying_iterator = underlying_type::basic_iterator;
     using traits_type = component_traits<Type, Entity>;
 
-    [[nodiscard]] auto &element_at(const std::size_t pos) const {
+    [[nodiscard]] auto &element_at(const stl::size_t pos) const {
         return payload[pos / traits_type::page_size][fast_mod(pos, traits_type::page_size)];
     }
 
-    auto assure_at_least(const std::size_t pos) {
+    auto assure_at_least(const stl::size_t pos) {
         const auto idx = pos / traits_type::page_size;
 
         if(!(idx < payload.size())) {
@@ -256,7 +256,7 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         return it;
     }
 
-    void shrink_to_size(const std::size_t sz) {
+    void shrink_to_size(const stl::size_t sz) {
         const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
         allocator_type allocator{get_allocator()};
 
@@ -280,12 +280,12 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
         payload.shrink_to_fit();
     }
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) {
+    void swap_at(const stl::size_t lhs, const stl::size_t rhs) {
         using std::swap;
         swap(element_at(lhs), element_at(rhs));
     }
 
-    void move_to(const std::size_t lhs, const std::size_t rhs) {
+    void move_to(const stl::size_t lhs, const stl::size_t rhs) {
         auto &elem = element_at(lhs);
         allocator_type allocator{get_allocator()};
         entt::uninitialized_construct_using_allocator(stl::to_address(assure_at_least(rhs)), allocator, stl::move(elem));
@@ -293,11 +293,11 @@ class basic_storage: public basic_sparse_set<Entity, typename std::allocator_tra
     }
 
 private:
-    [[nodiscard]] const void *get_at(const std::size_t pos) const final {
+    [[nodiscard]] const void *get_at(const stl::size_t pos) const final {
         return std::addressof(element_at(pos));
     }
 
-    void swap_or_move([[maybe_unused]] const std::size_t from, [[maybe_unused]] const std::size_t to) override {
+    void swap_or_move([[maybe_unused]] const stl::size_t from, [[maybe_unused]] const stl::size_t to) override {
         static constexpr bool is_pinned_type = !(std::is_move_constructible_v<Type> && stl::is_move_assignable_v<Type>);
         // use a runtime value to avoid compile-time suppression that drives the code coverage tool crazy
         ENTT_ASSERT((from + 1u) && !is_pinned_type, "Pinned type");
@@ -394,7 +394,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained elements. */
@@ -792,7 +792,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */
@@ -1008,7 +1008,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Extended iterable storage proxy. */

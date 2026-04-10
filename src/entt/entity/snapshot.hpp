@@ -422,12 +422,12 @@ public:
             storage.reserve(length);
             archive(in_use);
 
-            for(std::size_t pos{}; pos < in_use; ++pos) {
+            for(stl::size_t pos{}; pos < in_use; ++pos) {
                 archive(entt);
                 restore(entt);
             }
 
-            for(std::size_t pos = in_use; pos < length; ++pos) {
+            for(stl::size_t pos = in_use; pos < length; ++pos) {
                 archive(entt);
 
                 if(const auto entity = to_entity(entt); remloc.contains(entity)) {

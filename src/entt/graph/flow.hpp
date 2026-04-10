@@ -31,9 +31,9 @@ class basic_flow {
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, id_type>, "Invalid value type");
     using task_container_type = dense_set<id_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<id_type>>;
-    using ro_rw_container_type = stl::vector<stl::pair<std::size_t, bool>, typename alloc_traits::template rebind_alloc<stl::pair<std::size_t, bool>>>;
+    using ro_rw_container_type = stl::vector<stl::pair<stl::size_t, bool>, typename alloc_traits::template rebind_alloc<stl::pair<stl::size_t, bool>>>;
     using deps_container_type = dense_map<id_type, ro_rw_container_type, stl::identity, std::equal_to<>, typename alloc_traits::template rebind_alloc<stl::pair<const id_type, ro_rw_container_type>>>;
-    using adjacency_matrix_type = adjacency_matrix<directed_tag, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using adjacency_matrix_type = adjacency_matrix<directed_tag, typename alloc_traits::template rebind_alloc<stl::size_t>>;
 
     void emplace(const id_type res, const bool is_rw) {
         ENTT_ASSERT(index.first() < vertices.size(), "Invalid node");
@@ -84,9 +84,9 @@ class basic_flow {
     void transitive_closure(adjacency_matrix_type &matrix) const {
         const auto length = matrix.size();
 
-        for(std::size_t vk{}; vk < length; ++vk) {
-            for(std::size_t vi{}; vi < length; ++vi) {
-                for(std::size_t vj{}; vj < length; ++vj) {
+        for(stl::size_t vk{}; vk < length; ++vk) {
+            for(stl::size_t vi{}; vi < length; ++vi) {
+                for(stl::size_t vj{}; vj < length; ++vj) {
                     if(matrix.contains(vi, vk) && matrix.contains(vk, vj)) {
                         matrix.insert(vi, vj);
                     }
@@ -98,14 +98,14 @@ class basic_flow {
     void transitive_reduction(adjacency_matrix_type &matrix) const {
         const auto length = matrix.size();
 
-        for(std::size_t vert{}; vert < length; ++vert) {
+        for(stl::size_t vert{}; vert < length; ++vert) {
             matrix.erase(vert, vert);
         }
 
-        for(std::size_t vj{}; vj < length; ++vj) {
-            for(std::size_t vi{}; vi < length; ++vi) {
+        for(stl::size_t vj{}; vj < length; ++vj) {
+            for(stl::size_t vi{}; vi < length; ++vi) {
                 if(matrix.contains(vi, vj)) {
-                    for(std::size_t vk{}; vk < length; ++vk) {
+                    for(stl::size_t vk{}; vk < length; ++vk) {
                         if(matrix.contains(vj, vk)) {
                             matrix.erase(vi, vk);
                         }
@@ -119,7 +119,7 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Iterable task list. */
     using iterable = iterable_adaptor<typename task_container_type::const_iterator>;
     /*! @brief Adjacency matrix type. */

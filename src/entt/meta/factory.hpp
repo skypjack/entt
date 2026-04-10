@@ -456,7 +456,7 @@ public:
                     internal::meta_traits::is_none,
                     1u,
                     &internal::resolve<stl::remove_cvref_t<typename descriptor::return_type>>,
-                    &meta_arg<type_list<type_list_element_t<static_cast<std::size_t>(args_type::size != 1u), args_type>>>,
+                    &meta_arg<type_list<type_list_element_t<static_cast<stl::size_t>(args_type::size != 1u), args_type>>>,
                     &meta_setter<Type, Setter>,
                     &meta_getter<Type, Getter, Policy>});
         }

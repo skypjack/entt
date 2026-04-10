@@ -31,11 +31,11 @@ struct poly_inspector {
      * @param args The arguments to pass to the function.
      * @return A poly inspector convertible to any type.
      */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] poly_inspector invoke(Args &&...args) const;
 
     /*! @copydoc invoke */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] poly_inspector invoke(Args &&...args);
 };
 
@@ -45,7 +45,7 @@ struct poly_inspector {
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  */
-template<typename Concept, std::size_t Len, std::size_t Align>
+template<typename Concept, stl::size_t Len, stl::size_t Align>
 class poly_vtable {
     using inspector = Concept::template type<poly_inspector>;
 
@@ -139,7 +139,7 @@ struct poly_base {
      * @param args The arguments to pass to the function.
      * @return The return value of the invoked function, if any.
      */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(const poly_base &self, Args &&...args) const {
         const auto &poly = static_cast<const Poly &>(self);
 
@@ -151,7 +151,7 @@ struct poly_base {
     }
 
     /*! @copydoc invoke */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(poly_base &self, Args &&...args) {
         auto &poly = static_cast<Poly &>(self);
 
@@ -173,7 +173,7 @@ struct poly_base {
  * @param args The arguments to pass to the function.
  * @return The return value of the invoked function, if any.
  */
-template<std::size_t Member, typename Poly, typename... Args>
+template<stl::size_t Member, typename Poly, typename... Args>
 decltype(auto) poly_call(Poly &&self, Args &&...args) {
     return stl::forward<Poly>(self).template invoke<Member>(self, stl::forward<Args>(args)...);
 }
@@ -193,7 +193,7 @@ decltype(auto) poly_call(Poly &&self, Args &&...args) {
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  */
-template<typename Concept, std::size_t Len, std::size_t Align>
+template<typename Concept, stl::size_t Len, stl::size_t Align>
 class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align>>> {
     friend struct poly_base<basic_poly>;
 

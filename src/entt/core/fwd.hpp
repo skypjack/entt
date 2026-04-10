@@ -22,7 +22,7 @@ enum class any_policy : std::uint8_t {
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
+template<stl::size_t Len = sizeof(double[2]), stl::size_t = alignof(double[2])>
 class basic_any;
 
 /*! @brief Alias declaration for type identifiers. */

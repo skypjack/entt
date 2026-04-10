@@ -28,7 +28,7 @@ struct fnv_1a_params<std::uint64_t> {
 template<typename Char>
 struct basic_hashed_string {
     using value_type = Char;
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     using hash_type = id_type;
 
     const value_type *repr{};
@@ -91,7 +91,7 @@ public:
      * @param str Human-readable identifier.
      * @return The numeric representation of the string.
      */
-    template<std::size_t N>
+    template<stl::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     [[nodiscard]] static ENTT_CONSTEVAL hash_type value(const value_type (&str)[N]) noexcept {
         return basic_hashed_string{str};
@@ -130,7 +130,7 @@ public:
      * @tparam N Number of characters of the identifier.
      * @param str Human-readable identifier.
      */
-    template<std::size_t N>
+    template<stl::size_t N>
     // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
     ENTT_CONSTEVAL basic_hashed_string(const value_type (&str)[N]) noexcept
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
@@ -221,7 +221,7 @@ public:
  * @param len Length of the string to hash.
  */
 template<typename Char>
-basic_hashed_string(const Char *str, std::size_t len) -> basic_hashed_string<Char>;
+basic_hashed_string(const Char *str, stl::size_t len) -> basic_hashed_string<Char>;
 
 /**
  * @brief Deduction guide.
@@ -229,7 +229,7 @@ basic_hashed_string(const Char *str, std::size_t len) -> basic_hashed_string<Cha
  * @tparam N Number of characters of the identifier.
  * @param str Human-readable identifier.
  */
-template<typename Char, std::size_t N>
+template<typename Char, stl::size_t N>
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 basic_hashed_string(const Char (&str)[N]) -> basic_hashed_string<Char>;
 
@@ -240,7 +240,7 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] ENTT_CONSTEVAL hashed_string operator""_hs(const char *str, std::size_t) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL hashed_string operator""_hs(const char *str, stl::size_t) noexcept {
     return hashed_string{str};
 }
 
@@ -249,7 +249,7 @@ inline namespace literals {
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] ENTT_CONSTEVAL hashed_wstring operator""_hws(const wchar_t *str, std::size_t) noexcept {
+[[nodiscard]] ENTT_CONSTEVAL hashed_wstring operator""_hws(const wchar_t *str, stl::size_t) noexcept {
     return hashed_wstring{str};
 }
 

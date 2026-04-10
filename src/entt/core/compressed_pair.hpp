@@ -14,7 +14,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Type, std::size_t>
+template<typename Type, stl::size_t>
 struct compressed_pair_element {
     using reference = Type &;
     using const_reference = const Type &;
@@ -28,7 +28,7 @@ struct compressed_pair_element {
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
         : value{stl::forward<Arg>(arg)} {}
 
-    template<typename... Args, std::size_t... Index>
+    template<typename... Args, stl::size_t... Index>
     constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<Type, Args...>)
         : value{stl::forward<Args>(std::get<Index>(args))...} {}
 
@@ -44,7 +44,7 @@ private:
     Type value{};
 };
 
-template<typename Type, std::size_t Tag>
+template<typename Type, stl::size_t Tag>
 requires is_ebco_eligible_v<Type>
 struct compressed_pair_element<Type, Tag>: Type {
     using reference = Type &;
@@ -60,7 +60,7 @@ struct compressed_pair_element<Type, Tag>: Type {
     requires (!std::same_as<stl::remove_cvref_t<Arg>, compressed_pair_element>)
         : base_type{stl::forward<Arg>(arg)} {}
 
-    template<typename... Args, std::size_t... Index>
+    template<typename... Args, stl::size_t... Index>
     constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<base_type, Args...>)
         : base_type{stl::forward<Args>(std::get<Index>(args))...} {}
 
@@ -204,7 +204,7 @@ public:
      * @return Returns a reference to the first element if `Index` is 0 and a
      * reference to the second element if `Index` is 1.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     requires (Index <= 1u)
     [[nodiscard]] constexpr decltype(auto) get() noexcept {
         if constexpr(Index == 0u) {
@@ -215,7 +215,7 @@ public:
     }
 
     /*! @copydoc get */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     requires (Index <= 1u)
     [[nodiscard]] constexpr decltype(auto) get() const noexcept {
         if constexpr(Index == 0u) {

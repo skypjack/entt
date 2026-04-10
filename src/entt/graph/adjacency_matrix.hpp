@@ -19,7 +19,7 @@ namespace internal {
 
 template<typename It>
 class edge_iterator {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     void find_next() noexcept {
         for(; pos != last && !it[static_cast<It::difference_type>(pos)]; pos += offset) {}
@@ -87,14 +87,14 @@ private:
 template<std::derived_from<directed_tag> Category, typename Allocator>
 class adjacency_matrix {
     using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(stl::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
-    using container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, stl::size_t>, "Invalid value type");
+    using container_type = stl::vector<stl::size_t, typename alloc_traits::template rebind_alloc<stl::size_t>>;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Vertex type. */
     using vertex_type = size_type;
     /*! @brief Edge type. */

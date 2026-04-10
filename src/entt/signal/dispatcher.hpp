@@ -26,7 +26,7 @@ struct basic_dispatcher_handler {
     virtual void publish() = 0;
     virtual void disconnect(void *) = 0;
     virtual void clear() noexcept = 0;
-    [[nodiscard]] virtual std::size_t size() const noexcept = 0;
+    [[nodiscard]] virtual stl::size_t size() const noexcept = 0;
 };
 
 template<cvref_unqualified Type, typename Allocator>
@@ -76,7 +76,7 @@ public:
         }
     }
 
-    [[nodiscard]] std::size_t size() const noexcept override {
+    [[nodiscard]] stl::size_t size() const noexcept override {
         return events.size();
     }
 
@@ -140,7 +140,7 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     /*! @brief Default constructor. */
     basic_dispatcher()

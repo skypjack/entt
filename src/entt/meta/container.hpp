@@ -28,7 +28,7 @@ requires is_complete_v<stl::tuple_size<Type>>
 struct sequence_container_extent<Type>: integral_constant<stl::tuple_size_v<Type>> {};
 
 template<typename Type>
-inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
+inline constexpr stl::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
 
 template<typename Type>
 concept meta_sequence_container_like = requires(Type elem) {
@@ -67,7 +67,7 @@ struct basic_meta_sequence_container_traits {
     using iterator = meta_sequence_container::iterator;
 
     /*! @brief Number of elements, or `meta_dynamic_extent` if dynamic. */
-    static constexpr std::size_t extent = internal::sequence_container_extent_v<Type>;
+    static constexpr stl::size_t extent = internal::sequence_container_extent_v<Type>;
 
     /**
      * @brief Returns the number of elements in a container.

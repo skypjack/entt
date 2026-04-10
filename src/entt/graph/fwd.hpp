@@ -14,7 +14,7 @@ struct directed_tag {};
 /*! @brief Directed graph category tag. */
 struct undirected_tag: directed_tag {};
 
-template<std::derived_from<directed_tag>, typename = std::allocator<std::size_t>>
+template<std::derived_from<directed_tag>, typename = std::allocator<stl::size_t>>
 class adjacency_matrix;
 
 template<typename = std::allocator<id_type>>

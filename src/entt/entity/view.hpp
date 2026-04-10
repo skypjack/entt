@@ -46,7 +46,7 @@ template<typename It>
     return first == last;
 }
 
-template<typename Result, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
+template<typename Result, typename View, typename Other, stl::size_t... GLhs, stl::size_t... ELhs, stl::size_t... GRhs, stl::size_t... ERhs>
 [[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>) {
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
@@ -57,7 +57,7 @@ template<typename Result, typename View, typename Other, std::size_t... GLhs, st
     return elem;
 }
 
-template<typename Type, bool Checked, std::size_t Get, std::size_t Exclude>
+template<typename Type, bool Checked, stl::size_t Get, stl::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
     friend struct extended_view_iterator;
@@ -88,7 +88,7 @@ public:
           filter{},
           index{} {}
 
-    view_iterator(iterator_type first, stl::array<const Type *, Get> value, stl::array<const Type *, Exclude> excl, const std::size_t idx) noexcept
+    view_iterator(iterator_type first, stl::array<const Type *, Get> value, stl::array<const Type *, Exclude> excl, const stl::size_t idx) noexcept
         : it{first},
           pools{value},
           filter{excl},
@@ -208,9 +208,9 @@ class basic_view;
  * @tparam Get Number of storage iterated by the view.
  * @tparam Exclude Number of storage used to filter the view.
  */
-template<cvref_unqualified Type, bool Checked, std::size_t Get, std::size_t Exclude>
+template<cvref_unqualified Type, bool Checked, stl::size_t Get, stl::size_t Exclude>
 class basic_common_view {
-    template<typename Return, typename View, typename Other, std::size_t... GLhs, std::size_t... ELhs, std::size_t... GRhs, std::size_t... ERhs>
+    template<typename Return, typename View, typename Other, stl::size_t... GLhs, stl::size_t... ELhs, stl::size_t... GRhs, stl::size_t... ERhs>
     friend Return internal::view_pack(const View &, const Other &, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>);
 
     [[nodiscard]] auto offset() const noexcept {
@@ -245,21 +245,21 @@ protected:
         unchecked_refresh();
     }
 
-    [[nodiscard]] const Type *pool_at(const std::size_t pos) const noexcept {
+    [[nodiscard]] const Type *pool_at(const stl::size_t pos) const noexcept {
         return pools[pos];
     }
 
-    void pool_at(const std::size_t pos, const Type *elem) noexcept {
+    void pool_at(const stl::size_t pos, const Type *elem) noexcept {
         ENTT_ASSERT(elem != nullptr, "Unexpected element");
         pools[pos] = elem;
         refresh();
     }
 
-    [[nodiscard]] const Type *filter_at(const std::size_t pos) const noexcept {
+    [[nodiscard]] const Type *filter_at(const stl::size_t pos) const noexcept {
         return (filter[pos] == placeholder) ? nullptr : filter[pos];
     }
 
-    void filter_at(const std::size_t pos, const Type *elem) noexcept {
+    void filter_at(const stl::size_t pos, const Type *elem) noexcept {
         ENTT_ASSERT(elem != nullptr, "Unexpected element");
         filter[pos] = elem;
     }
@@ -268,7 +268,7 @@ protected:
         return internal::none_of(filter.begin(), filter.end(), entt);
     }
 
-    void use(const std::size_t pos) noexcept {
+    void use(const stl::size_t pos) noexcept {
         index = (index != Get) ? pos : Get;
     }
     /*! @endcond */
@@ -279,7 +279,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Forward iterator type. */
@@ -411,13 +411,13 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     : public basic_common_view<stl::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)> {
     using base_type = basic_common_view<stl::common_type_t<typename Get::base_type...>, internal::tombstone_check_v<Get...>, sizeof...(Get), sizeof...(Exclude)>;
 
-    template<std::size_t Index>
+    template<stl::size_t Index>
     using element_at = type_list_element_t<Index, type_list<Get..., Exclude...>>;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t Curr, std::size_t Other, typename... Args>
+    template<stl::size_t Curr, stl::size_t Other, typename... Args>
     [[nodiscard]] auto dispatch_get(const stl::tuple<typename base_type::entity_type, Args...> &curr) const {
         if constexpr(Curr == Other) {
             return stl::forward_as_tuple(std::get<Args>(curr)...);
@@ -426,7 +426,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
         }
     }
 
-    template<std::size_t Curr, typename Func, std::size_t... Index>
+    template<stl::size_t Curr, typename Func, stl::size_t... Index>
     void each(Func func, std::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = std::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
@@ -507,7 +507,7 @@ public:
      * @brief Forces a view to use a given element to drive iterations
      * @tparam Index Index of the element to use to drive iterations.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     void use() noexcept {
         base_type::use(Index);
     }
@@ -527,7 +527,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         if constexpr(Index < sizeof...(Get)) {
             return static_cast<element_at<Index> *>(const_cast<constness_as_t<common_type, element_at<Index>> *>(base_type::pool_at(Index)));
@@ -552,7 +552,7 @@ public:
      * @tparam Type Type of storage to assign to the view.
      * @param elem A storage to assign to the view.
      */
-    template<std::size_t Index, typename Type>
+    template<stl::size_t Index, typename Type>
     void storage(Type &elem) noexcept {
         static_assert(stl::is_convertible_v<Type &, element_at<Index> &>, "Unexpected type");
 
@@ -590,7 +590,7 @@ public:
      * @param entt A valid identifier.
      * @return The elements assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
             return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
@@ -689,7 +689,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = common_type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Random access iterator type. */
@@ -967,7 +967,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         static_assert(Index == 0u, "Index out of bounds");
         return static_cast<Get *>(const_cast<constness_as_t<common_type, Get> *>(base_type::handle()));
@@ -986,7 +986,7 @@ public:
      * @tparam Index Index of the storage to assign to the view.
      * @param elem A storage to assign to the view.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     void storage(Get &elem) noexcept {
         static_assert(Index == 0u, "Index out of bounds");
         *this = basic_view{elem};
@@ -1027,7 +1027,7 @@ public:
      * @param entt A valid identifier.
      * @return The element assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
             return storage()->get_as_tuple(entt);

@@ -27,7 +27,7 @@ enum class any_request : std::uint8_t {
     move
 };
 
-template<std::size_t Len, std::size_t Align>
+template<stl::size_t Len, stl::size_t Align>
 struct basic_any_storage {
     static constexpr bool has_buffer = true;
     union {
@@ -37,17 +37,17 @@ struct basic_any_storage {
     };
 };
 
-template<std::size_t Align>
+template<stl::size_t Align>
 struct basic_any_storage<0u, Align> {
     static constexpr bool has_buffer = false;
     const void *instance{};
 };
 
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 // NOLINTNEXTLINE(bugprone-sizeof-expression)
 struct in_situ: stl::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && stl::is_nothrow_move_constructible_v<Type>> {};
 
-template<std::size_t Len, std::size_t Align>
+template<stl::size_t Len, stl::size_t Align>
 struct in_situ<void, Len, Align>: stl::false_type {};
 
 } // namespace internal
@@ -58,7 +58,7 @@ struct in_situ<void, Len, Align>: stl::false_type {};
  * @tparam Len Size of the buffer reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  */
-template<std::size_t Len, std::size_t Align>
+template<stl::size_t Len, stl::size_t Align>
 class basic_any: private internal::basic_any_storage<Len, Align> {
     using request = internal::any_request;
     using base_type = internal::basic_any_storage<Len, Align>;
@@ -540,7 +540,7 @@ private:
  * @param data Target any object.
  * @return The element converted to the requested type.
  */
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 [[nodiscard]] stl::remove_const_t<Type> any_cast(const basic_any<Len, Align> &data) noexcept {
     const auto *const instance = any_cast<stl::remove_reference_t<Type>>(&data);
     ENTT_ASSERT(instance, "Invalid instance");
@@ -548,7 +548,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 }
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 [[nodiscard]] stl::remove_const_t<Type> any_cast(basic_any<Len, Align> &data) noexcept {
     // forces const on non-reference types to make them work also with wrappers for const references
     auto *const instance = any_cast<stl::remove_reference_t<const Type>>(&data);
@@ -557,7 +557,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
 }
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
 [[nodiscard]] stl::remove_const_t<Type> any_cast(basic_any<Len, Align> &&data) noexcept {
     if constexpr(stl::is_copy_constructible_v<stl::remove_cvref_t<Type>>) {
@@ -574,13 +574,13 @@ template<typename Type, std::size_t Len, std::size_t Align>
 }
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 [[nodiscard]] const Type *any_cast(const basic_any<Len, Align> *data) noexcept {
     return data->template data<stl::remove_const_t<Type>>();
 }
 
 /*! @copydoc any_cast */
-template<typename Type, std::size_t Len, std::size_t Align>
+template<typename Type, stl::size_t Len, stl::size_t Align>
 [[nodiscard]] Type *any_cast(basic_any<Len, Align> *data) noexcept {
     if constexpr(stl::is_const_v<Type>) {
         // last attempt to make wrappers for const references return their values
@@ -599,7 +599,7 @@ template<typename Type, std::size_t Len, std::size_t Align>
  * @param args Parameters to use to construct the instance.
  * @return A properly initialized wrapper for an object of the given type.
  */
-template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename... Args>
+template<typename Type, stl::size_t Len = basic_any<>::length, stl::size_t Align = basic_any<Len>::alignment, typename... Args>
 [[nodiscard]] basic_any<Len, Align> make_any(Args &&...args) {
     return basic_any<Len, Align>{stl::in_place_type<Type>, stl::forward<Args>(args)...};
 }
@@ -612,7 +612,7 @@ template<typename Type, std::size_t Len = basic_any<>::length, std::size_t Align
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
-template<std::size_t Len = basic_any<>::length, std::size_t Align = basic_any<Len>::alignment, typename Type>
+template<stl::size_t Len = basic_any<>::length, stl::size_t Align = basic_any<Len>::alignment, typename Type>
 [[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{stl::in_place_type<Type &&>, stl::forward<Type>(value)};
 }

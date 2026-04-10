@@ -27,19 +27,19 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr std::size_t dense_map_placeholder_position = (std::numeric_limits<std::size_t>::max)();
+static constexpr stl::size_t dense_map_placeholder_position = (std::numeric_limits<stl::size_t>::max)();
 
 template<typename Key, typename Type>
 struct dense_map_node final {
     using value_type = stl::pair<Key, Type>;
 
     template<typename... Args>
-    dense_map_node(const std::size_t pos, Args &&...args)
+    dense_map_node(const stl::size_t pos, Args &&...args)
         : next{pos},
           element{stl::forward<Args>(args)...} {}
 
     template<typename... Args>
-    dense_map_node(std::allocator_arg_t, const auto &allocator, const std::size_t pos, Args &&...args)
+    dense_map_node(std::allocator_arg_t, const auto &allocator, const stl::size_t pos, Args &&...args)
         : next{pos},
           element{entt::make_obj_using_allocator<value_type>(allocator, stl::forward<Args>(args)...)} {}
 
@@ -51,7 +51,7 @@ struct dense_map_node final {
         : next{other.next},
           element{entt::make_obj_using_allocator<value_type>(allocator, stl::move(other.element))} {}
 
-    std::size_t next;
+    stl::size_t next;
     value_type element;
 };
 
@@ -169,7 +169,7 @@ public:
 
     constexpr dense_map_local_iterator() noexcept = default;
 
-    constexpr dense_map_local_iterator(It iter, const std::size_t pos) noexcept
+    constexpr dense_map_local_iterator(It iter, const stl::size_t pos) noexcept
         : it{iter},
           offset{pos} {}
 
@@ -202,13 +202,13 @@ public:
         return offset == other.offset;
     }
 
-    [[nodiscard]] constexpr std::size_t index() const noexcept {
+    [[nodiscard]] constexpr stl::size_t index() const noexcept {
         return offset;
     }
 
 private:
     It it{};
-    std::size_t offset{dense_map_placeholder_position};
+    stl::size_t offset{dense_map_placeholder_position};
 };
 
 } // namespace internal
@@ -230,21 +230,21 @@ private:
 template<typename Key, typename Type, typename Hash, typename KeyEqual, typename Allocator>
 class dense_map {
     static constexpr float default_threshold = 0.875f;
-    static constexpr std::size_t minimum_capacity = 8u;
-    static constexpr std::size_t placeholder_position = internal::dense_map_placeholder_position;
+    static constexpr stl::size_t minimum_capacity = 8u;
+    static constexpr stl::size_t placeholder_position = internal::dense_map_placeholder_position;
 
     using node_type = internal::dense_map_node<Key, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, stl::pair<const Key, Type>>, "Invalid value type");
-    using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using sparse_container_type = stl::vector<stl::size_t, typename alloc_traits::template rebind_alloc<stl::size_t>>;
     using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
-    [[nodiscard]] std::size_t key_to_bucket(const auto &key) const noexcept {
+    [[nodiscard]] stl::size_t key_to_bucket(const auto &key) const noexcept {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         return fast_mod(static_cast<size_type>(sparse.second()(key)), bucket_count());
     }
 
-    [[nodiscard]] auto constrained_find(const auto &key, const std::size_t bucket) {
+    [[nodiscard]] auto constrained_find(const auto &key, const stl::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
                 return begin() + static_cast<iterator::difference_type>(offset);
@@ -254,7 +254,7 @@ class dense_map {
         return end();
     }
 
-    [[nodiscard]] auto constrained_find(const auto &key, const std::size_t bucket) const {
+    [[nodiscard]] auto constrained_find(const auto &key, const stl::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].next) {
             if(packed.second()(packed.first()[offset].element.first, key)) {
                 return cbegin() + static_cast<const_iterator::difference_type>(offset);
@@ -295,7 +295,7 @@ class dense_map {
         return stl::make_pair(--end(), true);
     }
 
-    void move_and_pop(const std::size_t pos) {
+    void move_and_pop(const stl::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             size_type *curr = &sparse.first()[key_to_bucket(packed.first().back().element.first)];
             packed.first()[pos] = stl::move(packed.first().back());
@@ -322,7 +322,7 @@ public:
     /*! @brief Key-value type of the container. */
     using value_type = stl::pair<const Key, Type>;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Type of function to use to hash the keys. */

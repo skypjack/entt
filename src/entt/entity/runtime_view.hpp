@@ -133,7 +133,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */

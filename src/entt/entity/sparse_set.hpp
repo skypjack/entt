@@ -143,10 +143,10 @@ class basic_sparse_set {
     using packed_container_type = stl::vector<Entity, Allocator>;
     using traits_type = entt_traits<Entity>;
 
-    static constexpr auto max_size = static_cast<std::size_t>(traits_type::to_entity(null));
+    static constexpr auto max_size = static_cast<stl::size_t>(traits_type::to_entity(null));
 
     // it could be auto but gcc complains and emits a warning due to a false positive
-    [[nodiscard]] std::size_t policy_to_head() const noexcept {
+    [[nodiscard]] stl::size_t policy_to_head() const noexcept {
         return static_cast<size_type>(max_size * static_cast<stl::remove_const_t<decltype(max_size)>>(mode != deletion_policy::swap_only));
     }
 
@@ -154,7 +154,7 @@ class basic_sparse_set {
         return static_cast<size_type>(traits_type::to_entity(entt));
     }
 
-    [[nodiscard]] auto pos_to_page(const std::size_t pos) const noexcept {
+    [[nodiscard]] auto pos_to_page(const stl::size_t pos) const noexcept {
         return static_cast<size_type>(pos / traits_type::page_size);
     }
 
@@ -202,7 +202,7 @@ class basic_sparse_set {
         }
     }
 
-    void swap_at(const std::size_t lhs, const std::size_t rhs) {
+    void swap_at(const stl::size_t lhs, const stl::size_t rhs) {
         auto &from = packed[lhs];
         auto &to = packed[rhs];
 
@@ -213,11 +213,11 @@ class basic_sparse_set {
     }
 
 private:
-    [[nodiscard]] virtual const void *get_at(const std::size_t) const {
+    [[nodiscard]] virtual const void *get_at(const stl::size_t) const {
         return nullptr;
     }
 
-    virtual void swap_or_move([[maybe_unused]] const std::size_t lhs, [[maybe_unused]] const std::size_t rhs) {
+    virtual void swap_or_move([[maybe_unused]] const stl::size_t lhs, [[maybe_unused]] const stl::size_t rhs) {
         ENTT_ASSERT((mode != deletion_policy::swap_only) || ((lhs < head) == (rhs < head)), "Cross swapping is not supported");
     }
 
@@ -361,7 +361,7 @@ public:
     /*! @brief Underlying version type. */
     using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Pointer type to contained entities. */

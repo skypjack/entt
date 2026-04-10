@@ -120,11 +120,11 @@ template<typename Registry>
 class basic_organizer final {
     using callback_type = void(const void *, Registry &);
     using prepare_type = void(Registry &);
-    using dependency_type = std::size_t(const bool, const type_info **, const std::size_t);
+    using dependency_type = stl::size_t(const bool, const type_info **, const stl::size_t);
 
     struct vertex_data final {
-        std::size_t ro_count{};
-        std::size_t rw_count{};
+        stl::size_t ro_count{};
+        stl::size_t rw_count{};
         const char *name{};
         const void *payload{};
         callback_type *callback{};
@@ -152,7 +152,7 @@ class basic_organizer final {
     }
 
     template<typename... Type>
-    [[nodiscard]] static std::size_t fill_dependencies(type_list<Type...>, [[maybe_unused]] const type_info **buffer, [[maybe_unused]] const std::size_t count) {
+    [[nodiscard]] static stl::size_t fill_dependencies(type_list<Type...>, [[maybe_unused]] const type_info **buffer, [[maybe_unused]] const stl::size_t count) {
         if constexpr(sizeof...(Type) == 0u) {
             return {};
         } else {
@@ -160,7 +160,7 @@ class basic_organizer final {
             const type_info *info[]{&type_id<Type>()...};
             const auto length = count < sizeof...(Type) ? count : sizeof...(Type);
 
-            for(std::size_t pos{}; pos < length; ++pos) {
+            for(stl::size_t pos{}; pos < length; ++pos) {
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 buffer[pos] = info[pos];
             }
@@ -170,7 +170,7 @@ class basic_organizer final {
     }
 
     template<typename... RO, typename... RW>
-    void track_dependencies(std::size_t index, const bool sync_point, type_list<RO...>, type_list<RW...>) {
+    void track_dependencies(stl::size_t index, const bool sync_point, type_list<RO...>, type_list<RW...>) {
         builder.bind(static_cast<id_type>(index));
         builder.set(type_hash<Registry>::value(), sync_point || (sizeof...(RO) + sizeof...(RW) == 0u));
         (builder.ro(type_hash<RO>::value()), ...);
@@ -183,7 +183,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = registry_type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Raw task function type. */
     using function_type = callback_type;
 
@@ -195,7 +195,7 @@ public:
          * @param from List of in-edges of the vertex.
          * @param to List of out-edges of the vertex.
          */
-        vertex(vertex_data data, stl::vector<std::size_t> from, stl::vector<std::size_t> to)
+        vertex(vertex_data data, stl::vector<stl::size_t> from, stl::vector<stl::size_t> to)
             : node{stl::move(data)},
               in{stl::move(from)},
               out{stl::move(to)} {}
@@ -207,7 +207,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        [[nodiscard]] size_type ro_dependency(const type_info **buffer, const std::size_t length) const noexcept {
+        [[nodiscard]] size_type ro_dependency(const type_info **buffer, const stl::size_t length) const noexcept {
             return node.dependency(false, buffer, length);
         }
 
@@ -218,7 +218,7 @@ public:
          * @param length The length of the user-supplied buffer.
          * @return The number of type info objects written to the buffer.
          */
-        [[nodiscard]] size_type rw_dependency(const type_info **buffer, const std::size_t length) const noexcept {
+        [[nodiscard]] size_type rw_dependency(const type_info **buffer, const stl::size_t length) const noexcept {
             return node.dependency(true, buffer, length);
         }
 
@@ -282,7 +282,7 @@ public:
          * @brief Returns the list of in-edges of a vertex.
          * @return The list of in-edges of a vertex.
          */
-        [[nodiscard]] const stl::vector<std::size_t> &in_edges() const noexcept {
+        [[nodiscard]] const stl::vector<stl::size_t> &in_edges() const noexcept {
             return in;
         }
 
@@ -290,7 +290,7 @@ public:
          * @brief Returns the list of out-edges of a vertex.
          * @return The list of out-edges of a vertex.
          */
-        [[nodiscard]] const stl::vector<std::size_t> &out_edges() const noexcept {
+        [[nodiscard]] const stl::vector<stl::size_t> &out_edges() const noexcept {
             return out;
         }
 
@@ -305,8 +305,8 @@ public:
 
     private:
         vertex_data node;
-        stl::vector<std::size_t> in;
-        stl::vector<std::size_t> out;
+        stl::vector<stl::size_t> in;
+        stl::vector<stl::size_t> out;
     };
 
     /**
@@ -329,7 +329,7 @@ public:
             name,
             nullptr,
             callback,
-            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const stl::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
@@ -361,7 +361,7 @@ public:
             name,
             &value_or_instance,
             callback,
-            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const stl::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
             &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
 
@@ -388,7 +388,7 @@ public:
             name,
             payload,
             func,
-            +[](const bool rw, const type_info **buffer, const std::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
+            +[](const bool rw, const type_info **buffer, const stl::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             nullptr,
             &type_id<void>()};
 
@@ -404,8 +404,8 @@ public:
         adjacency_list.reserve(vertices.size());
 
         for(auto adjacency_matrix = builder.graph(); auto curr: adjacency_matrix.vertices()) {
-            stl::vector<std::size_t> in{};
-            stl::vector<std::size_t> out{};
+            stl::vector<stl::size_t> in{};
+            stl::vector<stl::size_t> out{};
 
             for(auto &&edge: adjacency_matrix.in_edges(curr)) {
                 in.push_back(edge.first);

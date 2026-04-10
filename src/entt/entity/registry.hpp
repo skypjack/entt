@@ -270,7 +270,7 @@ public:
     /*! @brief Underlying version type. */
     using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Context type. */

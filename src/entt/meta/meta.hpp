@@ -50,7 +50,7 @@ class meta_sequence_container {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
@@ -111,7 +111,7 @@ class meta_associative_container {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 

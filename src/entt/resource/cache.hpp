@@ -136,7 +136,7 @@ public:
     /*! @brief Resource type. */
     using value_type = Type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Loader type. */
     using loader_type = Loader;
     /*! @brief Input iterator type. */

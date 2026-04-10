@@ -62,7 +62,7 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Sink type. */
     using sink_type = sink<sigh<Ret(Args...), Allocator>>;
 

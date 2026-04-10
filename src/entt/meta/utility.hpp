@@ -204,7 +204,7 @@ template<typename Policy, typename Candidate, typename... Args>
     }
 }
 
-template<typename Type, typename Policy, typename Candidate, std::size_t... Index>
+template<typename Type, typename Policy, typename Candidate, stl::size_t... Index>
 [[nodiscard]] meta_any meta_invoke(meta_any &instance, Candidate &&candidate, [[maybe_unused]] meta_any *const args, std::index_sequence<Index...>) {
     using descriptor = meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>;
 
@@ -227,7 +227,7 @@ template<typename Type, typename Policy, typename Candidate, std::size_t... Inde
     return meta_any{meta_ctx_arg, instance.context()};
 }
 
-template<typename Type, typename... Args, std::size_t... Index>
+template<typename Type, typename... Args, stl::size_t... Index>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args, std::index_sequence<Index...>) {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
     if(((args + Index)->allow_cast<Args>() && ...)) {
@@ -249,7 +249,7 @@ template<typename Type, typename... Args, std::size_t... Index>
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] meta_type meta_arg(const meta_ctx &ctx, const std::size_t index) noexcept {
+[[nodiscard]] meta_type meta_arg(const meta_ctx &ctx, const stl::size_t index) noexcept {
     const auto &context = internal::meta_context::from(ctx);
     return {ctx, internal::meta_arg_node(context, Type{}, index)};
 }
@@ -261,7 +261,7 @@ template<typename Type>
  * @return The meta type of the i-th element of the list of arguments.
  */
 template<typename Type>
-[[nodiscard]] meta_type meta_arg(const std::size_t index) noexcept {
+[[nodiscard]] meta_type meta_arg(const stl::size_t index) noexcept {
     return meta_arg<Type>(locator<meta_ctx>::value_or(), index);
 }
 

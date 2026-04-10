@@ -25,7 +25,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr std::size_t dense_set_placeholder_position = (std::numeric_limits<std::size_t>::max)();
+static constexpr stl::size_t dense_set_placeholder_position = (std::numeric_limits<stl::size_t>::max)();
 
 template<typename It>
 class dense_set_iterator final {
@@ -135,7 +135,7 @@ public:
 
     constexpr dense_set_local_iterator() noexcept = default;
 
-    constexpr dense_set_local_iterator(It iter, const std::size_t pos) noexcept
+    constexpr dense_set_local_iterator(It iter, const stl::size_t pos) noexcept
         : it{iter},
           offset{pos} {}
 
@@ -167,13 +167,13 @@ public:
         return offset == other.offset;
     }
 
-    [[nodiscard]] constexpr std::size_t index() const noexcept {
+    [[nodiscard]] constexpr stl::size_t index() const noexcept {
         return offset;
     }
 
 private:
     It it{};
-    std::size_t offset{dense_set_placeholder_position};
+    stl::size_t offset{dense_set_placeholder_position};
 };
 
 } // namespace internal
@@ -194,20 +194,20 @@ private:
 template<typename Type, typename Hash, typename KeyEqual, typename Allocator>
 class dense_set {
     static constexpr float default_threshold = 0.875f;
-    static constexpr std::size_t minimum_capacity = 8u;
-    static constexpr std::size_t placeholder_position = internal::dense_set_placeholder_position;
+    static constexpr stl::size_t minimum_capacity = 8u;
+    static constexpr stl::size_t placeholder_position = internal::dense_set_placeholder_position;
 
-    using node_type = stl::pair<std::size_t, Type>;
+    using node_type = stl::pair<stl::size_t, Type>;
     using alloc_traits = std::allocator_traits<Allocator>;
     static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using sparse_container_type = stl::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using sparse_container_type = stl::vector<stl::size_t, typename alloc_traits::template rebind_alloc<stl::size_t>>;
     using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
-    [[nodiscard]] std::size_t value_to_bucket(const auto &value) const noexcept {
+    [[nodiscard]] stl::size_t value_to_bucket(const auto &value) const noexcept {
         return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
-    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) {
+    [[nodiscard]] auto constrained_find(const auto &value, const stl::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return begin() + static_cast<iterator::difference_type>(offset);
@@ -217,7 +217,7 @@ class dense_set {
         return end();
     }
 
-    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) const {
+    [[nodiscard]] auto constrained_find(const auto &value, const stl::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return cbegin() + static_cast<const_iterator::difference_type>(offset);
@@ -242,7 +242,7 @@ class dense_set {
         return stl::make_pair(--end(), true);
     }
 
-    void move_and_pop(const std::size_t pos) {
+    void move_and_pop(const stl::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             size_type *curr = &sparse.first()[value_to_bucket(packed.first().back().second)];
             packed.first()[pos] = stl::move(packed.first().back());
@@ -267,7 +267,7 @@ public:
     /*! @brief Value type of the container. */
     using value_type = Type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Type of function to use to hash the elements. */

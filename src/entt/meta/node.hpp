@@ -78,7 +78,7 @@ struct meta_conv_node {
 };
 
 struct meta_ctor_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     size_type arity{0u};
@@ -87,7 +87,7 @@ struct meta_ctor_node {
 };
 
 struct meta_data_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     const char *name{};
@@ -101,7 +101,7 @@ struct meta_data_node {
 };
 
 struct meta_func_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     const char *name{};
@@ -115,7 +115,7 @@ struct meta_func_node {
 };
 
 struct meta_template_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     size_type arity{0u};
     const meta_type_node &(*resolve)(const meta_context &) noexcept {};
@@ -131,7 +131,7 @@ struct meta_type_descriptor {
 };
 
 struct meta_type_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     const type_info *info{};
     id_type id{};
@@ -188,7 +188,7 @@ template<cvref_unqualified Type>
 const meta_type_node &resolve(const meta_context &) noexcept;
 
 template<typename... Args>
-[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const std::size_t index) noexcept {
+[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const stl::size_t index) noexcept {
     using resolve_type = const meta_type_node &(*)(const meta_context &) noexcept;
     constexpr stl::array<resolve_type, sizeof...(Args)> list{&resolve<stl::remove_cvref_t<Args>>...};
     ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
@@ -263,7 +263,7 @@ auto setup_node_for() noexcept {
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const meta_context &area, const std::size_t index) noexcept -> decltype(auto) { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const meta_context &area, const stl::size_t index) noexcept -> decltype(auto) { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
     }
 
     return node;

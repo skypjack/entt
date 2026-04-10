@@ -85,18 +85,18 @@ private:
 };
 
 struct group_descriptor {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     virtual ~group_descriptor() = default;
     [[nodiscard]] virtual bool owned(const id_type) const noexcept {
         return false;
     }
 };
 
-template<typename Type, std::size_t Owned, std::size_t Get, std::size_t Exclude>
+template<typename Type, stl::size_t Owned, stl::size_t Get, stl::size_t Exclude>
 class group_handler final: public group_descriptor {
     using entity_type = Type::entity_type;
 
-    void swap_elements(const std::size_t pos, const entity_type entt) {
+    void swap_elements(const stl::size_t pos, const entity_type entt) {
         for(size_type next{}; next < Owned; ++next) {
             pools[next]->swap_elements((*pools[next])[pos], entt);
         }
@@ -156,7 +156,7 @@ public:
         return len;
     }
 
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
         if constexpr(Index < (Owned + Get)) {
             return pools[Index];
@@ -168,10 +168,10 @@ public:
 private:
     stl::array<common_type *, (Owned + Get)> pools;
     stl::array<common_type *, Exclude> filter;
-    std::size_t len{};
+    stl::size_t len{};
 };
 
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, stl::size_t Get, stl::size_t Exclude>
 class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
     using entity_type = Type::entity_type;
 
@@ -222,7 +222,7 @@ public:
         return elem;
     }
 
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
         if constexpr(Index < Get) {
             return pools[Index];
@@ -277,9 +277,9 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] auto pools_for(std::index_sequence<Index...>) const noexcept {
         using return_type = stl::tuple<Get *...>;
         return descriptor ? return_type{static_cast<Get *>(descriptor->template storage<Index>())...} : return_type{};
@@ -289,7 +289,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */
@@ -345,7 +345,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
         return *this ? static_cast<type *>(descriptor->template storage<Index>()) : nullptr;
@@ -498,7 +498,7 @@ public:
      * @param entt A valid identifier.
      * @return The elements assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         const auto cpools = pools_for(std::index_sequence_for<Get...>{});
 
@@ -613,7 +613,7 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<std::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
+    template<stl::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
@@ -691,9 +691,9 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t... Index, std::size_t... Other>
+    template<stl::size_t... Index, stl::size_t... Other>
     [[nodiscard]] auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
         using return_type = stl::tuple<Owned *..., Get *...>;
         return descriptor ? return_type{static_cast<Owned *>(descriptor->template storage<Index>())..., static_cast<Get *>(descriptor->template storage<sizeof...(Owned) + Other>())...} : return_type{};
@@ -703,7 +703,7 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
     /*! @brief Common type among all storage types. */
@@ -759,7 +759,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Owned..., Get..., Exclude...>>;
         return *this ? static_cast<type *>(descriptor->template storage<Index>()) : nullptr;
@@ -897,7 +897,7 @@ public:
      * @param entt A valid identifier.
      * @return The elements assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
 
@@ -1013,7 +1013,7 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<std::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
+    template<stl::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
         const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
 

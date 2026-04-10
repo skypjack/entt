@@ -24,14 +24,14 @@ requires Type::in_place_delete
 struct in_place_delete<Type>: stl::true_type {};
 
 template<typename Type>
-struct page_size: std::integral_constant<std::size_t, !stl::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
+struct page_size: std::integral_constant<stl::size_t, !stl::is_empty_v<ENTT_ETO_TYPE(Type)> * ENTT_PACKED_PAGE> {};
 
 template<>
-struct page_size<void>: std::integral_constant<std::size_t, 0u> {};
+struct page_size<void>: std::integral_constant<stl::size_t, 0u> {};
 
 template<typename Type>
-requires stl::is_convertible_v<decltype(Type::page_size), std::size_t>
-struct page_size<Type>: std::integral_constant<std::size_t, Type::page_size> {};
+requires stl::is_convertible_v<decltype(Type::page_size), stl::size_t>
+struct page_size<Type>: std::integral_constant<stl::size_t, Type::page_size> {};
 
 } // namespace internal
 /*! @endcond */
@@ -51,7 +51,7 @@ struct component_traits {
     /*! @brief Pointer stability, default is `false`. */
     static constexpr bool in_place_delete = internal::in_place_delete<Type>::value;
     /*! @brief Page size, default is `ENTT_PACKED_PAGE` for non-empty types. */
-    static constexpr std::size_t page_size = internal::page_size<Type>::value;
+    static constexpr stl::size_t page_size = internal::page_size<Type>::value;
 };
 
 } // namespace entt
