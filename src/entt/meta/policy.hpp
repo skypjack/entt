@@ -33,7 +33,7 @@ struct as_void_t final: private internal::meta_policy {
 struct as_ref_t final: private internal::meta_policy {
     /*! @cond ENTT_INTERNAL */
     template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>;
+    static constexpr bool value = stl::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>;
     /*! @endcond */
 };
 
@@ -41,7 +41,7 @@ struct as_ref_t final: private internal::meta_policy {
 struct as_cref_t final: private internal::meta_policy {
     /*! @cond ENTT_INTERNAL */
     template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type>;
+    static constexpr bool value = stl::is_reference_v<Type>;
     /*! @endcond */
 };
 

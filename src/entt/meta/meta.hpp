@@ -494,7 +494,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(!std::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>) {
+        if constexpr(!stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>) {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
@@ -530,7 +530,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        if constexpr(std::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>) {
+        if constexpr(stl::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>) {
             return allow_cast<const stl::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
         } else {
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {

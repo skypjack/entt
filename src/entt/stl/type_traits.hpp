@@ -41,6 +41,7 @@ using std::is_nothrow_destructible_v;
 using std::is_nothrow_invocable_v;
 using std::is_nothrow_move_constructible_v;
 using std::is_pointer_v;
+using std::is_reference_v;
 using std::is_same_v;
 using std::is_trivially_destructible_v;
 using std::is_void_v;
