@@ -761,7 +761,7 @@ template<typename Type>
         return false;
     } else if constexpr(is_complete_v<stl::tuple_size<stl::remove_const_t<Type>>>) {
         if constexpr(has_tuple_size_value<Type>::value) {
-            return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<stl::tuple_size<Type>::value>{});
+            return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(stl::make_index_sequence<stl::tuple_size<Type>::value>{});
         } else {
             return maybe_equality_comparable<Type>(0);
         }

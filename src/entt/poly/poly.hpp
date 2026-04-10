@@ -115,7 +115,7 @@ public:
      */
     template<cvref_unqualified Type>
     [[nodiscard]] static type instance() noexcept {
-        static const vtable_type vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
+        static const vtable_type vtable = fill_vtable<Type>(stl::make_index_sequence<Concept::template impl<Type>::size>{});
 
         if constexpr(is_mono) {
             return std::get<0>(vtable);
