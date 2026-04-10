@@ -387,7 +387,7 @@ template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
  */
 template<typename Type, typename... Args>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args) {
-    return internal::meta_construct<Type, Args...>(ctx, args, std::index_sequence_for<Args...>{});
+    return internal::meta_construct<Type, Args...>(ctx, args, stl::index_sequence_for<Args...>{});
 }
 
 /**

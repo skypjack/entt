@@ -14,6 +14,7 @@ using std::in_place;
 using std::in_place_t;
 using std::in_place_type;
 using std::in_place_type_t;
+using std::index_sequence_for;
 using std::make_pair;
 using std::move;
 using std::pair;

@@ -142,8 +142,8 @@ public:
      */
     template<typename... Args, typename... Other>
     constexpr compressed_pair(stl::piecewise_construct_t, stl::tuple<Args...> args, stl::tuple<Other...> other) noexcept(stl::is_nothrow_constructible_v<first_base, Args...> && stl::is_nothrow_constructible_v<second_base, Other...>)
-        : first_base{stl::move(args), std::index_sequence_for<Args...>{}},
-          second_base{stl::move(other), std::index_sequence_for<Other...>{}} {}
+        : first_base{stl::move(args), stl::index_sequence_for<Args...>{}},
+          second_base{stl::move(other), stl::index_sequence_for<Other...>{}} {}
 
     /*! @brief Default destructor. */
     ~compressed_pair() = default;

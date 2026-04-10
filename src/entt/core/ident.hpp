@@ -27,7 +27,7 @@ public:
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename Curr>
     requires (stl::is_same_v<stl::remove_cvref_t<Curr>, Type> || ...)
-    static constexpr value_type value = get<stl::remove_cvref_t<Curr>>(std::index_sequence_for<Type...>{});
+    static constexpr value_type value = get<stl::remove_cvref_t<Curr>>(stl::index_sequence_for<Type...>{});
 };
 
 } // namespace entt

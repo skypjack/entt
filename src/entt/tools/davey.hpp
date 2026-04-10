@@ -268,7 +268,7 @@ void davey(const basic_storage<Type, Entity, Allocator> &storage) {
  */
 template<typename... Get, typename... Exclude>
 void davey(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
-    internal::present_view(ctx, view, std::index_sequence_for<Get...>{});
+    internal::present_view(ctx, view, stl::index_sequence_for<Get...>{});
 }
 
 /**

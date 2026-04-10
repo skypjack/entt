@@ -156,7 +156,7 @@ struct extended_view_iterator final {
     [[nodiscard]] reference operator*() const noexcept {
         return [this]<auto... Index>(std::index_sequence<Index...>) {
             return stl::tuple_cat(stl::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
-        }(std::index_sequence_for<Get...>{});
+        }(stl::index_sequence_for<Get...>{});
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
@@ -595,7 +595,7 @@ public:
         if constexpr(sizeof...(Index) == 0) {
             return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
                 return stl::tuple_cat(this->storage<Idx>()->get_as_tuple(entt)...);
-            }(std::index_sequence_for<Get...>{});
+            }(stl::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
             return (storage<Index>()->get(entt), ...);
         } else {
@@ -624,7 +624,7 @@ public:
             if(const auto *view = base_type::handle(); view != nullptr) {
                 ((view == base_type::pool_at(Index) ? each<Index>(stl::move(func), seq) : void()), ...);
             }
-        }(std::index_sequence_for<Get...>{});
+        }(stl::index_sequence_for<Get...>{});
     }
 
     /**
@@ -661,7 +661,7 @@ public:
     template<std::derived_from<common_type>... OGet, std::derived_from<common_type>... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack<basic_view<get_t<Get..., OGet...>, exclude_t<Exclude..., OExclude...>>>(
-            *this, other, std::index_sequence_for<Get...>{}, std::index_sequence_for<Exclude...>{}, std::index_sequence_for<OGet...>{}, std::index_sequence_for<OExclude...>{});
+            *this, other, stl::index_sequence_for<Get...>{}, stl::index_sequence_for<Exclude...>{}, stl::index_sequence_for<OGet...>{}, stl::index_sequence_for<OExclude...>{});
     }
 };
 
@@ -1117,7 +1117,7 @@ public:
     template<std::derived_from<common_type>... OGet, std::derived_from<common_type>... OExclude>
     [[nodiscard]] auto operator|(const basic_view<get_t<OGet...>, exclude_t<OExclude...>> &other) const noexcept {
         return internal::view_pack<basic_view<get_t<Get, OGet...>, exclude_t<OExclude...>>>(
-            *this, other, std::index_sequence_for<Get>{}, std::index_sequence_for<>{}, std::index_sequence_for<OGet...>{}, std::index_sequence_for<OExclude...>{});
+            *this, other, stl::index_sequence_for<Get>{}, stl::index_sequence_for<>{}, stl::index_sequence_for<OGet...>{}, stl::index_sequence_for<OExclude...>{});
     }
 };
 

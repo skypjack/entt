@@ -36,7 +36,7 @@ using function_pointer_t = decltype(function_pointer(stl::declval<Type>()...));
 
 template<typename... Class, typename Ret, typename... Args>
 [[nodiscard]] ENTT_CONSTEVAL auto index_sequence_for(Ret (*)(Args...)) {
-    return std::index_sequence_for<Class..., Args...>{};
+    return stl::index_sequence_for<Class..., Args...>{};
 }
 
 } // namespace internal

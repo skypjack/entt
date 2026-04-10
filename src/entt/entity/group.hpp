@@ -500,7 +500,7 @@ public:
      */
     template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             return stl::apply([entt](auto *...curr) { return stl::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
@@ -558,7 +558,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -620,7 +620,7 @@ public:
                 static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
                 descriptor->handle().sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
             } else {
-                auto comp = [&compare, cpools = pools_for(std::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
+                auto comp = [&compare, cpools = pools_for(stl::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
                         return compare((std::get<Index>(cpools)->get(lhs), ...), (std::get<Index>(cpools)->get(rhs), ...));
                     } else {
@@ -899,7 +899,7 @@ public:
      */
     template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             return stl::apply([entt](auto *...curr) { return stl::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
@@ -957,7 +957,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -1015,7 +1015,7 @@ public:
      */
     template<stl::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
             static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
