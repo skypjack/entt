@@ -740,7 +740,7 @@ template<typename>
 [[nodiscard]] ENTT_CONSTEVAL bool dispatch_is_equality_comparable();
 
 template<typename Type, stl::size_t... Index>
-[[nodiscard]] ENTT_CONSTEVAL bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
+[[nodiscard]] ENTT_CONSTEVAL bool unpack_maybe_equality_comparable(stl::index_sequence<Index...>) {
     return (dispatch_is_equality_comparable<stl::tuple_element_t<Index, Type>>() && ...);
 }
 

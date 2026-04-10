@@ -95,7 +95,7 @@ class poly_vtable {
     }
 
     template<typename Type, auto... Index>
-    [[nodiscard]] static auto fill_vtable(std::index_sequence<Index...>) noexcept {
+    [[nodiscard]] static auto fill_vtable(stl::index_sequence<Index...>) noexcept {
         vtable_type impl{};
         (fill_vtable_entry<Type, value_list_element_v<Index, typename Concept::template impl<Type>>>(std::get<Index>(impl)), ...);
         return impl;

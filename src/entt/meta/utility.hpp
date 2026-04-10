@@ -205,7 +205,7 @@ template<typename Policy, typename Candidate, typename... Args>
 }
 
 template<typename Type, typename Policy, typename Candidate, stl::size_t... Index>
-[[nodiscard]] meta_any meta_invoke(meta_any &instance, Candidate &&candidate, [[maybe_unused]] meta_any *const args, std::index_sequence<Index...>) {
+[[nodiscard]] meta_any meta_invoke(meta_any &instance, Candidate &&candidate, [[maybe_unused]] meta_any *const args, stl::index_sequence<Index...>) {
     using descriptor = meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>;
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
@@ -228,7 +228,7 @@ template<typename Type, typename Policy, typename Candidate, stl::size_t... Inde
 }
 
 template<typename Type, typename... Args, stl::size_t... Index>
-[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args, std::index_sequence<Index...>) {
+[[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, meta_any *const args, stl::index_sequence<Index...>) {
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and std::span)
     if(((args + Index)->allow_cast<Args>() && ...)) {
         return meta_any{ctx, stl::in_place_type<Type>, (args + Index)->cast<Args>()...};

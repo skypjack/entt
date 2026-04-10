@@ -47,7 +47,7 @@ template<typename It>
 }
 
 template<typename Result, typename View, typename Other, stl::size_t... GLhs, stl::size_t... ELhs, stl::size_t... GRhs, stl::size_t... ERhs>
-[[nodiscard]] Result view_pack(const View &view, const Other &other, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>) {
+[[nodiscard]] Result view_pack(const View &view, const Other &other, stl::index_sequence<GLhs...>, stl::index_sequence<ELhs...>, stl::index_sequence<GRhs...>, stl::index_sequence<ERhs...>) {
     Result elem{};
     // friend-initialization, avoid multiple calls to refresh
     elem.pools = {view.template storage<GLhs>()..., other.template storage<GRhs>()...};
@@ -154,7 +154,7 @@ struct extended_view_iterator final {
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return [this]<auto... Index>(std::index_sequence<Index...>) {
+        return [this]<auto... Index>(stl::index_sequence<Index...>) {
             return stl::tuple_cat(stl::make_tuple(*it), static_cast<Get *>(const_cast<constness_as_t<typename Get::base_type, Get> *>(std::get<Index>(it.pools)))->get_as_tuple(*it)...);
         }(stl::index_sequence_for<Get...>{});
     }
@@ -211,7 +211,7 @@ class basic_view;
 template<cvref_unqualified Type, bool Checked, stl::size_t Get, stl::size_t Exclude>
 class basic_common_view {
     template<typename Return, typename View, typename Other, stl::size_t... GLhs, stl::size_t... ELhs, stl::size_t... GRhs, stl::size_t... ERhs>
-    friend Return internal::view_pack(const View &, const Other &, std::index_sequence<GLhs...>, std::index_sequence<ELhs...>, std::index_sequence<GRhs...>, std::index_sequence<ERhs...>);
+    friend Return internal::view_pack(const View &, const Other &, stl::index_sequence<GLhs...>, stl::index_sequence<ELhs...>, stl::index_sequence<GRhs...>, stl::index_sequence<ERhs...>);
 
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(index != Get, "Invalid view");
@@ -427,7 +427,7 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
     }
 
     template<stl::size_t Curr, typename Func, stl::size_t... Index>
-    void each(Func func, std::index_sequence<Index...>) const {
+    void each(Func func, stl::index_sequence<Index...>) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = std::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_view>().get({})))>) {
@@ -593,7 +593,7 @@ public:
     template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Index) == 0) {
-            return [this, entt]<auto... Idx>(std::index_sequence<Idx...>) {
+            return [this, entt]<auto... Idx>(stl::index_sequence<Idx...>) {
                 return stl::tuple_cat(this->storage<Idx>()->get_as_tuple(entt)...);
             }(stl::index_sequence_for<Get...>{});
         } else if constexpr(sizeof...(Index) == 1) {
@@ -620,7 +620,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        [this, &func]<auto... Index>(std::index_sequence<Index...> seq) {
+        [this, &func]<auto... Index>(stl::index_sequence<Index...> seq) {
             if(const auto *view = base_type::handle(); view != nullptr) {
                 ((view == base_type::pool_at(Index) ? each<Index>(stl::move(func), seq) : void()), ...);
             }

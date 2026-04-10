@@ -29,7 +29,7 @@ struct compressed_pair_element {
         : value{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, stl::size_t... Index>
-    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<Type, Args...>)
+    constexpr compressed_pair_element(stl::tuple<Args...> args, stl::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<Type, Args...>)
         : value{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {
@@ -61,7 +61,7 @@ struct compressed_pair_element<Type, Tag>: Type {
         : base_type{stl::forward<Arg>(arg)} {}
 
     template<typename... Args, stl::size_t... Index>
-    constexpr compressed_pair_element(stl::tuple<Args...> args, std::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<base_type, Args...>)
+    constexpr compressed_pair_element(stl::tuple<Args...> args, stl::index_sequence<Index...>) noexcept(stl::is_nothrow_constructible_v<base_type, Args...>)
         : base_type{stl::forward<Args>(std::get<Index>(args))...} {}
 
     [[nodiscard]] constexpr reference get() noexcept {

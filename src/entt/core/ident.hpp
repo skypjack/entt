@@ -16,7 +16,7 @@ namespace entt {
 template<typename... Type>
 class ident {
     template<typename Curr, stl::size_t... Index>
-    [[nodiscard]] static ENTT_CONSTEVAL id_type get(std::index_sequence<Index...>) noexcept {
+    [[nodiscard]] static ENTT_CONSTEVAL id_type get(stl::index_sequence<Index...>) noexcept {
         return (0 + ... + (stl::is_same_v<Curr, type_list_element_t<Index, type_list<stl::decay_t<Type>...>>> ? id_type{Index} : id_type{}));
     }
 

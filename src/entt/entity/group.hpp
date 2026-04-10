@@ -280,7 +280,7 @@ class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<stl::size_t... Index>
-    [[nodiscard]] auto pools_for(std::index_sequence<Index...>) const noexcept {
+    [[nodiscard]] auto pools_for(stl::index_sequence<Index...>) const noexcept {
         using return_type = stl::tuple<Get *...>;
         return descriptor ? return_type{static_cast<Get *>(descriptor->template storage<Index>())...} : return_type{};
     }
@@ -694,7 +694,7 @@ class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
     template<stl::size_t... Index, stl::size_t... Other>
-    [[nodiscard]] auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
+    [[nodiscard]] auto pools_for(stl::index_sequence<Index...>, stl::index_sequence<Other...>) const noexcept {
         using return_type = stl::tuple<Owned *..., Get *...>;
         return descriptor ? return_type{static_cast<Owned *>(descriptor->template storage<Index>())..., static_cast<Get *>(descriptor->template storage<sizeof...(Owned) + Other>())...} : return_type{};
     }
