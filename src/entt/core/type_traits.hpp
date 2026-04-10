@@ -38,14 +38,14 @@ inline constexpr choice_t<N> choice{};
  * @tparam Type The type of which to return the size.
  */
 template<typename Type>
-struct size_of: std::integral_constant<stl::size_t, 0u> {};
+struct size_of: stl::integral_constant<stl::size_t, 0u> {};
 
 /*! @copydoc size_of */
 template<typename Type>
 requires requires { sizeof(Type); }
 struct size_of<Type>
     // NOLINTNEXTLINE(bugprone-sizeof-expression)
-    : std::integral_constant<stl::size_t, sizeof(Type)> {};
+    : stl::integral_constant<stl::size_t, sizeof(Type)> {};
 
 /**
  * @brief Helper variable template.
@@ -75,7 +75,7 @@ inline constexpr auto unpack_as_value = Value;
  * @tparam Value A static constant.
  */
 template<auto Value>
-using integral_constant = std::integral_constant<decltype(Value), Value>;
+using integral_constant = stl::integral_constant<decltype(Value), Value>;
 
 /**
  * @brief Alias template to facilitate the creation of named values.
@@ -892,13 +892,13 @@ using nth_argument_t = nth_argument<Index, Candidate>::type;
 } // namespace entt
 
 template<typename... Type>
-struct entt::stl::tuple_size<entt::type_list<Type...>>: std::integral_constant<entt::stl::size_t, entt::type_list<Type...>::size> {};
+struct entt::stl::tuple_size<entt::type_list<Type...>>: entt::stl::integral_constant<entt::stl::size_t, entt::type_list<Type...>::size> {};
 
 template<entt::stl::size_t Index, typename... Type>
 struct entt::stl::tuple_element<Index, entt::type_list<Type...>>: entt::type_list_element<Index, entt::type_list<Type...>> {};
 
 template<auto... Value>
-struct entt::stl::tuple_size<entt::value_list<Value...>>: std::integral_constant<entt::stl::size_t, entt::value_list<Value...>::size> {};
+struct entt::stl::tuple_size<entt::value_list<Value...>>: entt::stl::integral_constant<entt::stl::size_t, entt::value_list<Value...>::size> {};
 
 template<entt::stl::size_t Index, auto... Value>
 struct entt::stl::tuple_element<Index, entt::value_list<Value...>>: entt::value_list_element<Index, entt::value_list<Value...>> {};

@@ -12,6 +12,7 @@ using std::conditional_t;
 using std::decay_t;
 using std::extent_v;
 using std::false_type;
+using std::integral_constant;
 using std::invoke_result_t;
 using std::is_aggregate_v;
 using std::is_array_v;

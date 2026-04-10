@@ -331,7 +331,7 @@ public:
             callback,
             +[](const bool rw, const type_info **buffer, const stl::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
-            &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
+            &type_id<stl::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(stl::move(vdata));
@@ -363,7 +363,7 @@ public:
             callback,
             +[](const bool rw, const type_info **buffer, const stl::size_t length) { return rw ? fill_dependencies(typename resource_type::rw{}, buffer, length) : fill_dependencies(typename resource_type::ro{}, buffer, length); },
             +[](registry_type &reg) { void(to_args(reg, typename resource_type::args{})); },
-            &type_id<std::integral_constant<decltype(Candidate), Candidate>>()};
+            &type_id<stl::integral_constant<decltype(Candidate), Candidate>>()};
 
         track_dependencies(vertices.size(), resource_type::sync_point, typename resource_type::ro{}, typename resource_type::rw{});
         vertices.push_back(stl::move(vdata));
