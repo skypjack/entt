@@ -32,6 +32,7 @@ using std::is_invocable_r_v;
 using std::is_invocable_v;
 using std::is_lvalue_reference_v;
 using std::is_member_object_pointer_v;
+using std::is_member_pointer_v;
 using std::is_move_assignable_v;
 using std::is_nothrow_constructible_v;
 using std::is_nothrow_copy_constructible_v;

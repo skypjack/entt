@@ -831,7 +831,7 @@ using constness_as_t = constness_as<To, From>::type;
  */
 template<typename Member>
 class member_class {
-    static_assert(std::is_member_pointer_v<Member>, "Invalid pointer type to non-static member object or function");
+    static_assert(stl::is_member_pointer_v<Member>, "Invalid pointer type to non-static member object or function");
 
     template<typename Class, typename Ret, typename... Args>
     static Class *clazz(Ret (Class::*)(Args...));

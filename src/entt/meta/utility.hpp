@@ -316,7 +316,7 @@ template<typename Type, auto Data>
  */
 template<typename Type, auto Data, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
-    if constexpr(std::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
+    if constexpr(stl::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
         if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
             if constexpr(stl::is_invocable_v<decltype(Data), Type &>) {
                 if(auto *clazz = instance->try_cast<Type>(); clazz) {

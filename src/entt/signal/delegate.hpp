@@ -141,7 +141,7 @@ public:
             fn = [](const void *, Args... args) -> return_type {
                 return Ret(std::invoke(Candidate, stl::forward<Args>(args)...));
             };
-        } else if constexpr(std::is_member_pointer_v<decltype(Candidate)>) {
+        } else if constexpr(stl::is_member_pointer_v<decltype(Candidate)>) {
             fn = wrap<Candidate>(internal::index_sequence_for<type_list_element_t<0, type_list<Args...>>>(internal::function_pointer_t<decltype(Candidate)>{}));
         } else {
             fn = wrap<Candidate>(internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate)>{}));
