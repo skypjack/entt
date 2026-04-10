@@ -1,4 +1,8 @@
+#include <component/collectible_component.h>
+#include <component/color_component.h>
+#include <component/game_state_component.h>
 #include <component/input_listener_component.h>
+#include <component/player_component.h>
 #include <component/rect_component.h>
 #include <component/renderable_component.h>
 #include <entt/entity/registry.hpp>
@@ -14,11 +18,23 @@ void imgui_system(const entt::registry &registry) {
     ImGui::End();
 
     ImGui::Begin("Davey - view");
-    entt::davey(registry.view<renderable_component, rect_component>());
+    entt::davey(registry.view<renderable_component, rect_component, color_component>());
     ImGui::End();
 
     ImGui::Begin("Davey - storage");
-    entt::davey(*registry.storage<input_listener_component>());
+    entt::davey(*registry.storage<player_component>());
+    ImGui::End();
+
+    ImGui::Begin("Game State");
+    const auto &state = registry.ctx().get<game_state_component>();
+    ImGui::Text("Score: %d", state.score);
+    ImGui::Text("Best score: %d", state.best_score);
+    ImGui::Text("Time left: %.1f", state.remaining_time);
+    ImGui::Text("Running: %s", state.running ? "true" : "false");
+    ImGui::End();
+
+    ImGui::Begin("Collectible");
+    entt::davey(*registry.storage<collectible_component>());
     ImGui::End();
 }
 
