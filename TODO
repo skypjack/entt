@@ -10,14 +10,12 @@ DOC:
 * bump entities, reserved bits on identifiers
 
 TODO:
-* review all NOLINT
 * bring nested groups back in place (see bd34e7f)
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
 * self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
 * storage entity: fast range-push from above
-* table: pop back to support swap and pop, single column access, empty type optimization
 * suppress -Wself-move on CI with g++13
 * runtime types support for meta for types that aren't backed by C++ types
 * built-in no-pagination storage - no_pagination page size as limits::max
@@ -31,8 +29,9 @@ TODO:
 * finish the imgui viewer/editor!
 * archetype-like a-là EnTT support (see my own notes)
 * organizer: view/storage only based model, no registry
-* introduce a way to inject stl from outside too
 * redesign snapshot as a whole
 * explore "runtime" mode for hashed string where the source is copied internally
 * storage: shrink_to_fit does not work with reentrant destructor?
+* make meta_any buffer size configurable (propagate to any)
 * test trivially_destructible optimization
+* introduce a way to inject stl from outside too
