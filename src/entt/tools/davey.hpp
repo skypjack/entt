@@ -56,7 +56,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             if(as_string) {
                 ImGui::Text("%s: %s", label, as_string);
             } else {
-                ImGui::Text("%s: %zu", label, elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
+                ImGui::Text("%s: %zu", label, elem.template allow_cast<stl::uint64_t>().template cast<stl::uint64_t>());
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == type_id<bool>()) {
@@ -66,7 +66,7 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             } else if(type.info() == type_id<char>()) {
                 ImGui::Text("%s: %c", label, elem.template cast<char>());
             } else if(type.is_integral()) {
-                ImGui::Text("%s: %zu", label, elem.template allow_cast<std::uint64_t>().template cast<std::uint64_t>());
+                ImGui::Text("%s: %zu", label, elem.template allow_cast<stl::uint64_t>().template cast<stl::uint64_t>());
             } else {
                 ImGui::Text("%s: %f", label, elem.template allow_cast<double>().template cast<double>());
             }

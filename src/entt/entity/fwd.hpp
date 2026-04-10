@@ -15,7 +15,7 @@ namespace entt {
 enum class entity : id_type {};
 
 /*! @brief Storage deletion policy. */
-enum class deletion_policy : std::uint8_t {
+enum class deletion_policy : stl::uint8_t {
     /*! @brief Swap-and-pop deletion policy. */
     swap_and_pop = 0u,
     /*! @brief In-place deletion policy. */

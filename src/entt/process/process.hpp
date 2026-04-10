@@ -70,7 +70,7 @@ struct process_adaptor;
  */
 template<typename Delta, typename Allocator>
 class basic_process: public std::enable_shared_from_this<basic_process<Delta, Allocator>> {
-    enum class state : std::uint8_t {
+    enum class state : stl::uint8_t {
         idle = 0,
         running,
         paused,

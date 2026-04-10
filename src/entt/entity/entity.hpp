@@ -35,22 +35,22 @@ struct entt_traits<Type>
 };
 
 template<>
-struct entt_traits<std::uint32_t> {
-    using value_type = std::uint32_t;
+struct entt_traits<stl::uint32_t> {
+    using value_type = stl::uint32_t;
 
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
+    using entity_type = stl::uint32_t;
+    using version_type = stl::uint16_t;
 
     static constexpr entity_type entity_mask = 0xFFFFF;
     static constexpr entity_type version_mask = 0xFFF;
 };
 
 template<>
-struct entt_traits<std::uint64_t> {
-    using value_type = std::uint64_t;
+struct entt_traits<stl::uint64_t> {
+    using value_type = stl::uint64_t;
 
-    using entity_type = std::uint64_t;
-    using version_type = std::uint32_t;
+    using entity_type = stl::uint64_t;
+    using version_type = stl::uint32_t;
 
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
     static constexpr entity_type version_mask = 0xFFFFFFFF;

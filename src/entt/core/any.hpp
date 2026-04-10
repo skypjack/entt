@@ -6,6 +6,7 @@
 #include "../config/config.h"
 #include "../core/concepts.hpp"
 #include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "fwd.hpp"
@@ -18,7 +19,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-enum class any_request : std::uint8_t {
+enum class any_request : stl::uint8_t {
     info,
     transfer,
     assign,

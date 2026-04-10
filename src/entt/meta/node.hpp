@@ -13,6 +13,7 @@
 #include "../core/utility.hpp"
 #include "../stl/array.hpp"
 #include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
@@ -25,7 +26,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-enum class meta_traits : std::uint32_t {
+enum class meta_traits : stl::uint32_t {
     is_none = 0x0000,
     is_const = 0x0001,
     is_static = 0x0002,

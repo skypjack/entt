@@ -8,7 +8,7 @@
 namespace entt {
 
 /*! @brief Possible modes of an any object. */
-enum class any_policy : std::uint8_t {
+enum class any_policy : stl::uint8_t {
     /*! @brief Default mode, no element available. */
     empty,
     /*! @brief Owning mode, dynamically allocated element. */

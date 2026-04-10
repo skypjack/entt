@@ -43,10 +43,10 @@
 #endif
 
 #ifndef ENTT_ID_TYPE
-#    include <cstdint>
-#    define ENTT_ID_TYPE std::uint32_t
+#    include "../stl/cstdint.hpp"
+#    define ENTT_ID_TYPE stl::uint32_t
 #else
-#    include <cstdint> // provides coverage for types in the std namespace
+#    include "../stl/cstdint.hpp" // provides coverage for types in the std namespace
 #endif
 
 #ifndef ENTT_SPARSE_PAGE

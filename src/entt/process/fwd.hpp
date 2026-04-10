@@ -10,13 +10,13 @@ template<typename, typename = std::allocator<void>>
 class basic_process;
 
 /*! @brief Alias declaration for the most common use case. */
-using process = basic_process<std::uint32_t>;
+using process = basic_process<stl::uint32_t>;
 
 template<typename, typename = std::allocator<void>>
 class basic_scheduler;
 
 /*! @brief Alias declaration for the most common use case. */
-using scheduler = basic_scheduler<std::uint32_t>;
+using scheduler = basic_scheduler<stl::uint32_t>;
 
 } // namespace entt
 
