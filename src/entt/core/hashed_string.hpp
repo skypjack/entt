@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string_view>
 #include "fwd.hpp"
 
 namespace entt {
@@ -124,6 +125,14 @@ public:
         }
         // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
+
+    /**
+     * @brief Constructs a hashed string from a string view.
+     * @param sv String view to hash.
+     */
+    template<typename StringView, std::enable_if_t<std::is_convertible_v<StringView, std::basic_string_view<value_type>> && !std::is_pointer_v<std::decay_t<StringView>>, int> = 0>
+    constexpr basic_hashed_string(StringView&& sv) noexcept
+        : basic_hashed_string{static_cast<std::basic_string_view<value_type>>(sv).data(), static_cast<std::basic_string_view<value_type>>(sv).size()} {}
 
     /**
      * @brief Constructs a hashed string from an array of const characters.

@@ -85,6 +85,52 @@ TEST_F(HashedString, Correctness) {
     ASSERT_EQ(entt::hashed_string{"foobar"}.size(), 6u);
 }
 
+TEST_F(HashedString, StringViewConstructor) {
+    // Case 1: Null-terminated string_view (standard case)
+    const std::string_view view{"foobar"};
+    ASSERT_EQ(entt::hashed_string{view}, expected);
+    ASSERT_EQ(entt::hashed_string{view}.size(), 6u);
+
+    // Case 2: Explicit size (prefix of longer string, not null-terminated)
+    const std::string_view view_sized{"foobar__", 6};
+    ASSERT_EQ(entt::hashed_string{view_sized}, expected);
+    ASSERT_EQ(entt::hashed_string{view_sized}.size(), 6u);
+
+    // Case 3: Substring in the middle (not null-terminated)
+    const char* buffer = "XXfoobarYY";
+    const std::string_view mid{buffer + 2, 6};
+    ASSERT_EQ(entt::hashed_string{mid}, expected);
+    ASSERT_EQ(entt::hashed_string{mid}.size(), 6u);
+
+    // Case 4: Prefix of std::string (common use case)
+    const std::string str = "foobarbaz";
+    const std::string_view prefix{str.data(), 6};
+    ASSERT_EQ(entt::hashed_string{prefix}, expected);
+    ASSERT_EQ(entt::hashed_string{prefix}.size(), 6u);
+
+    // Case 5: Empty string_view
+    const std::string_view empty{};
+    ASSERT_EQ(entt::hashed_string{empty}.size(), 0u);
+    ASSERT_EQ(entt::hashed_string{empty}.value(), entt::internal::fnv_1a_params<>::offset);
+
+    // Case 6: Single character
+    const std::string_view single{"X", 1};
+    const auto hs_single = entt::hashed_string{single};
+    ASSERT_EQ(hs_single.size(), 1u);
+    ASSERT_EQ(hs_single, entt::hashed_string{"X"});
+
+    // Case 7: String_view with embedded nulls (tests size() is respected, not strlen)
+    const char* with_nulls = "foo\0bar";
+    const std::string_view with_null{with_nulls, 7};
+    const auto hs_with_null = entt::hashed_string{with_null};
+    ASSERT_EQ(hs_with_null.size(), 7u);
+    // Hash should include the null byte, different from just "foo"
+    ASSERT_NE(hs_with_null, entt::hashed_string{"foo"});
+
+    // Verify data() is consistent across all cases
+    ASSERT_STREQ(entt::hashed_string{view}.data(), "foobar");
+}
+
 TEST_F(HashedString, Order) {
     using namespace entt::literals;
     const entt::hashed_string lhs = "foo"_hs;
