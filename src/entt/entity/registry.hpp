@@ -639,6 +639,23 @@ public:
     }
 
     /**
+     * @brief Assigns identifiers without requiring an empty registry.
+     *
+     * This is intended for systems that restore an entity table around
+     * components whose entity identifiers have already been reconstructed.
+     *
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param destroyed The head of the list of destroyed entities.
+     */
+    template<typename It>
+    void assign_preserving_alive(It first, It last, const entity_type destroyed) {
+        entities.assign(first, last);
+        free_list = destroyed;
+    }
+
+    /**
      * @brief Releases an identifier.
      *
      * The version is updated and the identifier can be recycled at any time.
