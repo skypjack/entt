@@ -1,27 +1,30 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <compare>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/bit.hpp"
-#include "../stl/cmath.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/functional.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/limits.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../core/compressed_pair.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/bit.hpp"
+#    include "../stl/cmath.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/functional.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/limits.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
-
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
@@ -178,6 +181,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Associative container for unique objects of a given type.
@@ -884,6 +889,8 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold{default_threshold};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

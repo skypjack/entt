@@ -1,89 +1,92 @@
 #ifndef ENTT_CORE_TUPLE_HPP
 #define ENTT_CORE_TUPLE_HPP
 
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#endif // ENTT_MODULE
 
-/**
- * @brief Provides the member constant `value` to true if a given type is a
- * tuple, false otherwise.
- * @tparam Type The type to test.
- */
-template<typename Type>
-struct is_tuple: stl::false_type {};
-
-/**
- * @copybrief is_tuple
- * @tparam Args Tuple template arguments.
- */
-template<typename... Args>
-struct is_tuple<stl::tuple<Args...>>: stl::true_type {};
-
-/**
- * @brief Helper variable template.
- * @tparam Type The type to test.
- */
-template<typename Type>
-inline constexpr bool is_tuple_v = is_tuple<Type>::value;
-
-/**
- * @brief Utility function to unwrap tuples of a single element.
- * @tparam Type Tuple type of any sizes.
- * @param value A tuple object of the given type.
- * @return The tuple itself if it contains more than one element, the first
- * element otherwise.
- */
-template<typename Type>
-constexpr decltype(auto) unwrap_tuple(Type &&value) noexcept {
-    if constexpr(stl::tuple_size_v<stl::remove_reference_t<Type>> == 1u) {
-        return stl::get<0>(stl::forward<Type>(value));
-    } else {
-        return stl::forward<Type>(value);
-    }
-}
-
-/**
- * @brief Utility class to forward-and-apply tuple objects.
- * @tparam Func Type of underlying invocable object.
- */
-template<typename Func>
-struct forward_apply: private Func {
+ENTT_MODULE_EXPORT namespace entt {
     /**
-     * @brief Constructs a forward-and-apply object.
-     * @tparam Args Types of arguments to use to construct the new instance.
-     * @param args Parameters to use to construct the instance.
+     * @brief Provides the member constant `value` to true if a given type is a
+     * tuple, false otherwise.
+     * @tparam Type The type to test.
+     */
+    template<typename Type>
+    struct is_tuple: stl::false_type {};
+
+    /**
+     * @copybrief is_tuple
+     * @tparam Args Tuple template arguments.
      */
     template<typename... Args>
-    constexpr forward_apply(Args &&...args) noexcept(stl::is_nothrow_constructible_v<Func, Args...>)
-        : Func{stl::forward<Args>(args)...} {}
+    struct is_tuple<stl::tuple<Args...>>: stl::true_type {};
 
     /**
-     * @brief Forwards and applies the arguments with the underlying function.
-     * @tparam Type Tuple-like type to forward to the underlying function.
-     * @param args Parameters to forward to the underlying function.
-     * @return Return value of the underlying function, if any.
+     * @brief Helper variable template.
+     * @tparam Type The type to test.
      */
     template<typename Type>
-    constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(stl::apply(stl::declval<Func &>(), args))) {
-        return stl::apply(static_cast<Func &>(*this), stl::forward<Type>(args));
-    }
+    inline constexpr bool is_tuple_v = is_tuple<Type>::value;
 
-    /*! @copydoc operator()() */
+    /**
+     * @brief Utility function to unwrap tuples of a single element.
+     * @tparam Type Tuple type of any sizes.
+     * @param value A tuple object of the given type.
+     * @return The tuple itself if it contains more than one element, the first
+     * element otherwise.
+     */
     template<typename Type>
-    constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(stl::apply(stl::declval<const Func &>(), args))) {
-        return stl::apply(static_cast<const Func &>(*this), stl::forward<Type>(args));
+    constexpr decltype(auto) unwrap_tuple(Type && value) noexcept {
+        if constexpr(stl::tuple_size_v<stl::remove_reference_t<Type>> == 1u) {
+            return stl::get<0>(stl::forward<Type>(value));
+        } else {
+            return stl::forward<Type>(value);
+        }
     }
-};
 
-/**
- * @brief Deduction guide.
- * @tparam Func Type of underlying invocable object.
- */
-template<typename Func>
-forward_apply(Func) -> forward_apply<stl::remove_cvref_t<Func>>;
+    /**
+     * @brief Utility class to forward-and-apply tuple objects.
+     * @tparam Func Type of underlying invocable object.
+     */
+    template<typename Func>
+    struct forward_apply: private Func {
+        /**
+         * @brief Constructs a forward-and-apply object.
+         * @tparam Args Types of arguments to use to construct the new instance.
+         * @param args Parameters to use to construct the instance.
+         */
+        template<typename... Args>
+        constexpr forward_apply(Args &&...args) noexcept(stl::is_nothrow_constructible_v<Func, Args...>)
+            : Func{stl::forward<Args>(args)...} {}
+
+        /**
+         * @brief Forwards and applies the arguments with the underlying function.
+         * @tparam Type Tuple-like type to forward to the underlying function.
+         * @param args Parameters to forward to the underlying function.
+         * @return Return value of the underlying function, if any.
+         */
+        template<typename Type>
+        constexpr decltype(auto) operator()(Type &&args) noexcept(noexcept(stl::apply(stl::declval<Func &>(), args))) {
+            return stl::apply(static_cast<Func &>(*this), stl::forward<Type>(args));
+        }
+
+        /*! @copydoc operator()() */
+        template<typename Type>
+        constexpr decltype(auto) operator()(Type &&args) const noexcept(noexcept(stl::apply(stl::declval<const Func &>(), args))) {
+            return stl::apply(static_cast<const Func &>(*this), stl::forward<Type>(args));
+        }
+    };
+
+    /**
+     * @brief Deduction guide.
+     * @tparam Func Type of underlying invocable object.
+     */
+    template<typename Func>
+    forward_apply(Func) -> forward_apply<stl::remove_cvref_t<Func>>;
 
 } // namespace entt
 

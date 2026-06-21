@@ -1,13 +1,17 @@
 #ifndef ENTT_ENTITY_RUNTIME_VIEW_HPP
 #define ENTT_ENTITY_RUNTIME_VIEW_HPP
 
-#include "../stl/algorithm.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../stl/algorithm.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -91,6 +95,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Generic runtime view.
@@ -316,6 +322,8 @@ private:
     container_type pools;
     container_type filter;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

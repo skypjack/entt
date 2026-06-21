@@ -1,16 +1,20 @@
 #ifndef ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 #define ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -78,6 +82,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic implementation of a directed adjacency matrix.
@@ -326,6 +332,8 @@ private:
     container_type matrix;
     size_type vert;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

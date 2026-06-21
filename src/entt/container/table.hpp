@@ -1,14 +1,18 @@
 #ifndef ENTT_CONTAINER_TABLE_HPP
 #define ENTT_CONTAINER_TABLE_HPP
 
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -107,6 +111,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic table implementation.
@@ -417,16 +423,18 @@ private:
     container_type payload;
 };
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
 /*! @cond ENTT_INTERNAL */
 #include <utility>
 
-namespace std {
-
-template<typename... Container, typename Allocator>
-struct uses_allocator<entt::basic_table<Container...>, Allocator>
-    : entt::stl::bool_constant<(entt::stl::uses_allocator_v<Container, Allocator> && ...)> {};
+/*! @cond TURN_OFF_DOXYGEN */
+ENTT_MODULE_EXPORT namespace std {
+    template<typename... Container, typename Allocator>
+    struct uses_allocator<entt::basic_table<Container...>, Allocator>
+        : entt::stl::bool_constant<(entt::stl::uses_allocator_v<Container, Allocator> && ...)> {};
 
 } // namespace std
 /*! @endcond */

@@ -1,6 +1,9 @@
 #ifndef ENTT_ENTITY_REGISTRY_HPP
 #define ENTT_ENTITY_REGISTRY_HPP
 
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
 #include <compare>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
@@ -29,6 +32,7 @@
 #include "sparse_set.hpp"
 #include "storage.hpp"
 #include "view.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -201,6 +205,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Fast and reliable entity-component system.
@@ -1175,6 +1181,8 @@ private:
     group_container_type groups;
     storage_for_type<entity_type> entities;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

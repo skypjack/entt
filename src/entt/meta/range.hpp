@@ -1,14 +1,18 @@
 #ifndef ENTT_META_RANGE_HPP
 #define ENTT_META_RANGE_HPP
 
-#include <compare>
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/utility.hpp"
-#include "context.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../core/fwd.hpp"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/utility.hpp"
+#    include "context.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -106,6 +110,8 @@ private:
 } // namespace internal
 /*! @endcond */
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
  * @tparam Type Type of meta objects returned.
@@ -113,6 +119,8 @@ private:
  */
 template<typename Type, stl::forward_iterator It>
 using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, It>>;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

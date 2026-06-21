@@ -1,22 +1,26 @@
 #ifndef ENTT_RESOURCE_RESOURCE_CACHE_HPP
 #define ENTT_RESOURCE_RESOURCE_CACHE_HPP
 
-#include <compare>
-#include "../container/dense_map.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/functional.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
-#include "loader.hpp"
-#include "resource.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../container/dense_map.hpp"
+#    include "../core/compressed_pair.hpp"
+#    include "../core/fwd.hpp"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/functional.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#    include "loader.hpp"
+#    include "resource.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -115,6 +119,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic cache for resources of any type.
@@ -380,6 +386,8 @@ public:
 private:
     compressed_pair<container_type, loader_type> pool;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

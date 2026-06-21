@@ -1,6 +1,9 @@
 #ifndef ENTT_ENTITY_SNAPSHOT_HPP
 #define ENTT_ENTITY_SNAPSHOT_HPP
 
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/type_traits.hpp"
@@ -13,6 +16,7 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "view.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -30,6 +34,8 @@ void orphans(Registry &registry) {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Utility class to create snapshots from a registry.
@@ -503,6 +509,8 @@ private:
     dense_map<typename traits_type::entity_type, stl::pair<entity_type, entity_type>> remloc;
     registry_type *reg;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

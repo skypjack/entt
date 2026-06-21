@@ -1,19 +1,23 @@
 #ifndef ENTT_ENTITY_VIEW_HPP
 #define ENTT_ENTITY_VIEW_HPP
 
-#include "../config/config.h"
-#include "../core/concepts.hpp"
-#include "../core/iterator.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/array.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/concepts.hpp"
+#    include "../core/iterator.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/array.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -22,7 +26,7 @@ namespace internal {
 
 template<typename... Type>
 // NOLINTNEXTLINE(misc-redundant-expression)
-static constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
+inline constexpr bool tombstone_check_v = ((sizeof...(Type) == 1u) && ... && (Type::storage_policy == deletion_policy::in_place));
 
 template<cvref_unqualified Type>
 const Type *view_placeholder() {
@@ -178,6 +182,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief View implementation.
@@ -1136,6 +1142,8 @@ basic_view(Type &...storage) -> basic_view<get_t<Type...>, exclude_t<>>;
  */
 template<typename... Get, typename... Exclude>
 basic_view(stl::tuple<Get &...>, stl::tuple<Exclude &...> = {}) -> basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

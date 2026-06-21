@@ -1,6 +1,9 @@
 #ifndef ENTT_ENTITY_SPARSE_SET_HPP
 #define ENTT_ENTITY_SPARSE_SET_HPP
 
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
 #include <compare>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
@@ -16,6 +19,7 @@
 #include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -115,6 +119,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Sparse set implementation.
@@ -1070,6 +1076,8 @@ private:
     deletion_policy mode;
     size_type head;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

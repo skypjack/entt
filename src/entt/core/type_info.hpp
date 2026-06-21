@@ -1,13 +1,17 @@
 #ifndef ENTT_CORE_TYPE_INFO_HPP
 #define ENTT_CORE_TYPE_INFO_HPP
 
-#include <compare>
-#include "../config/config.h"
-#include "../stl/string_view.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
-#include "hashed_string.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../config/config.h"
+#    include "../stl/string_view.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#    include "hashed_string.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -71,6 +75,8 @@ template<typename Type>
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Type sequential identifier.
@@ -226,6 +232,8 @@ template<typename Type>
 [[nodiscard]] const type_info &type_id(const Type &) noexcept {
     return type_id<stl::remove_cvref_t<Type>>();
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

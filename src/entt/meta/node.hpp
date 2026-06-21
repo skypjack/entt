@@ -1,25 +1,29 @@
 #ifndef ENTT_META_NODE_HPP
 #define ENTT_META_NODE_HPP
 
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/concepts.hpp"
-#include "../core/enum.hpp"
-#include "../core/fwd.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
-#include "../stl/array.hpp"
-#include "../stl/bit.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/cstdint.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "context.hpp"
-#include "fwd.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../core/concepts.hpp"
+#    include "../core/enum.hpp"
+#    include "../core/fwd.hpp"
+#    include "../core/type_info.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../core/utility.hpp"
+#    include "../stl/array.hpp"
+#    include "../stl/bit.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/cstdint.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "context.hpp"
+#    include "fwd.hpp"
+#    include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 

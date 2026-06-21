@@ -1,15 +1,19 @@
 #ifndef ENTT_ENTITY_HANDLE_HPP
 #define ENTT_ENTITY_HANDLE_HPP
 
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/iterator.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -77,6 +81,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Non-owning handle to an entity.
@@ -362,6 +368,8 @@ private:
     registry_type *owner;
     entity_type entt;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 
