@@ -27,7 +27,6 @@ module;
 #include "config/config.h"
 #include "config/macro.h"
 #include "config/version.h"
-#include "core/attribute.h"
 
 export module entt;
 
