@@ -6,21 +6,28 @@ module;
 #define ENTT_MODULE_EXPORT_END }
 
 // clang-format off
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <deque>
-#include <functional>
-#include <limits>
-#include <list>
-#include <map>
-#include <memory>
-#include <ostream>
-#include <set>
-#include <string_view>
-#include <unordered_set>
-#include <utility>
-#include <typeinfo>
+#include "stl/algorithm.hpp"
+#include "stl/array.hpp"
+#include "stl/atomic.hpp"
+#include "stl/bit.hpp"
+#include "stl/cmath.hpp"
+#include "stl/concepts.hpp"
+#include "stl/cstddef.hpp"
+#include "stl/cstdint.hpp"
+#include "stl/functional.hpp"
+#include "stl/ios.hpp"
+#include "stl/iterator.hpp"
+#include "stl/limits.hpp"
+#include "stl/memory.hpp"
+#include "stl/ostream.hpp"
+#include "stl/sstream.hpp"
+#include "stl/string.hpp"
+#include "stl/string_view.hpp"
+#include "stl/tuple.hpp"
+#include "stl/type_traits.hpp"
+#include "stl/utility.hpp"
+#include "stl/vector.hpp"
+
 
 #ifdef ENTT_USER_CONFIG
 #    include ENTT_USER_CONFIG
@@ -35,19 +42,20 @@ export module entt;
 #include "core/algorithm.hpp"
 #include "core/fwd.hpp"
 #include "core/type_traits.hpp"
+#include "core/concepts.hpp"
+#include "core/hashed_string.hpp"
+#include "core/type_info.hpp"
 #include "core/any.hpp"
 #include "core/bit.hpp"
 #include "core/compressed_pair.hpp"
 #include "core/enum.hpp"
 #include "core/family.hpp"
-#include "core/hashed_string.hpp"
 #include "core/ident.hpp"
 #include "core/iterator.hpp"
 #include "core/memory.hpp"
 #include "core/monostate.hpp"
 #include "core/ranges.hpp"
 #include "core/tuple.hpp"
-#include "core/type_info.hpp"
 #include "core/utility.hpp"
 
 #include "container/dense_map.hpp"
@@ -110,3 +118,5 @@ export module entt;
 #include "resource/cache.hpp"
 #include "resource/fwd.hpp"
 #include "resource/loader.hpp"
+
+// clang-format on
