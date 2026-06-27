@@ -31,7 +31,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr stl::size_t dense_map_placeholder_position = (stl::numeric_limits<stl::size_t>::max)();
+inline constexpr stl::size_t dense_map_placeholder_position = (stl::numeric_limits<stl::size_t>::max)();
 
 template<typename Key, typename Type>
 struct dense_map_node final {
