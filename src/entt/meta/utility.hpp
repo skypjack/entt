@@ -282,40 +282,51 @@ template<typename Type>
  * @tparam Type Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
- * @param value Parameter to use to set the variable.
+ * @param args Parameters to use to set the variable.
  * @return True in case of success, false otherwise.
  */
 template<typename Type, auto Data>
-[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any value) {
+[[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any *const args) {
     if constexpr(stl::is_member_function_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
-        using descriptor = meta_function_helper_t<Type, decltype(Data)>;
-        using data_type = type_list_element_t<descriptor::is_static, typename descriptor::args_type>;
-
-        if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
-            stl::invoke(Data, *clazz, value.cast<data_type>());
-            return true;
-        }
+        return static_cast<bool>(internal::meta_invoke<Type, as_void_t>(*instance.operator->(), Data, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Data)>::args_type::size>{}));
     } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
 
         if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
-            if(auto *const clazz = instance->try_cast<Type>(); clazz && value.allow_cast<data_type>()) {
-                stl::invoke(Data, *clazz) = value.cast<data_type>();
+            if(auto *const clazz = instance->try_cast<Type>(); clazz && args->allow_cast<data_type>()) {
+                stl::invoke(Data, *clazz) = args->cast<data_type>();
                 return true;
             }
         }
+
+        return false;
     } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
         using data_type = stl::remove_reference_t<decltype(*Data)>;
 
         if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
-            if(value.allow_cast<data_type>()) {
-                *Data = value.cast<data_type>();
+            if(args->allow_cast<data_type>()) {
+                *Data = args->cast<data_type>();
                 return true;
             }
         }
-    }
 
-    return false;
+        return false;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @brief Sets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to set.
+ * @param instance An opaque instance of the underlying type, if required.
+ * @param value Parameter to use to set the variable.
+ * @return True in case of success, false otherwise.
+ */
+template<typename Type, auto Data>
+[[nodiscard]] bool meta_setter(meta_handle instance, meta_any value) {
+    return meta_setter<Type, Data>(*instance.operator->(), &value);
 }
 
 /**
@@ -324,22 +335,19 @@ template<typename Type, auto Data>
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
+ * @param args Parameters to use to set the variable.
  * @return A meta any containing the value of the underlying variable.
  */
 template<typename Type, auto Data, meta_policy Policy = as_value_t>
-[[nodiscard]] meta_any meta_getter(meta_handle instance) {
-    if constexpr(stl::is_member_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
+[[nodiscard]] meta_any meta_getter(meta_handle instance, [[maybe_unused]] meta_any *const args) {
+    if constexpr(stl::is_member_function_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
+        return internal::meta_invoke<Type, Policy>(*instance.operator->(), Data, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Data)>::args_type::size>{});
+    } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
         if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
-            if constexpr(stl::is_invocable_v<decltype(Data), Type &>) {
-                if(auto *clazz = instance->try_cast<Type>(); clazz) {
-                    return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *clazz));
-                }
-            }
-
-            if constexpr(stl::is_invocable_v<decltype(Data), const Type &>) {
-                if(auto *fallback = instance->try_cast<const Type>(); fallback) {
-                    return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *fallback));
-                }
+            if(auto *clazz = instance->try_cast<Type>(); clazz) {
+                return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *clazz));
+            } else if(auto *fallback = instance->try_cast<const Type>(); fallback) {
+                return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *fallback));
             }
         }
 
@@ -353,6 +361,19 @@ template<typename Type, auto Data, meta_policy Policy = as_value_t>
     } else {
         return meta_dispatch<Policy>(instance->context(), Data);
     }
+}
+
+/**
+ * @brief Gets the value of a given variable.
+ * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Data The actual variable to get.
+ * @tparam Policy Optional policy (no policy set by default).
+ * @param instance An opaque instance of the underlying type, if required.
+ * @return A meta any containing the value of the underlying variable.
+ */
+template<typename Type, auto Data, meta_policy Policy = as_value_t>
+[[nodiscard]] meta_any meta_getter(meta_handle instance) {
+    return meta_getter<Type, Data, Policy>(*instance.operator->(), nullptr);
 }
 
 /**

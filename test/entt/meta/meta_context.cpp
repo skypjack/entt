@@ -278,8 +278,8 @@ TEST_F(MetaContext, MetaData) {
     ASSERT_EQ(global.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), global_marker);
     ASSERT_EQ(local.data("value"_hs).type().data("marker"_hs).get({}).cast<int>(), local_marker);
 
-    ASSERT_EQ(global.data("rw"_hs).arg().data("marker"_hs).get({}).cast<int>(), global_marker);
-    ASSERT_EQ(local.data("rw"_hs).arg().data("marker"_hs).get({}).cast<int>(), local_marker);
+    ASSERT_EQ(global.data("rw"_hs).set_arg(0u).data("marker"_hs).get({}).cast<int>(), global_marker);
+    ASSERT_EQ(local.data("rw"_hs).set_arg(0u).data("marker"_hs).get({}).cast<int>(), local_marker);
 
     clazz instance{'c', 8};
     const argument value{2};
