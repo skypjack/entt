@@ -30,7 +30,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-enum class meta_traits : std::uint32_t {
+enum class meta_traits : stl::uint32_t {
     is_none = 0x0000,
     is_const = 0x0001,
     is_static = 0x0002,
@@ -49,18 +49,18 @@ enum class meta_traits : std::uint32_t {
 };
 
 template<typename Type>
-requires std::is_enum_v<Type>
+requires stl::is_enum_v<Type>
 [[nodiscard]] auto meta_to_user_traits(const meta_traits traits) noexcept {
-    constexpr auto shift = std::popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
-    return Type{static_cast<std::underlying_type_t<Type>>(static_cast<std::underlying_type_t<meta_traits>>(traits) >> shift)};
+    constexpr auto shift = stl::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    return Type{static_cast<stl::underlying_type_t<Type>>(static_cast<stl::underlying_type_t<meta_traits>>(traits) >> shift)};
 }
 
 template<typename Type>
-requires std::is_enum_v<Type>
+requires stl::is_enum_v<Type>
 [[nodiscard]] auto user_to_meta_traits(const Type value) noexcept {
-    constexpr auto shift = std::popcount(static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
-    const auto traits = static_cast<std::underlying_type_t<internal::meta_traits>>(static_cast<std::underlying_type_t<Type>>(value));
-    ENTT_ASSERT(traits < ((~static_cast<std::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits)) >> shift), "Invalid traits");
+    constexpr auto shift = stl::popcount(static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits));
+    const auto traits = static_cast<stl::underlying_type_t<internal::meta_traits>>(static_cast<stl::underlying_type_t<Type>>(value));
+    ENTT_ASSERT(traits < ((~static_cast<stl::underlying_type_t<meta_traits>>(meta_traits::_user_defined_traits)) >> shift), "Invalid traits");
     return meta_traits{traits << shift};
 }
 
@@ -68,7 +68,7 @@ struct meta_type_node;
 
 struct meta_custom_node {
     id_type id{};
-    std::shared_ptr<void> value{};
+    stl::shared_ptr<void> value{};
 };
 
 struct meta_base_node {
@@ -83,7 +83,7 @@ struct meta_conv_node {
 };
 
 struct meta_ctor_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     size_type arity{0u};
@@ -92,21 +92,23 @@ struct meta_ctor_node {
 };
 
 struct meta_data_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     const char *name{};
     meta_traits traits{meta_traits::is_none};
-    size_type arity{0u};
+    size_type set_arity{0u};
+    size_type get_arity{0u};
+    meta_type (*set_arg)(const meta_ctx &, const size_type) noexcept {};
+    meta_type (*get_arg)(const meta_ctx &, const size_type) noexcept {};
     const meta_type_node &(*type)(const meta_context &) noexcept {};
-    meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
-    bool (*set)(meta_handle, meta_any){};
-    meta_any (*get)(meta_handle){};
+    bool (*set)(meta_handle, meta_any *const){};
+    meta_any (*get)(meta_handle, meta_any *const){};
     meta_custom_node custom{};
 };
 
 struct meta_func_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     id_type id{};
     const char *name{};
@@ -115,12 +117,12 @@ struct meta_func_node {
     const meta_type_node &(*ret)(const meta_context &) noexcept {};
     meta_type (*arg)(const meta_ctx &, const size_type) noexcept {};
     meta_any (*invoke)(meta_handle, meta_any *const){};
-    std::unique_ptr<meta_func_node> next;
+    stl::unique_ptr<meta_func_node> next;
     meta_custom_node custom{};
 };
 
 struct meta_template_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     size_type arity{0u};
     const meta_type_node &(*resolve)(const meta_context &) noexcept {};
@@ -128,18 +130,18 @@ struct meta_template_node {
 };
 
 struct meta_type_descriptor {
-    std::vector<meta_ctor_node> ctor{};
-    std::vector<meta_base_node> base{};
-    std::vector<meta_conv_node> conv{};
-    std::vector<meta_data_node> data{};
-    std::vector<meta_func_node> func{};
+    stl::vector<meta_ctor_node> ctor{};
+    stl::vector<meta_base_node> base{};
+    stl::vector<meta_conv_node> conv{};
+    stl::vector<meta_data_node> data{};
+    stl::vector<meta_func_node> func{};
 };
 
 struct meta_type_node {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     const type_info *info{};
-    id_type id{};
+    id_type alias{};
     const char *name{};
     meta_traits traits{meta_traits::is_none};
     size_type size_of{0u};
@@ -149,7 +151,7 @@ struct meta_type_node {
     meta_any (*from_void)(const meta_ctx &, void *, const void *){};
     meta_template_node templ{};
     meta_custom_node custom{};
-    std::unique_ptr<meta_type_descriptor> details{};
+    stl::unique_ptr<meta_type_descriptor> details{};
 };
 
 template<typename Type, typename Value>
@@ -163,14 +165,14 @@ template<typename Type, typename Value>
     return static_cast<Type::value_type *>(nullptr);
 }
 
-[[nodiscard]] inline auto *find_overload(meta_func_node *curr, std::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
+[[nodiscard]] inline auto *find_overload(meta_func_node *curr, stl::remove_pointer_t<decltype(meta_func_node::invoke)> *const ref) {
     while((curr != nullptr) && (curr->invoke != ref)) { curr = curr->next.get(); }
     return curr;
 }
 
 template<auto Member>
 [[nodiscard]] auto *look_for(const meta_context &context, const meta_type_node &node, const id_type id, bool recursive) {
-    using value_type = std::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
+    using value_type = stl::remove_reference_t<decltype((node.details.get()->*Member))>::value_type;
 
     if(node.details) {
         if(auto *member = find_member((node.details.get()->*Member), id); member != nullptr) {
@@ -193,9 +195,9 @@ template<cvref_unqualified Type>
 const meta_type_node &resolve(const meta_context &) noexcept;
 
 template<typename... Args>
-[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const std::size_t index) noexcept {
+[[nodiscard]] const meta_type_node &meta_arg_node(const meta_context &context, type_list<Args...>, const stl::size_t index) noexcept {
     using resolve_type = const meta_type_node &(*)(const meta_context &) noexcept;
-    constexpr std::array<resolve_type, sizeof...(Args)> list{&resolve<std::remove_cvref_t<Args>>...};
+    constexpr stl::array<resolve_type, sizeof...(Args)> list{&resolve<stl::remove_cvref_t<Args>>...};
     ENTT_ASSERT(index < sizeof...(Args), "Out of bounds");
     return list[index](context);
 }
@@ -220,47 +222,47 @@ auto setup_node_for() noexcept {
         &type_id<Type>(),
         type_id<Type>().hash(),
         nullptr,
-        (std::is_arithmetic_v<Type> ? meta_traits::is_arithmetic : meta_traits::is_none)
-            | (std::is_integral_v<Type> ? meta_traits::is_integral : meta_traits::is_none)
-            | (std::is_signed_v<Type> ? meta_traits::is_signed : meta_traits::is_none)
-            | (std::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
-            | (std::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
-            | (std::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
-            | (std::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
+        (stl::is_arithmetic_v<Type> ? meta_traits::is_arithmetic : meta_traits::is_none)
+            | (stl::is_integral_v<Type> ? meta_traits::is_integral : meta_traits::is_none)
+            | (stl::is_signed_v<Type> ? meta_traits::is_signed : meta_traits::is_none)
+            | (stl::is_array_v<Type> ? meta_traits::is_array : meta_traits::is_none)
+            | (stl::is_enum_v<Type> ? meta_traits::is_enum : meta_traits::is_none)
+            | (stl::is_class_v<Type> ? meta_traits::is_class : meta_traits::is_none)
+            | (stl::is_pointer_v<Type> ? meta_traits::is_pointer : meta_traits::is_none)
             | (is_meta_pointer_like_v<Type> ? meta_traits::is_pointer_like : meta_traits::is_none)
             | (is_complete_v<meta_sequence_container_traits<Type>> ? meta_traits::is_sequence_container : meta_traits::is_none)
             | (is_complete_v<meta_associative_container_traits<Type>> ? meta_traits::is_associative_container : meta_traits::is_none),
         size_of_v<Type>,
-        &resolve<std::remove_const_t<std::remove_pointer_t<Type>>>};
+        &resolve<stl::remove_const_t<stl::remove_pointer_t<Type>>>};
 
-    if constexpr(std::is_default_constructible_v<Type>) {
+    if constexpr(stl::is_default_constructible_v<Type>) {
         node.default_constructor = +[](const meta_ctx &ctx) {
-            return meta_any{ctx, std::in_place_type<Type>};
+            return meta_any{ctx, stl::in_place_type<Type>};
         };
     }
 
-    if constexpr(std::is_arithmetic_v<Type>) {
+    if constexpr(stl::is_arithmetic_v<Type>) {
         node.conversion_helper = +[](void *lhs, const void *rhs) {
             return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(*static_cast<const double *>(rhs))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
-    } else if constexpr(std::is_enum_v<Type>) {
+    } else if constexpr(stl::is_enum_v<Type>) {
         node.conversion_helper = +[](void *lhs, const void *rhs) {
-            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<std::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
+            return lhs ? static_cast<double>(*static_cast<Type *>(lhs) = static_cast<Type>(static_cast<stl::underlying_type_t<Type>>(*static_cast<const double *>(rhs)))) : static_cast<double>(*static_cast<const Type *>(rhs));
         };
     }
 
-    if constexpr(!std::is_void_v<Type> && !std::is_function_v<Type>) {
+    if constexpr(!stl::is_void_v<Type> && !stl::is_function_v<Type>) {
         node.from_void = +[](const meta_ctx &ctx, void *elem, const void *celem) {
             if(elem && celem) { // ownership construction request
-                return meta_any{ctx, std::in_place, static_cast<std::decay_t<Type> *>(elem)};
+                return meta_any{ctx, stl::in_place, static_cast<stl::decay_t<Type> *>(elem)};
             }
 
             if(elem) { // non-const reference construction request
-                return meta_any{ctx, std::in_place_type<std::decay_t<Type> &>, *static_cast<std::decay_t<Type> *>(elem)};
+                return meta_any{ctx, stl::in_place_type<stl::decay_t<Type> &>, *static_cast<stl::decay_t<Type> *>(elem)};
             }
 
             // const reference construction request
-            return meta_any{ctx, std::in_place_type<const std::decay_t<Type> &>, *static_cast<const std::decay_t<Type> *>(celem)};
+            return meta_any{ctx, stl::in_place_type<const stl::decay_t<Type> &>, *static_cast<const stl::decay_t<Type> *>(celem)};
         };
     }
 
@@ -268,22 +270,17 @@ auto setup_node_for() noexcept {
         node.templ = meta_template_node{
             meta_template_traits<Type>::args_type::size,
             &resolve<typename meta_template_traits<Type>::class_type>,
-            +[](const meta_context &area, const std::size_t index) noexcept -> decltype(auto) { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
+            +[](const meta_context &area, const stl::size_t index) noexcept -> decltype(auto) { return meta_arg_node(area, typename meta_template_traits<Type>::args_type{}, index); }};
     }
 
     return node;
 }
 
-[[nodiscard]] inline const meta_type_node *try_resolve(const meta_context &context, const type_info &info) noexcept {
-    const auto it = context.bucket.find(info.hash());
-    return (it != context.bucket.end()) ? it->second.get() : nullptr;
-}
-
 template<cvref_unqualified Type>
 [[nodiscard]] const meta_type_node &resolve(const meta_context &context) noexcept {
     static const meta_type_node node = setup_node_for<Type>();
-    const auto *elem = try_resolve(context, *node.info);
-    return (elem == nullptr) ? node : *elem;
+    const auto it = context.bucket.find(node.info->hash());
+    return (it == context.bucket.cend()) ? node : *it->second;
 }
 
 } // namespace internal
