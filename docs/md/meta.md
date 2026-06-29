@@ -139,6 +139,11 @@ generally used to create the following:
   entt::meta_factory<my_type>{}.data<nullptr, &my_type::data_member>("member"_hs);
   ```
 
+  Setters and getters take any number of arguments, making the meta member more
+  like a function than a _true member_, while still retaining its nature.<br/>
+  This is especially convenient when constructing complex members or indexing
+  values into underlying structures of various kinds.
+
 * _Member functions_. Meta member functions are actual member functions of the
   underlying type but also plain free functions. From the point of view of the
   client, all the functions associated with the reflected type appear as if they

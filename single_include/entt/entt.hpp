@@ -85678,7 +85678,7 @@ public:
      *
      * @warning
      * There is no guarantee that the returned handle is valid.<br/>
-     * If it is not, any use will result in indefinite behavior.
+     * If it is not, any use will result in undefined behavior.
      *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.

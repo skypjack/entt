@@ -29,7 +29,5 @@ TODO:
 * redesign snapshot as a whole
 * explore "runtime" mode for hashed string where the source is copied internally
 * storage: shrink_to_fit does not work with reentrant destructor?
-* make meta_any buffer size configurable (propagate to any)
 * test trivially_destructible optimization
 * finish the imgui viewer/editor!
-* document additional arguments to meta setters/getters
