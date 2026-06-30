@@ -973,7 +973,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -1235,7 +1235,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -1337,7 +1337,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -1356,7 +1356,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -1388,7 +1388,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -1404,7 +1404,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -1482,7 +1482,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -2608,7 +2608,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -2870,7 +2870,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -2972,7 +2972,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -2991,7 +2991,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -3023,7 +3023,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -3039,7 +3039,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -3117,7 +3117,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -7106,7 +7106,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -7368,7 +7368,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -7470,7 +7470,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -7489,7 +7489,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -7521,7 +7521,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -7537,7 +7537,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -7615,7 +7615,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -9941,7 +9941,7 @@ inline constexpr bool std::ranges::enable_view<entt::iterable_adaptor<Args...>>{
 namespace entt {
 
 /**
- * @brief Provides the member constant `value` to true if a given type is a
+ * @brief Provides the member constant `value` equal to true if a given type is a
  * tuple, false otherwise.
  * @tparam Type The type to test.
  */
@@ -10596,7 +10596,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -10858,7 +10858,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -10960,7 +10960,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -10979,7 +10979,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -11011,7 +11011,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -11027,7 +11027,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -11105,7 +11105,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -12075,7 +12075,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -12337,7 +12337,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -12439,7 +12439,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -12458,7 +12458,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -12490,7 +12490,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -12506,7 +12506,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -12584,7 +12584,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -18468,7 +18468,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -18730,7 +18730,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -18832,7 +18832,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -18851,7 +18851,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -18883,7 +18883,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -18899,7 +18899,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -18977,7 +18977,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -24142,7 +24142,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -24404,7 +24404,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -24506,7 +24506,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -24525,7 +24525,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -24557,7 +24557,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -24573,7 +24573,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -24651,7 +24651,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -28143,7 +28143,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -28405,7 +28405,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -28507,7 +28507,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -28526,7 +28526,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -28558,7 +28558,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -28574,7 +28574,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -28652,7 +28652,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -29778,7 +29778,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -30040,7 +30040,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -30142,7 +30142,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -30161,7 +30161,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -30193,7 +30193,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -30209,7 +30209,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -30287,7 +30287,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -32794,7 +32794,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -33056,7 +33056,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -33158,7 +33158,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -33177,7 +33177,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -33209,7 +33209,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -33225,7 +33225,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -33303,7 +33303,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -35985,7 +35985,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -36247,7 +36247,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -36349,7 +36349,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -36368,7 +36368,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -36400,7 +36400,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -36416,7 +36416,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -36494,7 +36494,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -37620,7 +37620,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -37882,7 +37882,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -37984,7 +37984,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -38003,7 +38003,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -38035,7 +38035,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -38051,7 +38051,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -38129,7 +38129,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -47351,7 +47351,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -47613,7 +47613,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -47715,7 +47715,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -47734,7 +47734,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -47766,7 +47766,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -47782,7 +47782,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -47860,7 +47860,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -48986,7 +48986,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -49248,7 +49248,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -49350,7 +49350,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -49369,7 +49369,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -49401,7 +49401,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -49417,7 +49417,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -49495,7 +49495,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -52002,7 +52002,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -52264,7 +52264,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -52366,7 +52366,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -52385,7 +52385,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -52417,7 +52417,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -52433,7 +52433,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -52511,7 +52511,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -54836,7 +54836,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -55098,7 +55098,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -55200,7 +55200,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -55219,7 +55219,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -55251,7 +55251,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -55267,7 +55267,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -55345,7 +55345,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -56471,7 +56471,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -56733,7 +56733,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -56835,7 +56835,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -56854,7 +56854,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -56886,7 +56886,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -56902,7 +56902,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -56980,7 +56980,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -59641,7 +59641,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -59903,7 +59903,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -60005,7 +60005,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -60024,7 +60024,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -60056,7 +60056,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -60072,7 +60072,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -60150,7 +60150,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -61601,7 +61601,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -61863,7 +61863,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -61965,7 +61965,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -61984,7 +61984,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -62016,7 +62016,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -62032,7 +62032,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -62110,7 +62110,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -64029,7 +64029,7 @@ template<typename>
 struct meta_associative_container_traits;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is a
+ * @brief Provides the member constant `value` equal to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
  */
 template<typename, typename = void>
@@ -67257,7 +67257,7 @@ struct as_is_t final: private internal::meta_policy {
 };
 
 /**
- * @brief Provides the member constant `value` to true if a type also is a meta
+ * @brief Provides the member constant `value` equal to true if a type also is a meta
  * policy, false otherwise.
  * @tparam Type Type to check.
  */
@@ -70850,7 +70850,7 @@ struct as_is_t final: private internal::meta_policy {
 };
 
 /**
- * @brief Provides the member constant `value` to true if a type also is a meta
+ * @brief Provides the member constant `value` equal to true if a type also is a meta
  * policy, false otherwise.
  * @tparam Type Type to check.
  */
@@ -71198,7 +71198,7 @@ template<typename>
 struct meta_associative_container_traits;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is a
+ * @brief Provides the member constant `value` equal to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
  */
 template<typename, typename = void>
@@ -72837,7 +72837,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -73099,7 +73099,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -73201,7 +73201,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -73220,7 +73220,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -73252,7 +73252,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -73268,7 +73268,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -73346,7 +73346,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -74761,7 +74761,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -75023,7 +75023,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -75125,7 +75125,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -75144,7 +75144,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -75176,7 +75176,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -75192,7 +75192,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -75270,7 +75270,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -76248,7 +76248,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -76510,7 +76510,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -76612,7 +76612,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -76631,7 +76631,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -76663,7 +76663,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -76679,7 +76679,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -76757,7 +76757,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -77437,7 +77437,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -77699,7 +77699,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -77801,7 +77801,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -77820,7 +77820,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -77852,7 +77852,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -77868,7 +77868,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -77946,7 +77946,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -79900,7 +79900,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -80162,7 +80162,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -80264,7 +80264,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -80283,7 +80283,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -80315,7 +80315,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -80331,7 +80331,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -80409,7 +80409,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -81535,7 +81535,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -81797,7 +81797,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -81899,7 +81899,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -81918,7 +81918,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -81950,7 +81950,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -81966,7 +81966,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -82044,7 +82044,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -83778,7 +83778,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -84040,7 +84040,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -84142,7 +84142,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -84161,7 +84161,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -84193,7 +84193,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -84209,7 +84209,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -84287,7 +84287,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -86745,7 +86745,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -87007,7 +87007,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -87109,7 +87109,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -87128,7 +87128,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -87160,7 +87160,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -87176,7 +87176,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -87254,7 +87254,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -88523,7 +88523,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -88785,7 +88785,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -88887,7 +88887,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -88906,7 +88906,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -88938,7 +88938,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -88954,7 +88954,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -89032,7 +89032,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -90158,7 +90158,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -90420,7 +90420,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -90522,7 +90522,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -90541,7 +90541,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -90573,7 +90573,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -90589,7 +90589,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -90667,7 +90667,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
@@ -92185,7 +92185,7 @@ template<typename List>
 using type_list_unique_t = typename type_list_unique<List>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a type list contains a
+ * @brief Provides the member constant `value` equal to true if a type list contains a
  * given type, false otherwise.
  * @tparam List Type list.
  * @tparam Type Type to look for.
@@ -92447,7 +92447,7 @@ template<typename Type>
 using value_list_unique_t = typename value_list_unique<Type>::type;
 
 /**
- * @brief Provides the member constant `value` to true if a value list contains
+ * @brief Provides the member constant `value` equal to true if a value list contains
  * a given value, false otherwise.
  * @tparam List Value list.
  * @tparam Value Value to look for.
@@ -92549,7 +92549,7 @@ template<typename Ret, typename Func, typename Args>
 inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * complete, false otherwise.
  * @tparam Type The type to test.
  */
@@ -92568,7 +92568,7 @@ template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is an
+ * @brief Provides the member constant `value` equal to true if a given type is an
  * iterator, false otherwise.
  * @tparam Type The type to test.
  */
@@ -92600,7 +92600,7 @@ template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is both
+ * @brief Provides the member constant `value` equal to true if a given type is both
  * an empty and non-final class, false otherwise.
  * @tparam Type The type to test
  */
@@ -92616,7 +92616,7 @@ template<typename Type>
 inline constexpr bool is_ebco_eligible_v = is_ebco_eligible<Type>::value;
 
 /**
- * @brief Provides the member constant `value` to true if `Type::is_transparent`
+ * @brief Provides the member constant `value` equal to true if `Type::is_transparent`
  * is valid and denotes a type, false otherwise.
  * @tparam Type The type to test.
  */
@@ -92694,7 +92694,7 @@ template<typename Type>
 /*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
+ * @brief Provides the member constant `value` equal to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type The type to test.
  */
