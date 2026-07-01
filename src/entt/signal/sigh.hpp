@@ -221,7 +221,7 @@ private:
  * @brief Connection class.
  *
  * Opaque object the aim of which is to allow users to release an already
- * estabilished connection without having to keep a reference to the signal or
+ * established connection without having to keep a reference to the signal or
  * the sink that generated it.
  */
 class connection {
@@ -261,7 +261,7 @@ private:
  * @brief Scoped connection class.
  *
  * Opaque object the aim of which is to allow users to release an already
- * estabilished connection without having to keep a reference to the signal or
+ * established connection without having to keep a reference to the signal or
  * the sink that generated it.<br/>
  * A scoped connection automatically breaks the link between the two objects
  * when it goes out of scope.
