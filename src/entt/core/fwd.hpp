@@ -1,14 +1,14 @@
 #ifndef ENTT_CORE_FWD_HPP
 #define ENTT_CORE_FWD_HPP
 
-#include <cstddef>
-#include <cstdint>
 #include "../config/config.h"
+#include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
 
 namespace entt {
 
 /*! @brief Possible modes of an any object. */
-enum class any_policy : std::uint8_t {
+enum class any_policy : stl::uint8_t {
     /*! @brief Default mode, no element available. */
     empty,
     /*! @brief Owning mode, dynamically allocated element. */
@@ -22,7 +22,7 @@ enum class any_policy : std::uint8_t {
 };
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-template<std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
+template<stl::size_t Len = sizeof(double[2]), stl::size_t = alignof(double[2])>
 class basic_any;
 
 /*! @brief Alias declaration for type identifiers. */

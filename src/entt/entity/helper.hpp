@@ -1,11 +1,11 @@
 #ifndef ENTT_ENTITY_HELPER_HPP
 #define ENTT_ENTITY_HELPER_HPP
 
-#include <memory>
-#include <type_traits>
-#include <utility>
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "component.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -61,7 +61,7 @@ template<typename Registry>
 class as_group {
     template<typename... Owned, typename... Get, typename... Exclude>
     [[nodiscard]] auto dispatch(owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>) const {
-        if constexpr(std::is_const_v<registry_type>) {
+        if constexpr(stl::is_const_v<registry_type>) {
             return reg->template group_if_exists<typename Owned::element_type...>(get_t<typename Get::element_type...>{}, exclude_t<typename Exclude::element_type...>{});
         } else {
             return reg->template group<constness_as_t<typename Owned::element_type, Owned>...>(get_t<constness_as_t<typename Get::element_type, Get>...>{}, exclude_t<constness_as_t<typename Exclude::element_type, Exclude>...>{});
@@ -104,9 +104,9 @@ private:
  * @param reg A registry that contains the given entity and its elements.
  * @param entt Entity from which to get the element.
  */
-template<auto Member, typename Registry = std::decay_t<nth_argument_t<0u, decltype(Member)>>>
+template<auto Member, typename Registry = stl::decay_t<nth_argument_t<0u, decltype(Member)>>>
 void invoke(Registry &reg, const typename Registry::entity_type entt) {
-    static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
+    static_assert(stl::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
     (reg.template get<member_class_t<decltype(Member)>>(entt).*Member)(reg, entt);
 }
 
@@ -129,8 +129,8 @@ basic_storage<Args...>::entity_type to_entity(const basic_storage<Args...> &stor
     const auto *page = storage.raw();
 
     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    for(std::size_t pos{}, count = storage.size(); pos < count; pos += traits_type::page_size, ++page) {
-        if(const auto dist = (std::addressof(instance) - *page); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
+    for(stl::size_t pos{}, count = storage.size(); pos < count; pos += traits_type::page_size, ++page) {
+        if(const auto dist = (stl::addressof(instance) - *page); dist >= 0 && dist < static_cast<decltype(dist)>(traits_type::page_size)) {
             return *(static_cast<const basic_storage<Args...>::base_type &>(storage).rbegin() + static_cast<decltype(dist)>(pos) + dist);
         }
     }
@@ -210,7 +210,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_construct(Args &&...args) {
-        this->registry().template on_construct<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_construct<Type>(name).template connect<Candidate>(stl::forward<Args>(args)...);
         return *this;
     }
 
@@ -223,7 +223,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_update(Args &&...args) {
-        this->registry().template on_update<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_update<Type>(name).template connect<Candidate>(stl::forward<Args>(args)...);
         return *this;
     }
 
@@ -236,7 +236,7 @@ struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
      */
     template<auto Candidate, typename... Args>
     auto on_destroy(Args &&...args) {
-        this->registry().template on_destroy<Type>(name).template connect<Candidate>(std::forward<Args>(args)...);
+        this->registry().template on_destroy<Type>(name).template connect<Candidate>(stl::forward<Args>(args)...);
         return *this;
     }
 

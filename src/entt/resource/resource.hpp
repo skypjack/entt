@@ -2,9 +2,9 @@
 #define ENTT_RESOURCE_RESOURCE_HPP
 
 #include <compare>
-#include <concepts>
-#include <memory>
-#include <utility>
+#include "../stl/concepts.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -28,7 +28,7 @@ public:
     /*! @brief Resource type. */
     using element_type = Type;
     /*! @brief Handle type. */
-    using handle_type = std::shared_ptr<element_type>;
+    using handle_type = stl::shared_ptr<element_type>;
 
     /*! @brief Default constructor. */
     resource() noexcept
@@ -39,7 +39,7 @@ public:
      * @param res A handle to a resource.
      */
     explicit resource(handle_type res) noexcept
-        : value{std::move(res)} {}
+        : value{stl::move(res)} {}
 
     /*! @brief Default copy constructor. */
     resource(const resource &) noexcept = default;
@@ -55,7 +55,7 @@ public:
      */
     template<typename Other>
     resource(const resource<Other> &other, element_type &res) noexcept
-        : value{other.value, std::addressof(res)} {}
+        : value{other.value, stl::addressof(res)} {}
 
     /**
      * @brief Copy constructs a handle which shares ownership of the resource.
@@ -63,7 +63,7 @@ public:
      * @param other The handle to copy from.
      */
     template<typename Other>
-    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
+    requires (!stl::same_as<Type, Other> && stl::constructible_from<Type &, Other &>)
     resource(const resource<Other> &other) noexcept
         : value{other.value} {}
 
@@ -73,9 +73,9 @@ public:
      * @param other The handle to move from.
      */
     template<typename Other>
-    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
+    requires (!stl::same_as<Type, Other> && stl::constructible_from<Type &, Other &>)
     resource(resource<Other> &&other) noexcept
-        : value{std::move(other.value)} {}
+        : value{stl::move(other.value)} {}
 
     /*! @brief Default destructor. */
     ~resource() = default;
@@ -99,7 +99,7 @@ public:
      * @return This resource handle.
      */
     template<typename Other>
-    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
+    requires (!stl::same_as<Type, Other> && stl::constructible_from<Type &, Other &>)
     resource &operator=(const resource<Other> &other) noexcept {
         value = other.value;
         return *this;
@@ -112,9 +112,9 @@ public:
      * @return This resource handle.
      */
     template<typename Other>
-    requires (!std::same_as<Type, Other> && std::constructible_from<Type &, Other &>)
+    requires (!stl::same_as<Type, Other> && stl::constructible_from<Type &, Other &>)
     resource &operator=(resource<Other> &&other) noexcept {
-        value = std::move(other.value);
+        value = stl::move(other.value);
         return *this;
     }
 
@@ -123,7 +123,7 @@ public:
      * @param other Resource to exchange the content with.
      */
     void swap(resource &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(value, other.value);
     }
 
@@ -192,7 +192,7 @@ public:
      * @param other A handle to a resource.
      */
     void reset(handle_type other) {
-        value = std::move(other);
+        value = stl::move(other);
     }
 
     /**

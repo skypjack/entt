@@ -1,12 +1,12 @@
 #ifndef ENTT_POLY_FWD_HPP
 #define ENTT_POLY_FWD_HPP
 
-#include <cstddef>
+#include "../stl/cstddef.hpp"
 
 namespace entt {
 
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-template<typename, std::size_t Len = sizeof(double[2]), std::size_t = alignof(double[2])>
+template<typename, stl::size_t Len = sizeof(double[2]), stl::size_t = alignof(double[2])>
 class basic_poly;
 
 /**

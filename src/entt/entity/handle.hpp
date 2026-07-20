@@ -1,13 +1,13 @@
 #ifndef ENTT_ENTITY_HANDLE_HPP
 #define ENTT_ENTITY_HANDLE_HPP
 
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -21,16 +21,16 @@ class handle_storage_iterator final {
     template<typename>
     friend class handle_storage_iterator;
 
-    using underlying_type = std::remove_reference_t<typename It::value_type::second_type>;
+    using underlying_type = stl::remove_reference_t<typename It::value_type::second_type>;
     using entity_type = underlying_type::entity_type;
 
 public:
-    using value_type = std::iterator_traits<It>::value_type;
+    using value_type = stl::iterator_traits<It>::value_type;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::forward_iterator_tag;
 
     constexpr handle_storage_iterator() noexcept
         : entt{null},
@@ -103,9 +103,9 @@ public:
     /*! @brief Underlying version type. */
     using version_type = traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Iterable handle type. */
-    using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(std::declval<registry_type>().storage())::iterator>>;
+    using iterable = iterable_adaptor<internal::handle_storage_iterator<typename decltype(stl::declval<registry_type>().storage())::iterator>>;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() noexcept
@@ -173,7 +173,7 @@ public:
 
     /*! @brief Destroys the entity associated with a handle. */
     void destroy() {
-        owner_or_assert().destroy(std::exchange(entt, null));
+        owner_or_assert().destroy(stl::exchange(entt, null));
     }
 
     /**
@@ -181,7 +181,7 @@ public:
      * @param version A desired version upon destruction.
      */
     void destroy(const version_type version) {
-        owner_or_assert().destroy(std::exchange(entt, null), version);
+        owner_or_assert().destroy(stl::exchange(entt, null), version);
     }
 
     /**
@@ -194,8 +194,8 @@ public:
     template<typename Type, typename... Args>
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     decltype(auto) emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner_or_assert().template emplace<Type>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
+        return owner_or_assert().template emplace<Type>(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -207,8 +207,8 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) emplace_or_replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner_or_assert().template emplace_or_replace<Type>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
+        return owner_or_assert().template emplace_or_replace<Type>(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -220,8 +220,8 @@ public:
      */
     template<typename Type, typename... Func>
     decltype(auto) patch(Func &&...func) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner_or_assert().template patch<Type>(entt, std::forward<Func>(func)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
+        return owner_or_assert().template patch<Type>(entt, stl::forward<Func>(func)...);
     }
 
     /**
@@ -233,8 +233,8 @@ public:
      */
     template<typename Type, typename... Args>
     decltype(auto) replace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner_or_assert().template replace<Type>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
+        return owner_or_assert().template replace<Type>(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -300,8 +300,8 @@ public:
      */
     template<typename Type, typename... Args>
     [[nodiscard]] decltype(auto) get_or_emplace(Args &&...args) const {
-        static_assert(((sizeof...(Scope) == 0) || ... || std::is_same_v<Type, Scope>), "Invalid type");
-        return owner_or_assert().template get_or_emplace<Type>(entt, std::forward<Args>(args)...);
+        static_assert(((sizeof...(Scope) == 0) || ... || stl::is_same_v<Type, Scope>), "Invalid type");
+        return owner_or_assert().template get_or_emplace<Type>(entt, stl::forward<Args>(args)...);
     }
 
     /**
@@ -353,7 +353,7 @@ public:
      */
     template<typename Other, typename... Args>
     operator basic_handle<Other, Args...>() const noexcept {
-        static_assert(std::is_same_v<Other, Registry> || std::is_same_v<std::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
+        static_assert(stl::is_same_v<Other, Registry> || stl::is_same_v<stl::remove_const_t<Other>, Registry>, "Invalid conversion between different handles");
         static_assert((sizeof...(Scope) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Scope)) && ... && (type_list_contains_v<type_list<Scope...>, Args>))), "Invalid conversion between different handles");
         return owner ? basic_handle<Other, Args...>{*owner, entt} : basic_handle<Other, Args...>{};
     }

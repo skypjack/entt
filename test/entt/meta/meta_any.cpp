@@ -160,6 +160,34 @@ TEST_F(MetaAny, Context) {
     ASSERT_EQ(&any.context(), &ctx);
 }
 
+TEST_F(MetaAny, Type) {
+    using namespace entt::literals;
+
+    entt::meta_ctx ctx{};
+
+    entt::meta_factory<clazz>{ctx, "other"_hs}
+        .data<nullptr, &clazz::value>("value"_hs);
+
+    entt::meta_any any{clazz{}};
+    const auto type = entt::resolve(ctx, "other"_hs);
+
+    ASSERT_EQ(any.type(), entt::resolve<clazz>());
+    ASSERT_NE(any.type(), entt::resolve<clazz>(ctx));
+
+    ASSERT_NE(type, entt::resolve<clazz>());
+    ASSERT_NE(type, entt::resolve<clazz>(ctx));
+
+    ASSERT_NE(&any.context(), &ctx);
+    ASSERT_EQ(&any.context(), &entt::locator<entt::meta_ctx>::value());
+    ASSERT_FALSE(any.type().data("value"_hs).is_const());
+
+    any.type(type);
+
+    ASSERT_EQ(&any.context(), &ctx);
+    ASSERT_NE(&any.context(), &entt::locator<entt::meta_ctx>::value());
+    ASSERT_TRUE(any.type().data("value"_hs).is_const());
+}
+
 TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 

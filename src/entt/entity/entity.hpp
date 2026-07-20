@@ -1,13 +1,13 @@
 #ifndef ENTT_ENTITY_ENTITY_HPP
 #define ENTT_ENTITY_ENTITY_HPP
 
-#include <bit>
-#include <concepts>
-#include <cstddef>
-#include <cstdint>
-#include <type_traits>
 #include "../config/config.h"
 #include "../core/bit.hpp"
+#include "../stl/bit.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/cstdint.hpp"
+#include "../stl/type_traits.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -20,10 +20,10 @@ struct entt_traits;
 
 template<typename Type>
 requires requires {
-    requires std::is_enum_v<Type>;
-    typename internal::entt_traits<std::underlying_type_t<Type>>::value_type;
+    requires stl::is_enum_v<Type>;
+    typename internal::entt_traits<stl::underlying_type_t<Type>>::value_type;
 }
-struct entt_traits<Type>: entt_traits<std::underlying_type_t<Type>> {
+struct entt_traits<Type>: entt_traits<stl::underlying_type_t<Type>> {
     using value_type = Type;
 };
 
@@ -35,22 +35,22 @@ struct entt_traits<Type>
 };
 
 template<>
-struct entt_traits<std::uint32_t> {
-    using value_type = std::uint32_t;
+struct entt_traits<stl::uint32_t> {
+    using value_type = stl::uint32_t;
 
-    using entity_type = std::uint32_t;
-    using version_type = std::uint16_t;
+    using entity_type = stl::uint32_t;
+    using version_type = stl::uint16_t;
 
     static constexpr entity_type entity_mask = 0xFFFFF;
     static constexpr entity_type version_mask = 0xFFF;
 };
 
 template<>
-struct entt_traits<std::uint64_t> {
-    using value_type = std::uint64_t;
+struct entt_traits<stl::uint64_t> {
+    using value_type = stl::uint64_t;
 
-    using entity_type = std::uint64_t;
-    using version_type = std::uint32_t;
+    using entity_type = stl::uint64_t;
+    using version_type = stl::uint32_t;
 
     static constexpr entity_type entity_mask = 0xFFFFFFFF;
     static constexpr entity_type version_mask = 0xFFFFFFFF;
@@ -74,10 +74,7 @@ concept entity_like = requires {
  */
 template<typename Traits>
 class basic_entt_traits {
-    static constexpr auto length = std::popcount(Traits::entity_mask);
-
-    static_assert(Traits::entity_mask && ((Traits::entity_mask & (Traits::entity_mask + 1)) == 0), "Invalid entity mask");
-    static_assert((Traits::version_mask & (Traits::version_mask + 1)) == 0, "Invalid version mask");
+    static constexpr auto length = stl::popcount(Traits::entity_mask);
 
 public:
     /*! @brief Value type. */
@@ -107,6 +104,7 @@ public:
      * @return The integral representation of the entity part.
      */
     [[nodiscard]] static constexpr entity_type to_entity(const value_type value) noexcept {
+        static_assert(Traits::entity_mask && ((Traits::entity_mask & (Traits::entity_mask + 1)) == 0), "Invalid entity mask");
         return (to_integral(value) & entity_mask);
     }
 
@@ -119,6 +117,7 @@ public:
         if constexpr(Traits::version_mask == 0u) {
             return version_type{};
         } else {
+            static_assert((Traits::version_mask & (Traits::version_mask + 1)) == 0, "Invalid version mask");
             return (static_cast<version_type>(to_integral(value) >> length) & version_mask);
         }
     }
@@ -179,7 +178,7 @@ struct entt_traits: basic_entt_traits<internal::entt_traits<Type>> {
     /*! @brief Base type. */
     using base_type = basic_entt_traits<internal::entt_traits<Type>>;
     /*! @brief Page size, default is `ENTT_SPARSE_PAGE`. */
-    static constexpr std::size_t page_size = ENTT_SPARSE_PAGE;
+    static constexpr stl::size_t page_size = ENTT_SPARSE_PAGE;
 };
 
 /**

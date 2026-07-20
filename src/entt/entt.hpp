@@ -1,6 +1,9 @@
 /*! @brief `EnTT` default namespace. */
 namespace entt {}
 
+/*! @brief Custom `EnTT` namespace for the standard template library. */
+namespace entt::stl {}
+
 // IWYU pragma: begin_exports
 #include "config/config.h"
 #include "config/macro.h"
@@ -66,7 +69,25 @@ namespace entt {}
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"
 #include "signal/sigh.hpp"
+#include "stl/algorithm.hpp"
+#include "stl/array.hpp"
+#include "stl/atomic.hpp"
+#include "stl/bit.hpp"
+#include "stl/cmath.hpp"
+#include "stl/concepts.hpp"
+#include "stl/cstddef.hpp"
+#include "stl/cstdint.hpp"
 #include "stl/functional.hpp"
+#include "stl/ios.hpp"
 #include "stl/iterator.hpp"
+#include "stl/limits.hpp"
 #include "stl/memory.hpp"
+#include "stl/ostream.hpp"
+#include "stl/sstream.hpp"
+#include "stl/string.hpp"
+#include "stl/string_view.hpp"
+#include "stl/tuple.hpp"
+#include "stl/type_traits.hpp"
+#include "stl/utility.hpp"
+#include "stl/vector.hpp"
 // IWYU pragma: end_exports

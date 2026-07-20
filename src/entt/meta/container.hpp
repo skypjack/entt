@@ -3,14 +3,13 @@
 #ifndef ENTT_META_CONTAINER_HPP
 #define ENTT_META_CONTAINER_HPP
 
-#include <concepts>
-#include <cstddef>
-#include <iterator>
-#include <type_traits>
-#include <utility>
 #include "../core/concepts.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "context.hpp"
 #include "fwd.hpp"
 #include "meta.hpp"
@@ -25,19 +24,19 @@ template<typename Type>
 struct sequence_container_extent: integral_constant<meta_dynamic_extent> {};
 
 template<typename Type>
-requires is_complete_v<std::tuple_size<Type>>
-struct sequence_container_extent<Type>: integral_constant<std::tuple_size_v<Type>> {};
+requires is_complete_v<stl::tuple_size<Type>>
+struct sequence_container_extent<Type>: integral_constant<stl::tuple_size_v<Type>> {};
 
 template<typename Type>
-inline constexpr std::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
+inline constexpr stl::size_t sequence_container_extent_v = sequence_container_extent<Type>::value;
 
 template<typename Type>
 concept meta_sequence_container_like = requires(Type elem) {
     typename Type::value_type;
     typename Type::iterator;
     requires entt::stl::forward_iterator<typename Type::iterator>;
-    { elem.begin() } -> std::same_as<typename Type::iterator>;
-    { elem.end() } -> std::same_as<typename Type::iterator>;
+    { elem.begin() } -> stl::same_as<typename Type::iterator>;
+    { elem.end() } -> stl::same_as<typename Type::iterator>;
     requires !requires { typename Type::key_type; };
     requires !requires { elem.substr(); };
 };
@@ -48,9 +47,9 @@ concept meta_associative_container_like = requires(Type value) {
     typename Type::value_type;
     typename Type::iterator;
     requires entt::stl::forward_iterator<typename Type::iterator>;
-    { value.begin() } -> std::same_as<typename Type::iterator>;
-    { value.end() } -> std::same_as<typename Type::iterator>;
-    value.find(std::declval<typename Type::key_type>());
+    { value.begin() } -> stl::same_as<typename Type::iterator>;
+    { value.end() } -> stl::same_as<typename Type::iterator>;
+    value.find(stl::declval<typename Type::key_type>());
 };
 
 } // namespace internal
@@ -68,7 +67,7 @@ struct basic_meta_sequence_container_traits {
     using iterator = meta_sequence_container::iterator;
 
     /*! @brief Number of elements, or `meta_dynamic_extent` if dynamic. */
-    static constexpr std::size_t extent = internal::sequence_container_extent_v<Type>;
+    static constexpr stl::size_t extent = internal::sequence_container_extent_v<Type>;
 
     /**
      * @brief Returns the number of elements in a container.
@@ -115,7 +114,7 @@ struct basic_meta_sequence_container_traits {
      * @return True in case of success, false otherwise.
      */
     [[nodiscard]] static bool resize([[maybe_unused]] void *container, [[maybe_unused]] const size_type sz) {
-        if constexpr(std::is_default_constructible_v<typename Type::value_type> && requires(Type elem) { elem.resize(sz); }) {
+        if constexpr(stl::is_default_constructible_v<typename Type::value_type> && requires(Type elem) { elem.resize(sz); }) {
             static_cast<Type *>(container)->resize(sz);
             return true;
         } else {
@@ -155,7 +154,7 @@ struct basic_meta_sequence_container_traits {
             auto *const non_const = any_cast<typename Type::iterator>(&it.base());
             return {area, static_cast<Type *>(container)->insert(
                               non_const ? *non_const : any_cast<const typename Type::const_iterator &>(it.base()),
-                              (value != nullptr) ? *static_cast<const Type::value_type *>(value) : *static_cast<const std::remove_reference_t<typename Type::const_reference> *>(cref))};
+                              (value != nullptr) ? *static_cast<const Type::value_type *>(value) : *static_cast<const stl::remove_reference_t<typename Type::const_reference> *>(cref))};
         } else {
             return iterator{};
         }
@@ -237,8 +236,8 @@ struct basic_meta_associative_container_traits {
      */
     static iterator iter(const meta_ctx &area, void *container, const void *as_const, const bool end) {
         return (container == nullptr)
-                   ? iterator{area, std::bool_constant<key_only>{}, end ? static_cast<const Type *>(as_const)->cend() : static_cast<const Type *>(as_const)->cbegin()}
-                   : iterator{area, std::bool_constant<key_only>{}, end ? static_cast<Type *>(container)->end() : static_cast<Type *>(container)->begin()};
+                   ? iterator{area, stl::bool_constant<key_only>{}, end ? static_cast<const Type *>(as_const)->cend() : static_cast<const Type *>(as_const)->cbegin()}
+                   : iterator{area, stl::bool_constant<key_only>{}, end ? static_cast<Type *>(container)->end() : static_cast<Type *>(container)->begin()};
     }
 
     /**
@@ -275,8 +274,8 @@ struct basic_meta_associative_container_traits {
      * @return An iterator to the element with the given key, if any.
      */
     static iterator find(const meta_ctx &area, void *container, const void *as_const, const void *key) {
-        return (container != nullptr) ? iterator{area, std::bool_constant<key_only>{}, static_cast<Type *>(container)->find(*static_cast<const Type::key_type *>(key))}
-                                      : iterator{area, std::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(*static_cast<const Type::key_type *>(key))};
+        return (container != nullptr) ? iterator{area, stl::bool_constant<key_only>{}, static_cast<Type *>(container)->find(*static_cast<const Type::key_type *>(key))}
+                                      : iterator{area, stl::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(*static_cast<const Type::key_type *>(key))};
     }
 };
 

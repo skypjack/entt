@@ -1,7 +1,7 @@
 #ifndef ENTT_CORE_CONCEPTS_HPP
 #define ENTT_CORE_CONCEPTS_HPP
 
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 
@@ -10,7 +10,7 @@ namespace entt {
  * @tparam Type Type to check.
  */
 template<typename Type>
-concept cvref_unqualified = std::is_same_v<std::remove_cvref_t<Type>, Type>;
+concept cvref_unqualified = stl::is_same_v<stl::remove_cvref_t<Type>, Type>;
 
 } // namespace entt
 

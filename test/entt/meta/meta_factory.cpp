@@ -4,6 +4,7 @@
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
+#include <entt/locator/locator.hpp>
 #include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
@@ -38,6 +39,14 @@ struct MetaFactory: ::testing::Test {
             return value;
         }
 
+        static void set_double(clazz &instance, double val) noexcept {
+            instance.value = static_cast<int>(val);
+        }
+
+        [[nodiscard]] static double get_double(const clazz &instance) noexcept {
+            return instance.value;
+        }
+
         [[nodiscard]] static std::string to_string(const clazz &instance) {
             return std::to_string(instance.get_int());
         }
@@ -55,9 +64,12 @@ struct MetaFactory: ::testing::Test {
     }
 };
 
+using MetaVoidFactory = MetaFactory;
 using MetaFactoryDeathTest = MetaFactory;
 
 TEST_F(MetaFactory, Constructors) {
+    using namespace entt::literals;
+
     entt::meta_ctx ctx{};
 
     ASSERT_EQ(entt::resolve(entt::type_id<int>()), entt::meta_type{});
@@ -74,6 +86,22 @@ TEST_F(MetaFactory, Constructors) {
     ASSERT_NE(entt::resolve(entt::type_id<int>()), entt::meta_type{});
     ASSERT_NE(entt::resolve(ctx, entt::type_id<int>()), entt::meta_type{});
     ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()).is_integral());
+
+    entt::meta_factory<double> other{"custom"_hs};
+
+    ASSERT_EQ(entt::resolve(entt::type_id<double>()), entt::meta_type{});
+    ASSERT_NE(entt::resolve("custom"_hs), entt::meta_type{});
+    ASSERT_EQ(entt::resolve(ctx, entt::type_id<double>()), entt::meta_type{});
+    ASSERT_EQ(entt::resolve(ctx, "custom"_hs), entt::meta_type{});
+    ASSERT_TRUE(entt::resolve("custom"_hs).is_arithmetic());
+
+    other = entt::meta_factory<double>{ctx, "custom"_hs};
+
+    ASSERT_EQ(entt::resolve(entt::type_id<double>()), entt::meta_type{});
+    ASSERT_NE(entt::resolve("custom"_hs), entt::meta_type{});
+    ASSERT_EQ(entt::resolve(ctx, entt::type_id<double>()), entt::meta_type{});
+    ASSERT_NE(entt::resolve(ctx, "custom"_hs), entt::meta_type{});
+    ASSERT_TRUE(entt::resolve("custom"_hs).is_arithmetic());
 }
 
 TEST_F(MetaFactory, Type) {
@@ -86,13 +114,38 @@ TEST_F(MetaFactory, Type) {
     factory.type("foo"_hs);
 
     ASSERT_NE(entt::resolve("foo"_hs), entt::meta_type{});
-    ASSERT_EQ(entt::resolve<int>().id(), "foo"_hs);
+    ASSERT_EQ(entt::resolve<int>().alias(), "foo"_hs);
 
     factory.type("bar"_hs);
 
     ASSERT_EQ(entt::resolve("foo"_hs), entt::meta_type{});
     ASSERT_NE(entt::resolve("bar"_hs), entt::meta_type{});
-    ASSERT_EQ(entt::resolve<int>().id(), "bar"_hs);
+    ASSERT_EQ(entt::resolve<int>().alias(), "bar"_hs);
+}
+
+TEST_F(MetaFactory, OverloadedType) {
+    using namespace entt::literals;
+
+    entt::meta_factory<int>{}
+        .type("foo"_hs)
+        .data<1>("value"_hs);
+
+    entt::meta_factory<int>{"integral"_hs}
+        .type("bar"_hs)
+        .data<2>("value"_hs);
+
+    ASSERT_NE(entt::resolve<int>(), entt::meta_type{});
+    ASSERT_NE(entt::resolve("integral"_hs), entt::meta_type{});
+    ASSERT_NE(entt::resolve<int>(), entt::resolve("integral"_hs));
+
+    ASSERT_NE(entt::resolve("foo"_hs), entt::meta_type{});
+    ASSERT_NE(entt::resolve("bar"_hs), entt::meta_type{});
+
+    ASSERT_EQ(entt::resolve("foo"_hs), entt::resolve<int>());
+    ASSERT_EQ(entt::resolve("bar"_hs), entt::resolve("integral"_hs));
+
+    ASSERT_EQ(entt::resolve<int>().data("value"_hs).get({}).cast<int>(), 1);
+    ASSERT_EQ(entt::resolve("integral"_hs).data("value"_hs).get({}).cast<int>(), 2);
 }
 
 ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
@@ -104,6 +157,17 @@ ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, Type) {
     factory.type("foo"_hs);
 
     ASSERT_DEATH(other.type("foo"_hs), "");
+    ASSERT_DEATH(factory.type(entt::type_hash<double>::value()), "");
+}
+
+ENTT_DEBUG_TEST_F(MetaFactoryDeathTest, OverloadedType) {
+    using namespace entt::literals;
+
+    entt::meta_factory<int> factory{};
+    entt::meta_factory<double> other{"overloaded"_hs};
+
+    ASSERT_DEATH(other.type(entt::type_hash<int>::value()), "");
+    ASSERT_DEATH(factory.type("overloaded"_hs), "");
 }
 
 TEST_F(MetaFactory, Base) {
@@ -178,6 +242,25 @@ TEST_F(MetaFactory, DataMemberObject) {
     ASSERT_TRUE(type.data("member"_hs));
     ASSERT_EQ(type.get("member"_hs, std::as_const(instance)), instance.member);
     ASSERT_EQ(type.get("member"_hs, instance), instance.member);
+    ASSERT_FALSE(type.set("member"_hs, std::as_const(instance), instance.member));
+    ASSERT_TRUE(type.set("member"_hs, instance, instance.member));
+}
+
+TEST_F(MetaFactory, DataFreeFunction) {
+    using namespace entt::literals;
+
+    clazz instance{1};
+    entt::meta_factory<clazz> factory{};
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.data("member"_hs));
+
+    factory.data<&clazz::set_double, &clazz::get_double>("member"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.data("member"_hs));
+    ASSERT_EQ(type.get("member"_hs, std::as_const(instance)).cast<double>(), instance.get_int());
+    ASSERT_EQ(type.get("member"_hs, instance).cast<double>(), instance.get_int());
     ASSERT_FALSE(type.set("member"_hs, std::as_const(instance), instance.member));
     ASSERT_TRUE(type.set("member"_hs, instance, instance.member));
 }
@@ -308,6 +391,24 @@ TEST_F(MetaFactory, Func) {
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.invoke("func"_hs, instance));
     ASSERT_EQ(type.invoke("func"_hs, instance).cast<int>(), instance.get_int());
+    ASSERT_FALSE(type.invoke("func"_hs, {}));
+}
+
+TEST_F(MetaFactory, FuncFreeFunction) {
+    using namespace entt::literals;
+
+    const clazz instance{1};
+    entt::meta_factory<clazz> factory{};
+    entt::meta_type type = entt::resolve<clazz>();
+
+    ASSERT_FALSE(type.func("func"_hs));
+
+    factory.func<&clazz::get_double>("func"_hs);
+    type = entt::resolve<clazz>();
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_TRUE(type.invoke("func"_hs, instance));
+    ASSERT_EQ(type.invoke("func"_hs, instance).cast<double>(), clazz::get_double(instance));
     ASSERT_FALSE(type.invoke("func"_hs, {}));
 }
 
@@ -482,6 +583,22 @@ TEST_F(MetaFactory, MetaReset) {
     ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
     ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
 
+    entt::meta_reset(entt::type_hash<int>::value());
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_reset(ctx, entt::type_hash<int>::value());
+
+    ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
+    ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_factory<int>{}.type("global"_hs);
+    entt::meta_factory<int>{ctx}.type("local"_hs);
+
+    ASSERT_TRUE(entt::resolve(entt::type_id<int>()));
+    ASSERT_TRUE(entt::resolve(ctx, entt::type_id<int>()));
+
     entt::meta_reset("global"_hs);
 
     ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
@@ -491,4 +608,20 @@ TEST_F(MetaFactory, MetaReset) {
 
     ASSERT_FALSE(entt::resolve(entt::type_id<int>()));
     ASSERT_FALSE(entt::resolve(ctx, entt::type_id<int>()));
+
+    entt::meta_factory<int>{"global"_hs};
+    entt::meta_factory<int>{ctx, "local"_hs};
+
+    ASSERT_TRUE(entt::resolve("global"_hs));
+    ASSERT_TRUE(entt::resolve(ctx, "local"_hs));
+
+    entt::meta_reset("global"_hs);
+
+    ASSERT_FALSE(entt::resolve("global"_hs));
+    ASSERT_TRUE(entt::resolve(ctx, "local"_hs));
+
+    entt::meta_reset(ctx, "local"_hs);
+
+    ASSERT_FALSE(entt::resolve("global"_hs));
+    ASSERT_FALSE(entt::resolve(ctx, "local"_hs));
 }

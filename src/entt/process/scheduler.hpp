@@ -1,13 +1,13 @@
 #ifndef ENTT_PROCESS_SCHEDULER_HPP
 #define ENTT_PROCESS_SCHEDULER_HPP
 
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/compressed_pair.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 #include "process.hpp"
 
@@ -35,9 +35,9 @@ namespace entt {
 template<typename Delta, typename Allocator>
 class basic_scheduler {
     using base_type = basic_process<Delta, Allocator>;
-    using alloc_traits = std::allocator_traits<Allocator>;
-    using container_allocator = alloc_traits::template rebind_alloc<std::shared_ptr<base_type>>;
-    using container_type = std::vector<std::shared_ptr<base_type>, container_allocator>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    using container_allocator = alloc_traits::template rebind_alloc<stl::shared_ptr<base_type>>;
+    using container_type = stl::vector<stl::shared_ptr<base_type>, container_allocator>;
 
 public:
     /*! @brief Process type. */
@@ -45,7 +45,7 @@ public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Unsigned integer type. */
     using delta_type = Delta;
 
@@ -68,7 +68,7 @@ public:
      * @param other The instance to move from.
      */
     basic_scheduler(basic_scheduler &&other) noexcept
-        : handlers{std::move(other.handlers)} {}
+        : handlers{stl::move(other.handlers)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -76,7 +76,7 @@ public:
      * @param allocator The allocator to use.
      */
     basic_scheduler(basic_scheduler &&other, const allocator_type &allocator)
-        : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
+        : handlers{container_type{stl::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || get_allocator() == other.get_allocator(), "Copying a scheduler is not allowed");
     }
 
@@ -105,7 +105,7 @@ public:
      * @param other Scheduler to exchange the content with.
      */
     void swap(basic_scheduler &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(handlers, other.handlers);
     }
 
@@ -153,7 +153,7 @@ public:
     template<typename Type, typename... Args>
     type &attach(Args &&...args) {
         const auto &allocator = handlers.second();
-        return *handlers.first().emplace_back(std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+        return *handlers.first().emplace_back(stl::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
     }
 
     /**
@@ -166,7 +166,7 @@ public:
     type &attach(Func func) {
         const auto &allocator = handlers.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *handlers.first().emplace_back(std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
+        return *handlers.first().emplace_back(stl::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
     }
 
     /**
@@ -192,7 +192,7 @@ public:
             }
 
             if(!elem || elem->rejected()) {
-                elem = std::move(handlers.first().back());
+                elem = stl::move(handlers.first().back());
                 handlers.first().pop_back();
             }
         }

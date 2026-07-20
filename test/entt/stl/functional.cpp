@@ -1,4 +1,3 @@
-#include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/type_traits.hpp>
 #include <entt/stl/functional.hpp>

@@ -221,14 +221,16 @@ endif()
 # Test config
 
 SETUP_BASIC_TEST(
-    NAME config_ext
-    SOURCES entt/config/config.cpp
-    INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-SETUP_BASIC_TEST(
     NAME config
     SOURCES entt/config/version.cpp
+)
+
+# Test config_ext
+
+SETUP_BASIC_TEST(
+    NAME config_ext
+    SOURCES entt/config_ext/config.cpp
+    INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # Test container
@@ -288,10 +290,12 @@ SETUP_BASIC_TEST(
         entt/entity/view.cpp
 )
 
+# Test entity_no_mixin
+
 SETUP_BASIC_TEST(
     NAME entity_no_mixin
     SOURCES
-        entt/entity/storage_utility.cpp
+        entt/entity_no_mixin/storage_utility.cpp
     DEFS ENTT_NO_MIXIN
 )
 
@@ -381,4 +385,33 @@ SETUP_BASIC_TEST(
         entt/stl/iterator.cpp
         entt/stl/memory.cpp
     DEFS ENTT_USE_STL
+)
+
+# Test stl_ext
+
+SETUP_BASIC_TEST(
+    NAME stl_ext
+    SOURCES
+        entt/stl_ext/algorithm.cpp
+        entt/stl_ext/array.cpp
+        entt/stl_ext/atomic.cpp
+        entt/stl_ext/bit.cpp
+        entt/stl_ext/cmath.cpp
+        entt/stl_ext/concepts.cpp
+        entt/stl_ext/cstddef.cpp
+        entt/stl_ext/cstdint.cpp
+        entt/stl_ext/functional.cpp
+        entt/stl_ext/ios.cpp
+        entt/stl_ext/iterator.cpp
+        entt/stl_ext/limits.cpp
+        entt/stl_ext/memory.cpp
+        entt/stl_ext/ostream.cpp
+        entt/stl_ext/sstream.cpp
+        entt/stl_ext/string.cpp
+        entt/stl_ext/string_view.cpp
+        entt/stl_ext/tuple.cpp
+        entt/stl_ext/type_traits.cpp
+        entt/stl_ext/utility.cpp
+        entt/stl_ext/vector.cpp
+    INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

@@ -274,6 +274,7 @@ TEST(NthArgument, Functionalities) {
 
 TEST(Tag, Functionalities) {
     using namespace entt::literals;
-    ASSERT_EQ(entt::tag<"foobar"_hs>::value, entt::hashed_string::value("foobar"));
-    testing::StaticAssertTypeEq<entt::tag<"foobar"_hs>::value_type, entt::id_type>();
+    static constexpr entt::id_type tag = "tag"_hs;
+    ASSERT_EQ(entt::tag<tag>::value, entt::hashed_string::value("tag"));
+    testing::StaticAssertTypeEq<entt::tag<tag>::value_type, entt::id_type>();
 }

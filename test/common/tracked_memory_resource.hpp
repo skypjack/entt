@@ -1,15 +1,14 @@
 #ifndef ENTT_COMMON_TRACKED_MEMORY_RESOURCE_HPP
 #define ENTT_COMMON_TRACKED_MEMORY_RESOURCE_HPP
 
-#if __has_include(<version>)
-#    include <version>
+#include <version>
+
+#if defined(__cpp_lib_memory_resource) && __cpp_lib_memory_resource >= 201603L
+#    define ENTT_HAS_TRACKED_MEMORY_RESOURCE
 #
-#    if defined(__cpp_lib_memory_resource) && __cpp_lib_memory_resource >= 201603L
-#        define ENTT_HAS_TRACKED_MEMORY_RESOURCE
-#
-#        include <cstddef>
-#        include <memory_resource>
-#        include <string>
+#    include <cstddef>
+#    include <memory_resource>
+#    include <string>
 
 namespace test {
 
@@ -58,7 +57,6 @@ private:
 
 } // namespace test
 
-#    endif
 #endif
 
 #endif

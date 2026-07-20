@@ -1,14 +1,13 @@
 #ifndef ENTT_SIGNAL_EMITTER_HPP
 #define ENTT_SIGNAL_EMITTER_HPP
 
-#include <functional>
-#include <type_traits>
-#include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -35,17 +34,17 @@ namespace entt {
 template<typename Derived, typename Allocator>
 class emitter {
     using key_type = id_type;
-    using mapped_type = std::function<void(void *)>;
+    using mapped_type = stl::function<void(void *)>;
 
-    using alloc_traits = std::allocator_traits<Allocator>;
-    using container_allocator = alloc_traits::template rebind_alloc<std::pair<const key_type, mapped_type>>;
-    using container_type = dense_map<key_type, mapped_type, stl::identity, std::equal_to<>, container_allocator>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    using container_allocator = alloc_traits::template rebind_alloc<stl::pair<const key_type, mapped_type>>;
+    using container_type = dense_map<key_type, mapped_type, stl::identity, stl::equal_to<>, container_allocator>;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     /*! @brief Default constructor. */
     emitter()
@@ -66,7 +65,7 @@ public:
      * @param other The instance to move from.
      */
     emitter(emitter &&other) noexcept
-        : handlers{std::move(other.handlers)} {}
+        : handlers{stl::move(other.handlers)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -74,13 +73,13 @@ public:
      * @param allocator The allocator to use.
      */
     emitter(emitter &&other, const allocator_type &allocator)
-        : handlers{container_type{std::move(other.handlers.first()), allocator}, allocator} {
+        : handlers{container_type{stl::move(other.handlers.first()), allocator}, allocator} {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || handlers.second() == other.handlers.second(), "Copying an emitter is not allowed");
     }
 
     /*! @brief Default destructor. */
     virtual ~emitter() {
-        static_assert(std::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
+        static_assert(stl::is_base_of_v<emitter<Derived, Allocator>, Derived>, "Invalid emitter type");
     }
 
     /**
@@ -105,7 +104,7 @@ public:
      * @param other Emitter to exchange the content with.
      */
     void swap(emitter &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(handlers, other.handlers);
     }
 
@@ -135,8 +134,8 @@ public:
      * @param func The listener to register.
      */
     template<typename Type>
-    void on(std::function<void(Type &, Derived &)> func) {
-        handlers.first().insert_or_assign(type_id<Type>().hash(), [func = std::move(func), this](void *value) {
+    void on(stl::function<void(Type &, Derived &)> func) {
+        handlers.first().insert_or_assign(type_id<Type>().hash(), [func = stl::move(func), this](void *value) {
             func(*static_cast<Type *>(value), static_cast<Derived &>(*this));
         });
     }
@@ -147,7 +146,7 @@ public:
      */
     template<typename Type>
     void erase() {
-        handlers.first().erase(type_hash<std::remove_cvref_t<Type>>::value());
+        handlers.first().erase(type_hash<stl::remove_cvref_t<Type>>::value());
     }
 
     /*! @brief Disconnects all the listeners. */
@@ -162,7 +161,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool contains() const {
-        return handlers.first().contains(type_hash<std::remove_cvref_t<Type>>::value());
+        return handlers.first().contains(type_hash<stl::remove_cvref_t<Type>>::value());
     }
 
     /**

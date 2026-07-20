@@ -1,10 +1,10 @@
 #ifndef ENTT_META_CTX_HPP
 #define ENTT_META_CTX_HPP
 
-#include <memory>
 #include "../container/dense_map.hpp"
 #include "../core/fwd.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/memory.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -15,9 +15,9 @@ namespace internal {
 struct meta_type_node;
 
 struct meta_context {
-    using container_type = dense_map<id_type, std::unique_ptr<meta_type_node>, stl::identity>;
+    using bucket_type = dense_map<id_type, stl::unique_ptr<meta_type_node>, stl::identity>;
 
-    container_type bucket;
+    bucket_type bucket;
 
     [[nodiscard]] inline static meta_context &from(meta_ctx &);
     [[nodiscard]] inline static const meta_context &from(const meta_ctx &);
@@ -26,14 +26,8 @@ struct meta_context {
 } // namespace internal
 /*! @endcond */
 
-/*! @brief Disambiguation tag for constructors and the like. */
-class meta_ctx_arg_t final {};
-
-/*! @brief Constant of type meta_context_arg_t used to disambiguate calls. */
-inline constexpr meta_ctx_arg_t meta_ctx_arg{};
-
 /*! @brief Opaque meta context type. */
-class meta_ctx: private internal::meta_context {
+struct meta_ctx: private internal::meta_context {
     // attorney idiom like model to access the base class
     friend struct internal::meta_context;
 };

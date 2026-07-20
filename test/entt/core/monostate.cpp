@@ -5,17 +5,18 @@
 TEST(Monostate, Functionalities) {
     using namespace entt::literals;
 
-    const bool b_pre = entt::monostate<entt::hashed_string{"foobar"}>{};
-    const int i_pre = entt::monostate<"foobar"_hs>{};
+    static constexpr entt::id_type tag = "tag"_hs;
+    const bool b_pre = entt::monostate<tag>{};
+    const int i_pre = entt::monostate<tag>{};
 
     ASSERT_FALSE(b_pre);
     ASSERT_EQ(i_pre, int{});
 
-    entt::monostate<"foobar"_hs>{} = true;
-    entt::monostate_v<"foobar"_hs> = 2;
+    entt::monostate<tag>{} = true;
+    entt::monostate_v<tag> = 2;
 
-    const bool &b_post = entt::monostate<"foobar"_hs>{};
-    const int &i_post = entt::monostate_v<entt::hashed_string{"foobar"}>;
+    const bool &b_post = entt::monostate<tag>{};
+    const int &i_post = entt::monostate_v<tag>;
 
     ASSERT_TRUE(b_post);
     ASSERT_EQ(i_post, 2);

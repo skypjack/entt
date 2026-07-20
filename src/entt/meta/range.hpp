@@ -2,13 +2,12 @@
 #define ENTT_META_RANGE_HPP
 
 #include <compare>
-#include <concepts>
-#include <cstddef>
-#include <iterator>
-#include <utility>
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/utility.hpp"
 #include "context.hpp"
 
 namespace entt {
@@ -20,12 +19,12 @@ struct meta_base_node;
 
 template<typename Type, typename It>
 struct meta_range_iterator final {
-    using value_type = std::pair<id_type, Type>;
+    using value_type = stl::pair<id_type, Type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::random_access_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::random_access_iterator_tag;
 
     constexpr meta_range_iterator() noexcept
         : it{},
@@ -72,7 +71,7 @@ struct meta_range_iterator final {
     }
 
     [[nodiscard]] constexpr reference operator[](const difference_type value) const noexcept {
-        if constexpr(std::is_same_v<It, typename meta_context::container_type::const_iterator>) {
+        if constexpr(stl::is_same_v<It, typename meta_context::bucket_type::const_iterator>) {
             return {it[value].first, Type{*ctx, *it[value].second}};
         } else {
             return {it[value].id, Type{*ctx, it[value]}};
@@ -87,7 +86,7 @@ struct meta_range_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
         return it - other.it;
     }
 

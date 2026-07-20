@@ -1,8 +1,8 @@
 #ifndef ENTT_GRAPH_DOT_HPP
 #define ENTT_GRAPH_DOT_HPP
 
-#include <concepts>
-#include <ostream>
+#include "../stl/concepts.hpp"
+#include "../stl/ostream.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -15,9 +15,9 @@ namespace entt {
  * @param writer Vertex decorator object.
  */
 template<typename Graph>
-requires std::derived_from<typename Graph::graph_category, directed_tag>
-void dot(std::ostream &out, const Graph &graph, std::invocable<std::ostream &, typename Graph::vertex_type> auto writer) {
-    if constexpr(std::same_as<typename Graph::graph_category, undirected_tag>) {
+requires stl::derived_from<typename Graph::graph_category, directed_tag>
+void dot(stl::ostream &out, const Graph &graph, stl::invocable<stl::ostream &, typename Graph::vertex_type> auto writer) {
+    if constexpr(stl::same_as<typename Graph::graph_category, undirected_tag>) {
         out << "graph{";
     } else {
         out << "digraph{";
@@ -30,7 +30,7 @@ void dot(std::ostream &out, const Graph &graph, std::invocable<std::ostream &, t
     }
 
     for(auto [lhs, rhs]: graph.edges()) {
-        if constexpr(std::same_as<typename Graph::graph_category, undirected_tag>) {
+        if constexpr(stl::same_as<typename Graph::graph_category, undirected_tag>) {
             out << lhs << "--" << rhs << ";";
         } else {
             out << lhs << "->" << rhs << ";";
@@ -47,7 +47,7 @@ void dot(std::ostream &out, const Graph &graph, std::invocable<std::ostream &, t
  * @param graph The graph to output.
  */
 template<typename Graph>
-void dot(std::ostream &out, const Graph &graph) {
+void dot(stl::ostream &out, const Graph &graph) {
     return dot(out, graph, [](auto &&...) {});
 }
 

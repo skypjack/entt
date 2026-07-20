@@ -1,24 +1,23 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <bit>
-#include <cmath>
 #include <compare>
-#include <concepts>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <limits>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/bit.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/bit.hpp"
+#include "../stl/cmath.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/limits.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -26,21 +25,21 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr std::size_t dense_set_placeholder_position = (std::numeric_limits<std::size_t>::max)();
+static constexpr stl::size_t dense_set_placeholder_position = (stl::numeric_limits<stl::size_t>::max)();
 
 template<typename It>
 class dense_set_iterator final {
     template<typename>
     friend class dense_set_iterator;
 
-    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+    static_assert(stl::is_pointer_v<It>, "Not a pointer type");
 
 public:
-    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
+    using value_type = stl::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::random_access_iterator_tag;
 
     constexpr dense_set_iterator() noexcept
         : it{} {}
@@ -49,7 +48,7 @@ public:
         : it{iter} {}
 
     template<typename Other>
-    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
+    requires (!stl::same_as<It, Other> && stl::constructible_from<It, Other>)
     constexpr dense_set_iterator(const dense_set_iterator<Other> &other) noexcept
         : it{other.it} {}
 
@@ -94,7 +93,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::addressof(operator[](0));
+        return stl::addressof(operator[](0));
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -102,7 +101,7 @@ public:
     }
 
     template<typename Other>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_set_iterator<Other> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const dense_set_iterator<Other> &other) const noexcept {
         return it - other.it;
     }
 
@@ -125,23 +124,23 @@ class dense_set_local_iterator final {
     template<typename>
     friend class dense_set_local_iterator;
 
-    static_assert(std::is_pointer_v<It>, "Not a pointer type");
+    static_assert(stl::is_pointer_v<It>, "Not a pointer type");
 
 public:
-    using value_type = std::remove_const_t<std::remove_pointer_t<It>>::second_type;
+    using value_type = stl::remove_const_t<stl::remove_pointer_t<It>>::second_type;
     using pointer = const value_type *;
     using reference = const value_type &;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::forward_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::forward_iterator_tag;
 
     constexpr dense_set_local_iterator() noexcept = default;
 
-    constexpr dense_set_local_iterator(It iter, const std::size_t pos) noexcept
+    constexpr dense_set_local_iterator(It iter, const stl::size_t pos) noexcept
         : it{iter},
           offset{pos} {}
 
     template<typename Other>
-    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
+    requires (!stl::same_as<It, Other> && stl::constructible_from<It, Other>)
     constexpr dense_set_local_iterator(const dense_set_local_iterator<Other> &other) noexcept
         : it{other.it},
           offset{other.offset} {}
@@ -156,7 +155,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::addressof(it[static_cast<difference_type>(offset)].second);
+        return stl::addressof(it[static_cast<difference_type>(offset)].second);
     }
 
     [[nodiscard]] constexpr reference operator*() const noexcept {
@@ -168,13 +167,13 @@ public:
         return offset == other.offset;
     }
 
-    [[nodiscard]] constexpr std::size_t index() const noexcept {
+    [[nodiscard]] constexpr stl::size_t index() const noexcept {
         return offset;
     }
 
 private:
     It it{};
-    std::size_t offset{dense_set_placeholder_position};
+    stl::size_t offset{dense_set_placeholder_position};
 };
 
 } // namespace internal
@@ -195,20 +194,20 @@ private:
 template<typename Type, typename Hash, typename KeyEqual, typename Allocator>
 class dense_set {
     static constexpr float default_threshold = 0.875f;
-    static constexpr std::size_t minimum_capacity = 8u;
-    static constexpr std::size_t placeholder_position = internal::dense_set_placeholder_position;
+    static constexpr stl::size_t minimum_capacity = 8u;
+    static constexpr stl::size_t placeholder_position = internal::dense_set_placeholder_position;
 
-    using node_type = std::pair<std::size_t, Type>;
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using sparse_container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
-    using packed_container_type = std::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
+    using node_type = stl::pair<stl::size_t, Type>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    using sparse_container_type = stl::vector<stl::size_t, typename alloc_traits::template rebind_alloc<stl::size_t>>;
+    using packed_container_type = stl::vector<node_type, typename alloc_traits::template rebind_alloc<node_type>>;
 
-    [[nodiscard]] std::size_t value_to_bucket(const auto &value) const noexcept {
+    [[nodiscard]] stl::size_t value_to_bucket(const auto &value) const noexcept {
         return fast_mod(static_cast<size_type>(sparse.second()(value)), bucket_count());
     }
 
-    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) {
+    [[nodiscard]] auto constrained_find(const auto &value, const stl::size_t bucket) {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return begin() + static_cast<iterator::difference_type>(offset);
@@ -218,7 +217,7 @@ class dense_set {
         return end();
     }
 
-    [[nodiscard]] auto constrained_find(const auto &value, const std::size_t bucket) const {
+    [[nodiscard]] auto constrained_find(const auto &value, const stl::size_t bucket) const {
         for(auto offset = sparse.first()[bucket]; offset != placeholder_position; offset = packed.first()[offset].first) {
             if(packed.second()(packed.first()[offset].second, value)) {
                 return cbegin() + static_cast<const_iterator::difference_type>(offset);
@@ -233,20 +232,20 @@ class dense_set {
         const auto index = value_to_bucket(value);
 
         if(auto it = constrained_find(value, index); it != end()) {
-            return std::make_pair(it, false);
+            return stl::make_pair(it, false);
         }
 
-        packed.first().emplace_back(sparse.first()[index], std::forward<Other>(value));
+        packed.first().emplace_back(sparse.first()[index], stl::forward<Other>(value));
         sparse.first()[index] = packed.first().size() - 1u;
         rehash_if_required();
 
-        return std::make_pair(--end(), true);
+        return stl::make_pair(--end(), true);
     }
 
-    void move_and_pop(const std::size_t pos) {
+    void move_and_pop(const stl::size_t pos) {
         if(const auto last = size() - 1u; pos != last) {
             size_type *curr = &sparse.first()[value_to_bucket(packed.first().back().second)];
-            packed.first()[pos] = std::move(packed.first().back());
+            packed.first()[pos] = stl::move(packed.first().back());
             for(; *curr != last; curr = &packed.first()[*curr].first) {}
             *curr = pos;
         }
@@ -268,9 +267,9 @@ public:
     /*! @brief Value type of the container. */
     using value_type = Type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Type of function to use to hash the elements. */
     using hasher = Hash;
     /*! @brief Type of function to use to compare the elements for equality. */
@@ -280,9 +279,9 @@ public:
     /*! @brief Constant random access iterator type. */
     using const_iterator = internal::dense_set_iterator<typename packed_container_type::const_pointer>;
     /*! @brief Reverse iterator type. */
-    using reverse_iterator = std::reverse_iterator<iterator>;
+    using reverse_iterator = stl::reverse_iterator<iterator>;
     /*! @brief Constant reverse iterator type. */
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using const_reverse_iterator = stl::reverse_iterator<const_iterator>;
     /*! @brief Forward iterator type. */
     using local_iterator = internal::dense_set_local_iterator<typename packed_container_type::pointer>;
     /*! @brief Constant forward iterator type. */
@@ -341,8 +340,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(const dense_set &other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(other.sparse.first(), allocator), std::forward_as_tuple(other.sparse.second())},
-          packed{std::piecewise_construct, std::forward_as_tuple(other.packed.first(), allocator), std::forward_as_tuple(other.packed.second())},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(other.sparse.first(), allocator), stl::forward_as_tuple(other.sparse.second())},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(other.packed.first(), allocator), stl::forward_as_tuple(other.packed.second())},
           threshold{other.threshold} {}
 
     /*! @brief Default move constructor. */
@@ -354,8 +353,8 @@ public:
      * @param allocator The allocator to use.
      */
     dense_set(dense_set &&other, const allocator_type &allocator)
-        : sparse{std::piecewise_construct, std::forward_as_tuple(std::move(other.sparse.first()), allocator), std::forward_as_tuple(std::move(other.sparse.second()))},
-          packed{std::piecewise_construct, std::forward_as_tuple(std::move(other.packed.first()), allocator), std::forward_as_tuple(std::move(other.packed.second()))},
+        : sparse{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.sparse.first()), allocator), stl::forward_as_tuple(stl::move(other.sparse.second()))},
+          packed{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.packed.first()), allocator), stl::forward_as_tuple(stl::move(other.packed.second()))},
           threshold{other.threshold} {}
 
     /*! @brief Default destructor. */
@@ -378,7 +377,7 @@ public:
      * @param other Container to exchange the content with.
      */
     void swap(dense_set &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(sparse, other.sparse);
         swap(packed, other.packed);
         swap(threshold, other.threshold);
@@ -440,7 +439,7 @@ public:
      * @return An iterator to the first instance of the reversed internal array.
      */
     [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
-        return std::make_reverse_iterator(cend());
+        return stl::make_reverse_iterator(cend());
     }
 
     /*! @copydoc crbegin */
@@ -450,7 +449,7 @@ public:
 
     /*! @copydoc rbegin */
     [[nodiscard]] reverse_iterator rbegin() noexcept {
-        return std::make_reverse_iterator(end());
+        return stl::make_reverse_iterator(end());
     }
 
     /**
@@ -459,7 +458,7 @@ public:
      * reversed internal array.
      */
     [[nodiscard]] const_reverse_iterator crend() const noexcept {
-        return std::make_reverse_iterator(cbegin());
+        return stl::make_reverse_iterator(cbegin());
     }
 
     /*! @copydoc crend */
@@ -469,7 +468,7 @@ public:
 
     /*! @copydoc rend */
     [[nodiscard]] reverse_iterator rend() noexcept {
-        return std::make_reverse_iterator(begin());
+        return stl::make_reverse_iterator(begin());
     }
 
     /**
@@ -510,13 +509,13 @@ public:
      * the element that prevented the insertion) and a bool denoting whether the
      * insertion took place.
      */
-    std::pair<iterator, bool> insert(const value_type &value) {
+    stl::pair<iterator, bool> insert(const value_type &value) {
         return insert_or_do_nothing(value);
     }
 
     /*! @copydoc insert */
-    std::pair<iterator, bool> insert(value_type &&value) {
-        return insert_or_do_nothing(std::move(value));
+    stl::pair<iterator, bool> insert(value_type &&value) {
+        return insert_or_do_nothing(stl::move(value));
     }
 
     /**
@@ -544,22 +543,22 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> emplace(Args &&...args) {
-        if constexpr(((sizeof...(Args) == 1u) && ... && std::is_same_v<std::decay_t<Args>, value_type>)) {
-            return insert_or_do_nothing(std::forward<Args>(args)...);
+    stl::pair<iterator, bool> emplace(Args &&...args) {
+        if constexpr(((sizeof...(Args) == 1u) && ... && stl::is_same_v<stl::decay_t<Args>, value_type>)) {
+            return insert_or_do_nothing(stl::forward<Args>(args)...);
         } else {
-            auto &node = packed.first().emplace_back(std::piecewise_construct, std::make_tuple(packed.first().size()), std::forward_as_tuple(std::forward<Args>(args)...));
+            auto &node = packed.first().emplace_back(stl::piecewise_construct, stl::make_tuple(packed.first().size()), stl::forward_as_tuple(stl::forward<Args>(args)...));
             const auto index = value_to_bucket(node.second);
 
             if(auto it = constrained_find(node.second, index); it != end()) {
                 packed.first().pop_back();
-                return std::make_pair(it, false);
+                return stl::make_pair(it, false);
             }
 
-            std::swap(node.first, sparse.first()[index]);
+            stl::swap(node.first, sparse.first()[index]);
             rehash_if_required();
 
-            return std::make_pair(--end(), true);
+            return stl::make_pair(--end(), true);
         }
     }
 
@@ -665,13 +664,13 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const value_type &value) {
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const value_type &value) {
         const auto it = find(value);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const value_type &value) const {
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const value_type &value) const {
         const auto it = find(value);
         return {it, it + !(it == cend())};
     }
@@ -683,14 +682,14 @@ public:
      * @return A pair of iterators pointing to the first element and past the
      * last element of the range.
      */
-    [[nodiscard]] std::pair<iterator, iterator> equal_range(const auto &value)
+    [[nodiscard]] stl::pair<iterator, iterator> equal_range(const auto &value)
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == end())};
     }
 
     /*! @copydoc equal_range */
-    [[nodiscard]] std::pair<const_iterator, const_iterator> equal_range(const auto &value) const
+    [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const auto &value) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(value);
         return {it, it + !(it == cend())};
@@ -792,7 +791,7 @@ public:
      * @return The number of elements in the given bucket.
      */
     [[nodiscard]] size_type bucket_size(const size_type index) const {
-        return static_cast<size_type>(std::distance(begin(index), end(index)));
+        return static_cast<size_type>(stl::distance(begin(index), end(index)));
     }
 
     /**
@@ -840,7 +839,7 @@ public:
         const auto cap = static_cast<size_type>(static_cast<float>(size()) / max_load_factor());
         value = value > cap ? value : cap;
 
-        if(const auto sz = std::bit_ceil(value); sz != bucket_count()) {
+        if(const auto sz = stl::bit_ceil(value); sz != bucket_count()) {
             sparse.first().resize(sz);
 
             for(auto &&elem: sparse.first()) {
@@ -849,7 +848,7 @@ public:
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
                 const auto index = value_to_bucket(packed.first()[pos].second);
-                packed.first()[pos].first = std::exchange(sparse.first()[index], pos);
+                packed.first()[pos].first = stl::exchange(sparse.first()[index], pos);
             }
         }
     }
@@ -861,7 +860,7 @@ public:
      */
     void reserve(const size_type cnt) {
         packed.first().reserve(cnt);
-        rehash(static_cast<size_type>(std::ceil(static_cast<float>(cnt) / max_load_factor())));
+        rehash(static_cast<size_type>(stl::ceil(static_cast<float>(cnt) / max_load_factor())));
     }
 
     /**

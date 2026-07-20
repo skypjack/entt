@@ -1,12 +1,12 @@
 #ifndef ENTT_PROCESS_PROCESS_HPP
 #define ENTT_PROCESS_PROCESS_HPP
 
-#include <cstdint>
-#include <memory>
-#include <type_traits>
-#include <utility>
 #include "../core/compressed_pair.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/cstdint.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -69,8 +69,8 @@ struct process_adaptor;
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
 template<typename Delta, typename Allocator>
-class basic_process: public std::enable_shared_from_this<basic_process<Delta, Allocator>> {
-    enum class state : std::uint8_t {
+class basic_process: public stl::enable_shared_from_this<basic_process<Delta, Allocator>> {
+    enum class state : stl::uint8_t {
         idle = 0,
         running,
         paused,
@@ -95,7 +95,7 @@ public:
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
     /*! @brief Handle type. */
-    using handle_type = std::shared_ptr<basic_process>;
+    using handle_type = stl::shared_ptr<basic_process>;
 
     /*! @brief Default constructor. */
     basic_process()
@@ -221,7 +221,7 @@ public:
     template<typename Type, typename... Args>
     basic_process &then(Args &&...args) {
         const auto &allocator = next.second();
-        return *(next.first() = std::allocate_shared<Type>(allocator, allocator, std::forward<Args>(args)...));
+        return *(next.first() = stl::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
     }
 
     /**
@@ -234,7 +234,7 @@ public:
     basic_process &then(Func func) {
         const auto &allocator = next.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *(next.first() = std::allocate_shared<process_type>(allocator, allocator, std::move(func)));
+        return *(next.first() = stl::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
     }
 
     /**
@@ -298,7 +298,7 @@ struct process_adaptor: public basic_process<Delta, Allocator> {
 
     process_adaptor(const allocator_type &allocator, Func proc)
         : base_type{allocator},
-          func{std::move(proc)} {}
+          func{stl::move(proc)} {}
 
     void update(const delta_type delta, void *data) override {
         func(*this, delta, data);

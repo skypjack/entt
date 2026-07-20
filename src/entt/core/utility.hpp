@@ -1,8 +1,8 @@
 #ifndef ENTT_CORE_UTILITY_HPP
 #define ENTT_CORE_UTILITY_HPP
 
-#include <type_traits>
-#include <utility>
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 
 namespace entt {
 
@@ -55,8 +55,8 @@ struct y_combinator {
      * @brief Constructs a y-combinator from a given function.
      * @param recursive A potentially recursive function.
      */
-    constexpr y_combinator(Func recursive) noexcept(std::is_nothrow_move_constructible_v<Func>)
-        : func{std::move(recursive)} {}
+    constexpr y_combinator(Func recursive) noexcept(stl::is_nothrow_move_constructible_v<Func>)
+        : func{stl::move(recursive)} {}
 
     /**
      * @brief Invokes a y-combinator and therefore its underlying function.
@@ -65,14 +65,14 @@ struct y_combinator {
      * @return Return value of the underlying function, if any.
      */
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) const noexcept(std::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
-        return func(*this, std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(Args &&...args) const noexcept(stl::is_nothrow_invocable_v<Func, const y_combinator &, Args...>) {
+        return func(*this, stl::forward<Args>(args)...);
     }
 
     /*! @copydoc operator()() */
     template<typename... Args>
-    constexpr decltype(auto) operator()(Args &&...args) noexcept(std::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
-        return func(*this, std::forward<Args>(args)...);
+    constexpr decltype(auto) operator()(Args &&...args) noexcept(stl::is_nothrow_invocable_v<Func, y_combinator &, Args...>) {
+        return func(*this, stl::forward<Args>(args)...);
     }
 
 private:

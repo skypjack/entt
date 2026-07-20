@@ -1,16 +1,16 @@
 #ifndef ENTT_POLY_POLY_HPP
 #define ENTT_POLY_POLY_HPP
 
-#include <concepts>
-#include <cstddef>
-#include <functional>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 #include "../core/any.hpp"
 #include "../core/concepts.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/functional.hpp"
+#include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -31,11 +31,11 @@ struct poly_inspector {
      * @param args The arguments to pass to the function.
      * @return A poly inspector convertible to any type.
      */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] poly_inspector invoke(Args &&...args) const;
 
     /*! @copydoc invoke */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] poly_inspector invoke(Args &&...args);
 };
 
@@ -45,12 +45,12 @@ struct poly_inspector {
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  */
-template<typename Concept, std::size_t Len, std::size_t Align>
+template<typename Concept, stl::size_t Len, stl::size_t Align>
 class poly_vtable {
     using inspector = Concept::template type<poly_inspector>;
 
     template<typename Ret, typename Clazz, typename... Args>
-    requires std::derived_from<inspector, std::remove_const_t<Clazz>>
+    requires stl::derived_from<inspector, stl::remove_const_t<Clazz>>
     static auto vtable_entry(Ret (*)(Clazz &, Args...))
         -> Ret (*)(constness_as_t<basic_any<Len, Align>, Clazz> &, Args...);
 
@@ -59,54 +59,54 @@ class poly_vtable {
         -> Ret (*)(const basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename Clazz, typename... Args>
-    requires std::derived_from<inspector, Clazz>
+    requires stl::derived_from<inspector, Clazz>
     static auto vtable_entry(Ret (Clazz::*)(Args...))
         -> Ret (*)(basic_any<Len, Align> &, Args...);
 
     template<typename Ret, typename Clazz, typename... Args>
-    requires std::derived_from<inspector, Clazz>
+    requires stl::derived_from<inspector, Clazz>
     static auto vtable_entry(Ret (Clazz::*)(Args...) const)
         -> Ret (*)(const basic_any<Len, Align> &, Args...);
 
     template<auto... Candidate>
     static auto make_vtable(value_list<Candidate...>) noexcept
-        -> decltype(std::make_tuple(vtable_entry(Candidate)...));
+        -> decltype(stl::make_tuple(vtable_entry(Candidate)...));
 
     template<typename... Func>
     [[nodiscard]] static ENTT_CONSTEVAL auto make_vtable(type_list<Func...>) noexcept {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
-        } else if constexpr((std::is_function_v<Func> && ...)) {
-            return decltype(std::make_tuple(vtable_entry(std::declval<Func inspector::*>())...)){};
+        } else if constexpr((stl::is_function_v<Func> && ...)) {
+            return decltype(stl::make_tuple(vtable_entry(stl::declval<Func inspector::*>())...)){};
         }
     }
 
     template<typename Type, auto Candidate, typename Ret, typename Any, typename... Args>
     static void fill_vtable_entry(Ret (*&entry)(Any &, Args...)) noexcept {
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
+        if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
             entry = +[](Any &, Args... args) -> Ret {
-                return std::invoke(Candidate, std::forward<Args>(args)...);
+                return stl::invoke(Candidate, stl::forward<Args>(args)...);
             };
         } else {
             entry = +[](Any &instance, Args... args) -> Ret {
-                return static_cast<Ret>(std::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(instance), std::forward<Args>(args)...));
+                return static_cast<Ret>(stl::invoke(Candidate, any_cast<constness_as_t<Type, Any> &>(instance), stl::forward<Args>(args)...));
             };
         }
     }
 
     template<typename Type, auto... Index>
-    [[nodiscard]] static auto fill_vtable(std::index_sequence<Index...>) noexcept {
+    [[nodiscard]] static auto fill_vtable(stl::index_sequence<Index...>) noexcept {
         vtable_type impl{};
-        (fill_vtable_entry<Type, value_list_element_v<Index, typename Concept::template impl<Type>>>(std::get<Index>(impl)), ...);
+        (fill_vtable_entry<Type, value_list_element_v<Index, typename Concept::template impl<Type>>>(stl::get<Index>(impl)), ...);
         return impl;
     }
 
     using vtable_type = decltype(make_vtable(Concept{}));
-    static constexpr bool is_mono = std::tuple_size_v<vtable_type> == 1u;
+    static constexpr bool is_mono = stl::tuple_size_v<vtable_type> == 1u;
 
 public:
     /*! @brief Virtual table type. */
-    using type = std::conditional_t<is_mono, std::tuple_element_t<0u, vtable_type>, const vtable_type *>;
+    using type = stl::conditional_t<is_mono, stl::tuple_element_t<0u, vtable_type>, const vtable_type *>;
 
     /**
      * @brief Returns a static virtual table for a specific concept and type.
@@ -115,10 +115,10 @@ public:
      */
     template<cvref_unqualified Type>
     [[nodiscard]] static type instance() noexcept {
-        static const vtable_type vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
+        static const vtable_type vtable = fill_vtable<Type>(stl::make_index_sequence<Concept::template impl<Type>::size>{});
 
         if constexpr(is_mono) {
-            return std::get<0>(vtable);
+            return stl::get<0>(vtable);
         } else {
             return &vtable;
         }
@@ -139,27 +139,27 @@ struct poly_base {
      * @param args The arguments to pass to the function.
      * @return The return value of the invoked function, if any.
      */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(const poly_base &self, Args &&...args) const {
         const auto &poly = static_cast<const Poly &>(self);
 
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(poly.vtable)>>) {
-            return poly.vtable(poly.storage, std::forward<Args>(args)...);
+        if constexpr(stl::is_function_v<stl::remove_pointer_t<decltype(poly.vtable)>>) {
+            return poly.vtable(poly.storage, stl::forward<Args>(args)...);
         } else {
-            return std::get<Member>(*poly.vtable)(poly.storage, std::forward<Args>(args)...);
+            return stl::get<Member>(*poly.vtable)(poly.storage, stl::forward<Args>(args)...);
         }
     }
 
     /*! @copydoc invoke */
-    template<std::size_t Member, typename... Args>
+    template<stl::size_t Member, typename... Args>
     [[nodiscard]] decltype(auto) invoke(poly_base &self, Args &&...args) {
         auto &poly = static_cast<Poly &>(self);
 
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(poly.vtable)>>) {
+        if constexpr(stl::is_function_v<stl::remove_pointer_t<decltype(poly.vtable)>>) {
             static_assert(Member == 0u, "Unknown member");
-            return poly.vtable(poly.storage, std::forward<Args>(args)...);
+            return poly.vtable(poly.storage, stl::forward<Args>(args)...);
         } else {
-            return std::get<Member>(*poly.vtable)(poly.storage, std::forward<Args>(args)...);
+            return stl::get<Member>(*poly.vtable)(poly.storage, stl::forward<Args>(args)...);
         }
     }
 };
@@ -173,9 +173,9 @@ struct poly_base {
  * @param args The arguments to pass to the function.
  * @return The return value of the invoked function, if any.
  */
-template<std::size_t Member, typename Poly, typename... Args>
+template<stl::size_t Member, typename Poly, typename... Args>
 decltype(auto) poly_call(Poly &&self, Args &&...args) {
-    return std::forward<Poly>(self).template invoke<Member>(self, std::forward<Args>(args)...);
+    return stl::forward<Poly>(self).template invoke<Member>(self, stl::forward<Args>(args)...);
 }
 
 /**
@@ -193,7 +193,7 @@ decltype(auto) poly_call(Poly &&self, Args &&...args) {
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  */
-template<typename Concept, std::size_t Len, std::size_t Align>
+template<typename Concept, stl::size_t Len, stl::size_t Align>
 class basic_poly: private Concept::template type<poly_base<basic_poly<Concept, Len, Align>>> {
     friend struct poly_base<basic_poly>;
 
@@ -213,9 +213,9 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    explicit basic_poly(std::in_place_type_t<Type>, Args &&...args)
-        : storage{std::in_place_type<Type>, std::forward<Args>(args)...},
-          vtable{poly_vtable<Concept, Len, Align>::template instance<std::remove_cvref_t<Type>>()} {}
+    explicit basic_poly(stl::in_place_type_t<Type>, Args &&...args)
+        : storage{stl::in_place_type<Type>, stl::forward<Args>(args)...},
+          vtable{poly_vtable<Concept, Len, Align>::template instance<stl::remove_cvref_t<Type>>()} {}
 
     /**
      * @brief Constructs a poly from a given value.
@@ -223,9 +223,9 @@ public:
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type>
-    requires (!std::same_as<std::remove_cvref_t<Type>, basic_poly>)
+    requires (!stl::same_as<stl::remove_cvref_t<Type>, basic_poly>)
     basic_poly(Type &&value) noexcept
-        : basic_poly{std::in_place_type<std::remove_cvref_t<Type>>, std::forward<Type>(value)} {}
+        : basic_poly{stl::in_place_type<stl::remove_cvref_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
      * @brief Returns the object type info if any, `type_id<void>()` otherwise.
@@ -256,8 +256,8 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
-        storage.template emplace<Type>(std::forward<Args>(args)...);
-        vtable = poly_vtable<Concept, Len, Align>::template instance<std::remove_cvref_t<Type>>();
+        storage.template emplace<Type>(stl::forward<Args>(args)...);
+        vtable = poly_vtable<Concept, Len, Align>::template instance<stl::remove_cvref_t<Type>>();
     }
 
     /*! @brief Destroys contained object */

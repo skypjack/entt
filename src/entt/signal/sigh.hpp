@@ -1,11 +1,11 @@
 #ifndef ENTT_SIGNAL_SIGH_HPP
 #define ENTT_SIGNAL_SIGH_HPP
 
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "../stl/cstddef.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
+#include "../stl/vector.hpp"
 #include "delegate.hpp"
 #include "fwd.hpp"
 
@@ -54,15 +54,15 @@ template<typename Ret, typename... Args, typename Allocator>
 class sigh<Ret(Args...), Allocator> {
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
-    using alloc_traits = std::allocator_traits<Allocator>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
     using delegate_type = delegate<Ret(Args...)>;
-    using container_type = std::vector<delegate_type, typename alloc_traits::template rebind_alloc<delegate_type>>;
+    using container_type = stl::vector<delegate_type, typename alloc_traits::template rebind_alloc<delegate_type>>;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Sink type. */
     using sink_type = sink<sigh<Ret(Args...), Allocator>>;
 
@@ -97,7 +97,7 @@ public:
      * @param other The instance to move from.
      */
     sigh(sigh &&other) noexcept
-        : calls{std::move(other.calls)} {}
+        : calls{stl::move(other.calls)} {}
 
     /**
      * @brief Allocator-extended move constructor.
@@ -105,7 +105,7 @@ public:
      * @param allocator The allocator to use.
      */
     sigh(sigh &&other, const allocator_type &allocator)
-        : calls{std::move(other.calls), allocator} {}
+        : calls{stl::move(other.calls), allocator} {}
 
     /*! @brief Default destructor. */
     ~sigh() = default;
@@ -135,7 +135,7 @@ public:
      * @param other Signal handler to exchange the content with.
      */
     void swap(sigh &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(calls, other.calls);
     }
 
@@ -193,17 +193,17 @@ public:
     template<typename Func>
     void collect(Func func, Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
-            if constexpr(std::is_void_v<Ret> || !std::is_invocable_v<Func, Ret>) {
+            if constexpr(stl::is_void_v<Ret> || !stl::is_invocable_v<Func, Ret>) {
                 calls[pos - 1u](args...);
 
-                if constexpr(std::is_invocable_r_v<bool, Func>) {
+                if constexpr(stl::is_invocable_r_v<bool, Func>) {
                     if(func()) {
                         break;
                     }
                 } else {
                     func();
                 }
-            } else if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
+            } else if constexpr(stl::is_invocable_r_v<bool, Func, Ret>) {
                 if(func(calls[pos - 1u](args...))) {
                     break;
                 }
@@ -221,7 +221,7 @@ private:
  * @brief Connection class.
  *
  * Opaque object the aim of which is to allow users to release an already
- * estabilished connection without having to keep a reference to the signal or
+ * established connection without having to keep a reference to the signal or
  * the sink that generated it.
  */
 class connection {
@@ -261,7 +261,7 @@ private:
  * @brief Scoped connection class.
  *
  * Opaque object the aim of which is to allow users to release an already
- * estabilished connection without having to keep a reference to the signal or
+ * established connection without having to keep a reference to the signal or
  * the sink that generated it.<br/>
  * A scoped connection automatically breaks the link between the two objects
  * when it goes out of scope.
@@ -285,7 +285,7 @@ struct scoped_connection {
      * @param other The scoped connection to move from.
      */
     scoped_connection(scoped_connection &&other) noexcept
-        : conn{std::exchange(other.conn, {})} {}
+        : conn{stl::exchange(other.conn, {})} {}
 
     /*! @brief Automatically breaks the link on destruction. */
     ~scoped_connection() {
@@ -304,7 +304,7 @@ struct scoped_connection {
      * @return This scoped connection.
      */
     scoped_connection &operator=(scoped_connection &&other) noexcept {
-        conn = std::exchange(other.conn, {});
+        conn = stl::exchange(other.conn, {});
         return *this;
     }
 
@@ -376,7 +376,7 @@ class sink<sigh<Ret(Args...), Allocator>> {
 
         for(auto pos = ref.calls.size(); pos; --pos) {
             if(auto &elem = ref.calls[pos - 1u]; callback(elem)) {
-                elem = std::move(ref.calls.back());
+                elem = stl::move(ref.calls.back());
                 ref.calls.pop_back();
             }
         }
@@ -418,7 +418,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>();
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate>>();
@@ -447,7 +447,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance);
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type &>>(value_or_instance);
@@ -471,7 +471,7 @@ public:
 
         delegate_type call{};
         call.template connect<Candidate>(value_or_instance);
-        signal_or_assert().calls.push_back(std::move(call));
+        signal_or_assert().calls.push_back(stl::move(call));
 
         delegate<void(void *)> conn{};
         conn.template connect<&release<Candidate, Type *>>(value_or_instance);

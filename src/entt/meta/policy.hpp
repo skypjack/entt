@@ -1,7 +1,7 @@
 #ifndef ENTT_META_POLICY_HPP
 #define ENTT_META_POLICY_HPP
 
-#include <type_traits>
+#include "../stl/type_traits.hpp"
 
 namespace entt {
 
@@ -33,7 +33,7 @@ struct as_void_t final: private internal::meta_policy {
 struct as_ref_t final: private internal::meta_policy {
     /*! @cond ENTT_INTERNAL */
     template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>;
+    static constexpr bool value = stl::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>;
     /*! @endcond */
 };
 
@@ -41,7 +41,7 @@ struct as_ref_t final: private internal::meta_policy {
 struct as_cref_t final: private internal::meta_policy {
     /*! @cond ENTT_INTERNAL */
     template<typename Type>
-    static constexpr bool value = std::is_reference_v<Type>;
+    static constexpr bool value = stl::is_reference_v<Type>;
     /*! @endcond */
 };
 
@@ -54,13 +54,13 @@ struct as_is_t final: private internal::meta_policy {
 };
 
 /**
- * @brief Provides the member constant `value` to true if a type also is a meta
- * policy, false otherwise.
+ * @brief Provides the member constant `value` equal to true if a type also is a
+ * meta policy, false otherwise.
  * @tparam Type Type to check.
  */
 template<typename Type>
 struct is_meta_policy
-    : std::bool_constant<std::is_base_of_v<internal::meta_policy, Type>> {};
+    : stl::bool_constant<stl::is_base_of_v<internal::meta_policy, Type>> {};
 
 /**
  * @brief Helper variable template.

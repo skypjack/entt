@@ -1,11 +1,11 @@
 #ifndef ENTT_ENTITY_RUNTIME_VIEW_HPP
 #define ENTT_ENTITY_RUNTIME_VIEW_HPP
 
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <utility>
-#include <vector>
+#include "../stl/algorithm.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/iterator.hpp"
+#include "../stl/utility.hpp"
+#include "../stl/vector.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -17,12 +17,12 @@ namespace internal {
 template<typename Set>
 class runtime_view_iterator final {
     using iterator_type = Set::iterator;
-    using iterator_traits = std::iterator_traits<iterator_type>;
+    using iterator_traits = stl::iterator_traits<iterator_type>;
 
     [[nodiscard]] bool valid() const {
         return (!tombstone_check || *it != tombstone)
-               && std::all_of(++pools->begin(), pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
-               && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
+               && stl::all_of(++pools->begin(), pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
+               && stl::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
     }
 
 public:
@@ -30,7 +30,7 @@ public:
     using pointer = iterator_traits::pointer;
     using reference = iterator_traits::reference;
     using difference_type = iterator_traits::difference_type;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = stl::bidirectional_iterator_tag;
 
     constexpr runtime_view_iterator() noexcept
         : pools{},
@@ -38,7 +38,7 @@ public:
           it{},
           tombstone_check{} {}
 
-    runtime_view_iterator(const std::vector<Set *> &cpools, iterator_type curr, const std::vector<Set *> &ignore) noexcept
+    runtime_view_iterator(const stl::vector<Set *> &cpools, iterator_type curr, const stl::vector<Set *> &ignore) noexcept
         : pools{&cpools},
           filter{&ignore},
           it{curr},
@@ -83,8 +83,8 @@ public:
     }
 
 private:
-    const std::vector<Set *> *pools;
-    const std::vector<Set *> *filter;
+    const stl::vector<Set *> *pools;
+    const stl::vector<Set *> *filter;
     iterator_type it;
     bool tombstone_check;
 };
@@ -117,9 +117,9 @@ private:
  */
 template<typename Type, typename Allocator>
 class basic_runtime_view {
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
-    using container_type = std::vector<Type *, Allocator>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type *>, "Invalid value type");
+    using container_type = stl::vector<Type *, Allocator>;
 
     [[nodiscard]] auto offset() const noexcept {
         ENTT_ASSERT(!pools.empty(), "Invalid view");
@@ -133,9 +133,9 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Type::entity_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = Type;
     /*! @brief Bidirectional iterator type. */
@@ -174,8 +174,8 @@ public:
      * @param allocator The allocator to use.
      */
     basic_runtime_view(basic_runtime_view &&other, const allocator_type &allocator)
-        : pools{std::move(other.pools), allocator},
-          filter{std::move(other.filter), allocator} {}
+        : pools{stl::move(other.pools), allocator},
+          filter{stl::move(other.filter), allocator} {}
 
     /*! @brief Default destructor. */
     ~basic_runtime_view() = default;
@@ -197,7 +197,7 @@ public:
      * @param other View to exchange the content with.
      */
     void swap(basic_runtime_view &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(pools, other.pools);
         swap(filter, other.filter);
     }
@@ -225,7 +225,7 @@ public:
         if(pools.empty() || !(base.size() < pools.front()->size())) {
             pools.push_back(&base);
         } else {
-            pools.push_back(std::exchange(pools.front(), &base));
+            pools.push_back(stl::exchange(pools.front(), &base));
         }
 
         return *this;
@@ -286,8 +286,8 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
         return !pools.empty()
-               && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
-               && std::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); })
+               && stl::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
+               && stl::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); })
                && pools.front()->index(entt) < offset();
     }
 

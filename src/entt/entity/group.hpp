@@ -1,20 +1,19 @@
 #ifndef ENTT_ENTITY_GROUP_HPP
 #define ENTT_ENTITY_GROUP_HPP
 
-#include <array>
-#include <concepts>
-#include <cstddef>
-#include <iterator>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "../stl/array.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
+#include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -30,29 +29,29 @@ template<typename It, typename... Owned, typename... Get>
 class extended_group_iterator<It, owned_t<Owned...>, get_t<Get...>> {
     template<typename Type>
     [[nodiscard]] auto index_to_element([[maybe_unused]] Type &cpool) const {
-        if constexpr(std::is_void_v<typename Type::value_type>) {
-            return std::make_tuple();
+        if constexpr(stl::is_void_v<typename Type::value_type>) {
+            return stl::make_tuple();
         } else {
-            return std::forward_as_tuple(cpool.rbegin()[it.index()]);
+            return stl::forward_as_tuple(cpool.rbegin()[it.index()]);
         }
     }
 
 public:
     using iterator_type = It;
-    using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<It>()), std::declval<Owned>().get_as_tuple({})..., std::declval<Get>().get_as_tuple({})...));
+    using value_type = decltype(stl::tuple_cat(stl::make_tuple(*stl::declval<It>()), stl::declval<Owned>().get_as_tuple({})..., stl::declval<Get>().get_as_tuple({})...));
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::forward_iterator_tag;
 
     constexpr extended_group_iterator()
         : it{},
           pools{} {}
 
-    extended_group_iterator(iterator_type from, std::tuple<Owned *..., Get *...> cpools)
+    extended_group_iterator(iterator_type from, stl::tuple<Owned *..., Get *...> cpools)
         : it{from},
-          pools{std::move(cpools)} {}
+          pools{stl::move(cpools)} {}
 
     extended_group_iterator &operator++() noexcept {
         return ++it, *this;
@@ -64,7 +63,7 @@ public:
     }
 
     [[nodiscard]] reference operator*() const noexcept {
-        return std::tuple_cat(std::make_tuple(*it), index_to_element(*std::get<Owned *>(pools))..., std::get<Get *>(pools)->get_as_tuple(*it)...);
+        return stl::tuple_cat(stl::make_tuple(*it), index_to_element(*stl::get<Owned *>(pools))..., stl::get<Get *>(pools)->get_as_tuple(*it)...);
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
@@ -82,37 +81,37 @@ public:
 
 private:
     It it;
-    std::tuple<Owned *..., Get *...> pools;
+    stl::tuple<Owned *..., Get *...> pools;
 };
 
 struct group_descriptor {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     virtual ~group_descriptor() = default;
     [[nodiscard]] virtual bool owned(const id_type) const noexcept {
         return false;
     }
 };
 
-template<typename Type, std::size_t Owned, std::size_t Get, std::size_t Exclude>
+template<typename Type, stl::size_t Owned, stl::size_t Get, stl::size_t Exclude>
 class group_handler final: public group_descriptor {
     using entity_type = Type::entity_type;
 
-    void swap_elements(const std::size_t pos, const entity_type entt) {
+    void swap_elements(const stl::size_t pos, const entity_type entt) {
         for(size_type next{}; next < Owned; ++next) {
             pools[next]->swap_elements((*pools[next])[pos], entt);
         }
     }
 
     void push_on_construct(const entity_type entt) {
-        if(std::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
+        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
+           && stl::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
-        if(std::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
+        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
+           && stl::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             swap_elements(len++, entt);
         }
     }
@@ -135,11 +134,11 @@ public:
     using size_type = Type::size_type;
 
     template<typename... OGType, typename... EType>
-    group_handler(std::tuple<OGType &...> ogpool, std::tuple<EType &...> epool)
-        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
-          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)} {
-        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
-        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
+    group_handler(stl::tuple<OGType &...> ogpool, stl::tuple<EType &...> epool)
+        : pools{stl::apply([](auto &&...cpool) { return stl::array<common_type *, (Owned + Get)>{&cpool...}; }, ogpool)},
+          filter{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Exclude>{&cpool...}; }, epool)} {
+        stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, ogpool);
+        stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
         common_setup();
     }
 
@@ -157,7 +156,7 @@ public:
         return len;
     }
 
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
         if constexpr(Index < (Owned + Get)) {
             return pools[Index];
@@ -167,27 +166,27 @@ public:
     }
 
 private:
-    std::array<common_type *, (Owned + Get)> pools;
-    std::array<common_type *, Exclude> filter;
-    std::size_t len{};
+    stl::array<common_type *, (Owned + Get)> pools;
+    stl::array<common_type *, Exclude> filter;
+    stl::size_t len{};
 };
 
-template<typename Type, std::size_t Get, std::size_t Exclude>
+template<typename Type, stl::size_t Get, stl::size_t Exclude>
 class group_handler<Type, 0u, Get, Exclude> final: public group_descriptor {
     using entity_type = Type::entity_type;
 
     void push_on_construct(const entity_type entt) {
         if(!elem.contains(entt)
-           && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
+           && stl::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && stl::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             elem.push(entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
         if(!elem.contains(entt)
-           && std::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
-           && std::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
+           && stl::apply([entt](auto *...cpool) { return (cpool->contains(entt) && ...); }, pools)
+           && stl::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             elem.push(entt);
         }
     }
@@ -206,12 +205,12 @@ public:
     using common_type = Type;
 
     template<typename Allocator, typename... GType, typename... EType>
-    group_handler(const Allocator &allocator, std::tuple<GType &...> gpool, std::tuple<EType &...> epool)
-        : pools{std::apply([](auto &&...cpool) { return std::array<common_type *, Get>{&cpool...}; }, gpool)},
-          filter{std::apply([](auto &&...cpool) { return std::array<common_type *, Exclude>{&cpool...}; }, epool)},
+    group_handler(const Allocator &allocator, stl::tuple<GType &...> gpool, stl::tuple<EType &...> epool)
+        : pools{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Get>{&cpool...}; }, gpool)},
+          filter{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Exclude>{&cpool...}; }, epool)},
           elem{allocator} {
-        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
-        std::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
+        stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::push_on_construct>(*this), cpool.on_destroy().template connect<&group_handler::remove_if>(*this)), ...); }, gpool);
+        stl::apply([this](auto &...cpool) { ((cpool.on_construct().template connect<&group_handler::remove_if>(*this), cpool.on_destroy().template connect<&group_handler::push_on_destroy>(*this)), ...); }, epool);
         common_setup();
     }
 
@@ -223,7 +222,7 @@ public:
         return elem;
     }
 
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] common_type *storage() const noexcept {
         if constexpr(Index < Get) {
             return pools[Index];
@@ -233,8 +232,8 @@ public:
     }
 
 private:
-    std::array<common_type *, Get> pools;
-    std::array<common_type *, Exclude> filter;
+    stl::array<common_type *, Get> pools;
+    stl::array<common_type *, Exclude> filter;
     common_type elem;
 };
 
@@ -274,15 +273,15 @@ class basic_group;
  */
 template<typename... Get, typename... Exclude>
 class basic_group<owned_t<>, get_t<Get...>, exclude_t<Exclude...>> {
-    using base_type = std::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = stl::common_type_t<typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t... Index>
-    [[nodiscard]] auto pools_for(std::index_sequence<Index...>) const noexcept {
-        using return_type = std::tuple<Get *...>;
+    template<stl::size_t... Index>
+    [[nodiscard]] auto pools_for(stl::index_sequence<Index...>) const noexcept {
+        using return_type = stl::tuple<Get *...>;
         return descriptor ? return_type{static_cast<Get *>(descriptor->template storage<Index>())...} : return_type{};
     }
 
@@ -290,9 +289,9 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */
@@ -309,7 +308,7 @@ public:
      * @return Group opaque identifier.
      */
     static id_type group_id() noexcept {
-        return type_hash<basic_group<owned_t<>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+        return type_hash<basic_group<owned_t<>, get_t<stl::remove_const_t<Get>...>, exclude_t<stl::remove_const_t<Exclude>...>>>::value();
     }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
@@ -346,7 +345,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Get..., Exclude...>>;
         return *this ? static_cast<type *>(descriptor->template storage<Index>()) : nullptr;
@@ -499,16 +498,16 @@ public:
      * @param entt A valid identifier.
      * @return The elements assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
+            return stl::apply([entt](auto *...curr) { return stl::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
         } else if constexpr(sizeof...(Index) == 1) {
-            return (std::get<Index>(cpools)->get(entt), ...);
+            return (stl::get<Index>(cpools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<Index>(cpools)->get_as_tuple(entt)...);
+            return stl::tuple_cat(stl::get<Index>(cpools)->get_as_tuple(entt)...);
         }
     }
 
@@ -537,10 +536,10 @@ public:
     template<typename Func>
     void each(Func func) const {
         for(const auto entt: *this) {
-            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
-                std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
+            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_group>().get({})))>) {
+                stl::apply(func, stl::tuple_cat(stl::make_tuple(entt), get(entt)));
             } else {
-                std::apply(func, get(entt));
+                stl::apply(func, get(entt));
             }
         }
     }
@@ -559,7 +558,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools_for(std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -571,7 +570,7 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(std::tuple<Type &...>, std::tuple<Type &...>);
+     * bool(stl::tuple<Type &...>, stl::tuple<Type &...>);
      * bool(const Type &..., const Type &...);
      * bool(const Entity, const Entity);
      * @endcode
@@ -598,7 +597,7 @@ public:
      */
     template<typename Type, typename... Other, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
-        sort<index_of<Type>, index_of<Other>...>(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        sort<index_of<Type>, index_of<Other>...>(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
     }
 
     /**
@@ -614,22 +613,22 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<std::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
+    template<stl::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) {
         if(*this) {
             if constexpr(sizeof...(Index) == 0) {
-                static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-                descriptor->handle().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+                static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
+                descriptor->handle().sort(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
             } else {
-                auto comp = [&compare, cpools = pools_for(std::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
+                auto comp = [&compare, cpools = pools_for(stl::index_sequence_for<Get...>{})](const entity_type lhs, const entity_type rhs) {
                     if constexpr(sizeof...(Index) == 1) {
-                        return compare((std::get<Index>(cpools)->get(lhs), ...), (std::get<Index>(cpools)->get(rhs), ...));
+                        return compare((stl::get<Index>(cpools)->get(lhs), ...), (stl::get<Index>(cpools)->get(rhs), ...));
                     } else {
-                        return compare(std::forward_as_tuple(std::get<Index>(cpools)->get(lhs)...), std::forward_as_tuple(std::get<Index>(cpools)->get(rhs)...));
+                        return compare(stl::forward_as_tuple(stl::get<Index>(cpools)->get(lhs)...), stl::forward_as_tuple(stl::get<Index>(cpools)->get(rhs)...));
                     }
                 };
 
-                descriptor->handle().sort(std::move(comp), std::move(algo), std::forward<Args>(args)...);
+                descriptor->handle().sort(stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
             }
         }
     }
@@ -688,15 +687,15 @@ template<typename... Owned, typename... Get, typename... Exclude>
 class basic_group<owned_t<Owned...>, get_t<Get...>, exclude_t<Exclude...>> {
     static_assert(((Owned::storage_policy != deletion_policy::in_place) && ...), "Groups do not support in-place delete");
 
-    using base_type = std::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
+    using base_type = stl::common_type_t<typename Owned::base_type..., typename Get::base_type..., typename Exclude::base_type...>;
     using underlying_type = base_type::entity_type;
 
     template<typename Type>
-    static constexpr std::size_t index_of = type_list_index_v<std::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
+    static constexpr stl::size_t index_of = type_list_index_v<stl::remove_const_t<Type>, type_list<typename Owned::element_type..., typename Get::element_type..., typename Exclude::element_type...>>;
 
-    template<std::size_t... Index, std::size_t... Other>
-    [[nodiscard]] auto pools_for(std::index_sequence<Index...>, std::index_sequence<Other...>) const noexcept {
-        using return_type = std::tuple<Owned *..., Get *...>;
+    template<stl::size_t... Index, stl::size_t... Other>
+    [[nodiscard]] auto pools_for(stl::index_sequence<Index...>, stl::index_sequence<Other...>) const noexcept {
+        using return_type = stl::tuple<Owned *..., Get *...>;
         return descriptor ? return_type{static_cast<Owned *>(descriptor->template storage<Index>())..., static_cast<Get *>(descriptor->template storage<sizeof...(Owned) + Other>())...} : return_type{};
     }
 
@@ -704,9 +703,9 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = underlying_type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
+    using difference_type = stl::ptrdiff_t;
     /*! @brief Common type among all storage types. */
     using common_type = base_type;
     /*! @brief Random access iterator type. */
@@ -723,7 +722,7 @@ public:
      * @return Group opaque identifier.
      */
     static id_type group_id() noexcept {
-        return type_hash<basic_group<owned_t<std::remove_const_t<Owned>...>, get_t<std::remove_const_t<Get>...>, exclude_t<std::remove_const_t<Exclude>...>>>::value();
+        return type_hash<basic_group<owned_t<stl::remove_const_t<Owned>...>, get_t<stl::remove_const_t<Get>...>, exclude_t<stl::remove_const_t<Exclude>...>>>::value();
     }
 
     /*! @brief Default constructor to use to create empty, invalid groups. */
@@ -760,7 +759,7 @@ public:
      * @tparam Index Index of the storage to return.
      * @return The storage for the given index.
      */
-    template<std::size_t Index>
+    template<stl::size_t Index>
     [[nodiscard]] auto *storage() const noexcept {
         using type = type_list_element_t<Index, type_list<Owned..., Get..., Exclude...>>;
         return *this ? static_cast<type *>(descriptor->template storage<Index>()) : nullptr;
@@ -898,16 +897,16 @@ public:
      * @param entt A valid identifier.
      * @return The elements assigned to the entity.
      */
-    template<std::size_t... Index>
+    template<stl::size_t... Index>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
-            return std::apply([entt](auto *...curr) { return std::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
+            return stl::apply([entt](auto *...curr) { return stl::tuple_cat(curr->get_as_tuple(entt)...); }, cpools);
         } else if constexpr(sizeof...(Index) == 1) {
-            return (std::get<Index>(cpools)->get(entt), ...);
+            return (stl::get<Index>(cpools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<Index>(cpools)->get_as_tuple(entt)...);
+            return stl::tuple_cat(stl::get<Index>(cpools)->get_as_tuple(entt)...);
         }
     }
 
@@ -936,10 +935,10 @@ public:
     template<typename Func>
     void each(Func func) const {
         for(auto args: each()) {
-            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
-                std::apply(func, args);
+            if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_group>().get({})))>) {
+                stl::apply(func, args);
             } else {
-                std::apply([&func](auto, auto &&...less) { func(std::forward<decltype(less)>(less)...); }, args);
+                stl::apply([&func](auto, auto &&...less) { func(stl::forward<decltype(less)>(less)...); }, args);
             }
         }
     }
@@ -958,7 +957,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable each() const noexcept {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
         return iterable{{begin(), cpools}, {end(), cpools}};
     }
 
@@ -970,7 +969,7 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(std::tuple<Type &...>, std::tuple<Type &...>);
+     * bool(stl::tuple<Type &...>, stl::tuple<Type &...>);
      * bool(const Type &, const Type &);
      * bool(const Entity, const Entity);
      * @endcode
@@ -998,7 +997,7 @@ public:
      */
     template<typename Type, typename... Other, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        sort<index_of<Type>, index_of<Other>...>(std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        sort<index_of<Type>, index_of<Other>...>(stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
     }
 
     /**
@@ -1014,23 +1013,23 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<std::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
+    template<stl::size_t... Index, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&...args) const {
-        const auto cpools = pools_for(std::index_sequence_for<Owned...>{}, std::index_sequence_for<Get...>{});
+        const auto cpools = pools_for(stl::index_sequence_for<Owned...>{}, stl::index_sequence_for<Get...>{});
 
         if constexpr(sizeof...(Index) == 0) {
-            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            storage<0>()->sort_n(descriptor->length(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            static_assert(stl::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
+            storage<0>()->sort_n(descriptor->length(), stl::move(compare), stl::move(algo), stl::forward<Args>(args)...);
         } else {
             auto comp = [&compare, &cpools](const entity_type lhs, const entity_type rhs) {
                 if constexpr(sizeof...(Index) == 1) {
-                    return compare((std::get<Index>(cpools)->get(lhs), ...), (std::get<Index>(cpools)->get(rhs), ...));
+                    return compare((stl::get<Index>(cpools)->get(lhs), ...), (stl::get<Index>(cpools)->get(rhs), ...));
                 } else {
-                    return compare(std::forward_as_tuple(std::get<Index>(cpools)->get(lhs)...), std::forward_as_tuple(std::get<Index>(cpools)->get(rhs)...));
+                    return compare(stl::forward_as_tuple(stl::get<Index>(cpools)->get(lhs)...), stl::forward_as_tuple(stl::get<Index>(cpools)->get(rhs)...));
                 }
             };
 
-            storage<0>()->sort_n(descriptor->length(), std::move(comp), std::move(algo), std::forward<Args>(args)...);
+            storage<0>()->sort_n(descriptor->length(), stl::move(comp), stl::move(algo), stl::forward<Args>(args)...);
         }
 
         auto cb = [this](auto *head, auto *...other) {
@@ -1041,7 +1040,7 @@ public:
             }
         };
 
-        std::apply(cb, cpools);
+        stl::apply(cb, cpools);
     }
 
 private:

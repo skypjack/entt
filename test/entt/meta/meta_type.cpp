@@ -201,7 +201,7 @@ TEST_F(MetaType, Resolve) {
     ASSERT_FALSE(entt::resolve(entt::type_id<void>()));
 
     auto range = entt::resolve();
-    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.id() == "class"_hs; });
+    const auto it = std::find_if(range.begin(), range.end(), [](auto curr) { return curr.second.alias() == "class"_hs; });
 
     ASSERT_NE(it, range.end());
     ASSERT_EQ(it->second, entt::resolve<clazz>());
@@ -224,7 +224,7 @@ TEST_F(MetaType, SafeWhenEmpty) {
     ASSERT_FALSE(type);
     ASSERT_EQ(type, entt::meta_type{});
     ASSERT_EQ(type.info(), entt::type_id<void>());
-    ASSERT_EQ(type.id(), entt::type_id<void>().hash());
+    ASSERT_EQ(type.alias(), entt::type_id<void>().hash());
     ASSERT_EQ(type.size_of(), 0u);
     ASSERT_FALSE(type.is_arithmetic());
     ASSERT_FALSE(type.is_integral());
@@ -307,7 +307,7 @@ TEST_F(MetaType, IdAndInfo) {
 
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
-    ASSERT_EQ(type.id(), "class"_hs);
+    ASSERT_EQ(type.alias(), "class"_hs);
     ASSERT_EQ(type.info(), entt::type_id<clazz>());
 }
 
@@ -783,7 +783,7 @@ TEST_F(MetaType, Reset) {
     using namespace entt::literals;
 
     ASSERT_TRUE(entt::resolve("class"_hs));
-    ASSERT_EQ(entt::resolve<clazz>().id(), "class"_hs);
+    ASSERT_EQ(entt::resolve<clazz>().alias(), "class"_hs);
     ASSERT_TRUE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_TRUE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor
@@ -792,7 +792,7 @@ TEST_F(MetaType, Reset) {
     entt::meta_reset("class"_hs);
 
     ASSERT_FALSE(entt::resolve("class"_hs));
-    ASSERT_NE(entt::resolve<clazz>().id(), "class"_hs);
+    ASSERT_NE(entt::resolve<clazz>().alias(), "class"_hs);
     ASSERT_FALSE(entt::resolve<clazz>().data("value"_hs));
     ASSERT_FALSE((entt::resolve<clazz>().construct(derived{}, clazz{})));
     // implicitly generated default constructor is not cleared
@@ -804,7 +804,7 @@ TEST_F(MetaType, Reset) {
 }
 
 TEST_F(MetaType, ResetLast) {
-    auto id = (entt::resolve().cend() - 1u)->second.id();
+    auto id = (entt::resolve().cend() - 1u)->second.alias();
 
     ASSERT_TRUE(entt::resolve(id));
 
@@ -980,7 +980,7 @@ TEST_F(MetaType, ReRegistration) {
     // this should not overwrite traits and custom data
     entt::meta_factory<double>{}.type("real"_hs);
 
-    ASSERT_FALSE(entt::resolve("double"_hs));
+    ASSERT_TRUE(entt::resolve("double"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs));
     ASSERT_TRUE(entt::resolve("real"_hs).data("var"_hs));
 

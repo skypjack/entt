@@ -1,8 +1,8 @@
 #ifndef ENTT_META_TYPE_TRAITS_HPP
 #define ENTT_META_TYPE_TRAITS_HPP
 
-#include <type_traits>
-#include <utility>
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 
 namespace entt {
 
@@ -28,11 +28,11 @@ template<typename>
 struct meta_associative_container_traits;
 
 /**
- * @brief Provides the member constant `value` to true if a given type is a
- * pointer-like type from the point of view of the meta system, false otherwise.
+ * @brief Provides the member constant `value` equal to true if a given type is
+ * a pointer-like type, false otherwise.
  */
 template<typename>
-struct is_meta_pointer_like: std::false_type {};
+struct is_meta_pointer_like: stl::false_type {};
 
 /**
  * @brief Partial specialization to ensure that const pointer-like types are

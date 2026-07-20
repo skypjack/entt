@@ -3,6 +3,7 @@
 #include <component/position_component.h>
 #include <component/rect_component.h>
 #include <component/renderable_component.h>
+#include <component/velocity_component.h>
 #include <entt/meta/factory.hpp>
 #include <meta/meta.h>
 
@@ -23,6 +24,7 @@ void meta_setup() {
 
     entt::meta_factory<input_listener_component::type>()
         .type("command type")
+        .data<input_listener_component::type::NONE>("none")
         .data<input_listener_component::type::UP>("up")
         .data<input_listener_component::type::DOWN>("down")
         .data<input_listener_component::type::LEFT>("left")
@@ -45,6 +47,11 @@ void meta_setup() {
 
     entt::meta_factory<renderable_component>()
         .type("renderable");
+
+    entt::meta_factory<velocity_component>()
+        .type("velocity")
+        .data<&velocity_component::dx>("dx")
+        .data<&velocity_component::dy>("dy");
 }
 
 } // namespace testbed

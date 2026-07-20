@@ -2,19 +2,18 @@
 #define ENTT_RESOURCE_RESOURCE_CACHE_HPP
 
 #include <compare>
-#include <concepts>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-#include <utility>
 #include "../container/dense_map.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
 #include "../core/iterator.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/iterator.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/tuple.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
 #include "fwd.hpp"
 #include "loader.hpp"
 #include "resource.hpp"
@@ -30,12 +29,12 @@ class resource_cache_iterator final {
     friend class resource_cache_iterator;
 
 public:
-    using value_type = std::pair<id_type, resource<Type>>;
+    using value_type = stl::pair<id_type, resource<Type>>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::random_access_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::random_access_iterator_tag;
 
     constexpr resource_cache_iterator() noexcept = default;
 
@@ -43,8 +42,8 @@ public:
         : it{iter} {}
 
     template<typename Other>
-    requires (!std::same_as<It, Other> && std::constructible_from<It, Other>)
-    constexpr resource_cache_iterator(const resource_cache_iterator<std::remove_const_t<Type>, Other> &other) noexcept
+    requires (!stl::same_as<It, Other> && stl::constructible_from<It, Other>)
+    constexpr resource_cache_iterator(const resource_cache_iterator<stl::remove_const_t<Type>, Other> &other) noexcept
         : it{other.it} {}
 
     constexpr resource_cache_iterator &operator++() noexcept {
@@ -96,7 +95,7 @@ public:
     }
 
     template<typename... Args>
-    [[nodiscard]] constexpr std::ptrdiff_t operator-(const resource_cache_iterator<Args...> &other) const noexcept {
+    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const resource_cache_iterator<Args...> &other) const noexcept {
         return it - other.it;
     }
 
@@ -125,10 +124,10 @@ private:
  */
 template<typename Type, typename Loader, typename Allocator>
 class resource_cache {
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
-    using container_allocator = alloc_traits::template rebind_alloc<std::pair<const id_type, typename Loader::result_type>>;
-    using container_type = dense_map<id_type, typename Loader::result_type, stl::identity, std::equal_to<>, container_allocator>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, Type>, "Invalid value type");
+    using container_allocator = alloc_traits::template rebind_alloc<stl::pair<const id_type, typename Loader::result_type>>;
+    using container_type = dense_map<id_type, typename Loader::result_type, stl::identity, stl::equal_to<>, container_allocator>;
 
 public:
     /*! @brief Allocator type. */
@@ -136,7 +135,7 @@ public:
     /*! @brief Resource type. */
     using value_type = Type;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Loader type. */
     using loader_type = Loader;
     /*! @brief Input iterator type. */
@@ -172,7 +171,7 @@ public:
      * @param allocator The allocator to use.
      */
     resource_cache(const resource_cache &other, const allocator_type &allocator)
-        : pool{std::piecewise_construct, std::forward_as_tuple(other.pool.first(), allocator), std::forward_as_tuple(other.pool.second())} {}
+        : pool{stl::piecewise_construct, stl::forward_as_tuple(other.pool.first(), allocator), stl::forward_as_tuple(other.pool.second())} {}
 
     /*! @brief Default move constructor. */
     resource_cache(resource_cache &&) noexcept = default;
@@ -183,7 +182,7 @@ public:
      * @param allocator The allocator to use.
      */
     resource_cache(resource_cache &&other, const allocator_type &allocator)
-        : pool{std::piecewise_construct, std::forward_as_tuple(std::move(other.pool.first()), allocator), std::forward_as_tuple(std::move(other.pool.second()))} {}
+        : pool{stl::piecewise_construct, stl::forward_as_tuple(stl::move(other.pool.first()), allocator), stl::forward_as_tuple(stl::move(other.pool.second()))} {}
 
     /*! @brief Default destructor. */
     ~resource_cache() = default;
@@ -287,12 +286,12 @@ public:
      * insertion took place.
      */
     template<typename... Args>
-    std::pair<iterator, bool> load(const id_type id, Args &&...args) {
+    stl::pair<iterator, bool> load(const id_type id, Args &&...args) {
         if(auto it = pool.first().find(id); it != pool.first().end()) {
             return {it, false};
         }
 
-        return pool.first().emplace(id, pool.second()(std::forward<Args>(args)...));
+        return pool.first().emplace(id, pool.second()(stl::forward<Args>(args)...));
     }
 
     /**
@@ -300,8 +299,8 @@ public:
      * @copydetails load
      */
     template<typename... Args>
-    std::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
-        return {pool.first().insert_or_assign(id, pool.second()(std::forward<Args>(args)...)).first, true};
+    stl::pair<iterator, bool> force_load(const id_type id, Args &&...args) {
+        return {pool.first().insert_or_assign(id, pool.second()(stl::forward<Args>(args)...)).first, true};
     }
 
     /**
@@ -309,7 +308,7 @@ public:
      *
      * @warning
      * There is no guarantee that the returned handle is valid.<br/>
-     * If it is not, any use will result in indefinite behavior.
+     * If it is not, any use will result in undefined behavior.
      *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.

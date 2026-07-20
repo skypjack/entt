@@ -1,15 +1,15 @@
 #ifndef ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 #define ENTT_GRAPH_ADJACENCY_MATRIX_HPP
 
-#include <concepts>
-#include <cstddef>
-#include <iterator>
-#include <memory>
-#include <type_traits>
-#include <utility>
-#include <vector>
 #include "../config/config.h"
 #include "../core/iterator.hpp"
+#include "../stl/concepts.hpp"
+#include "../stl/cstddef.hpp"
+#include "../stl/iterator.hpp"
+#include "../stl/memory.hpp"
+#include "../stl/type_traits.hpp"
+#include "../stl/utility.hpp"
+#include "../stl/vector.hpp"
 #include "fwd.hpp"
 
 namespace entt {
@@ -19,25 +19,25 @@ namespace internal {
 
 template<typename It>
 class edge_iterator {
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
 
     void find_next() noexcept {
         for(; pos != last && !it[static_cast<It::difference_type>(pos)]; pos += offset) {}
     }
 
 public:
-    using value_type = std::pair<size_type, size_type>;
+    using value_type = stl::pair<size_type, size_type>;
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
-    using difference_type = std::ptrdiff_t;
-    using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
+    using difference_type = stl::ptrdiff_t;
+    using iterator_category = stl::input_iterator_tag;
+    using iterator_concept = stl::forward_iterator_tag;
 
     constexpr edge_iterator() noexcept = default;
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     constexpr edge_iterator(It base, const size_type vertices, const size_type from, const size_type to, const size_type step) noexcept
-        : it{std::move(base)},
+        : it{stl::move(base)},
           vert{vertices},
           pos{from},
           last{to},
@@ -61,7 +61,7 @@ public:
     }
 
     [[nodiscard]] constexpr pointer operator->() const noexcept {
-        return std::make_pair<size_type>(pos / vert, pos % vert);
+        return stl::make_pair<size_type>(pos / vert, pos % vert);
     }
 
     [[nodiscard]] constexpr bool operator==(const edge_iterator &other) const noexcept {
@@ -84,21 +84,21 @@ private:
  * @tparam Category Either a directed or undirected category tag.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
-template<std::derived_from<directed_tag> Category, typename Allocator>
+template<stl::derived_from<directed_tag> Category, typename Allocator>
 class adjacency_matrix {
-    using alloc_traits = std::allocator_traits<Allocator>;
-    static_assert(std::is_same_v<typename alloc_traits::value_type, std::size_t>, "Invalid value type");
-    using container_type = std::vector<std::size_t, typename alloc_traits::template rebind_alloc<std::size_t>>;
+    using alloc_traits = stl::allocator_traits<Allocator>;
+    static_assert(stl::is_same_v<typename alloc_traits::value_type, stl::size_t>, "Invalid value type");
+    using container_type = stl::vector<stl::size_t, typename alloc_traits::template rebind_alloc<stl::size_t>>;
 
 public:
     /*! @brief Allocator type. */
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
+    using size_type = stl::size_t;
     /*! @brief Vertex type. */
     using vertex_type = size_type;
     /*! @brief Edge type. */
-    using edge_type = std::pair<vertex_type, vertex_type>;
+    using edge_type = stl::pair<vertex_type, vertex_type>;
     /*! @brief Vertex iterator type. */
     using vertex_iterator = iota_iterator<vertex_type>;
     /*! @brief Edge iterator type. */
@@ -153,7 +153,7 @@ public:
      * @param allocator The allocator to use.
      */
     adjacency_matrix(adjacency_matrix &&other, const allocator_type &allocator)
-        : matrix{std::move(other.matrix), allocator},
+        : matrix{stl::move(other.matrix), allocator},
           vert{other.vert} {}
 
     /*! @brief Default destructor. */
@@ -176,7 +176,7 @@ public:
      * @param other Adjacency matrix to exchange the content with.
      */
     void swap(adjacency_matrix &other) noexcept {
-        using std::swap;
+        using stl::swap;
         swap(matrix, other.matrix);
         swap(vert, other.vert);
     }
@@ -280,16 +280,16 @@ public:
      * the element that prevented the insertion) and a bool denoting whether the
      * insertion took place.
      */
-    std::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
+    stl::pair<edge_iterator, bool> insert(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
 
-        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+        if constexpr(stl::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
             ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 1u;
         }
 
-        const auto inserted = !std::exchange(matrix[pos], 1u);
+        const auto inserted = !stl::exchange(matrix[pos], 1u);
         return {edge_iterator{matrix.cbegin(), vert, pos, matrix.size(), 1u}, inserted};
     }
 
@@ -302,13 +302,13 @@ public:
     size_type erase(const vertex_type lhs, const vertex_type rhs) {
         const auto pos = lhs * vert + rhs;
 
-        if constexpr(std::is_same_v<graph_category, undirected_tag>) {
+        if constexpr(stl::is_same_v<graph_category, undirected_tag>) {
             const auto rev = rhs * vert + lhs;
             ENTT_ASSERT(matrix[pos] == matrix[rev], "Something went really wrong");
             matrix[rev] = 0u;
         }
 
-        return std::exchange(matrix[pos], 0u);
+        return stl::exchange(matrix[pos], 0u);
     }
 
     /**

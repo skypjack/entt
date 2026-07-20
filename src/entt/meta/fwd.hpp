@@ -1,12 +1,12 @@
 #ifndef ENTT_META_FWD_HPP
 #define ENTT_META_FWD_HPP
 
-#include <cstddef>
-#include <limits>
+#include "../stl/cstddef.hpp"
+#include "../stl/limits.hpp"
 
 namespace entt {
 
-class meta_ctx;
+struct meta_ctx;
 
 class meta_sequence_container;
 
@@ -30,7 +30,13 @@ template<typename>
 class meta_factory;
 
 /*! @brief Used to identicate that a sequence container has not a fixed size. */
-inline constexpr std::size_t meta_dynamic_extent = (std::numeric_limits<std::size_t>::max)();
+inline constexpr stl::size_t meta_dynamic_extent = (stl::numeric_limits<stl::size_t>::max)();
+
+/*! @brief Disambiguation tag for constructors and the like. */
+struct meta_ctx_arg_t final {};
+
+/*! @brief Constant of type meta_context_arg_t used to disambiguate calls. */
+inline constexpr meta_ctx_arg_t meta_ctx_arg{};
 
 } // namespace entt
 
