@@ -1,7 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,35,163,60"/>
-<area shape="rect" id="Node000001" href="$classentt_1_1basic__poly.html" title=" " alt="" coords="211,5,397,31"/>
-<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="176,32,210,28,211,33,177,38"/>
-<area shape="rect" id="Node000002" href="$classentt_1_1basic__poly.html" title="Static polymorphism made simple and within everyone&#39;s reach." alt="" coords="215,55,393,95"/>
-<area shape="poly" id="edge3_Node000000_Node000002" title=" " alt="" coords="177,56,215,61,214,67,176,62"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,35,163,61"/>
+<area shape="rect" id="Node000001" href="$classentt_1_1basic__poly.html" title=" " alt="" coords="211,5,397,32"/>
+<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="178,33,210,29,210,34,179,38"/>
+<area shape="rect" id="Node000002" href="$classentt_1_1basic__poly.html" title="Static polymorphism made simple and within everyone&#39;s reach." alt="" coords="215,56,393,99"/>
+<area shape="poly" id="edge3_Node000000_Node000002" title=" " alt="" coords="178,58,215,63,214,68,178,63"/>
 </map>

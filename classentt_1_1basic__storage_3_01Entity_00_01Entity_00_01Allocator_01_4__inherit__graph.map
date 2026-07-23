@@ -1,7 +1,7 @@
 <map id="entt::basic_storage&lt; Entity, Entity, Allocator &gt;" name="entt::basic_storage&lt; Entity, Entity, Allocator &gt;">
-<area shape="rect" id="Node000001" title="Swap&#45;only entity storage specialization." alt="" coords="244,60,425,100"/>
-<area shape="rect" id="Node000002" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,196,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,56,244,62,243,67,209,61"/>
-<area shape="rect" id="Node000003" href="$classentt_1_1basic__sparse__set.html" title="Sparse set implementation." alt="" coords="19,99,183,139"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,100,243,92,244,98,197,106"/>
+<area shape="rect" id="Node000001" title="Swap&#45;only entity storage specialization." alt="" coords="243,63,420,105"/>
+<area shape="rect" id="Node000002" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,5,195,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,60,242,65,242,71,210,65"/>
+<area shape="rect" id="Node000003" href="$classentt_1_1basic__sparse__set.html" title="Sparse set implementation." alt="" coords="19,104,181,147"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,106,242,97,243,102,197,111"/>
 </map>

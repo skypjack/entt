@@ -14,12 +14,12 @@ var searchData=
   ['list_11',['Type list and value list',['../md_docs_2md_2core.html#type-list-and-value-list',1,'']]],
   ['list_20and_20value_20list_12',['Type list and value list',['../md_docs_2md_2core.html#type-list-and-value-list',1,'']]],
   ['listeners_20disconnection_13',['Listeners disconnection',['../md_docs_2md_2entity.html#listeners-disconnection',1,'']]],
-  ['load_14',['load',['../classentt_1_1resource__cache.html#a4683e49fd16e93399c934b8e086d8175',1,'entt::resource_cache']]],
+  ['load_14',['load',['../classentt_1_1resource__cache.html#a9ad9546014a4e2a4fd26d28caa48efe7',1,'entt::resource_cache']]],
   ['load_5ffactor_15',['load_factor',['../classentt_1_1dense__map.html#a0ebd2095ae61e1908572efa33dc3df56',1,'entt::dense_map::load_factor()'],['../classentt_1_1dense__set.html#abceb56d6788f953e79b6d6924bfcbfe2',1,'entt::dense_set::load_factor()']]],
   ['loader_16',['loader',['../md_docs_2md_2entity.html#continuous-loader',1,'Continuous loader'],['../classentt_1_1resource__cache.html#a29225250d340dfc89818ab6662efe774',1,'entt::resource_cache::loader()'],['../md_docs_2md_2entity.html#snapshot-loader',1,'Snapshot loader']]],
   ['loader_20and_20the_20cache_17',['The resource, the loader and the cache',['../md_docs_2md_2resource.html#the-resource-the-loader-and-the-cache',1,'']]],
   ['loader_5ftype_18',['loader_type',['../classentt_1_1resource__cache.html#a834f161302d84ba1303358ce22f6e982',1,'entt::resource_cache']]],
   ['loaders_19',['Loaders',['../md_docs_2md_2resource.html#loaders',1,'']]],
-  ['local_5fiterator_20',['local_iterator',['../classentt_1_1dense__map.html#ad05e437f37f277cbe5c6121e67a4e89a',1,'entt::dense_map::local_iterator'],['../classentt_1_1dense__set.html#a83489efab7359c9c31d910844d96faa5',1,'entt::dense_set::local_iterator']]],
+  ['local_5fiterator_20',['local_iterator',['../classentt_1_1dense__map.html#ad19a16270f367d7d043f01188fa8bfee',1,'entt::dense_map::local_iterator'],['../classentt_1_1dense__set.html#a6c23ae29b65b4d7973fda5de1b7d4644',1,'entt::dense_set::local_iterator']]],
   ['locator_21',['locator',['../md_docs_2md_2locator.html',1,'Crash Course: service locator'],['../classentt_1_1locator.html',1,'entt::locator&lt; Service &gt;'],['../classentt_1_1locator.html#af0226a1ca179eba7e3b63ee47c1d668c',1,'entt::locator::locator()=delete'],['../classentt_1_1locator.html#a82dc46a7f4d405b674e487236fea8a2f',1,'entt::locator::locator(const locator &amp;)=delete'],['../md_docs_2md_2locator.html#service-locator',1,'Service locator']]]
 ];

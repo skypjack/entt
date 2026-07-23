@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1value__list__cat.html" title="Primary template isn&#39;t defined on purpose." alt="" coords="5,5,136,45"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,27,136,69"/>
+<area shape="rect" id="Node000001" href="$classentt_1_1basic__any.html" title=" " alt="" coords="194,5,320,32"/>
+<area shape="poly" id="edge37_Node000000_Node000001" title=" " alt="" coords="151,33,193,26,194,31,151,38"/>
+<area shape="rect" id="Node000002" href="$classentt_1_1basic__any.html" title="A SBO friendly, type&#45;safe container for single values of any type." alt="" coords="184,56,331,99"/>
+<area shape="poly" id="edge38_Node000000_Node000002" title=" " alt="" coords="151,58,184,63,183,68,151,63"/>
 </map>

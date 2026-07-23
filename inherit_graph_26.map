@@ -1,5 +1,13 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1basic__meta__associative__container__traits.html" title=" " alt="" coords="5,5,196,60"/>
-<area shape="rect" id="Node000001" href="$structentt_1_1meta__associative__container__traits_3_01std_1_1set_3_01Args_8_8_8_01_4_01_4.html" title="Meta associative container traits for std::sets of any type." alt="" coords="244,5,396,60"/>
-<area shape="poly" id="edge12_Node000000_Node000001" title=" " alt="" coords="210,30,243,30,243,35,210,35"/>
+<area shape="rect" id="Node000000" href="$classentt_1_1basic__sparse__set.html" title="Sparse set implementation." alt="" coords="19,5,181,48"/>
+<area shape="rect" id="Node000001" href="$classentt_1_1basic__storage_3_01Entity_00_01Entity_00_01Allocator_01_4.html" title="Swap&#45;only entity storage specialization." alt="" coords="243,5,420,48"/>
+<area shape="poly" id="edge10_Node000000_Node000001" title=" " alt="" coords="196,24,242,24,242,29,196,29"/>
+<area shape="rect" id="Node000002" href="$classentt_1_1basic__sparse__set.html" title=" " alt="" coords="5,97,195,172"/>
+<area shape="poly" id="edge12_Node000002_Node000001" title=" " alt="" coords="181,87,242,58,269,46,271,51,244,62,184,92"/>
+<area shape="rect" id="Node000003" href="$classentt_1_1basic__storage.html" title=" " alt="" coords="265,72,398,115"/>
+<area shape="poly" id="edge11_Node000002_Node000003" title=" " alt="" coords="209,112,264,102,265,108,210,118"/>
+<area shape="rect" id="Node000004" href="$classentt_1_1basic__storage_3_01Type_00_01Entity_00_01Allocator_01_4.html" title="Default constructor." alt="" coords="246,139,417,181"/>
+<area shape="poly" id="edge13_Node000002_Node000004" title=" " alt="" coords="210,144,246,148,245,153,210,149"/>
+<area shape="rect" id="Node000005" href="$classentt_1_1basic__storage.html" title="Storage implementation." alt="" coords="246,205,417,248"/>
+<area shape="poly" id="edge14_Node000002_Node000005" title=" " alt="" coords="207,176,244,191,273,202,271,207,242,196,205,181"/>
 </map>

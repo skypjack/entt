@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1as__void__t.html" title="Empty class type used to request the as void policy." alt="" coords="5,5,112,31"/>
+<area shape="rect" id="Node000000" href="$classentt_1_1basic__entt__traits.html" title=" " alt="" coords="5,80,153,139"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="201,5,344,64"/>
+<area shape="poly" id="edge5_Node000000_Node000001" title=" " alt="" coords="166,73,199,60,201,65,168,78"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="214,88,331,131"/>
+<area shape="poly" id="edge6_Node000000_Node000002" title=" " alt="" coords="168,107,213,107,213,112,168,112"/>
+<area shape="rect" id="Node000003" href="$structentt_1_1entt__traits.html" title="Entity traits." alt="" coords="214,155,331,197"/>
+<area shape="poly" id="edge7_Node000000_Node000003" title=" " alt="" coords="168,137,214,153,213,158,166,142"/>
 </map>

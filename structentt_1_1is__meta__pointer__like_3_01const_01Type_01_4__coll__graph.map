@@ -1,8 +1,10 @@
 <map id="entt::is_meta_pointer_like&lt; const Type &gt;" name="entt::is_meta_pointer_like&lt; const Type &gt;">
-<area shape="rect" id="Node000001" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="5,167,149,207"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="24,5,131,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,44,51,79,48,99,51,118,58,143,69,165,64,167,53,145,45,119,42,99,45,78,60,42"/>
-<area shape="rect" id="Node000003" href="$structentt_1_1is__meta__pointer__like.html" title=" " alt="" coords="60,79,204,119"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="95,40,121,77,117,80,91,43"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="115,132,92,168,87,165,110,129"/>
+<area shape="rect" id="Node000001" title="Partial specialization to ensure that const pointer&#45;like types are also accepted." alt="" coords="40,171,183,213"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,109,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,46,85,122,104,169,99,171,80,124,60,48"/>
+<area shape="rect" id="Node000003" href="$structentt_1_1is__meta__pointer__like_3_01Type_01_4.html" title="Specialization for self&#45;proclaimed meta pointer like types." alt="" coords="95,80,238,123"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="88,39,140,77,137,82,85,43"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,137,127,172,122,169,143,135"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="132,5,230,32"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="179,48,173,80,167,79,173,47"/>
 </map>

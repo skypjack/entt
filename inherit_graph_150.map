@@ -1,5 +1,16 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1value__list__element.html" title=" " alt="" coords="5,5,164,60"/>
-<area shape="rect" id="Node000001" href="$structstd_1_1tuple__element_3_01Index_00_01entt_1_1value__list_3_01Value_8_8_8_01_4_01_4.html" title=" " alt="" coords="212,5,344,60"/>
-<area shape="poly" id="edge41_Node000000_Node000001" title=" " alt="" coords="178,30,212,30,212,35,178,35"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,146,130,173"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1is__equality__comparable_3_01const_01Type_01_4.html" title="Provides the member constant value equal to true if a given type is equality comparable,..." alt="" coords="413,42,600,85"/>
+<area shape="poly" id="edge64_Node000000_Node000001" title=" " alt="" coords="80,131,95,103,117,73,144,45,176,24,212,11,249,4,287,3,325,6,396,20,455,39,453,44,395,25,324,11,287,8,250,10,213,16,179,29,147,49,121,77,100,106,84,133"/>
+<area shape="rect" id="Node000003" href="$structentt_1_1is__ebco__eligible.html" title="Provides the member constant value equal to true if a given type is both an empty and non&#45;final class..." alt="" coords="200,38,343,81"/>
+<area shape="poly" id="edge65_Node000000_Node000003" title=" " alt="" coords="100,135,176,91,203,79,205,84,179,95,103,140"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1is__equality__comparable.html" title="Provides the member constant value equal to true if a given type is equality comparable,..." alt="" coords="178,105,365,148"/>
+<area shape="poly" id="edge66_Node000000_Node000002" title=" " alt="" coords="145,144,177,139,178,144,146,150"/>
+<area shape="rect" id="Node000004" href="$structentt_1_1is__meta__policy.html" title="Provides the member constant value equal to true if a type also is a meta policy, false otherwise." alt="" coords="202,172,340,214"/>
+<area shape="poly" id="edge68_Node000000_Node000004" title=" " alt="" coords="145,170,202,179,201,184,144,175"/>
+<area shape="rect" id="Node000005" href="$structentt_1_1type__list__contains_3_01type__list_3_01Type_8_8_8_01_4_00_01Other_01_4.html" title="Provides the member constant value equal to true if a type list contains a given type,..." alt="" coords="193,238,350,297"/>
+<area shape="poly" id="edge69_Node000000_Node000005" title=" " alt="" coords="104,179,179,224,202,235,199,240,176,229,101,184"/>
+<area shape="rect" id="Node000006" href="$structentt_1_1value__list__contains_3_01value__list_3_01Value_8_8_8_01_4_00_01Other_01_4.html" title="Provides the member constant value equal to true if a value list contains a given value,..." alt="" coords="190,321,352,380"/>
+<area shape="poly" id="edge70_Node000000_Node000006" title=" " alt="" coords="85,185,123,246,149,278,179,307,196,318,193,323,176,311,145,282,119,249,81,188"/>
+<area shape="poly" id="edge67_Node000002_Node000001" title=" " alt="" coords="368,98,423,83,425,88,369,103"/>
 </map>

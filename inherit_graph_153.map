@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$structentt_1_1value__list__index_3_01Value_00_01value__list_3_01First_00_01Other_8_8_8_01_4_01_4.html" title="Provides compile&#45;time type access to the values of a value list." alt="" coords="5,5,176,60"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,31,148,57"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1size__of_3_01Type_01_4.html" title="A type&#45;only sizeof wrapper that returns 0 where sizeof complains." alt="" coords="196,5,340,32"/>
+<area shape="poly" id="edge105_Node000000_Node000001" title=" " alt="" coords="163,30,195,26,196,31,164,35"/>
+<area shape="rect" id="Node000002" href="$structentt_1_1size__of.html" title="A type&#45;only sizeof wrapper that returns 0 where sizeof complains." alt="" coords="196,56,340,83"/>
+<area shape="poly" id="edge106_Node000000_Node000002" title=" " alt="" coords="164,53,196,57,195,62,163,58"/>
 </map>

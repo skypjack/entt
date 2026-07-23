@@ -1,5 +1,5 @@
 <map id="entt::allocation_deleter&lt; Allocator &gt;" name="entt::allocation_deleter&lt; Allocator &gt;">
-<area shape="rect" id="Node000001" title="Deleter for allocator&#45;aware unique pointers (waiting for C++20)." alt="" coords="5,79,159,119"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="45,5,119,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,44,85,79,79,79,79,44"/>
+<area shape="rect" id="Node000001" title="Deleter for allocator&#45;aware unique pointers (waiting for C++20)." alt="" coords="5,80,158,123"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="45,5,118,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,48,84,80,79,80,79,48"/>
 </map>

@@ -1,7 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classentt_1_1basic__entt__traits.html" title="Common basic entity traits implementation." alt="" coords="5,49,153,89"/>
-<area shape="rect" id="Node000001" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="201,5,344,60"/>
-<area shape="poly" id="edge7_Node000000_Node000001" title=" " alt="" coords="167,50,201,43,202,49,168,55"/>
-<area shape="rect" id="Node000002" href="$structentt_1_1entt__traits.html" title=" " alt="" coords="213,85,332,125"/>
-<area shape="poly" id="edge8_Node000000_Node000002" title=" " alt="" coords="168,82,213,91,212,96,167,88"/>
+<area shape="rect" id="Node000000" href="$structentt_1_1basic__meta__associative__container__traits.html" title="General purpose implementation of meta associative container traits." alt="" coords="5,5,197,48"/>
+<area shape="rect" id="Node000001" href="$structentt_1_1meta__associative__container__traits_3_01Type_01_4.html" title="Traits for meta associative container like types." alt="" coords="245,5,413,48"/>
+<area shape="poly" id="edge8_Node000000_Node000001" title=" " alt="" coords="212,24,244,24,244,29,212,29"/>
 </map>
