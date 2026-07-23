@@ -51,7 +51,7 @@ class basic_meta_factory {
         return overload;
     }
 
-    bool unique_alias(const id_type alias) const noexcept {
+    [[nodiscard]] bool unique_alias(const id_type alias) const noexcept {
         return (ctx->bucket.find(alias) == ctx->bucket.cend()) && (stl::find_if(ctx->bucket.cbegin(), ctx->bucket.cend(), [alias](const auto &value) { return value.second->alias == alias; }) == ctx->bucket.cend());
     }
 
