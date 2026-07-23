@@ -139,7 +139,6 @@ protected:
 public:
     basic_meta_factory(meta_ctx &area, meta_type_node node, const id_type id)
         : ctx{&meta_context::from(area)},
-          bucket{},
           state{mode::type} {
         if(const auto it = ctx->bucket.find(id); it == ctx->bucket.cend()) {
             ENTT_ASSERT(unique_alias(id), "Duplicate identifier");
