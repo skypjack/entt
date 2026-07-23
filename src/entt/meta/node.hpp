@@ -21,10 +21,8 @@
 #include "fwd.hpp"
 #include "type_traits.hpp"
 
-namespace entt {
-
 /*! @cond ENTT_INTERNAL */
-namespace internal {
+namespace entt::internal {
 
 enum class meta_traits : stl::uint32_t {
     is_none = 0x0000,
@@ -279,9 +277,7 @@ template<cvref_unqualified Type>
     return (it == context.bucket.cend()) ? node : *it->second;
 }
 
-} // namespace internal
+} // namespace entt::internal
 /*! @endcond */
-
-} // namespace entt
 
 #endif
