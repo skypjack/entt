@@ -1,9 +1,5 @@
-#include <cmath>
-#include <cstddef>
-#include <limits>
 #include <gtest/gtest.h>
 #include <entt/core/bit.hpp>
-#include "../../common/config.h"
 
 TEST(Bit, FastMod) {
     // constexpr-ness guaranteed
