@@ -317,7 +317,7 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     void pop(underlying_iterator first, underlying_iterator last) override {
-        for(allocator_type allocator{get_allocator()}; first != last; ++first) {
+        for([[maybe_unused]] allocator_type allocator{get_allocator()}; first != last; ++first) {
             // cannot use first.index() because it would break with cross iterators
             auto &elem = element_at(base_type::index(*first));
 
