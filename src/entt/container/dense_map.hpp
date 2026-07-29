@@ -469,6 +469,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and stl::span)
         return packed.first().data() + packed.first().size();
     }
 
@@ -479,6 +480,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and stl::span)
         return packed.first().data() + packed.first().size();
     }
 
