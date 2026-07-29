@@ -30,3 +30,4 @@ TODO:
 * storage: shrink_to_fit does not work with reentrant destructor?
 * finish the imgui viewer/editor!
 * add basic_storage constructor which accepts a pair of iterators if possible
+* entity io

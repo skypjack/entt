@@ -154,6 +154,7 @@ if(ENTT_INCLUDE_HEADERS)
         entity/handle.hpp
         entity/mixin.hpp
         entity/helper.hpp
+        entity/io.hpp
         entity/organizer.hpp
         entity/ranges.hpp
         entity/registry.hpp

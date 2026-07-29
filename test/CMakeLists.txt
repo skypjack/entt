@@ -276,6 +276,7 @@ SETUP_BASIC_TEST(
         entt/entity/group.cpp
         entt/entity/handle.cpp
         entt/entity/helper.cpp
+        entt/entity/io.cpp
         entt/entity/organizer.cpp
         entt/entity/reactive_mixin.cpp
         entt/entity/registry.cpp
