@@ -268,32 +268,32 @@ template<typename Type>
 /**
  * @brief Sets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
- * @tparam Data The actual variable to set.
+ * @tparam Candidate The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
  * @param args Parameters to use to set the variable.
  * @return True in case of success, false otherwise.
  */
-template<typename Type, auto Data>
+template<typename Type, auto Candidate>
 [[nodiscard]] bool meta_setter([[maybe_unused]] meta_handle instance, [[maybe_unused]] meta_any *const args) {
-    if constexpr(stl::is_member_function_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
-        return static_cast<bool>(internal::meta_invoke<Type, as_void_t>(instance, Data, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Data)>::args_type::size>{}));
-    } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
-        using data_type = stl::remove_reference_t<typename meta_function_helper_t<Type, decltype(Data)>::return_type>;
+    if constexpr(stl::is_member_function_pointer_v<decltype(Candidate)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Candidate)>>>) {
+        return static_cast<bool>(internal::meta_invoke<Type, as_void_t>(instance, Candidate, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Candidate)>::args_type::size>{}));
+    } else if constexpr(stl::is_member_object_pointer_v<decltype(Candidate)>) {
+        using data_type = stl::remove_reference_t<typename meta_function_helper_t<Type, decltype(Candidate)>::return_type>;
 
         if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(auto *const clazz = instance->try_cast<Type>(); clazz && args->allow_cast<data_type>()) {
-                stl::invoke(Data, *clazz) = args->cast<data_type>();
+                stl::invoke(Candidate, *clazz) = args->cast<data_type>();
                 return true;
             }
         }
 
         return false;
-    } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
-        using data_type = stl::remove_reference_t<decltype(*Data)>;
+    } else if constexpr(stl::is_pointer_v<decltype(Candidate)>) {
+        using data_type = stl::remove_reference_t<decltype(*Candidate)>;
 
         if constexpr(!stl::is_array_v<data_type> && !stl::is_const_v<data_type>) {
             if(args->allow_cast<data_type>()) {
-                *Data = args->cast<data_type>();
+                *Candidate = args->cast<data_type>();
                 return true;
             }
         }
@@ -307,61 +307,61 @@ template<typename Type, auto Data>
 /**
  * @brief Sets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
- * @tparam Data The actual variable to set.
+ * @tparam Candidate The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
  * @param value Parameter to use to set the variable.
  * @return True in case of success, false otherwise.
  */
-template<typename Type, auto Data>
+template<typename Type, auto Candidate>
 [[nodiscard]] bool meta_setter(meta_handle instance, meta_any value) {
-    return meta_setter<Type, Data>(std::move(instance), &value);
+    return meta_setter<Type, Candidate>(std::move(instance), &value);
 }
 
 /**
  * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
- * @tparam Data The actual variable to get.
+ * @tparam Candidate The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
  * @param args Parameters to use to set the variable.
  * @return A meta any containing the value of the underlying variable.
  */
-template<typename Type, auto Data, meta_policy Policy = as_value_t>
+template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance, [[maybe_unused]] meta_any *const args) {
-    if constexpr(stl::is_member_function_pointer_v<decltype(Data)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Data)>>>) {
-        return internal::meta_invoke<Type, Policy>(instance, Data, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Data)>::args_type::size>{});
-    } else if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
-        if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Data), Type &>>>) {
+    if constexpr(stl::is_member_function_pointer_v<decltype(Candidate)> || stl::is_function_v<stl::remove_reference_t<stl::remove_pointer_t<decltype(Candidate)>>>) {
+        return internal::meta_invoke<Type, Policy>(instance, Candidate, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Candidate)>::args_type::size>{});
+    } else if constexpr(stl::is_member_object_pointer_v<decltype(Candidate)>) {
+        if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), Type &>>>) {
             if(auto *clazz = instance->try_cast<Type>(); clazz) {
-                return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *clazz));
+                return meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *clazz));
             } else if(auto *fallback = instance->try_cast<const Type>(); fallback) {
-                return meta_dispatch<Policy>(instance->context(), stl::invoke(Data, *fallback));
+                return meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *fallback));
             }
         }
 
         return meta_any{meta_ctx_arg, instance->context()};
-    } else if constexpr(stl::is_pointer_v<decltype(Data)>) {
-        if constexpr(stl::is_array_v<stl::remove_pointer_t<decltype(Data)>>) {
+    } else if constexpr(stl::is_pointer_v<decltype(Candidate)>) {
+        if constexpr(stl::is_array_v<stl::remove_pointer_t<decltype(Candidate)>>) {
             return meta_any{meta_ctx_arg, instance->context()};
         } else {
-            return meta_dispatch<Policy>(instance->context(), *Data);
+            return meta_dispatch<Policy>(instance->context(), *Candidate);
         }
     } else {
-        return meta_dispatch<Policy>(instance->context(), Data);
+        return meta_dispatch<Policy>(instance->context(), Candidate);
     }
 }
 
 /**
  * @brief Gets the value of a given variable.
  * @tparam Type Reflected type to which the variable is associated.
- * @tparam Data The actual variable to get.
+ * @tparam Candidate The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
  * @return A meta any containing the value of the underlying variable.
  */
-template<typename Type, auto Data, meta_policy Policy = as_value_t>
+template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
-    return meta_getter<Type, Data, Policy>(std::move(instance), nullptr);
+    return meta_getter<Type, Candidate, Policy>(std::move(instance), nullptr);
 }
 
 /**
