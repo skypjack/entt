@@ -1336,7 +1336,7 @@ public:
     }
 
     /**
-     * @copybrief construct
+     * @brief Creates an instance of the underlying type, if possible.
      * @param args Parameters to use to construct the instance.
      * @return A wrapper containing the new instance, if any.
      */
@@ -1374,7 +1374,7 @@ public:
     }
 
     /**
-     * @copybrief invoke
+     * @brief Invokes a function given an identifier, if possible.
      * @param id Unique identifier.
      * @tparam Instance Type of instance to operate on.
      * @param instance An instance that fits the underlying type.
