@@ -220,7 +220,7 @@ class basic_storage: public basic_sparse_set<Entity, typename stl::allocator_tra
     auto assure_at_least(const stl::size_t pos) {
         const auto idx = pos / traits_type::page_size;
 
-        if(!(idx < payload.size())) {
+        if(idx >= payload.size()) {
             auto curr = payload.size();
             allocator_type allocator{get_allocator()};
             payload.resize(idx + 1u, nullptr);
@@ -346,7 +346,7 @@ protected:
         } else {
             allocator_type allocator{get_allocator()};
 
-            for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
+            for(auto first = base_type::begin(); first.index() >= 0; ++first) {
                 if constexpr(traits_type::in_place_delete) {
                     if(*first != tombstone) {
                         base_type::in_place_pop(*first);
@@ -1131,7 +1131,7 @@ public:
      */
     entity_type generate(const entity_type hint) {
         if(hint != null && hint != tombstone) {
-            if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || !(base_type::index(curr) < base_type::free_list())) {
+            if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || (base_type::index(curr) >= base_type::free_list())) {
                 return *base_type::try_emplace(hint, true);
             }
         }

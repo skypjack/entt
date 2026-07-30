@@ -178,7 +178,7 @@ class basic_sparse_set {
         const auto pos = entity_to_pos(entt);
         const auto page = pos_to_page(pos);
 
-        if(!(page < sparse.size())) {
+        if(page >= sparse.size()) {
             sparse.resize(page + 1u, nullptr);
         }
 
@@ -337,7 +337,7 @@ protected:
                 packed.push_back(entt);
                 elem = traits_type::combine(static_cast<traits_type::entity_type>(packed.size() - 1u), traits_type::to_integral(entt));
             } else {
-                ENTT_ASSERT(!(entity_to_pos(elem) < head), "Slot not available");
+                ENTT_ASSERT(entity_to_pos(elem) >= head, "Slot not available");
                 bump(entt);
             }
 
@@ -502,7 +502,7 @@ public:
      * @param value Free list information that is mode dependent.
      */
     void free_list(const size_type value) noexcept {
-        ENTT_ASSERT((mode == deletion_policy::swap_only) && !(value > packed.size()), "Invalid value");
+        ENTT_ASSERT((mode == deletion_policy::swap_only) && (value <= packed.size()), "Invalid value");
         head = value;
     }
 
@@ -965,7 +965,7 @@ public:
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort_n(const size_type length, Compare compare, Sort algo = Sort{}, Args &&...args) {
         ENTT_ASSERT((mode != deletion_policy::in_place) || (head == max_size), "Sorting with tombstones not allowed");
-        ENTT_ASSERT(!(length > packed.size()), "Length exceeds the number of elements");
+        ENTT_ASSERT(length <= packed.size(), "Length exceeds the number of elements");
 
         algo(packed.rend() - static_cast<difference_type>(length), packed.rend(), stl::move(compare), stl::forward<Args>(args)...);
 

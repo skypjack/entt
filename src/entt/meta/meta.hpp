@@ -612,7 +612,7 @@ public:
 
     /*! @copydoc any::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return !(vtable == nullptr);
+        return (vtable != nullptr);
     }
 
     /*! @copydoc any::operator== */

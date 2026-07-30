@@ -792,13 +792,13 @@ public:
      */
     [[nodiscard]] stl::pair<iterator, iterator> equal_range(const key_type &key) {
         const auto it = find(key);
-        return {it, it + !(it == end())};
+        return {it, it + (it != end())};
     }
 
     /*! @copydoc equal_range */
     [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
         const auto it = find(key);
-        return {it, it + !(it == cend())};
+        return {it, it + (it != cend())};
     }
 
     /**
@@ -811,14 +811,14 @@ public:
     [[nodiscard]] stl::pair<iterator, iterator> equal_range(const auto &key)
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
-        return {it, it + !(it == end())};
+        return {it, it + (it != end())};
     }
 
     /*! @copydoc equal_range */
     [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const auto &key) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
-        return {it, it + !(it == cend())};
+        return {it, it + (it != cend())};
     }
 
     /**

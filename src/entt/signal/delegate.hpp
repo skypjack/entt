@@ -269,7 +269,7 @@ public:
      */
     [[nodiscard]] explicit operator bool() const noexcept {
         // no need to also test instance
-        return !(fn == nullptr);
+        return (fn != nullptr);
     }
 
     /**

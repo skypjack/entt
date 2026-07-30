@@ -222,7 +222,7 @@ public:
      * @return This runtime view.
      */
     basic_runtime_view &iterate(common_type &base) {
-        if(pools.empty() || !(base.size() < pools.front()->size())) {
+        if(pools.empty() || (base.size() >= pools.front()->size())) {
             pools.push_back(&base);
         } else {
             pools.push_back(stl::exchange(pools.front(), &base));
