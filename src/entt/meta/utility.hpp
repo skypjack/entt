@@ -194,8 +194,8 @@ template<meta_policy Policy = as_value_t, typename Type>
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Policy, typename Candidate, typename... Args>
-[[nodiscard]] meta_any meta_invoke_with_args(const meta_ctx &ctx, Candidate &&candidate, Args &&...args) {
+template<typename Policy, typename Candidate>
+[[nodiscard]] meta_any meta_invoke_with_args(const meta_ctx &ctx, Candidate &&candidate, auto &&...args) {
     if constexpr(stl::is_void_v<decltype(stl::invoke(stl::forward<Candidate>(candidate), args...))>) {
         stl::invoke(stl::forward<Candidate>(candidate), args...);
         return meta_any{ctx, stl::in_place_type<void>};
