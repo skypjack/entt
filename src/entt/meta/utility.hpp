@@ -440,13 +440,15 @@ template<typename Type, typename... Args>
  */
 template<typename Type, typename Policy = as_value_t, typename Candidate>
 [[nodiscard]] meta_any meta_construct(const meta_ctx &ctx, Candidate &&candidate, meta_any *const args) {
-    if constexpr(meta_function_helper_t<Type, Candidate>::is_static || stl::is_class_v<stl::remove_cvref_t<Candidate>>) {
+    using descriptor = meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>;
+
+    if constexpr(descriptor::is_static || stl::is_class_v<stl::remove_cvref_t<Candidate>>) {
         meta_handle placeholder{};
-        return internal::meta_invoke<Type, Policy>(placeholder, stl::forward<Candidate>(candidate), args, stl::make_index_sequence<meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>::args_type::size>{});
+        return internal::meta_invoke<Type, Policy>(placeholder, stl::forward<Candidate>(candidate), args, stl::make_index_sequence<descriptor::args_type::size>{});
     } else {
         meta_handle instance{ctx, *args};
         // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and stl::span)
-        return internal::meta_invoke<Type, Policy>(instance, stl::forward<Candidate>(candidate), args + 1u, stl::make_index_sequence<meta_function_helper_t<Type, stl::remove_reference_t<Candidate>>::args_type::size>{});
+        return internal::meta_invoke<Type, Policy>(instance, stl::forward<Candidate>(candidate), args + 1u, stl::make_index_sequence<descriptor::args_type::size>{});
     }
 }
 
