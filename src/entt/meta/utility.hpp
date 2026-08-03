@@ -337,7 +337,7 @@ template<typename Type, auto Candidate>
  */
 template<typename Type, auto Candidate>
 [[nodiscard]] bool meta_setter(meta_handle instance, meta_any value) {
-    return meta_setter<Type, Candidate>(std::move(instance), &value);
+    return meta_setter<Type, Candidate>(stl::move(instance), &value);
 }
 
 /**
@@ -384,7 +384,7 @@ template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
  */
 template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
 [[nodiscard]] meta_any meta_getter(meta_handle instance) {
-    return meta_getter<Type, Candidate, Policy>(std::move(instance), nullptr);
+    return meta_getter<Type, Candidate, Policy>(stl::move(instance), nullptr);
 }
 
 /**

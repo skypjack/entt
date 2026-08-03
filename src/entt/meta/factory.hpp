@@ -32,7 +32,7 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = stl::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
-    enum class mode : std::uint8_t {
+    enum class mode : stl::uint8_t {
         type,
         data,
         func

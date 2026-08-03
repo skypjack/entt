@@ -272,7 +272,7 @@ protected:
         current = (current != Get) ? pos : Get;
     }
 
-    [[nodiscard]] std::size_t index() const noexcept {
+    [[nodiscard]] stl::size_t index() const noexcept {
         return current;
     }
     /*! @endcond */
@@ -625,8 +625,8 @@ public:
     template<typename Func>
     void each(Func func) const {
         constexpr auto fallback = []<auto... Index>(stl::index_sequence<Index...>) {
-            return std::array{&basic_view<get_t<Get...>, exclude_t<Exclude...>>::template each<Func, Index, Index...>...};
-        }(std::index_sequence_for<Get...>{});
+            return stl::array{&basic_view<get_t<Get...>, exclude_t<Exclude...>>::template each<Func, Index, Index...>...};
+        }(stl::index_sequence_for<Get...>{});
 
         if(const auto idx = this->index(); idx != sizeof...(Get)) {
             (this->*fallback[idx])(stl::move(func));
