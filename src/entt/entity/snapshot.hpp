@@ -3,6 +3,7 @@
 
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/cstddef.hpp"

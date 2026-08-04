@@ -4,6 +4,7 @@
 #define ENTT_META_TEMPLATE_HPP
 
 #include "../core/type_traits.hpp"
+#include "type_traits.hpp"
 
 namespace entt {
 
