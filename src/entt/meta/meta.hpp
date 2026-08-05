@@ -198,6 +198,7 @@ class meta_any {
             if(req == internal::meta_traits::is_pointer) {
                 if constexpr(stl::is_class_v<Type>) {
                     if(const auto &elem = any_cast<const Type &>(value.storage); elem) {
+                        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
                         return (value.storage.policy() == any_policy::cref) ? static_cast<meta_any *>(other)->emplace<decltype(*elem)>(*elem) : static_cast<meta_any *>(other)->emplace<decltype(*const_cast<Type &>(elem))>(*const_cast<Type &>(elem));
                     }
                 } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
