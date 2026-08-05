@@ -1663,7 +1663,7 @@ TEST(View, PipeNoFilter) {
 
     std::get<0>(storage).emplace(entity[1u]);
 
-    entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage))};
+    const entt::basic_view view1{std::forward_as_tuple(std::get<0>(storage))};
     const entt::basic_view view2{std::forward_as_tuple(std::as_const(std::get<1>(storage)))};
 
     ASSERT_TRUE((view1 | view2).contains(entity[0u]));
