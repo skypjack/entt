@@ -377,6 +377,7 @@ public:
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
     meta_any &operator=(auto &&value)
     requires (!stl::same_as<stl::remove_cvref_t<decltype(value)>, meta_any>) {
         emplace<stl::remove_cvref_t<decltype(value)>>(stl::forward<decltype(value)>(value));
