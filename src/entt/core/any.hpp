@@ -305,14 +305,13 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
-    template<typename Type>
-    requires (!stl::same_as<stl::remove_cvref_t<Type>, basic_any>)
-    basic_any &operator=(Type &&value) {
-        emplace<stl::decay_t<Type>>(stl::forward<Type>(value));
+    // NOLINTNEXTLINE(cppcoreguidelines-c-copy-assignment-signature,misc-unconventional-assign-operator)
+    basic_any &operator=(auto &&value)
+    requires (!stl::same_as<stl::remove_cvref_t<decltype(value)>, basic_any>) {
+        emplace<stl::decay_t<decltype(value)>>(stl::forward<decltype(value)>(value));
         return *this;
     }
 
