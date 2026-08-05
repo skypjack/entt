@@ -103,11 +103,10 @@ struct type_hash final {
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
      */
-#if defined ENTT_PRETTY_FUNCTION
     [[nodiscard]] static constexpr id_type value() noexcept {
+#if defined ENTT_PRETTY_FUNCTION
         return internal::type_hash<Type>(0);
 #else
-    [[nodiscard]] static constexpr id_type value() noexcept {
         return type_index<Type>::value();
 #endif
     }
