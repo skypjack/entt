@@ -368,25 +368,6 @@ public:
 
     /**
      * @brief Returns an opaque pointer to the contained instance.
-     * @param req Expected type.
-     * @return An opaque pointer the contained instance, if any.
-     */
-    [[nodiscard]] const void *data(const type_info &req) const noexcept {
-        return has_value(req) ? data() : nullptr;
-    }
-
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
-     * @tparam Type Expected type.
-     * @return An opaque pointer the contained instance, if any.
-     */
-    template<typename Type>
-    [[nodiscard]] const Type *data() const noexcept {
-        return has_value<stl::remove_const_t<Type>>() ? static_cast<const Type *>(data()) : nullptr;
-    }
-
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data() noexcept {
@@ -398,8 +379,27 @@ public:
      * @param req Expected type.
      * @return An opaque pointer the contained instance, if any.
      */
+    [[nodiscard]] const void *data(const type_info &req) const noexcept {
+        return has_value(req) ? data() : nullptr;
+    }
+
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @param req Expected type.
+     * @return An opaque pointer the contained instance, if any.
+     */
     [[nodiscard]] void *data(const type_info &req) noexcept {
         return (mode == any_policy::cref) ? nullptr : const_cast<void *>(stl::as_const(*this).data(req));
+    }
+
+    /**
+     * @brief Returns an opaque pointer to the contained instance.
+     * @tparam Type Expected type.
+     * @return An opaque pointer the contained instance, if any.
+     */
+    template<typename Type>
+    [[nodiscard]] const Type *data() const noexcept {
+        return has_value<stl::remove_const_t<Type>>() ? static_cast<const Type *>(data()) : nullptr;
     }
 
     /**
