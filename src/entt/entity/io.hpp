@@ -5,7 +5,11 @@
 
 namespace entt {
 
-// towk in progress :)
+namespace experimental {
+
+// work in progress :)
+
+}
 
 } // namespace entt
 
