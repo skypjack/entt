@@ -12,15 +12,12 @@ DOC:
 TODO:
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * combine version-mask-vs-version-bits tricks with reserved bits to allow things like enabling/disabling
-* self contained entity traits to avoid explicit specializations (ie enum constants)
 * auto type info data from types if present
-* storage entity: fast range-push from above
 * suppress -Wself-move on CI with g++13
 * built-in no-pagination storage - no_pagination page size as limits::max
 * any cdynamic to support const ownership construction
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * review build process for testbed (i.e. tests first due to SDL)
-* use unique_ptr or any for meta_custom_node
 * paged vector as a standalone class
 * resource: shared_from_this?
 * archetype-like a-là EnTT support (see my own notes)
