@@ -410,6 +410,10 @@ TEST_F(MetaAny, SBOMoveAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(MetaAny, SBOSelfMoveAssignment) {
     entt::meta_any any{3};
 
@@ -422,6 +426,9 @@ TEST_F(MetaAny, SBOSelfMoveAssignment) {
     ASSERT_EQ(any, entt::meta_any{3});
     ASSERT_NE(any, entt::meta_any{0});
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(MetaAny, SBODirectAssignment) {
     entt::meta_any any{};
@@ -746,6 +753,10 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
     ASSERT_NE(other, fat{});
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(MetaAny, NoSBOSelfMoveAssignment) {
     const fat instance{.1, .2, .3, .4};
     entt::meta_any any{instance};
@@ -759,6 +770,9 @@ TEST_F(MetaAny, NoSBOSelfMoveAssignment) {
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(any, fat{});
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(MetaAny, NoSBODirectAssignment) {
     const fat instance{.1, .2, .3, .4};
@@ -1004,6 +1018,10 @@ TEST_F(MetaAny, VoidMoveAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(MetaAny, VoidSelfMoveAssignment) {
     entt::meta_any any{std::in_place_type<void>};
 
@@ -1015,6 +1033,9 @@ TEST_F(MetaAny, VoidSelfMoveAssignment) {
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(any, entt::meta_any{std::in_place_type<void>});
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(MetaAny, SBOMoveInvalidate) {
     entt::meta_any any{3};

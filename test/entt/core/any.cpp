@@ -322,6 +322,10 @@ TEST_F(Any, SBOMoveAssignment) {
     ASSERT_EQ(entt::any_cast<int>(other), 2);
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(Any, SBOSelfMoveAssignment) {
     entt::any any{2};
 
@@ -334,6 +338,9 @@ TEST_F(Any, SBOSelfMoveAssignment) {
     ASSERT_EQ(any.info(), entt::type_id<int>());
     ASSERT_EQ(entt::any_cast<int>(any), 2);
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(Any, SBODirectAssignment) {
     entt::any any{};
@@ -647,6 +654,10 @@ TEST_F(Any, NoSBOMoveAssignment) {
     ASSERT_EQ(entt::any_cast<fat>(other), instance);
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(Any, NoSBOSelfMoveAssignment) {
     const fat instance{.1, .2, .3, .4};
     entt::any any{instance};
@@ -660,6 +671,9 @@ TEST_F(Any, NoSBOSelfMoveAssignment) {
     ASSERT_EQ(any.info(), entt::type_id<fat>());
     ASSERT_EQ(entt::any_cast<fat>(any), instance);
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(Any, NoSBODirectAssignment) {
     const fat instance{.1, .2, .3, .4};
@@ -861,6 +875,10 @@ TEST_F(Any, VoidMoveAssignment) {
     ASSERT_EQ(entt::any_cast<double>(&other), nullptr);
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wself-move"
+#endif
 TEST_F(Any, VoidSelfMoveAssignment) {
     entt::any any{std::in_place_type<void>};
 
@@ -873,6 +891,9 @@ TEST_F(Any, VoidSelfMoveAssignment) {
     ASSERT_EQ(any.info(), entt::type_id<void>());
     ASSERT_EQ(any.data(), nullptr);
 }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST_F(Any, SBOMoveValidButUnspecifiedState) {
     entt::any any{2};
