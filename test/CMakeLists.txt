@@ -402,12 +402,10 @@ SETUP_BASIC_TEST(
         entt/stl_ext/cstddef.cpp
         entt/stl_ext/cstdint.cpp
         entt/stl_ext/functional.cpp
-        entt/stl_ext/ios.cpp
         entt/stl_ext/iterator.cpp
         entt/stl_ext/limits.cpp
         entt/stl_ext/memory.cpp
         entt/stl_ext/ostream.cpp
-        entt/stl_ext/sstream.cpp
         entt/stl_ext/string.cpp
         entt/stl_ext/string_view.cpp
         entt/stl_ext/tuple.cpp
