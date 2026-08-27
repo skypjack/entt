@@ -9,7 +9,6 @@
 #include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/bit.hpp"
-#include "../stl/cmath.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
@@ -986,7 +985,9 @@ public:
      */
     void reserve(const size_type cnt) {
         packed.first().reserve(cnt);
-        rehash(static_cast<size_type>(stl::ceil(static_cast<float>(cnt) / max_load_factor())));
+        const auto next = static_cast<double>(cnt) / max_load_factor();
+        const auto trunc = static_cast<stl::size_t>(next);
+        rehash(trunc + static_cast<stl::size_t>(next > trunc));
     }
 
     /**
