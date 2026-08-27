@@ -2,7 +2,6 @@
 #define ENTT_META_FWD_HPP
 
 #include "../stl/cstddef.hpp"
-#include "../stl/limits.hpp"
 
 namespace entt {
 
@@ -30,7 +29,7 @@ template<typename>
 class meta_factory;
 
 /*! @brief Used to identicate that a sequence container has not a fixed size. */
-inline constexpr stl::size_t meta_dynamic_extent = (stl::numeric_limits<stl::size_t>::max)();
+inline constexpr stl::size_t meta_dynamic_extent = ~static_cast<stl::size_t>(0);
 
 /*! @brief Disambiguation tag for constructors and the like. */
 struct meta_ctx_arg_t final {};

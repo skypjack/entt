@@ -13,7 +13,6 @@
 #include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
 #include "../stl/iterator.hpp"
-#include "../stl/limits.hpp"
 #include "../stl/memory.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"
@@ -26,7 +25,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr stl::size_t dense_map_placeholder_position = (stl::numeric_limits<stl::size_t>::max)();
+static constexpr stl::size_t dense_map_placeholder_position = ~static_cast<stl::size_t>(0);
 
 template<typename Key, typename Type>
 struct dense_map_node final {

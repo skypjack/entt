@@ -205,7 +205,6 @@ if(ENTT_INCLUDE_HEADERS)
         stl/cstdint.hpp
         stl/functional.hpp
         stl/iterator.hpp
-        stl/limits.hpp
         stl/memory.hpp
         stl/ostream.hpp
         stl/string.hpp
