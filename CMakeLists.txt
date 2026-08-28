@@ -206,7 +206,6 @@ if(ENTT_INCLUDE_HEADERS)
         stl/functional.hpp
         stl/iterator.hpp
         stl/memory.hpp
-        stl/ostream.hpp
         stl/string.hpp
         stl/string_view.hpp
         stl/tuple.hpp

@@ -79,7 +79,6 @@ namespace entt::stl {}
 #include "stl/functional.hpp"
 #include "stl/iterator.hpp"
 #include "stl/memory.hpp"
-#include "stl/ostream.hpp"
 #include "stl/string.hpp"
 #include "stl/string_view.hpp"
 #include "stl/tuple.hpp"
