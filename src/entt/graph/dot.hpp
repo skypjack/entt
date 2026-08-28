@@ -2,21 +2,21 @@
 #define ENTT_GRAPH_DOT_HPP
 
 #include "../stl/concepts.hpp"
-#include "../stl/ostream.hpp"
 #include "fwd.hpp"
 
 namespace entt {
 
 /**
  * @brief Outputs a graph in dot format.
+ * @tparam Out Type of the generic data stream where the data are written.
  * @tparam Graph Graph type, valid as long as it exposes edges and vertices.
- * @param out A standard output stream.
+ * @param out A generic data sink that satisfies the insertion expression.
  * @param graph The graph to output.
  * @param writer Vertex decorator object.
  */
-template<typename Graph>
+template<typename Out, typename Graph>
 requires stl::derived_from<typename Graph::graph_category, directed_tag>
-void dot(stl::ostream &out, const Graph &graph, stl::invocable<stl::ostream &, typename Graph::vertex_type> auto writer) {
+void dot(Out &out, const Graph &graph, stl::invocable<Out &, typename Graph::vertex_type> auto writer) {
     if constexpr(stl::same_as<typename Graph::graph_category, undirected_tag>) {
         out << "graph{";
     } else {
@@ -42,12 +42,10 @@ void dot(stl::ostream &out, const Graph &graph, stl::invocable<stl::ostream &, t
 
 /**
  * @brief Outputs a graph in dot format.
- * @tparam Graph Graph type, valid as long as it exposes edges and vertices.
- * @param out A standard output stream.
+ * @param out A generic data sink that satisfies the insertion expression.
  * @param graph The graph to output.
  */
-template<typename Graph>
-void dot(stl::ostream &out, const Graph &graph) {
+void dot(auto &out, const auto &graph) {
     return dot(out, graph, [](auto &&...) {});
 }
 
