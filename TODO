@@ -25,3 +25,4 @@ TODO:
 * storage: shrink_to_fit does not work with reentrant destructor?
 * finish the imgui viewer/editor!
 * entity io
+* add a note about custom stl to the reamde file
