@@ -42,6 +42,7 @@ if(DOXYGEN_FOUND)
             md/reference.md
             md/resource.md
             md/signal.md
+            md/stl.md
             doxy.in
     )
 
