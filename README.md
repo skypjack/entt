@@ -59,6 +59,7 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 * [Documentation](#documentation)
 * [Tests](#tests)
 * [EnTT in Action](#entt-in-action)
+* [Extensions](#extensions)
 * [Contributors](#contributors)
 * [License](#license)
 
@@ -387,6 +388,15 @@ incomplete list of games, applications and articles that can be used as a
 reference.
 
 If you know of other resources out there that are about `EnTT`, feel free to
+open an issue or a PR and I'll be glad to add them to the list.
+
+# Extensions
+
+Community-maintained extensions for EnTT:
+
+- [EnTTx](https://github.com/AsherFarag/enttx) - Adds **hierarchies**, **prefabs**, and **change observers** for use cases such as networking and undo/redo.
+
+If you know of other `EnTT` extensions, feel free to
 open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
