@@ -394,10 +394,11 @@ open an issue or a PR and I'll be glad to add them to the list.
 
 Community-maintained extensions for EnTT:
 
-- [EnTTx](https://github.com/AsherFarag/enttx) - Adds **hierarchies**, **prefabs**, and **change observers** for use cases such as networking and undo/redo.
+- [EnTTx](https://github.com/AsherFarag/enttx) - Adds **hierarchies**,
+  **prefabs**, and **observers** for use cases such as networking and undo/redo.
 
-If you know of other `EnTT` extensions, feel free to
-open an issue or a PR and I'll be glad to add them to the list.
+If you know of other `EnTT` extensions, feel free to open an issue or a PR and
+I'll be glad to add them to the list.
 
 # Contributors
 
