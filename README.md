@@ -223,7 +223,7 @@ The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
 * `CMake` version 3.28 or later.
-* `Doxygen` version 1.14 or later.
+* `Doxygen` version 1.18 or later.
 
 Alternatively, [Bazel](https://bazel.build) is also supported as a build system
 (credits to [zaucy](https://github.com/zaucy) who offered to maintain it).<br/>
