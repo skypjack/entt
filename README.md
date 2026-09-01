@@ -9,8 +9,9 @@
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Discord channel](https://img.shields.io/discord/707607951396962417?logo=discord)](https://discord.gg/5BjPWBd)
 
+> [!CAUTION]
 > `EnTT` has been a dream so far, we haven't found a single bug to date and it's
-> super easy to work with
+> super easy to work with.
 >
 > -- Every EnTT User Ever
 
@@ -44,6 +45,14 @@ Many thanks to [these people](https://skypjack.github.io/sponsorship/) and
 [![mojang](https://user-images.githubusercontent.com/1812216/106253145-67ca1980-6217-11eb-9c0b-d93561b37098.png)](https://mojang.com)
 [![imgly](https://user-images.githubusercontent.com/1812216/106253726-271ed000-6218-11eb-98e0-c9c681925770.png)](https://img.ly/)
 
+---
+
+> [!WARNING]
+> We **apologize** to our kind users for not posting updates every three days saying
+> that we are **faster** than three days ago and **better** than everyone else,
+> but consider it done. In the meantime, enjoy a library that **just works**
+> without having to constantly remind ourselves.
+
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -76,32 +85,30 @@ This project started off as a pure entity-component system. Over time the
 codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
+* Support for user implementations of the **Standard Template Library**.
 * Built-in **RTTI system** mostly similar to the standard one.
-* A `constexpr` utility for human-readable **resource names**.
-* Minimal **configuration system** built using the monostate pattern.
 * Incredibly fast **entity-component system** with its own _pay for what you
   use_ policy, unconstrained component types with optional pointer stability and
   hooks for storage customization.
-* Views and groups to iterate entities and components and allow different access
-  patterns, from **perfect SoA** to fully random.
-* A lot of **facilities** built on top of the entity-component system to help
-  the users and avoid reinventing the wheel.
 * General purpose **execution graph builder** for optimal scheduling.
-* The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free runtime **reflection system**.
 * **Static polymorphism** made simple and within everyone's reach.
 * A few homemade containers, like a sparse set based **hash map**.
-* A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
 * Delegates, **signal handlers** and a tiny event dispatcher.
-* A general purpose **event emitter** as a CRTP idiom based class template.
 * And **much more**! Check out the
   [**wiki**](https://github.com/skypjack/entt/wiki).
 
-Consider this list a work in progress as well as the project. The whole API is
-fully documented in-code for those who are brave enough to read it.<br/>
+This list as well as the project are a work in progress. The whole API is fully
+documented for those who are brave enough to read it.<br/>
 Please, do note that all tools are also DLL-friendly now and run smoothly across
 boundaries.
+
+> [!NOTE]
+> A **lot** of stuff was invented here, but we remain humble and let people copy
+> it without giving us credit.<br/>
+> The _good_ and the **bad** of open source, but bragging is for others. Feel
+> free to get **inspired**.
 
 One thing known to most is that `EnTT` is also used in **Minecraft**.<br/>
 Given that the game is available literally everywhere, I can confidently say 
@@ -170,6 +177,12 @@ add all the features I wanted to see in *my own library* at the same time.
 Nowadays, `EnTT` is finally what I was looking for: still faster than its
 _competitors_, lower memory usage in the average case, a really good API and an
 amazing set of features. And even more, of course.
+
+> [!Note]
+> If the `EnTT` API looks familiar, it's probably because it's been **copied** a
+> lot elsewhere (often without much ado).<br/>
+> Credit where credit is due though, the initial design was heavily inspired by
+> `EntityX`, another popular C++ library.
 
 ## Benchmark
 
