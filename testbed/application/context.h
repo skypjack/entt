@@ -15,6 +15,14 @@ struct context {
     context &operator=(const context &) = delete;
     context &operator=(context &&) = delete;
 
+    static constexpr auto logical_width() noexcept {
+        return 1920;
+    }
+
+    static constexpr auto logical_height() noexcept {
+        return 1080;
+    }
+
     SDL_Window *window() const noexcept;
     SDL_Renderer *renderer() const noexcept;
 

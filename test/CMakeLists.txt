@@ -276,6 +276,7 @@ SETUP_BASIC_TEST(
         entt/entity/group.cpp
         entt/entity/handle.cpp
         entt/entity/helper.cpp
+        entt/entity/io.cpp
         entt/entity/organizer.cpp
         entt/entity/reactive_mixin.cpp
         entt/entity/registry.cpp
@@ -396,17 +397,12 @@ SETUP_BASIC_TEST(
         entt/stl_ext/array.cpp
         entt/stl_ext/atomic.cpp
         entt/stl_ext/bit.cpp
-        entt/stl_ext/cmath.cpp
         entt/stl_ext/concepts.cpp
         entt/stl_ext/cstddef.cpp
         entt/stl_ext/cstdint.cpp
         entt/stl_ext/functional.cpp
-        entt/stl_ext/ios.cpp
         entt/stl_ext/iterator.cpp
-        entt/stl_ext/limits.cpp
         entt/stl_ext/memory.cpp
-        entt/stl_ext/ostream.cpp
-        entt/stl_ext/sstream.cpp
         entt/stl_ext/string.cpp
         entt/stl_ext/string_view.cpp
         entt/stl_ext/tuple.cpp

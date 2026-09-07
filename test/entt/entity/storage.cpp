@@ -1724,7 +1724,7 @@ TYPED_TEST(Storage, ReferencesGuaranteed) {
     ASSERT_EQ(pool.get(entity_type{1}), value_type{1});
 
     for(auto &&elem: pool) {
-        if(!(elem == value_type{})) {
+        if(elem != value_type{}) {
             elem = value_type{4};
         }
     }

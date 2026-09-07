@@ -232,7 +232,7 @@ TEST_F(MetaDereference, Optional) {
 
     deref.cast<int &>() = 3;
 
-    ASSERT_EQ(*any.cast<std::optional<int>>(), 3);
+    ASSERT_EQ(any.cast<std::optional<int>>().value_or(0), 3);
     ASSERT_EQ(*value, 3);
 }
 

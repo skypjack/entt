@@ -11,7 +11,7 @@ struct config;
 struct context;
 
 class application {
-    void update(entt::registry &);
+    void update(entt::registry &, const context &, const double);
     void draw(entt::registry &, const context &) const;
     void input(entt::registry &);
 

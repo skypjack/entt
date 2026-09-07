@@ -7,6 +7,7 @@
 
 #ifndef ENTT_MODULE
 #    include "../core/type_traits.hpp"
+#    include "type_traits.hpp"
 #endif // ENTT_MODULE
 
 ENTT_MODULE_EXPORT namespace entt {

@@ -1,6 +1,6 @@
 # Doxygen configuration (documentation)
 
-find_package(Doxygen 1.14)
+find_package(Doxygen 1.18)
 
 if(DOXYGEN_FOUND)
     include(FetchContent)
@@ -42,6 +42,7 @@ if(DOXYGEN_FOUND)
             md/reference.md
             md/resource.md
             md/signal.md
+            md/stl.md
             doxy.in
     )
 

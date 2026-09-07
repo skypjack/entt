@@ -121,14 +121,14 @@ class group_handler final: public group_descriptor {
     }
 
     void push_on_construct(const entity_type entt) {
-        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
+        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && (cpool->index(entt) >= pos) && (other->contains(entt) && ...); }, pools)
            && stl::apply([entt](auto *...cpool) { return (!cpool->contains(entt) && ...); }, filter)) {
             swap_elements(len++, entt);
         }
     }
 
     void push_on_destroy(const entity_type entt) {
-        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && !(cpool->index(entt) < pos) && (other->contains(entt) && ...); }, pools)
+        if(stl::apply([entt, pos = len](auto *cpool, auto *...other) { return cpool->contains(entt) && (cpool->index(entt) >= pos) && (other->contains(entt) && ...); }, pools)
            && stl::apply([entt](auto *...cpool) { return (0u + ... + cpool->contains(entt)) == 1u; }, filter)) {
             swap_elements(len++, entt);
         }

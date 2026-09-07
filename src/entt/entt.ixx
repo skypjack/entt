@@ -6,21 +6,17 @@ module;
 #define ENTT_MODULE_EXPORT_END }
 
 // clang-format off
+#include <compare>
 #include "stl/algorithm.hpp"
 #include "stl/array.hpp"
 #include "stl/atomic.hpp"
 #include "stl/bit.hpp"
-#include "stl/cmath.hpp"
 #include "stl/concepts.hpp"
 #include "stl/cstddef.hpp"
 #include "stl/cstdint.hpp"
 #include "stl/functional.hpp"
-#include "stl/ios.hpp"
 #include "stl/iterator.hpp"
-#include "stl/limits.hpp"
 #include "stl/memory.hpp"
-#include "stl/ostream.hpp"
-#include "stl/sstream.hpp"
 #include "stl/string.hpp"
 #include "stl/string_view.hpp"
 #include "stl/tuple.hpp"

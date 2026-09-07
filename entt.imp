@@ -3,6 +3,7 @@
   { "include": [ "@<gtest/internal/.*>", "private", "<gtest/gtest.h>", "public" ] },
   { "include": [ "@<gtest/gtest-.*>", "private", "<gtest/gtest.h>", "public" ] },
   # forward files
+  { "include": [ "@[\"<].*/config/config\\.h[\">]", "private", "<entt/ext/config.h>", "public" ] },
   { "include": [ "@[\"<].*/container/fwd\\.hpp[\">]", "private", "<entt/container/dense_map.hpp>", "public" ] },
   { "include": [ "@[\"<].*/container/fwd\\.hpp[\">]", "private", "<entt/container/dense_set.hpp>", "public" ] },
   { "include": [ "@[\"<].*/container/fwd\\.hpp[\">]", "private", "<entt/container/table.hpp>", "public" ] },
@@ -19,6 +20,7 @@
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/group.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/handle.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/helper.hpp>", "public" ] },
+  { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/io.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/mixin.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/organizer.hpp>", "public" ] },
   { "include": [ "@[\"<].*/entity/fwd\\.hpp[\">]", "private", "<entt/entity/ranges.hpp>", "public" ] },

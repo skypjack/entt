@@ -479,7 +479,7 @@ public:
      */
     bool reset(const id_type id) {
         ENTT_ASSERT(id != type_hash<entity_type>::value(), "Cannot reset entity storage");
-        return !(pools.erase(id) == 0u);
+        return (pools.erase(id) != 0u);
     }
 
     /**

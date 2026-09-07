@@ -78,23 +78,23 @@ struct value_type {
 
 } // namespace internal
 
-using pointer_stable = internal::pointer_stable_mixin<internal::value_type<int>>;
-using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<internal::value_type<int>>>;
-
-using non_default_constructible = internal::non_default_constructible_mixin<internal::value_type<int>>;
-using non_trivially_destructible = internal::non_trivially_destructible_mixin<internal::value_type<int>>;
-using non_comparable = internal::non_comparable_mixin<internal::empty_type>;
-using non_movable = internal::non_movable_mixin<internal::value_type<int>>;
-
-using new_delete = internal::new_delete_mixin<internal::value_type<int>>;
-
 using boxed_int = internal::value_type<int>;
 using boxed_char = internal::value_type<char>;
 
 using empty = internal::empty_type;
-struct other_empty: internal::empty_type {};
+struct other_empty: empty {};
 
 using aggregate = internal::aggregate_type;
+
+using pointer_stable = internal::pointer_stable_mixin<boxed_int>;
+using pointer_stable_non_trivially_destructible = internal::pointer_stable_mixin<internal::non_trivially_destructible_mixin<boxed_int>>;
+
+using non_default_constructible = internal::non_default_constructible_mixin<boxed_int>;
+using non_trivially_destructible = internal::non_trivially_destructible_mixin<boxed_int>;
+using non_comparable = internal::non_comparable_mixin<empty>;
+using non_movable = internal::non_movable_mixin<boxed_int>;
+
+using new_delete = internal::new_delete_mixin<boxed_int>;
 
 static_assert(std::is_trivially_destructible_v<pointer_stable>, "Not a trivially destructible type");
 static_assert(!std::is_trivially_destructible_v<non_trivially_destructible>, "Trivially destructible type");

@@ -251,17 +251,17 @@ class basic_common_view {
     friend Return internal::view_pack(const View &, const Other &, stl::index_sequence<GLhs...>, stl::index_sequence<ELhs...>, stl::index_sequence<GRhs...>, stl::index_sequence<ERhs...>);
 
     [[nodiscard]] auto offset() const noexcept {
-        ENTT_ASSERT(index != Get, "Invalid view");
-        return (pools[index]->policy() == deletion_policy::swap_only) ? pools[index]->free_list() : pools[index]->size();
+        ENTT_ASSERT(current != Get, "Invalid view");
+        return (pools[current]->policy() == deletion_policy::swap_only) ? pools[current]->free_list() : pools[current]->size();
     }
 
     void unchecked_refresh() noexcept {
-        index = 0u;
+        current = 0u;
 
         if constexpr(Get > 1u) {
             for(size_type pos{1u}; pos < Get; ++pos) {
-                if(pools[pos]->size() < pools[index]->size()) {
-                    index = pos;
+                if(pools[pos]->size() < pools[current]->size()) {
+                    current = pos;
                 }
             }
         }
@@ -278,7 +278,7 @@ protected:
     basic_common_view(stl::array<const Type *, Get> value, stl::array<const Type *, Exclude> excl) noexcept
         : pools{value},
           filter{excl},
-          index{Get} {
+          current{Get} {
         unchecked_refresh();
     }
 
@@ -305,8 +305,12 @@ protected:
         return internal::none_of(filter.begin(), filter.end(), entt);
     }
 
-    void use(const stl::size_t pos) noexcept {
-        index = (index != Get) ? pos : Get;
+    void index(const stl::size_t pos) noexcept {
+        current = (current != Get) ? pos : Get;
+    }
+
+    [[nodiscard]] stl::size_t index() const noexcept {
+        return current;
     }
     /*! @endcond */
 
@@ -324,7 +328,7 @@ public:
 
     /*! @brief Updates the internal leading view if required. */
     void refresh() noexcept {
-        size_type pos = static_cast<size_type>(index != Get) * Get;
+        size_type pos = static_cast<size_type>(current != Get) * Get;
         for(; pos < Get && pools[pos] != nullptr; ++pos) {}
 
         if(pos == Get) {
@@ -337,7 +341,7 @@ public:
      * @return The leading storage of the view.
      */
     [[nodiscard]] const common_type *handle() const noexcept {
-        return (index != Get) ? pools[index] : nullptr;
+        return (current != Get) ? pools[current] : nullptr;
     }
 
     /**
@@ -345,7 +349,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size_hint() const noexcept {
-        return (index != Get) ? offset() : size_type{};
+        return (current != Get) ? offset() : size_type{};
     }
 
     /**
@@ -356,7 +360,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end() - static_cast<difference_type>(offset()), pools, filter, index} : iterator{};
+        return (current != Get) ? iterator{pools[current]->end() - static_cast<difference_type>(offset()), pools, filter, current} : iterator{};
     }
 
     /**
@@ -364,7 +368,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const noexcept {
-        return (index != Get) ? iterator{pools[index]->end(), pools, filter, index} : iterator{};
+        return (current != Get) ? iterator{pools[current]->end(), pools, filter, current} : iterator{};
     }
 
     /**
@@ -383,10 +387,10 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const noexcept {
-        if(index != Get) {
-            auto it = pools[index]->rbegin();
+        if(current != Get) {
+            auto it = pools[current]->rbegin();
             const auto last = it + static_cast<difference_type>(offset());
-            for(const auto idx = static_cast<difference_type>(index); it != last && !(internal::all_of(pools.begin(), pools.begin() + idx, *it) && internal::all_of(pools.begin() + idx + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
+            for(const auto idx = static_cast<difference_type>(current); it != last && !(internal::all_of(pools.begin(), pools.begin() + idx, *it) && internal::all_of(pools.begin() + idx + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
             return it == last ? null : *it;
         }
 
@@ -400,7 +404,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const noexcept {
-        return contains(entt) ? iterator{pools[index]->find(entt), pools, filter, index} : end();
+        return contains(entt) ? iterator{pools[current]->find(entt), pools, filter, current} : end();
     }
 
     /**
@@ -408,7 +412,7 @@ public:
      * @return True if the view is fully initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (index != Get) && internal::fully_initialized(filter.begin(), filter.end(), placeholder);
+        return (current != Get) && internal::fully_initialized(filter.begin(), filter.end(), placeholder);
     }
 
     /**
@@ -417,17 +421,17 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const noexcept {
-        return (index != Get)
+        return (current != Get)
                && internal::all_of(pools.begin(), pools.end(), entt)
                && internal::none_of(filter.begin(), filter.end(), entt)
-               && pools[index]->index(entt) < offset();
+               && pools[current]->index(entt) < offset();
     }
 
 private:
     stl::array<const common_type *, Get> pools{};
     stl::array<const common_type *, Exclude> filter{};
     const common_type *placeholder{internal::view_placeholder<common_type>()};
-    size_type index{Get};
+    size_type current{Get};
 };
 
 /**
@@ -463,8 +467,8 @@ class basic_view<get_t<Get...>, exclude_t<Exclude...>>
         }
     }
 
-    template<stl::size_t Curr, typename Func, stl::size_t... Index>
-    void each(Func func, stl::index_sequence<Index...>) const {
+    template<typename Func, stl::size_t Curr, stl::size_t... Index>
+    void each(Func func) const {
         for(const auto curr: storage<Curr>()->each()) {
             if(const auto entt = stl::get<0>(curr); (!internal::tombstone_check_v<Get...> || (entt != tombstone)) && ((Curr == Index || base_type::pool_at(Index)->contains(entt)) && ...) && base_type::none_of(entt)) {
                 if constexpr(is_applicable_v<Func, decltype(stl::tuple_cat(stl::tuple<entity_type>{}, stl::declval<basic_view>().get({})))>) {
@@ -546,7 +550,7 @@ public:
      */
     template<stl::size_t Index>
     void use() noexcept {
-        base_type::use(Index);
+        base_type::index(Index);
     }
 
     /**
@@ -657,11 +661,13 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        [this, &func]<auto... Index>(stl::index_sequence<Index...> seq) {
-            if(const auto *view = base_type::handle(); view != nullptr) {
-                ((view == base_type::pool_at(Index) ? each<Index>(stl::move(func), seq) : void()), ...);
-            }
+        constexpr auto fallback = []<auto... Index>(stl::index_sequence<Index...>) {
+            return stl::array{&basic_view<get_t<Get...>, exclude_t<Exclude...>>::template each<Func, Index, Index...>...};
         }(stl::index_sequence_for<Get...>{});
+
+        if(const auto idx = this->index(); idx != sizeof...(Get)) {
+            (this->*fallback[idx])(stl::move(func));
+        }
     }
 
     /**

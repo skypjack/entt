@@ -1,4 +1,4 @@
-# Doxyfile 1.13.2
+# Doxyfile 1.18.0
 
 # This file describes the settings to be used by the documentation system
 # Doxygen (www.doxygen.org) for a project.
@@ -11,7 +11,7 @@
 # TAG = value [value, ...]
 # For lists, items can also be appended using:
 # TAG += value [value, ...]
-# Values that contain spaces should be placed between quotes (\" \").
+# Values that contain spaces should be placed between quotes (" ").
 #
 # Note:
 #
@@ -81,7 +81,7 @@ OUTPUT_DIRECTORY       = @DOXY_OUTPUT_DIRECTORY@
 # and will distribute the generated files over these directories. Enabling this
 # option can be useful when feeding Doxygen a huge amount of source files, where
 # putting all generated files in the same directory would otherwise cause
-# performance problems for the file system. Adapt CREATE_SUBDIRS_LEVEL to
+# performance problems for the file system. Adjust CREATE_SUBDIRS_LEVEL to
 # control the number of sub-directories.
 # The default value is: NO.
 
@@ -351,6 +351,20 @@ EXTENSION_MAPPING      =
 
 MARKDOWN_SUPPORT       = YES
 
+# If the MARKDOWN_STRICT tag is enabled then Doxygen treats text in comments as
+# Markdown formatted also in cases where Doxygen's native markup format
+# conflicts with that of Markdown. This is only relevant in cases where
+# backticks are used. Doxygen's native markup style allows a single quote to end
+# a text fragment started with a backtick and then treat it as a piece of quoted
+# text, whereas in Markdown such text fragment is treated as verbatim and only
+# ends when a second matching backtick is found. Also, Doxygen's native markup
+# format requires double quotes to be escaped when they appear in a backtick
+# section, whereas this is not needed for Markdown.
+# The default value is: YES.
+# This tag requires that the tag MARKDOWN_SUPPORT is set to YES.
+
+MARKDOWN_STRICT        = YES
+
 # When the TOC_INCLUDE_HEADINGS tag is set to a non-zero value, all headings up
 # to that level are automatically included in the table of contents, even if
 # they do not have an id attribute.
@@ -382,8 +396,8 @@ AUTOLINK_SUPPORT       = YES
 
 # This tag specifies a list of words that, when matching the start of a word in
 # the documentation, will suppress auto links generation, if it is enabled via
-# AUTOLINK_SUPPORT. This list does not affect affect links explicitly created
-# using \# or the \link or commands.
+# AUTOLINK_SUPPORT. This list does not affect links explicitly created using #
+# or the \link or \ref commands.
 # This tag requires that the tag AUTOLINK_SUPPORT is set to YES.
 
 AUTOLINK_IGNORE_WORDS  =
@@ -500,7 +514,7 @@ LOOKUP_CACHE_SIZE      = 0
 # which effectively disables parallel processing. Please report any issues you
 # encounter. Generating dot graphs in parallel is controlled by the
 # DOT_NUM_THREADS setting.
-# Minimum value: 0, maximum value: 32, default value: 1.
+# Minimum value: 0, maximum value: 512, default value: 1.
 
 NUM_PROC_THREADS       = 1
 
@@ -769,6 +783,27 @@ GENERATE_BUGLIST       = YES
 
 GENERATE_DEPRECATEDLIST= YES
 
+# The GENERATE_REQUIREMENTS tag can be used to enable (YES) or disable (NO) the
+# requirements page. When enabled, this page is automatically created when at
+# least one comment block with a \requirement command appears in the input.
+# The default value is: YES.
+
+GENERATE_REQUIREMENTS  = YES
+
+# The REQ_TRACEABILITY_INFO tag controls if traceability information is shown on
+# the requirements page (only relevant when using \requirement comment blocks).
+# The setting NO will disable the traceability information altogether. The
+# setting UNSATISFIED_ONLY will show a list of requirements that are missing a
+# satisfies relation (through the command: \satisfies). Similarly the setting
+# UNVERIFIED_ONLY will show a list of requirements that are missing a verifies
+# relation (through the command: \verifies). Setting the tag to YES (the
+# default) will show both lists if applicable.
+# Possible values are: YES, NO, UNSATISFIED_ONLY and UNVERIFIED_ONLY.
+# The default value is: YES.
+# This tag requires that the tag GENERATE_REQUIREMENTS is set to YES.
+
+REQ_TRACEABILITY_INFO  = YES
+
 # The ENABLED_SECTIONS tag can be used to enable conditional documentation
 # sections, marked by \if <section_label> ... \endif and \cond <section_label>
 # ... \endcond blocks.
@@ -810,8 +845,8 @@ SHOW_NAMESPACES        = YES
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # Doxygen should invoke to get the current version for each file (typically from
 # the version control system). Doxygen will invoke the program by executing (via
-# popen()) the command command input-file, where command is the value of the
-# FILE_VERSION_FILTER tag, and input-file is the name of an input file provided
+# popen()) the command command input_file, where command is the value of the
+# FILE_VERSION_FILTER tag, and input_file is the name of an input file provided
 # by Doxygen. Whatever the program writes to standard output is used as the file
 # version. For an example see the documentation.
 
@@ -1018,9 +1053,9 @@ INPUT_FILE_ENCODING    =
 #
 # If left blank the following patterns are tested:*.c, *.cc, *.cxx, *.cxxm,
 # *.cpp, *.cppm, *.ccm, *.c++, *.c++m, *.java, *.ii, *.ixx, *.ipp, *.i++, *.inl,
-# *.idl, *.ddl, *.odl, *.h, *.hh, *.hxx, *.hpp, *.h++, *.ixx, *.l, *.cs, *.d,
-# *.php, *.php4, *.php5, *.phtml, *.inc, *.m, *.markdown, *.md, *.mm, *.dox (to
-# be provided as Doxygen C comment), *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
+# *.idl, *.ddl, *.odl, *.h, *.hh, *.hxx, *.hpp, *.h++, *.l, *.cs, *.d, *.php,
+# *.php4, *.php5, *.phtml, *.inc, *.m, *.markdown, *.md, *.mm, *.dox (to be
+# provided as Doxygen C comment), *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f18, *.f, *.for, *.vhd, *.vhdl, *.ucf, *.qsf and *.ice.
 
 FILE_PATTERNS          = *.h \
@@ -1573,8 +1608,8 @@ DOCSET_PUBLISHER_NAME  = Publisher
 # a.o. the download links, offline (the HTML help workshop was already many
 # years in maintenance mode). You can download the HTML help workshop from the
 # web archives at Installation executable (see:
-# http://web.archive.org/web/20160201063255/http://download.microsoft.com/downlo
-# ad/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe).
+# http://web.archive.org/web/20160201063255/https://download.microsoft.com/downl
+# oad/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe).
 #
 # The HTML Help Workshop contains a compiler that can convert all HTML output
 # generated by Doxygen into a single compiled HTML file (.chm). Compiled HTML
@@ -1731,7 +1766,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # of each HTML page. A value of NO enables the index and the value YES disables
 # it. Since the tabs in the index contain the same information as the navigation
 # tree, you can set this option to YES if you also set GENERATE_TREEVIEW to YES.
-# The default value is: YES.
+# The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 DISABLE_INDEX          = NO
@@ -1746,20 +1781,29 @@ DISABLE_INDEX          = NO
 # further fine tune the look of the index (see "Fine-tuning the output"). As an
 # example, the default style sheet generated by Doxygen has an example that
 # shows how to put an image at the root of the tree instead of the PROJECT_NAME.
-# Since the tree basically has the same information as the tab index, you could
-# consider setting DISABLE_INDEX to YES when enabling this option.
+# Since the tree basically has more details information than the tab index, you
+# could consider setting DISABLE_INDEX to YES when enabling this option.
 # The default value is: YES.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 GENERATE_TREEVIEW      = NO
 
-# When both GENERATE_TREEVIEW and DISABLE_INDEX are set to YES, then the
-# FULL_SIDEBAR option determines if the side bar is limited to only the treeview
-# area (value NO) or if it should extend to the full height of the window (value
-# YES). Setting this to YES gives a layout similar to
-# https://docs.readthedocs.io with more room for contents, but less room for the
-# project logo, title, and description. If either GENERATE_TREEVIEW or
-# DISABLE_INDEX is set to NO, this option has no effect.
+# When GENERATE_TREEVIEW is set to YES, the PAGE_OUTLINE_PANEL option determines
+# if an additional navigation panel is shown at the right hand side of the
+# screen, displaying an outline of the contents of the main page, similar to
+# e.g. https://developer.android.com/reference If GENERATE_TREEVIEW is set to
+# NO, this option has no effect.
+# The default value is: YES.
+# This tag requires that the tag GENERATE_HTML is set to YES.
+
+PAGE_OUTLINE_PANEL     = YES
+
+# When GENERATE_TREEVIEW is set to YES, the FULL_SIDEBAR option determines if
+# the side bar is limited to only the treeview area (value NO) or if it should
+# extend to the full height of the window (value YES). Setting this to YES gives
+# a layout similar to e.g. https://docs.readthedocs.io with more room for
+# contents, but less room for the project logo, title, and description. If
+# GENERATE_TREEVIEW is set to NO, this option has no effect.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
@@ -1844,7 +1888,7 @@ USE_MATHJAX            = NO
 # regards to the different settings, so it is possible that also other MathJax
 # settings have to be changed when switching between the different MathJax
 # versions.
-# Possible values are: MathJax_2 and MathJax_3.
+# Possible values are: MathJax_2, MathJax_3 and MathJax_4.
 # The default value is: MathJax_2.
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
@@ -1853,9 +1897,10 @@ MATHJAX_VERSION        = MathJax_2
 # When MathJax is enabled you can set the default output format to be used for
 # the MathJax output. For more details about the output format see MathJax
 # version 2 (see:
-# http://docs.mathjax.org/en/v2.7-latest/output.html) and MathJax version 3
+# https://docs.mathjax.org/en/v2.7/output.html), MathJax version 3 (see:
+# https://docs.mathjax.org/en/v3.2/output/index.html) and MathJax version 4
 # (see:
-# http://docs.mathjax.org/en/latest/web/components/output.html).
+# https://docs.mathjax.org/en/v4.0/output/index.htm).
 # Possible values are: HTML-CSS (which is slower, but has the best
 # compatibility. This is the name for Mathjax version 2, for MathJax version 3
 # this will be translated into chtml), NativeMML (i.e. MathML. Only supported
@@ -1868,36 +1913,50 @@ MATHJAX_VERSION        = MathJax_2
 MATHJAX_FORMAT         = HTML-CSS
 
 # When MathJax is enabled you need to specify the location relative to the HTML
-# output directory using the MATHJAX_RELPATH option. The destination directory
-# should contain the MathJax.js script. For instance, if the mathjax directory
-# is located at the same level as the HTML output directory, then
-# MATHJAX_RELPATH should be ../mathjax. The default value points to the MathJax
-# Content Delivery Network so you can quickly see the result without installing
-# MathJax. However, it is strongly recommended to install a local copy of
-# MathJax from https://www.mathjax.org before deployment. The default value is:
+# output directory using the MATHJAX_RELPATH option. For Mathjax version 2 the
+# destination directory should contain the MathJax.js script. For instance, if
+# the mathjax directory is located at the same level as the HTML output
+# directory, then MATHJAX_RELPATH should be ../mathjax. For Mathjax versions 3
+# and 4 the destination directory should contain the tex-<format>.js script
+# (where <format> is either chtml or svg). The default value points to the
+# MathJax Content Delivery Network so you can quickly see the result without
+# installing MathJax. However, it is strongly recommended to install a local
+# copy of MathJax from https://www.mathjax.org before deployment. The default
+# value is:
 # - in case of MathJax version 2: https://cdn.jsdelivr.net/npm/mathjax@2
 # - in case of MathJax version 3: https://cdn.jsdelivr.net/npm/mathjax@3
+# - in case of MathJax version 4: https://cdn.jsdelivr.net/npm/mathjax@4
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
 MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/
 
 # The MATHJAX_EXTENSIONS tag can be used to specify one or more MathJax
 # extension names that should be enabled during MathJax rendering. For example
-# for MathJax version 2 (see
-# https://docs.mathjax.org/en/v2.7-latest/tex.html#tex-and-latex-extensions):
+# for MathJax version 2 (see https://docs.mathjax.org/en/v2.7/tex.html):
 # MATHJAX_EXTENSIONS = TeX/AMSmath TeX/AMSsymbols
 # For example for MathJax version 3 (see
-# http://docs.mathjax.org/en/latest/input/tex/extensions/index.html):
+# https://docs.mathjax.org/en/v3.2/input/tex/extensions/):
 # MATHJAX_EXTENSIONS = ams
+# For example for MathJax version 4 (see
+# https://docs.mathjax.org/en/v4.0/input/tex/extensions/):
+# MATHJAX_EXTENSIONS = units
+# Note that for Mathjax version 4 quite a few extensions are already
+# automatically loaded. To disable a package in Mathjax version 4 one can use
+# the package name prepended with a minus sign (- like MATHJAX_EXTENSIONS +=
+# -textmacros)
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
 MATHJAX_EXTENSIONS     =
 
 # The MATHJAX_CODEFILE tag can be used to specify a file with JavaScript pieces
-# of code that will be used on startup of the MathJax code. See the MathJax site
-# (see:
-# http://docs.mathjax.org/en/v2.7-latest/output.html) for more details. For an
-# example see the documentation.
+# of code that will be used on startup of the MathJax code. See the Mathjax site
+# for more details:
+# - MathJax version 2 (see:
+# https://docs.mathjax.org/en/v2.7/)
+# - MathJax version 3 (see:
+# https://docs.mathjax.org/en/v3.2/)
+# - MathJax version 4 (see:
+# https://docs.mathjax.org/en/v4.0/) For an example see the documentation.
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
 MATHJAX_CODEFILE       =
@@ -2078,9 +2137,8 @@ EXTRA_PACKAGES         =
 #
 # Note: Only use a user-defined header if you know what you are doing!
 # Note: The header is subject to change so you typically have to regenerate the
-# default header when upgrading to a newer version of Doxygen. The following
-# commands have a special meaning inside the header (and footer): For a
-# description of the possible markers and block names see the documentation.
+# default header when upgrading to a newer version of Doxygen. For a description
+# of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
 LATEX_HEADER           =
@@ -2558,10 +2616,23 @@ HAVE_DOT               = YES
 # processors available in the system. You can set it explicitly to a value
 # larger than 0 to get control over the balance between CPU load and processing
 # speed.
-# Minimum value: 0, maximum value: 32, default value: 0.
+# Minimum value: 0, maximum value: 512, default value: 0.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 DOT_NUM_THREADS        = 0
+
+# The DOT_BATCH_SIZE specifies the number of dot graphs Doxygen is allowed to
+# compile in a single invocation of dot. When set to 1 Doxygen will invoke dot
+# for each graph separately, which can cause significant process creation
+# overhead especially on systems with many CPU cores. Together with
+# DOT_NUM_THREADS this setting can be used to optimise the dot processing speed
+# for a particular system. Doxygen will try to give each thread a balanced batch
+# of work. If the total number of graphs to process exceeds DOT_NUM_THREADS *
+# DOT_BATCH_SIZE then additional batches will be created for dot to process.
+# Minimum value: 1, maximum value: 1000, default value: 50.
+# This tag requires that the tag HAVE_DOT is set to YES.
+
+DOT_BATCH_SIZE         = 50
 
 # DOT_COMMON_ATTR is common attributes for nodes, edges and labels of
 # subgraphs. When you want a differently looking font in the dot files that
@@ -2659,6 +2730,15 @@ UML_LOOK               = NO
 # This tag requires that the tag UML_LOOK is set to YES.
 
 UML_LIMIT_NUM_FIELDS   = 10
+
+# If the UML_LOOK tag is enabled, field labels are shown along the edge between
+# two class nodes. If there are many fields and many nodes the graph may become
+# too cluttered. The UML_MAX_EDGE_LABELS threshold limits the number of items to
+# make the size more manageable. Set this to 0 for no limit.
+# Minimum value: 0, maximum value: 100, default value: 10.
+# This tag requires that the tag UML_LOOK is set to YES.
+
+UML_MAX_EDGE_LABELS    = 10
 
 # If the DOT_UML_DETAILS tag is set to NO, Doxygen will show attributes and
 # methods without types and arguments in the UML graphs. If the DOT_UML_DETAILS
@@ -2845,6 +2925,58 @@ PLANTUML_INCLUDE_PATH  =
 
 PLANTUMLFILE_DIRS      =
 
+# When using Mermaid diagrams with CLI rendering, the MERMAID_PATH tag should be
+# used to specify the directory where the mmdc (Mermaid CLI) executable can be
+# found. If left blank, CLI-based rendering is disabled. For HTML output,
+# client-side rendering via JavaScript is used by default and does not require
+# mmdc. For LaTeX/PDF output, mmdc is required to pre-generate images. Doxygen
+# will generate a warning when CLI rendering is needed but mmdc is not
+# available.
+
+MERMAID_PATH           =
+
+# When using Mermaid diagrams, the MERMAID_CONFIG_FILE tag can be used to
+# specify a JSON configuration file for the Mermaid CLI tool (mmdc). This file
+# can contain theme settings and other Mermaid configuration options.
+
+MERMAID_CONFIG_FILE    =
+
+# The MERMAID_RENDER_MODE tag selects how Mermaid diagrams are rendered.
+# Possible values are: AUTO (use client-side rendering for HTML and mmdc for
+# LaTeX/PDF and other formats. If MERMAID_PATH is not set, non-HTML diagrams
+# will produce a warning), CLI (use the mmdc tool to pre-generate images
+# (requires Node.js and mermaid-js/mermaid-cli). Works for all output formats)
+# and CLIENT_SIDE (embed mermaid.js in HTML output for client-side rendering.
+# Does not require mmdc but only works for HTML output).
+# The default value is: AUTO.
+
+MERMAID_RENDER_MODE    = AUTO
+
+# The MERMAID_JS_URL tag specifies the URL to load mermaid.js from when using
+# client-side rendering (MERMAID_RENDER_MODE is CLIENT_SIDE or AUTO). The
+# default points to the latest Mermaid v11 release on the jsDelivr CDN.
+#
+# The default CDN URL requires internet access when viewing the generated
+# documentation. For offline use, download mermaid.esm.min.mjs and set this to a
+# relative path, or use MERMAID_RENDER_MODE=CLI to pre-generate images instead.
+# Examples:
+# - Latest v11 (default):
+# https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs
+# - Pinned version:
+# https://cdn.jsdelivr.net/npm/mermaid@11.3.0/dist/mermaid.esm.min.mjs
+# - Local copy: ./mermaid.esm.min.mjs (user must place file in HTML output
+# directory)
+# The default value is:
+# https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs.
+
+MERMAID_JS_URL         = https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs
+
+# The MERMAIDFILE_DIRS tag can be used to specify one or more directories that
+# contain Mermaid files that are included in the documentation (see the
+# \mermaidfile command).
+
+MERMAIDFILE_DIRS       =
+
 # The DOT_GRAPH_MAX_NODES tag can be used to set the maximum number of nodes
 # that will be shown in the graph. If the number of nodes in a graph becomes
 # larger than this value, Doxygen will truncate the graph, which is visualized
@@ -2868,15 +3000,6 @@ DOT_GRAPH_MAX_NODES    = 50
 # This tag requires that the tag HAVE_DOT is set to YES.
 
 MAX_DOT_GRAPH_DEPTH    = 0
-
-# Set the DOT_MULTI_TARGETS tag to YES to allow dot to generate multiple output
-# files in one run (i.e. multiple -o and -T options on the command line). This
-# makes dot run faster, but since only newer versions of dot (>1.8.10) support
-# this, this feature is disabled by default.
-# The default value is: NO.
-# This tag requires that the tag HAVE_DOT is set to YES.
-
-DOT_MULTI_TARGETS      = NO
 
 # If the GENERATE_LEGEND tag is set to YES Doxygen will generate a legend page
 # explaining the meaning of the various boxes and arrows in the dot generated

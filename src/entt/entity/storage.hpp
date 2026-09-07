@@ -240,7 +240,7 @@ class basic_storage: public basic_sparse_set<Entity, typename stl::allocator_tra
     auto assure_at_least(const stl::size_t pos) {
         const auto idx = pos / traits_type::page_size;
 
-        if(!(idx < payload.size())) {
+        if(idx >= payload.size()) {
             auto curr = payload.size();
             allocator_type allocator{get_allocator()};
             payload.resize(idx + 1u, nullptr);
@@ -337,21 +337,23 @@ protected:
      * @param last An iterator past the last element of the range of entities.
      */
     void pop(underlying_iterator first, underlying_iterator last) override {
-        for(allocator_type allocator{get_allocator()}; first != last; ++first) {
-            // cannot use first.index() because it would break with cross iterators
-            auto &elem = element_at(base_type::index(*first));
-
-            if constexpr(traits_type::in_place_delete) {
+        // cannot use first.index() in any case because it would break with cross iterators
+        if constexpr(traits_type::in_place_delete) {
+            for(allocator_type allocator{get_allocator()}; first != last; ++first) {
+                alloc_traits::destroy(allocator, stl::addressof(element_at(base_type::index(*first))));
                 base_type::in_place_pop(*first);
-                alloc_traits::destroy(allocator, stl::addressof(elem));
-            } else if constexpr(stl::is_trivially_destructible_v<element_type>) {
-                elem = stl::move(element_at(base_type::size() - 1u));
+            }
+        } else if constexpr(stl::is_trivially_destructible_v<element_type>) {
+            for(; first != last; ++first) {
+                element_at(base_type::index(*first)) = stl::move(element_at(base_type::size() - 1u));
                 base_type::swap_and_pop(*first);
-            } else {
-                auto &other = element_at(base_type::size() - 1u);
+            }
+        } else {
+            for(allocator_type allocator{get_allocator()}; first != last; ++first) {
+                auto &elem = element_at(base_type::size() - 1u);
                 // destroying on exit allows reentrant destructors
-                [[maybe_unused]] auto unused = stl::exchange(elem, stl::move(other));
-                alloc_traits::destroy(allocator, stl::addressof(other));
+                [[maybe_unused]] auto unused = stl::exchange(element_at(base_type::index(*first)), stl::move(elem));
+                alloc_traits::destroy(allocator, stl::addressof(elem));
                 base_type::swap_and_pop(*first);
             }
         }
@@ -364,7 +366,7 @@ protected:
         } else {
             allocator_type allocator{get_allocator()};
 
-            for(auto first = base_type::begin(); !(first.index() < 0); ++first) {
+            for(auto first = base_type::begin(); first.index() >= 0; ++first) {
                 if constexpr(traits_type::in_place_delete) {
                     if(*first != tombstone) {
                         base_type::in_place_pop(*first);
@@ -1149,7 +1151,7 @@ public:
      */
     entity_type generate(const entity_type hint) {
         if(hint != null && hint != tombstone) {
-            if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || !(base_type::index(curr) < base_type::free_list())) {
+            if(const auto curr = traits_type::construct(traits_type::to_entity(hint), base_type::current(hint)); curr == tombstone || (base_type::index(curr) >= base_type::free_list())) {
                 return *base_type::try_emplace(hint, true);
             }
         }

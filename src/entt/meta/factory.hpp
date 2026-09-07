@@ -36,7 +36,7 @@ namespace internal {
 class basic_meta_factory {
     using invoke_type = stl::remove_pointer_t<decltype(meta_func_node::invoke)>;
 
-    enum class mode {
+    enum class mode : stl::uint8_t {
         type,
         data,
         func
@@ -55,7 +55,7 @@ class basic_meta_factory {
         return overload;
     }
 
-    bool unique_alias(const id_type alias) const noexcept {
+    [[nodiscard]] bool unique_alias(const id_type alias) const noexcept {
         return (ctx->bucket.find(alias) == ctx->bucket.cend()) && (stl::find_if(ctx->bucket.cbegin(), ctx->bucket.cend(), [alias](const auto &value) { return value.second->alias == alias; }) == ctx->bucket.cend());
     }
 
@@ -143,7 +143,6 @@ protected:
 public:
     basic_meta_factory(meta_ctx &area, meta_type_node node, const id_type id)
         : ctx{&meta_context::from(area)},
-          bucket{},
           state{mode::type} {
         if(const auto it = ctx->bucket.find(id); it == ctx->bucket.cend()) {
             ENTT_ASSERT(unique_alias(id), "Duplicate identifier");

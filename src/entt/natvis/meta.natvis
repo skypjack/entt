@@ -40,7 +40,8 @@
 		<Expand>
 			<Item Name="[id]">id</Item>
 			<Item Name="[name]" Condition="name != nullptr">name,na</Item>
-			<Item Name="[arity]">arity</Item>
+			<Item Name="[set_arity]">set_arity</Item>
+			<Item Name="[get_arity]">get_arity</Item>
 			<Item Name="[is_const]">has_trait(entt::internal::meta_traits::is_const)</Item>
 			<Item Name="[is_static]">has_trait(entt::internal::meta_traits::is_static)</Item>
 			<Item Name="[custom]" Condition="custom.value != nullptr">custom</Item>

@@ -243,9 +243,6 @@ TEST_F(MetaContext, MetaOverloadedType) {
     ASSERT_EQ(global.alias(), "global"_hs);
     ASSERT_EQ(local.alias(), "local"_hs);
 
-    clazz instance{'c', 8};
-    const argument value{2};
-
     ASSERT_EQ(global.get("value"_hs, {}).cast<int>(), 1);
     ASSERT_EQ(local.get("value"_hs, {}).cast<int>(), 2);
 }

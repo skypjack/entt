@@ -12,12 +12,10 @@
 #    include "../core/memory.hpp"
 #    include "../core/type_traits.hpp"
 #    include "../stl/bit.hpp"
-#    include "../stl/cmath.hpp"
 #    include "../stl/concepts.hpp"
 #    include "../stl/cstddef.hpp"
 #    include "../stl/functional.hpp"
 #    include "../stl/iterator.hpp"
-#    include "../stl/limits.hpp"
 #    include "../stl/memory.hpp"
 #    include "../stl/tuple.hpp"
 #    include "../stl/type_traits.hpp"
@@ -26,12 +24,12 @@
 #    include "fwd.hpp"
 #endif // ENTT_MODULE
 
-namespace entt {
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-inline constexpr stl::size_t dense_map_placeholder_position = (stl::numeric_limits<stl::size_t>::max)();
+inline constexpr stl::size_t dense_map_placeholder_position = ~static_cast<stl::size_t>(0);
 
 template<typename Key, typename Type>
 struct dense_map_node final {
@@ -62,7 +60,7 @@ struct dense_map_node final {
 template<typename It>
 class dense_map_iterator final {
     template<typename>
-    friend class internal::dense_map_iterator;
+    friend class dense_map_iterator;
 
     static_assert(stl::is_pointer_v<It>, "Not a pointer type");
     using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
@@ -154,49 +152,10 @@ private:
     It it;
 };
 
-ENTT_MODULE_EXPORT_BEGIN
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr std::ptrdiff_t operator-(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return lhs.it - rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator==(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return lhs.it == rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator!=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return lhs.it < rhs.it;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return rhs < lhs;
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator<=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return !(lhs > rhs);
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator>=(const dense_map_iterator<Lhs> &lhs, const dense_map_iterator<Rhs> &rhs) noexcept {
-    return !(lhs < rhs);
-}
-
-ENTT_MODULE_EXPORT_END
-
 template<typename It>
 class dense_map_local_iterator final {
     template<typename>
-    friend class internal::dense_map_local_iterator;
+    friend class dense_map_local_iterator;
 
     static_assert(stl::is_pointer_v<It>, "Not a pointer type");
     using first_type = decltype(stl::as_const(stl::declval<It>()->element.first));
@@ -254,24 +213,8 @@ private:
     stl::size_t offset{dense_map_placeholder_position};
 };
 
-ENTT_MODULE_EXPORT_BEGIN
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator==(const dense_map_local_iterator<Lhs> &lhs, const dense_map_local_iterator<Rhs> &rhs) noexcept {
-    return lhs.index() == rhs.index();
-}
-
-template<typename Lhs, typename Rhs>
-[[nodiscard]] constexpr bool operator!=(const dense_map_local_iterator<Lhs> &lhs, const dense_map_local_iterator<Rhs> &rhs) noexcept {
-    return !(lhs == rhs);
-}
-
-ENTT_MODULE_EXPORT_END
-
 } // namespace internal
 /*! @endcond */
-
-ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Associative container for key-value pairs with unique keys.
@@ -528,6 +471,7 @@ public:
      * internal array.
      */
     [[nodiscard]] const_iterator cend() const noexcept {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and stl::span)
         return packed.first().data() + packed.first().size();
     }
 
@@ -538,6 +482,7 @@ public:
 
     /*! @copydoc end */
     [[nodiscard]] iterator end() noexcept {
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic) - waiting for C++20 (and stl::span)
         return packed.first().data() + packed.first().size();
     }
 
@@ -849,13 +794,13 @@ public:
      */
     [[nodiscard]] stl::pair<iterator, iterator> equal_range(const key_type &key) {
         const auto it = find(key);
-        return {it, it + !(it == end())};
+        return {it, it + (it != end())};
     }
 
     /*! @copydoc equal_range */
     [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const key_type &key) const {
         const auto it = find(key);
-        return {it, it + !(it == cend())};
+        return {it, it + (it != cend())};
     }
 
     /**
@@ -868,14 +813,14 @@ public:
     [[nodiscard]] stl::pair<iterator, iterator> equal_range(const auto &key)
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
-        return {it, it + !(it == end())};
+        return {it, it + (it != end())};
     }
 
     /*! @copydoc equal_range */
     [[nodiscard]] stl::pair<const_iterator, const_iterator> equal_range(const auto &key) const
     requires is_transparent_v<hasher> && is_transparent_v<key_equal> {
         const auto it = find(key);
-        return {it, it + !(it == cend())};
+        return {it, it + (it != cend())};
     }
 
     /**
@@ -1043,7 +988,9 @@ public:
      */
     void reserve(const size_type cnt) {
         packed.first().reserve(cnt);
-        rehash(static_cast<size_type>(stl::ceil(static_cast<float>(cnt) / max_load_factor())));
+        const auto next = static_cast<double>(cnt) / max_load_factor();
+        const auto trunc = static_cast<stl::size_t>(next);
+        rehash(trunc + static_cast<stl::size_t>(next > trunc));
     }
 
     /**
@@ -1067,8 +1014,6 @@ private:
     compressed_pair<packed_container_type, key_equal> packed;
     float threshold{default_threshold};
 };
-
-ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

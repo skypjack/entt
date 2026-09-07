@@ -972,10 +972,12 @@ TEST(DenseSet, Reserve) {
 
     ASSERT_EQ(set.bucket_count(), minimum_bucket_count);
 
-    set.reserve(minimum_bucket_count);
+    for(std::size_t next{1u}; next < minimum_bucket_count; ++next) {
+        const auto count = next * minimum_bucket_count;
+        set.reserve(count);
 
-    ASSERT_EQ(set.bucket_count(), 2 * minimum_bucket_count);
-    ASSERT_EQ(set.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil(minimum_bucket_count / set.max_load_factor()))));
+        ASSERT_EQ(set.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil((count) / set.max_load_factor()))));
+    }
 }
 
 TEST(DenseSet, ThrowingAllocator) {

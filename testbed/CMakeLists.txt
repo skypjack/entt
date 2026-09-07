@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL
-    GIT_TAG release-3.2.10
+    GIT_TAG release-3.4.12
     GIT_SHALLOW 1
 )
 
@@ -21,7 +21,7 @@ FetchContent_MakeAvailable(SDL3)
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui
-    GIT_TAG v1.91.9
+    GIT_TAG v1.92.8
     GIT_SHALLOW 1
 )
 
@@ -47,9 +47,10 @@ target_sources(
         application/application.cpp
         application/context.cpp
         meta/meta.cpp
-        system/hud_system.cpp
+        system/command_system.cpp
         system/imgui_system.cpp
         system/input_system.cpp
+        system/movement_system.cpp
         system/rendering_system.cpp
         testbed.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp

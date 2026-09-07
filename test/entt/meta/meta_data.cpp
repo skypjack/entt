@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -312,6 +311,18 @@ TEST_F(MetaData, GetInvalidArg) {
     ASSERT_FALSE(entt::resolve<clazz>().data("i"_hs).get(instance));
 }
 
+TEST_F(MetaData, GetUnnecessaryArgs) {
+    using namespace entt::literals;
+
+    entt::meta_any any{clazz{}};
+    any.cast<clazz &>().i = 3;
+    const auto value = entt::resolve<clazz>().data("i"_hs).get(any, 2, 'c');
+
+    ASSERT_TRUE(value);
+    ASSERT_TRUE(static_cast<bool>(value.cast<int>()));
+    ASSERT_EQ(value.cast<int>(), 3);
+}
+
 TEST_F(MetaData, SetMetaAnyArg) {
     using namespace entt::literals;
 
@@ -385,6 +396,17 @@ TEST_F(MetaData, SetByConstRef) {
 
     ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, wrapper.as_ref()));
     ASSERT_EQ(any.cast<clazz>().i, 3);
+}
+
+TEST_F(MetaData, SetUnnecessaryArgs) {
+    using namespace entt::literals;
+
+    entt::meta_any any{clazz{}};
+    const entt::meta_any value{1};
+
+    ASSERT_EQ(any.cast<clazz>().i, 0);
+    ASSERT_TRUE(entt::resolve<clazz>().data("i"_hs).set(any, value, 2, 'c'));
+    ASSERT_EQ(any.cast<clazz>().i, 1);
 }
 
 TEST_F(MetaData, SetterGetterAsFreeFunctions) {
@@ -503,7 +525,7 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
 }
 
-TEST_F(MetaData, SetterGetterMultiArg) {
+TEST_F(MetaData, SetterGetterMultiArgs) {
     using namespace entt::literals;
 
     auto data = entt::resolve<setter_getter>().data("multi"_hs);
@@ -525,6 +547,32 @@ TEST_F(MetaData, SetterGetterMultiArg) {
     ASSERT_FALSE(data.set(instance, 1, 2.0));
     ASSERT_TRUE(data.set(instance, 0, 0.5, 2.0));
     ASSERT_EQ(data.get(instance, 2).cast<int>(), 2);
+}
+
+TEST_F(MetaData, SetterGetterUnnecessaryArgs) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<setter_getter>().data("y"_hs);
+    setter_getter instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 1., 2, 'c'));
+    ASSERT_EQ(data.get(instance, 2, 'c').cast<int>(), 1);
+    ASSERT_TRUE(data.set(instance, 3, 2, 'c'));
+    ASSERT_EQ(data.get(instance, 2, 'c').cast<int>(), 3);
+}
+
+TEST_F(MetaData, SetterGetterMultiArgsUnnecessaryArgs) {
+    using namespace entt::literals;
+
+    auto data = entt::resolve<setter_getter>().data("multi"_hs);
+    setter_getter instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.get(instance, 2, 1, 'c').cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 0, 0.5, 2.0, 1, 'c'));
+    ASSERT_EQ(data.get(instance, 2, 1, 'c').cast<int>(), 2);
 }
 
 TEST_F(MetaData, ConstInstance) {

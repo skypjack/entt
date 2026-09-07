@@ -11,8 +11,8 @@ jobs:
     timeout-minutes: 60
 
     env:
-      IWYU: "0.24"
-      LLVM: "20"
+      IWYU: "0.25"
+      LLVM: "21"
 
     runs-on: ubuntu-latest
     continue-on-error: true

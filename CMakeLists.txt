@@ -190,6 +190,7 @@ if(ENTT_INCLUDE_HEADERS)
         entity/handle.hpp
         entity/mixin.hpp
         entity/helper.hpp
+        entity/io.hpp
         entity/organizer.hpp
         entity/ranges.hpp
         entity/registry.hpp
@@ -235,17 +236,12 @@ if(ENTT_INCLUDE_HEADERS)
         stl/array.hpp
         stl/atomic.hpp
         stl/bit.hpp
-        stl/cmath.hpp
         stl/concepts.hpp
         stl/cstddef.hpp
         stl/cstdint.hpp
         stl/functional.hpp
-        stl/ios.hpp
         stl/iterator.hpp
-        stl/limits.hpp
         stl/memory.hpp
-        stl/ostream.hpp
-        stl/sstream.hpp
         stl/string.hpp
         stl/string_view.hpp
         stl/tuple.hpp

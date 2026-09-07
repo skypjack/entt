@@ -13,8 +13,6 @@
 #include "../meta/pointer.hpp"
 #include "../meta/resolve.hpp"
 #include "../stl/cstdint.hpp"
-#include "../stl/ios.hpp"
-#include "../stl/sstream.hpp"
 #include "../stl/string.hpp"
 
 #if __has_include(<imgui.h>)
@@ -60,9 +58,8 @@ static void present_element(const meta_any &obj, OnEntity on_entity) {
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == type_id<bool>()) {
-                stl::stringstream buffer{};
-                buffer << stl::boolalpha << elem.template cast<bool>();
-                ImGui::Text("%s: %s", label, buffer.str().data());
+                const auto value = elem.template cast<bool>();
+                ImGui::Text("%s: %s", label, value ? "true" : "false");
             } else if(type.info() == type_id<char>()) {
                 ImGui::Text("%s: %c", label, elem.template cast<char>());
             } else if(type.is_integral()) {

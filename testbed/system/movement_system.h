@@ -6,6 +6,6 @@ namespace testbed {
 
 struct context;
 
-void hud_system(entt::registry &, const context &);
+void movement_system(entt::registry &, const context &, const double);
 
 } // namespace testbed
