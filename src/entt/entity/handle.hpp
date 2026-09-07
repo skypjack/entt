@@ -68,10 +68,8 @@ public:
         return operator*();
     }
 
-    template<typename Other>
-    [[nodiscard]] constexpr bool operator==(const handle_storage_iterator<Other> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename ILhs, typename IRhs>
+    friend constexpr bool operator==(const handle_storage_iterator<ILhs> &, const handle_storage_iterator<IRhs> &) noexcept;
 
 private:
     entity_type entt;

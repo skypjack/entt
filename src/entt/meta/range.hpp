@@ -90,17 +90,14 @@ struct meta_range_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
-        return it - other.it;
-    }
+    template<typename... Args>
+    friend constexpr stl::ptrdiff_t operator-(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const meta_range_iterator &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Args>
+    friend constexpr bool operator==(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
-    [[nodiscard]] constexpr auto operator<=>(const meta_range_iterator &other) const noexcept {
-        return it <=> other.it;
-    }
+    template<typename... Args>
+    friend constexpr bool operator<(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
 private:
     It it;

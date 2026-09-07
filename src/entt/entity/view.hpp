@@ -123,10 +123,8 @@ public:
         return *operator->();
     }
 
-    template<typename Other, auto... Args>
-    [[nodiscard]] constexpr bool operator==(const view_iterator<Other, Args...> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename LhsType, auto... LhsArgs, typename RhsType, auto... RhsArgs>
+    friend constexpr bool operator==(const view_iterator<LhsType, LhsArgs...> &, const view_iterator<RhsType, RhsArgs...> &) noexcept;
 
 private:
     iterator_type it;
@@ -188,10 +186,8 @@ struct extended_view_iterator final {
         return it;
     }
 
-    template<typename... Other>
-    [[nodiscard]] constexpr bool operator==(const extended_view_iterator<Other...> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_view_iterator<Lhs...> &, const extended_view_iterator<Rhs...> &) noexcept;
 
 private:
     It it;

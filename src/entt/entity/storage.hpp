@@ -181,10 +181,8 @@ public:
         return stl::get<It>(it);
     }
 
-    template<typename... Args>
-    [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Args...> &other) const noexcept {
-        return stl::get<0>(it) == stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_storage_iterator<Lhs...> &, const extended_storage_iterator<Rhs...> &) noexcept;
 
 private:
     stl::tuple<It, Other...> it;

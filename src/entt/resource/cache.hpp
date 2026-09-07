@@ -98,20 +98,14 @@ public:
         return operator*();
     }
 
-    template<typename... Args>
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const resource_cache_iterator<Args...> &other) const noexcept {
-        return it - other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr stl::ptrdiff_t operator-(const resource_cache_iterator<Lhs...> &, const resource_cache_iterator<Rhs...> &) noexcept;
 
-    template<typename... Args>
-    [[nodiscard]] constexpr bool operator==(const resource_cache_iterator<Args...> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const resource_cache_iterator<Lhs...> &, const resource_cache_iterator<Rhs...> &) noexcept;
 
-    template<typename... Args>
-    [[nodiscard]] constexpr auto operator<=>(const resource_cache_iterator<Args...> &other) const noexcept {
-        return it <=> other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator<(const resource_cache_iterator<Lhs...> &, const resource_cache_iterator<Rhs...> &) noexcept;
 
 private:
     It it;

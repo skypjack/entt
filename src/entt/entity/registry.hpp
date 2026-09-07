@@ -113,20 +113,14 @@ public:
         return operator*();
     }
 
-    template<typename Other>
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const registry_storage_iterator<Other> &other) const noexcept {
-        return it - other.it;
-    }
+    template<typename Lhs, typename Rhs>
+    friend constexpr stl::ptrdiff_t operator-(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
 
-    template<typename Other>
-    [[nodiscard]] constexpr bool operator==(const registry_storage_iterator<Other> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename Lhs, typename Rhs>
+    friend constexpr bool operator==(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
 
-    template<typename Other>
-    [[nodiscard]] constexpr auto operator<=>(const registry_storage_iterator<Other> &other) const noexcept {
-        return it <=> other.it;
-    }
+    template<typename Lhs, typename Rhs>
+    friend constexpr bool operator<(const registry_storage_iterator<Lhs> &, const registry_storage_iterator<Rhs> &) noexcept;
 
 private:
     It it;

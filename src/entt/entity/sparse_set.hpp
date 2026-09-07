@@ -90,20 +90,6 @@ struct sparse_set_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const sparse_set_iterator &other) const noexcept {
-        // intentionally reversed due to backward iteration
-        return other.offset - offset;
-    }
-
-    [[nodiscard]] constexpr bool operator==(const sparse_set_iterator &other) const noexcept {
-        return offset == other.offset;
-    }
-
-    [[nodiscard]] constexpr auto operator<=>(const sparse_set_iterator &other) const noexcept {
-        // intentionally reversed due to backward iteration
-        return other.offset <=> offset;
-    }
-
     [[nodiscard]] constexpr pointer data() const noexcept {
         return packed ? packed->data() : nullptr;
     }

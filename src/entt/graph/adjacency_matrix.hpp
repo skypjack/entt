@@ -68,9 +68,8 @@ public:
         return stl::make_pair<size_type>(pos / vert, pos % vert);
     }
 
-    [[nodiscard]] constexpr bool operator==(const edge_iterator &other) const noexcept {
-        return pos == other.pos;
-    }
+    template<typename Container>
+    friend constexpr bool operator==(const edge_iterator<Container> &, const edge_iterator<Container> &) noexcept;
 
 private:
     It it{};

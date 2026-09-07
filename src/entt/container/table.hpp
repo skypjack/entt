@@ -90,20 +90,14 @@ public:
         return operator[](0);
     }
 
-    template<typename... Other>
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) - stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr stl::ptrdiff_t operator-(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
-    template<typename... Other>
-    [[nodiscard]] constexpr bool operator==(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) == stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
-    template<typename... Other>
-    [[nodiscard]] constexpr auto operator<=>(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) <=> stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator<(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
 private:
     stl::tuple<It...> it;

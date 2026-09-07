@@ -78,10 +78,8 @@ public:
         return it;
     }
 
-    template<typename... Args>
-    [[nodiscard]] constexpr bool operator==(const extended_group_iterator<Args...> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) noexcept;
 
 private:
     It it;
