@@ -1,18 +1,21 @@
 #ifndef ENTT_RESOURCE_FWD_HPP
 #define ENTT_RESOURCE_FWD_HPP
 
-#include "../stl/memory.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/memory.hpp"
+#endif // ENTT_MODULE
 
-template<typename>
-struct resource_loader;
+ENTT_MODULE_EXPORT namespace entt {
+    template<typename>
+    struct resource_loader;
 
-template<typename Type, typename = resource_loader<Type>, typename = stl::allocator<Type>>
-class resource_cache;
+    template<typename Type, typename = resource_loader<Type>, typename = stl::allocator<Type>>
+    class resource_cache;
 
-template<typename>
-class resource;
+    template<typename>
+    class resource;
 
 } // namespace entt
 

@@ -1,24 +1,28 @@
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
 
-#include <compare>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_info.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "component.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "sparse_set.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../core/iterator.hpp"
+#    include "../core/memory.hpp"
+#    include "../core/type_info.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "component.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#    include "sparse_set.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -177,17 +181,31 @@ public:
         return stl::get<It>(it);
     }
 
-    template<typename... Args>
-    [[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Args...> &other) const noexcept {
-        return stl::get<0>(it) == stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_storage_iterator<Lhs...> &, const extended_storage_iterator<Rhs...> &) noexcept;
 
 private:
     stl::tuple<It, Other...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) == std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const extended_storage_iterator<Lhs...> &lhs, const extended_storage_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Storage implementation.
@@ -1218,6 +1236,8 @@ public:
 private:
     size_type placeholder{};
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

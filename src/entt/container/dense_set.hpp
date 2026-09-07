@@ -1,29 +1,33 @@
 #ifndef ENTT_CONTAINER_DENSE_SET_HPP
 #define ENTT_CONTAINER_DENSE_SET_HPP
 
-#include <compare>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/bit.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/functional.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../core/compressed_pair.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/bit.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/functional.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr stl::size_t dense_set_placeholder_position = ~static_cast<stl::size_t>(0);
+inline constexpr stl::size_t dense_set_placeholder_position = ~static_cast<stl::size_t>(0);
 
 template<typename It>
 class dense_set_iterator final {

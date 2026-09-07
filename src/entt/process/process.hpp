@@ -1,13 +1,17 @@
 #ifndef ENTT_PROCESS_PROCESS_HPP
 #define ENTT_PROCESS_PROCESS_HPP
 
-#include "../core/compressed_pair.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/cstdint.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../core/compressed_pair.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/cstdint.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -19,6 +23,8 @@ struct process_adaptor;
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Base class for processes.
@@ -286,6 +292,9 @@ private:
     compressed_pair<handle_type, allocator_type> next;
     state current;
 };
+ENTT_MODULE_EXPORT_END
+
+/*! @cond TURN_OFF_DOXYGEN */
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {

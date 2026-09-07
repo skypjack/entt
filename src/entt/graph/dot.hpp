@@ -1,10 +1,14 @@
 #ifndef ENTT_GRAPH_DOT_HPP
 #define ENTT_GRAPH_DOT_HPP
 
-#include "../stl/concepts.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/concepts.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Outputs a graph in dot format.

@@ -1,12 +1,16 @@
 #ifndef ENTT_ENTITY_COMPONENT_HPP
 #define ENTT_ENTITY_COMPONENT_HPP
 
-#include "../config/config.h"
-#include "../core/concepts.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/concepts.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -36,6 +40,8 @@ struct page_size<Type>: stl::integral_constant<stl::size_t, Type::page_size> {};
 } // namespace internal
 /*! @endcond */
 
+ENTT_MODULE_EXPORT_BEGIN
+
 /**
  * @brief Common way to access various properties of components.
  * @tparam Type Element type.
@@ -53,6 +59,8 @@ struct component_traits {
     /*! @brief Page size, default is `ENTT_PACKED_PAGE` for non-empty types. */
     static constexpr stl::size_t page_size = internal::page_size<Type>::value;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

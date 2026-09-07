@@ -1,142 +1,145 @@
 #ifndef ENTT_CORE_ALGORITHM_HPP
 #define ENTT_CORE_ALGORITHM_HPP
 
-#include "../stl/algorithm.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/functional.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/algorithm.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/functional.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#endif // ENTT_MODULE
 
-/**
- * @brief Function object to wrap `stl::sort` in a class type.
- *
- * Unfortunately, `stl::sort` cannot be passed as template argument to a class
- * template or a function template.<br/>
- * This class fills the gap by wrapping some flavors of `stl::sort` in a
- * function object.
- */
-struct std_sort {
+ENTT_MODULE_EXPORT namespace entt {
     /**
-     * @brief Sorts the elements in a range.
+     * @brief Function object to wrap `stl::sort` in a class type.
      *
-     * Sorts the elements in a range using the given binary comparison function.
-     *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Args Types of arguments to forward to the sort function.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
-     * @param compare A valid comparison function object.
-     * @param args Arguments to forward to the sort function, if any.
+     * Unfortunately, `stl::sort` cannot be passed as template argument to a class
+     * template or a function template.<br/>
+     * This class fills the gap by wrapping some flavors of `stl::sort` in a
+     * function object.
      */
-    template<typename Compare = stl::less<>, typename... Args>
-    void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
-        stl::sort(stl::forward<Args>(args)..., stl::move(first), stl::move(last), stl::move(compare));
-    }
-};
+    struct std_sort {
+        /**
+         * @brief Sorts the elements in a range.
+         *
+         * Sorts the elements in a range using the given binary comparison function.
+         *
+         * @tparam Compare Type of comparison function object.
+         * @tparam Args Types of arguments to forward to the sort function.
+         * @param first An iterator to the first element of the range to sort.
+         * @param last An iterator past the last element of the range to sort.
+         * @param compare A valid comparison function object.
+         * @param args Arguments to forward to the sort function, if any.
+         */
+        template<typename Compare = stl::less<>, typename... Args>
+        void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}, Args &&...args) const {
+            stl::sort(stl::forward<Args>(args)..., stl::move(first), stl::move(last), stl::move(compare));
+        }
+    };
 
-/*! @brief Function object for performing insertion sort. */
-struct insertion_sort {
-    /**
-     * @brief Sorts the elements in a range.
-     *
-     * Sorts the elements in a range using the given binary comparison function.
-     *
-     * @tparam Compare Type of comparison function object.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
-     * @param compare A valid comparison function object.
-     */
-    template<typename Compare = stl::less<>>
-    void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}) const {
-        if(first < last) {
-            for(auto it = first + 1; it < last; ++it) {
-                auto value = stl::move(*it);
-                auto pre = it;
+    /*! @brief Function object for performing insertion sort. */
+    struct insertion_sort {
+        /**
+         * @brief Sorts the elements in a range.
+         *
+         * Sorts the elements in a range using the given binary comparison function.
+         *
+         * @tparam Compare Type of comparison function object.
+         * @param first An iterator to the first element of the range to sort.
+         * @param last An iterator past the last element of the range to sort.
+         * @param compare A valid comparison function object.
+         */
+        template<typename Compare = stl::less<>>
+        void operator()(stl::random_access_iterator auto first, stl::random_access_iterator auto last, Compare compare = Compare{}) const {
+            if(first < last) {
+                for(auto it = first + 1; it < last; ++it) {
+                    auto value = stl::move(*it);
+                    auto pre = it;
 
-                // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                for(; pre > first && compare(value, *(pre - 1)); --pre) {
-                    *pre = stl::move(*(pre - 1));
+                    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                    for(; pre > first && compare(value, *(pre - 1)); --pre) {
+                        *pre = stl::move(*(pre - 1));
+                    }
+                    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+                    *pre = stl::move(value);
                 }
-                // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-
-                *pre = stl::move(value);
             }
         }
-    }
-};
+    };
 
-/**
- * @brief Function object for performing LSD radix sort.
- * @tparam Bit Number of bits processed per pass.
- * @tparam N Maximum number of bits to sort.
- */
-template<stl::size_t Bit, stl::size_t N>
-requires ((N % Bit) == 0) // The maximum number of bits to sort must be a multiple of the number of bits processed per pass
-struct radix_sort {
     /**
-     * @brief Sorts the elements in a range.
-     *
-     * Sorts the elements in a range using the given _getter_ to access the
-     * actual data to be sorted.
-     *
-     * This implementation is inspired by the online book
-     * [Physically Based Rendering](http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#RadixSort).
-     *
-     * @tparam It Type of random access iterator.
-     * @tparam Getter Type of _getter_ function object.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
-     * @param getter A valid _getter_ function object.
+     * @brief Function object for performing LSD radix sort.
+     * @tparam Bit Number of bits processed per pass.
+     * @tparam N Maximum number of bits to sort.
      */
-    template<stl::random_access_iterator It, typename Getter = stl::identity>
-    void operator()(It first, It last, Getter getter = Getter{}) const {
-        if(first < last) {
-            constexpr auto passes = N / Bit;
+    template<stl::size_t Bit, stl::size_t N>
+    requires ((N % Bit) == 0) // The maximum number of bits to sort must be a multiple of the number of bits processed per pass
+    struct radix_sort {
+        /**
+         * @brief Sorts the elements in a range.
+         *
+         * Sorts the elements in a range using the given _getter_ to access the
+         * actual data to be sorted.
+         *
+         * This implementation is inspired by the online book
+         * [Physically Based Rendering](http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#RadixSort).
+         *
+         * @tparam It Type of random access iterator.
+         * @tparam Getter Type of _getter_ function object.
+         * @param first An iterator to the first element of the range to sort.
+         * @param last An iterator past the last element of the range to sort.
+         * @param getter A valid _getter_ function object.
+         */
+        template<stl::random_access_iterator It, typename Getter = stl::identity>
+        void operator()(It first, It last, Getter getter = Getter{}) const {
+            if(first < last) {
+                constexpr auto passes = N / Bit;
 
-            using value_type = stl::iterator_traits<It>::value_type;
-            using difference_type = stl::iterator_traits<It>::difference_type;
-            stl::vector<value_type> aux(static_cast<stl::size_t>(stl::distance(first, last)));
+                using value_type = stl::iterator_traits<It>::value_type;
+                using difference_type = stl::iterator_traits<It>::difference_type;
+                stl::vector<value_type> aux(static_cast<stl::size_t>(stl::distance(first, last)));
 
-            auto part = [getter = stl::move(getter)](auto from, auto to, auto out, auto start) {
-                constexpr auto mask = (1 << Bit) - 1;
-                constexpr auto buckets = 1 << Bit;
+                auto part = [getter = stl::move(getter)](auto from, auto to, auto out, auto start) {
+                    constexpr auto mask = (1 << Bit) - 1;
+                    constexpr auto buckets = 1 << Bit;
 
-                // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, misc-const-correctness)
-                stl::size_t count[buckets]{};
+                    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays, misc-const-correctness)
+                    stl::size_t count[buckets]{};
 
-                for(auto it = from; it != to; ++it) {
-                    ++count[(getter(*it) >> start) & mask];
+                    for(auto it = from; it != to; ++it) {
+                        ++count[(getter(*it) >> start) & mask];
+                    }
+
+                    // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
+                    stl::size_t index[buckets]{};
+
+                    for(stl::size_t pos{}, end = buckets - 1u; pos < end; ++pos) {
+                        index[pos + 1u] = index[pos] + count[pos];
+                    }
+
+                    for(auto it = from; it != to; ++it) {
+                        const auto pos = index[(getter(*it) >> start) & mask]++;
+                        out[static_cast<difference_type>(pos)] = stl::move(*it);
+                    }
+                };
+
+                for(stl::size_t pass = 0; pass < (passes & ~1u); pass += 2) {
+                    part(first, last, aux.begin(), pass * Bit);
+                    part(aux.begin(), aux.end(), first, (pass + 1) * Bit);
                 }
 
-                // NOLINTNEXTLINE(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
-                stl::size_t index[buckets]{};
-
-                for(stl::size_t pos{}, end = buckets - 1u; pos < end; ++pos) {
-                    index[pos + 1u] = index[pos] + count[pos];
+                if constexpr(passes & 1) {
+                    part(first, last, aux.begin(), (passes - 1) * Bit);
+                    stl::move(aux.begin(), aux.end(), first);
                 }
-
-                for(auto it = from; it != to; ++it) {
-                    const auto pos = index[(getter(*it) >> start) & mask]++;
-                    out[static_cast<difference_type>(pos)] = stl::move(*it);
-                }
-            };
-
-            for(stl::size_t pass = 0; pass < (passes & ~1u); pass += 2) {
-                part(first, last, aux.begin(), pass * Bit);
-                part(aux.begin(), aux.end(), first, (pass + 1) * Bit);
-            }
-
-            if constexpr(passes & 1) {
-                part(first, last, aux.begin(), (passes - 1) * Bit);
-                stl::move(aux.begin(), aux.end(), first);
             }
         }
-    }
-};
+    };
 
 } // namespace entt
 

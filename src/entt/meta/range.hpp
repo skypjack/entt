@@ -1,14 +1,18 @@
 #ifndef ENTT_META_RANGE_HPP
 #define ENTT_META_RANGE_HPP
 
-#include <compare>
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/utility.hpp"
-#include "context.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../core/fwd.hpp"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/utility.hpp"
+#    include "context.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -86,25 +90,63 @@ struct meta_range_iterator final {
         return operator[](0);
     }
 
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const meta_range_iterator &other) const noexcept {
-        return it - other.it;
-    }
+    template<typename... Args>
+    friend constexpr stl::ptrdiff_t operator-(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
-    [[nodiscard]] constexpr bool operator==(const meta_range_iterator &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Args>
+    friend constexpr bool operator==(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
-    [[nodiscard]] constexpr auto operator<=>(const meta_range_iterator &other) const noexcept {
-        return it <=> other.it;
-    }
+    template<typename... Args>
+    friend constexpr bool operator<(const meta_range_iterator<Args...> &, const meta_range_iterator<Args...> &) noexcept;
 
 private:
     It it;
     const meta_ctx *ctx;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename... Args>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it - rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator==(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it == rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator!=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator<(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return lhs.it < rhs.it;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator>(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator<=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename... Args>
+[[nodiscard]] constexpr bool operator>=(const meta_range_iterator<Args...> &lhs, const meta_range_iterator<Args...> &rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
@@ -113,6 +155,8 @@ private:
  */
 template<typename Type, stl::forward_iterator It>
 using meta_range = iterable_adaptor<internal::meta_range_iterator<Type, It>>;
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

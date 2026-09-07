@@ -1,9 +1,13 @@
 #ifndef ENTT_META_FWD_HPP
 #define ENTT_META_FWD_HPP
 
-#include "../stl/cstddef.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/cstddef.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 struct meta_ctx;
 

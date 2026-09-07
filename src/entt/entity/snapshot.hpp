@@ -1,21 +1,25 @@
 #ifndef ENTT_ENTITY_SNAPSHOT_HPP
 #define ENTT_ENTITY_SNAPSHOT_HPP
 
-#include "../config/config.h"
-#include "../container/dense_map.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "view.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../container/dense_map.hpp"
+#    include "../core/type_info.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#    include "view.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {
