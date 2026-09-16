@@ -23,7 +23,7 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-static constexpr stl::size_t dense_set_placeholder_position = ~static_cast<stl::size_t>(0);
+inline constexpr stl::size_t dense_set_placeholder_position = ~static_cast<stl::size_t>(0);
 
 template<typename It>
 class dense_set_iterator final {
