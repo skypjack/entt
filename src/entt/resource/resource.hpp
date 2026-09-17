@@ -1,13 +1,17 @@
 #ifndef ENTT_RESOURCE_RESOURCE_HPP
 #define ENTT_RESOURCE_RESOURCE_HPP
 
-#include <compare>
-#include "../stl/concepts.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../stl/concepts.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /**
  * @brief Basic resource handle.

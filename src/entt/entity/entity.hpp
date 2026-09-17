@@ -1,14 +1,18 @@
 #ifndef ENTT_ENTITY_ENTITY_HPP
 #define ENTT_ENTITY_ENTITY_HPP
 
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../stl/bit.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/cstdint.hpp"
-#include "../stl/type_traits.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../stl/bit.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/cstdint.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -58,6 +62,8 @@ struct entt_traits<stl::uint64_t> {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Specifies that a type is an entity-like type.
@@ -306,6 +312,8 @@ inline constexpr null_t null{};
  * tombstone entity and any other identifier.
  */
 inline constexpr tombstone_t tombstone{};
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

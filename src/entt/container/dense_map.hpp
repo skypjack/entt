@@ -1,26 +1,30 @@
 #ifndef ENTT_CONTAINER_DENSE_MAP_HPP
 #define ENTT_CONTAINER_DENSE_MAP_HPP
 
-#include <compare>
-#include "../config/config.h"
-#include "../core/bit.hpp"
-#include "../core/compressed_pair.hpp"
-#include "../core/iterator.hpp"
-#include "../core/memory.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/bit.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/functional.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include <compare>
+#    include "../config/config.h"
+#    include "../core/bit.hpp"
+#    include "../core/compressed_pair.hpp"
+#    include "../core/iterator.hpp"
+#    include "../core/memory.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/bit.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/functional.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
+
+ENTT_MODULE_EXPORT namespace entt {
 
 /*! @cond ENTT_INTERNAL */
 namespace internal {

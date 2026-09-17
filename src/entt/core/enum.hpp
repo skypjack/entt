@@ -1,42 +1,47 @@
 #ifndef ENTT_CORE_ENUM_HPP
 #define ENTT_CORE_ENUM_HPP
 
-#include "../stl/concepts.hpp"
-#include "../stl/type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/concepts.hpp"
+#    include "../stl/type_traits.hpp"
+#endif // ENTT_MODULE
 
-/**
- * @brief Enable bitmask support for enum classes.
- * @tparam Type The enum type for which to enable bitmask support.
- */
-template<typename Type>
-struct enum_as_bitmask: stl::false_type {};
+ENTT_MODULE_EXPORT namespace entt {
+    /**
+     * @brief Enable bitmask support for enum classes.
+     * @tparam Type The enum type for which to enable bitmask support.
+     */
+    template<typename Type>
+    struct enum_as_bitmask: stl::false_type {};
 
-/*! @copydoc enum_as_bitmask */
-template<typename Type>
-requires requires {
-    requires stl::is_enum_v<Type>;
-    { Type::_entt_enum_as_bitmask } -> stl::same_as<Type>;
-}
-struct enum_as_bitmask<Type>: stl::true_type {};
+    /*! @copydoc enum_as_bitmask */
+    template<typename Type>
+    requires requires {
+        requires stl::is_enum_v<Type>;
+        { Type::_entt_enum_as_bitmask } -> stl::same_as<Type>;
+    }
+    struct enum_as_bitmask<Type>: stl::true_type {};
 
-/**
- * @brief Helper variable template.
- * @tparam Type The enum class type for which to enable bitmask support.
- */
-template<typename Type>
-inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
+    /**
+     * @brief Helper variable template.
+     * @tparam Type The enum class type for which to enable bitmask support.
+     */
+    template<typename Type>
+    inline constexpr bool enum_as_bitmask_v = enum_as_bitmask<Type>::value;
 
-/**
- * @brief Specifies that an enum class supports bitmask operations.
- * @tparam Type Enum class type.
- */
-template<typename Type>
-// check again that it is an enum to deal with incorrect specializations
-concept enum_bitmask = stl::is_enum_v<Type> && enum_as_bitmask_v<Type>;
+    /**
+     * @brief Specifies that an enum class supports bitmask operations.
+     * @tparam Type Enum class type.
+     */
+    template<typename Type>
+    // check again that it is an enum to deal with incorrect specializations
+    concept enum_bitmask = stl::is_enum_v<Type> && enum_as_bitmask_v<Type>;
 
 } // namespace entt
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Operator available for enums for which bitmask support is enabled.
@@ -98,5 +103,7 @@ template<entt::enum_bitmask Type>
 constexpr Type &operator^=(Type &lhs, const Type rhs) noexcept {
     return (lhs = (lhs ^ rhs));
 }
+
+ENTT_MODULE_EXPORT_END
 
 #endif

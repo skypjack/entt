@@ -1,290 +1,293 @@
 #ifndef ENTT_ENTITY_FWD_HPP
 #define ENTT_ENTITY_FWD_HPP
 
-#include "../config/config.h"
-#include "../core/concepts.hpp"
-#include "../core/fwd.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/cstdint.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/concepts.hpp"
+#    include "../core/fwd.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/cstdint.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#endif // ENTT_MODULE
 
-/*! @brief Default entity identifier. */
-enum class entity : id_type {};
+ENTT_MODULE_EXPORT namespace entt {
+    /*! @brief Default entity identifier. */
+    enum class entity : id_type {};
 
-/*! @brief Storage deletion policy. */
-enum class deletion_policy : stl::uint8_t {
-    /*! @brief Swap-and-pop deletion policy. */
-    swap_and_pop = 0u,
-    /*! @brief In-place deletion policy. */
-    in_place = 1u,
-    /*! @brief Swap-only deletion policy. */
-    swap_only = 2u,
-    /*! @brief Unspecified deletion policy. */
-    unspecified = swap_and_pop
-};
+    /*! @brief Storage deletion policy. */
+    enum class deletion_policy : stl::uint8_t {
+        /*! @brief Swap-and-pop deletion policy. */
+        swap_and_pop = 0u,
+        /*! @brief In-place deletion policy. */
+        in_place = 1u,
+        /*! @brief Swap-only deletion policy. */
+        swap_only = 2u,
+        /*! @brief Unspecified deletion policy. */
+        unspecified = swap_and_pop
+    };
 
-template<cvref_unqualified Type, typename Entity = entity>
-struct component_traits;
+    template<cvref_unqualified Type, typename Entity = entity>
+    struct component_traits;
 
-template<typename Entity = entity, typename = stl::allocator<Entity>>
-class basic_sparse_set;
+    template<typename Entity = entity, typename = stl::allocator<Entity>>
+    class basic_sparse_set;
 
-template<typename Type, typename = entity, typename = stl::allocator<Type>>
-class basic_storage;
+    template<typename Type, typename = entity, typename = stl::allocator<Type>>
+    class basic_storage;
 
-template<typename, typename>
-class basic_sigh_mixin;
+    template<typename, typename>
+    class basic_sigh_mixin;
 
-template<typename, typename>
-class basic_reactive_mixin;
+    template<typename, typename>
+    class basic_reactive_mixin;
 
-template<typename Entity = entity, typename = stl::allocator<Entity>>
-class basic_registry;
+    template<typename Entity = entity, typename = stl::allocator<Entity>>
+    class basic_registry;
 
-template<typename, typename>
-class basic_view;
+    template<typename, typename>
+    class basic_view;
 
-template<typename Type, typename = stl::allocator<Type *>>
-class basic_runtime_view;
+    template<typename Type, typename = stl::allocator<Type *>>
+    class basic_runtime_view;
 
-template<typename, typename, typename>
-class basic_group;
+    template<typename, typename, typename>
+    class basic_group;
 
-template<typename>
-class basic_organizer;
+    template<typename>
+    class basic_organizer;
 
-template<typename, typename...>
-class basic_handle;
+    template<typename, typename...>
+    class basic_handle;
 
-template<typename>
-class basic_snapshot;
+    template<typename>
+    class basic_snapshot;
 
-template<typename>
-class basic_snapshot_loader;
+    template<typename>
+    class basic_snapshot_loader;
 
-template<typename>
-class basic_continuous_loader;
+    template<typename>
+    class basic_continuous_loader;
 
-/*! @brief Alias declaration for the most common use case. */
-using sparse_set = basic_sparse_set<>;
+    /*! @brief Alias declaration for the most common use case. */
+    using sparse_set = basic_sparse_set<>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Type Element type.
- */
-template<typename Type>
-using storage = basic_storage<Type>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Type Element type.
+     */
+    template<typename Type>
+    using storage = basic_storage<Type>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Type Underlying storage type.
- */
-template<typename Type>
-using sigh_mixin = basic_sigh_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Type Underlying storage type.
+     */
+    template<typename Type>
+    using sigh_mixin = basic_sigh_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Type Underlying storage type.
- */
-template<typename Type>
-using reactive_mixin = basic_reactive_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Type Underlying storage type.
+     */
+    template<typename Type>
+    using reactive_mixin = basic_reactive_mixin<Type, basic_registry<typename Type::entity_type, typename Type::base_type::allocator_type>>;
 
-/*! @brief Alias declaration for the most common use case. */
-using registry = basic_registry<>;
+    /*! @brief Alias declaration for the most common use case. */
+    using registry = basic_registry<>;
 
-/*! @brief Alias declaration for the most common use case. */
-using organizer = basic_organizer<registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using organizer = basic_organizer<registry>;
 
-/*! @brief Alias declaration for the most common use case. */
-using handle = basic_handle<registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using handle = basic_handle<registry>;
 
-/*! @brief Alias declaration for the most common use case. */
-using const_handle = basic_handle<const registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using const_handle = basic_handle<const registry>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Args Other template parameters.
- */
-template<typename... Args>
-using handle_view = basic_handle<registry, Args...>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Args Other template parameters.
+     */
+    template<typename... Args>
+    using handle_view = basic_handle<registry, Args...>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Args Other template parameters.
- */
-template<typename... Args>
-using const_handle_view = basic_handle<const registry, Args...>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Args Other template parameters.
+     */
+    template<typename... Args>
+    using const_handle_view = basic_handle<const registry, Args...>;
 
-/*! @brief Alias declaration for the most common use case. */
-using snapshot = basic_snapshot<registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using snapshot = basic_snapshot<registry>;
 
-/*! @brief Alias declaration for the most common use case. */
-using snapshot_loader = basic_snapshot_loader<registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using snapshot_loader = basic_snapshot_loader<registry>;
 
-/*! @brief Alias declaration for the most common use case. */
-using continuous_loader = basic_continuous_loader<registry>;
+    /*! @brief Alias declaration for the most common use case. */
+    using continuous_loader = basic_continuous_loader<registry>;
 
-/*! @brief Alias declaration for the most common use case. */
-using runtime_view = basic_runtime_view<sparse_set>;
+    /*! @brief Alias declaration for the most common use case. */
+    using runtime_view = basic_runtime_view<sparse_set>;
 
-/*! @brief Alias declaration for the most common use case. */
-using const_runtime_view = basic_runtime_view<const sparse_set>;
+    /*! @brief Alias declaration for the most common use case. */
+    using const_runtime_view = basic_runtime_view<const sparse_set>;
 
-/**
- * @brief Alias for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct exclude_t final: type_list<Type...> {
-    /*! @brief Default constructor. */
-    explicit ENTT_CONSTEVAL exclude_t() = default;
-};
+    /**
+     * @brief Alias for exclusion lists.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    struct exclude_t final: type_list<Type...> {
+        /*! @brief Default constructor. */
+        explicit ENTT_CONSTEVAL exclude_t() = default;
+    };
 
-/**
- * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-inline constexpr exclude_t<Type...> exclude{};
+    /**
+     * @brief Variable template for exclusion lists.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    inline constexpr exclude_t<Type...> exclude{};
 
-/**
- * @brief Alias for lists of observed elements.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct get_t final: type_list<Type...> {
-    /*! @brief Default constructor. */
-    explicit ENTT_CONSTEVAL get_t() = default;
-};
+    /**
+     * @brief Alias for lists of observed elements.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    struct get_t final: type_list<Type...> {
+        /*! @brief Default constructor. */
+        explicit ENTT_CONSTEVAL get_t() = default;
+    };
 
-/**
- * @brief Variable template for lists of observed elements.
- * @tparam Type List of types.
- */
-template<typename... Type>
-inline constexpr get_t<Type...> get{};
+    /**
+     * @brief Variable template for lists of observed elements.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    inline constexpr get_t<Type...> get{};
 
-/**
- * @brief Alias for lists of owned elements.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct owned_t final: type_list<Type...> {
-    /*! @brief Default constructor. */
-    explicit ENTT_CONSTEVAL owned_t() = default;
-};
+    /**
+     * @brief Alias for lists of owned elements.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    struct owned_t final: type_list<Type...> {
+        /*! @brief Default constructor. */
+        explicit ENTT_CONSTEVAL owned_t() = default;
+    };
 
-/**
- * @brief Variable template for lists of owned elements.
- * @tparam Type List of types.
- */
-template<typename... Type>
-inline constexpr owned_t<Type...> owned{};
+    /**
+     * @brief Variable template for lists of owned elements.
+     * @tparam Type List of types.
+     */
+    template<typename... Type>
+    inline constexpr owned_t<Type...> owned{};
 
-/**
- * @brief Applies a given _function_ to a get list and generate a new list.
- * @tparam Type Types provided by the get list.
- * @tparam Op Unary operation as template class with a type member named `type`.
- */
-template<typename... Type, template<typename...> class Op>
-struct type_list_transform<get_t<Type...>, Op> {
-    /*! @brief Resulting get list after applying the transform function. */
-    using type = get_t<typename Op<Type>::type...>;
-};
+    /**
+     * @brief Applies a given _function_ to a get list and generate a new list.
+     * @tparam Type Types provided by the get list.
+     * @tparam Op Unary operation as template class with a type member named `type`.
+     */
+    template<typename... Type, template<typename...> class Op>
+    struct type_list_transform<get_t<Type...>, Op> {
+        /*! @brief Resulting get list after applying the transform function. */
+        using type = get_t<typename Op<Type>::type...>;
+    };
 
-/**
- * @brief Applies a given _function_ to an exclude list and generate a new list.
- * @tparam Type Types provided by the exclude list.
- * @tparam Op Unary operation as template class with a type member named `type`.
- */
-template<typename... Type, template<typename...> class Op>
-struct type_list_transform<exclude_t<Type...>, Op> {
-    /*! @brief Resulting exclude list after applying the transform function. */
-    using type = exclude_t<typename Op<Type>::type...>;
-};
+    /**
+     * @brief Applies a given _function_ to an exclude list and generate a new list.
+     * @tparam Type Types provided by the exclude list.
+     * @tparam Op Unary operation as template class with a type member named `type`.
+     */
+    template<typename... Type, template<typename...> class Op>
+    struct type_list_transform<exclude_t<Type...>, Op> {
+        /*! @brief Resulting exclude list after applying the transform function. */
+        using type = exclude_t<typename Op<Type>::type...>;
+    };
 
-/**
- * @brief Applies a given _function_ to an owned list and generate a new list.
- * @tparam Type Types provided by the owned list.
- * @tparam Op Unary operation as template class with a type member named `type`.
- */
-template<typename... Type, template<typename...> class Op>
-struct type_list_transform<owned_t<Type...>, Op> {
-    /*! @brief Resulting owned list after applying the transform function. */
-    using type = owned_t<typename Op<Type>::type...>;
-};
+    /**
+     * @brief Applies a given _function_ to an owned list and generate a new list.
+     * @tparam Type Types provided by the owned list.
+     * @tparam Op Unary operation as template class with a type member named `type`.
+     */
+    template<typename... Type, template<typename...> class Op>
+    struct type_list_transform<owned_t<Type...>, Op> {
+        /*! @brief Resulting owned list after applying the transform function. */
+        using type = owned_t<typename Op<Type>::type...>;
+    };
 
-/**
- * @brief Provides a common way to define storage types.
- * @tparam Type Storage value type.
- * @tparam Entity A valid entity type.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity = entity, typename Allocator = stl::allocator<Type>>
-struct storage_type {
-    /*! @brief Type-to-storage conversion result. */
-    using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
-};
+    /**
+     * @brief Provides a common way to define storage types.
+     * @tparam Type Storage value type.
+     * @tparam Entity A valid entity type.
+     * @tparam Allocator Type of allocator used to manage memory and elements.
+     */
+    template<typename Type, typename Entity = entity, typename Allocator = stl::allocator<Type>>
+    struct storage_type {
+        /*! @brief Type-to-storage conversion result. */
+        using type = ENTT_STORAGE(sigh_mixin, basic_storage<Type, Entity, Allocator>);
+    };
 
-/*! @brief Empty value type for reactive storage types. */
-struct reactive final {};
+    /*! @brief Empty value type for reactive storage types. */
+    struct reactive final {};
 
-/**
- * @ brief Partial specialization for reactive storage types.
- * @tparam Entity A valid entity type.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Entity, typename Allocator>
-struct storage_type<reactive, Entity, Allocator> {
-    /*! @brief Type-to-storage conversion result. */
-    using type = ENTT_STORAGE(reactive_mixin, basic_storage<reactive, Entity, Allocator>);
-};
+    /**
+     * @ brief Partial specialization for reactive storage types.
+     * @tparam Entity A valid entity type.
+     * @tparam Allocator Type of allocator used to manage memory and elements.
+     */
+    template<typename Entity, typename Allocator>
+    struct storage_type<reactive, Entity, Allocator> {
+        /*! @brief Type-to-storage conversion result. */
+        using type = ENTT_STORAGE(reactive_mixin, basic_storage<reactive, Entity, Allocator>);
+    };
 
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_type_t = storage_type<Args...>::type;
+    /**
+     * @brief Helper type.
+     * @tparam Args Arguments to forward.
+     */
+    template<typename... Args>
+    using storage_type_t = storage_type<Args...>::type;
 
-/**
- * Type-to-storage conversion utility that preserves constness.
- * @tparam Type Storage value type, eventually const.
- * @tparam Entity A valid entity type.
- * @tparam Allocator Type of allocator used to manage memory and elements.
- */
-template<typename Type, typename Entity = entity, typename Allocator = stl::allocator<stl::remove_const_t<Type>>>
-struct storage_for {
-    /*! @brief Type-to-storage conversion result. */
-    using type = constness_as_t<storage_type_t<stl::remove_const_t<Type>, Entity, Allocator>, Type>;
-};
+    /**
+     * Type-to-storage conversion utility that preserves constness.
+     * @tparam Type Storage value type, eventually const.
+     * @tparam Entity A valid entity type.
+     * @tparam Allocator Type of allocator used to manage memory and elements.
+     */
+    template<typename Type, typename Entity = entity, typename Allocator = stl::allocator<stl::remove_const_t<Type>>>
+    struct storage_for {
+        /*! @brief Type-to-storage conversion result. */
+        using type = constness_as_t<storage_type_t<stl::remove_const_t<Type>, Entity, Allocator>, Type>;
+    };
 
-/**
- * @brief Helper type.
- * @tparam Args Arguments to forward.
- */
-template<typename... Args>
-using storage_for_t = storage_for<Args...>::type;
+    /**
+     * @brief Helper type.
+     * @tparam Args Arguments to forward.
+     */
+    template<typename... Args>
+    using storage_for_t = storage_for<Args...>::type;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Get Types of storage iterated by the view.
- * @tparam Exclude Types of storage used to filter the view.
- */
-template<typename Get, typename Exclude = exclude_t<>>
-using view = basic_view<type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Get Types of storage iterated by the view.
+     * @tparam Exclude Types of storage used to filter the view.
+     */
+    template<typename Get, typename Exclude = exclude_t<>>
+    using view = basic_view<type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
 
-/**
- * @brief Alias declaration for the most common use case.
- * @tparam Owned Types of storage _owned_ by the group.
- * @tparam Get Types of storage _observed_ by the group.
- * @tparam Exclude Types of storage used to filter the group.
- */
-template<typename Owned, typename Get = get_t<>, typename Exclude = exclude_t<>>
-using group = basic_group<type_list_transform_t<Owned, storage_for>, type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
+    /**
+     * @brief Alias declaration for the most common use case.
+     * @tparam Owned Types of storage _owned_ by the group.
+     * @tparam Get Types of storage _observed_ by the group.
+     * @tparam Exclude Types of storage used to filter the group.
+     */
+    template<typename Owned, typename Get = get_t<>, typename Exclude = exclude_t<>>
+    using group = basic_group<type_list_transform_t<Owned, storage_for>, type_list_transform_t<Get, storage_for>, type_list_transform_t<Exclude, storage_for>>;
 
 } // namespace entt
 

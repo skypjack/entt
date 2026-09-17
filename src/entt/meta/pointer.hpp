@@ -3,39 +3,42 @@
 #ifndef ENTT_META_POINTER_HPP
 #define ENTT_META_POINTER_HPP
 
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "type_traits.hpp"
+#endif // ENTT_MODULE
 
-/**
- * @brief Makes `stl::shared_ptr`s of any type pointer-like types for the meta
- * system.
- * @tparam Type Element type.
- */
-template<typename Type>
-struct is_meta_pointer_like<stl::shared_ptr<Type>>
-    : stl::true_type {};
+ENTT_MODULE_EXPORT namespace entt {
+    /**
+     * @brief Makes `stl::shared_ptr`s of any type pointer-like types for the meta
+     * system.
+     * @tparam Type Element type.
+     */
+    template<typename Type>
+    struct is_meta_pointer_like<stl::shared_ptr<Type>>
+        : stl::true_type {};
 
-/**
- * @brief Makes `stl::unique_ptr`s of any type pointer-like types for the meta
- * system.
- * @tparam Type Element type.
- * @tparam Args Other arguments.
- */
-template<typename Type, typename... Args>
-struct is_meta_pointer_like<stl::unique_ptr<Type, Args...>>
-    : stl::true_type {};
+    /**
+     * @brief Makes `stl::unique_ptr`s of any type pointer-like types for the meta
+     * system.
+     * @tparam Type Element type.
+     * @tparam Args Other arguments.
+     */
+    template<typename Type, typename... Args>
+    struct is_meta_pointer_like<stl::unique_ptr<Type, Args...>>
+        : stl::true_type {};
 
-/**
- * @brief Specialization for self-proclaimed meta pointer like types.
- * @tparam Type Element type.
- */
-template<typename Type>
-requires requires { typename Type::is_meta_pointer_like; }
-struct is_meta_pointer_like<Type>
-    : stl::true_type {};
+    /**
+     * @brief Specialization for self-proclaimed meta pointer like types.
+     * @tparam Type Element type.
+     */
+    template<typename Type>
+    requires requires { typename Type::is_meta_pointer_like; }
+    struct is_meta_pointer_like<Type>
+        : stl::true_type {};
 
 } // namespace entt
 

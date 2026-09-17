@@ -142,3 +142,35 @@ paths appropriately.<br/>
 For example, `CMake` allows users to _bind_ additional include directories to a
 target with `target_include_directories`. See the test suite, and in particular
 the `config_ext` test for a practical example.
+
+## When consumed as a module
+
+When `EnTT` is consumed as a C++20 module, all the above definitions can be
+put into a custom configuration file that can be referred to through the
+`ENTT_USER_CONFIG` compile definition using its path. <br/>
+
+In case the module is built through CMake, the variable
+`ENTT_USER_CONFIG` can be set directly from the `CMakeLists.txt` file before
+including the library through `add_subdirectory`.<br/>
+
+Example of a custom configuration file and CMake setup:
+```c++
+// user_config.h
+
+#define ENTT_ID_TYPE std::uint64_t
+#define ENTT_USE_ATOMIC
+```
+```c++
+// CMakeLists.txt
+
+set(ENTT_MODULE ON)
+set(ENTT_USER_CONFIG "path/to/user_config.h")
+
+...
+
+add_subdirectory(path/to/entt)
+
+...
+
+target_link_libraries(your_target PUBLIC EnTT::EnTT)
+```

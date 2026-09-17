@@ -1,45 +1,48 @@
 #ifndef ENTT_SIGNAL_FWD_HPP
 #define ENTT_SIGNAL_FWD_HPP
 
-#include "../stl/memory.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/memory.hpp"
+#endif // ENTT_MODULE
 
-template<typename>
-class delegate;
+ENTT_MODULE_EXPORT namespace entt {
+    template<typename>
+    class delegate;
 
-template<typename = stl::allocator<void>>
-class basic_dispatcher;
+    template<typename = stl::allocator<void>>
+    class basic_dispatcher;
 
-template<typename, typename = stl::allocator<void>>
-class emitter;
+    template<typename, typename = stl::allocator<void>>
+    class emitter;
 
-class connection;
+    class connection;
 
-struct scoped_connection;
+    struct scoped_connection;
 
-template<typename>
-class sink;
+    template<typename>
+    class sink;
 
-template<typename Type, typename = stl::allocator<void>>
-class sigh;
+    template<typename Type, typename = stl::allocator<void>>
+    class sigh;
 
-/*! @brief Alias declaration for the most common use case. */
-using dispatcher = basic_dispatcher<>;
+    /*! @brief Alias declaration for the most common use case. */
+    using dispatcher = basic_dispatcher<>;
 
-/*! @brief Disambiguation tag for constructors and the like. */
-template<auto>
-struct connect_arg_t {
-    /*! @brief Default constructor. */
-    explicit connect_arg_t() = default;
-};
+    /*! @brief Disambiguation tag for constructors and the like. */
+    template<auto>
+    struct connect_arg_t {
+        /*! @brief Default constructor. */
+        explicit connect_arg_t() = default;
+    };
 
-/**
- * @brief Constant of type connect_arg_t used to disambiguate calls.
- * @tparam Candidate Element to connect (likely a free or member function).
- */
-template<auto Candidate>
-inline constexpr connect_arg_t<Candidate> connect_arg{};
+    /**
+     * @brief Constant of type connect_arg_t used to disambiguate calls.
+     * @tparam Candidate Element to connect (likely a free or member function).
+     */
+    template<auto Candidate>
+    inline constexpr connect_arg_t<Candidate> connect_arg{};
 
 } // namespace entt
 

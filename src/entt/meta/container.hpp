@@ -3,17 +3,21 @@
 #ifndef ENTT_META_CONTAINER_HPP
 #define ENTT_META_CONTAINER_HPP
 
-#include "../core/concepts.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "context.hpp"
-#include "fwd.hpp"
-#include "meta.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../core/concepts.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "context.hpp"
+#    include "fwd.hpp"
+#    include "meta.hpp"
+#    include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -54,6 +58,8 @@ concept meta_associative_container_like = requires(Type value) {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief General purpose implementation of meta sequence container traits.
@@ -292,6 +298,8 @@ struct meta_sequence_container_traits<Type>: basic_meta_sequence_container_trait
  */
 template<internal::meta_associative_container_like Type>
 struct meta_associative_container_traits<Type>: basic_meta_associative_container_traits<Type> {};
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

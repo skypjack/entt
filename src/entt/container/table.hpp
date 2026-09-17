@@ -1,14 +1,18 @@
 #ifndef ENTT_CONTAINER_TABLE_HPP
 #define ENTT_CONTAINER_TABLE_HPP
 
-#include "../config/config.h"
-#include "../core/iterator.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/iterator.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -18,7 +22,7 @@ namespace internal {
 template<typename... It>
 class table_iterator {
     template<typename...>
-    friend class table_iterator;
+    friend class internal::table_iterator;
 
 public:
     using value_type = decltype(stl::forward_as_tuple(*stl::declval<It>()...));
@@ -86,27 +90,62 @@ public:
         return operator[](0);
     }
 
-    template<typename... Other>
-    [[nodiscard]] constexpr stl::ptrdiff_t operator-(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) - stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr stl::ptrdiff_t operator-(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
-    template<typename... Other>
-    [[nodiscard]] constexpr bool operator==(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) == stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
-    template<typename... Other>
-    [[nodiscard]] constexpr auto operator<=>(const table_iterator<Other...> &other) const noexcept {
-        return stl::get<0>(it) <=> stl::get<0>(other.it);
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator<(const table_iterator<Lhs...> &, const table_iterator<Rhs...> &) noexcept;
 
 private:
     stl::tuple<It...> it;
 };
 
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr std::ptrdiff_t operator-(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) - std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) == std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return std::get<0>(lhs.it) < std::get<0>(rhs.it);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return rhs < lhs;
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator<=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs > rhs);
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator>=(const table_iterator<Lhs...> &lhs, const table_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs < rhs);
+}
+
+ENTT_MODULE_EXPORT_END
+
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Basic table implementation.
@@ -417,16 +456,18 @@ private:
     container_type payload;
 };
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
 /*! @cond ENTT_INTERNAL */
 #include <utility>
 
-namespace std {
-
-template<typename... Container, typename Allocator>
-struct uses_allocator<entt::basic_table<Container...>, Allocator>
-    : entt::stl::bool_constant<(entt::stl::uses_allocator_v<Container, Allocator> && ...)> {};
+/*! @cond TURN_OFF_DOXYGEN */
+ENTT_MODULE_EXPORT namespace std {
+    template<typename... Container, typename Allocator>
+    struct uses_allocator<entt::basic_table<Container...>, Allocator>
+        : entt::stl::bool_constant<(entt::stl::uses_allocator_v<Container, Allocator> && ...)> {};
 
 } // namespace std
 /*! @endcond */

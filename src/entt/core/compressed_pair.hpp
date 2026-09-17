@@ -1,13 +1,17 @@
 #ifndef ENTT_CORE_COMPRESSED_PAIR_HPP
 #define ENTT_CORE_COMPRESSED_PAIR_HPP
 
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
-#include "type_traits.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#    include "type_traits.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -75,6 +79,8 @@ struct compressed_pair_element<Type, Tag>: Type {
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief A compressed pair.
@@ -246,19 +252,20 @@ constexpr void swap(compressed_pair<First, Second> &lhs, compressed_pair<First, 
     lhs.swap(rhs);
 }
 
+ENTT_MODULE_EXPORT_END
+
 } // namespace entt
 
 /*! @cond ENTT_INTERNAL */
 #include <utility>
 
-namespace std {
+ENTT_MODULE_EXPORT namespace std {
+    template<typename First, typename Second>
+    struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<entt::stl::size_t, 2u> {};
 
-template<typename First, typename Second>
-struct tuple_size<entt::compressed_pair<First, Second>>: integral_constant<entt::stl::size_t, 2u> {};
-
-template<entt::stl::size_t Index, typename First, typename Second>
-requires (Index <= 1u)
-struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {};
+    template<entt::stl::size_t Index, typename First, typename Second>
+    requires (Index <= 1u)
+    struct tuple_element<Index, entt::compressed_pair<First, Second>>: conditional<Index == 0u, First, Second> {};
 
 } // namespace std
 /*! @endcond */

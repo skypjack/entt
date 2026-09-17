@@ -1,21 +1,25 @@
 #ifndef ENTT_ENTITY_GROUP_HPP
 #define ENTT_ENTITY_GROUP_HPP
 
-#include "../config/config.h"
-#include "../core/algorithm.hpp"
-#include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../stl/array.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/tuple.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/algorithm.hpp"
+#    include "../core/fwd.hpp"
+#    include "../core/iterator.hpp"
+#    include "../core/type_info.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../stl/array.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/tuple.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -74,15 +78,27 @@ public:
         return it;
     }
 
-    template<typename... Args>
-    [[nodiscard]] constexpr bool operator==(const extended_group_iterator<Args...> &other) const noexcept {
-        return it == other.it;
-    }
+    template<typename... Lhs, typename... Rhs>
+    friend constexpr bool operator==(const extended_group_iterator<Lhs...> &, const extended_group_iterator<Rhs...> &) noexcept;
 
 private:
     It it;
     stl::tuple<Owned *..., Get *...> pools;
 };
+
+ENTT_MODULE_EXPORT_BEGIN
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator==(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
+    return lhs.it == rhs.it;
+}
+
+template<typename... Lhs, typename... Rhs>
+[[nodiscard]] constexpr bool operator!=(const extended_group_iterator<Lhs...> &lhs, const extended_group_iterator<Rhs...> &rhs) noexcept {
+    return !(lhs == rhs);
+}
+
+ENTT_MODULE_EXPORT_END
 
 struct group_descriptor {
     using size_type = stl::size_t;
@@ -239,6 +255,8 @@ private:
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Group.
@@ -1046,6 +1064,8 @@ public:
 private:
     handler *descriptor;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

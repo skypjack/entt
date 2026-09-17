@@ -1,18 +1,22 @@
 #ifndef ENTT_CORE_ANY_HPP
 #define ENTT_CORE_ANY_HPP
 
-#include "../config/config.h"
-#include "../core/concepts.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/cstdint.hpp"
-#include "../stl/memory.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "fwd.hpp"
-#include "type_info.hpp"
-#include "type_traits.hpp"
-#include "utility.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/concepts.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/cstdint.hpp"
+#    include "../stl/memory.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "fwd.hpp"
+#    include "type_info.hpp"
+#    include "type_traits.hpp"
+#    include "utility.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -53,6 +57,8 @@ struct in_situ<void, Len, Align>: stl::false_type {};
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
@@ -616,6 +622,8 @@ template<stl::size_t Len = basic_any<>::length, stl::size_t Align = basic_any<Le
 [[nodiscard]] basic_any<Len, Align> forward_as_any(Type &&value) {
     return basic_any<Len, Align>{stl::in_place_type<Type &&>, stl::forward<Type>(value)};
 }
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

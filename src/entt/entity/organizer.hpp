@@ -1,17 +1,21 @@
 #ifndef ENTT_ENTITY_ORGANIZER_HPP
 #define ENTT_ENTITY_ORGANIZER_HPP
 
-#include "../core/type_info.hpp"
-#include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
-#include "../graph/adjacency_matrix.hpp"
-#include "../graph/flow.hpp"
-#include "../stl/cstddef.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "fwd.hpp"
-#include "helper.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../core/type_info.hpp"
+#    include "../core/type_traits.hpp"
+#    include "../core/utility.hpp"
+#    include "../graph/adjacency_matrix.hpp"
+#    include "../graph/flow.hpp"
+#    include "../stl/cstddef.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "fwd.hpp"
+#    include "helper.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -104,6 +108,8 @@ resource_traits<Registry, type_list<stl::remove_reference_t<Args>...>, type_list
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Utility class for creating a static task graph.
@@ -431,6 +437,8 @@ private:
     stl::vector<vertex_data> vertices;
     flow builder;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 

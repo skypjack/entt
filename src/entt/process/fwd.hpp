@@ -1,22 +1,25 @@
 #ifndef ENTT_PROCESS_FWD_HPP
 #define ENTT_PROCESS_FWD_HPP
 
-#include "../stl/cstdint.hpp"
-#include "../stl/memory.hpp"
+#include "../config/module.h"
 
-namespace entt {
+#ifndef ENTT_MODULE
+#    include "../stl/cstdint.hpp"
+#    include "../stl/memory.hpp"
+#endif // ENTT_MODULE
 
-template<typename, typename = stl::allocator<void>>
-class basic_process;
+ENTT_MODULE_EXPORT namespace entt {
+    template<typename, typename = stl::allocator<void>>
+    class basic_process;
 
-/*! @brief Alias declaration for the most common use case. */
-using process = basic_process<stl::uint32_t>;
+    /*! @brief Alias declaration for the most common use case. */
+    using process = basic_process<stl::uint32_t>;
 
-template<typename, typename = stl::allocator<void>>
-class basic_scheduler;
+    template<typename, typename = stl::allocator<void>>
+    class basic_scheduler;
 
-/*! @brief Alias declaration for the most common use case. */
-using scheduler = basic_scheduler<stl::uint32_t>;
+    /*! @brief Alias declaration for the most common use case. */
+    using scheduler = basic_scheduler<stl::uint32_t>;
 
 } // namespace entt
 

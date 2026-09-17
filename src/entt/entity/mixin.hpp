@@ -1,17 +1,21 @@
 #ifndef ENTT_ENTITY_MIXIN_HPP
 #define ENTT_ENTITY_MIXIN_HPP
 
-#include "../config/config.h"
-#include "../core/any.hpp"
-#include "../core/type_info.hpp"
-#include "../signal/sigh.hpp"
-#include "../stl/concepts.hpp"
-#include "../stl/iterator.hpp"
-#include "../stl/type_traits.hpp"
-#include "../stl/utility.hpp"
-#include "../stl/vector.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
+#include "../config/module.h"
+
+#ifndef ENTT_MODULE
+#    include "../config/config.h"
+#    include "../core/any.hpp"
+#    include "../core/type_info.hpp"
+#    include "../signal/sigh.hpp"
+#    include "../stl/concepts.hpp"
+#    include "../stl/iterator.hpp"
+#    include "../stl/type_traits.hpp"
+#    include "../stl/utility.hpp"
+#    include "../stl/vector.hpp"
+#    include "entity.hpp"
+#    include "fwd.hpp"
+#endif // ENTT_MODULE
 
 namespace entt {
 
@@ -41,6 +45,8 @@ struct has_on_destroy<Type, Registry>: stl::true_type {};
 
 } // namespace internal
 /*! @endcond */
+
+ENTT_MODULE_EXPORT_BEGIN
 
 /**
  * @brief Mixin type used to add signal support to storage types.
@@ -587,6 +593,8 @@ private:
     basic_registry_type *owner;
     container_type conn;
 };
+
+ENTT_MODULE_EXPORT_END
 
 } // namespace entt
 
