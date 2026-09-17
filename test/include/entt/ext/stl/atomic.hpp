@@ -6,7 +6,7 @@
 
 namespace entt::stl {
 using namespace std;
-static constexpr auto entt_ext_atomic = true;
+inline constexpr auto entt_ext_atomic = true;
 } // namespace entt::stl
 /*! @endcond */
 

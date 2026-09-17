@@ -6,7 +6,7 @@
 
 namespace entt::stl {
 using namespace std;
-static constexpr auto entt_ext_string_view = true;
+inline constexpr auto entt_ext_string_view = true;
 } // namespace entt::stl
 /*! @endcond */
 
