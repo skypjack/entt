@@ -1,8 +1,8 @@
 #ifndef ENTT_CORE_TYPE_INFO_HPP
 #define ENTT_CORE_TYPE_INFO_HPP
 
-#include <compare>
 #include "../config/config.h"
+#include "../stl/compare.hpp"
 #include "../stl/string_view.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"

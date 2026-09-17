@@ -1,7 +1,7 @@
 #ifndef ENTT_RESOURCE_RESOURCE_HPP
 #define ENTT_RESOURCE_RESOURCE_HPP
 
-#include <compare>
+#include "../stl/compare.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/memory.hpp"
 #include "../stl/utility.hpp"

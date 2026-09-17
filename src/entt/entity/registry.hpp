@@ -1,7 +1,6 @@
 #ifndef ENTT_ENTITY_REGISTRY_HPP
 #define ENTT_ENTITY_REGISTRY_HPP
 
-#include <compare>
 #include "../config/config.h"
 #include "../container/dense_map.hpp"
 #include "../core/algorithm.hpp"
@@ -14,6 +13,7 @@
 #include "../core/type_traits.hpp"
 #include "../stl/algorithm.hpp"
 #include "../stl/array.hpp"
+#include "../stl/compare.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"

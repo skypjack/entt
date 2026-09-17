@@ -1,12 +1,12 @@
 #ifndef ENTT_ENTITY_SPARSE_SET_HPP
 #define ENTT_ENTITY_SPARSE_SET_HPP
 
-#include <compare>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/any.hpp"
 #include "../core/bit.hpp"
 #include "../core/type_info.hpp"
+#include "../stl/compare.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/cstddef.hpp"
 #include "../stl/iterator.hpp"
