@@ -56,7 +56,7 @@
 #    undef ENTT_ASSERT
 #    define ENTT_ASSERT(condition, msg) (void(0))
 #elif !defined ENTT_ASSERT
-#    include <cassert>
+#    include "../stl/cassert.hpp"
 #    define ENTT_ASSERT(condition, msg) assert(((condition) && (msg)))
 #endif
 

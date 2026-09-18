@@ -397,6 +397,7 @@ SETUP_BASIC_TEST(
         entt/stl_ext/array.cpp
         entt/stl_ext/atomic.cpp
         entt/stl_ext/bit.cpp
+        entt/stl_ext/cassert.cpp
         entt/stl_ext/compare.cpp
         entt/stl_ext/concepts.cpp
         entt/stl_ext/cstddef.cpp
