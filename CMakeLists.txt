@@ -352,7 +352,7 @@ if(ENTT_BUILD_TESTING OR ENTT_BUILD_TESTBED)
     set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for tests and testbed")
     set(ENTT_CXX_STD cxx_std_20 CACHE STRING "C++ standard revision to use for tests and testbed")
 
-    # Tests and tesetbed do not work together because SDL gets confused with EnTT tests
+    # Tests and testbed do not work together because SDL gets confused with EnTT tests
     if(ENTT_BUILD_TESTING)
         option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
     
