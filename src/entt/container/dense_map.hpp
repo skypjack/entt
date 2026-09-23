@@ -986,7 +986,7 @@ public:
         packed.first().reserve(cnt);
         const auto next = static_cast<double>(cnt) / max_load_factor();
         const auto trunc = static_cast<stl::size_t>(next);
-        rehash(trunc + static_cast<stl::size_t>(next > trunc));
+        rehash(trunc + static_cast<stl::size_t>(next > static_cast<double>(trunc)));
     }
 
     /**
