@@ -976,7 +976,7 @@ TEST(DenseSet, Reserve) {
         const auto count = next * minimum_bucket_count;
         set.reserve(count);
 
-        ASSERT_EQ(set.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil((count) / set.max_load_factor()))));
+        ASSERT_EQ(set.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil(static_cast<double>(count) / set.max_load_factor()))));
     }
 }
 

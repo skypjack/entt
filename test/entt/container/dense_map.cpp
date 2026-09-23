@@ -1161,7 +1161,7 @@ TEST(DenseMap, Reserve) {
         const auto count = next * minimum_bucket_count;
         map.reserve(count);
 
-        ASSERT_EQ(map.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil((count) / map.max_load_factor()))));
+        ASSERT_EQ(map.bucket_count(), std::bit_ceil(static_cast<std::size_t>(std::ceil(static_cast<double>(count) / map.max_load_factor()))));
     }
 }
 
