@@ -27,23 +27,6 @@
 
 namespace entt {
 
-/*! @cond ENTT_INTERNAL */
-namespace internal {
-
-template<typename Type>
-struct basic_meta_object {
-    [[nodiscard]] auto &node_or_assert() const noexcept {
-        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
-        return *node;
-    }
-
-    const Type *node{};
-    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
-};
-
-} // namespace internal
-/*! @endcond */
-
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     class meta_iterator;
@@ -793,7 +776,14 @@ private:
  * @tparam Type Underlying meta node type.
  */
 template<typename Type>
-struct meta_object: protected internal::basic_meta_object<Type> {
+struct meta_object {
+protected:
+    [[nodiscard]] auto &node_or_assert() const noexcept {
+        ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
+        return *node;
+    }
+
+public:
     /*! @brief Underlying meta node type. */
     using node_type = Type;
     /*! @brief Unsigned integer type. */
@@ -808,8 +798,8 @@ struct meta_object: protected internal::basic_meta_object<Type> {
      * @param curr The underlying node with which to construct the instance.
      */
     meta_object(const meta_ctx &area, const node_type &curr) noexcept
-        : internal::basic_meta_object<Type>{&curr, &area} {
-    }
+        : node{&curr},
+          ctx{&area} {}
 
     /**
      * @brief Returns true if an object is valid, false otherwise.
@@ -827,6 +817,10 @@ struct meta_object: protected internal::basic_meta_object<Type> {
     [[nodiscard]] bool operator==(const meta_object &other) const noexcept {
         return (this->ctx == other.ctx) && (this->node == other.node);
     }
+
+protected:
+    const Type *node{};
+    const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
 /*! @brief Opaque wrapper for data members. */
