@@ -819,7 +819,7 @@ public:
     }
 
 protected:
-    const Type *node{};
+    const node_type *node{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
