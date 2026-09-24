@@ -1451,7 +1451,7 @@ public:
     }
 
 private:
-    mutable const internal::meta_type_node *node{};
+    const internal::meta_type_node *node{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
 };
 
