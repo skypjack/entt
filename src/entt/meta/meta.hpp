@@ -798,8 +798,8 @@ public:
      * @param curr The underlying node with which to construct the instance.
      */
     meta_object(const meta_ctx &area, const node_type &curr) noexcept
-        : node{&curr},
-          ctx{&area} {}
+        : ctx{&area},
+          node{&curr} {}
 
     /**
      * @brief Returns true if an object is valid, false otherwise.
@@ -819,8 +819,8 @@ public:
     }
 
 protected:
-    const node_type *node{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const node_type *node{};
 };
 
 /*! @brief Opaque wrapper for data members. */
@@ -1092,8 +1092,8 @@ public:
      * @param curr The underlying node with which to construct the instance.
      */
     meta_type(const meta_ctx &area, const internal::meta_type_node &curr) noexcept
-        : node{&curr},
-          ctx{&area} {}
+        : ctx{&area},
+          node{&curr} {}
 
     /**
      * @brief Returns the type info object of the underlying type.
@@ -1451,8 +1451,8 @@ public:
     }
 
 private:
-    const internal::meta_type_node *node{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
+    const internal::meta_type_node *node{};
 };
 
 [[nodiscard]] inline meta_type meta_any::type() const noexcept {
