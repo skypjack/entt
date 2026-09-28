@@ -830,6 +830,15 @@ public:
         }
     }
 
+    /**
+     * @brief Returns user defined data for a given meta object.
+     * @return User defined arbitrary data.
+     */
+    [[nodiscard]] meta_custom custom() const noexcept
+    requires requires(node_type elem) { elem.custom; } {
+        return node_or_assert().custom;
+    }
+
     /*! @copydoc meta_any::context */
     [[nodiscard]] const meta_ctx &context() const noexcept {
         return *ctx;
@@ -936,14 +945,6 @@ struct meta_data final: meta_object<internal::meta_data_node> {
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node_or_assert().traits);
     }
-
-    /**
-     * @brief Returns user defined data for a given meta object.
-     * @return User defined arbitrary data.
-     */
-    [[nodiscard]] meta_custom custom() const noexcept {
-        return node_or_assert().custom;
-    }
 };
 
 /*! @brief Opaque wrapper for member functions. */
@@ -1012,11 +1013,6 @@ struct meta_func final: meta_object<internal::meta_func_node> {
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node_or_assert().traits);
-    }
-
-    /*! @copydoc meta_data::custom */
-    [[nodiscard]] meta_custom custom() const noexcept {
-        return node_or_assert().custom;
     }
 
     /**
@@ -1431,11 +1427,6 @@ public:
     template<typename Type>
     [[nodiscard]] Type traits() const noexcept {
         return internal::meta_to_user_traits<Type>(node_or_assert().traits);
-    }
-
-    /*! @copydoc meta_data::custom */
-    [[nodiscard]] meta_custom custom() const noexcept {
-        return node_or_assert().custom;
     }
 };
 
