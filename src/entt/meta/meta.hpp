@@ -942,7 +942,7 @@ struct meta_data final: meta_object<internal::meta_data_node> {
      * @return User defined arbitrary data.
      */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return {node_or_assert().custom};
+        return node_or_assert().custom;
     }
 };
 
@@ -1016,7 +1016,7 @@ struct meta_func final: meta_object<internal::meta_func_node> {
 
     /*! @copydoc meta_data::custom */
     [[nodiscard]] meta_custom custom() const noexcept {
-        return {node_or_assert().custom};
+        return node_or_assert().custom;
     }
 
     /**
