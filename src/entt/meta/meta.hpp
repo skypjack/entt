@@ -28,7 +28,7 @@
 namespace entt {
 
 /*! @brief Proxy object for sequence containers. */
-class meta_sequence_container {
+class meta_sequence_container final {
     class meta_iterator;
 
 public:
@@ -89,7 +89,7 @@ private:
 };
 
 /*! @brief Proxy object for associative containers. */
-class meta_associative_container {
+class meta_associative_container final {
     class meta_iterator;
 
 public:
@@ -156,7 +156,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for values of any type. */
-class meta_any {
+class meta_any final {
     using vtable_type = void(const internal::meta_traits, const meta_any &, void *);
 
     template<cvref_unqualified Type>
@@ -658,7 +658,7 @@ private:
 }
 
 /*! @brief Opaque pointers to instances of any type. */
-class meta_handle {
+class meta_handle final {
     meta_handle(int, auto &value, auto &&...args)
     requires stl::same_as<stl::remove_cvref_t<decltype(value)>, meta_any>
         : any{stl::forward<decltype(args)>(args)..., value.as_ref()} {}
@@ -737,7 +737,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for user defined data of any type. */
-struct meta_custom {
+struct meta_custom final {
     /*! @brief Default constructor. */
     meta_custom() noexcept = default;
 
@@ -841,7 +841,7 @@ private:
 };
 
 /*! @brief Opaque wrapper for data members. */
-struct meta_data: meta_object<internal::meta_data_node> {
+struct meta_data final: meta_object<internal::meta_data_node> {
     using meta_object::meta_object;
 
     /**
@@ -947,7 +947,7 @@ struct meta_data: meta_object<internal::meta_data_node> {
 };
 
 /*! @brief Opaque wrapper for member functions. */
-struct meta_func: meta_object<internal::meta_func_node> {
+struct meta_func final: meta_object<internal::meta_func_node> {
     using meta_object::meta_object;
 
     /**
@@ -1029,7 +1029,7 @@ struct meta_func: meta_object<internal::meta_func_node> {
 };
 
 /*! @brief Opaque wrapper for base types. */
-struct meta_base: meta_object<internal::meta_base_node> {
+struct meta_base final: meta_object<internal::meta_base_node> {
     using meta_object::meta_object;
 
     /*! @copydoc meta_any::type */
@@ -1037,7 +1037,7 @@ struct meta_base: meta_object<internal::meta_base_node> {
 };
 
 /*! @brief Opaque wrapper for types. */
-class meta_type: public meta_object<internal::meta_type_node> {
+class meta_type final: public meta_object<internal::meta_type_node> {
     [[nodiscard]] auto lookup(meta_handle *const args, const auto sz, [[maybe_unused]] bool constness, auto next) const {
         decltype(next()) candidate = nullptr;
         size_type same{};
