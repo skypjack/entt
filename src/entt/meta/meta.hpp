@@ -848,6 +848,17 @@ public:
         return node_or_assert().custom;
     }
 
+    /**
+     * @brief Returns all meta traits for a given meta object.
+     * @tparam Type The type to convert the meta traits to.
+     * @return The registered meta traits, if any.
+     */
+    template<typename Type>
+    [[nodiscard]] Type traits() const noexcept
+    requires requires(node_type elem) { elem.traits; } {
+        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
+    }
+
     /*! @copydoc meta_any::context */
     [[nodiscard]] const meta_ctx &context() const noexcept {
         return *ctx;
@@ -936,16 +947,6 @@ struct meta_data final: meta_object<internal::meta_data_node> {
      * @return The type of the i-th argument of a data member's getter.
      */
     [[nodiscard]] inline meta_type get_arg(size_type index) const noexcept;
-
-    /**
-     * @brief Returns all meta traits for a given meta object.
-     * @tparam Type The type to convert the meta traits to.
-     * @return The registered meta traits, if any.
-     */
-    template<typename Type>
-    [[nodiscard]] Type traits() const noexcept {
-        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
-    }
 };
 
 /*! @brief Opaque wrapper for member functions. */
@@ -1000,12 +1001,6 @@ struct meta_func final: meta_object<internal::meta_func_node> {
     // NOLINTNEXTLINE(modernize-use-nodiscard)
     meta_any invoke(Instance &&instance, auto &&...args) const {
         return (sizeof...(args) == arity()) ? node_or_assert().invoke(meta_handle{context(), stl::forward<Instance>(instance)}, stl::array<meta_any, sizeof...(args)>{meta_any{context(), stl::forward<decltype(args)>(args)}...}.data()) : meta_any{meta_ctx_arg, context()};
-    }
-
-    /*! @copydoc meta_data::traits */
-    template<typename Type>
-    [[nodiscard]] Type traits() const noexcept {
-        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
     }
 
     /**
@@ -1406,12 +1401,6 @@ public:
     [[nodiscard]] meta_any get(const id_type id, Instance &&instance, auto &&...args) const {
         const auto candidate = data(id);
         return candidate ? candidate.get(stl::forward<Instance>(instance), stl::forward<decltype(args)>(args)...) : meta_any{meta_ctx_arg, context()};
-    }
-
-    /*! @copydoc meta_data::traits */
-    template<typename Type>
-    [[nodiscard]] Type traits() const noexcept {
-        return internal::meta_to_user_traits<Type>(node_or_assert().traits);
     }
 };
 
