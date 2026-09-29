@@ -773,16 +773,16 @@ private:
 
 /**
  * @brief Common opaque wrapper for meta objects.
- * @tparam Type Underlying meta node type.
+ * @tparam Node Underlying meta node type.
  */
-template<typename Type>
+template<typename Node>
 class meta_object {
     friend class meta_any;
 
 protected:
     /*! @cond ENTT_INTERNAL */
     [[nodiscard]] auto &node_or_assert() const noexcept {
-        if constexpr(stl::is_same_v<Type, internal::meta_type_node>) {
+        if constexpr(stl::is_same_v<node_type, internal::meta_type_node>) {
             return (node == nullptr) ? internal::resolve<void>(internal::meta_context::from(*ctx)) : *node;
         } else {
             ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
@@ -793,7 +793,7 @@ protected:
 
 public:
     /*! @brief Underlying meta node type. */
-    using node_type = Type;
+    using node_type = Node;
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
 
@@ -823,7 +823,7 @@ public:
      * @return True if the objects refer to the same type, false otherwise.
      */
     [[nodiscard]] bool operator==(const meta_object &other) const noexcept {
-        if constexpr(stl::is_same_v<Type, internal::meta_type_node>) {
+        if constexpr(stl::is_same_v<node_type, internal::meta_type_node>) {
             return (this->ctx == other.ctx) && (node_or_assert().alias == other.node_or_assert().alias);
         } else {
             return (this->ctx == other.ctx) && (this->node == other.node);
