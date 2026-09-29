@@ -831,6 +831,15 @@ public:
     }
 
     /**
+     * @brief Returns the name assigned to a meta object, if any.
+     * @return The name assigned to the meta object, if any.
+     */
+    [[nodiscard]] stl::string_view name() const noexcept
+    requires requires(node_type elem) { elem.name; } {
+        return (node_or_assert().name == nullptr) ? stl::string_view{} : stl::string_view{node_or_assert().name};
+    }
+
+    /**
      * @brief Returns user defined data for a given meta object.
      * @return User defined arbitrary data.
      */
@@ -852,14 +861,6 @@ private:
 /*! @brief Opaque wrapper for data members. */
 struct meta_data final: meta_object<internal::meta_data_node> {
     using meta_object::meta_object;
-
-    /**
-     * @brief Returns the name assigned to a data member, if any.
-     * @return The name assigned to the data member, if any.
-     */
-    [[nodiscard]] stl::string_view name() const noexcept {
-        return (node_or_assert().name == nullptr) ? stl::string_view{} : stl::string_view{node_or_assert().name};
-    }
 
     /**
      * @brief Returns the number of arguments of a data member's setter.
@@ -950,14 +951,6 @@ struct meta_data final: meta_object<internal::meta_data_node> {
 /*! @brief Opaque wrapper for member functions. */
 struct meta_func final: meta_object<internal::meta_func_node> {
     using meta_object::meta_object;
-
-    /**
-     * @brief Returns the name assigned to a member function, if any.
-     * @return The name assigned to the member function, if any.
-     */
-    [[nodiscard]] stl::string_view name() const noexcept {
-        return (node_or_assert().name == nullptr) ? stl::string_view{} : stl::string_view{node_or_assert().name};
-    }
 
     /**
      * @brief Returns the number of arguments accepted by a member function.
@@ -1103,14 +1096,6 @@ public:
      */
     [[nodiscard]] id_type alias() const noexcept {
         return node_or_assert().alias;
-    }
-
-    /**
-     * @brief Returns the name assigned to a type, if any.
-     * @return The name assigned to the type, if any.
-     */
-    [[nodiscard]] stl::string_view name() const noexcept {
-        return (node_or_assert().name == nullptr) ? stl::string_view{} : stl::string_view{node_or_assert().name};
     }
 
     /**
