@@ -72,6 +72,13 @@ TEST_F(MetaBase, Comparison) {
     ASSERT_TRUE(base == base);
 }
 
+TEST_F(MetaBase, Context) {
+    const auto type = entt::resolve<base_3>();
+    const auto base = type.base().begin()->second;
+
+    ASSERT_EQ(&base.context(), &type.context());
+}
+
 TEST_F(MetaBase, Type) {
     const auto type = entt::resolve<base_3>();
     const auto iterable = type.base();

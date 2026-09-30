@@ -200,6 +200,15 @@ TEST_F(MetaData, Comparison) {
     ASSERT_TRUE(data == data);
 }
 
+TEST_F(MetaData, Context) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<clazz>();
+    const auto data = type.data("i"_hs);
+
+    ASSERT_EQ(&data.context(), &type.context());
+}
+
 TEST_F(MetaData, NonConst) {
     using namespace entt::literals;
 

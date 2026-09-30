@@ -232,6 +232,15 @@ TEST_F(MetaFunc, Comparison) {
     ASSERT_TRUE(func == func);
 }
 
+TEST_F(MetaFunc, Context) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<function>();
+    const auto func = type.func("f2"_hs);
+
+    ASSERT_EQ(&func.context(), &type.context());
+}
+
 TEST_F(MetaFunc, NonConst) {
     using namespace entt::literals;
 

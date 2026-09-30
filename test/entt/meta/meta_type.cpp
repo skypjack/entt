@@ -215,6 +215,15 @@ TEST_F(MetaType, Resolve) {
     ASSERT_TRUE(found);
 }
 
+TEST_F(MetaType, Context) {
+    using namespace entt::literals;
+
+    const auto type = entt::resolve<clazz>();
+    const auto &cxt = entt::locator<entt::meta_ctx>::value_or();
+
+    ASSERT_EQ(&type.context(), &cxt);
+}
+
 TEST_F(MetaType, SafeWhenEmpty) {
     using namespace entt::literals;
 
