@@ -280,6 +280,7 @@ SETUP_BASIC_TEST(
         entt/entity/organizer.cpp
         entt/entity/reactive_mixin.cpp
         entt/entity/registry.cpp
+        entt/entity/registry_context.cpp
         entt/entity/runtime_view.cpp
         entt/entity/sigh_mixin.cpp
         entt/entity/snapshot.cpp
