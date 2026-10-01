@@ -9,7 +9,6 @@ namespace test {
 template<typename Type>
 struct registry_context_value {
     registry_context_value();
-    void touch();
     registry_context_value *insert(entt::registry &);
 };
 
