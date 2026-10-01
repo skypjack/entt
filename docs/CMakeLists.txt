@@ -13,7 +13,7 @@ if(DOXYGEN_FOUND)
     FetchContent_MakeAvailable(doxygen-awesome-css)
 
     set(DOXY_SOURCE_DIRECTORY ${EnTT_SOURCE_DIR}/src)
-    FetchContent_GetProperties(doxygen-awesome-css SOURCE_DIR DOXY_CSS_DIRECTORY)
+    set(DOXY_CSS_DIRECTORY ${doxygen-awesome-css_SOURCE_DIR})
     set(DOXY_DOCS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     set(DOXY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
