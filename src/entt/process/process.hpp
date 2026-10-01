@@ -1,7 +1,9 @@
 #ifndef ENTT_PROCESS_PROCESS_HPP
 #define ENTT_PROCESS_PROCESS_HPP
 
+#include "../config/config.h"
 #include "../core/compressed_pair.hpp"
+#include "../core/memory.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/cstdint.hpp"
 #include "../stl/memory.hpp"
@@ -16,6 +18,46 @@ namespace internal {
 
 template<typename, typename, typename>
 struct process_adaptor;
+
+/**
+ * @brief Creates a shared pointer to a process-like type by forwarding the
+ * allocator to its constructor as a plain argument.
+ *
+ * Unlike `std::allocate_shared`, this avoids triggering uses-allocator
+ * construction on the given type (as mandated for example for
+ * `std::pmr::polymorphic_allocator`), which would otherwise conflict with the
+ * allocator being also forwarded explicitly as a constructor argument.
+ *
+ * @tparam Type Type of object to create.
+ * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Args Types of arguments to use to construct the object.
+ * @param allocator The allocator to use.
+ * @param args Parameters to use to construct the object.
+ * @return A newly created shared pointer to an object of the given type.
+ */
+template<typename Type, typename Allocator, typename... Args>
+stl::shared_ptr<Type> allocate_process(const Allocator &allocator, Args &&...args) {
+    using alloc_traits = typename stl::allocator_traits<Allocator>::template rebind_traits<Type>;
+    using rebound_allocator = typename alloc_traits::allocator_type;
+    using deleter_type = allocation_deleter<rebound_allocator>;
+
+    rebound_allocator alloc{allocator};
+    auto ptr = alloc_traits::allocate(alloc, 1u);
+
+    ENTT_TRY {
+        ::new(static_cast<void *>(stl::to_address(ptr))) Type(allocator, stl::forward<Args>(args)...);
+    }
+    ENTT_CATCH {
+        alloc_traits::deallocate(alloc, ptr, 1u);
+        ENTT_THROW;
+    }
+
+    // guards the constructed object until ownership is transferred to the shared_ptr below
+    stl::unique_ptr<Type, deleter_type> guard{stl::to_address(ptr), deleter_type{alloc}};
+    stl::shared_ptr<Type> result{guard.get(), deleter_type{alloc}, alloc};
+    guard.release();
+    return result;
+}
 
 } // namespace internal
 /*! @endcond */
@@ -221,7 +263,7 @@ public:
     template<typename Type, typename... Args>
     basic_process &then(Args &&...args) {
         const auto &allocator = next.second();
-        return *(next.first() = stl::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
+        return *(next.first() = internal::allocate_process<Type>(allocator, stl::forward<Args>(args)...));
     }
 
     /**
@@ -234,7 +276,7 @@ public:
     basic_process &then(Func func) {
         const auto &allocator = next.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *(next.first() = stl::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
+        return *(next.first() = internal::allocate_process<process_type>(allocator, stl::move(func)));
     }
 
     /**
