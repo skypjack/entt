@@ -7,7 +7,9 @@ registry_context_value<Type>::registry_context_value() = default;
 
 template<typename Type>
 registry_context_value<Type> *registry_context_value<Type>::insert(entt::registry &registry) {
-    registry.ctx().emplace<registry_context_value<Type> *>(this);
+    auto &ctx = registry.ctx();
+    ctx.emplace<registry_context_value<Type> *>(this);
+    ctx.emplace_as<registry_context_value<Type> *>(0u, this);
     return this;
 }
 

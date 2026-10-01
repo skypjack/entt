@@ -2372,9 +2372,12 @@ TEST_F(Registry, ContextTypeMatchingAcrossTranslationUnits) {
     entt::registry registry{};
     auto *const expected = test::registry_context_insert(registry);
     const auto *const value = registry.ctx().find<test::registry_context_type *>();
+    const auto *const hinted = registry.ctx().find<test::registry_context_type *>(0u);
 
     ASSERT_NE(value, nullptr);
     ASSERT_EQ(*value, expected);
+    ASSERT_NE(hinted, nullptr);
+    ASSERT_EQ(*hinted, expected);
 }
 
 TEST_F(Registry, ContextHint) {
