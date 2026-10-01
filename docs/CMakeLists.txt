@@ -7,9 +7,7 @@ if(DOXYGEN_FOUND)
 
     FetchContent_Declare(
         doxygen-awesome-css
-        GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
-        GIT_TAG main
-        GIT_SHALLOW 1
+        URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
     )
 
     FetchContent_MakeAvailable(doxygen-awesome-css)
