@@ -25,7 +25,8 @@ struct StorageBase: testing::Test {
     struct update_from_destructor {
         update_from_destructor(entt::basic_storage<update_from_destructor, my_entity> &ref, my_entity other)
             : storage{&ref},
-              target{other} {}
+              target{other} {
+        }
 
         update_from_destructor(const update_from_destructor &) = delete;
         update_from_destructor &operator=(const update_from_destructor &) = delete;
@@ -49,6 +50,10 @@ struct StorageBase: testing::Test {
     private:
         entt::basic_storage<update_from_destructor, my_entity> *storage{};
         my_entity target{entt::null};
+
+    private:
+        // used to trigger an assertion failure in case of double destruction
+        std::unordered_set<char> set{};
     };
 
     struct create_from_constructor {
