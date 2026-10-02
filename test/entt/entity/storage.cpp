@@ -1772,6 +1772,26 @@ TEST(Storage, UpdateFromDestructor) {
     }
 }
 
+TEST(Storage, UpdateFromDestructorOnDestroy) {
+    using entity_type = StorageBase::my_entity;
+
+    constexpr auto size = 10u;
+    const std::array entity{entity_type{4u}, entity_type{2u}, entity_type{0u}};
+
+    for(auto target: entity) {
+        entt::basic_storage<StorageBase::update_from_destructor, entity_type> pool;
+
+        for(std::size_t next{}; next < size; ++next) {
+            const auto other = entity_type(next);
+            pool.emplace(other, pool, other == entity_type(size / 2) ? target : other);
+        }
+
+        pool.erase(entity_type(size / 2));
+
+        // the storage goes out of scope here
+    }
+}
+
 TEST(Storage, CreateFromConstructor) {
     using entity_type = StorageBase::my_entity;
 
