@@ -255,21 +255,9 @@ class basic_storage: public basic_sparse_set<Entity, typename stl::allocator_tra
         return it;
     }
 
-    void shrink_to_size(const stl::size_t sz) {
-        const auto from = (sz + traits_type::page_size - 1u) / traits_type::page_size;
+    void shrink_to_size() {
+        const auto from = (base_type::size() + traits_type::page_size - 1u) / traits_type::page_size;
         allocator_type allocator{get_allocator()};
-
-        if constexpr(!stl::is_trivially_destructible_v<element_type>) {
-            for(auto pos = sz, length = base_type::size(); pos < length; ++pos) {
-                if constexpr(traits_type::in_place_delete) {
-                    if(base_type::data()[pos] != tombstone) {
-                        alloc_traits::destroy(allocator, stl::addressof(element_at(pos)));
-                    }
-                } else {
-                    alloc_traits::destroy(allocator, stl::addressof(element_at(pos)));
-                }
-            }
-        }
 
         for(auto pos = from, last = payload.size(); pos < last; ++pos) {
             alloc_traits::deallocate(allocator, payload[pos], traits_type::page_size);
@@ -458,7 +446,8 @@ public:
     /*! @brief Default destructor. */
     // NOLINTNEXTLINE(bugprone-exception-escape)
     ~basic_storage() override {
-        shrink_to_size(0u);
+        pop_all();
+        shrink_to_size();
     }
 
     /**
@@ -523,7 +512,7 @@ public:
     /*! @brief Requests the removal of unused capacity. */
     void shrink_to_fit() override {
         base_type::shrink_to_fit();
-        shrink_to_size(base_type::size());
+        shrink_to_size();
     }
 
     /**

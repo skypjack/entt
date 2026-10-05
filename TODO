@@ -21,6 +21,6 @@ TODO:
 * archetype-like a-là EnTT support (see my own notes)
 * organizer: view/storage only based model, no registry
 * explore "runtime" mode for hashed string where the source is copied internally
-* storage: shrink_to_fit does not work with reentrant destructor?
 * finish the imgui viewer/editor!
 * entity io
+* storage.cpp update_from_destructor triggers natvis errors
