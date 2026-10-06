@@ -127,7 +127,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     }
 
     template<typename Type, typename... Args>
-    void initialize([[maybe_unused]] Args &&...args) {
+    decltype(auto) initialize([[maybe_unused]] Args &&...args) {
         using plain_type = stl::remove_cvref_t<Type>;
 
         vtable = basic_vtable<plain_type>;
@@ -139,10 +139,12 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             this->instance = nullptr;
         } else if constexpr(stl::is_lvalue_reference_v<Type>) {
             deleter = nullptr;
-            mode = stl::is_const_v<stl::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+            using non_reference_type = stl::remove_reference_t<Type>;
+            mode = stl::is_const_v<non_reference_type> ? any_policy::cref : any_policy::ref;
             static_assert((stl::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
             // NOLINTNEXTLINE(bugprone-multi-level-implicit-pointer-conversion)
             this->instance = (stl::addressof(args), ...);
+            return *static_cast<non_reference_type *>(const_cast<constness_as_t<void, non_reference_type> *>(this->instance));
         } else if constexpr(in_situ_v<plain_type>) {
             if constexpr(stl::is_trivially_destructible_v<plain_type>) {
                 deleter = nullptr;
@@ -153,10 +155,10 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             mode = any_policy::embedded;
 
             if constexpr(stl::is_aggregate_v<plain_type> && (sizeof...(Args) != 0u || !stl::is_default_constructible_v<plain_type>)) {
-                ::new(&this->buffer) plain_type{stl::forward<Args>(args)...};
+                return *::new(&this->buffer) plain_type{stl::forward<Args>(args)...};
             } else {
                 // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-                ::new(&this->buffer) plain_type(stl::forward<Args>(args)...);
+                return *::new(&this->buffer) plain_type(stl::forward<Args>(args)...);
             }
         } else {
             deleter = &basic_deleter<plain_type>;
@@ -170,6 +172,8 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
             } else {
                 this->instance = new plain_type(stl::forward<Args>(args)...);
             }
+
+            return *static_cast<plain_type *>(const_cast<void *>(this->instance));
         }
     }
 
@@ -421,11 +425,12 @@ public:
      * @tparam Type Type of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
+     * @return A reference to the newly created object, if any.
      */
     template<typename Type, typename... Args>
-    void emplace(Args &&...args) {
+    decltype(auto) emplace(Args &&...args) {
         invoke_deleter_if_exists();
-        initialize<Type>(stl::forward<Args>(args)...);
+        return initialize<Type>(stl::forward<Args>(args)...);
     }
 
     /**

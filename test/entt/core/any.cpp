@@ -32,6 +32,8 @@ struct Any: ::testing::Test {
     };
 
     struct fat {
+        fat() = default;
+
         fat(double v1, double v2, double v3, double v4)
             : value{v1, v2, v3, v4} {}
 
@@ -992,6 +994,20 @@ TEST_F(Any, EmplaceVoid) {
     ASSERT_FALSE(any.owner());
     ASSERT_EQ(any.policy(), entt::any_policy::empty);
     ASSERT_EQ(any.info(), entt::type_id<void>());
+}
+
+TEST_F(Any, EmplaceReturnType) {
+    testing::StaticAssertTypeEq<void, decltype(entt::any{}.emplace<void>())>();
+
+    testing::StaticAssertTypeEq<int &, decltype(entt::any{}.emplace<int>())>();
+    testing::StaticAssertTypeEq<int &, decltype(entt::any{}.emplace<int &>(std::declval<int &>()))>();
+    testing::StaticAssertTypeEq<int &, decltype(entt::any{}.emplace<int &&>(std::declval<int>()))>();
+    testing::StaticAssertTypeEq<const int &, decltype(entt::any{}.emplace<const int &>(std::declval<int &>()))>();
+
+    testing::StaticAssertTypeEq<fat &, decltype(entt::any{}.emplace<fat>())>();
+    testing::StaticAssertTypeEq<fat &, decltype(entt::any{}.emplace<fat &>(std::declval<fat &>()))>();
+    testing::StaticAssertTypeEq<fat &, decltype(entt::any{}.emplace<fat &&>(std::declval<fat>()))>();
+    testing::StaticAssertTypeEq<const fat &, decltype(entt::any{}.emplace<const fat &>(std::declval<fat &>()))>();
 }
 
 TEST_F(Any, Reset) {
