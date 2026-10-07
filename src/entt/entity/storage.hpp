@@ -255,8 +255,8 @@ class basic_storage: public basic_sparse_set<Entity, typename stl::allocator_tra
         return it;
     }
 
-    void shrink_to_size() {
-        const auto from = (base_type::size() + traits_type::page_size - 1u) / traits_type::page_size;
+    void shrink_to_size(const bool assume_empty = false) {
+        const auto from = assume_empty ? 0u : (base_type::size() + traits_type::page_size - 1u) / traits_type::page_size;
         allocator_type allocator{get_allocator()};
 
         for(auto pos = from, last = payload.size(); pos < last; ++pos) {
@@ -447,7 +447,8 @@ public:
     // NOLINTNEXTLINE(bugprone-exception-escape)
     ~basic_storage() override {
         pop_all();
-        shrink_to_size();
+        // skip tombstones when shrinking
+        shrink_to_size(true);
     }
 
     /**
