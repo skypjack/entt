@@ -25,8 +25,7 @@ struct StorageBase: testing::Test {
     struct update_from_destructor {
         update_from_destructor(entt::basic_storage<update_from_destructor, my_entity> &ref, my_entity other)
             : storage{&ref},
-              target{other} {
-        }
+              target{other} {}
 
         update_from_destructor(const update_from_destructor &) = delete;
         update_from_destructor &operator=(const update_from_destructor &) = delete;
