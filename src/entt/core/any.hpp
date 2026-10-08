@@ -489,18 +489,7 @@ public:
      */
     [[nodiscard]] basic_any as_ref() noexcept {
         basic_any other = stl::as_const(*this).as_ref();
-
-        switch(mode) {
-            using enum any_policy;
-        case cref:
-        case empty:
-            other.mode = mode;
-            break;
-        default:
-            other.mode = any_policy::ref;
-            break;
-        }
-
+        other.mode = (has_value() && (mode != any_policy::cref)) ? any_policy::ref : mode;
         return other;
     }
 
@@ -510,7 +499,7 @@ public:
         other.instance = data();
         other.vtable = vtable;
         other.underlying_type = underlying_type;
-        other.mode = any_policy::cref;
+        other.mode = has_value() ? any_policy::cref : mode;
         return other;
     }
 

@@ -24,4 +24,3 @@ TODO:
 * finish the imgui viewer/editor!
 * entity io
 * storage.cpp update_from_destructor triggers natvis errors
-* const any::as_ref sets the wrong mode on empty objects
