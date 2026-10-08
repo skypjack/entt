@@ -505,21 +505,18 @@ public:
      */
     template<typename Type>
     [[nodiscard]] bool allow_cast() {
-        if constexpr(stl::is_reference_v<Type> && !stl::is_const_v<stl::remove_reference_t<Type>>) {
-            return allow_cast<const stl::remove_reference_t<Type> &>() && (storage.policy() != any_policy::cref);
-        } else {
-            if(storage.has_value<stl::remove_cvref_t<Type>>()) {
-                return true;
-            } else if(auto other = stl::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
-                if(other.storage.owner()) {
-                    stl::swap(*this, other);
-                }
-
-                return true;
+        if(storage.has_value<stl::remove_cvref_t<Type>>()) {
+            constexpr auto no_check = !stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>;
+            return no_check || (storage.policy() != any_policy::cref);
+        } else if(auto other = stl::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
+            if(other.storage.owner()) {
+                stl::swap(*this, other);
             }
 
-            return false;
+            return true;
         }
+
+        return false;
     }
 
     /*! @copydoc any::emplace */
