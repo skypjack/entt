@@ -15,33 +15,6 @@
 
 namespace entt {
 
-/*! @cond ENTT_INTERNAL */
-namespace internal {
-
-template<typename, typename>
-struct has_on_construct final: stl::false_type {};
-
-template<typename Type, typename Registry>
-requires stl::invocable<decltype(&Type::on_construct), Registry &, typename Registry::entity_type>
-struct has_on_construct<Type, Registry>: stl::true_type {};
-
-template<typename, typename>
-struct has_on_update final: stl::false_type {};
-
-template<typename Type, typename Registry>
-requires stl::invocable<decltype(&Type::on_update), Registry &, typename Registry::entity_type>
-struct has_on_update<Type, Registry>: stl::true_type {};
-
-template<typename, typename>
-struct has_on_destroy final: stl::false_type {};
-
-template<typename Type, typename Registry>
-requires stl::invocable<decltype(&Type::on_destroy), Registry &, typename Registry::entity_type>
-struct has_on_destroy<Type, Registry>: stl::true_type {};
-
-} // namespace internal
-/*! @endcond */
-
 /**
  * @brief Mixin type used to add signal support to storage types.
  *
@@ -152,16 +125,18 @@ public:
           construction{allocator},
           destruction{allocator},
           update{allocator} {
-        if constexpr(internal::has_on_construct<typename underlying_type::element_type, Registry>::value) {
-            sink{construction}.template connect<&underlying_type::element_type::on_construct>();
+        using element_type = typename underlying_type::element_type;
+
+        if constexpr(requires(element_type elem) { elem.on_construct(*owner, entity_type{}); }) {
+            sink{construction}.template connect<&element_type::on_construct>();
         }
 
-        if constexpr(internal::has_on_update<typename underlying_type::element_type, Registry>::value) {
-            sink{update}.template connect<&underlying_type::element_type::on_update>();
+        if constexpr(requires(element_type elem) { elem.on_update(*owner, entity_type{}); }) {
+            sink{update}.template connect<&element_type::on_update>();
         }
 
-        if constexpr(internal::has_on_destroy<typename underlying_type::element_type, Registry>::value) {
-            sink{destruction}.template connect<&underlying_type::element_type::on_destroy>();
+        if constexpr(requires(element_type elem) { elem.on_destroy(*owner, entity_type{}); }) {
+            sink{destruction}.template connect<&element_type::on_destroy>();
         }
     }
 
