@@ -153,7 +153,7 @@ public:
     template<typename Type, typename... Args>
     type &attach(Args &&...args) {
         const auto &allocator = handlers.second();
-        return *handlers.first().emplace_back(stl::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
+        return *handlers.first().emplace_back(internal::allocate_process<Type>(allocator, stl::forward<Args>(args)...));
     }
 
     /**
@@ -166,7 +166,7 @@ public:
     type &attach(Func func) {
         const auto &allocator = handlers.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *handlers.first().emplace_back(stl::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
+        return *handlers.first().emplace_back(internal::allocate_process<process_type>(allocator, stl::move(func)));
     }
 
     /**

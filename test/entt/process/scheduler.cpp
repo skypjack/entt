@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <memory_resource>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
@@ -36,6 +37,30 @@ class succeeded_process: public entt::process {
 
 public:
     using entt::process::process;
+};
+
+template<typename Delta, typename Allocator>
+class pmr_process: public entt::basic_process<Delta, Allocator> {
+    using base_type = entt::basic_process<Delta, Allocator>;
+
+public:
+    using allocator_type = typename base_type::allocator_type;
+    using delta_type = typename base_type::delta_type;
+
+    pmr_process(const allocator_type &allocator, delta_type delay)
+        : base_type{allocator},
+          remaining{delay} {}
+
+    void update(const delta_type delta, void *) override {
+        remaining -= delta;
+
+        if(remaining <= delta_type{0}) {
+            this->succeed();
+        }
+    }
+
+private:
+    delta_type remaining;
 };
 
 class failed_process: public entt::process {
@@ -204,4 +229,28 @@ TEST(Scheduler, CustomAllocator) {
     const decltype(scheduler) other{std::move(scheduler), allocator};
 
     ASSERT_EQ(other.size(), 1u);
+}
+
+TEST(Scheduler, PolymorphicAllocator) {
+    using allocator_type = std::pmr::polymorphic_allocator<void>;
+    using process_type = pmr_process<std::uint32_t, allocator_type>;
+
+    std::pmr::unsynchronized_pool_resource resource{};
+    const allocator_type allocator{&resource};
+
+    entt::basic_scheduler<std::uint32_t, allocator_type> scheduler{allocator};
+
+    ASSERT_EQ(scheduler.get_allocator(), allocator);
+
+    scheduler.attach<process_type>(1u).then<process_type>(1u);
+
+    ASSERT_EQ(scheduler.size(), 1u);
+
+    scheduler.update(1u);
+
+    ASSERT_EQ(scheduler.size(), 1u);
+
+    scheduler.update(1u);
+
+    ASSERT_TRUE(scheduler.empty());
 }
