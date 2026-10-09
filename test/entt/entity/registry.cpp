@@ -21,6 +21,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
 #include "../../common/mixin.hpp"
+#include "../../common/registry_context.h"
 #include "../../common/value_type.h"
 
 struct Registry: testing::Test {
@@ -2365,6 +2366,18 @@ TEST_F(Registry, Context) {
 
     ASSERT_FALSE(ctx.contains<char>());
     ASSERT_FALSE(ctx.contains<int>());
+}
+
+TEST_F(Registry, ContextTypeMatchingAcrossTranslationUnits) {
+    entt::registry registry{};
+    auto *const expected = test::registry_context_insert(registry);
+    const auto *const value = registry.ctx().find<test::registry_context_type *>();
+    const auto *const hinted = registry.ctx().find<test::registry_context_type *>(0u);
+
+    ASSERT_NE(value, nullptr);
+    ASSERT_EQ(*value, expected);
+    ASSERT_NE(hinted, nullptr);
+    ASSERT_EQ(*hinted, expected);
 }
 
 TEST_F(Registry, ContextHint) {
