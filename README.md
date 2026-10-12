@@ -433,8 +433,7 @@ who has participated so far.
 
 # License
 
-Code and documentation Copyright (c) 2017-2026 Michele Caini.<br/>
-Colorful logo Copyright (c) 2018-2021 Richard Caseres.
+Code and documentation Copyright (c) 2017-2026 Michele Caini.
 
 Code released under
 [the MIT license](https://github.com/skypjack/entt/blob/main/LICENSE).<br/>
