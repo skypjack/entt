@@ -1,7 +1,7 @@
 ![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/103550016-90752280-4ea8-11eb-8667-12ed2219e137.png)
 
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
-[![Coverage](https://codecov.io/gh/skypjack/entt/branch/main/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
+[![Coverage](https://codecov.io/gh/skypjack/entt/graph/badge.svg?token=n6rQta40nM)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/zxW73f)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://skypjack.github.io/entt/)
 [![Vcpkg port](https://img.shields.io/vcpkg/v/entt)](https://vcpkg.link/ports/entt)
