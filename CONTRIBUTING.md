@@ -29,9 +29,9 @@ How to do it mostly depends on the type of contribution:
   [pull request](https://github.com/skypjack/entt/pulls) with your code.
   **Please**, add some tests to avoid regressions in future if possible, it
   would be really appreciated. Note that the `EnTT` library has a
-  [coverage at 100%](https://coveralls.io/github/skypjack/entt?branch=master)
-  (at least it was at 100% at the time I wrote this file) and this is the reason
-  for which you can be confident with using it in a production environment.
+  [coverage at 100%](https://coveralls.io/github/skypjack/entt?branch=main) (at
+  least it was at 100% at the time I wrote this file) and this is the reason for
+  which you can be confident with using it in a production environment.
 
 * If you want to propose a new feature and you know how to code it, **please**
   do not issue directly a pull request. Before to do it,

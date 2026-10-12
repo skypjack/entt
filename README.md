@@ -1,7 +1,7 @@
 ![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/103550016-90752280-4ea8-11eb-8667-12ed2219e137.png)
 
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
-[![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
+[![Coverage](https://codecov.io/gh/skypjack/entt/branch/main/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/zxW73f)
 [![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://skypjack.github.io/entt/)
 [![Vcpkg port](https://img.shields.io/vcpkg/v/entt)](https://vcpkg.link/ports/entt)
@@ -425,11 +425,11 @@ I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all as soon as possible.
 
 If you decide to participate, please see the guidelines for
-[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING.md)
+[contributing](https://github.com/skypjack/entt/blob/main/CONTRIBUTING.md)
 before to create issues or pull requests.<br/>
 Take also a look at the
-[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
-know who has participated so far.
+[contributors list](https://github.com/skypjack/entt/blob/main/AUTHORS) to know
+who has participated so far.
 
 # License
 
@@ -437,7 +437,7 @@ Code and documentation Copyright (c) 2017-2026 Michele Caini.<br/>
 Colorful logo Copyright (c) 2018-2021 Richard Caseres.
 
 Code released under
-[the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).<br/>
+[the MIT license](https://github.com/skypjack/entt/blob/main/LICENSE).<br/>
 Documentation released under
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).<br/>
 All logos released under
