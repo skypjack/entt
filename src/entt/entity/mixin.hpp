@@ -125,18 +125,18 @@ public:
           construction{allocator},
           destruction{allocator},
           update{allocator} {
-        using element_type = typename underlying_type::element_type;
+        using underlying_element_type = typename underlying_type::element_type;
 
-        if constexpr(requires(element_type elem) { elem.on_construct(*owner, entity_type{}); }) {
-            sink{construction}.template connect<&element_type::on_construct>();
+        if constexpr(requires(underlying_element_type elem) { elem.on_construct(*owner, entity_type{}); }) {
+            sink{construction}.template connect<&underlying_element_type::on_construct>();
         }
 
-        if constexpr(requires(element_type elem) { elem.on_update(*owner, entity_type{}); }) {
-            sink{update}.template connect<&element_type::on_update>();
+        if constexpr(requires(underlying_element_type elem) { elem.on_update(*owner, entity_type{}); }) {
+            sink{update}.template connect<&underlying_element_type::on_update>();
         }
 
-        if constexpr(requires(element_type elem) { elem.on_destroy(*owner, entity_type{}); }) {
-            sink{destruction}.template connect<&element_type::on_destroy>();
+        if constexpr(requires(underlying_element_type elem) { elem.on_destroy(*owner, entity_type{}); }) {
+            sink{destruction}.template connect<&underlying_element_type::on_destroy>();
         }
     }
 
