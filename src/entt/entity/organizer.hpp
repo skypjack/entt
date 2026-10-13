@@ -11,7 +11,7 @@
 #include "../stl/utility.hpp"
 #include "../stl/vector.hpp"
 #include "fwd.hpp"
-#include "helper.hpp"
+#include "utility.hpp"
 
 namespace entt {
 

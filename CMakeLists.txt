@@ -153,7 +153,6 @@ if(ENTT_INCLUDE_HEADERS)
         entity/group.hpp
         entity/handle.hpp
         entity/mixin.hpp
-        entity/helper.hpp
         entity/io.hpp
         entity/organizer.hpp
         entity/ranges.hpp
@@ -162,6 +161,7 @@ if(ENTT_INCLUDE_HEADERS)
         entity/snapshot.hpp
         entity/sparse_set.hpp
         entity/storage.hpp
+        entity/utlity.hpp
         entity/view.hpp
         graph/adjacency_matrix.hpp
         graph/dot.hpp

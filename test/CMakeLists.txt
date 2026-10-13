@@ -275,7 +275,6 @@ SETUP_BASIC_TEST(
         entt/entity/entity.cpp
         entt/entity/group.cpp
         entt/entity/handle.cpp
-        entt/entity/helper.cpp
         entt/entity/io.cpp
         entt/entity/organizer.cpp
         entt/entity/reactive_mixin.cpp
@@ -288,6 +287,7 @@ SETUP_BASIC_TEST(
         entt/entity/storage_entity.cpp
         entt/entity/storage_no_instance.cpp
         entt/entity/storage_utility.cpp
+        entt/entity/utility.cpp
         entt/entity/view.cpp
 )
 
