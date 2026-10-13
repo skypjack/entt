@@ -8,9 +8,6 @@
 #include "../stl/utility.hpp"
 #include "component.hpp"
 #include "fwd.hpp"
-#include "group.hpp"
-#include "storage.hpp"
-#include "view.hpp"
 
 namespace entt {
 
