@@ -165,3 +165,39 @@ TEST_F(SighHelper, Functionalities) {
 
     ASSERT_EQ(counter, 6);
 }
+
+TEST(CloneEntity, NullEntity) {
+    entt::registry registry{};
+    const entt::entity entity = entt::null;
+    const auto other = entt::clone_entity(registry, entity);
+
+    ASSERT_NE(entity, other);
+    ASSERT_TRUE(registry.valid(other));
+    ASSERT_TRUE(registry.orphan(other));
+}
+
+TEST(CloneEntity, EmptyEntity) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+    const auto other = entt::clone_entity(registry, entity);
+
+    ASSERT_NE(entity, other);
+    ASSERT_TRUE(registry.valid(other));
+    ASSERT_TRUE(registry.orphan(other));
+}
+
+TEST(CloneEntity, ValidEntity) {
+    entt::registry registry{};
+    const auto entity = registry.create();
+
+    registry.emplace<char>(entity, 'c');
+    registry.emplace<int>(entity, 1);
+
+    const auto other = entt::clone_entity(registry, entity);
+
+    ASSERT_NE(entity, other);
+    ASSERT_TRUE(registry.valid(other));
+    ASSERT_TRUE((registry.all_of<char, int>(other)));
+    ASSERT_EQ(registry.get<char>(other), 'c');
+    ASSERT_EQ(registry.get<int>(other), 1);
+}

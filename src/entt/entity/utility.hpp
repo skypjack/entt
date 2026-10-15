@@ -1,6 +1,7 @@
 #ifndef ENTT_ENTITY_UTILITY_HPP
 #define ENTT_ENTITY_UTILITY_HPP
 
+#include "../config/config.h"
 #include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../stl/memory.hpp"
@@ -247,6 +248,27 @@ private:
  */
 template<typename Registry>
 sigh_helper(Registry &) -> sigh_helper<Registry>;
+
+/**
+ * @brief Clones an entity and all its components.
+ * @tparam Entity A valid entity type.
+ * @tparam Args Registry type template parameters.
+ * @param ref A valid reference to a registry.
+ * @param src Source entity to copy from.
+ * @return The newly created entity that is a copy of the given one, if any.
+ */
+template<typename Entity, typename... Args>
+[[nodiscard]] Entity clone_entity(basic_registry<Entity, Args...> &ref, const Entity src) {
+    const auto dst = ref.create();
+
+    for([[maybe_unused]] auto [id, storage]: ref.storage()) {
+        if(storage.contains(src)) {
+            storage.push(dst, storage.value(src));
+        }
+    }
+
+    return dst;
+}
 
 } // namespace entt
 
