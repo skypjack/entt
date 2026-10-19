@@ -446,7 +446,11 @@ public:
     /*! @brief Default destructor. */
     // NOLINTNEXTLINE(bugprone-exception-escape)
     ~basic_storage() override {
-        pop_all();
+        if constexpr(!stl::is_trivially_destructible_v<element_type>) {
+            // no need to invoke pop_all on trivially destructible types
+            pop_all();
+        }
+
         // skip tombstones when shrinking
         shrink_to_size(true);
     }
