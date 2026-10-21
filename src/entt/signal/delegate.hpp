@@ -65,35 +65,32 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using return_type = stl::remove_const_t<Ret>;
-    using delegate_type = return_type(const void *, Args...);
-
     template<auto Candidate, stl::size_t... Index>
     [[nodiscard]] auto wrap(stl::index_sequence<Index...>) noexcept {
-        return [](const void *, Args... args) -> return_type {
+        return [](const void *, Args... args) -> result_type {
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(stl::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
-            return static_cast<Ret>(stl::invoke(Candidate, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<result_type, decltype(Candidate), type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            return static_cast<result_type>(stl::invoke(Candidate, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
         };
     }
 
     template<auto Candidate, typename Type, stl::size_t... Index>
     [[nodiscard]] auto wrap(Type &, stl::index_sequence<Index...>) noexcept {
-        return [](const void *payload, Args... args) -> return_type {
+        return [](const void *payload, Args... args) -> result_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(stl::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
-            return static_cast<Ret>(stl::invoke(Candidate, *curr, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<result_type, decltype(Candidate), Type &, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            return static_cast<result_type>(stl::invoke(Candidate, *curr, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
         };
     }
 
     template<auto Candidate, typename Type, stl::size_t... Index>
     [[nodiscard]] auto wrap(Type *, stl::index_sequence<Index...>) noexcept {
-        return [](const void *payload, Args... args) -> return_type {
+        return [](const void *payload, Args... args) -> result_type {
             Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
             [[maybe_unused]] const auto arguments = stl::forward_as_tuple(stl::forward<Args>(args)...);
-            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<Ret, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
-            return static_cast<Ret>(stl::invoke(Candidate, curr, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
+            [[maybe_unused]] constexpr auto offset = !stl::is_invocable_r_v<result_type, decltype(Candidate), Type *, type_list_element_t<Index, type_list<Args...>>...> * (sizeof...(Args) - sizeof...(Index));
+            return static_cast<result_type>(stl::invoke(Candidate, curr, stl::forward<type_list_element_t<Index + offset, type_list<Args...>>>(stl::get<Index + offset>(arguments))...));
         };
     }
 
@@ -138,7 +135,7 @@ public:
         instance = nullptr;
 
         if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
-            fn = [](const void *, Args... args) -> return_type {
+            fn = [](const void *, Args... args) -> Ret {
                 return Ret(stl::invoke(Candidate, stl::forward<Args>(args)...));
             };
         } else if constexpr(stl::is_member_pointer_v<decltype(Candidate)>) {
@@ -168,7 +165,7 @@ public:
         instance = &value_or_instance;
 
         if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
-            fn = [](const void *payload, Args... args) -> return_type {
+            fn = [](const void *payload, Args... args) -> Ret {
                 Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(stl::invoke(Candidate, *curr, stl::forward<Args>(args)...));
             };
@@ -192,7 +189,7 @@ public:
         instance = value_or_instance;
 
         if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>) {
-            fn = [](const void *payload, Args... args) -> return_type {
+            fn = [](const void *payload, Args... args) -> Ret {
                 Type *curr = static_cast<Type *>(const_cast<constness_as_t<void, Type> *>(payload));
                 return Ret(stl::invoke(Candidate, curr, stl::forward<Args>(args)...));
             };
@@ -283,7 +280,7 @@ public:
 
 private:
     const void *instance{};
-    delegate_type *fn{};
+    function_type *fn{};
 };
 
 /**

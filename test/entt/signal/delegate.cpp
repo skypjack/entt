@@ -309,6 +309,11 @@ TEST(Delegate, DeductionGuide) {
     ASSERT_TRUE(lambda);
 }
 
+TEST(Delegate, ReturnTypeConstness) {
+    // constness on class return types is preserved
+    [[maybe_unused]] entt::delegate<const std::string()> delegate{+[](const void *) -> const std::string { return {}; }};
+}
+
 TEST(Delegate, ConstInstance) {
     entt::delegate<int(int)> delegate;
     const delegate_functor functor;
@@ -394,8 +399,8 @@ TEST(Delegate, Constructors) {
     const entt::delegate<int(int)> func{entt::connect_arg<&power_of_two>};
     const entt::delegate<int(int)> ref{entt::connect_arg<&sum_with_ref>, value};
     const entt::delegate<int(int)> ptr{entt::connect_arg<&sum_with_ptr>, &value};
-    const entt::delegate<int(int)> member { entt::connect_arg<&delegate_functor::operator()>,
-                                            functor };
+    const entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>,
+                                          functor};
 
     ASSERT_FALSE(empty);
 
@@ -416,8 +421,8 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
     delegate_functor functor;
 
     const entt::delegate<void(int)> func{entt::connect_arg<&power_of_two>};
-    const entt::delegate<void(int)> member { entt::connect_arg<&delegate_functor::operator()>,
-                                             &functor };
+    const entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>,
+                                           &functor};
     const entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::mul>, &std::as_const(functor)};
 
     ASSERT_TRUE(func);
