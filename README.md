@@ -265,7 +265,7 @@ installation logic provided by this library.
 When using `CMake`, just enable the option `ENTT_INCLUDE_NATVIS` and enjoy
 it.<br/>
 Otherwise, most of the tools are covered via Natvis and all files can be found
-in the `natvis` subdirectory, divided by module.<br/>
+in the `src/entt/natvis` subdirectory, divided by module.<br/>
 If you spot errors or have suggestions, any contribution is welcome!
 
 ## Packaging Tools
