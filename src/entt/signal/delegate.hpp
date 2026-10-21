@@ -5,6 +5,7 @@
 #include "../core/type_traits.hpp"
 #include "../stl/cstddef.hpp"
 #include "../stl/functional.hpp"
+#include "../stl/memory.hpp"
 #include "../stl/tuple.hpp"
 #include "../stl/type_traits.hpp"
 #include "../stl/utility.hpp"
@@ -162,7 +163,7 @@ public:
      */
     template<auto Candidate, typename Type>
     void connect(Type &value_or_instance) noexcept {
-        instance = &value_or_instance;
+        instance = std::addressof(value_or_instance);
 
         if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
             fn = [](const void *payload, Args... args) -> Ret {
