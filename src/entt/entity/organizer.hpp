@@ -370,7 +370,7 @@ public:
     }
 
     /**
-     * @brief Adds an user defined function with optional payload to the task
+     * @brief Adds a user defined function with optional payload to the task
      * list.
      * @tparam Req Additional requirements and/or override resource access mode.
      * @param func Function to add to the task list.
