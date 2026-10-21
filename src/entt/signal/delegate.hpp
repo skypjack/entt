@@ -118,7 +118,7 @@ public:
     }
 
     /**
-     * @brief Constructs a delegate and connects an user defined function with
+     * @brief Constructs a delegate and connects a user defined function with
      * optional payload.
      * @param function Function to connect to the delegate.
      * @param payload User defined arbitrary data.
@@ -200,13 +200,13 @@ public:
     }
 
     /**
-     * @brief Connects an user defined function with optional payload to a
+     * @brief Connects a user defined function with optional payload to a
      * delegate.
      *
      * The delegate isn't responsible for the connected object or the payload.
      * Users must always guarantee that the lifetime of an instance overcomes
      * the one of the delegate.<br/>
-     * The payload is returned as the first argument to the target function in
+     * The payload is provided as the first argument to the target function in
      * all cases.
      *
      * @param function Function to connect to the delegate.
