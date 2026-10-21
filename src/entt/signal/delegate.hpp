@@ -275,9 +275,7 @@ public:
      * @param other Delegate with which to compare.
      * @return False if the two contents differ, true otherwise.
      */
-    [[nodiscard]] bool operator==(const delegate<Ret(Args...)> &other) const noexcept {
-        return fn == other.fn && instance == other.instance;
-    }
+    [[nodiscard]] bool operator==(const delegate &other) const noexcept = default;
 
 private:
     const void *instance{};
