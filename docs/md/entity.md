@@ -307,7 +307,7 @@ registry.remove<position>(entity);
 
 The `clear` member function works similarly and is used to either:
 
-* Erases all instances of the given components from the entities that own them:
+* Erase all instances of the given components from the entities that own them:
 
   ```cpp
   registry.clear<position>();
@@ -325,8 +325,8 @@ Finally, references to components are obtained simply as:
 const auto &cregistry = registry;
 
 // const and non-const reference
-const auto &crenderable = cregistry.get<renderable>(entity);
-auto &renderable = registry.get<renderable>(entity);
+const auto &crend = cregistry.get<renderable>(entity);
+auto &rend = registry.get<renderable>(entity);
 
 // const and non-const references
 const auto [cpos, cvel] = cregistry.get<position, velocity>(entity);
@@ -627,7 +627,7 @@ for(auto entity: storage) {
 Wrapping it in a view and combining it with other views is another option:
 
 ```cpp
-for(auto [entity, pos]: (entt:.basic_view{storage} | registry.view<position>(entt::exclude<velocity>)).each()) {
+for(auto [entity, pos]: (entt::basic_view{storage} | registry.view<position>(entt::exclude<velocity>)).each()) {
     // ...
 }
 ```
@@ -652,7 +652,7 @@ Similarly, the reactive mixin does not disconnect itself from observed storages
 upon destruction. Therefore, users have to do this themselves:
 
 ```cpp
-entt::registry = storage.registry();
+entt::registry &registry = storage.registry();
 
 registry.on_construct<position>().disconnect(&storage);
 registry.on_construct<velocity>().disconnect(&storage);
@@ -679,7 +679,7 @@ There are two functions that respond to slightly different needs:
 
   ```cpp
   registry.sort<renderable>([](const entt::entity lhs, const entt::entity rhs) {
-      return entt::registry::entity(lhs) < entt::registry::entity(rhs);
+      return entt::to_integral(lhs) < entt::to_integral(rhs);
   });
   ```
 
@@ -689,7 +689,7 @@ There are two functions that respond to slightly different needs:
 * Components are sorted according to the order imposed by another component:
 
   ```cpp
-  registry.sort<movement, physics>();
+  registry.storage<movement>().sort_as(registry.storage<physics>());
   ```
 
   In this case, instances of `movement` are arranged in memory so that cache
@@ -762,7 +762,7 @@ The type of a tombstone is internal and can change at any time. However, there
 exist implicit conversions from a tombstone to identifiers of any allowed type:
 
 ```cpp
-entt::entity null = entt::tombstone;
+entt::entity tombstone = entt::tombstone;
 ```
 
 Similarly, the tombstone compares to any other identifier:
@@ -840,7 +840,7 @@ entt::sigh_helper{registry}
         .on_construct<&a_listener>()
         .on_destroy<&another_listener>()
     .with<velocity>("other"_hs)
-        .on_update<yet_another_listener>();
+        .on_update<&yet_another_listener>();
 ```
 
 Runtime pools are also supported by providing an identifier when calling `with`,
@@ -1186,7 +1186,7 @@ than one snapshot in a sort of _continuous loading_ that updates the destination
 one step at a time.<br/>
 Identifiers that entities originally had are not transferred to the target.
 Instead, the loader maps remote identifiers to local ones while restoring a
-snapshot. Wrapping the archive is a conveninent way of updating identifiers that
+snapshot. Wrapping the archive is a convenient way of updating identifiers that
 are part of components automatically (see the example below).<br/>
 Another difference with the snapshot loader is that the continuous loader has an
 internal state that must persist over time. Therefore, there is no reason to
@@ -1206,10 +1206,10 @@ auto archive = [&loader, &input](auto &value) {
 };
 
 loader
-    .get<entt::entity>(input)
-    .get<a_component>(input)
-    .get<another_component>(input)
-    .get<dirty_component>(input)
+    .get<entt::entity>(archive)
+    .get<a_component>(archive)
+    .get<another_component>(archive)
+    .get<dirty_component>(archive)
     .orphans();
 ```
 
@@ -1317,8 +1317,8 @@ pool contains all the instances of a single component type and all the entities
 to which it is assigned.<br/>
 Sparse arrays are _paged_ to avoid wasting memory. Packed arrays of components
 are also paged to have pointer stability upon additions. Packed arrays of
-entities are not instead.<br/>
-All pools rearranges their items in order to keep the internal arrays tightly
+entities, on the other hand, are not paged.<br/>
+All pools rearrange their items in order to keep the internal arrays tightly
 packed and maximize performance, unless full pointer stability is enabled.
 
 ## Component traits
@@ -1746,14 +1746,14 @@ auto view = registry.view<position, velocity, renderable>();
 
 for(auto entity: view) {
     // a component at a time ...
-    auto &position = view.get<position>(entity);
-    auto &velocity = view.get<velocity>(entity);
+    auto &pos1 = view.get<position>(entity);
+    auto &vel1 = view.get<velocity>(entity);
 
     // ... multiple components ...
-    auto [pos, vel] = view.get<position, velocity>(entity);
+    auto [pos2, vel2] = view.get<position, velocity>(entity);
 
     // ... all components at once
-    auto [pos, vel, rend] = view.get(entity);
+    auto [pos3, vel3, rend3] = view.get(entity);
 
     // ...
 }
@@ -1827,7 +1827,7 @@ For example, to _filter_ a view based on two groups of entities with different
 characteristics, there will be no need to reinitialize anything:
 
 ```cpp
-entt::view<entt::get<my_type, void>> view{registry.storage<my_type>>()};
+entt::view<entt::get_t<my_type, void>> view{registry.storage<my_type>()};
 
 entt::storage_for_t<void> the_good{};
 entt::storage_for_t<void> the_bad{};
@@ -1836,13 +1836,13 @@ entt::storage_for_t<void> the_bad{};
 
 view.storage(the_good);
 
-for(auto [entt, elem]: view) {
+for(auto [owner, elem]: view) {
   // the good entities with their components here
 }
 
 view.storage(the_bad);
 
-for(auto [entt, elem]: view) {
+for(auto [owner, elem]: view) {
   // the bad entities with their components here
 }
 ```
@@ -1886,7 +1886,7 @@ auto view = registry.view<position>();
 auto other = registry.view<velocity>();
 const auto &storage = registry.storage<renderable>();
 
-auto pack = view | other | renderable;
+auto pack = view | other | storage;
 ```
 
 The constness of the types is preserved and their order depends on the order in
@@ -1905,7 +1905,9 @@ For example, if the registry contains fewer `velocity`s than it contains
 depends on how the `velocity` components are arranged in their pool:
 
 ```cpp
-for(auto entity: registry.view<positon, velocity>()) { 
+auto view = registry.view<position, velocity>();
+
+for(auto entity: view) { 
     // ...
 }
 ```
@@ -1930,7 +1932,7 @@ order, this is possible for a single type view using its reverse iterators:
 ```cpp
 auto view = registry.view<position>();
 
-for(auto it = view.rbegin(), last = view.rend(); it != last; ++iter) {
+for(auto it = view.rbegin(), last = view.rend(); it != last; ++it) {
     // ...
 }
 ```
@@ -1941,7 +1943,7 @@ type views to lead the iteration.
 
 ### Runtime views
 
-Multi type views iterate entities that have at least all the given components.
+Runtime views iterate entities that have at least all the given components.
 During construction, they look at the number of elements available in each pool
 and use the smallest set in order to speed up iterations.<br/>
 They offer more or less the same functionalities of a multi type view. However,
@@ -2029,14 +2031,14 @@ auto group = registry.group<position>(entt::get<velocity, renderable>);
 
 for(auto entity: group) {
     // a component at a time ...
-    auto &position = group.get<position>(entity);
-    auto &velocity = group.get<velocity>(entity);
+    auto &pos1 = group.get<position>(entity);
+    auto &vel1 = group.get<velocity>(entity);
 
     // ... multiple components ...
-    auto [pos, vel] = group.get<position, velocity>(entity);
+    auto [pos2, vel2] = group.get<position, velocity>(entity);
 
     // ... all components at once
-    auto [pos, vel, rend] = group.get(entity);
+    auto [pos3, vel3, rend3] = group.get(entity);
 
     // ...
 }
@@ -2175,7 +2177,7 @@ Similarly, these statements are all valid:
 ```cpp
 position &pos = view.get<position>(entity);
 const position &cpos = view.get<const position>(entity);
-const velocity &cpos = view.get<const velocity>(entity);
+const velocity &cvel = view.get<const velocity>(entity);
 std::tuple<position &, const velocity &> tup = view.get<position, const velocity>(entity);
 std::tuple<const position &, const velocity &> ctup = view.get<const position, const velocity>(entity);
 ```
@@ -2362,9 +2364,8 @@ registry to work. Actually, users can reach the goal with the registry as it is
 while working with most of the common models.
 
 Because of the few reasons mentioned above and many others not mentioned, users
-are completely responsible for synchronization whether required. On the other
-hand, they could get away with it without having to resort to particular
-expedients.
+are completely responsible for synchronization if required. On the other hand,
+they could get away with it without having to resort to particular expedients.
 
 Finally, `EnTT` is configured via a few compile-time definitions to make some of
 its parts implicitly thread-safe, roughly speaking only the ones that really
