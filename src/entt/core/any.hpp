@@ -347,7 +347,7 @@ public:
      */
     template<cvref_unqualified Type>
     [[nodiscard]] bool has_value() const noexcept {
-        return (underlying_type == type_hash<Type>::value());
+        return (underlying_type == type_hash<Type>::value()) || (vtable == &basic_vtable<Type>);
     }
 
     /**
