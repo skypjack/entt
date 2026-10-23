@@ -11,6 +11,7 @@
 #include <entt/core/type_info.hpp>
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
+#include "../../common/type_hash_mismatch.h"
 #include "../../common/value_type.h"
 
 struct Any: ::testing::Test {
@@ -96,6 +97,12 @@ TEST_F(Any, HasValue) {
     ASSERT_TRUE(any.has_value(entt::type_id<int>()));
     ASSERT_FALSE(any.has_value<char>());
     ASSERT_TRUE(any.has_value<int>());
+}
+
+TEST_F(Any, TypeHashMismatch) {
+    const entt::any any{std::in_place_type<test::type_hash_mismatch>};
+
+    ASSERT_NE(entt::any_cast<test::type_hash_mismatch>(&any), nullptr);
 }
 
 TEST_F(Any, SBO) {

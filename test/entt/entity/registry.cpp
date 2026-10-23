@@ -21,6 +21,7 @@
 #include <entt/signal/sigh.hpp>
 #include "../../common/config.h"
 #include "../../common/mixin.hpp"
+#include "../../common/type_hash_mismatch.h"
 #include "../../common/value_type.h"
 
 struct Registry: testing::Test {
@@ -2365,6 +2366,16 @@ TEST_F(Registry, Context) {
 
     ASSERT_FALSE(ctx.contains<char>());
     ASSERT_FALSE(ctx.contains<int>());
+}
+
+TEST_F(Registry, ContextTypeHashMismatch) {
+    entt::registry registry{};
+    constexpr entt::id_type id = 42u;
+
+    const auto &expected = registry.ctx().emplace_as<test::type_hash_mismatch>(id);
+    const auto *const value = registry.ctx().find<test::type_hash_mismatch>(id);
+
+    ASSERT_EQ(value, &expected);
 }
 
 TEST_F(Registry, ContextHint) {
