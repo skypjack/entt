@@ -17,10 +17,10 @@ ago. Fortunately, there are also people who took the time to implement open
 source projects based on `EnTT` and did not hold back when it came to
 documenting them.
 
-Below an incomplete list of games, applications and articles that can be used as
-a reference.<br/>
-Where I put the word _apparently_ means that the use of `EnTT` is documented but
-the authors did not make explicit announcements or contacted me directly.
+Below is an incomplete list of games, applications, and articles that may serve
+as references.<br/>
+The word _apparently_ indicates that `EnTT` use is documented, but the authors
+have not announced it explicitly or contacted me directly.
 
 If you know of other resources out there that are about `EnTT`, feel free to
 open an issue or a PR. I will be glad to add them to this page.<br/>
