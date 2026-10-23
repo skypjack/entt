@@ -54,7 +54,7 @@ if(adjacency_matrix.contains(0u, 1u)) {
 }
 ```
 
-Both `insert` and` erase` are _idempotent_ functions which have no effect if the
+Both `insert` and `erase` are _idempotent_ functions that have no effect if the
 element already exists or has already been deleted.<br/>
 The first one returns an `std::pair` containing the iterator to the element and
 a boolean value indicating whether the element was newly inserted or not. The
@@ -86,9 +86,8 @@ for(auto last = adjacency_matrix.size(), pos = {}; pos < last; ++pos) {
 ```
 
 As for visiting the edges, a few functions are available.<br/>
-When the purpose is to visit all the edges of a given adjacency matrix, the
-`edges` function returns an iterable object that is used to get them as pairs of
-vertices:
+To visit all the edges in an adjacency matrix, use the `edges` function. It
+returns an iterable object that yields the edges as pairs of vertices:
 
 ```cpp
 for(auto [lhs, rhs]: adjacency_matrix.edges()) {
@@ -146,8 +145,8 @@ of the library.
 This class is designed as a sort of _state machine_ to which a specific task is
 attached for which the resources accessed in read-only or read-write mode are
 specified.<br/>
-Most of the functions in the API also return the flow builder itself, according
-to what is the common sense API when it comes to builder classes.
+Most functions in the API also return the flow builder itself, as is common in
+builder APIs.
 
 Once all tasks are registered and resources assigned to them, an execution graph
 in the form of an adjacency matrix is returned to the user.<br/>
@@ -180,8 +179,8 @@ Indeed, the use of `id_type` as an identifier type is not by accident. In fact,
 it matches well with the internal hashed string class. Moreover, it is also the
 same type returned by the hash function of the internal RTTI system, in case the
 user wants to rely on that.<br/>
-However, being an integral value, it leaves the user full freedom to rely on his
-own tools if necessary.
+However, because it is an integral value, users remain free to rely on their own
+tools if necessary.
 
 Once a task is associated with the flow builder, it has also assigned read-only
 or read-write resources as appropriate:
