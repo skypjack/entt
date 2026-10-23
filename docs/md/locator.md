@@ -55,8 +55,8 @@ Finally, to reset a service, use the `reset` function.
 Sometimes it is useful to _transfer_ a copy of a service to another locator. For
 example, when working across boundaries it is common to _share_ a service with a
 dynamically loaded module.<br/>
-Options are not much in this case. Among these is the possibility of _exporting_
-services and assigning them to a different locator.
+Options are limited. One possibility is to _export_ the service and assign it to
+a different locator.
 
 This is what the `handle` and `reset` functions are meant for.<br/>
 The former returns an opaque object useful for _exporting_ (or rather, obtaining
