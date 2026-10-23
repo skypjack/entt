@@ -20,21 +20,18 @@
 
 # Introduction
 
-`EnTT` has become almost completely customizable over time, in many
-respects. These variables are just one of the many ways to customize how it
-works.<br/>
-In the vast majority of cases, users will have no interest in changing the
-default parameters. For all other cases, the list of possible configurations
-with which it is possible to adjust the behavior of the library at runtime can
-be found below.
+`EnTT` has become highly customizable over time in many respects. Configuration
+macros are one of the ways to customize how the library works.<br/>
+Most users do not need to change the default settings. The configuration options
+for adjusting the library at compile time are listed below.
 
 # Definitions
 
 All options are intended as parameters to the compiler (or user-defined macros
 within the compilation units, if preferred).<br/>
-Each parameter can result in internal library definitions. It is not recommended
-to try to also modify these definitions, since there is no guarantee that they
-will remain stable over time unlike the options below.
+Each option may affect internal library definitions. Avoid modifying those
+definitions, since they are not guaranteed to remain stable over time, unlike
+the options described below.
 
 ## ENTT_USE_STL
 
@@ -128,9 +125,9 @@ compilation time. If unwanted, this macro suppresses automatic generation.
 `EnTT` mixes non-standard language features with others that are perfectly
 compliant to offer some of its functionalities.<br/>
 This definition prevents the library from using non-standard techniques, that
-is, functionalities that are not fully compliant with the standard C++.<br/>
+that is, features that are not fully compliant with the C++ standard.<br/>
 While there are no known portability issues at the time of this writing, this
-should make the library fully portable anyway if needed.
+can help make the library fully portable when needed.
 
 # Configuration injection
 
