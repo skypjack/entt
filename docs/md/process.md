@@ -172,7 +172,7 @@ type and the arguments to use to construct it:
 scheduler.attach<my_process>(_1000u);
 ```
 
-The scheduler will also provide the process with its allocator as the first
+The scheduler also provides the process with its allocator as the first
 argument.<br>
 In case of lambdas or functors, the required signature is the one already seen
 for the `then` function of a process:
