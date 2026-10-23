@@ -13,7 +13,7 @@
 general and on GNU/Linux when default visibility was set to hidden. The
 limitation was mainly due to a custom utility used to assign unique, sequential
 identifiers with different types.<br/>
-Fortunately, nowadays `EnTT` works smoothly across boundaries.
+Fortunately, `EnTT` now works smoothly across boundaries.
 
 ## Smooth until proven otherwise
 
@@ -35,8 +35,8 @@ shared libraries that do not export any symbols.
 
 For those who need more details, the test suite contains many examples covering
 the most common cases (see the `lib` directory for all details).<br/>
-It goes without saying that it is impossible to cover **all** possible cases.
-However, what is offered should hopefully serve as a basis for all of them.
+It is impossible to cover **all** possible cases. However, the examples should
+provide a useful starting point.
 
 ## Meta context
 
@@ -81,8 +81,7 @@ is unknown to the former, a dedicated pool is created within the registry on
 first use.<br/>
 As one can guess, this pool is instantiated on a different side of the boundary
 from the `registry`. Therefore, the instance is now managing memory from
-different spaces, and this can quickly lead to crashes if not properly
-addressed.
+different spaces, which can quickly lead to crashes if not properly addressed.
 
 To overcome the risk, it is recommended to use well-defined interfaces that make
 fundamental types pass through the boundaries, isolating the instances of the
