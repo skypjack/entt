@@ -32,10 +32,9 @@ part of the documentation.
 latest revision of the language and the standard library. For this reason, it is
 likely that some classes you are working with are using standard containers
 under the hood.<br/>
-Unfortunately, it is known that the standard containers are not particularly
-performing in debugging (the reasons for this go beyond this document) and are
-even less so on Windows, apparently. Fortunately, this can also be mitigated a
-lot, achieving good results in many cases.
+Standard containers are known to perform poorly in debug builds (the reasons are
+beyond the scope of this document), especially on Windows. Fortunately, this can
+often be mitigated, with good results in many cases.
 
 First of all, there are two things to do in a Windows project:
 
@@ -62,15 +61,15 @@ preferably `O1`.
 
 ## How can I represent hierarchies with my components?
 
-This is one of the first questions that anyone makes when starting to work with
-the entity-component-system architectural pattern.<br/>
+This is one of the first questions people ask when they start working with the
+entity-component-system architectural pattern.<br/>
 There are several approaches to the problem, and the best one depends mainly on
-the real problem one is facing. In all cases, how to do it does not strictly
-depend on the library in use, but the latter certainly allows or not different
-techniques depending on how the data are laid out.
+the specific problem. In all cases, the approach does not strictly depend on the
+library in use, but it may allow or prevent different techniques depending on
+how the data is laid out.
 
-I tried to describe some of the approaches that fit well with the model of
-`EnTT`. [This](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
+I tried to describe some approaches that fit well with the `EnTT` model.
+[This](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
 first post of a series that tries to _explore_ the problem. More will probably
 come in the future.<br/>
 In addition, `EnTT` also offers the possibility to create stable storage types
@@ -90,7 +89,7 @@ Custom entity identifiers are definitely a good idea in two cases at least:
 
 Identifiers can be defined through enum classes and class types that define an
 `entity_type` member of type `std::uint32_t` or `std::uint64_t`.<br/>
-In fact, this is a definition equivalent to that of `entt::entity`:
+In fact, this definition is equivalent to that of `entt::entity`:
 
 ```cpp
 enum class entity: std::uint32_t {};
@@ -176,11 +175,10 @@ If this is not clear, below you can find a _vademecum_ for this purpose:
 Among the most controversial functions can be found `emplace_or_replace` and
 `destroy`. However, following the above rules, it is quite simple to know what 
 will happen.<br/>
-In the first case, `on_created` is invoked if the entity has not the component,
-otherwise the latter is replaced and therefore `on_update` is triggered. As for
-the second case, components are removed from their entities and thus freed when
-they are recycled. It means that `on_destroyed` is triggered for every component 
-owned by the entity that is destroyed.
+For `emplace_or_replace`, `on_created` is invoked if the entity lacks the
+component. Otherwise, it is replaced and `on_update` is triggered.<br/>
+Destroying an entity removes its components and triggers `on_destroyed` for
+each of them.
 
 ## Duplicate storage for the same component
 
