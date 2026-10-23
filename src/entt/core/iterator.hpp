@@ -108,9 +108,7 @@ struct iota_iterator final {
      * @param other A properly initialized iota iterator.
      * @return True if the two iterators are identical, false otherwise.
      */
-    [[nodiscard]] constexpr bool operator==(const iota_iterator &other) const noexcept {
-        return current == other.current;
-    }
+    [[nodiscard]] constexpr bool operator==(const iota_iterator &other) const noexcept = default;
 
 private:
     value_type current;
