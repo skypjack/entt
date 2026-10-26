@@ -17,7 +17,6 @@ TODO:
 * any cdynamic to support const ownership construction
 * meta non-const allow_cast overloads: (const int &) to (int &) is not allowed, but (const int &) to (double &) is allowed (support only for convertibles)
 * paged vector as a standalone class
-* resource: shared_from_this?
 * archetype-like a-là EnTT support (see my own notes)
 * organizer: view/storage only based model, no registry
 * explore "runtime" mode for hashed string where the source is copied internally
