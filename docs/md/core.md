@@ -337,15 +337,15 @@ const auto hash = entt::hashed_string::value(orig.c_str());
 
 This possibility should not be exploited in tight loops, since the computation
 takes place at runtime and no longer at compile-time. It could therefore affect
-performance to some degrees.
+performance to some extent.
 
 ## Wide characters
 
-The `hashed_string` class is an alias  for `basic_hashed_string<char>`. To use
-the C++ type for wide character representations, there exists also the alias
+The `hashed_string` class is an alias for `basic_hashed_string<char>`. To use
+the C++ type for wide character representations, there is also the alias
 `hashed_wstring` for `basic_hashed_string<wchar_t>`.<br/>
-In this case, the user defined literal to use to create hashed strings on the
-fly is `_hws`:
+In this case, use the `_hws` user-defined literal to create hashed strings on
+the fly:
 
 ```cpp
 constexpr auto str = L"text"_hws;
@@ -455,8 +455,8 @@ documentation to those interested in the subject.
 
 A nasty thing in C++ (at least up to C++20) is the fact that shared pointers
 support allocators while unique pointers do not.<br/>
-There is a proposal at the moment that also shows (among the other things) how
-this can be implemented without any compiler support.
+A current proposal also shows, among other things, how this can be implemented
+without any compiler support.
 
 The `allocate_unique` function follows this proposal, making a virtue out of
 necessity:
