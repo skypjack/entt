@@ -19,8 +19,7 @@ I hope the following lists can grow much more in the future.
 
 # Similar projects
 
-Below an incomplete list of similar projects that I have come across so
-far.<br/>
+Below is an incomplete list of similar projects I have come across so far.<br/>
 If some terms or designs are not clear, I recommend referring to the
 [_ECS Back and Forth_](https://skypjack.github.io/tags/#ecs) series for all the
 details.
