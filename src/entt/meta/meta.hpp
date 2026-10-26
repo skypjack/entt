@@ -474,13 +474,15 @@ public:
             if(storage.has_value<stl::remove_cvref_t<Type>>()) {
                 return as_ref();
             } else if(*this) {
+                const auto &from = fetch_node();
+
                 if constexpr(stl::is_arithmetic_v<stl::remove_cvref_t<Type>> || stl::is_enum_v<stl::remove_cvref_t<Type>>) {
-                    if(const auto &from = fetch_node(); from.conversion_helper) {
+                    if(from.conversion_helper) {
                         return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
                     }
                 }
 
-                if(const auto &from = fetch_node(); from.details != nullptr) {
+                if(from.details != nullptr) {
                     if(const auto *elem = internal::find_member(from.details->conv, entt::type_hash<stl::remove_cvref_t<Type>>::value()); elem != nullptr) {
                         return elem->conv(*ctx, storage.data());
                     }
@@ -1437,14 +1439,16 @@ bool meta_any::set(const id_type id, auto &&...args) {
     if(storage.has_value(type.info())) {
         return as_ref();
     } else if(*this) {
-        if(const auto &from = fetch_node(); (from.conversion_helper != nullptr) && (type.is_arithmetic() || type.is_enum())) {
+        const auto &from = fetch_node();
+
+        if((from.conversion_helper != nullptr) && (type.is_arithmetic() || type.is_enum())) {
             auto other = type.construct();
             const auto value = from.conversion_helper(nullptr, storage.data());
             other.fetch_node().conversion_helper(other.storage.data(), &value);
             return other;
         }
 
-        if(const auto &from = fetch_node(); from.details) {
+        if(from.details) {
             if(const auto *elem = internal::find_member(from.details->conv, type.info().hash()); elem != nullptr) {
                 return elem->conv(*ctx, storage.data());
             }
