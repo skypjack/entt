@@ -417,8 +417,8 @@ to case. In particular:
   container and returns true in case of success.<br/>
   For example, it is not possible to increase capacity of fixed size containers.
 
-* The `begin` and `end` member functions return opaque iterators that is used to
-  iterate the container directly:
+* The `begin` and `end` member functions return opaque iterators used to iterate
+  the container directly:
 
   ```cpp
   for(entt::meta_any element: view) {
@@ -786,8 +786,8 @@ designed to convert an opaque pointer into a `meta_any`:
 entt::meta_any any = entt::resolve(id).from_void(element);
 ```
 
-Unfortunately, it is not possible to do a check on the actual type. Therefore,
-this call can be considered as a _static cast_ with all its _problems_.<br/>
+Unfortunately, it is not possible to check the actual type. Therefore, this call
+can be considered as a _static cast_ with all its _problems_.<br/>
 On the other hand, the ability to construct a `meta_any` from an opaque pointer
 opens the door to some pretty interesting uses that are worth exploring.
 
@@ -826,10 +826,10 @@ There are a few alternatives available at the moment:
 
 * The _as-ref_ and _as-cref_ policies, associated with the types
   `entt::as_ref_t` and `entt::as_cref_t`.<br/>
-  They allow to build wrappers that act as references to unmanaged objects.
-  Accessing the object contained in the wrapper for which the _reference_ was
-  requested makes it possible to directly access the instance used to initialize
-  the wrapper itself:
+  They allow users to build wrappers that reference unmanaged objects. Accessing
+  the object contained in the wrapper for which the _reference_ was requested
+  makes it possible to directly access the instance used to initialize the
+  wrapper itself:
 
   ```cpp
   entt::meta_factory<my_type>{}.data<&my_type::data_member, entt::as_ref_t>("member"_hs);
@@ -991,8 +991,8 @@ It is also possible to reset types by their unique identifiers:
 entt::meta_reset("my_type"_hs);
 ```
 
-Finally, there exists a non-template overload of the `meta_reset` function that
-does not accept arguments and resets all meta types at once:
+Finally, there is a non-template overload of the `meta_reset` function that does
+not accept arguments and resets all meta types at once:
 
 ```cpp
 entt::meta_reset();
