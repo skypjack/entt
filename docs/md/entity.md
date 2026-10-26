@@ -137,7 +137,7 @@ recommended since its format can change in future.<br/>
 Components (the _C_ of an _ECS_) are of any type, without any constraints, not
 even that of being movable. No need to register them nor their types.<br/>
 Systems (the _S_ of an _ECS_) are plain functions, functors, lambdas and so on.
-It is not required to announce them in any case and have no requirements.
+They do not need to be announced and have no other requirements.
 
 The next sections go into detail on how to use the entity-component system part
 of the `EnTT` library.<br/>
@@ -154,8 +154,8 @@ alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
 Entities are represented by _entity identifiers_. An entity identifier contains
 information about the entity itself and its version.<br/>
-User defined identifiers are allowed as enum classes and class types that define
-an `entity_type` member of type `std::uint32_t` or `std::uint64_t`.
+User defined identifiers can be enum classes or class types that define an
+`entity_type` member of type `std::uint32_t` or `std::uint64_t`.
 
 A registry is used both to construct and to destroy entities:
 
@@ -378,8 +378,8 @@ In all cases, the function type of a listener is equivalent to the following:
 void(entt::registry &, entt::entity);
 ```
 
-All listeners are provided with the registry that triggered the notification and
-the involved entity. Note also that:
+All listeners receive the registry that triggered the notification and the
+involved entity. Note also that:
 
 * Listeners for construction signals are invoked **after** components have been
   created.
@@ -819,8 +819,8 @@ purpose.
 
 ### Invoke
 
-The `invoke` helper allows to _propagate_ a signal to a member function of a
-component without having to _extend_ it:
+The `invoke` helper allows users to _propagate_ a signal to a member function of
+a component without having to _extend_ it:
 
 ```cpp
 registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
@@ -985,8 +985,8 @@ following features:
   within the adjacency list.
 
 Since the creation of pools and resources within the registry is not necessarily
-thread safe, each vertex also offers a `prepare` function which is used to setup
-a registry for execution with the created graph:
+thread safe, each vertex also offers a `prepare` function to set up a registry
+for execution with the created graph:
 
 ```cpp
 auto graph = organizer.graph();
@@ -1084,8 +1084,8 @@ const my_type *ptr = registry.ctx().find<const my_type>();
 const my_type &var = registry.ctx().get<const my_type>();
 ```
 
-Aliased properties are erased as it happens with any other variable. Similarly,
-it is also possible to assign them a _name_.
+Aliased properties are erased like any other variable. Similarly, it is also
+possible to assign them a _name_.
 
 ## Snapshot: complete vs continuous
 
@@ -1300,13 +1300,12 @@ In particular:
 ### One example to rule them all
 
 `EnTT` comes with some examples (actually some tests) that show how to integrate
-a well known library for serialization as an archive. It uses
+a well-known library for serialization as an archive. It uses
 [`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
 because I wanted to learn how it works at the time I was writing the code.
 
-The code **is not** production-ready and it is not neither the only nor
-(probably) the best way to do it. However, feel free to use it at your own
-risk.<br/>
+The code **is not** production-ready, nor is it the only or (probably) the best
+way to do it. However, feel free to use it at your own risk.<br/>
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
 
@@ -1383,9 +1382,9 @@ optimization selectively rather than globally.
 A void storage (`entt::storage<void>` or `entt::basic_storage<void, Entity>`),
 is a fully functional storage type used to create pools not associated with a
 particular component type.<br/>
-From a technical point of view, it is in all respects similar to a storage for
-empty types when their optimization is enabled. Pagination is disabled as well
-as pointer stability (as not necessary).<br/>
+Technically, it is very similar to a storage for empty types when their
+optimization is enabled. Pagination is disabled as well as pointer stability (as
+not necessary).<br/>
 However, this should be preferred to using a simple sparse set. In particular,
 a void storage offers all those feature normally offered by other storage types.
 Therefore, it is a perfectly valid pool for use with views and groups or within
@@ -1706,15 +1705,14 @@ different APIs.
 Single type views are specialized to give a performance boost in all cases.
 There is nothing as fast as a single type view. They just walk through packed
 (actually paged) arrays of elements and return them directly.<br/>
-This kind of views also allows getting the exact number of elements they are
-going to return.<br/>
+This kind of view also lets users get the exact number of elements it returns.
 Refer to the inline documentation for all the details.
 
 Multi type views iterate entities that have at least all the given components.
 During construction, they look at the number of elements available in each pool
 and use the smallest set in order to speed up iterations.<br/>
-This kind of views only allow to get the estimated number of elements they are
-going to return.<br/>
+This kind of view provides only an estimate of the number of elements it will
+return.<br/>
 Refer to the inline documentation for all the details.
 
 Storing aside views is not required as they are extremely cheap to construct. In
@@ -1877,7 +1875,7 @@ the `my_type` component, regardless of what other components they have.
 Views are combined with storage objects and with each other to create new, more
 specific _queries_.<br/>
 The type returned when combining multiple elements together is itself a view,
-more in general a multi component one.
+more generally, a multi-component one.
 
 Combining different elements tries to mimic ranges:
 
@@ -2013,8 +2011,7 @@ avoided as long as possible.
 All groups affect to an extent the creation and destruction of their components.
 This is due to the fact that they must _observe_ changes in the pools of
 interest and arrange data _correctly_ when needed for the types they own.<br/>
-In all cases, a group allows to get the exact number of elements it is going to
-return.<br/>
+A group also provides the exact number of elements it will return.<br/>
 Refer to the inline documentation for all the details.
 
 Storing aside groups is not required as they are extremely cheap to create, even
@@ -2239,8 +2236,8 @@ identifiers.
 
 ## What is allowed and what is not
 
-Most of the _ECS_ available out there do not allow to create and destroy
-entities and components during iterations, nor to have pointer stability.<br/>
+Most _ECS_ libraries do not allow users to create and destroy entities and
+components during iterations, nor to have pointer stability.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
 * Creating entities and components is allowed during iterations in most cases
@@ -2396,8 +2393,8 @@ std::for_each(std::execution::par_unseq, view.begin(), view.end(), [&view](auto 
 });
 ```
 
-This can increase the throughput considerably, even without resorting to who
-knows what artifacts that are difficult to maintain over time.
+This can increase throughput considerably without resorting to obscure
+techniques that are difficult to maintain over time.
 
 Unfortunately, because of the limitations of the current revision of the
 standard, the parallel `std::for_each` accepts only forward iterators. This
