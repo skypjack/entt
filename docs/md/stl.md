@@ -60,8 +60,8 @@ by the library itself, unlike what happens with the standard C++ library.
 
 The easiest solution is to include a custom implementation and _import_ it into
 the required namespace via the files indicated.<br/>
-An `using namespace my_stl;` directive should get the job done, but users can
-also import the tools one by one if they prefer to.
+A `using namespace my_stl;` directive should do the job, but users can also
+import the tools one by one if they prefer to.
 
 # Final note
 
