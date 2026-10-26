@@ -163,6 +163,7 @@ class meta_any final {
     static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] void *other) {
         if(req == internal::meta_traits::is_none) {
             value.node = &internal::resolve<Type>(internal::meta_context::from(*value.ctx));
+            return;
         }
 
         if constexpr(is_meta_pointer_like_v<Type>) {
