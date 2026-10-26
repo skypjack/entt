@@ -262,7 +262,7 @@ Signals make use of delegates internally, and therefore they undergo the same
 rules and offer similar functionalities. It may be a good idea to consult the
 documentation of the `delegate` class for further information.
 
-A signal handler is can be used as a private data member without exposing any
+A signal handler can be used as a private data member without exposing any
 _publish_ functionality to the clients of a class.<br/>
 The basic idea is to impose a clear separation between the signal itself and the
 `sink` class, that is a tool to be used to connect and disconnect listeners on
@@ -532,7 +532,7 @@ void(Type &, my_emitter &)
 ```
 
 Where `Type` is the type of event they want to receive.<br/>
-To attach a listener to an emitter, there exists the `on` member function:
+To attach a listener to an emitter, use the `on` member function:
 
 ```cpp
 emitter.on<my_event>([](const my_event &event, my_emitter &emitter) {
@@ -562,7 +562,7 @@ struct my_event { int i; };
 emitter.publish(my_event{42});
 ```
 
-Finally, the `empty` member function tests if there exists at least a listener
+Finally, the `empty` member function tests whether at least one listener is
 registered with the event emitter while `contains` is used to check if a given
 event type is associated with a valid listener:
 
