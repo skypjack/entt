@@ -18,13 +18,13 @@ Static polymorphism is a very powerful tool in C++, albeit sometimes cumbersome
 to obtain.<br/>
 This module aims to make it simple and easy to use.
 
-The library allows to define _concepts_ as interfaces to fulfill with concrete
-classes without having to inherit from a common base.<br/>
+The library lets users define _concepts_ as interfaces that concrete classes can
+fulfill without having to inherit from a common base.<br/>
 Among others, this is one of the advantages of static polymorphism in general
 and of a generic wrapper like that offered by the `poly` class template in
 particular.<br/>
 The result is an object to pass around as such and not through a reference or a
-pointer, as it happens when it comes to working with dynamic polymorphism.
+pointer, unlike objects used with dynamic polymorphism.
 
 Since the `poly` class template makes use of `entt::any` internally, it also
 supports most of its feature. For example, the possibility to create aliases to
@@ -48,9 +48,8 @@ The former is admittedly an experimental library, with many interesting ideas.
 I have some doubts about the usefulness of some features in real world projects,
 but perhaps my lack of experience comes into play here. In my opinion, its only
 flaw is the API that I find slightly more cumbersome than other solutions.<br/>
-The latter was undoubtedly a source of inspiration for this module. Although I
-opted for different choices in the implementation of both the final API and some
-features.
+The latter was undoubtedly a source of inspiration for this module, although I
+chose a different final API and implementation for some features.
 
 Either way, the authors are gurus of the C++ community, people I only have to
 learn from.
@@ -61,10 +60,10 @@ The first thing to do to create a _type-erasing polymorphic object wrapper_ (to
 use the terminology introduced by Eric Niebler) is to define a _concept_ that
 types will have to adhere to.<br/>
 For this purpose, the library offers a single class that supports both deduced
-and fully defined interfaces. Although having interfaces deduced automatically
-is convenient and allows users to write less code in most cases, it has some
-limitations. It is therefore useful to be able to get around the deduction by
-providing a custom definition for the static virtual table.
+and fully defined interfaces. Automatically deduced interfaces are convenient
+and allow users to write less code in most cases, but they have some
+limitations. Users can bypass deduction by providing a custom definition for the
+static virtual table.
 
 Once the interface is defined, a generic implementation is needed to fulfill the
 concept itself.<br/>
@@ -253,8 +252,8 @@ in appending the new functions to the previous list.
 
 As for a defined concept instead, the list of types is _extended_ in a similar
 way to what is shown for the implementation of the above concept.<br/>
-To do this, it is useful to declare a function that allows to convert a
-_concept_ into its underlying `type_list` object:
+To do this, it is useful to declare a function that converts a _concept_ into
+its underlying `type_list` object:
 
 ```cpp
 template<typename... Type>
