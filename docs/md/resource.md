@@ -98,7 +98,7 @@ is suitable for constructing a handle, that is fine.
 When using the default handle, it expects a resource type which is convertible
 to or suitable for constructing an `std::shared_ptr<Type>` (where `Type` is the
 actual resource type).<br/>
-In other terms, the loader should return shared pointers to the given resource
+In other words, the loader should return shared pointers to the given resource
 type. However, this is not mandatory. Users can easily get around this
 constraint by specializing both the handle and the loader.
 
@@ -175,12 +175,12 @@ entt::resource<my_resource> res = ret.first->second;
 
 Note that the hashed string is used for convenience in the example above.<br/>
 Resource identifiers are nothing more than integral values. Therefore, plain
-numbers as well as non-class enum value are accepted.
+numbers as well as unscoped enum values are accepted.
 
 It is worth mentioning that the iterators of a cache as well as its indexing
 operators return resource handles rather than instances of the mapped type.<br/>
 Since the cache has no control over the loader and a resource is not required to
 also be convertible to bool, these handles can be invalid. This usually means an
 error in the user logic, but it may also be an _expected_ event.<br/>
-It is therefore recommended to verify handles validity with a check in debug
-(for example, when loading) or an appropriate logic in retail.
+It is therefore recommended to verify handle validity with a check in debug (for
+example, when loading) or an appropriate logic in retail.
