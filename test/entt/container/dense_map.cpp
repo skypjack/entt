@@ -1147,6 +1147,20 @@ TEST(DenseMap, Rehash) {
     ASSERT_EQ(map.bucket_size(3u), 0u);
 }
 
+TEST(DenseMap, RehashRounding) {
+    entt::dense_map<std::size_t, std::size_t, entt::stl::identity> map;
+
+    for(std::size_t next{}; next < 65u; ++next) {
+        map.emplace(next, next);
+    }
+
+    map.max_load_factor(8.f);
+    map.rehash(0u);
+
+    ASSERT_EQ(map.bucket_count(), 16u);
+    ASSERT_LE(map.load_factor(), map.max_load_factor());
+}
+
 TEST(DenseMap, Reserve) {
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_map<int, int> map;
