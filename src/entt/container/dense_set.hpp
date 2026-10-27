@@ -836,7 +836,11 @@ public:
      */
     void rehash(const size_type cnt) {
         auto value = cnt > minimum_capacity ? cnt : minimum_capacity;
-        const auto cap = static_cast<size_type>(static_cast<float>(size()) / max_load_factor());
+
+        const auto next = static_cast<double>(size()) / max_load_factor();
+        const auto trunc = static_cast<size_type>(next);
+        const auto cap = trunc + static_cast<size_type>(next > static_cast<double>(trunc));
+
         value = value > cap ? value : cap;
 
         if(const auto sz = stl::bit_ceil(value); sz != bucket_count()) {

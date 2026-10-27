@@ -962,6 +962,20 @@ TEST(DenseSet, Rehash) {
     ASSERT_EQ(set.bucket_size(3u), 0u);
 }
 
+TEST(DenseSet, RehashRounding) {
+    entt::dense_set<std::size_t, entt::stl::identity> set;
+
+    for(std::size_t next{}; next < 65u; ++next) {
+        set.emplace(next);
+    }
+
+    set.max_load_factor(8.f);
+    set.rehash(0u);
+
+    ASSERT_EQ(set.bucket_count(), 16u);
+    ASSERT_LE(set.load_factor(), set.max_load_factor());
+}
+
 TEST(DenseSet, Reserve) {
     constexpr std::size_t minimum_bucket_count = 8u;
     entt::dense_set<int> set;
