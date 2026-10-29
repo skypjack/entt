@@ -239,9 +239,12 @@ public:
      * @return This flow builder.
      */
     basic_flow &bind(const id_type value) {
-        sync_on += (sync_on == vertices.size());
-        const auto it = vertices.emplace(value).first;
-        index.first() = size_type(it - vertices.begin());
+        const auto prev = vertices.size();
+        const auto [it, inserted] = vertices.emplace(value);
+
+        sync_on += (inserted && sync_on == prev);
+        index.first() = static_cast<size_type>(it - vertices.begin());
+
         return *this;
     }
 

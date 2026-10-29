@@ -322,6 +322,53 @@ TEST(Flow, DeferredRebind) {
     ASSERT_TRUE(graph.contains(1u, 0u));
 }
 
+TEST(Flow, RebindWithoutSyncPoint) {
+    entt::flow flow{};
+    flow.bind(0u).bind(1u).bind(0u).ro(99u);
+
+    ASSERT_EQ(flow.size(), 2u);
+
+    const auto graph = flow.graph();
+
+    ASSERT_EQ(graph.size(), 2u);
+
+    for(std::size_t lhs{}; lhs < graph.size(); ++lhs) {
+        for(std::size_t rhs{}; rhs < graph.size(); ++rhs) {
+            ASSERT_FALSE(graph.contains(lhs, rhs));
+        }
+    }
+}
+
+TEST(Flow, RebindThenSyncPoint) {
+    entt::flow flow{};
+
+    flow.bind(0u).bind(1u).bind(0u).sync();
+    flow.bind(2u).rw(5u);
+
+    const auto graph = flow.graph();
+
+    ASSERT_EQ(graph.size(), 3u);
+
+    ASSERT_TRUE(graph.contains(0u, 2u));
+    ASSERT_FALSE(graph.contains(2u, 0u));
+    ASSERT_FALSE(graph.contains(1u, 2u));
+    ASSERT_FALSE(graph.contains(0u, 1u));
+    ASSERT_FALSE(graph.contains(1u, 0u));
+}
+
+TEST(Flow, RebindAfterSyncPoint) {
+    entt::flow flow{};
+
+    flow.bind(0u).sync();
+    flow.bind(1u).bind(0u).bind(1u).rw(7u);
+
+    const auto graph = flow.graph();
+
+    ASSERT_EQ(graph.size(), 2u);
+    ASSERT_TRUE(graph.contains(0u, 1u));
+    ASSERT_FALSE(graph.contains(1u, 0u));
+}
+
 TEST(Flow, Loop) {
     entt::flow flow{};
     flow.bind(0).rw(2).bind(1).ro(2).bind(0).rw(2);
