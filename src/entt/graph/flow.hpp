@@ -288,6 +288,8 @@ public:
      * @return This flow builder.
      */
     basic_flow &ro(stl::input_iterator auto first, stl::input_iterator auto last) {
+        static_assert(stl::is_convertible_v<decltype(*first), id_type>, "Unexpected value type");
+
         for(; first != last; ++first) {
             emplace(*first, false);
         }
@@ -312,6 +314,8 @@ public:
      * @return This flow builder.
      */
     basic_flow &rw(stl::input_iterator auto first, stl::input_iterator auto last) {
+        static_assert(stl::is_convertible_v<decltype(*first), id_type>, "Unexpected value type");
+
         for(; first != last; ++first) {
             emplace(*first, true);
         }
