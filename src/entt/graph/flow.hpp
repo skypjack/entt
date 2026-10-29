@@ -6,7 +6,6 @@
 #include "../container/dense_set.hpp"
 #include "../core/compressed_pair.hpp"
 #include "../core/fwd.hpp"
-#include "../core/iterator.hpp"
 #include "../stl/algorithm.hpp"
 #include "../stl/concepts.hpp"
 #include "../stl/cstddef.hpp"
@@ -119,8 +118,6 @@ public:
     using allocator_type = Allocator;
     /*! @brief Unsigned integer type. */
     using size_type = stl::size_t;
-    /*! @brief Iterable task list. */
-    using iterable = iterable_adaptor<typename task_container_type::const_iterator>;
     /*! @brief Adjacency matrix type. */
     using graph_type = adjacency_matrix_type;
 
