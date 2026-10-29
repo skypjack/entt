@@ -522,7 +522,11 @@ public:
         return false;
     }
 
-    /*! @copydoc any::emplace */
+    /**
+     * @brief Replaces the contained object by creating a new instance directly.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param args Parameters to use to construct the instance.
+     */
     template<typename Type>
     void emplace(auto &&...args) {
         storage.emplace<Type>(stl::forward<decltype(args)>(args)...);
