@@ -256,7 +256,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate>
-    auto conv() noexcept {
+    meta_factory conv() noexcept {
         using conv_type = stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), element_type &>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, stl::invoke(Candidate, *static_cast<const element_type *>(instance))); };
 
