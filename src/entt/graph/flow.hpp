@@ -287,7 +287,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &ro(stl::input_iterator auto first, stl::input_iterator auto last) {
+    basic_flow &ro(stl::input_iterator auto first, stl::sentinel_for<decltype(first)> auto last) {
         static_assert(stl::is_convertible_v<decltype(*first), id_type>, "Unexpected value type");
 
         for(; first != last; ++first) {
@@ -313,7 +313,7 @@ public:
      * @param last An iterator past the last element of the range of elements.
      * @return This flow builder.
      */
-    basic_flow &rw(stl::input_iterator auto first, stl::input_iterator auto last) {
+    basic_flow &rw(stl::input_iterator auto first, stl::sentinel_for<decltype(first)> auto last) {
         static_assert(stl::is_convertible_v<decltype(*first), id_type>, "Unexpected value type");
 
         for(; first != last; ++first) {

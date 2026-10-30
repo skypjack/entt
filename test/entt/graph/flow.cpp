@@ -194,6 +194,20 @@ TEST(Flow, RangeRW) {
     ASSERT_FALSE(graph.contains(1u, 0u));
 }
 
+TEST(Flow, RangeWithSentinel) {
+    const std::array<entt::id_type, 3u> res{0u, 1u};
+    entt::flow flow{};
+
+    flow.bind(0u).rw(std::counted_iterator{res.begin(), 1}, std::default_sentinel);
+    flow.bind(1u).ro(std::counted_iterator{res.begin(), 2}, std::default_sentinel);
+
+    const auto graph = flow.graph();
+
+    ASSERT_EQ(graph.size(), 2u);
+    ASSERT_TRUE(graph.contains(0u, 1u));
+    ASSERT_FALSE(graph.contains(1u, 0u));
+}
+
 TEST(Flow, Graph) {
     using namespace entt::literals;
 
