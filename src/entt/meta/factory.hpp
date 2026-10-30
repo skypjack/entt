@@ -257,7 +257,7 @@ public:
      */
     template<auto Candidate>
     meta_factory conv() noexcept {
-        using conv_type = stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), element_type &>>;
+        using conv_type = stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), const element_type &>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, stl::invoke(Candidate, *static_cast<const element_type *>(instance))); };
 
         base_type::insert_or_assign(
