@@ -7,7 +7,7 @@ _TESTS = [
     "entity",
     "group",
     "handle",
-    "helper",
+    "io",
     "organizer",
     "reactive_mixin",
     "registry",
@@ -19,6 +19,7 @@ _TESTS = [
     "storage_entity",
     "storage_no_instance",
     "storage_utility",
+    "utility",
     "view",
 ]
 
