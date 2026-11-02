@@ -9,6 +9,8 @@ file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/entt/config/version.h" ENTT_VERSIO
 list(TRANSFORM ENTT_VERSION REPLACE ${ENTT_VERSION_REGEX} "\\1")
 string(JOIN "." ENTT_VERSION ${ENTT_VERSION})
 
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/entt/config/version.h")
+
 # Project configuration
 
 project(
