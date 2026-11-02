@@ -161,7 +161,7 @@ if(ENTT_INCLUDE_HEADERS)
         entity/snapshot.hpp
         entity/sparse_set.hpp
         entity/storage.hpp
-        entity/utlity.hpp
+        entity/utility.hpp
         entity/view.hpp
         graph/adjacency_matrix.hpp
         graph/dot.hpp
