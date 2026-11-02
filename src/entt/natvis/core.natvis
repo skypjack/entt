@@ -2,6 +2,10 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
     <Type Name="entt::basic_any&lt;*&gt;">
 		<DisplayString>{{ policy={ mode,en } }}</DisplayString>
+		<Expand>
+			<Item Name="[policy]">mode,en</Item>
+			<Item Name="[type]">underlying_type</Item>
+		</Expand>
     </Type>
 	<Type Name="entt::compressed_pair&lt;*&gt;">
 		<Intrinsic Name="first" Optional="true" Expression="((first_base*)this)->value"/>
