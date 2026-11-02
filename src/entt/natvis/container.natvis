@@ -7,7 +7,7 @@
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
 			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
+			<Item Name="[load_factor]" ExcludeView="simple">bucket_count() != 0u ? (float)size() / (float)bucket_count() : 0.0f</Item>
 			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
 			<IndexListItems>
 				<Size>size()</Size>
@@ -22,7 +22,7 @@
 		<Expand>
 			<Item Name="[capacity]" ExcludeView="simple">packed.first_base::value.capacity()</Item>
 			<Item Name="[bucket_count]" ExcludeView="simple">bucket_count()</Item>
-			<Item Name="[load_factor]" ExcludeView="simple">(float)size() / (float)bucket_count()</Item>
+			<Item Name="[load_factor]" ExcludeView="simple">bucket_count() != 0u ? (float)size() / (float)bucket_count() : 0.0f</Item>
 			<Item Name="[max_load_factor]" ExcludeView="simple">threshold</Item>
 			<IndexListItems>
 				<Size>size()</Size>
