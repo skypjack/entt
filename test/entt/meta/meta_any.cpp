@@ -412,7 +412,7 @@ TEST_F(MetaAny, SBOMoveAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wself-move"
 #endif
@@ -428,7 +428,7 @@ TEST_F(MetaAny, SBOSelfMoveAssignment) {
     ASSERT_EQ(any, entt::meta_any{3});
     ASSERT_NE(any, entt::meta_any{0});
 }
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic pop
 #endif
 
@@ -755,7 +755,7 @@ TEST_F(MetaAny, NoSBOMoveAssignment) {
     ASSERT_NE(other, fat{});
 }
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wself-move"
 #endif
@@ -772,7 +772,7 @@ TEST_F(MetaAny, NoSBOSelfMoveAssignment) {
     ASSERT_EQ(any, entt::meta_any{instance});
     ASSERT_NE(any, fat{});
 }
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic pop
 #endif
 
@@ -1020,7 +1020,7 @@ TEST_F(MetaAny, VoidMoveAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wself-move"
 #endif
@@ -1035,7 +1035,7 @@ TEST_F(MetaAny, VoidSelfMoveAssignment) {
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(any, entt::meta_any{std::in_place_type<void>});
 }
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ >= 13)
 #    pragma GCC diagnostic pop
 #endif
 
