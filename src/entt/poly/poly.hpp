@@ -85,7 +85,7 @@ class poly_vtable {
     static void fill_vtable_entry(Ret (*&entry)(Any &, Args...)) noexcept {
         if constexpr(stl::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
             entry = +[](Any &, Args... args) -> Ret {
-                return stl::invoke(Candidate, stl::forward<Args>(args)...);
+                return static_cast<Ret>(stl::invoke(Candidate, stl::forward<Args>(args)...));
             };
         } else {
             entry = +[](Any &instance, Args... args) -> Ret {
