@@ -224,7 +224,7 @@ public:
      */
     template<typename Type>
     requires (!stl::same_as<stl::remove_cvref_t<Type>, basic_poly>)
-    basic_poly(Type &&value) noexcept
+    basic_poly(Type &&value)
         : basic_poly{stl::in_place_type<stl::remove_cvref_t<Type>>, stl::forward<Type>(value)} {}
 
     /**
