@@ -144,6 +144,7 @@ struct poly_base {
         const auto &poly = static_cast<const Poly &>(self);
 
         if constexpr(stl::is_function_v<stl::remove_pointer_t<decltype(poly.vtable)>>) {
+            static_assert(Member == 0u, "Unknown member");
             return poly.vtable(poly.storage, stl::forward<Args>(args)...);
         } else {
             return stl::get<Member>(*poly.vtable)(poly.storage, stl::forward<Args>(args)...);
