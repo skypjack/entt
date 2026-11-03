@@ -76,7 +76,8 @@ class poly_vtable {
     [[nodiscard]] static ENTT_CONSTEVAL auto make_vtable(type_list<Func...>) noexcept {
         if constexpr(sizeof...(Func) == 0u) {
             return decltype(make_vtable(typename Concept::template impl<inspector>{})){};
-        } else if constexpr((stl::is_function_v<Func> && ...)) {
+        } else {
+            static_assert((stl::is_function_v<Func> && ...), "Invalid function type");
             return decltype(stl::make_tuple(vtable_entry(stl::declval<Func inspector::*>())...)){};
         }
     }
