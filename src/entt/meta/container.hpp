@@ -131,7 +131,7 @@ struct basic_meta_sequence_container_traits {
      * @return An iterator to the first or past the last element of the
      * container.
      */
-    static iterator iter(const meta_ctx &area, void *container, const void *as_const, const bool end) {
+    [[nodiscard]] static iterator iter(const meta_ctx &area, void *container, const void *as_const, const bool end) {
         return (container == nullptr)
                    ? iterator{area, end ? static_cast<const Type *>(as_const)->cend() : static_cast<const Type *>(as_const)->cbegin()}
                    : iterator{area, end ? static_cast<Type *>(container)->end() : static_cast<Type *>(container)->begin()};
@@ -234,7 +234,7 @@ struct basic_meta_associative_container_traits {
      * @return An iterator to the first or past the last element of the
      * container.
      */
-    static iterator iter(const meta_ctx &area, void *container, const void *as_const, const bool end) {
+    [[nodiscard]] static iterator iter(const meta_ctx &area, void *container, const void *as_const, const bool end) {
         return (container == nullptr)
                    ? iterator{area, stl::bool_constant<key_only>{}, end ? static_cast<const Type *>(as_const)->cend() : static_cast<const Type *>(as_const)->cbegin()}
                    : iterator{area, stl::bool_constant<key_only>{}, end ? static_cast<Type *>(container)->end() : static_cast<Type *>(container)->begin()};
@@ -273,7 +273,7 @@ struct basic_meta_associative_container_traits {
      * @param key Opaque key value of an element to search for.
      * @return An iterator to the element with the given key, if any.
      */
-    static iterator find(const meta_ctx &area, void *container, const void *as_const, const void *key) {
+    [[nodiscard]] static iterator find(const meta_ctx &area, void *container, const void *as_const, const void *key) {
         return (container != nullptr) ? iterator{area, stl::bool_constant<key_only>{}, static_cast<Type *>(container)->find(*static_cast<const Type::key_type *>(key))}
                                       : iterator{area, stl::bool_constant<key_only>{}, static_cast<const Type *>(as_const)->find(*static_cast<const Type::key_type *>(key))};
     }
