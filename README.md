@@ -178,7 +178,7 @@ Nowadays, `EnTT` is finally what I was looking for: still faster than its
 _competitors_, lower memory usage in the average case, a really good API and an
 amazing set of features. And even more, of course.
 
-> [!Note]
+> [!NOTE]
 > If the `EnTT` API looks familiar, it's probably because it's been **copied** a
 > lot elsewhere (often without much ado).<br/>
 > Credit where credit is due though, the initial design was heavily inspired by
