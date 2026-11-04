@@ -72,40 +72,40 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
 
     template<cvref_unqualified Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
-        switch(const auto *elem = static_cast<const Type *>(value.data()); req) {
+        switch(req) {
             using enum internal::any_request;
         case info:
             return &type_id<Type>();
         case transfer:
             if constexpr(stl::is_move_assignable_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
-                *const_cast<Type *>(elem) = stl::move(*static_cast<Type *>(const_cast<void *>(other)));
+                *const_cast<Type *>(static_cast<const Type *>(value.data())) = stl::move(*static_cast<Type *>(const_cast<void *>(other)));
                 return other;
             }
             [[fallthrough]];
         case assign:
             if constexpr(stl::is_copy_assignable_v<Type>) {
-                *const_cast<Type *>(elem) = *static_cast<const Type *>(other);
+                *const_cast<Type *>(static_cast<const Type *>(value.data())) = *static_cast<const Type *>(other);
                 return other;
             }
             break;
         case compare:
             if constexpr(!stl::is_function_v<Type> && !stl::is_array_v<Type> && is_equality_comparable_v<Type>) {
-                return (*elem == *static_cast<const Type *>(other)) ? other : nullptr;
+                return (*static_cast<const Type *>(value.data()) == *static_cast<const Type *>(other)) ? other : nullptr;
             } else {
-                return (elem == other) ? other : nullptr;
+                return (value.data() == other) ? other : nullptr;
             }
         case copy:
             if constexpr(stl::is_copy_constructible_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void)
-                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*elem);
+                static_cast<basic_any *>(const_cast<void *>(other))->initialize<Type>(*static_cast<const Type *>(value.data()));
             }
             break;
         case move:
             ENTT_ASSERT(value.mode == any_policy::embedded, "Unexpected policy");
             if constexpr(in_situ_v<Type>) {
                 // NOLINTNEXTLINE(bugprone-casting-through-void, bugprone-multi-level-implicit-pointer-conversion)
-                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{stl::move(*const_cast<Type *>(elem))};
+                return ::new(&static_cast<basic_any *>(const_cast<void *>(other))->buffer) Type{stl::move(*const_cast<Type *>(static_cast<const Type *>(value.data())))};
             }
         }
 
