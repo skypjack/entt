@@ -241,7 +241,7 @@ public:
      * @brief Returns the child process without releasing ownership, if any.
      * @return The child process attached to the object, if any.
      */
-    handle_type peek() {
+    [[nodiscard]] handle_type peek() const {
         return next.first();
     }
 
