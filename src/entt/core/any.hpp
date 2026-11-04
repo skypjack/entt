@@ -46,10 +46,11 @@ struct basic_any_storage<0u, Align> {
 
 template<typename Type, stl::size_t Len, stl::size_t Align>
 // NOLINTNEXTLINE(bugprone-sizeof-expression)
-struct in_situ: stl::bool_constant<(Len != 0u) && alignof(Type) <= Align && sizeof(Type) <= Len && stl::is_nothrow_move_constructible_v<Type>> {};
+constexpr bool in_situ_v = (Len != 0u) && (alignof(Type) <= Align) && (sizeof(Type) <= Len) && stl::is_nothrow_move_constructible_v<Type>;
 
+// Specialization for void type
 template<stl::size_t Len, stl::size_t Align>
-struct in_situ<void, Len, Align>: stl::false_type {};
+constexpr bool in_situ_v<void, Len, Align> = false;
 
 } // namespace internal
 /*! @endcond */
@@ -67,7 +68,7 @@ class basic_any: private internal::basic_any_storage<Len, Align> {
     using deleter_type = void(const basic_any &);
 
     template<typename Type>
-    static constexpr bool in_situ_v = internal::in_situ<Type, Len, Align>::value;
+    static constexpr bool in_situ_v = internal::in_situ_v<Type, Len, Align>;
 
     template<cvref_unqualified Type>
     static const void *basic_vtable(const request req, const basic_any &value, const void *other) {
