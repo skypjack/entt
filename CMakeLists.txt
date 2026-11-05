@@ -345,7 +345,7 @@ if(ENTT_INSTALL)
     export(PACKAGE EnTT)
 endif()
 
-# Tests
+# Tests and testbed
 
 option(ENTT_BUILD_TESTING "Enable building tests." OFF)
 
@@ -362,22 +362,9 @@ if(ENTT_BUILD_TESTING)
     
     include(CTest)
     enable_testing()
+
     add_subdirectory(test)
-endif()
-
-# Testbed
-
-option(ENTT_BUILD_TESTBED "Enable building testbed." OFF)
-
-if(ENTT_BUILD_TESTBED)
-    if(ENTT_BUILD_TESTING)
-        message(VERBOSE "Tests and testbed do not work together because SDL gets confused with EnTT tests")
-    else()
-        set(ENTT_ID_TYPE std::uint32_t CACHE STRING "Type of identifiers to use for testbed")
-        set(ENTT_CXX_STD cxx_std_20 CACHE STRING "C++ standard revision to use for testbed")
-
-        add_subdirectory(testbed)
-    endif()
+    add_subdirectory(testbed)
 endif()
 
 # Documentation
