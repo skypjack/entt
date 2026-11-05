@@ -286,7 +286,7 @@ SETUP_BASIC_TEST(
         entt/entity/storage.cpp
         entt/entity/storage_entity.cpp
         entt/entity/storage_no_instance.cpp
-        entt/entity/storage_utility.cpp
+        entt/entity/storage_traits.cpp
         entt/entity/utility.cpp
         entt/entity/view.cpp
 )
@@ -296,7 +296,7 @@ SETUP_BASIC_TEST(
 SETUP_BASIC_TEST(
     NAME entity_no_mixin
     SOURCES
-        entt/entity_no_mixin/storage_utility.cpp
+        entt/entity_no_mixin/storage_traits.cpp
     DEFS ENTT_NO_MIXIN
 )
 

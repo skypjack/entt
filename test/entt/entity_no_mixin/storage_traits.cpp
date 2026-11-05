@@ -2,15 +2,15 @@
 #include <entt/entity/storage.hpp>
 
 template<typename Type>
-struct StorageUtility: testing::Test {
+struct StorageTraits: testing::Test {
     using type = Type;
 };
 
-using StorageUtilityTypes = ::testing::Types<int, char, double, void>;
+using StorageTraitsTypes = ::testing::Types<int, char, double, void>;
 
-TYPED_TEST_SUITE(StorageUtility, StorageUtilityTypes, );
+TYPED_TEST_SUITE(StorageTraits, StorageTraitsTypes, );
 
-TYPED_TEST(StorageUtility, StorageType) {
+TYPED_TEST(StorageTraits, StorageType) {
     using value_type = TestFixture::type;
 
     // just a bunch of static asserts to avoid regressions
@@ -18,7 +18,7 @@ TYPED_TEST(StorageUtility, StorageType) {
     testing::StaticAssertTypeEq<entt::storage_type_t<value_type>, entt::storage<value_type>>();
 }
 
-TYPED_TEST(StorageUtility, StorageFor) {
+TYPED_TEST(StorageTraits, StorageFor) {
     using value_type = TestFixture::type;
 
     // just a bunch of static asserts to avoid regressions

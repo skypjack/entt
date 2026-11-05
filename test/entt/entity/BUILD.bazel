@@ -16,7 +16,7 @@ _TESTS = [
     "snapshot",
     "sparse_set",
     "storage",
-    "storage_entity",
+    "storage_traits",
     "storage_no_instance",
     "storage_utility",
     "utility",
