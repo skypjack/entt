@@ -413,3 +413,11 @@ SETUP_BASIC_TEST(
         entt/stl_ext/vector.cpp
     INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+# Test tools
+
+SETUP_BASIC_TEST(
+    NAME tools
+    SOURCES
+        entt/tools/davey.cpp
+)
