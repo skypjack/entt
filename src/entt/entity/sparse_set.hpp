@@ -621,7 +621,7 @@ public:
         return iterator{packed, pos};
     }
 
-    /*! @copydoc begin */
+    /*! @copydoc entt::basic_sparse_set::begin */
     [[nodiscard]] const_iterator cbegin() const noexcept {
         return begin();
     }
@@ -635,7 +635,7 @@ public:
         return iterator{packed, {}};
     }
 
-    /*! @copydoc end */
+    /*! @copydoc entt::basic_sparse_set::end */
     [[nodiscard]] const_iterator cend() const noexcept {
         return end();
     }
@@ -653,7 +653,7 @@ public:
         return stl::make_reverse_iterator(end());
     }
 
-    /*! @copydoc rbegin */
+    /*! @copydoc entt::basic_sparse_set::rbegin */
     [[nodiscard]] const_reverse_iterator crbegin() const noexcept {
         return rbegin();
     }
@@ -667,7 +667,7 @@ public:
         return stl::make_reverse_iterator(begin());
     }
 
-    /*! @copydoc rend */
+    /*! @copydoc entt::basic_sparse_set::rend */
     [[nodiscard]] const_reverse_iterator crend() const noexcept {
         return rend();
     }
