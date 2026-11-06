@@ -29,7 +29,7 @@ jobs:
       env:
         CXX: ${{ matrix.compiler.exe }}-${{ matrix.compiler.version }}
       run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON -DENTT_BUILD_TOOLS=ON ..
         make -j4
     - name: Run tests
       working-directory: build
@@ -55,7 +55,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ${{ matrix.toolset_option }} ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON -DENTT_BUILD_TOOLS=ON ${{ matrix.toolset_option }} ..
         cmake --build . -j 4
     - name: Run tests
       working-directory: build

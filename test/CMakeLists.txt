@@ -388,8 +388,10 @@ SETUP_BASIC_TEST(
 
 # Test tools
 
-SETUP_BASIC_TEST(
-    NAME tools
-    SOURCES
-        entt/tools/davey.cpp
-)
+if(ENTT_BUILD_TOOLS)
+    SETUP_BASIC_TEST(
+        NAME tools
+        SOURCES
+            entt/tools/davey.cpp
+    )
+endif()

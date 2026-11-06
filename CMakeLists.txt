@@ -364,12 +364,17 @@ if(ENTT_BUILD_TESTING)
     option(ENTT_BUILD_EXAMPLE "Build examples." OFF)
     option(ENTT_BUILD_LIB "Build lib tests." OFF)
     option(ENTT_BUILD_SNAPSHOT "Build snapshot test with Cereal." OFF)
+    option(ENTT_BUILD_TOOLS "Build tools tests." OFF)
+    option(ENTT_BUILD_TESTBED "Build testbed." OFF)
     
     include(CTest)
     enable_testing()
 
     add_subdirectory(test)
-    add_subdirectory(testbed)
+
+    if(ENTT_BUILD_TESTBED)
+        add_subdirectory(testbed)
+    endif()
 endif()
 
 # Documentation
