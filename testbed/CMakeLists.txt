@@ -2,30 +2,10 @@
 
 include(FetchContent)
 
-# Fetch SDL3
+# Fetch SDL3 and ImGui
 
-FetchContent_Declare(
-    SDL3
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL
-    GIT_TAG release-3.4.20
-    GIT_SHALLOW 1
-)
-
-option(SDL_STATIC "Enable SDL static library" ON)
-option(SDL_SHARED "Disable SDL shared library" OFF)
-
-FetchContent_MakeAvailable(SDL3)
-
-# Fetch ImGui
-
-FetchContent_Declare(
-    imgui
-    GIT_REPOSITORY https://github.com/ocornut/imgui
-    GIT_TAG v1.92.8
-    GIT_SHALLOW 1
-)
-
-FetchContent_MakeAvailable(imgui)
+include(FetchSDL3)
+include(FetchImGui)
 
 # Testbed executable
 
