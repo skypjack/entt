@@ -4,13 +4,7 @@ find_package(Doxygen 1.18)
 
 if(DOXYGEN_FOUND)
     include(FetchContent)
-
-    FetchContent_Declare(
-        doxygen-awesome-css
-        URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
-    )
-
-    FetchContent_MakeAvailable(doxygen-awesome-css)
+    include(FetchDoxygenAwesomeCss)
 
     set(DOXY_SOURCE_DIRECTORY ${EnTT_SOURCE_DIR}/src)
     set(DOXY_CSS_DIRECTORY ${doxygen-awesome-css_SOURCE_DIR})
