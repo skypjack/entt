@@ -9,16 +9,7 @@ find_package(Threads REQUIRED)
 if(ENTT_FIND_GTEST_PACKAGE)
     find_package(GTest REQUIRED)
 else()
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG main
-        GIT_SHALLOW 1
-    )
-
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-    FetchContent_MakeAvailable(googletest)
+    include(FetchGoogleTest)
 
     add_library(GTest::Main ALIAS gtest_main)
 
@@ -160,14 +151,7 @@ endif()
 # Test lib
 
 if(ENTT_BUILD_LIB)
-    FetchContent_Declare(
-        cr
-        GIT_REPOSITORY https://github.com/fungos/cr.git
-        GIT_TAG master
-        GIT_SHALLOW 1
-    )
-
-    FetchContent_MakeAvailable(cr)
+    include(FetchCR)
 
     add_library(cr::cr ALIAS cr)
 
@@ -194,19 +178,7 @@ endif()
 # Test snapshot
 
 if(ENTT_BUILD_SNAPSHOT)
-    FetchContent_Declare(
-        cereal
-        GIT_REPOSITORY https://github.com/USCiLab/cereal.git
-        GIT_TAG v1.3.2
-        GIT_SHALLOW 1
-    )
-       
-    set(BUILD_DOC OFF CACHE BOOL "" FORCE)
-    set(BUILD_SANDBOX OFF CACHE BOOL "" FORCE)
-    set(SKIP_PORTABILITY_TEST ON CACHE BOOL "" FORCE)
-    set(SKIP_PERFORMANCE_COMPARISON ON CACHE BOOL "" FORCE)
-
-    FetchContent_MakeAvailable(cereal)
+    include(FetchCereal)
 
     SETUP_BASIC_TEST(
         NAME snapshot
