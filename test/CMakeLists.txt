@@ -389,6 +389,9 @@ SETUP_BASIC_TEST(
 # Test tools
 
 if(ENTT_BUILD_TOOLS)
+    include(FetchImGui)
+    include(FetchImGuiTestEngine)
+    
     SETUP_BASIC_TEST(
         NAME tools
         SOURCES
