@@ -129,7 +129,7 @@ which can be used to add (`dot`) properties to the output as needed:
 std::ostringstream output{};
 
 entt::dot(output, adjacency_matrix, [](auto &output, auto vertex) {
-    out << "label=\"v\"" << vertex << ",shape=\"box\"";
+    output << "label=\"v" << vertex << "\",shape=\"box\"";
 });
 ```
 
@@ -200,7 +200,7 @@ Also in the case of resources, they are identified by numeric values of type
 `id_type`. As above, the choice is not entirely random. This goes well with the
 tools offered by the library while leaving room for maximum flexibility.
 
-Finally, both the `ro` and` rw` functions also offer an overload that accepts a
+Finally, both the `ro` and `rw` functions also offer an overload that accepts a
 pair of iterators, so that one can pass a range of resources in one go.
 
 ### Rebinding
@@ -214,7 +214,7 @@ or tasks.
 
 In fact, nothing prevents rebinding elements to a flow.<br/>
 However, the behavior changes slightly from case to case and has some nuances
-that it is worth knowing about.
+worth knowing about.
 
 Directly rebinding a resource without the task being replaced trivially results
 in the task's access mode for that resource being updated:

@@ -74,8 +74,8 @@ and use them with other locators. Of course, all a user will get is to have an
 uninitialized service elsewhere as well.
 
 Note that exporting a service allows users to _share_ the object currently set
-in a locator. Replacing it will not replace the element, even where a service
-has been configured with a handle to the previous item.<br/>
+in a locator. Replacing it will not replace the element, even when a service has
+been configured with a handle to the previous item.<br/>
 In other words, if an audio service is replaced with a null object to silence an
 application and the original service was shared, this operation will not
 propagate to the other locators. Therefore, a module that shares the ownership

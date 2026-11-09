@@ -217,8 +217,8 @@ Primarily designed for internal use and far from being feature complete, the
 `compressed_pair` class does exactly what it promises: it tries to reduce the
 size of a pair by exploiting _Empty Base Class Optimization_ (or _EBCO_).<br/>
 This class **is not** a drop-in replacement for `std::pair`. However, it offers
-enough functionalities to be a good alternative for when reducing memory usage
-is more important than having some cool and probably useless feature.
+enough functionalities to be a good alternative when reducing memory usage is
+more important than having some cool and probably useless feature.
 
 Although the API is very close to that of `std::pair` (apart from the fact that
 the template parameters are inferred from the constructor and therefore there is
@@ -832,7 +832,7 @@ I am also pretty sure that more and more utilities will be added over time as
 needs become apparent.<br/>
 Many of these functionalities also exist in their version dedicated to value
 lists. We therefore have `value_list_element[_v]` as well as
-`value_list_cat[_t]`and so on.
+`value_list_cat[_t]` and so on.
 
 # Unique sequential identifiers
 

@@ -50,7 +50,7 @@ tools like `CMake`.<br/>
 The `EnTT` test suite provides an example of how to proceed, also designed to
 avoid future regressions.
 
-## Importability 
+## Importability
 
 Having all the required files is not enough, since `EnTT` does not know the
 namespace in which the user defined their tools. Therefore, anyone providing the
@@ -65,7 +65,7 @@ import the tools one by one if they prefer to.
 
 # Final note
 
-`EnTT` is designed to work with the API, guarantees, and pros and cons of the
+`EnTT` is designed to work with the API, guarantees, and behavior of the
 standard template library.<br/>
 The flexibility afforded by the ability to _import_ a custom implementation does
 not compromise this requirement. Therefore, in the event of an incompatible API

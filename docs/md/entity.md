@@ -683,7 +683,7 @@ There are two functions that respond to slightly different needs:
   });
   ```
 
-  There exists also the possibility to use a custom sort function object for
+  There also exists the possibility to use a custom sort function object for
   when the usage pattern is known.
 
 * Components are sorted according to the order imposed by another component:
@@ -1370,8 +1370,8 @@ type is assigned are considered. Moreover, less memory is used, mainly because
 there does not exist any instance of the component, no matter how many entities
 it is assigned to.
 
-More in general, none of the feature offered by the library is affected, but for
-the ones that require to return actual instances.<br/>
+More in general, none of the features offered by the library are affected, but
+for the ones that require to return actual instances.<br/>
 This optimization is disabled by defining the `ENTT_NO_ETO` macro. In this case,
 empty types are treated like all other types. Setting a page size at component
 level via the `component_traits` class template is another way to disable this
@@ -1386,7 +1386,7 @@ Technically, it is very similar to a storage for empty types when their
 optimization is enabled. Pagination is disabled as well as pointer stability (as
 not necessary).<br/>
 However, this should be preferred to using a simple sparse set. In particular,
-a void storage offers all those feature normally offered by other storage types.
+a void storage offers all those features normally offered by other storage types.
 Therefore, it is a perfectly valid pool for use with views and groups or within
 a registry.
 
@@ -1637,8 +1637,9 @@ auto &&storage = registry.storage<velocity>("second pool"_hs);
 
 If a name is not provided, the default storage associated with the given type is
 always returned.<br/>
-Since the storage are also self-contained, the registry does not _duplicate_ its
-own API for them. However, there is still no limit to the possibilities of use:
+Since the storages are also self-contained, the registry does not _duplicate_
+its own API for them. However, there is still no limit to the possibilities of
+use:
 
 ```cpp
 auto &&other = registry.storage<velocity>("other"_hs);

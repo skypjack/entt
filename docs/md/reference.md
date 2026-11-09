@@ -44,7 +44,7 @@ details.
   * [Polypropylene](https://github.com/pmbittner/Polypropylene): a hybrid
     solution between an ECS and dynamic mixins.
 
-* C#
+* C#:
   * [Arch](https://github.com/genaray/Arch): a simple, fast and _unity entities_
     inspired archetype ECS with optional multithreading. 
   * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
@@ -86,5 +86,5 @@ details.
   * [Specs](https://github.com/amethyst/specs): a parallel ECS based mainly on
     hierarchical bitsets that allows different types of storage as needed.
 
-* Zig
+* Zig:
   * [zig-ecs](https://github.com/prime31/zig-ecs): a _zig-ification_ of `EnTT`.

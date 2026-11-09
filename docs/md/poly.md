@@ -27,7 +27,7 @@ The result is an object to pass around as such and not through a reference or a
 pointer, unlike objects used with dynamic polymorphism.
 
 Since the `poly` class template makes use of `entt::any` internally, it also
-supports most of its feature. For example, the possibility to create aliases to
+supports most of its features. For example, the possibility to create aliases to
 existing and thus unmanaged objects. This allows users to exploit the static
 polymorphism while maintaining ownership of objects.<br/>
 Likewise, the `poly` class template also benefits from the small buffer
@@ -156,7 +156,7 @@ struct Drawable: entt::type_list<bool(int) const> {
 ```
 
 Why should a user fully define a concept if the function types are the same as
-the deduced ones?<br>
+the deduced ones?<br/>
 In fact, this is the limitation that can be worked around by manually defining
 the static virtual table.
 

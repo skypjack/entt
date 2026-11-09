@@ -70,10 +70,10 @@ two sides and therefore a divergence in the contents.
 
 There is another subtle problem due to memory management that can lead to
 headaches.<br/>
-It can occur where there are pools of objects (such as components or events)
+It can occur when there are pools of objects (such as components or events)
 dynamically created on demand. This is usually not a problem when working with
-linked libraries that rely on the same dynamic runtime. However, it can occur in
-the case of plugins or statically linked runtimes.
+linked libraries that use the same dynamic runtime. However, it can occur in the
+case of plugins or statically linked runtimes.
 
 As an example, imagine creating an instance of `registry` in the main executable
 and sharing it with a plugin. If the latter starts working with a component that

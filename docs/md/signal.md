@@ -9,7 +9,7 @@
   * [Raw access](#raw-access)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
-  * [Connect, disconnect, publish](#connect-disconnect-publish)]
+  * [Connect, disconnect, publish](#connect-disconnect-publish)
   * [Named queues](#named-queues)
 * [Event emitter](#event-emitter)
 

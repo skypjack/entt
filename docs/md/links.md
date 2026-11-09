@@ -139,8 +139,6 @@ I hope the following lists can grow much more in the future.
     users unlock abilities to fight horde of enemies in an endless world.
   * [Letalka](https://github.com/dviglo2d/dviglo2d/tree/main/games/letalka):
     small demo game with ships and bullets flying everywhere on the screen.
-  * [Lichgate](https://buas.itch.io/lichgate): step into the robes of a powerful
-    mage determined to halt the relentless hordes of undead.
   * [You Are Circle](https://store.steampowered.com/app/3578190/You_Are_Circle/):
     a roguelite top-down shooter with a high-contrast vector line aesthetic.
   * [EnTT Dino](https://github.com/omgitsaheadcrab/entt_dino): a Dinosaur Game

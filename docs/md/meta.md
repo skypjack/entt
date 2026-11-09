@@ -568,7 +568,7 @@ Container support is minimal but likely sufficient to satisfy all needs.
 
 ## Pointer-like types
 
-As with containers, it is also possible to _tell_ to the meta system which types
+As with containers, it is also possible to _tell_ the meta system which types
 are _pointers_. This makes it possible to dereference instances of `meta_any`,
 thus obtaining light _references_ to pointed objects that are also correctly
 associated with their meta types.<br/>

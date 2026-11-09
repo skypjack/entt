@@ -92,7 +92,7 @@ Loaders also are fully customizable as expected.
 
 A custom loader is a class with at least one function call operator and a member
 type named `result_type`.<br/>
-The loader is not required to return a resource handle. As long as `return_type`
+The loader is not required to return a resource handle. As long as `result_type`
 is suitable for constructing a handle, that is fine.
 
 When using the default handle, it expects a resource type which is convertible

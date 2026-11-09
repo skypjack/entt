@@ -125,7 +125,7 @@ compilation time. If unwanted, this macro suppresses automatic generation.
 `EnTT` mixes non-standard language features with others that are perfectly
 compliant to offer some of its functionalities.<br/>
 This definition prevents the library from using non-standard techniques, that
-that is, features that are not fully compliant with the C++ standard.<br/>
+is, features that are not fully compliant with the C++ standard.<br/>
 While there are no known portability issues at the time of this writing, this
 can help make the library fully portable when needed.
 
