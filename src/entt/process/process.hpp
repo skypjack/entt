@@ -221,7 +221,7 @@ public:
     template<typename Type, typename... Args>
     basic_process &then(Args &&...args) {
         const auto &allocator = next.second();
-        return *(next.first() = stl::allocate_shared<Type>(allocator, allocator, stl::forward<Args>(args)...));
+        return *(next.first() = stl::allocate_shared<Type>(allocator, stl::forward<Args>(args)...));
     }
 
     /**
@@ -234,7 +234,7 @@ public:
     basic_process &then(Func func) {
         const auto &allocator = next.second();
         using process_type = internal::process_adaptor<delta_type, Func, allocator_type>;
-        return *(next.first() = stl::allocate_shared<process_type>(allocator, allocator, stl::move(func)));
+        return *(next.first() = stl::allocate_shared<process_type>(allocator, stl::move(func)));
     }
 
     /**
@@ -296,7 +296,7 @@ struct process_adaptor: public basic_process<Delta, Allocator> {
     using base_type = basic_process<Delta, Allocator>;
     using delta_type = base_type::delta_type;
 
-    process_adaptor(const allocator_type &allocator, Func proc)
+    process_adaptor(Func proc, const allocator_type &allocator = allocator_type{})
         : base_type{allocator},
           func{stl::move(proc)} {}
 

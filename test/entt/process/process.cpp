@@ -2,6 +2,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
+#include "../../common/tracked_memory_resource.hpp"
 #include "../../common/value_type.h"
 
 template<typename Delta>
@@ -320,3 +321,22 @@ TEST(Process, CustomAllocator) {
     ASSERT_EQ(other.get_allocator(), allocator);
     ASSERT_FALSE(other.get_allocator() != allocator);
 }
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(Process, UsesAllocatorConstruction) {
+    using process_type = entt::basic_process<std::uint32_t, std::pmr::polymorphic_allocator<void>>;
+
+    test::tracked_memory_resource memory_resource{};
+    process_type process{&memory_resource};
+
+    ASSERT_TRUE(process.get_allocator().resource()->is_equal(memory_resource));
+    ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
+
+    const process_type &other = process.then([](process_type &, std::uint32_t, void *) {});
+
+    ASSERT_TRUE(other.get_allocator().resource()->is_equal(memory_resource));
+    ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
+}
+
+#endif

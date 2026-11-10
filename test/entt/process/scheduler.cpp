@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 #include <entt/process/scheduler.hpp>
+#include "../../common/tracked_memory_resource.hpp"
 
 class foo_process: public entt::process {
     void update(const delta_type, void *) override {
@@ -18,7 +19,7 @@ class foo_process: public entt::process {
 public:
     using allocator_type = entt::process::allocator_type;
 
-    foo_process(const allocator_type &allocator, std::function<void()> upd, std::function<void()> abort)
+    foo_process(std::function<void()> upd, std::function<void()> abort, const allocator_type &allocator = allocator_type{})
         : entt::process{allocator},
           on_update{std::move(upd)},
           on_aborted{std::move(abort)} {}
@@ -205,3 +206,23 @@ TEST(Scheduler, CustomAllocator) {
 
     ASSERT_EQ(other.size(), 1u);
 }
+
+#if defined(ENTT_HAS_TRACKED_MEMORY_RESOURCE)
+
+TEST(Scheduler, UsesAllocatorConstruction) {
+    using scheduler_type = entt::basic_scheduler<std::uint32_t, std::pmr::polymorphic_allocator<void>>;
+
+    test::tracked_memory_resource memory_resource{};
+    scheduler_type scheduler{&memory_resource};
+
+    ASSERT_TRUE(scheduler.get_allocator().resource()->is_equal(memory_resource));
+    ASSERT_NE(memory_resource.do_allocate_counter(), 0u);
+
+    const auto cnt = memory_resource.do_allocate_counter();
+    auto &process = scheduler.attach([](typename scheduler_type::type &, std::uint32_t, void *) {});
+
+    ASSERT_TRUE(process.get_allocator().resource()->is_equal(memory_resource));
+    ASSERT_NE(memory_resource.do_allocate_counter(), cnt);
+}
+
+#endif
