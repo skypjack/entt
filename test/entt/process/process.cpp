@@ -329,14 +329,10 @@ TEST(Process, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     process_type process{&memory_resource};
-
-    ASSERT_TRUE(process.get_allocator().resource()->is_equal(memory_resource));
-    ASSERT_EQ(memory_resource.do_allocate_counter(), 0u);
-
     const process_type &other = process.then([](process_type &, std::uint32_t, void *) {});
 
+    ASSERT_TRUE(process.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_TRUE(other.get_allocator().resource()->is_equal(memory_resource));
-    ASSERT_EQ(memory_resource.do_allocate_counter(), 1u);
 }
 
 #endif

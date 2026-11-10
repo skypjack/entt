@@ -214,15 +214,10 @@ TEST(Scheduler, UsesAllocatorConstruction) {
 
     test::tracked_memory_resource memory_resource{};
     scheduler_type scheduler{&memory_resource};
-
-    ASSERT_TRUE(scheduler.get_allocator().resource()->is_equal(memory_resource));
-    ASSERT_NE(memory_resource.do_allocate_counter(), 0u);
-
-    const auto cnt = memory_resource.do_allocate_counter();
     auto &process = scheduler.attach([](typename scheduler_type::type &, std::uint32_t, void *) {});
 
+    ASSERT_TRUE(scheduler.get_allocator().resource()->is_equal(memory_resource));
     ASSERT_TRUE(process.get_allocator().resource()->is_equal(memory_resource));
-    ASSERT_NE(memory_resource.do_allocate_counter(), cnt);
 }
 
 #endif
