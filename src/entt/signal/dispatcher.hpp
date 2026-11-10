@@ -37,7 +37,7 @@ class dispatcher_handler final: public basic_dispatcher_handler {
 public:
     using allocator_type = Allocator;
 
-    dispatcher_handler(const allocator_type &allocator)
+    explicit dispatcher_handler(const allocator_type &allocator = allocator_type{})
         : signal{allocator},
           events{allocator} {}
 
@@ -120,7 +120,7 @@ class basic_dispatcher {
 
         if(!ptr) {
             const auto &allocator = get_allocator();
-            ptr = stl::allocate_shared<handler_type<Type>>(allocator, allocator);
+            ptr = stl::allocate_shared<handler_type<Type>>(allocator);
         }
 
         return static_cast<handler_type<Type> &>(*ptr);
