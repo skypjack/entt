@@ -205,7 +205,7 @@ public:
     using common_type = Type;
 
     template<typename Allocator, typename... GType, typename... EType>
-    group_handler(const Allocator &allocator, stl::tuple<GType &...> gpool, stl::tuple<EType &...> epool)
+    group_handler(stl::tuple<GType &...> gpool, stl::tuple<EType &...> epool, const Allocator &allocator)
         : pools{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Get>{&cpool...}; }, gpool)},
           filter{stl::apply([](auto &&...cpool) { return stl::array<common_type *, Exclude>{&cpool...}; }, epool)},
           elem{allocator} {

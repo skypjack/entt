@@ -18,7 +18,7 @@ struct EntityCopy: testing::Test {
         using allocator_type = Type::allocator_type;
         using element_type = Type::element_type;
 
-        explicit meta_mixin(const allocator_type &allocator);
+        explicit meta_mixin(const allocator_type &allocator = allocator_type{});
     };
 
     void TearDown() override {
