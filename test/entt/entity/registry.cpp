@@ -2467,6 +2467,89 @@ TEST_F(Registry, ContextPoolMemberDestructionOrder) {
     ASSERT_TRUE(ctx_check);
 }
 
+TEST_F(Registry, ContextIteration) {
+    entt::registry registry{};
+
+    registry.ctx().emplace<int>(1);
+    registry.ctx().emplace<std::string>("string");
+    registry.ctx().emplace<float>(2.f);
+
+    auto it = registry.ctx().begin();
+
+    testing::StaticAssertTypeEq<decltype(it)::value_type::first_type, const entt::registry::context::key_type &>();
+    testing::StaticAssertTypeEq<decltype(it)::value_type::second_type, entt::registry::context::mapped_type &>();
+
+    ASSERT_NE(it, registry.ctx().end());
+
+    ASSERT_EQ(it->first, entt::type_hash<int>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<int>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it)->first, entt::type_hash<std::string>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<std::string>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it)->first, entt::type_hash<float>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<float>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it), registry.ctx().end());
+}
+
+TEST_F(Registry, ContextConstIteration) {
+    entt::registry registry{};
+    const auto &cregistry = registry;
+
+    registry.ctx().emplace<int>(1);
+    registry.ctx().emplace<std::string>("string");
+    registry.ctx().emplace<float>(2.f);
+
+    auto it = cregistry.ctx().begin();
+
+    testing::StaticAssertTypeEq<decltype(it)::value_type::first_type, const entt::registry::context::key_type &>();
+    testing::StaticAssertTypeEq<decltype(it)::value_type::second_type, const entt::registry::context::mapped_type &>();
+
+    ASSERT_NE(it, cregistry.ctx().end());
+
+    ASSERT_EQ(it->first, entt::type_hash<int>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<int>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it)->first, entt::type_hash<std::string>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<std::string>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it)->first, entt::type_hash<float>::value());
+    ASSERT_EQ(it->second.info().name(), entt::type_id<float>().name());
+    ASSERT_EQ(it->second.policy(), entt::any_policy::dynamic);
+
+    ASSERT_EQ((++it), cregistry.ctx().end());
+}
+
+TEST_F(Registry, ContextIterationEmpty) {
+    entt::registry registry{};
+    const auto &cregistry = registry;
+
+    EXPECT_EQ(registry.ctx().begin(), registry.ctx().end());
+    EXPECT_EQ(cregistry.ctx().begin(), cregistry.ctx().end());
+}
+
+TEST_F(Registry, ContextIterationAfterClear) {
+    entt::registry registry{};
+    const auto &cregistry = registry;
+
+    registry.ctx().emplace<int>(1);
+    registry.ctx().emplace<std::string>("string");
+
+    EXPECT_EQ(registry.ctx().get<int>(), 1);
+    EXPECT_EQ(cregistry.ctx().get<std::string>(), "string");
+
+    registry.ctx().clear();
+
+    EXPECT_EQ(registry.ctx().begin(), registry.ctx().end());
+    EXPECT_EQ(cregistry.ctx().begin(), cregistry.ctx().end());
+}
+
 TEST_F(Registry, Constness) {
     testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().emplace<int>({})), int &>();
     testing::StaticAssertTypeEq<decltype(std::declval<entt::registry>().emplace<test::empty>({})), void>();

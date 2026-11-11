@@ -132,8 +132,15 @@ template<typename Allocator>
 class registry_context {
     using alloc_traits = stl::allocator_traits<Allocator>;
     using allocator_type = alloc_traits::template rebind_alloc<stl::pair<const id_type, basic_any<0u>>>;
+    using container_type = dense_map<id_type, basic_any<0u>, stl::identity, stl::equal_to<>, allocator_type>;
 
 public:
+    using key_type = typename container_type::key_type;
+    using mapped_type = typename container_type::mapped_type;
+    using value_type = typename container_type::value_type;
+    using iterator = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
+
     explicit registry_context(const allocator_type &allocator)
         : ctx{allocator} {}
 
@@ -195,8 +202,32 @@ public:
         return it != ctx.cend() && it->second.info() == type_id<Type>();
     }
 
+    [[nodiscard]] iterator begin() noexcept {
+        return ctx.begin();
+    }
+
+    [[nodiscard]] iterator end() noexcept {
+        return ctx.end();
+    }
+
+    [[nodiscard]] const_iterator begin() const noexcept {
+        return ctx.begin();
+    }
+
+    [[nodiscard]] const_iterator end() const noexcept {
+        return ctx.end();
+    }
+
+    [[nodiscard]] const_iterator cbegin() const noexcept {
+        return ctx.cbegin();
+    }
+
+    [[nodiscard]] const_iterator cend() const noexcept {
+        return ctx.cend();
+    }
+
 private:
-    dense_map<id_type, basic_any<0u>, stl::identity, stl::equal_to<>, allocator_type> ctx;
+    container_type ctx;
 };
 
 } // namespace internal
