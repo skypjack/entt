@@ -288,40 +288,40 @@ void davey(const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
  */
 template<typename Entity, typename Allocator>
 void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registry) {
-    ImGui::BeginTabBar("#tabs");
+    if(ImGui::BeginTabBar("#tabs")) {
+        if(ImGui::BeginTabItem("Entity")) {
+            for(const auto [entt]: registry.template storage<Entity>()->each()) {
+                ImGui::PushID(static_cast<int>(to_entity(entt)));
 
-    if(ImGui::BeginTabItem("Entity")) {
-        for(const auto [entt]: registry.template storage<Entity>()->each()) {
-            ImGui::PushID(static_cast<int>(to_entity(entt)));
+                if(ImGui::TreeNode(&type_id<Entity>(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
+                    const auto range = registry.storage();
+                    internal::present_entity(ctx, entt, range.begin(), range.end());
+                    ImGui::TreePop();
+                }
 
-            if(ImGui::TreeNode(&type_id<Entity>(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
-                const auto range = registry.storage();
-                internal::present_entity(ctx, entt, range.begin(), range.end());
-                ImGui::TreePop();
+                ImGui::PopID();
             }
 
-            ImGui::PopID();
+            ImGui::EndTabItem();
         }
 
-        ImGui::EndTabItem();
-    }
+        if(ImGui::BeginTabItem("Storage")) {
+            for([[maybe_unused]] auto [id, storage]: registry.storage()) {
+                const auto type = resolve(ctx, storage.info());
+                const stl::string name = type.name().empty() ? stl::string{storage.info().name()} : stl::string{type.name()};
+                const char *const label = name.c_str();
 
-    if(ImGui::BeginTabItem("Storage")) {
-        for([[maybe_unused]] auto [id, storage]: registry.storage()) {
-            const auto type = resolve(ctx, storage.info());
-            const stl::string name = type.name().empty() ? stl::string{storage.info().name()} : stl::string{type.name()};
-            const char *const label = name.c_str();
-
-            if(ImGui::TreeNode(&storage.info(), "%s (%zu)", label, storage.size())) {
-                internal::present_storage(ctx, storage);
-                ImGui::TreePop();
+                if(ImGui::TreeNode(&storage.info(), "%s (%zu)", label, storage.size())) {
+                    internal::present_storage(ctx, storage);
+                    ImGui::TreePop();
+                }
             }
+
+            ImGui::EndTabItem();
         }
 
-        ImGui::EndTabItem();
+        ImGui::EndTabBar();
     }
-
-    ImGui::EndTabBar();
 }
 
 /**
