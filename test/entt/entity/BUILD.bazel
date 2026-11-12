@@ -15,10 +15,10 @@ _TESTS = [
     "sigh_mixin",
     "snapshot",
     "sparse_set",
-    "storage",
-    "storage_traits",
+    "storage_entity",
     "storage_no_instance",
-    "storage_utility",
+    "storage_traits",
+    "storage",
     "utility",
     "view",
 ]
