@@ -18,7 +18,7 @@ jobs:
     continue-on-error: true
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Install llvm/clang
       # see: https://apt.llvm.org/
       run: |
@@ -67,7 +67,7 @@ jobs:
     continue-on-error: true
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Compile tests
       working-directory: build
       env:

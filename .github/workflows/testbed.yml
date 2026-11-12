@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Install required packages
       run: |
         sudo apt update
@@ -57,8 +57,9 @@ jobs:
     timeout-minutes: 15
     runs-on: windows-latest
 
+    - uses: actions/checkout@v6
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: seanmiddleditch/gha-setup-ninja@master
     - name: Compile testbed
       working-directory: build
@@ -69,9 +70,10 @@ jobs:
   macos:
     timeout-minutes: 15
     runs-on: macOS-latest
+    - uses: actions/checkout@v6
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Compile testbed
       working-directory: build
       run: |
