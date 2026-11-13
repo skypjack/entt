@@ -15,8 +15,6 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-struct meta_base_node;
-
 template<typename Type, typename It>
 struct meta_range_iterator final {
     using value_type = stl::pair<id_type, Type>;
