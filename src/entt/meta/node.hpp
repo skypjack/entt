@@ -2,13 +2,11 @@
 #define ENTT_META_NODE_HPP
 
 #include "../config/config.h"
-#include "../core/bit.hpp"
 #include "../core/concepts.hpp"
 #include "../core/enum.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
 #include "../stl/array.hpp"
 #include "../stl/bit.hpp"
 #include "../stl/cstddef.hpp"
