@@ -57,6 +57,13 @@ template<typename Result, typename View, typename Other, stl::size_t... GLhs, st
     return elem;
 }
 
+template<bool Checked, typename Type, stl::size_t Get, stl::size_t Exclude>
+[[nodiscard]] bool valid(const stl::array<const Type *, Get> &pools, const stl::array<const Type *, Exclude> &filter, const stl::ptrdiff_t index, const typename Type::entity_type entt) noexcept {
+    return (!Checked || (entt != tombstone))
+           && ((Get == 1u) || (internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)))
+           && ((Exclude == 0u) || internal::none_of(filter.begin(), filter.end(), entt));
+}
+
 template<typename Type, bool Checked, stl::size_t Get, stl::size_t Exclude>
 class view_iterator final {
     template<typename, typename...>
@@ -65,14 +72,8 @@ class view_iterator final {
     using iterator_type = Type::const_iterator;
     using iterator_traits = stl::iterator_traits<iterator_type>;
 
-    [[nodiscard]] bool valid(const iterator_traits::value_type entt) const noexcept {
-        return (!Checked || (entt != tombstone))
-               && ((Get == 1u) || (internal::all_of(pools.begin(), pools.begin() + index, entt) && internal::all_of(pools.begin() + index + 1, pools.end(), entt)))
-               && ((Exclude == 0u) || internal::none_of(filter.begin(), filter.end(), entt));
-    }
-
     void seek_next() {
-        for(constexpr iterator_type sentinel{}; it != sentinel && !valid(*it); ++it) {}
+        for(constexpr iterator_type sentinel{}; it != sentinel && !valid<Checked>(pools, filter, index, *it); ++it) {}
     }
 
 public:
@@ -353,7 +354,7 @@ public:
         if(current != Get) {
             auto it = pools[current]->rbegin();
             const auto last = it + static_cast<difference_type>(offset());
-            for(const auto idx = static_cast<difference_type>(current); it != last && !(internal::all_of(pools.begin(), pools.begin() + idx, *it) && internal::all_of(pools.begin() + idx + 1, pools.end(), *it) && internal::none_of(filter.begin(), filter.end(), *it)); ++it) {}
+            for(const auto idx = static_cast<difference_type>(current); it != last && !internal::valid<Checked>(pools, filter, idx, *it); ++it) {}
             return it == last ? null : *it;
         }
 

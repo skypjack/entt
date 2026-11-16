@@ -1319,40 +1319,69 @@ TEST(ViewMultiStorage, StableType) {
 TEST(ViewMultiStorage, StableTypeWithExclude) {
     std::tuple<entt::storage<test::pointer_stable>, entt::storage<int>> storage{};
     const entt::basic_view view{std::forward_as_tuple(std::get<0>(storage)), std::forward_as_tuple(std::get<1>(storage))};
-    const std::array entity{entt::entity{1}, entt::entity{3}};
+    const std::array entity{entt::entity{0}, entt::entity{1}, entt::entity{2}};
     const entt::entity tombstone = entt::tombstone;
 
-    std::get<0>(storage).emplace(entity[0u], 0);
-    std::get<0>(storage).emplace(entity[1u], 4);
-    std::get<1>(storage).emplace(entity[0u]);
+    std::get<0>(storage).emplace(entity[0u], 1);
+    std::get<0>(storage).emplace(entity[1u], 2);
+    std::get<0>(storage).emplace(entity[2u], 3);
+    std::get<1>(storage).emplace(entity[1u]);
 
-    ASSERT_EQ(view.size_hint(), 2u);
-    ASSERT_FALSE(view.contains(entity[0u]));
-    ASSERT_TRUE(view.contains(entity[1u]));
+    ASSERT_EQ(view.size_hint(), 3u);
 
-    std::get<0>(storage).erase(entity[0u]);
-    std::get<1>(storage).erase(entity[0u]);
+    ASSERT_TRUE(view.contains(entity[0u]));
+    ASSERT_FALSE(view.contains(entity[1u]));
+    ASSERT_TRUE(view.contains(entity[2u]));
 
-    ASSERT_EQ(view.size_hint(), 2u);
-    ASSERT_FALSE(view.contains(entity[0u]));
-    ASSERT_TRUE(view.contains(entity[1u]));
+    ASSERT_EQ(view.front(), entity[2u]);
+    ASSERT_EQ(view.back(), entity[0u]);
+
+    std::get<0>(storage).erase(entity[2u]);
+
+    ASSERT_EQ(view.size_hint(), 3u);
+
+    ASSERT_TRUE(view.contains(entity[0u]));
+    ASSERT_FALSE(view.contains(entity[1u]));
+    ASSERT_FALSE(view.contains(entity[2u]));
+
+    ASSERT_EQ(view.front(), entity[0u]);
+    ASSERT_EQ(view.back(), entity[0u]);
 
     for(auto entt: view) {
         ASSERT_NE(entt, tombstone);
-        ASSERT_EQ(entt, entity[1u]);
+        ASSERT_EQ(entt, entity[0u]);
     }
 
     for(auto [entt, comp]: view.each()) {
         ASSERT_NE(entt, tombstone);
-        ASSERT_EQ(entt, entity[1u]);
-        ASSERT_EQ(comp.value, 4);
+        ASSERT_EQ(entt, entity[0u]);
+        ASSERT_EQ(comp.value, 1);
     }
 
     view.each([&entity, tombstone](const auto entt, auto &&...) {
         ASSERT_NE(entt, tombstone);
-        ASSERT_EQ(entt, entity[1u]);
+        ASSERT_EQ(entt, entity[0u]);
     });
+
+    std::get<0>(storage).erase(entity[0u]);
+
+    ASSERT_EQ(view.size_hint(), 3u);
+
+    ASSERT_FALSE(view.contains(entity[0u]));
+    ASSERT_FALSE(view.contains(entity[1u]));
+    ASSERT_FALSE(view.contains(entity[2u]));
+
+    ASSERT_EQ(view.front(), tombstone);
+    ASSERT_EQ(view.back(), tombstone);
+
+    ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.each().begin(), view.each().end());
 }
+/*
+    std::size_t count{};
+    for([[maybe_unused]] const auto entt: view) { ++count; }
+    ASSERT_EQ(count, 0u);
+*/
 
 TEST(ViewMultiStorage, SameStorageTypes) {
     std::tuple<entt::storage<int>, entt::storage<int>> storage{};
