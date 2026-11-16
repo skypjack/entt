@@ -8,12 +8,12 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - { pkg: g++, exe: 'g++', version: 12 }
           - { pkg: g++, exe: 'g++', version: 13 }
           - { pkg: g++, exe: 'g++', version: 14 }
-          - { pkg: clang, exe: 'clang++', version: 16 }
-          - { pkg: clang, exe: 'clang++', version: 17 }
-          - { pkg: clang, exe: 'clang++', version: 18 }
+          - { pkg: g++, exe: 'g++', version: 15 }
+          - { pkg: clang, exe: 'clang++', version: 20 }
+          - { pkg: clang, exe: 'clang++', version: 21 }
+          - { pkg: clang, exe: 'clang++', version: 22 }
 
     timeout-minutes: 15
     runs-on: ubuntu-latest
