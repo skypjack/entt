@@ -14,6 +14,7 @@
 #include "../meta/resolve.hpp"
 #include "../stl/cstdint.hpp"
 #include "../stl/string.hpp"
+#include "../stl/type_traits.hpp"
 
 #if __has_include(<imgui.h>)
 #    include <imgui.h>
@@ -286,14 +287,35 @@ void davey(const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
  * @param ctx The context from which to search for meta types.
  * @param registry An instance of the registry type.
  */
-template<typename Entity, typename Allocator>
-void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registry) {
+void davey(const meta_ctx &ctx, registry_like auto &registry) {
+    constexpr bool is_const_registry = stl::is_const_v<stl::remove_reference_t<decltype(registry)>>;
+    using registry_type = stl::remove_cvref_t<decltype(registry)>;
+
+    if constexpr(!is_const_registry) {
+        if(ImGui::Button("Add Entity")) {
+            [[maybe_unused]] auto entt = registry.create();
+        }
+
+        ImGui::Separator();
+    }
+
     if(ImGui::BeginTabBar("#tabs")) {
         if(ImGui::BeginTabItem("Entity")) {
-            for(const auto [entt]: registry.template storage<Entity>()->each()) {
+            using storage_type = typename registry_type::template storage_for_type<typename registry_type::entity_type>;
+            using iterable_type = decltype(stl::declval<storage_type>().each());
+
+            iterable_type iterable{};
+
+            if constexpr(is_const_registry) {
+                iterable = registry.template storage<typename registry_type::entity_type>()->each();
+            } else {
+                iterable = registry.template storage<typename registry_type::entity_type>().each();
+            }
+
+            for(const auto [entt]: iterable) {
                 ImGui::PushID(static_cast<int>(to_entity(entt)));
 
-                if(ImGui::TreeNode(&type_id<Entity>(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
+                if(ImGui::TreeNode(&type_id<typename registry_type::entity_type>(), "%d [%d/%d]", to_integral(entt), to_entity(entt), to_version(entt))) {
                     const auto range = registry.storage();
                     internal::present_entity(ctx, entt, range.begin(), range.end());
                     ImGui::TreePop();
@@ -330,8 +352,7 @@ void davey(const meta_ctx &ctx, const basic_registry<Entity, Allocator> &registr
  * @tparam Allocator Registry allocator type.
  * @param registry An instance of the registry type.
  */
-template<typename Entity, typename Allocator>
-void davey(const basic_registry<Entity, Allocator> &registry) {
+void davey(registry_like auto &registry) {
     davey(locator<meta_ctx>::value_or(), registry);
 }
 
