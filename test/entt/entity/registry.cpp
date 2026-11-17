@@ -2672,3 +2672,10 @@ TEST_F(Registry, NoEtoType) {
 
     ASSERT_EQ((std::get<0>(view.get<no_eto_type, int>(entity))), (std::get<0>(cview.get<const no_eto_type, const int>(entity))));
 }
+
+TEST_F(Registry, RegistryLike) {
+    static_assert(!entt::registry_like<int>);
+    static_assert(!entt::registry_like<const int>);
+    static_assert(entt::registry_like<entt::registry>);
+    static_assert(entt::registry_like<const entt::registry>);
+}

@@ -1207,6 +1207,16 @@ private:
     storage_for_type<entity_type> entities;
 };
 
+/**
+ * @brief Checks if a type is a registry.
+ * @tparam Type The type to check.
+ */
+template<typename Type>
+concept registry_like = requires {
+    typename stl::remove_cvref_t<Type>::entity_type;
+    typename stl::remove_cvref_t<Type>::allocator_type;
+} && stl::derived_from<stl::remove_cvref_t<Type>, basic_registry<typename stl::remove_cvref_t<Type>::entity_type, typename stl::remove_cvref_t<Type>::allocator_type>>;
+
 } // namespace entt
 
 #endif
