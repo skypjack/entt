@@ -100,6 +100,13 @@ struct entt::entt_traits<Registry::my_entity>: entt::basic_entt_traits<entity_tr
     static constexpr auto page_size = ENTT_SPARSE_PAGE;
 };
 
+TEST_F(Registry, RegistryLike) {
+    static_assert(!entt::registry_like<int>);
+    static_assert(!entt::registry_like<const int>);
+    static_assert(entt::registry_like<entt::registry>);
+    static_assert(entt::registry_like<const entt::registry>);
+}
+
 TEST_F(Registry, Functionalities) {
     using traits_type = entt::entt_traits<entt::entity>;
 
@@ -2671,11 +2678,4 @@ TEST_F(Registry, NoEtoType) {
     auto cview = std::as_const(registry).view<const no_eto_type, const int>();
 
     ASSERT_EQ((std::get<0>(view.get<no_eto_type, int>(entity))), (std::get<0>(cview.get<const no_eto_type, const int>(entity))));
-}
-
-TEST_F(Registry, RegistryLike) {
-    static_assert(!entt::registry_like<int>);
-    static_assert(!entt::registry_like<const int>);
-    static_assert(entt::registry_like<entt::registry>);
-    static_assert(entt::registry_like<const entt::registry>);
 }
