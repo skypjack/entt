@@ -195,7 +195,7 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
 }
 
 template<typename... Get, typename... Exclude, stl::size_t... Index>
-static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view, stl::index_sequence<Index...>) {
+static void present_view(const meta_ctx &ctx, basic_view<get_t<Get...>, exclude_t<Exclude...>> view, stl::index_sequence<Index...>) {
     using view_type = basic_view<get_t<Get...>, exclude_t<Exclude...>>;
     const stl::array<const typename view_type::common_type *, sizeof...(Index)> range{view.template storage<Index>()...};
 
@@ -270,7 +270,7 @@ void davey(storage_like auto &storage) {
  * @param view An instance of the view type.
  */
 template<typename... Get, typename... Exclude>
-void davey(const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
+void davey(basic_view<get_t<Get...>, exclude_t<Exclude...>> view) {
     davey(locator<meta_ctx>::value_or(), view);
 }
 
