@@ -57,6 +57,15 @@ using StorageNoInstanceTypes = ::testing::Types<test::empty, void>;
 TYPED_TEST_SUITE(StorageNoInstance, StorageNoInstanceTypes, );
 TYPED_TEST_SUITE(StorageNoInstanceDeathTest, StorageNoInstanceTypes, );
 
+TYPED_TEST(StorageNoInstance, StorageLike) {
+    using value_type = TestFixture::type;
+
+    static_assert(!entt::storage_like<int>);
+    static_assert(!entt::storage_like<const int>);
+    static_assert(entt::storage_like<entt::storage<value_type>>);
+    static_assert(entt::storage_like<const entt::storage<value_type>>);
+}
+
 TYPED_TEST(StorageNoInstance, Constructors) {
     using value_type = TestFixture::type;
 

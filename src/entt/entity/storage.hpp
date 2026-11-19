@@ -1213,6 +1213,17 @@ private:
     size_type placeholder{};
 };
 
+/**
+ * @brief Checks if a type is a storage.
+ * @tparam Type The type to check.
+ */
+template<typename Type>
+concept storage_like = requires {
+    typename stl::remove_cvref_t<Type>::entity_type;
+    typename stl::remove_cvref_t<Type>::allocator_type;
+    typename stl::remove_cvref_t<Type>::element_type;
+} && stl::derived_from<stl::remove_cvref_t<Type>, basic_sparse_set<typename stl::remove_cvref_t<Type>::entity_type, typename stl::allocator_traits<typename stl::remove_cvref_t<Type>::allocator_type>::template rebind_alloc<typename stl::remove_cvref_t<Type>::entity_type>>>;
+
 } // namespace entt
 
 #endif

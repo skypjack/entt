@@ -14,6 +14,13 @@
 #include "../../common/config.h"
 #include "../../common/linter.hpp"
 
+TEST(StorageEntity, StorageLike) {
+    static_assert(!entt::storage_like<int>);
+    static_assert(!entt::storage_like<const int>);
+    static_assert(entt::storage_like<entt::storage<entt::entity>>);
+    static_assert(entt::storage_like<const entt::storage<entt::entity>>);
+}
+
 TEST(StorageEntity, Constructors) {
     entt::storage<entt::entity> pool;
 

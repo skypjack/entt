@@ -93,6 +93,16 @@ using StorageTypes = ::testing::Types<int, test::pointer_stable, test::non_trivi
 TYPED_TEST_SUITE(Storage, StorageTypes, );
 TYPED_TEST_SUITE(StorageDeathTest, StorageTypes, );
 
+TYPED_TEST(Storage, StorageLike) {
+    using value_type = TestFixture::type;
+    using entity_type = TestFixture::my_entity;
+
+    static_assert(!entt::storage_like<int>);
+    static_assert(!entt::storage_like<const int>);
+    static_assert(entt::storage_like<entt::basic_storage<value_type, entity_type>>);
+    static_assert(entt::storage_like<const entt::basic_storage<value_type, entity_type>>);
+}
+
 TYPED_TEST(Storage, Constructors) {
     using value_type = TestFixture::type;
     using entity_type = TestFixture::my_entity;
