@@ -235,31 +235,6 @@ static void present_view(const meta_ctx &ctx, const basic_view<get_t<Get...>, ex
 /*! @endcond */
 
 /**
- * @brief ImGui-based introspection tool for storage types.
- * @tparam Type Storage element type.
- * @tparam Entity Storage entity type.
- * @tparam Allocator Storage allocator type.
- * @param ctx The context from which to search for meta types.
- * @param storage An instance of the storage type.
- */
-template<typename Type, typename Entity, typename Allocator>
-void davey(const meta_ctx &ctx, const basic_storage<Type, Entity, Allocator> &storage) {
-    internal::present_storage(ctx, storage);
-}
-
-/**
- * @brief ImGui-based introspection tool for storage types.
- * @tparam Type Storage element type.
- * @tparam Entity Storage entity type.
- * @tparam Allocator Storage allocator type.
- * @param storage An instance of the storage type.
- */
-template<typename Type, typename Entity, typename Allocator>
-void davey(const basic_storage<Type, Entity, Allocator> &storage) {
-    davey(locator<meta_ctx>::value_or(), storage);
-}
-
-/**
  * @brief ImGui-based introspection tool for view types.
  * @tparam Get Types of storage iterated by the view.
  * @tparam Exclude Types of storage used to filter the view.
@@ -267,8 +242,25 @@ void davey(const basic_storage<Type, Entity, Allocator> &storage) {
  * @param view An instance of the view type.
  */
 template<typename... Get, typename... Exclude>
-void davey(const meta_ctx &ctx, const basic_view<get_t<Get...>, exclude_t<Exclude...>> &view) {
+void davey(const meta_ctx &ctx, basic_view<get_t<Get...>, exclude_t<Exclude...>> view) {
     internal::present_view(ctx, view, stl::index_sequence_for<Get...>{});
+}
+
+/**
+ * @brief ImGui-based introspection tool for storage types.
+ * @param ctx The context from which to search for meta types.
+ * @param storage An instance of the storage type.
+ */
+void davey(const meta_ctx &ctx, storage_like auto &storage) {
+    internal::present_storage(ctx, storage);
+}
+
+/**
+ * @brief ImGui-based introspection tool for storage types.
+ * @param storage An instance of the storage type.
+ */
+void davey(storage_like auto &storage) {
+    davey(locator<meta_ctx>::value_or(), storage);
 }
 
 /**
