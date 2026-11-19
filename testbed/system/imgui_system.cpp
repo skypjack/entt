@@ -24,15 +24,21 @@ void imgui_system(entt::registry &registry) {
         ImGui::PopID();
     }
 
-    if(ImGui::CollapsingHeader("View - Renderable & Rect")) {
-        ImGui::PushID("View");
-        entt::davey(registry.view<renderable_component, rect_component>());
+    if(ImGui::CollapsingHeader("Storage - Rect")) {
+        ImGui::PushID("Storage");
+        entt::davey(registry.storage<rect_component>());
         ImGui::PopID();
     }
 
-    if(ImGui::CollapsingHeader("Storage - Input Listener")) {
+    if(ImGui::CollapsingHeader("Const Storage - Input Listener")) {
         ImGui::PushID("Storage");
-        entt::davey(registry.storage<input_listener_component>());
+        entt::davey(*std::as_const(registry).storage<input_listener_component>());
+        ImGui::PopID();
+    }
+
+    if(ImGui::CollapsingHeader("View - Renderable & const Rect")) {
+        ImGui::PushID("View");
+        entt::davey(registry.view<renderable_component, const rect_component>());
         ImGui::PopID();
     }
 
