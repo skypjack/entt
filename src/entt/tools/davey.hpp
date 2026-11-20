@@ -26,8 +26,8 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
-template<typename Entity, typename OnEntity>
-static void present_element(meta_any obj, OnEntity on_entity) {
+template<typename Entity>
+static void present_element(meta_any obj, auto on_entity) {
     for([[maybe_unused]] const auto [id, data]: obj.type().data()) {
         const auto elem = data.get(obj);
         const stl::string name = data.name().empty() ? stl::string{data.type().info().name()} : stl::string{data.name()};
@@ -166,8 +166,9 @@ static void present_storage(const meta_ctx &ctx, const basic_sparse_set<Entity, 
     }
 }
 
-template<typename Entity, typename It>
-static void present_entity(const meta_ctx &ctx, const Entity entt, const It from, const It to) {
+static void present_entity(const meta_ctx &ctx, const auto entt, auto from, auto to) {
+    using entity_type = decltype(entt);
+
     for(auto it = from; it != to; ++it) {
         if(const auto &storage = it->second; storage.contains(entt)) {
             if(auto type = resolve(ctx, storage.info()); type) {
@@ -176,9 +177,9 @@ static void present_entity(const meta_ctx &ctx, const Entity entt, const It from
 
                 if(ImGui::TreeNode(&storage.info(), "%s", label)) {
                     if(const auto obj = type.from_void(storage.value(entt)); obj) {
-                        present_element<Entity>(obj.as_ref(), [&ctx, from, to](const char *name, const Entity other) {
+                        present_element<entity_type>(obj.as_ref(), [&ctx, from, to](const char *name, const entity_type other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, to_integral(other), to_entity(other), to_version(other))) {
-                                present_entity<Entity>(ctx, other, from, to);
+                                present_entity<entity_type>(ctx, other, from, to);
                                 ImGui::TreePop();
                             }
                         });
