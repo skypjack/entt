@@ -1,6 +1,5 @@
 #define CR_HOST
 
-#include <functional>
 #include <gtest/gtest.h>
 #include <cr.h>
 #include "../../../common/emitter.h"

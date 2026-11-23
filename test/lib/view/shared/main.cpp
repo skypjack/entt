@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <entt/config/config.h>
 #include "../types.h"
 #include "lib.h"
 

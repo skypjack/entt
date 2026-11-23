@@ -1,6 +1,7 @@
 #ifndef ENTT_LIB_META_PLUGIN_STD_USERDATA_H
 #define ENTT_LIB_META_PLUGIN_STD_USERDATA_H
 
+#include <cstddef>
 #include <type_traits>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
