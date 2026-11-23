@@ -123,7 +123,7 @@ public:
      */
     template<typename Type>
     void publish(Type value) {
-        if(const auto id = type_id<Type>().hash(); handlers.first().contains(id)) {
+        if(const auto id = type_hash<Type>::value(); handlers.first().contains(id)) {
             handlers.first()[id](&value);
         }
     }
@@ -135,7 +135,7 @@ public:
      */
     template<typename Type>
     void on(stl::function<void(Type &, Derived &)> func) {
-        handlers.first().insert_or_assign(type_id<Type>().hash(), [func = stl::move(func), this](void *value) {
+        handlers.first().insert_or_assign(type_hash<Type>::value(), [func = stl::move(func), this](void *value) {
             func(*static_cast<Type *>(value), static_cast<Derived &>(*this));
         });
     }
