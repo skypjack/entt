@@ -146,18 +146,9 @@ struct type_info final {
     template<typename Type>
     // NOLINTBEGIN(modernize-use-transparent-functors)
     constexpr type_info(stl::in_place_type_t<Type>) noexcept
-        : seq{type_index<stl::remove_cvref_t<Type>>::value()},
-          identifier{type_hash<stl::remove_cvref_t<Type>>::value()},
+        : identifier{type_hash<stl::remove_cvref_t<Type>>::value()},
           alias{type_name<stl::remove_cvref_t<Type>>::value()} {}
     // NOLINTEND(modernize-use-transparent-functors)
-
-    /**
-     * @brief Type index.
-     * @return Type index.
-     */
-    [[nodiscard]] constexpr id_type index() const noexcept {
-        return seq;
-    }
 
     /**
      * @brief Type hash.
@@ -190,11 +181,10 @@ struct type_info final {
      * @return The relative order between the two type info objects.
      */
     [[nodiscard]] constexpr auto operator<=>(const type_info &other) const noexcept {
-        return seq <=> other.seq;
+        return identifier <=> other.identifier;
     }
 
 private:
-    id_type seq;
     id_type identifier;
     stl::string_view alias;
 };

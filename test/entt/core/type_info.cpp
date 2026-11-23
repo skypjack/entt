@@ -59,13 +59,11 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_TRUE(info == info);
     ASSERT_FALSE(info != info);
 
-    ASSERT_EQ(info.index(), entt::type_index<int>::value());
     ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
 
     other = info;
 
-    ASSERT_EQ(other.index(), entt::type_index<int>::value());
     ASSERT_EQ(other.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(other.name(), entt::type_name<int>::value());
 }
