@@ -182,8 +182,8 @@ class meta_any final {
         } else if constexpr(requires(Type elem) { *elem; }) {
             if constexpr(stl::is_class_v<Type>) {
                 elem.dereference = +[](const meta_any &value) {
-                    const auto &elem = any_cast<const Type &>(value.storage);
-                    return elem ? ((value.storage.policy() == any_policy::cref) ? forward_as_meta(*value.ctx, *elem) : forward_as_meta(*value.ctx, *const_cast<Type &>(elem))) : meta_any{meta_ctx_arg, *value.ctx};
+                    const auto &obj = any_cast<const Type &>(value.storage);
+                    return obj ? ((value.storage.policy() == any_policy::cref) ? forward_as_meta(*value.ctx, *obj) : forward_as_meta(*value.ctx, *const_cast<Type &>(obj))) : meta_any{meta_ctx_arg, *value.ctx};
                 };
             } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
                 elem.dereference = +[](const meta_any &value) {
