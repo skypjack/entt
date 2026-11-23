@@ -235,7 +235,7 @@ public:
 
             base_type::insert_or_assign(
                 internal::meta_base_node{
-                    type_id<Base>().hash(),
+                    type_hash<Base>::value(),
                     &internal::resolve<Base>,
                     op});
         }
@@ -262,7 +262,7 @@ public:
 
         base_type::insert_or_assign(
             internal::meta_conv_node{
-                type_id<conv_type>().hash(),
+                type_hash<conv_type>::value(),
                 op});
 
         return *this;
@@ -284,7 +284,7 @@ public:
 
         base_type::insert_or_assign(
             internal::meta_conv_node{
-                type_id<conv_type>().hash(),
+                type_hash<conv_type>::value(),
                 op});
 
         return *this;
@@ -311,7 +311,7 @@ public:
 
         base_type::insert_or_assign(
             internal::meta_ctor_node{
-                type_id<typename descriptor::args_type>().hash(),
+                type_hash<typename descriptor::args_type>::value(),
                 descriptor::args_type::size,
                 &meta_arg<typename descriptor::args_type>,
                 &meta_construct<element_type, Candidate, Policy>});
@@ -337,7 +337,7 @@ public:
 
             base_type::insert_or_assign(
                 internal::meta_ctor_node{
-                    type_id<typename descriptor::args_type>().hash(),
+                    type_hash<typename descriptor::args_type>::value(),
                     descriptor::args_type::size,
                     &meta_arg<typename descriptor::args_type>,
                     &meta_construct<element_type, Args...>});
@@ -562,7 +562,7 @@ public:
      */
     template<typename Value, typename... Args>
     meta_factory custom(Args &&...args) {
-        base_type::custom(internal::meta_custom_node{type_id<Value>().hash(), stl::make_shared<Value>(stl::forward<Args>(args)...)});
+        base_type::custom(internal::meta_custom_node{type_hash<Value>::value(), stl::make_shared<Value>(stl::forward<Args>(args)...)});
         return *this;
     }
 };
@@ -615,7 +615,7 @@ inline void meta_reset(const id_type alias) noexcept {
  */
 template<typename Type>
 void meta_reset(meta_ctx &ctx) noexcept {
-    internal::meta_context::from(ctx).bucket.erase(type_id<Type>().hash());
+    internal::meta_context::from(ctx).bucket.erase(type_hash<Type>::value());
 }
 
 /**
