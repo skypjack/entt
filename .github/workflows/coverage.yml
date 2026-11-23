@@ -16,7 +16,7 @@ jobs:
         CXXFLAGS: "--coverage -fno-elide-constructors -fno-inline -fno-default-inline"
         CXX: g++
       run: |
-        cmake -DENTT_BUILD_TESTING=ON ..
+        cmake -DENTT_BUILD_TESTING=ON -DENTT_BUILD_LIB=ON -DENTT_BUILD_EXAMPLE=ON ..
         make -j4
     - name: Run tests
       working-directory: build
@@ -26,11 +26,14 @@ jobs:
     - name: Collect data
       working-directory: build
       run: |
-        sudo apt install lcov
-        lcov -c -d . -o coverage.info --ignore-errors gcov,gcov,mismatch,mismatch
-        lcov -l coverage.info
+        sudo apt update
+        sudo apt install -y lcov
+        IGNORE="gcov,gcov,mismatch,mismatch,inconsistent,inconsistent,negative,negative"
+        lcov -c -d . -o coverage.info --rc geninfo_unexecuted_blocks=1 --ignore-errors "$IGNORE"
+        lcov -r coverage.info '/usr/*' '*/test/*' '*/build/*' -o coverage.info --ignore-errors "$IGNORE,unused,unused"
+        lcov -l coverage.info --ignore-errors "$IGNORE"
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: build/coverage.info
