@@ -179,11 +179,11 @@ class meta_any final {
                     }
                 };
             }
-        } else if constexpr(requires(Type elem) { *elem; }) {
+        } else if constexpr(requires(Type instance) { *instance; }) {
             if constexpr(stl::is_class_v<Type>) {
                 elem.dereference = +[](const meta_any &value) {
-                    const auto &obj = any_cast<const Type &>(value.storage);
-                    return obj ? ((value.storage.policy() == any_policy::cref) ? forward_as_meta(*value.ctx, *obj) : forward_as_meta(*value.ctx, *const_cast<Type &>(obj))) : meta_any{meta_ctx_arg, *value.ctx};
+                    const auto &object = any_cast<const Type &>(value.storage);
+                    return object ? ((value.storage.policy() == any_policy::cref) ? forward_as_meta(*value.ctx, *object) : forward_as_meta(*value.ctx, *const_cast<Type &>(object))) : meta_any{meta_ctx_arg, *value.ctx};
                 };
             } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
                 elem.dereference = +[](const meta_any &value) {
