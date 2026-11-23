@@ -157,52 +157,58 @@ private:
 
 /*! @brief Opaque wrapper for values of any type. */
 class meta_any final {
-    using vtable_type = void(const internal::meta_traits, const meta_any &, void *);
+    struct vtable_type {
+        const internal::meta_type_node &(*resolve)(const internal::meta_context &){};
+        meta_any (*dereference)(const meta_any &){};
+        meta_sequence_container (*sequence_container)(const meta_any &){};
+        meta_associative_container (*associative_container)(const meta_any &){};
+    };
 
     template<cvref_unqualified Type>
-    static void basic_vtable(const internal::meta_traits req, const meta_any &value, [[maybe_unused]] void *other) {
-        if(req == internal::meta_traits::is_none) {
-            value.node = &internal::resolve<Type>(internal::meta_context::from(*value.ctx));
-            return;
-        }
+    static vtable_type make_vtable() noexcept {
+        vtable_type elem{.resolve = &internal::resolve<Type>};
 
         if constexpr(is_meta_pointer_like_v<Type>) {
-            if(req == internal::meta_traits::is_pointer) {
-                if constexpr(!stl::is_void_v<stl::remove_const_t<typename stl::pointer_traits<Type>::element_type>>) {
+            if constexpr(!stl::is_void_v<stl::remove_const_t<typename stl::pointer_traits<Type>::element_type>>) {
+                elem.dereference = +[](const meta_any &value) {
                     if constexpr(stl::is_constructible_v<bool, Type>) {
-                        if(const auto &pointer_like = any_cast<const Type &>(value.storage); pointer_like) {
-                            static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(pointer_like));
-                        }
+                        const auto &pointer_like = any_cast<const Type &>(value.storage);
+                        return pointer_like ? forward_as_meta(*value.ctx, adl_meta_pointer_like<Type>::dereference(pointer_like)) : meta_any{meta_ctx_arg, *value.ctx};
                     } else {
-                        static_cast<meta_any *>(other)->emplace<decltype(adl_meta_pointer_like<Type>::dereference(stl::declval<const Type &>()))>(adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value.storage)));
+                        return forward_as_meta(*value.ctx, adl_meta_pointer_like<Type>::dereference(any_cast<const Type &>(value.storage)));
                     }
-                }
+                };
             }
         } else if constexpr(requires(Type elem) { *elem; }) {
-            if(req == internal::meta_traits::is_pointer) {
-                if constexpr(stl::is_class_v<Type>) {
-                    if(const auto &elem = any_cast<const Type &>(value.storage); elem) {
-                        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-                        return (value.storage.policy() == any_policy::cref) ? static_cast<meta_any *>(other)->emplace<decltype(*elem)>(*elem) : static_cast<meta_any *>(other)->emplace<decltype(*const_cast<Type &>(elem))>(*const_cast<Type &>(elem));
-                    }
-                } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
-                    if(auto *pointer = any_cast<Type>(value.storage); pointer) {
-                        static_cast<meta_any *>(other)->emplace<stl::conditional_t<stl::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>>(*pointer);
-                    }
-                }
+            if constexpr(stl::is_class_v<Type>) {
+                elem.dereference = +[](const meta_any &value) {
+                    const auto &elem = any_cast<const Type &>(value.storage);
+                    return elem ? ((value.storage.policy() == any_policy::cref) ? forward_as_meta(*value.ctx, *elem) : forward_as_meta(*value.ctx, *const_cast<Type &>(elem))) : meta_any{meta_ctx_arg, *value.ctx};
+                };
+            } else if constexpr(!stl::is_array_v<Type> && !stl::is_void_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>) {
+                elem.dereference = +[](const meta_any &value) {
+                    auto *pointer = any_cast<Type>(value.storage);
+                    using element_type = stl::conditional_t<stl::is_function_v<stl::remove_const_t<stl::remove_pointer_t<Type>>>, Type, stl::remove_pointer_t<Type> &>;
+                    return pointer ? forward_as_meta(*value.ctx, static_cast<element_type>(*pointer)) : meta_any{meta_ctx_arg, *value.ctx};
+                };
             }
-        } else if constexpr(is_complete_v<meta_sequence_container_traits<Type>> || is_complete_v<meta_associative_container_traits<Type>>) {
-            if(constexpr auto flag = (is_complete_v<meta_sequence_container_traits<Type>> ? internal::meta_traits::is_sequence_container : internal::meta_traits::is_associative_container); req == flag) {
-                using container_type = stl::conditional_t<is_complete_v<meta_sequence_container_traits<Type>>, meta_sequence_container, meta_associative_container>;
-                *static_cast<container_type *>(other) = (value.storage.policy() == any_policy::cref) ? container_type{*value.ctx, any_cast<const Type &>(value.storage)} : container_type{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
-            }
+        } else if constexpr(is_complete_v<meta_sequence_container_traits<Type>>) {
+            elem.sequence_container = +[](const meta_any &value) {
+                return (value.storage.policy() == any_policy::cref) ? meta_sequence_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_sequence_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
+            };
+        } else if constexpr(is_complete_v<meta_associative_container_traits<Type>>) {
+            elem.associative_container = +[](const meta_any &value) {
+                return (value.storage.policy() == any_policy::cref) ? meta_associative_container{*value.ctx, any_cast<const Type &>(value.storage)} : meta_associative_container{*value.ctx, any_cast<Type &>(const_cast<meta_any &>(value).storage)};
+            };
         }
+
+        return elem;
     }
 
     [[nodiscard]] const auto &fetch_node() const {
         if(node == nullptr) {
             ENTT_ASSERT(*this, "Invalid vtable function");
-            vtable(internal::meta_traits::is_none, *this, nullptr);
+            node = &vtable.resolve(internal::meta_context::from(*ctx));
             ENTT_ASSERT(node != nullptr, "Invalid pointer to node");
         }
 
@@ -245,7 +251,7 @@ public:
     explicit meta_any(const meta_ctx &area, stl::in_place_type_t<Type>, auto &&...args)
         : storage{stl::in_place_type<Type>, stl::forward<decltype(args)>(args)...},
           ctx{&area},
-          vtable{&basic_vtable<stl::remove_cvref_t<Type>>} {}
+          vtable{make_vtable<stl::remove_cvref_t<Type>>()} {}
 
     /**
      * @brief Constructs a wrapper taking ownership of the passed object.
@@ -262,7 +268,7 @@ public:
     explicit meta_any(const meta_ctx &area, stl::in_place_t, auto *value)
         : storage{stl::in_place, value},
           ctx{&area},
-          vtable{storage ? &basic_vtable<stl::remove_const_t<stl::remove_pointer_t<decltype(value)>>> : nullptr} {
+          vtable{storage ? make_vtable<stl::remove_const_t<stl::remove_pointer_t<decltype(value)>>>() : vtable_type{}} {
     }
 
     /**
@@ -302,7 +308,7 @@ public:
         : storage{stl::move(other.storage)},
           ctx{&area},
           node{(ctx == other.ctx) ? stl::exchange(other.node, nullptr) : nullptr},
-          vtable{stl::exchange(other.vtable, nullptr)} {}
+          vtable{stl::exchange(other.vtable, vtable_type{})} {}
 
     /**
      * @brief Copy constructor.
@@ -312,7 +318,7 @@ public:
         : storage{other.storage},
           ctx{other.ctx},
           node{(other.storage && !storage) ? nullptr : other.node},
-          vtable{(other.storage && !storage) ? nullptr : other.vtable} {
+          vtable{(other.storage && !storage) ? vtable_type{} : other.vtable} {
     }
 
     /**
@@ -323,7 +329,7 @@ public:
         : storage{stl::move(other.storage)},
           ctx{other.ctx},
           node{stl::exchange(other.node, nullptr)},
-          vtable{stl::exchange(other.vtable, nullptr)} {}
+          vtable{stl::exchange(other.vtable, vtable_type{})} {}
 
     /*! @brief Default destructor. */
     ~meta_any() = default;
@@ -338,7 +344,7 @@ public:
             ctx = other.ctx;
             storage = other.storage;
             node = (other.storage && !storage) ? nullptr : other.node;
-            vtable = (other.storage && !storage) ? nullptr : other.vtable;
+            vtable = (other.storage && !storage) ? vtable_type{} : other.vtable;
         }
 
         return *this;
@@ -353,7 +359,7 @@ public:
         storage = stl::move(other.storage);
         ctx = other.ctx;
         node = stl::exchange(other.node, nullptr);
-        vtable = stl::exchange(other.vtable, nullptr);
+        vtable = stl::exchange(other.vtable, vtable_type{});
         return *this;
     }
 
@@ -530,8 +536,8 @@ public:
     template<typename Type>
     void emplace(auto &&...args) {
         storage.emplace<Type>(stl::forward<decltype(args)>(args)...);
-        auto *prev = stl::exchange(vtable, &basic_vtable<stl::remove_cvref_t<Type>>);
-        node = (prev == vtable) ? node : nullptr;
+        const auto prev = stl::exchange(vtable, make_vtable<stl::remove_cvref_t<Type>>());
+        node = (prev.resolve == vtable.resolve) ? node : nullptr;
     }
 
     /*! @copydoc any::assign */
@@ -544,7 +550,7 @@ public:
     void reset() {
         storage.reset();
         node = nullptr;
-        vtable = nullptr;
+        vtable = {};
     }
 
     /**
@@ -552,16 +558,12 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() noexcept {
-        meta_sequence_container proxy{};
-        if(*this) { vtable(internal::meta_traits::is_sequence_container, *this, &proxy); }
-        return proxy;
+        return vtable.sequence_container ? vtable.sequence_container(*this) : meta_sequence_container{};
     }
 
     /*! @copydoc as_sequence_container */
     [[nodiscard]] meta_sequence_container as_sequence_container() const noexcept {
-        meta_sequence_container proxy{};
-        if(*this) { vtable(internal::meta_traits::is_sequence_container, as_ref(), &proxy); }
-        return proxy;
+        return vtable.sequence_container ? vtable.sequence_container(as_ref()) : meta_sequence_container{};
     }
 
     /**
@@ -569,16 +571,12 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() noexcept {
-        meta_associative_container proxy{};
-        if(*this) { vtable(internal::meta_traits::is_associative_container, *this, &proxy); }
-        return proxy;
+        return vtable.associative_container ? vtable.associative_container(*this) : meta_associative_container{};
     }
 
     /*! @copydoc as_associative_container */
     [[nodiscard]] meta_associative_container as_associative_container() const noexcept {
-        meta_associative_container proxy{};
-        if(*this) { vtable(internal::meta_traits::is_associative_container, as_ref(), &proxy); }
-        return proxy;
+        return vtable.associative_container ? vtable.associative_container(as_ref()) : meta_associative_container{};
     }
 
     /**
@@ -587,21 +585,17 @@ public:
      * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
     [[nodiscard]] meta_any operator*() noexcept {
-        meta_any ret{meta_ctx_arg, *ctx};
-        if(*this) { vtable(internal::meta_traits::is_pointer, *this, &ret); }
-        return ret;
+        return vtable.dereference ? vtable.dereference(*this) : meta_any{};
     }
 
     /*! @copydoc operator* */
     [[nodiscard]] meta_any operator*() const noexcept {
-        meta_any ret{meta_ctx_arg, *ctx};
-        if(*this) { vtable(internal::meta_traits::is_pointer, as_ref(), &ret); }
-        return ret;
+        return vtable.dereference ? vtable.dereference(as_ref()) : meta_any{};
     }
 
     /*! @copydoc any::operator bool */
     [[nodiscard]] explicit operator bool() const noexcept {
-        return (vtable != nullptr);
+        return (vtable.resolve != nullptr);
     }
 
     /*! @copydoc any::operator== */
@@ -639,7 +633,7 @@ private:
     any storage{};
     const meta_ctx *ctx{&locator<meta_ctx>::value_or()};
     mutable const internal::meta_type_node *node{};
-    vtable_type *vtable{};
+    vtable_type vtable{};
 };
 
 /**
