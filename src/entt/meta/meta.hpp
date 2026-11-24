@@ -475,37 +475,7 @@ public:
      * @return A valid meta object if convertible, an invalid one otherwise.
      */
     template<typename Type>
-    [[nodiscard]] meta_any allow_cast() const {
-        if constexpr(!stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>) {
-            if(storage.has_value<stl::remove_cvref_t<Type>>()) {
-                return as_ref();
-            } else if(*this) {
-                const auto &from = fetch_node();
-
-                if constexpr(stl::is_arithmetic_v<stl::remove_cvref_t<Type>> || stl::is_enum_v<stl::remove_cvref_t<Type>>) {
-                    if(from.conversion_helper) {
-                        return meta_any{*ctx, static_cast<Type>(from.conversion_helper(nullptr, storage.data()))};
-                    }
-                }
-
-                if(from.details != nullptr) {
-                    if(const auto *elem = internal::find_member(from.details->conv, entt::type_hash<stl::remove_cvref_t<Type>>::value()); elem != nullptr) {
-                        return elem->conv(*ctx, storage.data());
-                    }
-
-                    for(auto &&curr: from.details->base) {
-                        if(auto other = curr.type(internal::meta_context::from(*ctx)).from_void(*ctx, nullptr, curr.cast(storage.data())); curr.id == entt::type_hash<stl::remove_cvref_t<Type>>::value()) {
-                            return other;
-                        } else if(auto from_base = stl::as_const(other).template allow_cast<Type>(); from_base) {
-                            return from_base;
-                        }
-                    }
-                }
-            }
-        }
-
-        return meta_any{meta_ctx_arg, *ctx};
-    }
+    [[nodiscard]] meta_any allow_cast() const;
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
@@ -513,20 +483,7 @@ public:
      * @return True if convertible, false otherwise.
      */
     template<typename Type>
-    [[nodiscard]] bool allow_cast() {
-        if(storage.has_value<stl::remove_cvref_t<Type>>()) {
-            constexpr auto no_check = !stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>;
-            return no_check || (storage.policy() != any_policy::cref);
-        } else if(auto other = stl::as_const(*this).allow_cast<stl::remove_cvref_t<Type>>(); other) {
-            if(other.storage.owner()) {
-                stl::swap(*this, other);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
+    [[nodiscard]] bool allow_cast();
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
@@ -1476,6 +1433,29 @@ bool meta_any::set(const id_type id, auto &&...args) {
     }
 
     return false;
+}
+
+template<typename Type>
+[[nodiscard]] meta_any meta_any::allow_cast() const {
+    if constexpr(!stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>) {
+        if(storage.has_value<stl::remove_cvref_t<Type>>()) {
+            return as_ref();
+        }
+
+        return allow_cast(meta_type{*ctx, internal::resolve<stl::remove_cvref_t<Type>>(internal::meta_context::from(*ctx))});
+    } else {
+        return meta_any{meta_ctx_arg, *ctx};
+    }
+}
+
+template<typename Type>
+[[nodiscard]] bool meta_any::allow_cast() {
+    if(storage.has_value<stl::remove_cvref_t<Type>>()) {
+        constexpr auto no_check = !stl::is_reference_v<Type> || stl::is_const_v<stl::remove_reference_t<Type>>;
+        return no_check || (storage.policy() != any_policy::cref);
+    }
+
+    return allow_cast(meta_type{*ctx, internal::resolve<stl::remove_cvref_t<Type>>(internal::meta_context::from(*ctx))});
 }
 
 inline bool meta_any::assign(const meta_any &other) {
