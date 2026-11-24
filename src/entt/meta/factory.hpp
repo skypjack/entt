@@ -204,7 +204,7 @@ public:
      * @param name A custom unique identifier as a **string literal**.
      * @return A meta factory for the given type.
      */
-    meta_factory type(const char *name) noexcept {
+    meta_factory &type(const char *name) noexcept {
         return type(hashed_string::value(name), name);
     }
 
@@ -214,7 +214,7 @@ public:
      * @param name An optional name for the type as a **string literal**.
      * @return A meta factory for the given type.
      */
-    meta_factory type(const id_type alias, const char *name = nullptr) noexcept {
+    meta_factory &type(const id_type alias, const char *name = nullptr) noexcept {
         base_type::type(alias, name);
         return *this;
     }
@@ -229,7 +229,7 @@ public:
      */
     template<typename Base>
     requires stl::derived_from<element_type, Base>
-    meta_factory base() noexcept {
+    meta_factory &base() noexcept {
         if constexpr(!stl::same_as<element_type, Base>) {
             auto *const op = +[](const void *instance) noexcept { return static_cast<const void *>(static_cast<const Base *>(static_cast<const element_type *>(instance))); };
 
@@ -256,7 +256,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate>
-    meta_factory conv() noexcept {
+    meta_factory &conv() noexcept {
         using conv_type = stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), const element_type &>>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, stl::invoke(Candidate, *static_cast<const element_type *>(instance))); };
 
@@ -278,7 +278,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename To>
-    meta_factory conv() noexcept {
+    meta_factory &conv() noexcept {
         using conv_type = stl::remove_cvref_t<To>;
         auto *const op = +[](const meta_ctx &area, const void *instance) { return forward_as_meta(area, static_cast<To>(*static_cast<const element_type *>(instance))); };
 
@@ -304,7 +304,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_value_t>
-    meta_factory ctor() noexcept {
+    meta_factory &ctor() noexcept {
         using descriptor = meta_function_helper_t<element_type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
         static_assert(stl::is_same_v<stl::remove_cvref_t<typename descriptor::return_type>, element_type>, "The function doesn't return an object of the required type");
@@ -330,7 +330,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename... Args>
-    meta_factory ctor() noexcept {
+    meta_factory &ctor() noexcept {
         // default constructor is already implicitly generated, no need for redundancy
         if constexpr(sizeof...(Args) != 0u) {
             using descriptor = meta_function_helper_t<element_type, element_type (*)(Args...)>;
@@ -354,7 +354,7 @@ public:
      * @return A meta factory for the given type.
      */
     template<auto Data, typename Policy = as_value_t>
-    meta_factory data(const char *name) noexcept {
+    meta_factory &data(const char *name) noexcept {
         return data<Data, Policy>(hashed_string::value(name), name);
     }
 
@@ -373,7 +373,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_value_t>
-    meta_factory data(const id_type id, const char *name = nullptr) noexcept {
+    meta_factory &data(const id_type id, const char *name = nullptr) noexcept {
         if constexpr(stl::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = stl::invoke_result_t<decltype(Data), element_type &>;
             static_assert(Policy::template value<data_type>, "Invalid return type for the given policy");
@@ -427,7 +427,7 @@ public:
      * @return A meta factory for the given type.
      */
     template<auto Setter, auto Getter, typename Policy = as_value_t>
-    meta_factory data(const char *name) noexcept {
+    meta_factory &data(const char *name) noexcept {
         return data<Setter, Getter, Policy>(hashed_string::value(name), name);
     }
 
@@ -453,7 +453,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_value_t>
-    meta_factory data(const id_type id, const char *name = nullptr) noexcept {
+    meta_factory &data(const id_type id, const char *name = nullptr) noexcept {
         using getter = meta_function_helper_t<element_type, decltype(Getter)>;
         static_assert(Policy::template value<typename getter::return_type>, "Invalid return type for the given policy");
 
@@ -500,7 +500,7 @@ public:
      * @return A meta factory for the given type.
      */
     template<auto Candidate, typename Policy = as_value_t>
-    meta_factory func(const char *name) noexcept {
+    meta_factory &func(const char *name) noexcept {
         return func<Candidate, Policy>(hashed_string::value(name), name);
     }
 
@@ -519,7 +519,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_value_t>
-    meta_factory func(const id_type id, const char *name = nullptr) noexcept {
+    meta_factory &func(const id_type id, const char *name = nullptr) noexcept {
         using descriptor = meta_function_helper_t<element_type, decltype(Candidate)>;
         static_assert(Policy::template value<typename descriptor::return_type>, "Invalid return type for the given policy");
 
@@ -547,7 +547,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Value>
-    meta_factory traits(const Value value, const bool unset = false) {
+    meta_factory &traits(const Value value, const bool unset = false) {
         static_assert(stl::is_enum_v<Value>, "Invalid enum type");
         base_type::traits(internal::user_to_meta_traits(value), unset);
         return *this;
@@ -561,7 +561,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Value, typename... Args>
-    meta_factory custom(Args &&...args) {
+    meta_factory &custom(Args &&...args) {
         base_type::custom(internal::meta_custom_node{type_hash<Value>::value(), stl::make_shared<Value>(stl::forward<Args>(args)...)});
         return *this;
     }
