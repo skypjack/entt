@@ -355,10 +355,8 @@ template<typename Type, auto Candidate, meta_policy Policy = as_value_t>
         return internal::meta_invoke<Type, Candidate, Policy>(instance, args, stl::make_index_sequence<meta_function_helper_t<Type, decltype(Candidate)>::args_type::size>{});
     } else if constexpr(stl::is_member_object_pointer_v<decltype(Candidate)>) {
         if constexpr(!stl::is_array_v<stl::remove_cvref_t<stl::invoke_result_t<decltype(Candidate), Type &>>>) {
-            if(auto *clazz = instance->try_cast<Type>(); clazz) {
-                return meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *clazz));
-            } else if(auto *fallback = instance->try_cast<const Type>(); fallback) {
-                return meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *fallback));
+            if(const auto *clazz = instance->try_cast<const Type>(); clazz) {
+                return (instance->base().policy() == any_policy::cref) ? meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *clazz)) : meta_dispatch<Policy>(instance->context(), stl::invoke(Candidate, *const_cast<Type *>(clazz)));
             }
         }
 
