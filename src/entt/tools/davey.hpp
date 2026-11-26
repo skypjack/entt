@@ -27,6 +27,8 @@ namespace entt {
 /*! @cond ENTT_INTERNAL */
 namespace internal {
 
+constexpr const char *unknown = "??";
+
 template<typename Entity>
 static void present_element(meta_any obj, auto on_entity) {
     for([[maybe_unused]] const auto [id, data]: obj.type().data()) {
@@ -57,8 +59,11 @@ static void present_element(meta_any obj, auto on_entity) {
             if(as_string) {
                 ImGui::Text("%s: %s", label, as_string);
             } else {
-                elem.template allow_cast<stl::uint64_t>();
-                ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
+                if(elem.template allow_cast<stl::uint64_t>()) {
+                    ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
+                } else {
+                    ImGui::Text("%s: %s", label, unknown);
+                }
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == type_id<bool>()) {
@@ -67,11 +72,17 @@ static void present_element(meta_any obj, auto on_entity) {
             } else if(type.info() == type_id<char>()) {
                 ImGui::Text("%s: %c", label, elem.template cast<char>());
             } else if(type.is_integral()) {
-                elem.template allow_cast<stl::uint64_t>();
-                ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
+                if(elem.template allow_cast<stl::uint64_t>()) {
+                    ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
+                } else {
+                    ImGui::Text("%s: %s", label, unknown);
+                }
             } else {
-                elem.template allow_cast<double>();
-                ImGui::Text("%s: %f", label, elem.template cast<double>());
+                if(elem.template allow_cast<double>()) {
+                    ImGui::Text("%s: %f", label, elem.template cast<double>());
+                } else {
+                    ImGui::Text("%s: %s", label, unknown);
+                }
             }
         } else if(type.is_pointer_like()) {
             if(auto deref = *obj; deref) {
