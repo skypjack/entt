@@ -30,7 +30,7 @@ namespace internal {
 template<typename Entity>
 static void present_element(meta_any obj, auto on_entity) {
     for([[maybe_unused]] const auto [id, data]: obj.type().data()) {
-        const auto elem = data.get(obj);
+        auto elem = data.get(obj);
         const stl::string name = data.name().empty() ? stl::string{data.type().info().name()} : stl::string{data.name()};
         const char *const label = name.c_str();
 
@@ -57,7 +57,8 @@ static void present_element(meta_any obj, auto on_entity) {
             if(as_string) {
                 ImGui::Text("%s: %s", label, as_string);
             } else {
-                ImGui::Text("%s: %zu", label, elem.template allow_cast<stl::uint64_t>().template cast<stl::uint64_t>());
+                elem.template allow_cast<stl::uint64_t>();
+                ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
             }
         } else if(type.is_arithmetic()) {
             if(type.info() == type_id<bool>()) {
@@ -66,9 +67,11 @@ static void present_element(meta_any obj, auto on_entity) {
             } else if(type.info() == type_id<char>()) {
                 ImGui::Text("%s: %c", label, elem.template cast<char>());
             } else if(type.is_integral()) {
-                ImGui::Text("%s: %zu", label, elem.template allow_cast<stl::uint64_t>().template cast<stl::uint64_t>());
+                elem.template allow_cast<stl::uint64_t>();
+                ImGui::Text("%s: %zu", label, elem.template cast<stl::uint64_t>());
             } else {
-                ImGui::Text("%s: %f", label, elem.template allow_cast<double>().template cast<double>());
+                elem.template allow_cast<double>();
+                ImGui::Text("%s: %f", label, elem.template cast<double>());
             }
         } else if(type.is_pointer_like()) {
             if(auto deref = *obj; deref) {
@@ -87,7 +90,7 @@ static void present_element(meta_any obj, auto on_entity) {
                     ImGui::PushID(static_cast<int>(pos));
 
                     if(ImGui::TreeNode(label, "%zu", pos)) {
-                        present_element<Entity>(view[pos].as_ref(), on_entity);
+                        present_element<Entity>(view[pos], on_entity);
                         ImGui::TreePop();
                     }
 
