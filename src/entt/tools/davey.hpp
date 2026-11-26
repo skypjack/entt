@@ -197,9 +197,9 @@ static void present_entity(const meta_ctx &ctx, const auto entt, auto from, auto
     }
 }
 
-template<typename... Get, typename... Exclude, stl::size_t... Index>
-static void present_view(const meta_ctx &ctx, basic_view<get_t<Get...>, exclude_t<Exclude...>> view, stl::index_sequence<Index...>) {
-    using view_type = basic_view<get_t<Get...>, exclude_t<Exclude...>>;
+template<stl::size_t... Index>
+static void present_view(const meta_ctx &ctx, auto view, stl::index_sequence<Index...>) {
+    using view_type = decltype(view);
 
     const auto present_storage_element = [&ctx](auto *storage, const auto entt) {
         if(auto type = resolve(ctx, storage->info()); type) {
