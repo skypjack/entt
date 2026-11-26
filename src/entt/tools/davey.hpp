@@ -178,7 +178,7 @@ static void present_entity(const meta_ctx &ctx, const auto entt, auto from, auto
                 const char *const label = name.c_str();
 
                 if(ImGui::TreeNode(&storage.info(), "%s", label)) {
-                    if(const auto obj = type.from_void(storage.value(entt)); obj) {
+                    if(auto obj = type.from_void(storage.value(entt)); obj) {
                         present_element<entity_type>(obj.as_ref(), [&ctx, from, to](const char *name, const entity_type other) {
                             if(ImGui::TreeNode(name, "%s: %d [%d/%d]", name, to_integral(other), to_entity(other), to_version(other))) {
                                 present_entity<entity_type>(ctx, other, from, to);
